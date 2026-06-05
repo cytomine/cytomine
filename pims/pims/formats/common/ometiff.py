@@ -16,7 +16,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING, Type, Union
+from typing import TYPE_CHECKING
 from xml.etree import ElementTree as etree
 
 import numpy as np
@@ -33,12 +33,18 @@ from pims.formats.utils.abstract import CachedDataPath
 from pims.formats.utils.convertor import AbstractConvertor
 from pims.formats.utils.engines.omexml import omexml_type
 from pims.formats.utils.engines.tifffile import (
-    TifffileChecker, TifffileParser, cached_tifffile,
-    remove_tiff_comments
+    TifffileChecker,
+    TifffileParser,
+    cached_tifffile,
+    remove_tiff_comments,
 )
 from pims.formats.utils.engines.vips import VipsReader
 from pims.formats.utils.histogram import DefaultHistogramReader
-from pims.formats.utils.structures.metadata import ImageChannel, ImageMetadata, MetadataStore
+from pims.formats.utils.structures.metadata import (
+    ImageChannel,
+    ImageMetadata,
+    MetadataStore,
+)
 from pims.formats.utils.structures.planes import PlanesInfo
 from pims.formats.utils.structures.pyramid import Pyramid
 from pims.utils import UNIT_REGISTRY
@@ -54,14 +60,14 @@ if TYPE_CHECKING:
 
 
 def clean_ome_dict(d: dict) -> dict:
-    ignored = ('Settings', 'Ref', 'TiffData', 'BinData')
+    ignored = ("Settings", "Ref", "TiffData", "BinData")
 
     def parse_ref(key, ref):
-        if key == 'Channel':
-            ids = [ref.split(':')[-1]]
+        if key == "Channel":
+            ids = [ref.split(":")[-1]]
         else:
-            ids = ref.split(':')[1:]
-        return ''.join([f"[{i}]" for i in ids])
+            ids = ref.split(":")[1:]
+        return "".join([f"[{i}]" for i in ids])
 
     cleaned = dict()
     for k, v in d.items():
@@ -70,25 +76,25 @@ def clean_ome_dict(d: dict) -> dict:
 
         v = deepcopy(v)
         if type(v) is dict:
-            if 'ID' in v.keys():
-                if k != 'Pixels':
-                    id = parse_ref(k, v['ID'])
-                    del v['ID']
+            if "ID" in v.keys():
+                if k != "Pixels":
+                    id = parse_ref(k, v["ID"])
+                    del v["ID"]
                     v = {id: v}
                     d[k] = v
                 else:
-                    del v['ID']
+                    del v["ID"]
             cleaned[k] = clean_ome_dict(v)
         elif type(v) is list:
             new_v = dict()
             for idx, item in enumerate(v):
                 keys = item.keys()
-                if 'ID' in keys and all(i not in keys for i in ignored):
-                    id = parse_ref(k, item['ID'])
-                    del item['ID']
+                if "ID" in keys and all(i not in keys for i in ignored):
+                    id = parse_ref(k, item["ID"])
+                    del item["ID"]
                     new_v[id] = item
                 else:
-                    new_v[f'[{idx}]'] = item
+                    new_v[f"[{idx}]"] = item
             if len(new_v) == 0:
                 new_v = v
             cleaned[k] = clean_ome_dict(new_v)  # pyrefly: ignore
@@ -99,17 +105,17 @@ def clean_ome_dict(d: dict) -> dict:
 
 
 omexml_dimension = {
-    'X': 'width',
-    'Y': 'height',
-    'C': 'n_concrete_channels',
-    'Z': 'depth',
-    'T': 'duration',
-    'S': 'n_samples'
+    "X": "width",
+    "Y": "height",
+    "C": "n_concrete_channels",
+    "Z": "depth",
+    "T": "duration",
+    "S": "n_samples",
 }
 
 
 def cached_main_tifffile_series(
-    format: Union[AbstractFormat, CachedDataPath]
+    format: AbstractFormat | CachedDataPath,
 ) -> TiffPageSeries:
     tf = cached_tifffile(format)
 
@@ -117,7 +123,7 @@ def cached_main_tifffile_series(
         idx = np.argmax([np.prod(s.shape) for s in tf.series])
         return tf.series[idx]
 
-    return format.get_cached('_tf_baseseries', get_baseseries, tf)
+    return format.get_cached("_tf_baseseries", get_baseseries, tf)
 
 
 class OmeTiffChecker(TifffileChecker):
@@ -128,11 +134,14 @@ class OmeTiffChecker(TifffileChecker):
                 tf = cls.get_tifffile(pathlike)
                 if not tf.is_ome:
                     return False
-                
+
                 if len(tf.series) >= 1:
                     baseline = cached_main_tifffile_series(pathlike)
-                    if baseline and not baseline.is_pyramidal\
-                            and len(baseline.levels) == 1:
+                    if (
+                        baseline
+                        and not baseline.is_pyramidal
+                        and len(baseline.levels) == 1
+                    ):
                         return True
             return False
         except RuntimeError:
@@ -152,7 +161,7 @@ class OmeTiffParser(TifffileParser):
             parsed = etree.fromstring(omexml)
         except etree.ParseError:
             try:
-                omexml = omexml.decode(errors='ignore').encode()
+                omexml = omexml.decode(errors="ignore").encode()
                 parsed = etree.fromstring(omexml)
             except Exception:  # noqa
                 return None
@@ -165,17 +174,17 @@ class OmeTiffParser(TifffileParser):
         main = None
         idx = 0
         for element in omexml:
-            if element.tag.endswith('BinaryOnly'):
+            if element.tag.endswith("BinaryOnly"):
                 break
-            if not element.tag.endswith('Image'):
+            if not element.tag.endswith("Image"):
                 continue
 
             for im_element in element:
-                if not im_element.tag.endswith('Pixels'):
+                if not im_element.tag.endswith("Pixels"):
                     continue
                 attr = im_element.attrib
-                w = int(attr.get('SizeX'))
-                h = int(attr.get('SizeY'))
+                w = int(attr.get("SizeX"))
+                h = int(attr.get("SizeY"))
                 size = w * h
                 if size > max_size:
                     max_size = size
@@ -198,82 +207,81 @@ class OmeTiffParser(TifffileParser):
 
         omexml = self.main_root
         if omexml is None:
-            raise ValueError('Impossible to find main OME-TIF image.')
+            raise ValueError("Impossible to find main OME-TIF image.")
 
         for element in omexml:
-            if not element.tag.endswith('Pixels'):
+            if not element.tag.endswith("Pixels"):
                 continue
             attr = element.attrib
 
-            imd.pixel_type = np.dtype(omexml_type[attr.get('Type').lower()])
+            imd.pixel_type = np.dtype(omexml_type[attr.get("Type").lower()])
             imd.significant_bits = dtype_to_bits(imd.pixel_type)
 
-            axes = ''.join(reversed(attr['DimensionOrder']))
-            shape = [int(attr['Size' + ax]) for ax in axes]
+            axes = "".join(reversed(attr["DimensionOrder"]))
+            shape = [int(attr["Size" + ax]) for ax in axes]
             spp = 1  # samples per pixel
             cc_idx = 0  # concrete channel idx
 
             for data in element:
-                if not data.tag.endswith('Channel'):
+                if not data.tag.endswith("Channel"):
                     continue
 
                 attr = data.attrib
                 if cc_idx == 0:
-                    spp = int(attr.get('SamplesPerPixel', spp))
+                    spp = int(attr.get("SamplesPerPixel", spp))
                     if spp > 1:
                         # correct channel dimension for spp
                         shape = [
-                            shape[i] // spp if ax == 'C' else shape[i]
+                            shape[i] // spp if ax == "C" else shape[i]
                             for i, ax in enumerate(axes)
                         ]
-                elif int(attr.get('SamplesPerPixel', 1)) != spp:
-                    raise ValueError(
-                        'OME-TIF: differing SamplesPerPixel not supported'
-                    )
+                elif int(attr.get("SamplesPerPixel", 1)) != spp:
+                    raise ValueError("OME-TIF: differing SamplesPerPixel not supported")
 
-                if cc_idx >= shape[axes.index('C')]:
+                if cc_idx >= shape[axes.index("C")]:
                     # Happens when <Channel> is repeated for spp > 1, while
                     #  information is already extracted.
                     break
 
                 if spp == 3:
                     # If RGB channel, Color attribute is ignored (Icy behavior)
-                    colors = [
-                        infer_channel_color(None, i, 3) for i in range(spp)
-                    ]
+                    colors = [infer_channel_color(None, i, 3) for i in range(spp)]
                 else:
-                    colors = [infer_channel_color(
-                        parse_int(attr.get('Color')),
-                        cc_idx,
-                        shape[axes.index('C')]
-                    )] * spp
+                    colors = [
+                        infer_channel_color(
+                            parse_int(attr.get("Color")), cc_idx, shape[axes.index("C")]
+                        )
+                    ] * spp
 
-                names = [attr.get('Name')] * spp
+                names = [attr.get("Name")] * spp
                 if names[0] is None:
                     if spp == 1:
-                        if 2 <= shape[axes.index('C')] <= 3:
-                            names = ['RGB'[cc_idx]]
+                        if 2 <= shape[axes.index("C")] <= 3:
+                            names = ["RGB"[cc_idx]]
                     elif spp == 3:
-                        names = ['R', 'G', 'B']
+                        names = ["R", "G", "B"]
 
-                emission = parse_float(attr.get('EmissionWavelength'))
-                excitation = parse_float(attr.get('ExcitationWavelength'))
+                emission = parse_float(attr.get("EmissionWavelength"))
+                excitation = parse_float(attr.get("ExcitationWavelength"))
 
                 for s in range(spp):
-                    imd.set_channel(ImageChannel(
-                        index=cc_idx * spp + s,
-                        suggested_name=names[s], color=colors[s],
-                        emission_wavelength=emission,
-                        excitation_wavelength=excitation
-                    ))
+                    imd.set_channel(
+                        ImageChannel(
+                            index=cc_idx * spp + s,
+                            suggested_name=names[s],
+                            color=colors[s],
+                            emission_wavelength=emission,
+                            excitation_wavelength=excitation,
+                        )
+                    )
 
                 cc_idx += 1
 
-            imd.width = shape[axes.index('X')]
-            imd.height = shape[axes.index('Y')]
-            imd.depth = shape[axes.index('Z')] if 'Z' in axes else 1
-            imd.duration = shape[axes.index('T')] if 'T' in axes else 1
-            imd.n_concrete_channels = shape[axes.index('C')] if 'C' in axes else 1
+            imd.width = shape[axes.index("X")]
+            imd.height = shape[axes.index("Y")]
+            imd.depth = shape[axes.index("Z")] if "Z" in axes else 1
+            imd.duration = shape[axes.index("T")] if "T" in axes else 1
+            imd.n_concrete_channels = shape[axes.index("C")] if "C" in axes else 1
             imd.n_samples = spp
 
         return imd
@@ -283,106 +291,102 @@ class OmeTiffParser(TifffileParser):
 
         omexml = self.main_root
         if omexml is None:
-            raise ValueError('Impossible to find main OME-TIF image.')
+            raise ValueError("Impossible to find main OME-TIF image.")
 
         attr = omexml.attrib
-        imd.description = attr.get('Name')
+        imd.description = attr.get("Name")
 
         instrument_ref = None
         for element in omexml:
-            if element.tag.endswith('AcquisitionDate'):
-                imd.acquisition_datetime = self.parse_ome_acquisition_date(
-                    element.text
-                )
+            if element.tag.endswith("AcquisitionDate"):
+                imd.acquisition_datetime = self.parse_ome_acquisition_date(element.text)
                 continue
 
-            if element.tag.endswith('Description'):
+            if element.tag.endswith("Description"):
                 imd.description = element.text
                 continue
 
-            if element.tag.endswith('InstrumentRef'):
+            if element.tag.endswith("InstrumentRef"):
                 attr = element.attrib
-                instrument_ref = attr.get('ID')
+                instrument_ref = attr.get("ID")
                 continue
-            
-            if not element.tag.endswith('Pixels'):
+
+            if not element.tag.endswith("Pixels"):
                 continue
             attr = element.attrib
 
             imd.physical_size_x = self.parse_ome_physical_size(
-                parse_float(attr.get('PhysicalSizeX')), 
-                attr.get('PhysicalSizeXUnit')
+                parse_float(attr.get("PhysicalSizeX")), attr.get("PhysicalSizeXUnit")
             )
             imd.physical_size_y = self.parse_ome_physical_size(
-                parse_float(attr.get('PhysicalSizeY')),
-                attr.get('PhysicalSizeYUnit')
+                parse_float(attr.get("PhysicalSizeY")), attr.get("PhysicalSizeYUnit")
             )
             imd.physical_size_z = self.parse_ome_physical_size(
-                parse_float(attr.get('PhysicalSizeZ')),
-                attr.get('PhysicalSizeZUnit')
+                parse_float(attr.get("PhysicalSizeZ")), attr.get("PhysicalSizeZUnit")
             )
             imd.frame_rate = self.parse_frame_rate(
-                parse_float(attr.get('TimeIncrement')),
-                attr.get('TimeIncrementUnit')
+                parse_float(attr.get("TimeIncrement")), attr.get("TimeIncrementUnit")
             )
 
         if instrument_ref is not None:
             root = self.omexml
             for element in root:
-                if element.tag.endswith('BinaryOnly'):
+                if element.tag.endswith("BinaryOnly"):
                     break
-                if not element.tag.endswith('Instrument'):
+                if not element.tag.endswith("Instrument"):
                     continue
 
                 attr = element.attrib
-                id = attr.get('ID')
+                id = attr.get("ID")
                 if instrument_ref != id:
                     continue
 
                 for data in element:
-                    if data.tag.endswith('Microscope'):
+                    if data.tag.endswith("Microscope"):
                         attr = data.attrib
-                        imd.microscope.model = attr.get('Model')
+                        imd.microscope.model = attr.get("Model")
                         continue
 
-                    if data.tag.endswith('Objective'):
+                    if data.tag.endswith("Objective"):
                         attr = data.attrib
-                        imd.objective.nominal_magnification = \
-                            parse_float(attr.get('NominalMagnification'))
-                        imd.objective.calibrated_magnification = \
-                            parse_float(attr.get('CalibratedMagnification'))
+                        imd.objective.nominal_magnification = parse_float(
+                            attr.get("NominalMagnification")
+                        )
+                        imd.objective.calibrated_magnification = parse_float(
+                            attr.get("CalibratedMagnification")
+                        )
                         continue
 
         # Associated
         root = self.omexml
         idx = 0
         for element in root:
-            if element.tag.endswith('BinaryOnly'):
+            if element.tag.endswith("BinaryOnly"):
                 break
-            if not element.tag.endswith('Image'):
+            if not element.tag.endswith("Image"):
                 continue
 
             attr = element.attrib
             if idx != self.main_idx:
-                name = attr.get('Name')
+                name = attr.get("Name")
                 if name is None:
                     continue
-                if name.lower() in ['thumbnail', 'thumb']:
+                if name.lower() in ["thumbnail", "thumb"]:
                     associated = imd.associated_thumb
-                elif name.lower() == 'label':
+                elif name.lower() == "label":
                     associated = imd.associated_label
-                elif name.lower() == 'macro':
+                elif name.lower() == "macro":
                     associated = imd.associated_macro
                 else:
                     continue
 
                 for im_element in element:
-                    if not im_element.tag.endswith('Pixels'):
+                    if not im_element.tag.endswith("Pixels"):
                         continue
                     attr = im_element.attrib
-                    associated.width = attr.get('SizeX')
-                    associated.height = attr.get('SizeY')
-                    associated.n_channels = attr.get('SizeC', 1)
+                    associated.width = attr.get("SizeX")
+                    associated.height = attr.get("SizeY")
+                    associated.n_channels = attr.get("SizeC", 1)
                     break
             idx += 1
 
@@ -391,27 +395,30 @@ class OmeTiffParser(TifffileParser):
 
     @staticmethod
     def parse_frame_rate(
-        time_increment: Optional[float], unit: Optional[str]
-    ) -> Optional[Quantity]:
+        time_increment: float | None, unit: str | None
+    ) -> Quantity | None:
         if unit is None:
-            unit = 's'
+            unit = "s"
         if time_increment is None or time_increment <= 0:
             return None
         return 1 / (time_increment * UNIT_REGISTRY(unit))
 
     @staticmethod
     def parse_ome_physical_size(
-        physical_size: Optional[float], unit: Optional[str]
-    ) -> Optional[Quantity]:
+        physical_size: float | None, unit: str | None
+    ) -> Quantity | None:
         if unit is None:
-            unit = 'µm'
-        if physical_size is None or physical_size <= 0 \
-                or unit in ['pixel', 'reference frame']:
+            unit = "µm"
+        if (
+            physical_size is None
+            or physical_size <= 0
+            or unit in ["pixel", "reference frame"]
+        ):
             return None
         return physical_size * UNIT_REGISTRY(unit)
 
     @staticmethod
-    def parse_ome_acquisition_date(date: Optional[str]) -> Optional[datetime]:
+    def parse_ome_acquisition_date(date: str | None) -> datetime | None:
         if date is None:
             return None
         try:
@@ -440,33 +447,36 @@ class OmeTiffParser(TifffileParser):
     def parse_planes(self) -> PlanesInfo:
         imd = self.format.main_imd
         pi = PlanesInfo(
-            imd.n_concrete_channels, imd.depth, imd.duration,
-            ['page_index'], [np.int64]
+            imd.n_concrete_channels,
+            imd.depth,
+            imd.duration,
+            ["page_index"],
+            [np.int64],
         )
 
         omexml = self.main_root
         if omexml is None:
-            raise ValueError('Impossible to find main OME-TIF image.')
+            raise ValueError("Impossible to find main OME-TIF image.")
 
         for element in omexml:
-            if not element.tag.endswith('Pixels'):
+            if not element.tag.endswith("Pixels"):
                 continue
             attr = element.attrib
-            axes = ''.join(reversed(attr['DimensionOrder']))
-            positions = [axes.index(ax) for ax in 'CZT']
+            axes = "".join(reversed(attr["DimensionOrder"]))
+            positions = [axes.index(ax) for ax in "CZT"]
             shape = [getattr(imd, omexml_dimension[ax]) for ax in axes]
             n_pages = product(shape[:-2])
             ifds = []
 
             for data in element:
-                if not data.tag.endswith('TiffData'):
+                if not data.tag.endswith("TiffData"):
                     continue
 
                 attr = data.attrib
-                ifd = int(attr.get('IFD', 0))
-                num = int(attr.get('NumPlanes', 1 if 'IFD' in attr else 0))
-                num = int(attr.get('PlaneCount', num))
-                idx = [int(attr.get('First' + ax, 0)) for ax in axes[:-2]]
+                ifd = int(attr.get("IFD", 0))
+                num = int(attr.get("NumPlanes", 1 if "IFD" in attr else 0))
+                num = int(attr.get("PlaneCount", num))
+                idx = [int(attr.get("First" + ax, 0)) for ax in axes[:-2]]
                 try:
                     idx = int(np.ravel_multi_index(idx, shape[:-2]))
                 except ValueError:
@@ -499,9 +509,7 @@ class OmeTiffReader(VipsReader):
         pages = OrderedDict()
 
         cc_idxs, s_idxs = self._concrete_channel_indexes(channels)
-        page_idxs = self.format.planes_info.get(
-            cc_idxs, z, t, 'page_index'
-        )
+        page_idxs = self.format.planes_info.get(cc_idxs, z, t, "page_index")
 
         for page, s in zip(page_idxs, s_idxs):
             if page in pages:
@@ -529,7 +537,15 @@ class OmeTiffReader(VipsReader):
             im = fix_rgb_interpretation(im)
         return im
 
-    def read_thumb(self, out_width, out_height, precomputed=None, c=None, z=None, t=None):
+    def read_thumb(
+        self,
+        out_width,
+        out_height,
+        precomputed=None,
+        c=None,
+        z=None,
+        t=None,
+    ):
         # TODO: precomputed ?
         # Thumbnail already uses shrink-on-load feature in default VipsReader
         # (i.e it loads the right pyramid level according the requested dimensions)
@@ -540,12 +556,12 @@ class OmeTiffReader(VipsReader):
             region, (out_width, out_height)
         )
         region = region.scale_to_tier(tier)
-        subifd = tier.data.get('subifd')
+        subifd = tier.data.get("subifd")
 
         def read_func(path, region, page=None, subifd=None):  # noqa
             opts = dict(page=page)
             if subifd is not None:
-                opts['subifd'] = subifd
+                opts["subifd"] = subifd
             tiff_page = VIPSImage.tiffload(str(path), **opts)
             im = tiff_page.extract_area(
                 region.left, region.top, region.width, region.height
@@ -565,16 +581,21 @@ class OmeTiffConvertor(AbstractConvertor):
 
         opts = dict()
         if n_pages > 1:
-            opts['page_height'] = vips_source.get('page-height')
+            opts["page_height"] = vips_source.get("page-height")
 
         result = vips_source.tiffsave(
-            str(dest_path), pyramid=True, tile=True,
-            tile_width=256, tile_height=256, bigtiff=True,
-            properties=False, subifd=True,
+            str(dest_path),
+            pyramid=True,
+            tile=True,
+            tile_width=256,
+            tile_height=256,
+            bigtiff=True,
+            properties=False,
+            subifd=True,
             depth=pyvips.enums.ForeignDzDepth.ONETILE,
             compression=pyvips.enums.ForeignTiffCompression.LZW,
             region_shrink=pyvips.enums.RegionShrink.MEAN,
-            **opts
+            **opts,
         )
         ok = not bool(result)
 
@@ -587,7 +608,7 @@ class OmeTiffConvertor(AbstractConvertor):
                 pass
         return ok
 
-    def conversion_format(self) -> Type[AbstractFormat]:
+    def conversion_format(self) -> type[AbstractFormat]:
         return PyrOmeTiffFormat
 
 
@@ -604,6 +625,7 @@ class OmeTiffFormat(AbstractFormat):
     References:
 
     """
+
     checker_class = OmeTiffChecker
     parser_class = OmeTiffParser
     reader_class = OmeTiffReader
@@ -633,6 +655,7 @@ class OmeTiffFormat(AbstractFormat):
 
 # -----------------------------------------------------------------------------
 # PYRAMIDAL OME TIF
+
 
 class PyrOmeTiffChecker(TifffileChecker):
     @classmethod
@@ -679,9 +702,10 @@ class PyrOmeTiffParser(OmeTiffParser):
 
             subifd = i - 1 if i > 0 else None
             pyramid.insert_tier(
-                page.imagewidth, page.imagelength,
+                page.imagewidth,
+                page.imagelength,
                 (tilewidth, tilelength),
-                subifd=subifd
+                subifd=subifd,
             )
 
         return pyramid

@@ -12,7 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 import logging
-from typing import List, Optional, Union
 
 from pyvips import Image as VIPSImage
 
@@ -72,7 +71,7 @@ class JPEG2000Reader(VipsReader):
 
     def read_window(
         self, region, out_width, out_height,
-        c: Optional[Union[int, List[int]]] = None, **other
+        c: int | list[int] | None = None, **other
     ):
         tier = self.format.pyramid.most_appropriate_tier(
             region, (out_width, out_height)
@@ -87,7 +86,7 @@ class JPEG2000Reader(VipsReader):
         return self._extract_channels(im, c)
 
     def read_tile(
-        self, tile, c: Optional[Union[int, List[int]]] = None, **other
+        self, tile, c: int | list[int] | None = None, **other
     ):
         tier = tile.tier
         page = tier.data.get('page_index')

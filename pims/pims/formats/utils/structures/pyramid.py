@@ -14,7 +14,6 @@
 from __future__ import annotations
 
 from math import ceil
-from typing import List, Optional, Tuple, Union
 
 from pims.api.utils.models import TierIndexType
 from pims.processing.region import Region, Tile
@@ -27,9 +26,9 @@ class PyramidTier:
     """
 
     def __init__(
-        self, width: int, height: int, tile_size: Union[Tuple[int, int], int],
+        self, width: int, height: int, tile_size: tuple[int, int] | int,
         pyramid: Pyramid,
-        data: Optional[dict] = None
+        data: dict | None = None
     ):
         self.width = width
         self.height = height
@@ -43,7 +42,7 @@ class PyramidTier:
         return self.width * self.height
 
     @property
-    def factor(self) -> Tuple[float, float]:
+    def factor(self) -> tuple[float, float]:
         if self.pyramid.base is None:
             return 1.0, 1.0
         else:
@@ -97,7 +96,7 @@ class PyramidTier:
         """
         return self.max_tx * self.max_ty
 
-    def ti2txty(self, ti: int) -> Tuple[int, int]:
+    def ti2txty(self, ti: int) -> tuple[int, int]:
         """
         Convert a tile index to a couple (tx, ty)
         """
@@ -150,7 +149,7 @@ class Pyramid:
         return self.n_zooms - 1
 
     @property
-    def tiers(self) -> List[PyramidTier]:
+    def tiers(self) -> list[PyramidTier]:
         return self._tiers
 
     @property
@@ -167,7 +166,7 @@ class Pyramid:
         return self.max_level - level if self.max_level > 0 else 0
 
     def insert_tier(
-        self, width: int, height: int, tile_size: Union[Tuple[int, int], int],
+        self, width: int, height: int, tile_size: tuple[int, int] | int,
         **tier_data
     ):
         """
@@ -218,7 +217,7 @@ class Pyramid:
         return self.tiers[self.n_levels - 1]
 
     def most_appropriate_tier(
-        self, region: Region, out_size: Tuple[int, int]
+        self, region: Region, out_size: tuple[int, int]
     ) -> PyramidTier:
         """
         Get the best pyramid tier to get `region` at `out_size`.

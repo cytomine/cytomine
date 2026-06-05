@@ -13,7 +13,7 @@
 #  * limitations under the License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pyvips
@@ -211,7 +211,7 @@ class ImageJTiffConvertor(AbstractConvertor):
                 pass
         return ok
 
-    def conversion_format(self) -> Type[AbstractFormat]:
+    def conversion_format(self) -> type[AbstractFormat]:
         return PyrOmeTiffFormat
 
 

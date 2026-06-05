@@ -17,7 +17,7 @@ import logging
 import re
 from abc import ABC
 from copy import deepcopy
-from typing import Any, ClassVar, Dict, List, Optional, TYPE_CHECKING, Type
+from typing import Any, ClassVar, TYPE_CHECKING
 
 from pims.cache import SimpleDataCache, cached_property
 from pims.formats.utils.checker import AbstractChecker
@@ -57,14 +57,14 @@ class AbstractFormat(ABC, SimpleDataCache):
     """
     Base format. All image formats must extend this class.
     """
-    checker_class: ClassVar[Type[AbstractChecker]]
-    parser_class: ClassVar[Type[AbstractParser]]
-    reader_class: ClassVar[Type[AbstractReader]]
-    convertor_class: ClassVar[Type[AbstractConvertor] | None] = None
+    checker_class: ClassVar[type[AbstractChecker]]
+    parser_class: ClassVar[type[AbstractParser]]
+    reader_class: ClassVar[type[AbstractReader]]
+    convertor_class: ClassVar[type[AbstractConvertor] | None] = None
 
-    histogram_reader_class: ClassVar[Type[AbstractHistogramReader]]
+    histogram_reader_class: ClassVar[type[AbstractHistogramReader]]
 
-    def __init__(self, path: Path, existing_cache: Dict[str, Any] | None = None):
+    def __init__(self, path: Path, existing_cache: dict[str, Any] | None = None):
         """
         Initialize an image in this format. It does nothing until some
         parsing or reading methods are called.
@@ -223,7 +223,7 @@ class AbstractFormat(ABC, SimpleDataCache):
         """
         return True
 
-    def conversion_format(self) -> Optional[Type[AbstractFormat]]:
+    def conversion_format(self) -> type[AbstractFormat] | None:
         """
         Get the format to which the image in this format will be converted,
         if needed.
@@ -302,7 +302,7 @@ class AbstractFormat(ABC, SimpleDataCache):
         return self.parser.parse_planes()
 
     @cached_property
-    def annotations(self) -> List[ParsedMetadataAnnotation]:
+    def annotations(self) -> list[ParsedMetadataAnnotation]:
         """
         Get annotations stored in image format metadata.
         """

@@ -13,7 +13,7 @@
 #  * limitations under the License.
 import logging
 from operator import itemgetter
-from typing import Any, List, Optional, Union
+from typing import Any
 
 import numpy as np
 import pyvips.enums
@@ -101,7 +101,7 @@ class VipsReader(AbstractReader):
         return filename
 
     @staticmethod
-    def _extract_channels(im: VIPSImage, c: Optional[Union[int, List[int]]]) -> VIPSImage:
+    def _extract_channels(im: VIPSImage, c: int | list[int] | None) -> VIPSImage:
         if c is None or isinstance(c, list) and im.bands == len(c):
             return im
         elif isinstance(c, int):
@@ -139,7 +139,7 @@ class VipsReader(AbstractReader):
 
     def read_thumb(
         self, out_width: int, out_height: int, precomputed: bool = False,
-        c: Optional[Union[int, List[int]]] = None, **other
+        c: int | list[int] | None = None, **other
     ) -> VIPSImage:
         im = self.vips_thumbnail(out_width, out_height)
         if im.hasalpha():
@@ -148,7 +148,7 @@ class VipsReader(AbstractReader):
 
     def read_window(
         self, region: Region, out_width: int, out_height: int,
-        c: Optional[Union[int, List[int]]] = None, **other
+        c: int | list[int] | None = None, **other
     ) -> VIPSImage:
         image = cached_vips_file(self.format)
         region = region.scale_to_tier(self.format.pyramid.base)
@@ -158,7 +158,7 @@ class VipsReader(AbstractReader):
         return self._extract_channels(im, c)
 
     def read_tile(
-        self, tile: Tile, c: Optional[Union[int, List[int]]] = None, **other
+        self, tile: Tile, c: int | list[int] | None = None, **other
     ) -> VIPSImage:
         return self.read_window(
             tile, int(tile.width), int(tile.height), c, **other
@@ -201,7 +201,7 @@ class VipsReader(AbstractReader):
 #         image = self.vips_hist_image()
 #         return np.sum(vips_to_numpy(image.hist_find()), axis=2).squeeze()
 #
-#     def channels_bounds(self) -> List[Tuple[int, int]]:
+#     def channels_bounds(self) -> list[Tuple[int, int]]:
 #         image = self.vips_hist_image()
 #         vips_stats = image.stats()
 #         np_stats = vips_to_numpy(vips_stats).astype(np.int)

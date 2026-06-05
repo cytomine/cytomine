@@ -13,7 +13,6 @@
 #  * limitations under the License.
 import logging
 from functools import cached_property
-from typing import List, Optional, Union
 import pathlib
 import numpy as np
 import orjson
@@ -24,13 +23,15 @@ from pims.config import get_settings
 from pims.formats import AbstractFormat
 from pims.formats.utils.abstract import CachedDataPath
 from pims.formats.utils.checker import SignatureChecker
-from pims.formats.utils.engines.vips import (
-    VipsSpatialConvertor
-)
+from pims.formats.utils.engines.vips import VipsSpatialConvertor
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.parser import AbstractParser
 from pims.formats.utils.reader import AbstractReader
-from pims.formats.utils.structures.metadata import ImageChannel, ImageMetadata, MetadataStore
+from pims.formats.utils.structures.metadata import (
+    ImageChannel,
+    ImageMetadata,
+    MetadataStore,
+)
 from pims.formats.utils.structures.planes import PlanesInfo
 from pims.formats.utils.structures.pyramid import Pyramid
 from pims.processing.adapters import RawImagePixels, convert_to
@@ -54,10 +55,8 @@ def _json_load(path):
             return orjson.loads(f.read())
 
 
-def cached_json(format: Union[AbstractFormat, CachedDataPath]) -> dict:
-    return format.get_cached(
-        '_json', _json_load, str(format.path.resolve())
-    )
+def cached_json(format: AbstractFormat | CachedDataPath) -> dict:
+    return format.get_cached("_json", _json_load, str(format.path.resolve()))
 
 
 class VirtualStackChecker(SignatureChecker):
@@ -84,20 +83,17 @@ class VirtualStackParser(AbstractParser):
         imd.duration = metadata.get("duration")
         imd.n_concrete_channels = metadata.get(
             "n_concrete_channels",
-            metadata.get("n_intrinsic_channels", metadata.get("n_channels"))
+            metadata.get("n_intrinsic_channels", metadata.get("n_channels")),
         )
         imd.n_samples = metadata.get(
-            "n_samples",
-            metadata.get("n_channels_per_read", 1)
+            "n_samples", metadata.get("n_channels_per_read", 1)
         )
 
         imd.pixel_type = np.dtype(metadata.get("pixel_type"))
         imd.significant_bits = dtype_to_bits(imd.pixel_type)
 
         for i, channel in enumerate(image.get("channels", [])):
-            imd.set_channel(
-                ImageChannel(index=i, color=channel.get("color"))
-            )
+            imd.set_channel(ImageChannel(index=i, color=channel.get("color")))
 
         return imd
 
@@ -110,9 +106,7 @@ class VirtualStackParser(AbstractParser):
             raise MetadataParsingProblem(self.format.path)
 
         imd.description = metadata.get("description")
-        imd.acquisition_datetime = parse_datetime(
-            metadata.get("acquired_at")
-        )
+        imd.acquisition_datetime = parse_datetime(metadata.get("acquired_at"))
 
         imd.physical_size_x = metadata.get("physical_size_x")
         imd.physical_size_y = metadata.get("physical_size_y")
@@ -137,8 +131,7 @@ class VirtualStackParser(AbstractParser):
     def parse_planes(self) -> PlanesInfo:
         imd = self.format.main_imd
         pi = PlanesInfo(
-            imd.n_concrete_channels, imd.depth, imd.duration,
-            ['location'], ['U255']
+            imd.n_concrete_channels, imd.depth, imd.duration, ["location"], ["U255"]
         )
 
         image = cached_json(self.format)
@@ -160,14 +153,21 @@ class VirtualStackReader(AbstractReader):
     def _get_underlying_format(filepath):
         from pims.formats.utils.factories import SpatialReadableFormatFactory
         from pims.files.file import Path
+
         FILE_ROOT_PATH = get_settings().root
         return SpatialReadableFormatFactory(match_on_ext=True).match(
             Path(FILE_ROOT_PATH, filepath).get_spatial()
         )
 
-    def read_thumb(self, out_width: int, out_height: int, precomputed: bool = False,
-                   c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None,
-                   t: Optional[int] = None) -> RawImagePixels:
+    def read_thumb(
+        self,
+        out_width: int,
+        out_height: int,
+        precomputed: bool = False,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
+    ) -> RawImagePixels:
         bands = list()
         if c is None:
             channels = list(range(self.format.main_imd.n_channels))
@@ -180,7 +180,7 @@ class VirtualStackReader(AbstractReader):
                     self._get_underlying_format(
                         self.format.planes_info.get(c, z, t, "location")
                     ).reader.read_thumb(out_width, out_height, precomputed),
-                    VIPSImage
+                    VIPSImage,
                 )
             )
 
@@ -189,9 +189,15 @@ class VirtualStackReader(AbstractReader):
             im = fix_rgb_interpretation(im)
         return im
 
-    def read_window(self, region: Region, out_width: int, out_height: int,
-                    c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None,
-                    t: Optional[int] = None) -> RawImagePixels:
+    def read_window(
+        self,
+        region: Region,
+        out_width: int,
+        out_height: int,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
+    ) -> RawImagePixels:
         bands = list()
         if c is None:
             channels = list(range(self.format.main_imd.n_channels))
@@ -204,7 +210,7 @@ class VirtualStackReader(AbstractReader):
                     self._get_underlying_format(
                         self.format.planes_info.get(c, z, t, "location")
                     ).reader.read_window(region, out_width, out_height),
-                    VIPSImage
+                    VIPSImage,
                 )
             )
 
@@ -213,11 +219,14 @@ class VirtualStackReader(AbstractReader):
             im = fix_rgb_interpretation(im)
         return im
 
-    def read_tile(self, tile: Tile, c: Optional[Union[int, List[int]]] = None,
-                  z: Optional[int] = None, t: Optional[int] = None) -> RawImagePixels:
-        return self.read_window(
-            tile, int(tile.width), int(tile.height), c, z, t
-        )
+    def read_tile(
+        self,
+        tile: Tile,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
+    ) -> RawImagePixels:
+        return self.read_window(tile, int(tile.width), int(tile.height), c, z, t)
 
 
 class VirtualStackFormat(AbstractFormat):
@@ -276,6 +285,7 @@ class VirtualStackFormat(AbstractFormat):
         }
     ```
     """
+
     checker_class = VirtualStackChecker
     parser_class = VirtualStackParser
     reader_class = VirtualStackReader

@@ -14,7 +14,7 @@
 
 from datetime import date, datetime, time
 from enum import Enum
-from typing import AbstractSet, Any, List, Optional, Sequence, Tuple, ValuesView
+from typing import AbstractSet, Any, Sequence, ValuesView
 
 import numpy as np
 from pint import Quantity
@@ -122,12 +122,12 @@ class MetadataStore:
         self._namedstores = dict()
 
     @staticmethod
-    def _split_namespaced_key(namespaced_key: str) -> Tuple[str, str]:
+    def _split_namespaced_key(namespaced_key: str) -> tuple[str, str]:
         """Split namespace and the rest from a key"""
         split = namespaced_key.split('.', 1)
         return ("", namespaced_key) if len(split) < 2 else (split[0], split[1])
 
-    def set(self, namespaced_key: str, value: Any, namespace: Optional[str] = None) -> None:
+    def set(self, namespaced_key: str, value: Any, namespace: str | None = None) -> None:
         """
         Set a metadata in the store.
 
@@ -190,7 +190,7 @@ class MetadataStore:
     def flatten(self):
         return self._flatten(self._namedstores)
 
-    def items(self) -> AbstractSet[Tuple[str, Metadata]]:
+    def items(self) -> AbstractSet[tuple[str, Metadata]]:
         return self.flatten().items()
 
     def keys(self) -> AbstractSet[str]:
@@ -251,10 +251,10 @@ class _MetadataStorable:
 
 
 class ImageChannel(_MetadataStorable):
-    emission_wavelength: Optional[Quantity]
-    excitation_wavelength: Optional[Quantity]
+    emission_wavelength: Quantity | None
+    excitation_wavelength: Quantity | None
     index: int
-    suggested_name: Optional[str]
+    suggested_name: str | None
 
     __slots__ = (
         'emission_wavelength', 'excitation_wavelength', 'index',
@@ -262,9 +262,9 @@ class ImageChannel(_MetadataStorable):
     )
 
     def __init__(
-        self, index: int, emission_wavelength: Optional[float] = None,
-        excitation_wavelength: Optional[float] = None, suggested_name: Optional[str] = None,
-        color: Optional[Color] = None
+        self, index: int, emission_wavelength: float | None = None,
+        excitation_wavelength: float | None = None, suggested_name: str | None = None,
+        color: Color | None = None
     ):
         self.emission_wavelength = emission_wavelength
         self.excitation_wavelength = excitation_wavelength
@@ -272,7 +272,7 @@ class ImageChannel(_MetadataStorable):
         self.suggested_name = suggested_name
         self._color = color
 
-    def _infer_color(self) -> Optional[Color]:
+    def _infer_color(self) -> Color | None:
         """Try to infer channel color. If found, store color in `_color`."""
         c = infer_channel_color(self.suggested_name, self.index, channel_color_list=[])
         if c:
@@ -280,7 +280,7 @@ class ImageChannel(_MetadataStorable):
         return c
 
     @property
-    def color(self) -> Optional[Color]:
+    def color(self) -> Color | None:
         if self._color:
             return self._color
         return self._infer_color()
@@ -290,7 +290,7 @@ class ImageChannel(_MetadataStorable):
         self._color = value
 
     @property
-    def hex_color(self) -> Optional[str]:
+    def hex_color(self) -> str | None:
         c = self.color
         return c.as_hex() if c else None
 
@@ -299,8 +299,8 @@ class ImageChannel(_MetadataStorable):
 
 
 class ImageObjective(_MetadataStorable):
-    nominal_magnification: Optional[float]
-    calibrated_magnification: Optional[float]
+    nominal_magnification: float | None
+    calibrated_magnification: float | None
 
     __slots__ = ('nominal_magnification', 'calibrated_magnification')
 
@@ -313,7 +313,7 @@ class ImageObjective(_MetadataStorable):
 
 
 class ImageMicroscope(_MetadataStorable):
-    model: Optional[str]
+    model: str | None
 
     __slots__ = ('model',)
 
@@ -325,9 +325,9 @@ class ImageMicroscope(_MetadataStorable):
 
 
 class ImageAssociated(_MetadataStorable):
-    n_channels: Optional[int]
-    height: Optional[int]
-    width: Optional[int]
+    n_channels: int | None
+    height: int | None
+    width: int | None
 
     __slots__ = ('n_channels', 'height', 'width', '_kind')
 
@@ -358,13 +358,13 @@ class ImageMetadata(_MetadataStorable):
     n_distinct_channels: int
     pixel_type: np.dtype
     significant_bits: int
-    physical_size_x: Optional[Quantity]
-    physical_size_y: Optional[Quantity]
-    physical_size_z: Optional[Quantity]
-    frame_rate: Optional[Quantity]
-    acquisition_datetime: Optional[datetime]
-    description: Optional[str]
-    channels: List[ImageChannel]
+    physical_size_x: Quantity | None
+    physical_size_y: Quantity | None
+    physical_size_z: Quantity | None
+    frame_rate: Quantity | None
+    acquisition_datetime: datetime | None
+    description: str | None
+    channels: list[ImageChannel]
     objective: ImageObjective
     microscope: ImageMicroscope
     associated_thumb: ImageAssociated

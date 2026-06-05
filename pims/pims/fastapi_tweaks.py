@@ -69,15 +69,13 @@ query_explode = False
 
 def request_params_to_args(
     required_params: Sequence[ModelField],
-    received_params: Union[Mapping[str, Any], QueryParams, Headers],
-) -> Tuple[Dict[str, Any], List[Any]]:
+    received_params: Mapping[str, Any] | QueryParams | Headers,
+) -> tuple[dict[str, Any], list[Any]]:
     values = {}
     errors = []
     for field in required_params:
         field_info = field.field_info
-        assert isinstance(
-            field_info, params.Param
-        ), "Params must be subclasses of Param"
+        assert isinstance(field_info, params.Param), "Params must be subclasses of Param"
 
         if utils.is_scalar_sequence_field(field) and isinstance(
                 received_params, (QueryParams, Headers)
@@ -118,17 +116,17 @@ def request_params_to_args(
 
 def get_request_handler(
     dependant: Dependant,
-    body_field: Optional[ModelField] = None,
-    status_code: Optional[int] = None,
-    response_class: Union[Type[Response], DefaultPlaceholder] = Default(JSONResponse),
-    response_field: Optional[ModelField] = None,
-    response_model_include: Optional[IncEx] = None,
-    response_model_exclude: Optional[IncEx] = None,
+    body_field: ModelField | None = None,
+    status_code: int | None = None,
+    response_class: type[Response] | DefaultPlaceholder = Default(JSONResponse),
+    response_field: ModelField | None = None,
+    response_model_include: IncEx | None = None,
+    response_model_exclude: IncEx | None = None,
     response_model_by_alias: bool = True,
     response_model_exclude_unset: bool = False,
     response_model_exclude_defaults: bool = False,
     response_model_exclude_none: bool = False,
-    dependency_overrides_provider: Optional[Any] = None,
+    dependency_overrides_provider: Any | None = None,
 ) -> Callable[[Request], Coroutine[Any, Any, Response]]:
     assert dependant.call is not None, "dependant.call must be a function"
     is_coroutine = asyncio.iscoroutinefunction(dependant.call)
@@ -260,10 +258,8 @@ def get_request_handler(
 
     return app
 
-######
 
-
-def apply_fastapi_tweaks():
+def apply_fastapi_tweaks() -> None:
     # Monkey patch Fast API
     utils.request_params_to_args = request_params_to_args
     routing.get_request_handler = get_request_handler

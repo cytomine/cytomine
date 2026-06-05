@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from PIL.Image import Image as PILImage
@@ -47,7 +47,7 @@ class ImagePixelsImpl(ABC):
         pass
 
     @abstractmethod
-    def prepare_channels(self, required_indexes: List[int]) -> ImagePixelsImpl:
+    def prepare_channels(self, required_indexes: list[int]) -> ImagePixelsImpl:
         pass
 
     @abstractmethod
@@ -109,7 +109,7 @@ class NumpyImagePixels(ImagePixelsImpl):
         self.pixels = np.dstack((self.pixels, pixels))
         return self
 
-    def prepare_channels(self, required_indexes: List[int]) -> ImagePixelsImpl:
+    def prepare_channels(self, required_indexes: list[int]) -> ImagePixelsImpl:
         self.pixels = self.pixels[:, :, required_indexes]
         return self
 
@@ -185,7 +185,7 @@ class VipsImagePixels(ImagePixelsImpl):
         self.pixels = self.pixels.bandjoin(pixels)
         return self
 
-    def prepare_channels(self, required_indexes: List[int]) -> ImagePixelsImpl:
+    def prepare_channels(self, required_indexes: list[int]) -> ImagePixelsImpl:
         self.pixels = bandjoin([self.pixels[i] for i in required_indexes])
         return self
 
@@ -332,7 +332,7 @@ class VipsImagePixels(ImagePixelsImpl):
 class ImagePixels:
     _impl: ImagePixelsImpl
 
-    def __init__(self, pixels: Union[RawImagePixels, ImagePixelsImpl]):
+    def __init__(self, pixels: RawImagePixels | ImagePixelsImpl):
         self._impl = None  # noqa # pyrefly: ignore
 
         if not isinstance(pixels, ImagePixelsImpl):
@@ -369,7 +369,7 @@ class ImagePixels:
         self._impl.append_channel(pixels)
         return self
 
-    def prepare_channels(self, required_indexes: List[int]) -> ImagePixels:
+    def prepare_channels(self, required_indexes: list[int]) -> ImagePixels:
         self._impl.prepare_channels(required_indexes)
         return self
     

@@ -13,7 +13,6 @@
 #  * limitations under the License.
 from collections.abc import MutableSequence
 from math import floor
-from typing import Optional, Tuple
 
 import numpy as np
 from shapely.geometry import GeometryCollection, LineString, Point
@@ -31,8 +30,8 @@ class ParsedAnnotation:
     """
 
     def __init__(
-        self, geometry: BaseGeometry, fill_color: Optional[Color] = None,
-        stroke_color: Optional[Color] = None, stroke_width: Optional[int] = None,
+        self, geometry: BaseGeometry, fill_color: Color | None = None,
+        stroke_color: Color | None = None, stroke_width: int | None = None,
         point_envelope_length: float = 1
     ):
         self.geometry = geometry
@@ -62,7 +61,7 @@ class ParsedAnnotation:
         return self.is_fill_grayscale and self.is_stroke_grayscale
 
     @property
-    def bounds(self) -> Tuple[float, float, float, float]:
+    def bounds(self) -> tuple[float, float, float, float]:
         """
         Returns a (minx, miny, maxx, maxy) tuple (float values)
         that bounds the object.
@@ -132,7 +131,7 @@ class ParsedAnnotations(MutableSequence):
         return all(annot.is_grayscale for annot in self._data)
 
     @property
-    def bounds(self) -> Tuple[float, float, float, float]:
+    def bounds(self) -> tuple[float, float, float, float]:
         """
         Returns a (minx, miny, maxx, maxy) tuple (float values)
         that bounds the whole collection.

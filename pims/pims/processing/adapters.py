@@ -13,7 +13,7 @@
 #  * limitations under the License.
 from __future__ import annotations
 
-from typing import Callable, Dict, Tuple, Type, Union
+from typing import Callable
 
 import numpy as np
 from PIL import Image as PILImage
@@ -140,10 +140,10 @@ def identity(v):
     return v
 
 
-RawImagePixels = Union[np.ndarray, VIPSImage, PILImage.Image]
-RawImagePixelsType = Union[Type[np.ndarray], Type[VIPSImage], Type[PILImage.Image]]
+RawImagePixels = np.ndarray | VIPSImage | PILImage.Image
+RawImagePixelstype = type[np.ndarray] | type[VIPSImage] | type[PILImage.Image]
 
-imglib_adapters: Dict[Tuple[RawImagePixelsType, RawImagePixelsType], Callable] = {
+imglib_adapters: dict[tuple[RawImagePixelstype, RawImagePixelstype], Callable] = {
     (np.ndarray, VIPSImage): numpy_to_vips,
     (np.ndarray, PILImage.Image): numpy_to_pil,
     (np.ndarray, np.ndarray): identity,
@@ -157,7 +157,7 @@ imglib_adapters: Dict[Tuple[RawImagePixelsType, RawImagePixelsType], Callable] =
 
 
 def convert_to(
-    image: RawImagePixels, new_image_type: RawImagePixelsType
+    image: RawImagePixels, new_image_type: RawImagePixelstype
 ) -> RawImagePixels:
     """
     Convert a convertible image (pixels) to a new convertible image type.

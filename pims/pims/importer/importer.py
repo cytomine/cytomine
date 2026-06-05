@@ -13,7 +13,6 @@
 #  * limitations under the License.
 import logging
 import shutil
-from typing import List, Optional
 
 from celery import group, signature
 from celery.result import allow_join_result
@@ -72,35 +71,35 @@ class FileImporter:
     identify the file format, converts it if needed and checks its integrity.
     """
 
-    listeners: List[ImportListener]
+    listeners: list[ImportListener]
 
     # Pending file (not yet in `FILE_ROOT_PATH`)
     pending_file: Path
-    pending_name: Optional[str]
+    pending_name: str | None
 
     # Paths to directories for the current import (in `FILE_ROOT_PATH`)
-    upload_dir: Optional[Path]
-    processed_dir: Optional[Path]
-    extracted_dir: Optional[Path]
+    upload_dir: Path | None
+    processed_dir: Path | None
+    extracted_dir: Path | None
 
     # Path to upload file (in `upload_dir`)
-    upload_path: Optional[Path]
+    upload_path: Path | None
 
     # Original representation path (& image) (in `processed_dir`)
-    original_path: Optional[Path]
-    original: Optional[Image]
+    original_path: Path | None
+    original: Image | None
 
     # Spatial representation path (& image) (in `processed_dir`)
-    spatial_path: Optional[Path]
-    spatial: Optional[Image]
+    spatial_path: Path | None
+    spatial: Image | None
 
     # Histogram representation path (& histogram) (in `processed_dir`)
-    histogram_path: Optional[Path]
-    histogram: Optional[Histogram]
+    histogram_path: Path | None
+    histogram: Histogram | None
 
     def __init__(
-        self, pending_file: Path, pending_name: Optional[str] = None,
-        listeners: Optional[List[ImportListener]] = None
+        self, pending_file: Path, pending_name: str | None = None,
+        listeners: list[ImportListener] | None = None
     ):
         """
         Parameters
@@ -537,7 +536,7 @@ class FileImporter:
 
 
 def run_import(
-    filepath: str, name: str, extra_listeners: Optional[List[ImportListener]] = None,
+    filepath: str, name: str, extra_listeners: list[ImportListener] | None = None,
     prefer_copy: bool = False
 ):
     pending_file = Path(filepath)

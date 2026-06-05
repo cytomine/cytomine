@@ -1,7 +1,6 @@
 import logging
 from lxml import etree
 from pathlib import Path
-from typing import List
 
 from cytomine.models import UploadedFile
 
@@ -32,7 +31,7 @@ class ImageImporter:
         images = root.findall(".//IMAGE_REF")
         return [image.get("alias") for image in images]
 
-    def import_image(self, alias: str, projects: List[str]) -> ImportResult:
+    def import_image(self, alias: str, projects: list[str]) -> ImportResult:
         image_path = self.base_path / "IMAGES" / alias
         if not image_path.exists():
             logger.warning(f"'{image_path}' does not exist!")

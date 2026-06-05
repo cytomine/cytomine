@@ -2,7 +2,6 @@ import logging
 import os
 from collections import defaultdict
 from lxml import etree
-from typing import List
 
 from cytomine import Cytomine
 from cytomine.models import (
@@ -42,7 +41,7 @@ class BucketParser:
         return next(iter(self.dependency.keys()), None) or next(iter(self.datasets.keys()))
 
     @property
-    def children(self) -> List[str]:
+    def children(self) -> list[str]:
         return self.dependency.get(self.parent, [])
 
     def discover(self) -> None:

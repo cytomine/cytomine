@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
@@ -14,7 +12,7 @@ api_tags = ['Housekeeping']
 
 
 class DiskUsage(BaseModel):
-    mount_point: Optional[str] = Field(
+    mount_point: str | None = Field(
         None,
         description='The mounting point of the file system having the directory.'
     )
@@ -67,9 +65,7 @@ def _serialize_usage(path):
     tags=api_tags,
     response_class=FastJsonResponse,
 )
-async def show_path_usage(
-    directorypath: str,
-) -> DiskUsage:
+async def show_path_usage(directorypath: str) -> DiskUsage:
     """
     Directory disk usage
     """
@@ -97,9 +93,9 @@ class DiskUsageLegacy(BaseModel):
     used: int
     available: int
     usedP: float
-    hostname: Optional[str] = None
-    mount: Optional[str] = None
-    ip: Optional[str] = None
+    hostname: str | None = None
+    mount: str | None = None
+    ip: str | None = None
 
 
 @router.get(

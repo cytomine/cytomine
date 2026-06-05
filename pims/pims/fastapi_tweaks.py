@@ -18,10 +18,7 @@ import json
 from contextlib import AsyncExitStack
 from copy import deepcopy
 from enum import Enum
-from typing import (
-    Any, Callable, Coroutine, Dict, List, Mapping, Optional, Sequence, Tuple, Type,
-    Union
-)
+from typing import Any, Callable, Coroutine, Mapping, Sequence
 
 from fastapi import params, routing
 from fastapi._compat import _regenerate_error_with_loc, get_missing_field_error, _normalize_errors, Undefined, \
@@ -132,12 +129,12 @@ def get_request_handler(
     is_coroutine = asyncio.iscoroutinefunction(dependant.call)
     is_body_form = body_field and isinstance(body_field.field_info, params.Form)
     if isinstance(response_class, DefaultPlaceholder):
-        actual_response_class: Type[Response] = response_class.value
+        actual_response_class: type[Response] = response_class.value
     else:
         actual_response_class = response_class
 
     async def app(request: Request) -> Response:
-        response: Union[Response, None] = None
+        response: Response | None = None
         async with AsyncExitStack() as file_stack:
             try:
                 body: Any = None
@@ -185,7 +182,7 @@ def get_request_handler(
                     status_code=400, detail="There was an error parsing the body"
                 )
                 raise http_error from e
-            errors: List[Any] = []
+            errors: list[Any] = []
             async with AsyncExitStack() as async_exit_stack:
                 solved_result = await solve_dependencies(
                     request=request,
@@ -204,7 +201,7 @@ def get_request_handler(
                             raw_response.background = background_tasks
                         response = raw_response
                     else:
-                        response_args: Dict[str, Any] = {"background": background_tasks}
+                        response_args: dict[str, Any] = {"background": background_tasks}
                         # If status_code was set, use it, otherwise use the default from the
                         # response class, in the case of redirect it's 307
                         current_status_code = (

@@ -1,9 +1,9 @@
 import json
 from datetime import datetime
-from typing import Any, Union
+from typing import Any
 
 
-def parse_json(value: Any, raise_exc: bool = False) -> Union[dict, None]:
+def parse_json(value: Any, raise_exc: bool = False) -> dict | None:
     try:
         return json.loads(value)
     except:  # noqa
@@ -12,7 +12,7 @@ def parse_json(value: Any, raise_exc: bool = False) -> Union[dict, None]:
         return None
 
 
-def parse_boolean(value: Any, raise_exc: bool = False) -> Union[bool, None]:
+def parse_boolean(value: Any, raise_exc: bool = False) -> bool | None:
     _true_set = {"yes", "true", "t", "y", "1"}
     _false_set = {"no", "false", "f", "n", "0"}
 
@@ -30,7 +30,7 @@ def parse_boolean(value: Any, raise_exc: bool = False) -> Union[bool, None]:
     return None
 
 
-def parse_float(value: Any, raise_exc: bool = False) -> Union[float, None]:
+def parse_float(value: Any, raise_exc: bool = False) -> float | None:
     if isinstance(value, str):
         value = value.replace(",", ".")
     try:
@@ -41,7 +41,7 @@ def parse_float(value: Any, raise_exc: bool = False) -> Union[float, None]:
         return None
 
 
-def parse_int(value: Any, raise_exc: bool = False) -> Union[int, None]:
+def parse_int(value: Any, raise_exc: bool = False) -> int | None:
     try:
         return int(value)
     except:  # noqa
@@ -54,7 +54,7 @@ def parse_datetime(
     value: Any,
     formats: list[str] | None = None,
     raise_exc: bool = False,
-) -> Union[datetime, None]:
+) -> datetime | None:
     if formats is None:
         formats = ["%Y:%m:%d %H:%M:%S", "%m/%d/%y %H:%M:%S"]
 

@@ -1,4 +1,4 @@
-from typing import List, Optional, Sequence, Union
+from typing import Sequence, Union
 
 import numpy as np
 from pydantic.color import RGBA, float_to_255, ints_to_rgba, parse_str, parse_tuple
@@ -33,7 +33,7 @@ class Color(PydanticColor):
         # if we've got here value must be a valid color
         self._original = value
 
-    def as_float_tuple(self, alpha: Optional[bool] = None) -> tuple:
+    def as_float_tuple(self, alpha: bool | None = None) -> tuple:
         """
         Return color as a tuple of float in [0, 1].
 
@@ -57,7 +57,7 @@ class Color(PydanticColor):
             # alpha is False
             return r, g, b
 
-    def as_int(self, alpha: Optional[bool] = None) -> int:
+    def as_int(self, alpha: bool | None = None) -> int:
         """
         Return color as an integer.
 
@@ -155,7 +155,7 @@ BLUE = Color((0, 0, 255))
 RGB = [RED, GREEN, BLUE]
 
 
-def is_rgb(colors: List[Color]) -> bool:
+def is_rgb(colors: list[Color]) -> bool:
     """Check if a list of colors is the list [RED, GREEN, BLUE]."""
     if len(colors) != 3:
         return False
@@ -167,11 +167,11 @@ def is_rgb(colors: List[Color]) -> bool:
 
 
 def infer_channel_color(
-    color_name: Optional[ColorType],
+    color_name: ColorType | None,
     index: int,
-    n_channels: Optional[int] = None,
-    channel_color_list: Optional[Sequence[str]] = None,
-) -> Union[Color, None]:
+    n_channels: int | None = None,
+    channel_color_list: Sequence[str] | None = None,
+) -> Color | None:
     """
     Try to infer a color for an image channel.
 

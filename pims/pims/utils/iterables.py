@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, List, Optional, Sized, TypeVar, Union
+from typing import Any, Iterable, Sized, TypeVar
 
 from pims.api.exceptions import BadRequestException
 
@@ -41,7 +41,7 @@ def find_first_available_int(values, mini=0, maxi=100) -> int:
     raise ValueError("There is no available integer.")
 
 
-def ensure_list(value: Union[List[T], T]) -> List[T]:
+def ensure_list(value: list[T] | T) -> list[T]:
     """
     Ensure it is a list.
 
@@ -63,10 +63,10 @@ def ensure_list(value: Union[List[T], T]) -> List[T]:
 
 
 def check_array_size(
-    iterable: Optional[Sized],
-    allowed: List[int],
+    iterable: Sized | None,
+    allowed: list[int],
     nullable: bool = True,
-    name: Optional[str] = None,
+    name: str | None = None,
 ):
     """
     Verify an iterable has an allowed size or, optionally, is empty.
@@ -108,8 +108,8 @@ def check_array_size(
 
 def check_array_size_parameters(
     parameter_names: Iterable[str],
-    parameters: Dict,
-    allowed: List[int],
+    parameters: dict,
+    allowed: list[int],
     nullable: bool = True,
 ):
     for name in parameter_names:
@@ -117,7 +117,7 @@ def check_array_size_parameters(
         check_array_size(value, allowed=allowed, nullable=nullable, name=name)
 
 
-def flatten(t):
+def flatten(t) -> list:
     return [item for sublist in t for item in sublist]
 
 

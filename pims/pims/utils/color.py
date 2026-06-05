@@ -1,4 +1,4 @@
-from typing import Sequence, Union
+from typing import Sequence
 
 import numpy as np
 from pydantic.color import RGBA, float_to_255, ints_to_rgba, parse_str, parse_tuple
@@ -8,7 +8,7 @@ from pydantic_extra_types.color import (
     ColorType as PydanticColorType,
 )
 
-ColorType = Union[PydanticColorType, int]
+ColorType = PydanticColorType | int
 
 
 class Color(PydanticColor):

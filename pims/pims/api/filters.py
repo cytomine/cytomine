@@ -44,7 +44,7 @@ class Filter(BaseModel):
 
 
 class FiltersList(CollectionSize):
-    items: List[Filter] = Field(None, description='Array of filters', title='Filter')
+    items: list[Filter] = Field(None, description='Array of filters', title='Filter')
 
 
 def _serialize_filter(imgfilter):

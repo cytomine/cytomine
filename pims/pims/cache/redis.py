@@ -18,7 +18,7 @@ import logging
 import pickle
 from enum import Enum
 from functools import partial, wraps
-from typing import Any, Callable, List, Optional, Tuple, Type
+from typing import Any, Callable
 
 from fastapi_utils.tasks import repeat_every
 from redis import asyncio as aioredis
@@ -142,7 +142,7 @@ class RedisBackend:
     def __init__(self, redis_url: str):
         self.redis = aioredis.from_url(redis_url, socket_connect_timeout=10)
 
-    async def get_with_ttl(self, key: str, namespace: str = None) -> Tuple[int, str]:
+    async def get_with_ttl(self, key: str, namespace: str = None) -> tuple[int, str]:
         async with self.redis.pipeline(transaction=True) as pipe:
             key = f"{namespace}:{key}" if namespace else key
             return await (pipe.ttl(key).get(key).execute())
@@ -183,7 +183,7 @@ class PIMSCache:
 
     @classmethod
     async def init(
-        cls, backend, default_expire: int = None, disabled_namespaces: List[str] = None
+        cls, backend, default_expire: int = None, disabled_namespaces: list[str] = None
     ):
         if cls._init:
             return
@@ -310,12 +310,12 @@ def image_response_cache_control_builder(ttl=0):
 
 
 def cache_data(
-    expire: int = None,
-    ignored_variable_parameters: Optional[List] = None,
-    codec: Type[Codec] = None,
-    key_builder: Callable = None,
-    cache_control_builder: Callable = None,
-    namespace: str = None
+    expire: int | None = None,
+    ignored_variable_parameters: list | None = None,
+    codec: type[Codec] | None = None,
+    key_builder: Callable | None = None,
+    cache_control_builder: Callable | None = None,
+    namespace: str | None = None
 ):
     def wrapper(func: Callable):
         @wraps(func)
@@ -422,8 +422,8 @@ def cache_data(
 
 
 def cache_image_response(
-    expire: int = None,
-    ignored_variable_parameters: Optional[List] = None,
+    expire: int | None = None,
+    ignored_variable_parameters: list | None = None,
     supported_mimetypes=None
 ):
     """
@@ -452,8 +452,8 @@ def cache_image_response(
 
 
 def cache_response(
-    expire: int = None,
-    ignored_variable_parameters: Optional[List] = None,
+    expire: int | None = None,
+    ignored_variable_parameters: list | None = None,
 ):
     if ignored_variable_parameters is None:
         ignored_variable_parameters = []

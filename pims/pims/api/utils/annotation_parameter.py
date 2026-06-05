@@ -1,4 +1,4 @@
-from typing import Dict, Iterable, List, Optional
+from typing import Iterable
 
 from shapely.affinity import affine_transform
 from shapely.errors import ShapelyError
@@ -12,12 +12,12 @@ from pims.utils.color import Color
 
 
 def parse_annotations(
-    annotations: Iterable[Dict],
-    ignore_fields: Optional[List[str]] = None,
-    default: Optional[Dict] = None,
-    point_envelope_length: Optional[float] = None,
+    annotations: Iterable[dict],
+    ignore_fields: list[str] | None = None,
+    default: dict | None = None,
+    point_envelope_length: float | None = None,
     origin: AnnotationOrigin = AnnotationOrigin.LEFT_TOP,
-    im_height: Optional[int] = None,
+    im_height: int | None = None,
 ) -> ParsedAnnotations:
     """
     Parse a list of annotations.
@@ -64,14 +64,14 @@ def parse_annotations(
 
 def parse_annotation(
     geometry: str,
-    fill_color: Optional[Color] = None,
-    stroke_color: Optional[Color] = None,
-    stroke_width: Optional[int] = None,
-    ignore_fields: Optional[List[str]] = None,
-    default: Optional[Dict] = None,
+    fill_color: Color | None = None,
+    stroke_color: Color | None = None,
+    stroke_width: int | None = None,
+    ignore_fields: list[str] | None = None,
+    default: dict | None = None,
     point_envelope_length: float = 1.0,
     origin: AnnotationOrigin = AnnotationOrigin.LEFT_TOP,
-    im_height: Optional[int] = None,
+    im_height: int | None = None,
 ) -> ParsedAnnotation:
     """
     Parse an annotation.

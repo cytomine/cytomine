@@ -12,7 +12,7 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 
-from typing import Iterable, List, Optional, Tuple, Type, Union
+from typing import Iterable
 
 from pims.api.exceptions import ColormapNotFoundProblem, FilterNotFoundProblem
 from pims.api.utils.models import BitDepthEnum, ColormapEnum, ColormapId, IntensitySelectionEnum
@@ -22,13 +22,13 @@ from pims.formats.utils.structures.metadata import ImageChannel
 from pims.processing.colormaps import BLACK_COLORMAP, ColorColormap, Colormap, ColormapsByName
 from pims.utils.color import Color
 
-Intensities = List[Union[int, str]]
+Intensities = list[int | str]
 
 
 def parse_intensity_bounds(
-    image: Image, out_channels: List[int], out_zslices: List[int], out_timepoints: List[int],
+    image: Image, out_channels: list[int], out_zslices: list[int], out_timepoints: list[int],
     min_intensities: Intensities, max_intensities: Intensities, allow_none: bool = False
-) -> Tuple[List[int], List[int]]:
+) -> tuple[list[int], list[int]]:
     """
     Parse intensity parameters according to a specific image.
 
@@ -121,13 +121,13 @@ def parse_intensity_bounds(
     return parsed_mins, parsed_maxs
 
 
-def parse_bitdepth(in_image: Image, bits: Union[int, BitDepthEnum]) -> int:
+def parse_bitdepth(in_image: Image, bits: int | BitDepthEnum) -> int:
     return in_image.significant_bits if bits == BitDepthEnum.AUTO else bits
 
 
 def parse_filter_ids(
     filter_ids: Iterable[str], existing_filters: FiltersById
-) -> List[Type[AbstractFilter]]:
+) -> list[type[AbstractFilter]]:
     filters = []
     for filter_id in filter_ids:
         try:
@@ -138,9 +138,9 @@ def parse_filter_ids(
 
 
 def parse_colormap_ids(
-    colormap_ids: List[ColormapId], existing_colormaps: ColormapsByName, channel_idxs: List[int],
-    img_channels: List[ImageChannel]
-) -> List[Union[Colormap, None]]:
+    colormap_ids: list[ColormapId], existing_colormaps: ColormapsByName, channel_idxs: list[int],
+    img_channels: list[ImageChannel]
+) -> list[Colormap | None]:
     colormaps = []
     if len(colormap_ids) == 0:
         colormap_ids = [ColormapEnum.DEFAULT] * len(channel_idxs)
@@ -157,8 +157,8 @@ def parse_colormap_ids(
 
 
 def parse_colormap_id(
-    colormap_id: ColormapId, existing_colormaps: ColormapsByName, default_color: Optional[Color]
-) -> Optional[Colormap]:
+    colormap_id: ColormapId, existing_colormaps: ColormapsByName, default_color: Color | None
+) -> Colormap | None:
     """
     Parse a colormap ID to a valid colormap (or None).
 
@@ -213,9 +213,7 @@ def parse_colormap_id(
     return colormap
 
 
-def parse_gammas(
-    out_channels: List[int], gammas: List[float]
-):
+def parse_gammas(out_channels: list[int], gammas: list[float]):
     """
     Parse gammas parameter.
 
@@ -239,12 +237,12 @@ def parse_gammas(
 
 
 def remove_useless_channels(
-    channel_idxs: List[int],
-    min_intensities: List[int],
-    max_intensities: List[int],
-    colormaps: List[Colormap],
-    gammas: List[float]
-) -> Tuple[List[int], List[int], List[int], List[Colormap], List[float]]:
+    channel_idxs: list[int],
+    min_intensities: list[int],
+    max_intensities: list[int],
+    colormaps: list[Colormap],
+    gammas: list[float]
+) -> tuple[list[int], list[int], list[int], list[Colormap], list[float]]:
     """
     Remove channels with a black colormap, as they will produce a black image
     and are useless.

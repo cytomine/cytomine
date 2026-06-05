@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 from importlib import import_module
 from inspect import isabstract, isclass
 from pkgutil import iter_modules
-from typing import Callable, Dict, List, Tuple, Type, Union
+from typing import Callable
 
 from pims.processing.adapters import RawImagePixels, RawImagePixelsType, imglib_adapters
 
@@ -35,7 +35,7 @@ class AbstractFilter(ABC):
     Base class for a filter.
     Filters are expected to be called like functions.
     """
-    _impl: Dict[RawImagePixelsType, Callable]
+    _impl: dict[RawImagePixelsType, Callable]
 
     def __init__(self, histogram=None):
         self._impl = {}
@@ -45,18 +45,18 @@ class AbstractFilter(ABC):
         self.histogram = histogram
 
     @property
-    def implementations(self) -> List[RawImagePixelsType]:
+    def implementations(self) -> list[RawImagePixelsType]:
         return list(self._impl.keys())
 
     @property
     def implementation_adapters(
         self
-    ) -> Dict[Tuple[RawImagePixelsType, RawImagePixelsType], Callable]:
+    ) -> dict[tuple[RawImagePixelsType, RawImagePixelsType], Callable]:
         return imglib_adapters
 
     def __call__(
         self, obj: RawImagePixels, *args, **kwargs
-    ) -> Union[RawImagePixels, bytes]:
+    ) -> RawImagePixels | bytes:
         """
         Apply image operation on given obj. Return type is a convertible
         image type (but not necessarily the type of `obj`).
@@ -207,7 +207,7 @@ def _get_all_filters():
     return filters
 
 
-FiltersById = Dict[str, Type[AbstractFilter]]
+FiltersById = dict[str, type[AbstractFilter]]
 
 
 FILTER_PLUGINS = _discover_filter_plugins()

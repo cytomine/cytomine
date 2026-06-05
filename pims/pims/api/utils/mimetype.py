@@ -16,7 +16,6 @@ import typing
 from collections import OrderedDict
 from enum import Enum
 from functools import cached_property
-from typing import List, Optional, Tuple
 
 from fastapi.params import Path as PathParam
 
@@ -37,20 +36,12 @@ SupportedExtensions = typing.OrderedDict[OutputExtension, str]
 mimetype_from_extension = {
     OutputExtension.JPEG: "image/jpeg",
     OutputExtension.PNG: "image/png",
-    OutputExtension.WEBP: "image/webp"
+    OutputExtension.WEBP: "image/webp",
 }
 
-PNG_MIMETYPES = {
-    "image/png": OutputExtension.PNG,
-    "image/apng": OutputExtension.PNG
-}
-WEBP_MIMETYPES = {
-    "image/webp": OutputExtension.WEBP
-}
-JPEG_MIMETYPES = {
-    "image/jpg": OutputExtension.JPEG,
-    "image/jpeg": OutputExtension.JPEG
-}
+PNG_MIMETYPES = {"image/png": OutputExtension.PNG, "image/apng": OutputExtension.PNG}
+WEBP_MIMETYPES = {"image/webp": OutputExtension.WEBP}
+JPEG_MIMETYPES = {"image/jpg": OutputExtension.JPEG, "image/jpeg": OutputExtension.JPEG}
 
 
 def build_mimetype_dict(*mimetype_dicts) -> SupportedMimeTypes:
@@ -63,27 +54,31 @@ def build_mimetype_dict(*mimetype_dicts) -> SupportedMimeTypes:
     return ordered_mimetypes
 
 
-VISUALISATION_MIMETYPES = build_mimetype_dict(WEBP_MIMETYPES, JPEG_MIMETYPES, PNG_MIMETYPES)
-PROCESSING_MIMETYPES = build_mimetype_dict(PNG_MIMETYPES, JPEG_MIMETYPES, WEBP_MIMETYPES)
+VISUALISATION_MIMETYPES = build_mimetype_dict(
+    WEBP_MIMETYPES, JPEG_MIMETYPES, PNG_MIMETYPES
+)
+PROCESSING_MIMETYPES = build_mimetype_dict(
+    PNG_MIMETYPES, JPEG_MIMETYPES, WEBP_MIMETYPES
+)
 
 # Matches 'text' or 'application'
-major_type_str = r'[a-zA-Z0-9._-]+'
+major_type_str = r"[a-zA-Z0-9._-]+"
 
 # Matches 'html', or 'xml+gml'
-minor_type_str = r'[a-zA-Z0-9._+-]+'
+minor_type_str = r"[a-zA-Z0-9._+-]+"
 
 # Matches either '*', 'image/*', or 'image/png'
 valid_mime_type = re.compile(
-    fr'^(?:\*|{major_type_str}/\*|{major_type_str}/{minor_type_str})$'
+    rf"^(?:\*|{major_type_str}/\*|{major_type_str}/{minor_type_str})$"
 )
 
 # Matches the 'q=1.23' from the parameters of a Accept mime types
-q_match = re.compile(r'(?:^|;)\s*q=([0-9.-]+)(?:$|;)')
+q_match = re.compile(r"(?:^|;)\s*q=([0-9.-]+)(?:$|;)")
 
 
 class AcceptableType:
     def __init__(self, raw: str):
-        tokens = raw.split(';')
+        tokens = raw.split(";")
         head, tail = tokens[0], tokens[1] if len(tokens) > 1 else ""
 
         self.mimetype = self._parse_mimetype(head)
@@ -106,8 +101,10 @@ class AcceptableType:
         return 1
 
     def __eq__(self, other) -> bool:
-        return isinstance(other, AcceptableType) and \
-               (self.mimetype, self.weight) == (other.mimetype, other.weight)
+        return isinstance(other, AcceptableType) and (self.mimetype, self.weight) == (
+            other.mimetype,
+            other.weight,
+        )
 
     def __lt__(self, other) -> bool:
         if not isinstance(other, AcceptableType):
@@ -117,23 +114,25 @@ class AcceptableType:
     @cached_property
     def pattern(self):
         # *: Simple match all case
-        if self.mimetype == '*':
+        if self.mimetype == "*":
             return valid_mime_type
         # image/*: Match the major type
-        if self.mimetype.endswith('*'):
-            return re.compile('^' + re.escape(self.mimetype[:-1]) + minor_type_str + '$')
+        if self.mimetype.endswith("*"):
+            return re.compile(
+                "^" + re.escape(self.mimetype[:-1]) + minor_type_str + "$"
+            )
         # All other cases, match the exact mime type string
-        return re.compile('^' + re.escape(self.mimetype) + '$')
+        return re.compile("^" + re.escape(self.mimetype) + "$")
 
     def matches(self, mimetype: str):
         return self.pattern.match(mimetype)
 
 
-def parse_accept_header(header: str) -> List[AcceptableType]:
+def parse_accept_header(header: str) -> list[AcceptableType]:
     """
     Parse an ``Accept`` header into a sorted list of acceptable types
     """
-    raw_mime_types = header.split(',')
+    raw_mime_types = header.split(",")
     mime_types = []
     for raw_mime_type in raw_mime_types:
         try:
@@ -144,7 +143,7 @@ def parse_accept_header(header: str) -> List[AcceptableType]:
     return sorted(mime_types, reverse=True)
 
 
-def get_best_mimetype(header: str, available_types: List[str]) -> Optional[str]:
+def get_best_mimetype(header: str, available_types: list[str]) -> str | None:
     """
     Find the best mime type to respond to a request with,
     from an ``Accept`` header and list of response mime types
@@ -161,9 +160,10 @@ def get_best_mimetype(header: str, available_types: List[str]) -> Optional[str]:
 
 
 def get_output_format(
-    extension: Optional[OutputExtension], accept_header: Optional[str],
-    supported: SupportedMimeTypes
-) -> Tuple[OutputExtension, str]:
+    extension: OutputExtension | None,
+    accept_header: str | None,
+    supported: SupportedMimeTypes,
+) -> tuple[OutputExtension, str]:
     """
     Get the best output/response format and mime type according to
     the request and the ordered dictionary of supported mime types.

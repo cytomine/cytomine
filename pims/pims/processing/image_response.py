@@ -12,7 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import numpy as np
 from starlette.responses import Response
@@ -46,7 +45,7 @@ class ImageResponse(ABC):
     """
 
     def __init__(
-        self, in_image: Optional[Image], out_format: OutputExtension,
+        self, in_image: Image | None, out_format: OutputExtension,
         out_width: int, out_height: int, out_bitdepth: int = 8, **kwargs
     ):
         self.in_image = in_image
@@ -89,7 +88,7 @@ class ImageResponse(ABC):
         )
 
     def http_response(
-        self, mimetype: str, extra_headers: Optional[dict[str, str]] = None
+        self, mimetype: str, extra_headers: dict[str, str] | None = None
     ) -> Response:
         """
         Encapsulate image response into an HTTP response, ready to be sent to
@@ -148,7 +147,7 @@ class ProcessedView(MultidimImageResponse, ABC):
         z_reduction: GenericReduction, t_reduction: GenericReduction,
         gammas: list[float], filters: list[type[AbstractFilter]],
         colormaps: list[Colormap], min_intensities: list[int],
-        max_intensities: list[int], log: bool, threshold: Optional[float],
+        max_intensities: list[int], log: bool, threshold: float | None,
         colorspace: Colorspace = Colorspace.AUTO, **kwargs
     ):
         super().__init__(
@@ -195,7 +194,7 @@ class ProcessedView(MultidimImageResponse, ABC):
                 self.threshold_processing or
                 self.log_processing)
 
-    def math_lut(self) -> Optional[StackedLookUpTables]:
+    def math_lut(self) -> StackedLookUpTables | None:
         """
         Compute lookup table for math processing operations if any.
 
@@ -257,7 +256,7 @@ class ProcessedView(MultidimImageResponse, ABC):
                         and is_rgb_colormapping(self.colormaps))
         return False
 
-    def colormap_lut(self) -> Optional[StackedLookUpTables]:
+    def colormap_lut(self) -> StackedLookUpTables | None:
         """
         Compute lookup table from colormaps if any.
 
@@ -289,7 +288,7 @@ class ProcessedView(MultidimImageResponse, ABC):
             ]
         )
 
-    def lut(self) -> Optional[StackedLookUpTables]:
+    def lut(self) -> StackedLookUpTables | None:
         """
         The lookup table to apply combining all processing operations.
         """
@@ -347,7 +346,7 @@ class ProcessedView(MultidimImageResponse, ABC):
         return any([f.require_histogram() for f in self.filters])
 
     @property
-    def filter_required_colorspace(self) -> Optional[Colorspace]:
+    def filter_required_colorspace(self) -> Colorspace | None:
         """
         If filtering and some filters require a specific colorspace, get the
         minimum satisfying colorspace.
@@ -446,7 +445,7 @@ class ThumbnailResponse(ProcessedView):
         t_reduction: GenericReduction, gammas: list[float],
         filters: list[type[AbstractFilter]], colormaps: list[Colormap],
         min_intensities: list[int], max_intensities: list[int], log: bool,
-        use_precomputed: bool, threshold: Optional[float], **kwargs
+        use_precomputed: bool, threshold: float | None, **kwargs
     ):
         super().__init__(
             in_image, in_channels, in_z_slices, in_timepoints, out_format,
@@ -476,7 +475,7 @@ class ResizedResponse(ProcessedView):
         gammas: list[float], filters: list[type[AbstractFilter]],
         colormaps: list[Colormap], min_intensities: list[int],
         max_intensities: list[int], log: bool, out_bitdepth: int,
-        threshold: Optional[float], colorspace: Colorspace, **kwargs
+        threshold: float | None, colorspace: Colorspace, **kwargs
     ):
         super().__init__(
             in_image, in_channels, in_z_slices, in_timepoints, out_format,
@@ -503,10 +502,10 @@ class WindowResponse(ProcessedView):
         gammas: list[float], filters: list[type[AbstractFilter]],
         colormaps: list[Colormap], min_intensities: list[int],
         max_intensities: list[int], log: bool, out_bitdepth: int,
-        threshold: Optional[float], colorspace: Colorspace,
-        annotations: Optional[ParsedAnnotations] = None,
-        affine_matrix: Optional[np.ndarray] = None,
-        annot_params: Optional[dict] = None, **kwargs
+        threshold: float | None, colorspace: Colorspace,
+        annotations: ParsedAnnotations | None = None,
+        affine_matrix: np.ndarray | None = None,
+        annot_params: dict | None = None, **kwargs
     ):
         super().__init__(
             in_image, in_channels, in_z_slices, in_timepoints, out_format,
@@ -597,7 +596,7 @@ class TileResponse(ProcessedView):
         z_reduction: GenericReduction, t_reduction: GenericReduction,
         gammas: list[float], filters: list[type[AbstractFilter]],
         colormaps: list[Colormap], min_intensities: list[int],
-        max_intensities: list[int], log: bool, threshold: Optional[float],
+        max_intensities: list[int], log: bool, threshold: float | None,
         **kwargs
     ):
         super().__init__(

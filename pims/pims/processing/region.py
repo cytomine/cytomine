@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING
 
 from pims.utils.iterables import split_tuple
 
@@ -34,7 +34,7 @@ class Region:
     def __init__(
         self,
         top: float, left: float, width: float, height: float,
-        downsample: Union[Tuple[float, float], float] = 1.0
+        downsample: tuple[float, float] | float = 1.0
     ):
         self.top = top
         self.left = left
@@ -79,7 +79,7 @@ class Region:
         """Region height at full resolution"""
         return self.height * self.height_downsample
 
-    def scale(self, downsample: Union[Tuple[float, float], float]) -> Region:
+    def scale(self, downsample: tuple[float, float] | float) -> Region:
         """
         Scale the region in-place at a new downsample.
 

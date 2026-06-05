@@ -13,7 +13,7 @@
 #  * limitations under the License.
 from datetime import datetime
 from enum import Enum
-from typing import Any, List, Optional, Union
+from typing import Any, Union
 
 from fastapi import APIRouter, Depends, Path as PathParam
 from pydantic import BaseModel, Field, RootModel
@@ -73,7 +73,7 @@ class SingleFileInfo(BaseModel):
 
 
 class CollectionFileInfo(SingleFileInfo):
-    children: List[Union['CollectionFileInfo', SingleFileInfo]] = Field(
+    children: list[Union['CollectionFileInfo', SingleFileInfo]] = Field(
         ..., description='Information about children files'
     )
 
@@ -82,7 +82,7 @@ CollectionFileInfo.model_rebuild()
 
 
 class FileInfo(RootModel):
-    root: Union[CollectionFileInfo, SingleFileInfo]
+    root: CollectionFileInfo | SingleFileInfo
 
     @classmethod
     def from_path(cls, path):
@@ -144,20 +144,20 @@ class ImageInfo(BaseModel):
         ...,
         description='The multidimensional image duration. It is the number of frames.',
     )
-    physical_size_x: Optional[float] = Field(
+    physical_size_x: float | None = Field(
         None,
         description='The physical size of a pixel along the X axis, expressed in micrometers (µm).'
     )
-    physical_size_y: Optional[float] = Field(
+    physical_size_y: float | None = Field(
         None,
         description='The physical size of a pixel along the Y axis, expressed in micrometers (µm).'
     )
-    physical_size_z: Optional[float] = Field(
+    physical_size_z: float | None = Field(
         None,
         description='The physical size of a pixel (voxel) along the Z axis, expressed in '
                     'micrometers (µm).',
     )
-    frame_rate: Optional[float] = Field(
+    frame_rate: float | None = Field(
         None,
         description='The frequency at which consecutive timepoints are taken (T axis), expressed '
                     'in Hz.',
@@ -195,10 +195,10 @@ class ImageInfo(BaseModel):
                     'RGB or fluorescence images have 1 single distinct channels (all channels '
                     'are merged). Hyperspectral images can have several distinct channels.'
     )
-    acquired_at: Optional[datetime] = Field(
+    acquired_at: datetime | None = Field(
         None, description='The acquisition date of the image.'
     )
-    description: Optional[str] = Field(None, description='The image description.')
+    description: str | None = Field(None, description='The image description.')
     pixel_type: PixelType = Field(
         ..., description='The type used to store each pixel in the image.'
     )
@@ -289,7 +289,7 @@ class PyramidInfo(BaseModel):
     n_tiers: Annotated[int, Field(ge=1)] = Field(
         ..., description='The number of tiers in the pyramid.'
     )
-    tiers: List[TierInfo]
+    tiers: list[TierInfo]
 
     @classmethod
     def from_pyramid(cls, pyramid):
@@ -313,7 +313,7 @@ class FullRepresentationInfo(SimpleRepresentationInfo):
 
 
 class RepresentationInfo(RootModel):
-    root: Union[FullRepresentationInfo, SimpleRepresentationInfo]
+    root: FullRepresentationInfo | SimpleRepresentationInfo
 
     @classmethod
     def from_path(cls, path):
@@ -330,7 +330,7 @@ class RepresentationInfo(RootModel):
             )
 
 
-async def _get_representation_info_list(path: Path) -> List[Union[FullRepresentationInfo, SimpleRepresentationInfo]]:
+async def _get_representation_info_list(path: Path) -> list[FullRepresentationInfo | SimpleRepresentationInfo]:
     data = []
     for representation in FileRole.representations():
         try:
@@ -342,7 +342,7 @@ async def _get_representation_info_list(path: Path) -> List[Union[FullRepresenta
 
 
 class Microscope(BaseModel):
-    model: Optional[str] = Field(None, description='The microscope model.')
+    model: str | None = Field(None, description='The microscope model.')
 
     @classmethod
     def from_image(cls, image):
@@ -350,10 +350,10 @@ class Microscope(BaseModel):
 
 
 class Objective(BaseModel):
-    nominal_magnification: Optional[float] = Field(
+    nominal_magnification: float | None = Field(
         None, description='Magnification of the lens specified by the manufacturer.'
     )
-    calibrated_magnification: Optional[float] = Field(
+    calibrated_magnification: float | None = Field(
         None, description='Magnification of the lens measured by a calibration process.'
     )
 
@@ -383,14 +383,14 @@ class InstrumentInfo(BaseModel):
 
 class ChannelsInfoItem(BaseModel):
     index: Annotated[int, Field(ge=0)] = Field(..., description='Channel index.')
-    suggested_name: Optional[str] = Field(
+    suggested_name: str | None = Field(
         None,
         description='Suggested name for the channel inferred from other properties.',
     )
-    emission_wavelength: Optional[float] = Field(
+    emission_wavelength: float | None = Field(
         None, description='Wavelength of emission for a particular channel.'
     )
-    excitation_wavelength: Optional[float] = Field(
+    excitation_wavelength: float | None = Field(
         None, description='Wavelength of excitation for a particular channel.'
     )
     color: str = Field(
@@ -416,7 +416,7 @@ class ChannelsInfo(RootModel):
     Information about channels in an image file.
     """
 
-    root: List[ChannelsInfoItem] = Field(
+    root: list[ChannelsInfoItem] = Field(
         ..., description='Information about channels in an image file.'
     )
 
@@ -469,7 +469,7 @@ class AssociatedInfo(RootModel):
     Information about all associated in an image file.
     """
 
-    root: List[AssociatedInfoItem] = Field(
+    root: list[AssociatedInfoItem] = Field(
         ..., description='Information about associated in an image file.'
     )
 
@@ -509,7 +509,7 @@ class Metadata(BaseModel):
     key: str = Field(..., description='The metadata key')
     value: Any = Field(..., description='The metadata value')
     type: MetadataTypeEnum = Field('STRING', description='The metadata value type')
-    namespace: Optional[str] = Field(
+    namespace: str | None = Field(
         None, description='The metadata namespace to avoid key name conflicts'
     )
 
@@ -532,7 +532,7 @@ class ImageFullInfo(BaseModel):
     channels: ChannelsInfo
     instrument: InstrumentInfo
     associated: AssociatedInfo
-    representations: List[RepresentationInfo]
+    representations: list[RepresentationInfo]
 
 
 @router.get(
@@ -741,7 +741,7 @@ async def _show_associated_image(
 # METADATA
 
 class MetadataCollection(CollectionSize):
-    items: List[Metadata]
+    items: list[Metadata]
 
 
 @router.get(
@@ -776,7 +776,7 @@ class MetadataAnnotation(BaseModel):
         description='A geometry described in Well-known text (WKT)',
         examples=['POINT(10 10)'],
     )
-    terms: List[str] = Field(
+    terms: list[str] = Field(
         ...,
         description='A list of terms (labels) associated to the annotation',
         examples=['ROI']
@@ -785,15 +785,15 @@ class MetadataAnnotation(BaseModel):
         ...,
         description='A set of key-value pairs associated to the annotation'
     )
-    channels: List[int] = Field(
+    channels: list[int] = Field(
         ...,
         description='Channel indexes associated to the annotation'
     )
-    z_slices: List[int] = Field(
+    z_slices: list[int] = Field(
         ...,
         description='Z-slice indexes associated to the annotation'
     )
-    timepoints: List[int] = Field(
+    timepoints: list[int] = Field(
         ...,
         description='Timepoint indexes associated to the annotation'
     )
@@ -813,7 +813,7 @@ class MetadataAnnotation(BaseModel):
 
 
 class MetadataAnnotationCollection(CollectionSize):
-    items: List[MetadataAnnotation]
+    items: list[MetadataAnnotation]
 
 
 @router.get(
@@ -841,7 +841,7 @@ async def show_metadata_annotations(
 # REPRESENTATIONS
 
 class RepresentationInfoCollection(CollectionSize):
-    items: List[RepresentationInfo]
+    items: list[RepresentationInfo]
 
 
 @router.get(

@@ -14,7 +14,6 @@
 from __future__ import annotations
 
 import shutil
-from typing import Tuple
 
 import numpy as np
 import zarr as zarr
@@ -52,7 +51,7 @@ def argmax_nonzero(arr, axis=-1):
     return arr.shape[axis] - np.argmax(np.flip(arr, axis=axis) != 0, axis=axis) - 1
 
 
-def clamp_histogram(hist, bounds=None) -> Tuple[np.ndarray, np.ndarray]:
+def clamp_histogram(hist, bounds=None) -> tuple[np.ndarray, np.ndarray]:
     """
     Clamp a 1D histogram between bounds (inclusive). If bounds are not set,
     bounds are computed so that the histogram is clamped between first and last

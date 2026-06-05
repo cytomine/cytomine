@@ -11,7 +11,6 @@
 #  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
-from typing import List
 
 import numpy as np
 from pyvips import Image as VIPSImage, Interpretation as VIPSInterpretation, Operation  # noqa
@@ -67,14 +66,14 @@ def vips_dtype(bits: int) -> str:
     return dtype_to_vips_format[bits_to_str_dtype(bits)]
 
 
-def bandjoin(bands: List[VIPSImage]) -> VIPSImage:
+def bandjoin(bands: list[VIPSImage]) -> VIPSImage:
     if len(bands) == 1:
         return bands[0]
 
     return Operation.call('bandjoin', bands)
 
 
-def bandjoin_rgb(bands: List[VIPSImage]) -> VIPSImage:
+def bandjoin_rgb(bands: list[VIPSImage]) -> VIPSImage:
     return fix_rgb_interpretation(bandjoin(bands))
 
 
@@ -86,7 +85,7 @@ def fix_rgb_interpretation(im: VIPSImage) -> VIPSImage:
     return im
 
 
-def bandreduction(bands: List[VIPSImage], reduction: ChannelReduction) -> VIPSImage:
+def bandreduction(bands: list[VIPSImage], reduction: ChannelReduction) -> VIPSImage:
     if reduction == ChannelReduction.ADD:
         return VIPSImage.sum(bands).cast(bands[0].format)
     elif reduction == ChannelReduction.MAX:

@@ -13,7 +13,7 @@
 #  * limitations under the License.
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from pims.formats import FORMATS, FormatsByExt
 from pims.formats.utils.abstract import AbstractFormat, CachedDataPath
@@ -42,7 +42,7 @@ class FormatFactory:
         self.formats = formats
         self.match_on_ext = match_on_ext
 
-    def match(self, path: Path) -> Optional[AbstractFormat]:
+    def match(self, path: Path) -> AbstractFormat | None:
         """
         Identify a matching format for given path.
 

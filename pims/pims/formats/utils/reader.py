@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -30,13 +30,19 @@ class AbstractReader(ABC):
     """
     Base reader. All format readers must extend this class.
     """
+
     def __init__(self, format: AbstractFormat):
         self.format = format
 
     @abstractmethod
     def read_thumb(
-        self, out_width: int, out_height: int, precomputed: bool = None,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+        self,
+        out_width: int,
+        out_height: int,
+        precomputed: bool = False,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
     ) -> RawImagePixels:
         """
         Get an image thumbnail whose dimensions are the nearest possible to
@@ -87,8 +93,13 @@ class AbstractReader(ABC):
 
     @abstractmethod
     def read_window(
-        self, region: Region, out_width: int, out_height: int,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+        self,
+        region: Region,
+        out_width: int,
+        out_height: int,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
     ) -> RawImagePixels:
         """
         Get an image window whose output dimensions are the nearest possible to
@@ -140,8 +151,11 @@ class AbstractReader(ABC):
 
     @abstractmethod
     def read_tile(
-        self, tile: Tile,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+        self,
+        tile: Tile,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
     ) -> RawImagePixels:
         """
         Get an image tile. It is a particular case of `read_window` where the
@@ -180,7 +194,7 @@ class AbstractReader(ABC):
         """
         raise NotImplementedError()
 
-    def read_label(self, out_width: int, out_height: int) -> Optional[RawImagePixels]:
+    def read_label(self, out_width: int, out_height: int) -> RawImagePixels | None:
         """
         Get a precomputed image label whose output dimensions are the nearest
         possible to asked output dimensions.
@@ -209,7 +223,7 @@ class AbstractReader(ABC):
         """
         return None
 
-    def read_macro(self, out_width: int, out_height: int) -> Optional[RawImagePixels]:
+    def read_macro(self, out_width: int, out_height: int) -> RawImagePixels | None:
         """
         Get a precomputed image macro whose output dimensions are the nearest
         possible to asked output dimensions.
@@ -239,8 +253,8 @@ class AbstractReader(ABC):
         return None
 
     def _concrete_channel_indexes(
-        self, channels: Optional[Union[int, List[int]]]
-    ) -> Tuple[list, list]:
+        self, channels: int | list[int] | None
+    ) -> tuple[list, list]:
         if channels is None:
             channels = np.arange(self.format.main_imd.n_channels)
         else:

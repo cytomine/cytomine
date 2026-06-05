@@ -18,10 +18,7 @@ import json
 from contextlib import AsyncExitStack
 from copy import deepcopy
 from enum import Enum
-from typing import (
-    Any, Callable, Coroutine, Dict, List, Mapping, Optional, Sequence, Tuple, Type,
-    Union
-)
+from typing import Any, Callable, Coroutine, Mapping, Sequence
 
 from fastapi import params, routing
 from fastapi._compat import _regenerate_error_with_loc, get_missing_field_error, _normalize_errors, Undefined, \
@@ -69,15 +66,13 @@ query_explode = False
 
 def request_params_to_args(
     required_params: Sequence[ModelField],
-    received_params: Union[Mapping[str, Any], QueryParams, Headers],
-) -> Tuple[Dict[str, Any], List[Any]]:
+    received_params: Mapping[str, Any] | QueryParams | Headers,
+) -> tuple[dict[str, Any], list[Any]]:
     values = {}
     errors = []
     for field in required_params:
         field_info = field.field_info
-        assert isinstance(
-            field_info, params.Param
-        ), "Params must be subclasses of Param"
+        assert isinstance(field_info, params.Param), "Params must be subclasses of Param"
 
         if utils.is_scalar_sequence_field(field) and isinstance(
                 received_params, (QueryParams, Headers)
@@ -85,7 +80,7 @@ def request_params_to_args(
             if isinstance(field_info, params.Query) and not query_explode:
                 value = received_params.get(field.alias)
                 if value is not None:
-                    delimiter = query_style_to_delimiter.get(query_style)
+                    delimiter = query_style_to_delimiter.get(query_style, ",")
                     value = list(csv.reader([value], delimiter=delimiter))[0]
             else:
                 value = received_params.getlist(field.alias) or field.default
@@ -118,28 +113,28 @@ def request_params_to_args(
 
 def get_request_handler(
     dependant: Dependant,
-    body_field: Optional[ModelField] = None,
-    status_code: Optional[int] = None,
-    response_class: Union[Type[Response], DefaultPlaceholder] = Default(JSONResponse),
-    response_field: Optional[ModelField] = None,
-    response_model_include: Optional[IncEx] = None,
-    response_model_exclude: Optional[IncEx] = None,
+    body_field: ModelField | None = None,
+    status_code: int | None = None,
+    response_class: type[Response] | DefaultPlaceholder = Default(JSONResponse),
+    response_field: ModelField | None = None,
+    response_model_include: IncEx | None = None,
+    response_model_exclude: IncEx | None = None,
     response_model_by_alias: bool = True,
     response_model_exclude_unset: bool = False,
     response_model_exclude_defaults: bool = False,
     response_model_exclude_none: bool = False,
-    dependency_overrides_provider: Optional[Any] = None,
+    dependency_overrides_provider: Any | None = None,
 ) -> Callable[[Request], Coroutine[Any, Any, Response]]:
     assert dependant.call is not None, "dependant.call must be a function"
     is_coroutine = asyncio.iscoroutinefunction(dependant.call)
     is_body_form = body_field and isinstance(body_field.field_info, params.Form)
     if isinstance(response_class, DefaultPlaceholder):
-        actual_response_class: Type[Response] = response_class.value
+        actual_response_class: type[Response] = response_class.value
     else:
         actual_response_class = response_class
 
     async def app(request: Request) -> Response:
-        response: Union[Response, None] = None
+        response: Response | None = None
         async with AsyncExitStack() as file_stack:
             try:
                 body: Any = None
@@ -187,7 +182,7 @@ def get_request_handler(
                     status_code=400, detail="There was an error parsing the body"
                 )
                 raise http_error from e
-            errors: List[Any] = []
+            errors: list[Any] = []
             async with AsyncExitStack() as async_exit_stack:
                 solved_result = await solve_dependencies(
                     request=request,
@@ -206,7 +201,7 @@ def get_request_handler(
                             raw_response.background = background_tasks
                         response = raw_response
                     else:
-                        response_args: Dict[str, Any] = {"background": background_tasks}
+                        response_args: dict[str, Any] = {"background": background_tasks}
                         # If status_code was set, use it, otherwise use the default from the
                         # response class, in the case of redirect it's 307
                         current_status_code = (
@@ -260,10 +255,8 @@ def get_request_handler(
 
     return app
 
-######
 
-
-def apply_fastapi_tweaks():
+def apply_fastapi_tweaks() -> None:
     # Monkey patch Fast API
     utils.request_params_to_args = request_params_to_args
     routing.get_request_handler = get_request_handler

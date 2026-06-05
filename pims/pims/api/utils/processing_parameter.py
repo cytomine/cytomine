@@ -87,7 +87,7 @@ def parse_intensity_bounds(
             elif bound_value > max_allowed_intensity:
                 return max_allowed_intensity
             else:
-                return intensity
+                return bound_value
         else:
             if allow_none and bound_value == "NONE":
                 return bound_default
@@ -107,14 +107,6 @@ def parse_intensity_bounds(
                 return stretch_plane()
             else:
                 return bound_default
-
-    for idx, (channel, intensity) in enumerate(zip(out_channels, min_intensities)):
-        min_intensities[idx] = parse_intensity(channel, intensity, 0, "minimum")
-
-    for idx, (channel, intensity) in enumerate(zip(out_channels, max_intensities)):
-        max_intensities[idx] = parse_intensity(
-            channel, intensity, max_allowed_intensity, "maximum"
-        )
 
     parsed_mins = [
         parse_intensity(channel, intensity, 0, "minimum")

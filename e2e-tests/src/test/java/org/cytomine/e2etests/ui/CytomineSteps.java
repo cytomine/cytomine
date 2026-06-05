@@ -711,4 +711,15 @@ public class CytomineSteps {
             By.xpath("//div[contains(text(), 'Image group " + imageGroupName + " was successfully deleted')]")
         );
     }
+
+    public void openImageGroupInViewer(
+        Wait<WebDriver> wait,
+        String projectUrl,
+        String imageGroupName
+    ) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "image-groups"));
+        webDriverUtils.xpathClick(wait, "//a[normalize-space()='" + imageGroupName + "']");
+        webDriverUtils.waitLoading(wait);
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
+    }
 }

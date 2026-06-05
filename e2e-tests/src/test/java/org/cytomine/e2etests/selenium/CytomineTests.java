@@ -575,8 +575,9 @@ public class CytomineTests {
 
         String imageGroupName = "selenium-" + randomUUID();
         cytomineSteps.createImageGroup(wait, projectUrl, imageGroupName, Set.of(imageName));
-
+        cytomineSteps.openImageGroupInViewer(wait, projectUrl, imageGroupName);
         cytomineSteps.deleteImageGroup(wait, projectUrl, imageGroupName);
+
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteOntology(wait, ontologyUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);

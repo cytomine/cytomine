@@ -15,7 +15,7 @@
 import shutil
 import sys
 from functools import lru_cache
-from typing import List, Optional, Callable
+from typing import Callable
 from zipfile import ZipFile
 
 from pims.api.exceptions import NoMatchingFormatProblem
@@ -87,7 +87,7 @@ def xztar_match(signature: bytearray) -> bool:
 
 
 @lru_cache
-def _build_archive_format_list() -> List[ArchiveFormat]:
+def _build_archive_format_list() -> list[ArchiveFormat]:
     formats = []
     extensions = shutil.get_archive_formats()
     for name, description in extensions:
@@ -102,7 +102,7 @@ ARCHIVE_FORMATS = _build_archive_format_list()
 
 
 class Archive(Path):
-    def __init__(self, *pathsegments, format: Optional[ArchiveFormat] = None):
+    def __init__(self, *pathsegments, format: ArchiveFormat | None = None):
         super().__init__(pathsegments)
 
         _format = None

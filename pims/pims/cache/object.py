@@ -13,7 +13,7 @@
 #  * limitations under the License.
 import copy
 from functools import cached_property as _cached_property
-from typing import Any, Callable, Dict, KeysView, Union
+from typing import Any, Callable, KeysView
 
 from pims.utils.copy import SafelyCopiable
 
@@ -50,7 +50,7 @@ class cached_property:  # noqa
         return value
 
 
-DictCache = Dict[str, Any]
+DictCache = dict[str, Any]
 
 
 class SimpleDataCache(SafelyCopiable):
@@ -97,7 +97,7 @@ class SimpleDataCache(SafelyCopiable):
         self.cache_value(key, delayed_func(*args, **kwargs))
 
     def get_cached(
-        self, key: str, delayed_func_or_value: Union[Callable, Any],
+        self, key: str, delayed_func_or_value: Callable | Any,
         *args, **kwargs
     ) -> Any:
         """

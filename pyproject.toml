@@ -25,5 +25,9 @@ ignore-missing-imports = ["*"]
 project-includes = [
   "cbir/**/*.py",
   "clients/python/**/*.py",
+  "pims/**/*.py",
   "sam/**/*.py",
+]
+project-excludes = [
+  "pims/plugins/**/*.py",
 ]

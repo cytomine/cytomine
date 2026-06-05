@@ -12,8 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 
-from typing import List
-
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
 
@@ -46,7 +44,7 @@ class Colormap(BaseModel):
 
 
 class ColormapsList(CollectionSize):
-    items: List[Colormap] = Field(None, description='Array of colormaps', title='Colormap')
+    items: list[Colormap] = Field(None, description='Array of colormaps', title='Colormap')
 
 
 def _serialize_colormap(cmap):
@@ -67,7 +65,7 @@ async def list_colormaps(
     )
 ):
     """
-    List all colormaps
+    list all colormaps
     """
     colormaps = [
         _serialize_colormap(cmap)

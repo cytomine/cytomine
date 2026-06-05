@@ -12,7 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Tuple, Type, Union
 
 import numpy as np
 from starlette.responses import Response
@@ -46,7 +45,7 @@ class ImageResponse(ABC):
     """
 
     def __init__(
-        self, in_image: Optional[Image], out_format: OutputExtension,
+        self, in_image: Image | None, out_format: OutputExtension,
         out_width: int, out_height: int, out_bitdepth: int = 8, **kwargs
     ):
         self.in_image = in_image
@@ -89,7 +88,7 @@ class ImageResponse(ABC):
         )
 
     def http_response(
-        self, mimetype: str, extra_headers: Optional[Dict[str, str]] = None
+        self, mimetype: str, extra_headers: dict[str, str] | None = None
     ) -> Response:
         """
         Encapsulate image response into an HTTP response, ready to be sent to
@@ -109,7 +108,7 @@ class MultidimImageResponse(ImageResponse, ABC):
 
     def __init__(
         self, in_image: Image,
-        in_channels: List[int], in_z_slices: List[int], in_timepoints: List[int],
+        in_channels: list[int], in_z_slices: list[int], in_timepoints: list[int],
         out_format: OutputExtension, out_width: int, out_height: int,
         out_bitdepth: int, c_reduction: ChannelReduction,
         z_reduction: GenericReduction, t_reduction: GenericReduction, **kwargs
@@ -126,12 +125,12 @@ class MultidimImageResponse(ImageResponse, ABC):
         self.z_reduction = z_reduction
         self.t_reduction = t_reduction
 
-    def raw_view_planes(self) -> Tuple[List[int], int, int]:
+    def raw_view_planes(self) -> tuple[list[int], int, int]:
         # PIMS API currently only allow requests for 1 Z or T plane
         return self.channels, self.z_slices[0], self.timepoints[0]
 
     @abstractmethod
-    def raw_view(self, c: Union[int, List[int]], z: int, t: int) -> RawImagePixels:
+    def raw_view(self, c: int | list[int], z: int, t: int) -> RawImagePixels:
         pass
 
 
@@ -142,13 +141,13 @@ class ProcessedView(MultidimImageResponse, ABC):
 
     def __init__(
         self, in_image: Image,
-        in_channels: List[int], in_z_slices: List[int], in_timepoints: List[int],
+        in_channels: list[int], in_z_slices: list[int], in_timepoints: list[int],
         out_format: OutputExtension, out_width: int, out_height: int,
         out_bitdepth: int, c_reduction: ChannelReduction,
         z_reduction: GenericReduction, t_reduction: GenericReduction,
-        gammas: List[float], filters: List[Type[AbstractFilter]],
-        colormaps: List[Colormap], min_intensities: List[int],
-        max_intensities: List[int], log: bool, threshold: Optional[float],
+        gammas: list[float], filters: list[type[AbstractFilter]],
+        colormaps: list[Colormap], min_intensities: list[int],
+        max_intensities: list[int], log: bool, threshold: float | None,
         colorspace: Colorspace = Colorspace.AUTO, **kwargs
     ):
         super().__init__(
@@ -195,7 +194,7 @@ class ProcessedView(MultidimImageResponse, ABC):
                 self.threshold_processing or
                 self.log_processing)
 
-    def math_lut(self) -> Optional[StackedLookUpTables]:
+    def math_lut(self) -> StackedLookUpTables | None:
         """
         Compute lookup table for math processing operations if any.
 
@@ -204,7 +203,7 @@ class ProcessedView(MultidimImageResponse, ABC):
         lut
             Stacked LUTs (n_channels, 2**img.bitdepth, 1)
         """
-        if not self.math_processing:
+        if not self.math_processing or not self.in_image:
             return None
 
         n_channels = len(self.channels)
@@ -234,7 +233,7 @@ class ProcessedView(MultidimImageResponse, ABC):
             lut = np.log1p(lut) * 1. / np.log1p(1)
 
         if self.threshold_processing:
-            lut[lut < self.threshold] = 0.0
+            lut[lut < self.threshold] = 0.0  # pyrefly: ignore
 
         lut *= self.max_intensity
         lut = np.rint(lut)
@@ -257,7 +256,7 @@ class ProcessedView(MultidimImageResponse, ABC):
                         and is_rgb_colormapping(self.colormaps))
         return False
 
-    def colormap_lut(self) -> Optional[StackedLookUpTables]:
+    def colormap_lut(self) -> StackedLookUpTables | None:
         """
         Compute lookup table from colormaps if any.
 
@@ -289,7 +288,7 @@ class ProcessedView(MultidimImageResponse, ABC):
             ]
         )
 
-    def lut(self) -> Optional[StackedLookUpTables]:
+    def lut(self) -> StackedLookUpTables | None:
         """
         The lookup table to apply combining all processing operations.
         """
@@ -347,7 +346,7 @@ class ProcessedView(MultidimImageResponse, ABC):
         return any([f.require_histogram() for f in self.filters])
 
     @property
-    def filter_required_colorspace(self) -> Optional[Colorspace]:
+    def filter_required_colorspace(self) -> Colorspace | None:
         """
         If filtering and some filters require a specific colorspace, get the
         minimum satisfying colorspace.
@@ -422,6 +421,9 @@ class ProcessedView(MultidimImageResponse, ABC):
         Process image histogram from in/out parameters, so that if can be
         used by histogram filters on processed images.
         """
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         hist = self.in_image.histogram.plane_histogram(*self.raw_view_planes())
         hist = np.atleast_2d(hist)
 
@@ -437,13 +439,13 @@ class ProcessedView(MultidimImageResponse, ABC):
 
 class ThumbnailResponse(ProcessedView):
     def __init__(
-        self, in_image: Image, in_channels: List[int], in_z_slices: List[int],
-        in_timepoints: List[int], out_format: OutputExtension, out_width: int,
+        self, in_image: Image, in_channels: list[int], in_z_slices: list[int],
+        in_timepoints: list[int], out_format: OutputExtension, out_width: int,
         out_height: int, c_reduction: ChannelReduction, z_reduction: GenericReduction,
-        t_reduction: GenericReduction, gammas: List[float],
-        filters: List[Type[AbstractFilter]], colormaps: List[Colormap],
-        min_intensities: List[int], max_intensities: List[int], log: bool,
-        use_precomputed: bool, threshold: Optional[float], **kwargs
+        t_reduction: GenericReduction, gammas: list[float],
+        filters: list[type[AbstractFilter]], colormaps: list[Colormap],
+        min_intensities: list[int], max_intensities: list[int], log: bool,
+        use_precomputed: bool, threshold: float | None, **kwargs
     ):
         super().__init__(
             in_image, in_channels, in_z_slices, in_timepoints, out_format,
@@ -454,7 +456,10 @@ class ThumbnailResponse(ProcessedView):
 
         self.use_precomputed = use_precomputed
 
-    def raw_view(self, c: Union[int, List[int]], z: int, t: int) -> RawImagePixels:
+    def raw_view(self, c: int | list[int], z: int, t: int) -> RawImagePixels:
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         return self.in_image.thumbnail(
             self.out_width, self.out_height, c=c, z=z, t=t,
             precomputed=self.use_precomputed
@@ -463,14 +468,14 @@ class ThumbnailResponse(ProcessedView):
 
 class ResizedResponse(ProcessedView):
     def __init__(
-        self, in_image: Image, in_channels: List[int], in_z_slices: List[int],
-        in_timepoints: List[int], out_format: OutputExtension, out_width: int,
+        self, in_image: Image, in_channels: list[int], in_z_slices: list[int],
+        in_timepoints: list[int], out_format: OutputExtension, out_width: int,
         out_height: int, c_reduction: ChannelReduction,
         z_reduction: GenericReduction, t_reduction: GenericReduction,
-        gammas: List[float], filters: List[Type[AbstractFilter]],
-        colormaps: List[Colormap], min_intensities: List[int],
-        max_intensities: List[int], log: bool, out_bitdepth: int,
-        threshold: Optional[float], colorspace: Colorspace, **kwargs
+        gammas: list[float], filters: list[type[AbstractFilter]],
+        colormaps: list[Colormap], min_intensities: list[int],
+        max_intensities: list[int], log: bool, out_bitdepth: int,
+        threshold: float | None, colorspace: Colorspace, **kwargs
     ):
         super().__init__(
             in_image, in_channels, in_z_slices, in_timepoints, out_format,
@@ -479,7 +484,10 @@ class ResizedResponse(ProcessedView):
             max_intensities, log, threshold, colorspace, **kwargs
         )
 
-    def raw_view(self, c: Union[int, List[int]], z: int, t: int) -> RawImagePixels:
+    def raw_view(self, c: int | list[int], z: int, t: int) -> RawImagePixels:
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         return self.in_image.thumbnail(
             self.out_width, self.out_height, c=c, z=z, t=t, precomputed=False
         )
@@ -487,17 +495,17 @@ class ResizedResponse(ProcessedView):
 
 class WindowResponse(ProcessedView):
     def __init__(
-        self, in_image: Image, in_channels: List[int], in_z_slices: List[int],
-        in_timepoints: List[int], region: Region, out_format: OutputExtension,
+        self, in_image: Image, in_channels: list[int], in_z_slices: list[int],
+        in_timepoints: list[int], region: Region, out_format: OutputExtension,
         out_width: int, out_height: int, c_reduction: ChannelReduction,
         z_reduction: GenericReduction, t_reduction: GenericReduction,
-        gammas: List[float], filters: List[Type[AbstractFilter]],
-        colormaps: List[Colormap], min_intensities: List[int],
-        max_intensities: List[int], log: bool, out_bitdepth: int,
-        threshold: Optional[float], colorspace: Colorspace,
-        annotations: Optional[ParsedAnnotations] = None,
-        affine_matrix: Optional[np.ndarray] = None,
-        annot_params: Optional[dict] = None, **kwargs
+        gammas: list[float], filters: list[type[AbstractFilter]],
+        colormaps: list[Colormap], min_intensities: list[int],
+        max_intensities: list[int], log: bool, out_bitdepth: int,
+        threshold: float | None, colorspace: Colorspace,
+        annotations: ParsedAnnotations | None = None,
+        affine_matrix: np.ndarray | None = None,
+        annot_params: dict | None = None, **kwargs
     ):
         super().__init__(
             in_image, in_channels, in_z_slices, in_timepoints, out_format,
@@ -517,6 +525,9 @@ class WindowResponse(ProcessedView):
 
     @property
     def colorspace_processing(self) -> bool:
+        if not self.annotations:
+            return False
+
         if (self.colorspace == Colorspace.AUTO
                 and self.annotation_mode == AnnotationStyleMode.DRAWING
                 and len(self.channels) == 1
@@ -526,6 +537,9 @@ class WindowResponse(ProcessedView):
 
     @property
     def new_colorspace(self) -> Colorspace:
+        if not self.annotations:
+            return False
+
         if (self.colorspace == Colorspace.AUTO
                 and self.annotation_mode == AnnotationStyleMode.DRAWING
                 and len(self.channels) == 1
@@ -565,7 +579,10 @@ class WindowResponse(ProcessedView):
                 )
         return pixels
 
-    def raw_view(self, c: Union[int, List[int]], z: int, t: int) -> RawImagePixels:
+    def raw_view(self, c: int | list[int], z: int, t: int) -> RawImagePixels:
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         return self.in_image.window(
             self.region, self.out_width, self.out_height, c=c, z=z, t=t
         )
@@ -573,13 +590,13 @@ class WindowResponse(ProcessedView):
 
 class TileResponse(ProcessedView):
     def __init__(
-        self, in_image: Image, in_channels: List[int], in_z_slices: List[int],
-        in_timepoints: List[int], tile_region: Tile, out_format: OutputExtension,
+        self, in_image: Image, in_channels: list[int], in_z_slices: list[int],
+        in_timepoints: list[int], tile_region: Tile, out_format: OutputExtension,
         out_width: int, out_height: int, c_reduction: ChannelReduction,
         z_reduction: GenericReduction, t_reduction: GenericReduction,
-        gammas: List[float], filters: List[Type[AbstractFilter]],
-        colormaps: List[Colormap], min_intensities: List[int],
-        max_intensities: List[int], log: bool, threshold: Optional[float],
+        gammas: list[float], filters: list[type[AbstractFilter]],
+        colormaps: list[Colormap], min_intensities: list[int],
+        max_intensities: list[int], log: bool, threshold: float | None,
         **kwargs
     ):
         super().__init__(
@@ -592,7 +609,10 @@ class TileResponse(ProcessedView):
         # Tile (region)
         self.tile_region = tile_region
 
-    def raw_view(self, c: Union[int, List[int]], z: int, t: int) -> RawImagePixels:
+    def raw_view(self, c: int | list[int], z: int, t: int) -> RawImagePixels:
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         return self.in_image.tile(self.tile_region, c=c, z=z, t=t)
 
 
@@ -605,6 +625,9 @@ class AssociatedResponse(ImageResponse):
         self.associated_key = associated_key
 
     def associated_image(self) -> RawImagePixels:
+        if self.in_image is None:
+            raise ValueError("in_image is not set")
+
         if self.associated_key == AssociatedName.macro:
             associated = self.in_image.macro(self.out_width, self.out_height)
         elif self.associated_key == AssociatedName.label:

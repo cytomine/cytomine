@@ -12,7 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 import logging
-from typing import Optional
 
 from pint import Quantity
 
@@ -20,10 +19,7 @@ from pims.cache import cached_property
 from pims.formats import AbstractFormat
 from pims.formats.utils.abstract import CachedDataPath
 from pims.formats.utils.checker import SignatureChecker
-from pims.formats.utils.engines.vips import (
-    VipsParser, VipsReader,
-    VipsSpatialConvertor
-)
+from pims.formats.utils.engines.vips import VipsParser, VipsReader, VipsSpatialConvertor
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.structures.metadata import ImageMetadata
 from pims.utils import UNIT_REGISTRY
@@ -36,11 +32,13 @@ class PNGChecker(SignatureChecker):
     @classmethod
     def match(cls, pathlike: CachedDataPath) -> bool:
         buf = cls.get_signature(pathlike)
-        return (len(buf) > 3 and
-                buf[0] == 0x89 and
-                buf[1] == 0x50 and
-                buf[2] == 0x4E and
-                buf[3] == 0x47)
+        return (
+            len(buf) > 3
+            and buf[0] == 0x89
+            and buf[1] == 0x50
+            and buf[2] == 0x4E
+            and buf[3] == 0x47
+        )
 
 
 class PNGParser(VipsParser):
@@ -60,35 +58,42 @@ class PNGParser(VipsParser):
         desc_fields = ("PNG.Comment", "EXIF.ImageDescription", "EXIF.UserComment")
         imd.description = raw.get_first_value(desc_fields)
 
-        date_fields = ("PNG.CreationTime", "PNG.ModifyDate", "EXIF.CreationDate",
-                       "EXIF.DateTimeOriginal", "EXIF.ModifyDate")
+        date_fields = (
+            "PNG.CreationTime",
+            "PNG.ModifyDate",
+            "EXIF.CreationDate",
+            "EXIF.DateTimeOriginal",
+            "EXIF.ModifyDate",
+        )
         imd.acquisition_datetime = parse_datetime(raw.get_first_value(date_fields))
 
         imd.physical_size_x = self.parse_physical_size(
-            raw.get_value("PNG.PixelsPerUnitX"),
-            raw.get_value("PNG.PixelUnits"), True
+            raw.get_value("PNG.PixelsPerUnitX"), raw.get_value("PNG.PixelUnits"), True
         )
         imd.physical_size_y = self.parse_physical_size(
-            raw.get_value("PNG.PixelsPerUnitY"),
-            raw.get_value("PNG.PixelUnits"), True
+            raw.get_value("PNG.PixelsPerUnitY"), raw.get_value("PNG.PixelUnits"), True
         )
         if imd.physical_size_x is None and imd.physical_size_y is None:
             imd.physical_size_x = self.parse_physical_size(
                 raw.get_value("EXIF.XResolution"),
-                raw.get_value("EXIF.ResolutionUnit"), False
+                raw.get_value("EXIF.ResolutionUnit"),
+                False,
             )
             imd.physical_size_y = self.parse_physical_size(
                 raw.get_value("EXIF.YResolution"),
-                raw.get_value("EXIF.ResolutionUnit"), False
+                raw.get_value("EXIF.ResolutionUnit"),
+                False,
             )
         imd.is_complete = True
         return imd
 
     @staticmethod
     def parse_physical_size(
-        physical_size: Optional[str], unit: Optional[str], inverse: bool
-    ) -> Optional[Quantity]:
-        supported_units = {1: "meter", 2: "inch"}
+        physical_size: str | None,
+        unit: str | None,
+        inverse: bool,
+    ) -> Quantity | None:
+        supported_units: dict[str | int, str] = {1: "meter", 2: "inch"}
         if isinstance(unit, str):
             supported_units = {"meters": "meter", "inches": "inch"}
         if physical_size is not None and unit in supported_units.keys():
@@ -97,7 +102,8 @@ class PNGParser(VipsParser):
                 return None
             if inverse:
                 physical_size = 1 / physical_size
-            return physical_size * UNIT_REGISTRY(supported_units[unit])
+            unit_name = supported_units.get(unit, "meter") if unit is not None else "meter"
+            return physical_size * UNIT_REGISTRY(unit_name)
         return None
 
 

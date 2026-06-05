@@ -6,7 +6,6 @@ from pathlib import Path
 from shapely import wkt
 from shapely.geometry import shape
 from shapely.ops import transform
-from typing import List
 
 from cytomine.models import (
     Annotation,
@@ -35,7 +34,7 @@ class AnnotationImporter:
         self.images = images
         self.ontologies = ontologies
 
-    def get_annotations(self) -> List[str]:
+    def get_annotations(self) -> list[str]:
         dataset_xml_path = self.base_path / "METADATA" / "dataset.xml"
         tree = etree.parse(dataset_xml_path)
         root = tree.getroot()
@@ -43,7 +42,7 @@ class AnnotationImporter:
         annotations = root.findall(".//ANNOTATION_REF")
         return [annot.get("alias") for annot in annotations]
 
-    def load(self, annotation_path: Path, image_height: int) -> List[WktAnnotation]:
+    def load(self, annotation_path: Path, image_height: int) -> list[WktAnnotation]:
         try:
             with open(self.base_path / annotation_path, "r") as fp:
                 geometry = geojson.load(fp)
@@ -118,7 +117,7 @@ def feature_to_wkt(feature: dict, image_height: int) -> WktAnnotation:
     )
 
 
-def geojson_to_wkt(geojson: dict, image_height: int) -> List[WktAnnotation]:
+def geojson_to_wkt(geojson: dict, image_height: int) -> list[WktAnnotation]:
     geojson_type = geojson.get("type")
 
     if geojson_type == "FeatureCollection":

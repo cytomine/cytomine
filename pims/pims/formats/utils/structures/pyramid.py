@@ -154,13 +154,11 @@ class Pyramid:
         return self._tiers
 
     @property
-    def base(self) -> PyramidTier:
+    def base(self) -> PyramidTier | None:
         """
         Get base tier (always the image at full resolution).
         """
-        if self.n_levels == 0:
-            raise ValueError("Cannot get the base tier of an empty pyramid.")
-        return self._tiers[0]
+        return self._tiers[0] if self.n_levels > 0 else None
 
     def zoom_to_level(self, zoom: int) -> int:
         return self.max_zoom - zoom if self.max_zoom > 0 else 0

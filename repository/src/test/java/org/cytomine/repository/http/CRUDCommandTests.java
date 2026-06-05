@@ -51,11 +51,6 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         return userId.toString();
     }
 
-    default void testGet() {
-
-
-    }
-
     @Test
     @SneakyThrows
     default void baseTest() {

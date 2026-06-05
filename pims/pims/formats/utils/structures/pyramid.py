@@ -202,10 +202,8 @@ class Pyramid:
     def __iter__(self):
         return iter(self._tiers)
 
-    def most_appropriate_tier_for_downsample_factor(
-        self, factor: float
-    ) -> PyramidTier:
-        if factor < self.base.average_factor:
+    def most_appropriate_tier_for_downsample_factor(self, factor: float) -> PyramidTier:
+        if self.base is not None and factor < self.base.average_factor:
             return self.base
 
         for i in range(1, self.n_levels):

@@ -3,11 +3,16 @@ package org.cytomine.repository.http;
 import java.time.LocalDateTime;
 
 import lombok.SneakyThrows;
+import org.cytomine.repository.RepositoryApp;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
+import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.HasLocaleDateTimeCUD;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
@@ -20,6 +25,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest(classes = RepositoryApp.class)
+@AutoConfigureMockMvc
+@Import(PostGisTestConfiguration.class)
 public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
     MockMvc getMockMvc();
 
@@ -37,6 +45,8 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
     JdbcTemplate getJdbcTemplate();
 
+    default void beforeCreate(long userId) {
+    }
 
     default String createUser() {
         Long userId = getJdbcTemplate().queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
@@ -48,6 +58,7 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         getJdbcTemplate().update(
             "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) VALUES (?, 0, ?, ?)", userRoleId,
             userId, adminRoleId);
+        beforeCreate(userId);
         return userId.toString();
     }
 

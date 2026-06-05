@@ -73,16 +73,22 @@ class UndoControllerTest {
     void undoInsertTermCommandDeletesCreatedTerm() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#00FF00", ontologyId, Optional.empty());
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse createResponse = termCommandService.create(userId, createTerm, now).orElseThrow();
+        HttpCommandResponse createResponse = termCommandService.create(userId, createTerm, now)
+            .orElseThrow();
 
         Long termId = ((TermResponse) createResponse.data()).id();
         UUID insertCommandId = createResponse.commandId();
-        assertTrue(termRepository.findById(termId).isPresent());
+        assertTrue(termRepository.findById(termId)
+            .isPresent());
 
         mockMvc.perform(post("/commands/undo/{commandId}", insertCommandId).param("userId", userId.toString()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").value(termId.intValue()));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.id").value(termId.intValue()));
 
-        assertTrue(now.isBefore(termRepository.findById(termId).get().getDeleted().toLocalDateTime()));
+        assertTrue(now.isBefore(termRepository.findById(termId)
+            .get()
+            .getDeleted()
+            .toLocalDateTime()));
     }
 
     @Test
@@ -90,22 +96,27 @@ class UndoControllerTest {
     void undoUpdateTermCommandRestoresPreviousState() {
         CreateTerm createTerm = new CreateTerm("originalName", "#FF0000", ontologyId, Optional.empty());
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse createResponse = termCommandService.create(userId, createTerm, now).orElseThrow();
+        HttpCommandResponse createResponse = termCommandService.create(userId, createTerm, now)
+            .orElseThrow();
 
         Long termId = ((TermResponse) createResponse.data()).id();
 
         UpdateTerm updateTerm = new UpdateTerm(Optional.of("updatedName"), Optional.of("#00FF00"));
-        HttpCommandResponse updateResponse = termCommandService.update(termId, userId, updateTerm, now).orElseThrow();
+        HttpCommandResponse updateResponse = termCommandService.update(termId, userId, updateTerm, now)
+            .orElseThrow();
 
         UUID updateCommandId = updateResponse.commandId();
-        TermEntity updatedTerm = termRepository.findById(termId).orElseThrow();
+        TermEntity updatedTerm = termRepository.findById(termId)
+            .orElseThrow();
         assertEquals("updatedName", updatedTerm.getName());
         assertEquals("#00FF00", updatedTerm.getColor());
 
         mockMvc.perform(post("/commands/undo/{commandId}", updateCommandId).param("userId", userId.toString()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").value(termId.intValue()));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.id").value(termId.intValue()));
 
-        TermEntity restoredTerm = termRepository.findById(termId).orElseThrow();
+        TermEntity restoredTerm = termRepository.findById(termId)
+            .orElseThrow();
         assertEquals("originalName", restoredTerm.getName());
         assertEquals("#FF0000", restoredTerm.getColor());
     }
@@ -114,7 +125,8 @@ class UndoControllerTest {
     @SneakyThrows
     void undoWithNonExistentCommandIdReturnsEmpty() {
         mockMvc.perform(post("/commands/undo/{commandId}", UUID.randomUUID()).param("userId", userId.toString()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$").doesNotExist());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").doesNotExist());
     }
 
     @Test
@@ -122,7 +134,8 @@ class UndoControllerTest {
     void undoByUserWithoutPermissionReturnsEmpty() {
         CreateTerm createTerm = new CreateTerm("termToUndo", "#FF0000", ontologyId, Optional.empty());
         LocalDateTime now = LocalDateTime.now();
-        HttpCommandResponse createResponse = termCommandService.create(userId, createTerm, now).orElseThrow();
+        HttpCommandResponse createResponse = termCommandService.create(userId, createTerm, now)
+            .orElseThrow();
 
         Long termId = ((TermResponse) createResponse.data()).id();
         UUID insertCommandId = createResponse.commandId();
@@ -131,8 +144,10 @@ class UndoControllerTest {
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
 
         mockMvc.perform(post("/commands/undo/{commandId}", insertCommandId).param("userId", nonAdminUserId.toString()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$").doesNotExist());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").doesNotExist());
 
-        assertTrue(termRepository.findById(termId).isPresent());
+        assertTrue(termRepository.findById(termId)
+            .isPresent());
     }
 }

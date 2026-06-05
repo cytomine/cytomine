@@ -73,64 +73,77 @@ class TermCommandServiceTest {
 
     @Test
     void createThenDeleteThenUndoDeleteThenRedoDelete() {
-        LocalDateTime t0 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
+        LocalDateTime t0 = LocalDateTime.now()
+            .truncatedTo(ChronoUnit.MICROS);
         LocalDateTime t1 = t0.plusSeconds(1);
         LocalDateTime t2 = t0.plusSeconds(2);
 
 
         HttpCommandResponse createResponse =
-            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, Optional.empty()), t0).orElseThrow();
+            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, Optional.empty()), t0)
+                .orElseThrow();
         TermResponse dataResult = (TermResponse) createResponse.data();
         long termId = dataResult.id();
 
         assertEquals(new HttpCommandResponse(true,
-            new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t0, Optional.empty(), Optional.empty(), Set.of()),
-            createResponse.commandId(), Commands.CREATE_TERM), createResponse);
+            new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t0, Optional.empty(), Optional.empty(),
+                Set.of()), createResponse.commandId(), Commands.CREATE_TERM), createResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 0, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), null, null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 0, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0),
+                null, null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
 
-        HttpCommandResponse deleteResponse = termCommandService.delete(termId, userId, t1).orElseThrow();
+        HttpCommandResponse deleteResponse = termCommandService.delete(termId, userId, t1)
+            .orElseThrow();
         UUID deleteCommandId = deleteResponse.commandId();
-        DeleteTermCommand deleteCmd =
-            (DeleteTermCommand) commandV2Repository.findById(deleteCommandId).orElseThrow().getData();
+        DeleteTermCommand deleteCmd = (DeleteTermCommand) commandV2Repository.findById(deleteCommandId)
+            .orElseThrow()
+            .getData();
 
         assertEquals(new HttpCommandResponse(true,
             new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t0, Optional.of(t1), null, Set.of()),
             deleteCommandId, Commands.DELETE_TERM), deleteResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 1, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), Timestamp.valueOf(t1), null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 1, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0),
+                Timestamp.valueOf(t1), null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
 
-        HttpCommandResponse undoResponse =
-            termCommandService.undoDelete(deleteCommandId, deleteCmd, userId, t2).orElseThrow();
+        HttpCommandResponse undoResponse = termCommandService.undoDelete(deleteCommandId, deleteCmd, userId, t2)
+            .orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
             new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t2, Optional.empty(), null, Set.of()),
             deleteCommandId, Commands.DELETE_TERM), undoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 2, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t2), null, null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 2, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t2),
+                null, null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
 
         LocalDateTime t3 = t0.plusSeconds(3);
-        HttpCommandResponse redoResponse =
-            termCommandService.redoDelete(deleteCommandId, deleteCmd, userId, t3).orElseThrow();
+        HttpCommandResponse redoResponse = termCommandService.redoDelete(deleteCommandId, deleteCmd, userId, t3)
+            .orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
-            new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t2, Optional.of(t3), Optional.empty(), Set.of()),
-            deleteCommandId, Commands.DELETE_TERM), redoResponse);
+            new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t2, Optional.of(t3), Optional.empty(),
+                Set.of()), deleteCommandId, Commands.DELETE_TERM), redoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 3, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t2), Timestamp.valueOf(t3), null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 3, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t2),
+                Timestamp.valueOf(t3), null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
     }
 
     @Test
     void createThenUpdateThenUndoUpdateThenRedoUpdate() {
-        LocalDateTime t0 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
+        LocalDateTime t0 = LocalDateTime.now()
+            .truncatedTo(ChronoUnit.MICROS);
         LocalDateTime t1 = t0.plusSeconds(1);
 
 
@@ -141,94 +154,113 @@ class TermCommandServiceTest {
         long termId = dataResult.id();
 
         assertEquals(new HttpCommandResponse(true,
-            new TermResponse(termId, "original", "#FF0000", ontologyId, t0, t0, Optional.empty(), Optional.empty(), Set.of()),
-            createResponse.commandId(), Commands.CREATE_TERM), createResponse);
+            new TermResponse(termId, "original", "#FF0000", ontologyId, t0, t0, Optional.empty(), Optional.empty(),
+                Set.of()), createResponse.commandId(), Commands.CREATE_TERM), createResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 0, ontologyId, "original", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), null, null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 0, ontologyId, "original", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0),
+                null, null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
 
         HttpCommandResponse updateResponse =
             termCommandService.update(termId, userId, new UpdateTerm(Optional.of("updated"), Optional.of("#00FF00")),
-                t1).orElseThrow();
+                    t1)
+                .orElseThrow();
         UUID updateCommandId = updateResponse.commandId();
-        UpdateTermCommand updateCmd =
-            (UpdateTermCommand) commandV2Repository.findById(updateCommandId).orElseThrow().getData();
+        UpdateTermCommand updateCmd = (UpdateTermCommand) commandV2Repository.findById(updateCommandId)
+            .orElseThrow()
+            .getData();
 
         assertEquals(new HttpCommandResponse(true,
-            new TermResponse(termId, "updated", "#00FF00", ontologyId, t0, t0, Optional.empty(), Optional.empty(), Set.of()),
-            updateCommandId, Commands.UPDATE_TERM), updateResponse);
+            new TermResponse(termId, "updated", "#00FF00", ontologyId, t0, t0, Optional.empty(), Optional.empty(),
+                Set.of()), updateCommandId, Commands.UPDATE_TERM), updateResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 1, ontologyId, "updated", "#00FF00", Timestamp.valueOf(t0), Timestamp.valueOf(t0), null, null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 1, ontologyId, "updated", "#00FF00", Timestamp.valueOf(t0), Timestamp.valueOf(t0),
+                null, null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
 
-        HttpCommandResponse undoResponse =
-            termCommandService.undoUpdate(updateCommandId, updateCmd, userId, t0).orElseThrow();
+        HttpCommandResponse undoResponse = termCommandService.undoUpdate(updateCommandId, updateCmd, userId, t0)
+            .orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
-            new TermResponse(termId, "original", "#FF0000", ontologyId, t0, t0, Optional.empty(), Optional.empty(), Set.of()),
-            updateCommandId, Commands.UPDATE_TERM), undoResponse);
+            new TermResponse(termId, "original", "#FF0000", ontologyId, t0, t0, Optional.empty(), Optional.empty(),
+                Set.of()), updateCommandId, Commands.UPDATE_TERM), undoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 2, ontologyId, "original", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), null, null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 2, ontologyId, "original", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0),
+                null, null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
 
         LocalDateTime t2 = t0.plusSeconds(2);
-        HttpCommandResponse redoResponse =
-            termCommandService.redoUpdate(updateCommandId, updateCmd, userId, t2).orElseThrow();
+        HttpCommandResponse redoResponse = termCommandService.redoUpdate(updateCommandId, updateCmd, userId, t2)
+            .orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
-            new TermResponse(termId, "updated", "#00FF00", ontologyId, t0, t2, Optional.empty(), Optional.empty(), Set.of()),
-            updateCommandId, Commands.UPDATE_TERM), redoResponse);
+            new TermResponse(termId, "updated", "#00FF00", ontologyId, t0, t2, Optional.empty(), Optional.empty(),
+                Set.of()), updateCommandId, Commands.UPDATE_TERM), redoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 3, ontologyId, "updated", "#00FF00", Timestamp.valueOf(t0), Timestamp.valueOf(t2), null, null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 3, ontologyId, "updated", "#00FF00", Timestamp.valueOf(t0), Timestamp.valueOf(t2),
+                null, null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
     }
 
     @Test
     void createThenUndoCreateThenRedoCreate() {
-        LocalDateTime t0 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
+        LocalDateTime t0 = LocalDateTime.now()
+            .truncatedTo(ChronoUnit.MICROS);
         LocalDateTime t1 = t0.plusSeconds(1);
         LocalDateTime t2 = t0.plusSeconds(2);
 
         HttpCommandResponse createResponse =
-            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, Optional.empty()), t0).orElseThrow();
+            termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, Optional.empty()), t0)
+                .orElseThrow();
         TermResponse dataResult = (TermResponse) createResponse.data();
         long termId = dataResult.id();
         UUID createCommandId = createResponse.commandId();
-        CreateTermCommand createCmd =
-            (CreateTermCommand) commandV2Repository.findById(createCommandId).orElseThrow().getData();
+        CreateTermCommand createCmd = (CreateTermCommand) commandV2Repository.findById(createCommandId)
+            .orElseThrow()
+            .getData();
 
         assertEquals(new HttpCommandResponse(true,
-            new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t0, Optional.empty(), Optional.empty(), Set.of()),
-            createCommandId, Commands.CREATE_TERM), createResponse);
+            new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t0, Optional.empty(), Optional.empty(),
+                Set.of()), createCommandId, Commands.CREATE_TERM), createResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 0, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), null, null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 0, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0),
+                null, null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
 
-        HttpCommandResponse undoResponse =
-            termCommandService.undoCreate(createCommandId, createCmd, userId, t1).orElseThrow();
+        HttpCommandResponse undoResponse = termCommandService.undoCreate(createCommandId, createCmd, userId, t1)
+            .orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
-            new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t0, Optional.of(t1), Optional.empty(), Set.of()),
-            createCommandId, Commands.CREATE_TERM), undoResponse);
+            new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t0, Optional.of(t1), Optional.empty(),
+                Set.of()), createCommandId, Commands.CREATE_TERM), undoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 1, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0), Timestamp.valueOf(t1), null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 1, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t0),
+                Timestamp.valueOf(t1), null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
 
-        HttpCommandResponse redoResponse =
-            termCommandService.redoCreate(createCommandId, createCmd, userId, t2).orElseThrow();
+        HttpCommandResponse redoResponse = termCommandService.redoCreate(createCommandId, createCmd, userId, t2)
+            .orElseThrow();
 
         assertEquals(new HttpCommandResponse(true,
-            new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t2, Optional.empty(), Optional.empty(), Set.of()),
-            createCommandId, Commands.CREATE_TERM), redoResponse);
+            new TermResponse(termId, "term1", "#FF0000", ontologyId, t0, t2, Optional.empty(), Optional.empty(),
+                Set.of()), createCommandId, Commands.CREATE_TERM), redoResponse);
         entityManager.flush();
         entityManager.clear();
-        assertEquals(new TermEntity(termId, 2, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t2), null, null, Set.of()),
-            termRepository.findById(termId).orElseThrow());
+        assertEquals(
+            new TermEntity(termId, 2, ontologyId, "term1", "#FF0000", Timestamp.valueOf(t0), Timestamp.valueOf(t2),
+                null, null, Set.of()), termRepository.findById(termId)
+                .orElseThrow());
     }
 }

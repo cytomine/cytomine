@@ -74,53 +74,61 @@ class TermLifecycleTest {
 
     @Test
     void createTwoTermsMakeOneChildThenEditBothThenDeleteParent() {
-        LocalDateTime t0 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
+        LocalDateTime t0 = LocalDateTime.now()
+            .truncatedTo(ChronoUnit.MICROS);
         LocalDateTime t1 = t0.plusSeconds(1);
         LocalDateTime t2 = t0.plusSeconds(2);
         LocalDateTime t3 = t0.plusSeconds(3);
 
         // Step 1: create parent and child terms
-        TermResponse parentResponse = (TermResponse) termCommandService
-            .create(userId, new CreateTerm("parent", "#FF0000", ontologyId, null), t0)
-            .orElseThrow().data();
+        TermResponse parentResponse =
+            (TermResponse) termCommandService.create(userId, new CreateTerm("parent", "#FF0000", ontologyId, null), t0)
+                .orElseThrow()
+                .data();
         long parentId = parentResponse.id();
 
-        TermResponse childResponse = (TermResponse) termCommandService
-            .create(userId, new CreateTerm("child", "#00FF00", ontologyId, null), t0)
-            .orElseThrow().data();
+        TermResponse childResponse =
+            (TermResponse) termCommandService.create(userId, new CreateTerm("child", "#00FF00", ontologyId, null), t0)
+                .orElseThrow()
+                .data();
         long childId = childResponse.id();
 
         entityManager.flush();
         entityManager.clear();
 
-        assertEquals("parent", termRepository.findById(parentId).orElseThrow().getName());
-        assertEquals("child", termRepository.findById(childId).orElseThrow().getName());
+        assertEquals("parent", termRepository.findById(parentId)
+            .orElseThrow()
+            .getName());
+        assertEquals("child", termRepository.findById(childId)
+            .orElseThrow()
+            .getName());
 
         // Step 2: make child a child of parent via a term relation (term1=parent, term2=child)
-        HttpCommandResponse relationCreationResponse = termRelationCommandService
-            .create(userId, new CreateTermRelation(parentId, childId, "parent"), t1)
-            .orElseThrow();
+        HttpCommandResponse relationCreationResponse =
+            termRelationCommandService.create(userId, new CreateTermRelation(parentId, childId, "parent"), t1)
+                .orElseThrow();
         TermRelationResponse termRelationResponse = (TermRelationResponse) relationCreationResponse.data();
         long termRelationId = termRelationResponse.id();
 
         entityManager.flush();
         entityManager.clear();
 
-        TermRelationEntity savedRelation = termRelationRepository.findById(termRelationId).orElseThrow();
+        TermRelationEntity savedRelation = termRelationRepository.findById(termRelationId)
+            .orElseThrow();
         assertNotNull(savedRelation);
         assertEquals(parentId, savedRelation.getTerm1Id());
         assertEquals(childId, savedRelation.getTerm2Id());
 
         // Step 3: edit both terms
-        HttpCommandResponse updateParentResponse = termCommandService
-            .update(parentId, userId, new UpdateTerm(Optional.of("parent-updated"), Optional.of("#FF00FF")), t2)
+        HttpCommandResponse updateParentResponse = termCommandService.update(parentId, userId,
+                new UpdateTerm(Optional.of("parent-updated"), Optional.of("#FF00FF")), t2)
             .orElseThrow();
         TermResponse updatedParent = (TermResponse) updateParentResponse.data();
         assertEquals("parent-updated", updatedParent.name());
         assertEquals("#FF00FF", updatedParent.color());
 
-        HttpCommandResponse updateChildResponse = termCommandService
-            .update(childId, userId, new UpdateTerm(Optional.of("child-updated"), Optional.of("#0000FF")), t2)
+        HttpCommandResponse updateChildResponse = termCommandService.update(childId, userId,
+                new UpdateTerm(Optional.of("child-updated"), Optional.of("#0000FF")), t2)
             .orElseThrow();
         TermResponse updatedChild = (TermResponse) updateChildResponse.data();
         assertEquals("child-updated", updatedChild.name());
@@ -129,24 +137,30 @@ class TermLifecycleTest {
         entityManager.flush();
         entityManager.clear();
 
-        TermEntity savedParent = termRepository.findById(parentId).orElseThrow();
+        TermEntity savedParent = termRepository.findById(parentId)
+            .orElseThrow();
         assertEquals("parent-updated", savedParent.getName());
         assertEquals("#FF00FF", savedParent.getColor());
 
-        TermEntity savedChild = termRepository.findById(childId).orElseThrow();
+        TermEntity savedChild = termRepository.findById(childId)
+            .orElseThrow();
         assertEquals("child-updated", savedChild.getName());
         assertEquals("#0000FF", savedChild.getColor());
 
         // Step 4: delete the parent
-        HttpCommandResponse deleteResponse = termCommandService.delete(parentId, userId, t3).orElseThrow();
+        HttpCommandResponse deleteResponse = termCommandService.delete(parentId, userId, t3)
+            .orElseThrow();
         TermResponse deletedParent = (TermResponse) deleteResponse.data();
-        assertTrue(deletedParent.deleted().isPresent());
-        assertEquals(t3, deletedParent.deleted().get());
+        assertTrue(deletedParent.deleted()
+            .isPresent());
+        assertEquals(t3, deletedParent.deleted()
+            .get());
 
         entityManager.flush();
         entityManager.clear();
 
-        TermEntity deletedEntity = termRepository.findById(parentId).orElseThrow();
+        TermEntity deletedEntity = termRepository.findById(parentId)
+            .orElseThrow();
         assertEquals(t3, deletedEntity.getDeleted());
     }
 }

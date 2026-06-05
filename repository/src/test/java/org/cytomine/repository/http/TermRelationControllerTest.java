@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +34,7 @@ import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelati
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -96,12 +96,16 @@ class TermRelationControllerTest {
 
         String response =
             mockMvc.perform(get("/term_relations/{id}", entity.getId()).param("userId", userId.toString()))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         TermRelationResponse result = objectMapper.readValue(response, TermRelationResponse.class);
         TermRelationResponse expected =
-            new TermRelationResponse(entity.getId(), term1.getId(), term2.getId(), relationId, entity.getUpdated().toLocalDateTime(),
-                Optional.empty(), entity.getCreated().toLocalDateTime(), "comment");
+            new TermRelationResponse(entity.getId(), term1.getId(), term2.getId(), relationId,
+                entity.getUpdated().toLocalDateTime(), Optional.empty(), entity.getCreated().toLocalDateTime(),
+                "comment");
         assertEquals(expected, result);
     }
 
@@ -109,7 +113,10 @@ class TermRelationControllerTest {
     @SneakyThrows
     void findTermRelationByIdWhenNotExistsReturnsEmpty() {
         String response = mockMvc.perform(get("/term_relations/{id}", 999L).param("userId", userId.toString()))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         assertNull(objectMapper.readValue(response, TermRelationResponse.class));
     }
@@ -126,7 +133,10 @@ class TermRelationControllerTest {
 
         String response =
             mockMvc.perform(get("/term_relations/{id}", entity.getId()).param("userId", nonAdminUserId.toString()))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         assertNull(objectMapper.readValue(response, TermRelationResponse.class));
     }
@@ -140,13 +150,16 @@ class TermRelationControllerTest {
 
         String response =
             mockMvc.perform(get("/term_relations/ontology/{ontologyId}", ontologyId).param("userId", userId.toString()))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         List<TermRelationResponse> result = objectMapper.readValue(response, new TypeReference<>() {
         });
         TermRelationResponse expected =
-            new TermRelationResponse(entity.getId(), term1.getId(), term2.getId(), relationId, entity.getUpdated().toLocalDateTime(),
-                Optional.empty(), entity.getCreated().toLocalDateTime(), null);
+            new TermRelationResponse(entity.getId(), term1.getId(), term2.getId(), relationId,
+                entity.getUpdated().toLocalDateTime(), Optional.empty(), entity.getCreated().toLocalDateTime(), null);
         assertEquals(List.of(expected), result);
     }
 
@@ -162,7 +175,10 @@ class TermRelationControllerTest {
 
         String response = mockMvc.perform(
                 get("/term_relations/ontology/{ontologyId}", ontologyId).param("userId", nonAdminUserId.toString()))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         List<TermRelationResponse> result = objectMapper.readValue(response, new TypeReference<>() {
         });
@@ -176,10 +192,13 @@ class TermRelationControllerTest {
         TermEntity term2 = createAndSaveTermEntity("term2", "#00FF00");
         CreateTermRelation createTermRelation = new CreateTermRelation(term1.getId(), term2.getId(), "parent");
 
-        String response = mockMvc.perform(
-                post("/term_relations").param("userId", userId.toString()).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(createTermRelation))).andExpect(status().isOk()).andReturn()
-            .getResponse().getContentAsString();
+        String response = mockMvc.perform(post("/term_relations").param("userId", userId.toString())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createTermRelation)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         HttpCommandResponse result =
             objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
@@ -202,10 +221,13 @@ class TermRelationControllerTest {
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
 
-        String response = mockMvc.perform(
-                post("/term_relations").param("userId", nonAdminUserId.toString()).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(createTermRelation))).andExpect(status().isOk()).andReturn()
-            .getResponse().getContentAsString();
+        String response = mockMvc.perform(post("/term_relations").param("userId", nonAdminUserId.toString())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createTermRelation)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         assertNull(objectMapper.readValue(response, HttpCommandResponse.class));
     }
@@ -218,10 +240,13 @@ class TermRelationControllerTest {
         createAndSaveTermRelationEntity(term1.getId(), term2.getId());
         CreateTermRelation createTermRelation = new CreateTermRelation(term1.getId(), term2.getId(), "parent");
 
-        String response = mockMvc.perform(
-                post("/term_relations").param("userId", userId.toString()).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(createTermRelation))).andExpect(status().isOk()).andReturn()
-            .getResponse().getContentAsString();
+        String response = mockMvc.perform(post("/term_relations").param("userId", userId.toString())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createTermRelation)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         assertNull(objectMapper.readValue(response, HttpCommandResponse.class));
     }
@@ -237,8 +262,12 @@ class TermRelationControllerTest {
             new UpdateTermRelation(Optional.empty(), Optional.of(term3.getId()), Optional.empty());
 
         String response = mockMvc.perform(put("/term_relations/{id}", entity.getId()).param("userId", userId.toString())
-                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateTermRelation)))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateTermRelation)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         HttpCommandResponse result =
             objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
@@ -255,10 +284,13 @@ class TermRelationControllerTest {
         UpdateTermRelation updateTermRelation =
             new UpdateTermRelation(Optional.empty(), Optional.empty(), Optional.empty());
 
-        String response = mockMvc.perform(
-                put("/term_relations/{id}", 999L).param("userId", userId.toString()).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(updateTermRelation))).andExpect(status().isOk()).andReturn()
-            .getResponse().getContentAsString();
+        String response = mockMvc.perform(put("/term_relations/{id}", 999L).param("userId", userId.toString())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateTermRelation)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         assertNull(objectMapper.readValue(response, HttpCommandResponse.class));
     }
@@ -272,7 +304,10 @@ class TermRelationControllerTest {
 
         String response =
             mockMvc.perform(delete("/term_relations/{id}", entity.getId()).param("userId", userId.toString()))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         HttpCommandResponse result =
             objectMapper.readValue(response, objectMapper.getTypeFactory().constructType(HttpCommandResponse.class));
@@ -289,7 +324,10 @@ class TermRelationControllerTest {
     @SneakyThrows
     void deleteWhenNotExistsReturnsEmpty() {
         String response = mockMvc.perform(delete("/term_relations/{id}", 999L).param("userId", userId.toString()))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         assertNull(objectMapper.readValue(response, HttpCommandResponse.class));
     }
@@ -306,15 +344,18 @@ class TermRelationControllerTest {
 
         String response =
             mockMvc.perform(delete("/term_relations/{id}", entity.getId()).param("userId", nonAdminUserId.toString()))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         assertNull(objectMapper.readValue(response, HttpCommandResponse.class));
     }
 
     private TermEntity createAndSaveTermEntity(String name, String color) {
         Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-        return termRepository.saveAndFlush(new TermEntity(null, 0, ontologyId, name, color, now, now, null, "comment",
-            null));
+        return termRepository.saveAndFlush(
+            new TermEntity(null, 0, ontologyId, name, color, now, now, null, "comment", null));
     }
 
     private TermRelationEntity createAndSaveTermRelationEntity(long term1Id, long term2Id) {

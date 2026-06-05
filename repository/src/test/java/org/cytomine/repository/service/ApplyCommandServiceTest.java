@@ -64,7 +64,8 @@ class ApplyCommandServiceTest {
         UUID id = UUID.randomUUID();
         when(commandRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertFalse(applyCommandService.undoCommand(userId, id, LocalDateTime.now()).isPresent());
+        assertFalse(applyCommandService.undoCommand(userId, id, LocalDateTime.now())
+            .isPresent());
     }
 
     @Test
@@ -72,7 +73,8 @@ class ApplyCommandServiceTest {
         UUID id = UUID.randomUUID();
         when(commandRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertFalse(applyCommandService.redoCommand(userId, id, LocalDateTime.now()).isPresent());
+        assertFalse(applyCommandService.redoCommand(userId, id, LocalDateTime.now())
+            .isPresent());
     }
 
     @Test
@@ -191,8 +193,7 @@ class ApplyCommandServiceTest {
     void undoUpdateTermRelationCommandDelegatesToTermRelationCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        UpdateTermRelationCommand cmd =
-            new UpdateTermRelationCommand(relationPayload, relationPayload, userId);
+        UpdateTermRelationCommand cmd = new UpdateTermRelationCommand(relationPayload, relationPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termRelationCommandService.undoUpdate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.UPDATE_TERM_RELATION)));
@@ -234,8 +235,7 @@ class ApplyCommandServiceTest {
     void redoUpdateTermRelationCommandDelegatesToTermRelationCommandService() {
         UUID id = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        UpdateTermRelationCommand cmd =
-            new UpdateTermRelationCommand(relationPayload, relationPayload, userId);
+        UpdateTermRelationCommand cmd = new UpdateTermRelationCommand(relationPayload, relationPayload, userId);
         when(commandRepository.findById(id)).thenReturn(Optional.of(new CommandV2Entity(id, null, null, cmd, 0L)));
         when(termRelationCommandService.redoUpdate(id, cmd, userId, now)).thenReturn(
             Optional.of(mockResponse(Commands.UPDATE_TERM_RELATION)));

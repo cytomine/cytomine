@@ -38,13 +38,14 @@ public class TermCommandService
     private final ACLService aclService;
 
     @Override
-    public TermEntity update(TermEntity entity, UpdateTerm payload, Timestamp now) {
-        return termMapper.update(entity, payload.name().orElse(entity.getName()),
-            payload.color().orElse(entity.getColor()), now);
+    public TermEntity updateEntityWithEntity(TermEntity entity, UpdateTerm payload, Timestamp now) {
+        return termMapper.update(entity, payload.name()
+            .orElse(entity.getName()), payload.color()
+            .orElse(entity.getColor()), now);
     }
 
     @Override
-    public TermEntity updateWithPayload(TermEntity entity, TermCommandPayload payload, Timestamp now) {
+    public TermEntity updateEntityWithPayload(TermEntity entity, TermCommandPayload payload, Timestamp now) {
         return termMapper.updateWithPayload(entity, payload, now);
     }
 
@@ -93,13 +94,17 @@ public class TermCommandService
 
     @Override
     public boolean canWrite(long userId, long id) {
-        return termRepository.findById(id).map(TermEntity::getOntologyId)
-            .map(ontologyId -> aclService.canWriteOntology(userId, ontologyId)).orElse(false);
+        return termRepository.findById(id)
+            .map(TermEntity::getOntologyId)
+            .map(ontologyId -> aclService.canWriteOntology(userId, ontologyId))
+            .orElse(false);
     }
 
     @Override
     public boolean canDelete(long userId, long id) {
-        return termRepository.findById(id).map(TermEntity::getOntologyId)
-            .map(ontologyId -> aclService.canDeleteOntology(userId, ontologyId)).orElse(false);
+        return termRepository.findById(id)
+            .map(TermEntity::getOntologyId)
+            .map(ontologyId -> aclService.canDeleteOntology(userId, ontologyId))
+            .orElse(false);
     }
 }

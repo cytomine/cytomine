@@ -50,15 +50,15 @@ public class TermEntity implements HasDeleted, HasUpdated {
         inverseJoinColumns = @JoinColumn(name = "term2_id"))
     private Set<TermEntity> children;
 
-//    public LocalDateTime getCreated() {
-//        return created.truncatedTo(MICROS);
-//    }
-//
-//    public LocalDateTime getUpdated() {
-//        return updated.truncatedTo(MICROS);
-//    }
-//
-//    public LocalDateTime getDeleted() {
-//        return Optional.ofNullable(deleted).map(a -> a.truncatedTo(MICROS)).orElse(null);
-//    }
+    //    public LocalDateTime getCreated() {
+    //        return created.truncatedTo(MICROS);
+    //    }
+    //
+    //    public LocalDateTime getUpdated() {
+    //        return updated.truncatedTo(MICROS);
+    //    }
+    //
+    //    public LocalDateTime getDeleted() {
+    //        return Optional.ofNullable(deleted).map(a -> a.truncatedTo(MICROS)).orElse(null);
+    //    }
 }

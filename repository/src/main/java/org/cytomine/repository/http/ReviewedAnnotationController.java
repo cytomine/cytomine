@@ -32,21 +32,31 @@ public class ReviewedAnnotationController implements ReviewedAnnotationHttpContr
     @Transactional
     public Set<Long> replaceAllTermIds(long reviewedAnnotationTermsId, long userId, Set<Long> newLinks) {
 
-        if (!termRepository.findAllById(newLinks).stream().map(TermEntity::getOntologyId).distinct()
+        if (!termRepository.findAllById(newLinks)
+            .stream()
+            .map(TermEntity::getOntologyId)
+            .distinct()
             .allMatch(ontologyId -> aclService.canWriteOntology(userId, ontologyId))) {
             return Set.of();
         }
 
         Set<ReviewedAnnotationLinkEntity> existing =
             reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId);
-        if (existing.stream().map(ReviewedAnnotationLinkEntity::getTermId).collect(Collectors.toSet())
+        if (existing.stream()
+            .map(ReviewedAnnotationLinkEntity::getTermId)
+            .collect(Collectors.toSet())
             .equals(newLinks)) {
-            return existing.stream().map(ReviewedAnnotationLinkEntity::getTermId).collect(Collectors.toSet());
+            return existing.stream()
+                .map(ReviewedAnnotationLinkEntity::getTermId)
+                .collect(Collectors.toSet());
         } else {
             reviewedAnnotationLinkRepository.deleteAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId);
-            return reviewedAnnotationLinkRepository.saveAll(
-                newLinks.stream().map(termId -> new ReviewedAnnotationLinkEntity(termId, reviewedAnnotationTermsId))
-                    .toList()).stream().map(ReviewedAnnotationLinkEntity::getTermId).collect(Collectors.toSet());
+            return reviewedAnnotationLinkRepository.saveAll(newLinks.stream()
+                    .map(termId -> new ReviewedAnnotationLinkEntity(termId, reviewedAnnotationTermsId))
+                    .toList())
+                .stream()
+                .map(ReviewedAnnotationLinkEntity::getTermId)
+                .collect(Collectors.toSet());
         }
     }
 }

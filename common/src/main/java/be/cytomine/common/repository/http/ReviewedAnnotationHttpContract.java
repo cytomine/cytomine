@@ -16,7 +16,7 @@ public interface ReviewedAnnotationHttpContract {
 
     @PutExchange("/terms/{reviewedAnnotationTermsId}")
     Set<Long> replaceAllTermIds(@PathVariable long reviewedAnnotationTermsId, @RequestParam long userId,
-                                @RequestBody Set<Long> newLinks);
+        @RequestBody Set<Long> newLinks);
 
 
 }

@@ -4,7 +4,7 @@ import be.cytomine.common.repository.model.command.CommandType;
 import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.request.OntologyCommandPayload;
 
-public record UpdateOntologyCommand( OntologyCommandPayload before, OntologyCommandPayload after, long userId)
+public record UpdateOntologyCommand(OntologyCommandPayload before, OntologyCommandPayload after, long userId)
     implements UpdateCommandRequest<OntologyCommandPayload> {
     @Override
     public CommandType getCommandType() {

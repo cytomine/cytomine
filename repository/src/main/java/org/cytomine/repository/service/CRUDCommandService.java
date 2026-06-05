@@ -19,10 +19,11 @@ import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
 
-public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E extends HasDeleted & HasUpdated, R extends ApplyCommandResponse> {
-    E update(E entity, U payload, Timestamp now);
+public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E extends HasDeleted & HasUpdated,
+    R extends ApplyCommandResponse> {
+    E updateEntityWithEntity(E entity, U payload, Timestamp now);
 
-    E updateWithPayload(E entity, P payload, Timestamp now);
+    E updateEntityWithPayload(E entity, P payload, Timestamp now);
 
     R mapToResponse(E entity);
 
@@ -66,7 +67,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         if (canWrite(userId, id)) {
             return get(id).map(e -> {
                 P beforePayload = map(e);
-                E update = update(e, updatePayload, Timestamp.valueOf(now));
+                E update = updateEntityWithEntity(e, updatePayload, Timestamp.valueOf(now));
                 E savedEntity = save(update);
                 UpdateCommandRequest<?> updateCommandRequest =
                     mapUpdateCommand(userId, beforePayload, map(savedEntity));
@@ -119,7 +120,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
     default Optional<HttpCommandResponse> updateWithExistingCommand(long userId, UUID commandId, String command,
         P payload, LocalDateTime now) {
         return get(payload.id()).map(entity -> {
-            E updatedEntity = updateWithPayload(entity, payload, Timestamp.valueOf(now));
+            E updatedEntity = updateEntityWithPayload(entity, payload, Timestamp.valueOf(now));
             return saveAndBuildResponse(updatedEntity, command, commandId);
         });
     }

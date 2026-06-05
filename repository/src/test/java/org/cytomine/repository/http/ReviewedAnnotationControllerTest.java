@@ -104,8 +104,12 @@ class ReviewedAnnotationControllerTest {
     void replaceAllTermIdsWhenNoExistingLinksCreatesAndReturnsNewLinks() {
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId1))))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of(termId1))))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
         });
@@ -121,8 +125,12 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId2))))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of(termId2))))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
         });
@@ -138,8 +146,12 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId1))))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of(termId1))))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
         });
@@ -155,14 +167,18 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of())))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of())))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
         });
         assertTrue(result.isEmpty());
-        assertTrue(
-            reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId).isEmpty());
+        assertTrue(reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId)
+            .isEmpty());
     }
 
     @Test
@@ -176,9 +192,13 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId",
-                        nonAdminUserId.toString()).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(Set.of(termId2)))).andExpect(status().isOk()).andReturn()
-            .getResponse().getContentAsString();
+                        nonAdminUserId.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of(termId2))))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
         });
@@ -187,7 +207,9 @@ class ReviewedAnnotationControllerTest {
     }
 
     private Set<Long> termIdsForAnnotation(long annotationTermsId) {
-        return reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(annotationTermsId).stream()
-            .map(ReviewedAnnotationLinkEntity::getTermId).collect(java.util.stream.Collectors.toSet());
+        return reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(annotationTermsId)
+            .stream()
+            .map(ReviewedAnnotationLinkEntity::getTermId)
+            .collect(java.util.stream.Collectors.toSet());
     }
 }

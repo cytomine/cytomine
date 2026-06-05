@@ -30,21 +30,17 @@ public interface TermHttpContract {
     Optional<TermResponse> findTermByID(@PathVariable long id, @RequestParam long userId);
 
     @PostExchange
-    Optional<HttpCommandResponse> create(@RequestParam long userId,
-                                         @Valid @RequestBody CreateTerm createTerm);
+    Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateTerm createTerm);
 
     @PutExchange("/{id}")
-    Optional<HttpCommandResponse> update(@PathVariable long id,
-                                         @RequestParam long userId,
-                                         @RequestBody UpdateTerm updateTerm);
+    Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
+        @RequestBody UpdateTerm updateTerm);
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse> delete(@PathVariable long id,
-                                         @RequestParam long userId);
+    Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
     @DeleteExchange("/all")
-    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids,
-        @RequestParam long userId);
+    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids, @RequestParam long userId);
 
     @GetExchange("/project/{id}")
     Page<TermResponse> findTermsByProject(@PathVariable long id, @RequestParam long userId, Pageable pageable);

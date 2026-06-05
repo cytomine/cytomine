@@ -1,5 +1,7 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <changeSet author="lrollus (generated)" id="0">
         <preConditions onFail="MARK_RAN">
             <!--
@@ -1639,22 +1641,45 @@
             </column>
             <column name="updated" type="TIMESTAMP WITHOUT TIME ZONE"/>
         </createTable>
-        <addForeignKeyConstraint baseColumnNames="config_id" baseTableName="amqp_queue_config_instance" constraintName="fk_1fanxk0y2ei162u635t7xei1q" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="amqp_queue_config" validate="true"/>
-        <addUniqueConstraint columnNames="name" constraintName="uk_mrfl7ovhfydr8i27vjw8aoy5m" tableName="amqp_queue_config"/>
+        <addForeignKeyConstraint baseColumnNames="config_id" baseTableName="amqp_queue_config_instance"
+                                 constraintName="fk_1fanxk0y2ei162u635t7xei1q" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="amqp_queue_config" validate="true"/>
+        <addUniqueConstraint columnNames="name" constraintName="uk_mrfl7ovhfydr8i27vjw8aoy5m"
+                             tableName="amqp_queue_config"/>
         <addUniqueConstraint columnNames="key" constraintName="uk_13bwk73aypkhryokrboje4i2g" tableName="keyword"/>
-        <addForeignKeyConstraint baseColumnNames="processing_server_id" baseTableName="job" constraintName="fk_7o2q73awvcf3128k3fdrbv1it" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="processing_server" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="amqp_queue_id" baseTableName="processing_server" constraintName="fk_e0bfykpq1hcokbha6kpds0jhh" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="amqp_queue" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="default_processing_server_id" baseTableName="software" constraintName="fk_h1h797soh6wjy7fvjpv79hs2y" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="processing_server" validate="true"/>
-        <addUniqueConstraint columnNames="name" constraintName="uk_3rqggmm8it0ldmh26ku7jgert" tableName="processing_server"/>
+        <addForeignKeyConstraint baseColumnNames="processing_server_id" baseTableName="job"
+                                 constraintName="fk_7o2q73awvcf3128k3fdrbv1it" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="processing_server" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="amqp_queue_id" baseTableName="processing_server"
+                                 constraintName="fk_e0bfykpq1hcokbha6kpds0jhh" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="amqp_queue" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="default_processing_server_id" baseTableName="software"
+                                 constraintName="fk_h1h797soh6wjy7fvjpv79hs2y" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="processing_server" validate="true"/>
+        <addUniqueConstraint columnNames="name" constraintName="uk_3rqggmm8it0ldmh26ku7jgert"
+                             tableName="processing_server"/>
         <createIndex indexName="undostackitem_user_index" tableName="undo_stack_item">
             <column name="user_id"/>
         </createIndex>
         <createIndex indexName="undo_stack_item_command_id_index" tableName="undo_stack_item">
             <column name="command_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="transaction_id" baseTableName="undo_stack_item" constraintName="fk_60f4l0y7u8uoxsv5cchj3riec" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="transaction" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="undo_stack_item" constraintName="fk_jr534eqd2uu2on33bk33srbp0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="command_id" baseTableName="undo_stack_item" constraintName="fk_sg0k3d3hy3aou7lcmhlx51w08" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="command" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="transaction_id" baseTableName="undo_stack_item"
+                                 constraintName="fk_60f4l0y7u8uoxsv5cchj3riec" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="transaction" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="undo_stack_item"
+                                 constraintName="fk_jr534eqd2uu2on33bk33srbp0" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="command_id" baseTableName="undo_stack_item"
+                                 constraintName="fk_sg0k3d3hy3aou7lcmhlx51w08" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="command" validate="true"/>
         <createIndex indexName="image_instance_created_index" tableName="image_instance">
             <column name="created"/>
         </createIndex>
@@ -1705,20 +1730,53 @@
             JOIN abstract_image ON ((abstract_image.id = image_instance.base_image_id)))
             JOIN acl_object_identity ON ((project.id = acl_object_identity.object_id_identity)))
             JOIN acl_sid ON (((acl_sid.sid)::text = (sec_user.username)::text)))
-            JOIN acl_entry ON (((acl_entry.sid = acl_sid.id) AND (acl_entry.acl_object_identity = acl_object_identity.id) AND (acl_entry.mask &gt;= 1))))
+            JOIN acl_entry ON (((acl_entry.sid = acl_sid.id) AND (acl_entry.acl_object_identity =
+            acl_object_identity.id) AND (acl_entry.mask &gt;= 1))))
             WHERE ((image_instance.deleted IS NULL) AND (image_instance.parent_id IS NULL))
-            GROUP BY image_instance.id, project.id, sec_user.id, abstract_image.id;</createView>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="image_instance" constraintName="fk_6fgy0dijeaoewaksl7rlf3ijo" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="review_user_id" baseTableName="image_instance" constraintName="fk_6wk4ly5mawowa6ch7xic325ba" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="image_sequence" constraintName="fk_8o73teg65qjkmhbgw99i95v3u" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="image_instance" constraintName="fk_af23mb7legfv8w5bm2ayah96o" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="slice_instance" constraintName="fk_hwgns4jo7dc2l89p6xiyimfcv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="base_image_id" baseTableName="image_instance" constraintName="fk_lrrjj2y0tf8xispggbjevkksi" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="abstract_image" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="track" constraintName="fk_o34jw8ofqrx19528fpwtvwq7w" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="image_instance" constraintName="fk_tc70uewrdpmbnryjl2ev12b9s" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addUniqueConstraint columnNames="project_id, base_image_id" constraintName="unique_base_image_id" tableName="image_instance"/>
-        <addForeignKeyConstraint baseColumnNames="sender_id" baseTableName="shared_annotation" constraintName="fk_qwi8kxyv6j1aod3teoxapwuu0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="shared_annotation_receivers_id" baseTableName="shared_annotation_user" constraintName="fk_sqen5jpdhl9utcwm7ob7u4puh" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="shared_annotation" validate="true"/>
+            GROUP BY image_instance.id, project.id, sec_user.id, abstract_image.id;
+        </createView>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="image_instance"
+                                 constraintName="fk_6fgy0dijeaoewaksl7rlf3ijo" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="review_user_id" baseTableName="image_instance"
+                                 constraintName="fk_6wk4ly5mawowa6ch7xic325ba" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="image_sequence"
+                                 constraintName="fk_8o73teg65qjkmhbgw99i95v3u" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="image_instance"
+                                 constraintName="fk_af23mb7legfv8w5bm2ayah96o" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="slice_instance"
+                                 constraintName="fk_hwgns4jo7dc2l89p6xiyimfcv" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="base_image_id" baseTableName="image_instance"
+                                 constraintName="fk_lrrjj2y0tf8xispggbjevkksi" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="abstract_image" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="track"
+                                 constraintName="fk_o34jw8ofqrx19528fpwtvwq7w" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="image_instance"
+                                 constraintName="fk_tc70uewrdpmbnryjl2ev12b9s" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addUniqueConstraint columnNames="project_id, base_image_id" constraintName="unique_base_image_id"
+                             tableName="image_instance"/>
+        <addForeignKeyConstraint baseColumnNames="sender_id" baseTableName="shared_annotation"
+                                 constraintName="fk_qwi8kxyv6j1aod3teoxapwuu0" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="shared_annotation_receivers_id" baseTableName="shared_annotation_user"
+                                 constraintName="fk_sqen5jpdhl9utcwm7ob7u4puh" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="shared_annotation" validate="true"/>
         <createIndex indexName="command_user_id_index" tableName="command">
             <column name="user_id"/>
         </createIndex>
@@ -1728,11 +1786,26 @@
         <createIndex indexName="command_created_index" tableName="command">
             <column name="created"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="transaction_id" baseTableName="command" constraintName="fk_71sexwlgqwurbshptap75oyd8" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="transaction" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="command" constraintName="fk_dno1qx2pstqia5ihw5e2b0602" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="command_id" baseTableName="redo_stack_item" constraintName="fk_mjskbsj8dd60bknr4wutd4e0b" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="command" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="command_id" baseTableName="command_history" constraintName="fk_roscror71ixgs06th1kk9l61g" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="command" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="command" constraintName="fk_rt3b167jqhxuwq675fx6y2iyi" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="transaction_id" baseTableName="command"
+                                 constraintName="fk_71sexwlgqwurbshptap75oyd8" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="transaction" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="command"
+                                 constraintName="fk_dno1qx2pstqia5ihw5e2b0602" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="command_id" baseTableName="redo_stack_item"
+                                 constraintName="fk_mjskbsj8dd60bknr4wutd4e0b" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="command" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="command_id" baseTableName="command_history"
+                                 constraintName="fk_roscror71ixgs06th1kk9l61g" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="command" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="command"
+                                 constraintName="fk_rt3b167jqhxuwq675fx6y2iyi" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
         <createIndex indexName="command_history_project_id_index" tableName="command_history">
             <column name="project_id"/>
         </createIndex>
@@ -1745,13 +1818,25 @@
         <createIndex indexName="command_history_command_id_index" tableName="command_history">
             <column name="command_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="command_history" constraintName="fk_94paw4mm2k7y0r70b0d461r3l" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="command_history" constraintName="fk_oua15nsfqgbr0v8hvg5o604lh" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="command_history"
+                                 constraintName="fk_94paw4mm2k7y0r70b0d461r3l" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="command_history"
+                                 constraintName="fk_oua15nsfqgbr0v8hvg5o604lh" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
         <createIndex indexName="redo_stack_item_command_id_index" tableName="redo_stack_item">
             <column name="command_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="transaction_id" baseTableName="redo_stack_item" constraintName="fk_7pmi3w78wfvbbnv0jhvktnpw7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="transaction" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="redo_stack_item" constraintName="fk_g6suxxfck342d2ofkb4dwvtay" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="transaction_id" baseTableName="redo_stack_item"
+                                 constraintName="fk_7pmi3w78wfvbbnv0jhvktnpw7" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="transaction" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="redo_stack_item"
+                                 constraintName="fk_g6suxxfck342d2ofkb4dwvtay" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
         <createIndex indexName="acl_object_identity_object_id_identity_index" tableName="acl_object_identity">
             <column name="object_id_identity"/>
         </createIndex>
@@ -1781,7 +1866,11 @@
             sec_user,
             acl_sid,
             acl_entry
-            WHERE ((project.id = acl_object_identity.object_id_identity) AND ((acl_sid.sid)::text = (sec_user.username)::text) AND (acl_entry.sid = acl_sid.id) AND (acl_entry.acl_object_identity = acl_object_identity.id) AND (sec_user.user_id IS NULL) AND (acl_entry.mask &gt;= 1) AND (project.deleted IS NULL));</createView>
+            WHERE ((project.id = acl_object_identity.object_id_identity) AND ((acl_sid.sid)::text =
+            (sec_user.username)::text) AND (acl_entry.sid = acl_sid.id) AND (acl_entry.acl_object_identity =
+            acl_object_identity.id) AND (sec_user.user_id IS NULL) AND (acl_entry.mask &gt;= 1) AND (project.deleted IS
+            NULL));
+        </createView>
         <createView fullDefinition="false" viewName="admin_project">SELECT DISTINCT project.id,
             project.version,
             project.are_images_downloadable,
@@ -1808,7 +1897,11 @@
             sec_user,
             acl_sid,
             acl_entry
-            WHERE ((project.id = acl_object_identity.object_id_identity) AND ((acl_sid.sid)::text = (sec_user.username)::text) AND (acl_entry.sid = acl_sid.id) AND (acl_entry.acl_object_identity = acl_object_identity.id) AND (sec_user.user_id IS NULL) AND (acl_entry.mask &gt;= 16) AND (project.deleted IS NULL));</createView>
+            WHERE ((project.id = acl_object_identity.object_id_identity) AND ((acl_sid.sid)::text =
+            (sec_user.username)::text) AND (acl_entry.sid = acl_sid.id) AND (acl_entry.acl_object_identity =
+            acl_object_identity.id) AND (sec_user.user_id IS NULL) AND (acl_entry.mask &gt;= 16) AND (project.deleted IS
+            NULL));
+        </createView>
         <createView fullDefinition="false" viewName="creator_project">SELECT DISTINCT project.id,
             project.version,
             project.are_images_downloadable,
@@ -1834,20 +1927,40 @@
             acl_object_identity,
             sec_user,
             acl_sid
-            WHERE ((project.id = acl_object_identity.object_id_identity) AND ((acl_sid.sid)::text = (sec_user.username)::text) AND (acl_object_identity.owner_sid = acl_sid.id) AND (sec_user.user_id IS NULL) AND (project.deleted IS NULL));</createView>
-        <addForeignKeyConstraint baseColumnNames="object_id_class" baseTableName="acl_object_identity" constraintName="fk_6c3ugmk053uy27bk2sred31lf" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="acl_class" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="parent_object" baseTableName="acl_object_identity" constraintName="fk_6oap2k8q5bl33yq3yffrwedhf" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="acl_object_identity" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="acl_object_identity" baseTableName="acl_entry" constraintName="fk_fhuoesmjef3mrv0gpja4shvcr" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="acl_object_identity" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="owner_sid" baseTableName="acl_object_identity" constraintName="fk_nxv5we2ion9fwedbkge7syoc3" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="acl_sid" validate="true"/>
-        <addUniqueConstraint columnNames="object_id_class, object_id_identity" constraintName="unique_object_id_identity" tableName="acl_object_identity"/>
+            WHERE ((project.id = acl_object_identity.object_id_identity) AND ((acl_sid.sid)::text =
+            (sec_user.username)::text) AND (acl_object_identity.owner_sid = acl_sid.id) AND (sec_user.user_id IS NULL)
+            AND (project.deleted IS NULL));
+        </createView>
+        <addForeignKeyConstraint baseColumnNames="object_id_class" baseTableName="acl_object_identity"
+                                 constraintName="fk_6c3ugmk053uy27bk2sred31lf" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="acl_class" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="parent_object" baseTableName="acl_object_identity"
+                                 constraintName="fk_6oap2k8q5bl33yq3yffrwedhf" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="acl_object_identity" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="acl_object_identity" baseTableName="acl_entry"
+                                 constraintName="fk_fhuoesmjef3mrv0gpja4shvcr" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="acl_object_identity" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="owner_sid" baseTableName="acl_object_identity"
+                                 constraintName="fk_nxv5we2ion9fwedbkge7syoc3" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="acl_sid" validate="true"/>
+        <addUniqueConstraint columnNames="object_id_class, object_id_identity"
+                             constraintName="unique_object_id_identity" tableName="acl_object_identity"/>
         <createIndex indexName="acl_entry_acl_object_identity_index" tableName="acl_entry">
             <column name="acl_object_identity"/>
         </createIndex>
         <createIndex indexName="acl_entry_sid_index" tableName="acl_entry">
             <column name="sid"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="sid" baseTableName="acl_entry" constraintName="fk_i6xyfccd4y3wlwhgwpo4a9rm1" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="acl_sid" validate="true"/>
-        <addUniqueConstraint columnNames="acl_object_identity, ace_order" constraintName="unique_ace_order" tableName="acl_entry"/>
+        <addForeignKeyConstraint baseColumnNames="sid" baseTableName="acl_entry"
+                                 constraintName="fk_i6xyfccd4y3wlwhgwpo4a9rm1" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="acl_sid" validate="true"/>
+        <addUniqueConstraint columnNames="acl_object_identity, ace_order" constraintName="unique_ace_order"
+                             tableName="acl_entry"/>
         <createIndex indexName="acl_sid_sid_index" tableName="acl_sid">
             <column name="sid"/>
         </createIndex>
@@ -1855,14 +1968,29 @@
         <createIndex indexName="storage_user_id_index" tableName="storage">
             <column name="user_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="storage" constraintName="fk_1i4jiuo3n7io1cc4ilu2s38mc" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="storage_id" baseTableName="storage_abstract_image" constraintName="fk_c8tmdpqj8hq1yxh09tlc5wkth" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="storage" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="storage_id" baseTableName="image_server_storage" constraintName="fk_nlstfudl6nhhlf5fr2qnvki7r" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="storage" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="storage"
+                                 constraintName="fk_1i4jiuo3n7io1cc4ilu2s38mc" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="storage_id" baseTableName="storage_abstract_image"
+                                 constraintName="fk_c8tmdpqj8hq1yxh09tlc5wkth" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="storage" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="storage_id" baseTableName="image_server_storage"
+                                 constraintName="fk_nlstfudl6nhhlf5fr2qnvki7r" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="storage" validate="true"/>
         <createIndex indexName="sample_created_index" tableName="sample">
             <column name="created"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="sample_id" baseTableName="source" constraintName="fk_48nw8m8i0x2m71897wi7cwwta" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sample" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="sample_id" baseTableName="abstract_image" constraintName="fk_fg6xbsax3enl5wx0w2jg69aj6" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sample" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="sample_id" baseTableName="source"
+                                 constraintName="fk_48nw8m8i0x2m71897wi7cwwta" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sample" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="sample_id" baseTableName="abstract_image"
+                                 constraintName="fk_fg6xbsax3enl5wx0w2jg69aj6" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sample" validate="true"/>
         <addUniqueConstraint columnNames="name" constraintName="uk_a5hea3xlyin6etsaelmekjrbe" tableName="sample"/>
         <createIndex indexName="abstract_image_created_index" tableName="abstract_image">
             <column name="created"/>
@@ -1876,25 +2004,55 @@
         <createIndex indexName="abstract_image_user_id_index" tableName="abstract_image">
             <column name="user_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="abstract_slice" constraintName="fk_eixfhdky51jgjel5qwsg7mhqj" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="abstract_image" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="scanner_id" baseTableName="abstract_image" constraintName="fk_md4br11eaxdfd5qtj6uistld1" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="instrument" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="abstract_image_id" baseTableName="storage_abstract_image" constraintName="fk_nx135s1gql4c3f97c9h29iunr" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="abstract_image" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="abstract_image" constraintName="fk_rp6913vdgv2itjspso27dsd4p" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="companion_file" constraintName="fk_sj3yu7f4i18htv5yhwkwhg9d3" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="abstract_image" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="abstract_slice"
+                                 constraintName="fk_eixfhdky51jgjel5qwsg7mhqj" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="abstract_image" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="scanner_id" baseTableName="abstract_image"
+                                 constraintName="fk_md4br11eaxdfd5qtj6uistld1" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="instrument" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="abstract_image_id" baseTableName="storage_abstract_image"
+                                 constraintName="fk_nx135s1gql4c3f97c9h29iunr" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="abstract_image" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="abstract_image"
+                                 constraintName="fk_rp6913vdgv2itjspso27dsd4p" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="companion_file"
+                                 constraintName="fk_sj3yu7f4i18htv5yhwkwhg9d3" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="abstract_image" validate="true"/>
         <createIndex indexName="abstract_slice_uploaded_file_id_index" tableName="abstract_slice">
             <column name="uploaded_file_id"/>
         </createIndex>
         <createIndex indexName="abstract_slice_image_id_index" tableName="abstract_slice">
             <column name="image_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="mime_id" baseTableName="abstract_slice" constraintName="fk_1v05hrtjnvce5jyomlmtit7sk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="mime" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="base_slice_id" baseTableName="slice_instance" constraintName="fk_kotwdsgccim3q30f5yigbcr38" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="abstract_slice" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="mime_id" baseTableName="abstract_slice"
+                                 constraintName="fk_1v05hrtjnvce5jyomlmtit7sk" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="mime" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="base_slice_id" baseTableName="slice_instance"
+                                 constraintName="fk_kotwdsgccim3q30f5yigbcr38" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="abstract_slice" validate="true"/>
         <createIndex indexName="slice_instance_base_slice_id_index" tableName="slice_instance">
             <column name="base_slice_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="annotation_track" constraintName="fk_af2j9gu3x7bwisrjaa3my3efw" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="slice_instance" constraintName="fk_ajcae7y95op8hhilef528q16o" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="annotation_index" constraintName="fk_q00ycisk5ula612n81sfx3ud2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="annotation_track"
+                                 constraintName="fk_af2j9gu3x7bwisrjaa3my3efw" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="slice_instance"
+                                 constraintName="fk_ajcae7y95op8hhilef528q16o" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="annotation_index"
+                                 constraintName="fk_q00ycisk5ula612n81sfx3ud2" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
         <createIndex indexName="property_domain_ident_index" tableName="property">
             <column name="domain_ident"/>
         </createIndex>
@@ -1913,7 +2071,10 @@
         <createIndex indexName="annotation_index_user_id_index" tableName="annotation_index">
             <column name="user_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="annotation_index" constraintName="fk_kba5x5ktp61txg1wpagqibsok" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="annotation_index"
+                                 constraintName="fk_kba5x5ktp61txg1wpagqibsok" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
         <createIndex indexName="annotation_term_user_annotation_id_index" tableName="annotation_term">
             <column name="user_annotation_id"/>
         </createIndex>
@@ -1923,8 +2084,14 @@
         <createIndex indexName="annotation_term_user_id_index" tableName="annotation_term">
             <column name="user_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="term_id" baseTableName="annotation_term" constraintName="fk_bi28rym47sc6lgrkq6j1jxfsy" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="term" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="annotation_term" constraintName="fk_fr6po0ubgm4steust2cck5raa" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="term_id" baseTableName="annotation_term"
+                                 constraintName="fk_bi28rym47sc6lgrkq6j1jxfsy" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="term" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="annotation_term"
+                                 constraintName="fk_fr6po0ubgm4steust2cck5raa" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
         <createIndex indexName="algo_annotation_term_annotation_ident_index" tableName="algo_annotation_term">
             <column name="annotation_ident"/>
         </createIndex>
@@ -1940,10 +2107,22 @@
         <createIndex indexName="algo_annotation_term_user_job_id_index" tableName="algo_annotation_term">
             <column name="user_job_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="user_job_id" baseTableName="algo_annotation_term" constraintName="fk_947bqk8gupy5a4waijcu8tttm" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="term_id" baseTableName="algo_annotation_term" constraintName="fk_n2t11iv92sah6ps4vc54bu8yv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="term" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="expected_term_id" baseTableName="algo_annotation_term" constraintName="fk_pkgsjc6gcojxrkp7k6jj2bqjg" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="term" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="algo_annotation_term" constraintName="fk_suqs8shw69cacl2n8m99t0hwh" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_job_id" baseTableName="algo_annotation_term"
+                                 constraintName="fk_947bqk8gupy5a4waijcu8tttm" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="term_id" baseTableName="algo_annotation_term"
+                                 constraintName="fk_n2t11iv92sah6ps4vc54bu8yv" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="term" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="expected_term_id" baseTableName="algo_annotation_term"
+                                 constraintName="fk_pkgsjc6gcojxrkp7k6jj2bqjg" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="term" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="algo_annotation_term"
+                                 constraintName="fk_suqs8shw69cacl2n8m99t0hwh" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
         <createIndex indexName="relation_term_relation_id_index" tableName="relation_term">
             <column name="relation_id"/>
         </createIndex>
@@ -1953,23 +2132,47 @@
         <createIndex indexName="relation_term_term2_id_index" tableName="relation_term">
             <column name="term2_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="term1_id" baseTableName="relation_term" constraintName="fk_9d0uksavo6y85hpv9ikfg6v65" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="term" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="relation_id" baseTableName="relation_term" constraintName="fk_dmkntgxxdj62k5da59k5bi4gk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="relation" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="term2_id" baseTableName="relation_term" constraintName="fk_r6384f0rfuqensgxjx2207jl7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="term" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="term1_id" baseTableName="relation_term"
+                                 constraintName="fk_9d0uksavo6y85hpv9ikfg6v65" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="term" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="relation_id" baseTableName="relation_term"
+                                 constraintName="fk_dmkntgxxdj62k5da59k5bi4gk" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="relation" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="term2_id" baseTableName="relation_term"
+                                 constraintName="fk_r6384f0rfuqensgxjx2207jl7" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="term" validate="true"/>
         <createIndex indexName="term_ontology_id_index" tableName="term">
             <column name="ontology_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="term_id" baseTableName="annotation_filter_term" constraintName="fk_9bvjpw5mgysdncgqxtg3emce2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="term" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="term_id" baseTableName="reviewed_annotation_term" constraintName="fk_9ihc892kdbdl59mfps7g538ok" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="term" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="ontology_id" baseTableName="term" constraintName="fk_9yffaq04vokeans3ey8sir31w" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="ontology" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="term_id" baseTableName="annotation_filter_term"
+                                 constraintName="fk_9bvjpw5mgysdncgqxtg3emce2" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="term" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="term_id" baseTableName="reviewed_annotation_term"
+                                 constraintName="fk_9ihc892kdbdl59mfps7g538ok" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="term" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="ontology_id" baseTableName="term"
+                                 constraintName="fk_9yffaq04vokeans3ey8sir31w" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="ontology" validate="true"/>
         <createIndex indexName="track_image_id_index" tableName="track">
             <column name="image_id"/>
         </createIndex>
         <createIndex indexName="track_project_id_index" tableName="track">
             <column name="project_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="track" constraintName="fk_a57b9oiv8h43nn21xl8pwu86e" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="track_id" baseTableName="annotation_track" constraintName="fk_qjjkidc52v6pallcu0p343ppe" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="track" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="track"
+                                 constraintName="fk_a57b9oiv8h43nn21xl8pwu86e" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="track_id" baseTableName="annotation_track"
+                                 constraintName="fk_qjjkidc52v6pallcu0p343ppe" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="track" validate="true"/>
         <createIndex indexName="annotation_track_track_id_index" tableName="annotation_track">
             <column name="track_id"/>
         </createIndex>
@@ -1985,22 +2188,68 @@
         <createIndex indexName="sec_user_user_id_index" tableName="sec_user">
             <column name="user_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="tag" constraintName="fk_151ooxskkpn49blwsh7mjwysx" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="search_engine_filter" constraintName="fk_4668esumub0lfceei21d3mokn" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="ontology" constraintName="fk_7o34a7pexlcdiabh6avwb8gds" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="shared_annotation_user" constraintName="fk_8465xk0vtu2eo78jhwk2evp6g" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="auth_with_token" constraintName="fk_8fipmhm3xcpkeotckesl7pii" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="forgot_password_token" constraintName="fk_9s1okjmlql64mh55l9ehjlkmh" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="annotation_filter" constraintName="fk_a6fivveivhj68xn0bp4vm7sfl" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="job_id" baseTableName="sec_user" constraintName="fk_brnml18s8o4tjt2qu4yn3tycb" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="job" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="sec_user_id" baseTableName="sec_user_sec_role" constraintName="fk_f1eew3u65ajs3e50xvacwgron" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="sec_user" constraintName="fk_g5inaeadj5iqiwddmky1pcir2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="sec_user_id" baseTableName="annotation_filter_sec_user" constraintName="fk_geipe23f9a46kkpur8sk88383" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="news" constraintName="fk_l4y0pyrfrk6c7egnf41thnfph" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_group" constraintName="fk_mps81qti05d9he0y66y5jt845" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="project_representative_user" constraintName="fk_pbag6k4n4xyema08sw2yleut9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="project_default_layer" constraintName="fk_tmom8yydh4f43qvfl4i485gb2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addUniqueConstraint columnNames="public_key" constraintName="uk_orqbsamoket434rnhtt6ic46r" tableName="sec_user"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="tag"
+                                 constraintName="fk_151ooxskkpn49blwsh7mjwysx" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="search_engine_filter"
+                                 constraintName="fk_4668esumub0lfceei21d3mokn" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="ontology"
+                                 constraintName="fk_7o34a7pexlcdiabh6avwb8gds" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="shared_annotation_user"
+                                 constraintName="fk_8465xk0vtu2eo78jhwk2evp6g" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="auth_with_token"
+                                 constraintName="fk_8fipmhm3xcpkeotckesl7pii" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="forgot_password_token"
+                                 constraintName="fk_9s1okjmlql64mh55l9ehjlkmh" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="annotation_filter"
+                                 constraintName="fk_a6fivveivhj68xn0bp4vm7sfl" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="job_id" baseTableName="sec_user"
+                                 constraintName="fk_brnml18s8o4tjt2qu4yn3tycb" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="job" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="sec_user_id" baseTableName="sec_user_sec_role"
+                                 constraintName="fk_f1eew3u65ajs3e50xvacwgron" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="sec_user"
+                                 constraintName="fk_g5inaeadj5iqiwddmky1pcir2" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="sec_user_id" baseTableName="annotation_filter_sec_user"
+                                 constraintName="fk_geipe23f9a46kkpur8sk88383" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="news"
+                                 constraintName="fk_l4y0pyrfrk6c7egnf41thnfph" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_group"
+                                 constraintName="fk_mps81qti05d9he0y66y5jt845" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="project_representative_user"
+                                 constraintName="fk_pbag6k4n4xyema08sw2yleut9" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="project_default_layer"
+                                 constraintName="fk_tmom8yydh4f43qvfl4i485gb2" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addUniqueConstraint columnNames="public_key" constraintName="uk_orqbsamoket434rnhtt6ic46r"
+                             tableName="sec_user"/>
         <createIndex indexName="job_project_id_index" tableName="job">
             <column name="project_id"/>
         </createIndex>
@@ -2010,82 +2259,194 @@
         <createIndex indexName="job_processing_server_id_index" tableName="job">
             <column name="processing_server_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="software_id" baseTableName="job" constraintName="fk_55s2532t84kfjb46dm49e18lh" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="software" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="job_id" baseTableName="job_data" constraintName="fk_d829oem8lngvemljcmfuktqqm" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="job" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="job" constraintName="fk_q8j917t7g0bw0jqspxsqksd8d" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="job_id" baseTableName="job_parameter" constraintName="fk_quais1rfnay2kdb76nqipvcor" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="job" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="job_template_id" baseTableName="job_template_annotation" constraintName="fk_suxjddbxh6niehsgkej1byd1i" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="job" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="software_id" baseTableName="job"
+                                 constraintName="fk_55s2532t84kfjb46dm49e18lh" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="software" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="job_id" baseTableName="job_data"
+                                 constraintName="fk_d829oem8lngvemljcmfuktqqm" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="job" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="job"
+                                 constraintName="fk_q8j917t7g0bw0jqspxsqksd8d" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="job_id" baseTableName="job_parameter"
+                                 constraintName="fk_quais1rfnay2kdb76nqipvcor" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="job" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="job_template_id" baseTableName="job_template_annotation"
+                                 constraintName="fk_suxjddbxh6niehsgkej1byd1i" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="job" validate="true"/>
         <createIndex indexName="job_parameter_job_id_index" tableName="job_parameter">
             <column name="job_id"/>
         </createIndex>
         <createIndex indexName="job_parameter_software_parameter_id_index" tableName="job_parameter">
             <column name="software_parameter_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="software_parameter_id" baseTableName="job_parameter" constraintName="fk_jeqigdnlw5f7ylk4cvudnr73" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="software_parameter" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="software_parameter_id" baseTableName="job_parameter"
+                                 constraintName="fk_jeqigdnlw5f7ylk4cvudnr73" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="software_parameter" validate="true"/>
         <createIndex indexName="software_parameter_software_id_index" tableName="software_parameter">
             <column name="software_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="software_id" baseTableName="software_parameter" constraintName="fk_6tyh4gkgfg7hdq4eba51fkgu7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="software" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="software_parameter_id" baseTableName="software_parameter_constraint" constraintName="fk_bmw9mo6802ugois8mmb56322f" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="software_parameter" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="software_id" baseTableName="software_parameter"
+                                 constraintName="fk_6tyh4gkgfg7hdq4eba51fkgu7" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="software" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="software_parameter_id" baseTableName="software_parameter_constraint"
+                                 constraintName="fk_bmw9mo6802ugois8mmb56322f" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="software_parameter" validate="true"/>
         <createIndex indexName="software_project_software_id_index" tableName="software_project">
             <column name="software_id"/>
         </createIndex>
         <createIndex indexName="software_project_project_id_index" tableName="software_project">
             <column name="project_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="software_project" constraintName="fk_cspa983xvkp2sel4lmlgoo4dr" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="software_id" baseTableName="software_project" constraintName="fk_sy20a2uj4raaj32avpx3c8nsv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="software" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="software_project"
+                                 constraintName="fk_cspa983xvkp2sel4lmlgoo4dr" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="software_id" baseTableName="software_project"
+                                 constraintName="fk_sy20a2uj4raaj32avpx3c8nsv" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="software" validate="true"/>
         <createIndex indexName="user_group_user_id_index" tableName="user_group">
             <column name="user_id"/>
         </createIndex>
         <createIndex indexName="user_group_group_id_index" tableName="user_group">
             <column name="group_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="group_id" baseTableName="user_group" constraintName="fk_789v3ejjs9uj5vu1ufexj2tbv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="group" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="group_id" baseTableName="user_group"
+                                 constraintName="fk_789v3ejjs9uj5vu1ufexj2tbv" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="group" validate="true"/>
         <createIndex indexName="auth_with_token_user_id_index" tableName="auth_with_token">
             <column name="user_id"/>
         </createIndex>
         <createIndex indexName="auth_with_token_token_key_index" tableName="auth_with_token">
             <column name="token_key"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="project_default_layer" constraintName="fk_4uaxr9mro5kcb0apuyjmsmc4p" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_retrieval_projects_id" baseTableName="project_project" constraintName="fk_5aryiqcm0tpxdtbn220rmdio6" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="project_representative_user" constraintName="fk_7hmjj6g0xxyw1trmlwf2x4ogc" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="annotation_filter" constraintName="fk_7xxsjya2swvuwfbe8kxshvxdw" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="discipline_id" baseTableName="project" constraintName="fk_9pgiq5w5hfpqi65owpewc3wkp" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="discipline" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="ontology_id" baseTableName="project" constraintName="fk_c3xcld4mvmddp7q2je6d437tc" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="ontology" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="project_project" constraintName="fk_ehckrfvasgu5bn8p292f87iyx" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="image_group" constraintName="fk_pii947c8taadk9csgm9bfggt3" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="image_filter_project" constraintName="fk_q2eaays0nr0a00cdkahiekobh" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="project_default_layer"
+                                 constraintName="fk_4uaxr9mro5kcb0apuyjmsmc4p" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_retrieval_projects_id" baseTableName="project_project"
+                                 constraintName="fk_5aryiqcm0tpxdtbn220rmdio6" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="project_representative_user"
+                                 constraintName="fk_7hmjj6g0xxyw1trmlwf2x4ogc" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="annotation_filter"
+                                 constraintName="fk_7xxsjya2swvuwfbe8kxshvxdw" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="discipline_id" baseTableName="project"
+                                 constraintName="fk_9pgiq5w5hfpqi65owpewc3wkp" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="discipline" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="ontology_id" baseTableName="project"
+                                 constraintName="fk_c3xcld4mvmddp7q2je6d437tc" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="ontology" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="project_project"
+                                 constraintName="fk_ehckrfvasgu5bn8p292f87iyx" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="image_group"
+                                 constraintName="fk_pii947c8taadk9csgm9bfggt3" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="image_filter_project"
+                                 constraintName="fk_q2eaays0nr0a00cdkahiekobh" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
         <addUniqueConstraint columnNames="name" constraintName="uk_3k75vvu7mevyvvb5may5lj8k7" tableName="project"/>
-        <addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="tag_domain_association" constraintName="fk_85ph9yvqxucw6x8ngk198s05s" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="tag" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="queue_id" baseTableName="amqp_queue_config_instance" constraintName="fk_kd7etbkq6r32b1w8vnt8ywgwr" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="amqp_queue" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="mime_id" baseTableName="mime_image_server" constraintName="fk_iqf8h0fh14kbmyge41fgaas8b" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="mime" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="tag_domain_association"
+                                 constraintName="fk_85ph9yvqxucw6x8ngk198s05s" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="tag" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="queue_id" baseTableName="amqp_queue_config_instance"
+                                 constraintName="fk_kd7etbkq6r32b1w8vnt8ywgwr" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="amqp_queue" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="mime_id" baseTableName="mime_image_server"
+                                 constraintName="fk_iqf8h0fh14kbmyge41fgaas8b" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="mime" validate="true"/>
         <addUniqueConstraint columnNames="mime_type" constraintName="uk_8xpof8ejct6l0j7xg71co30wl" tableName="mime"/>
-        <addForeignKeyConstraint baseColumnNames="value_id" baseTableName="job_data" constraintName="fk_220nw7q94pw1vn4jcwn4ib57h" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="job_data_binary_value" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="parameter_constraint_id" baseTableName="software_parameter_constraint" constraintName="fk_2kr7g52ehhuavyh6fcvuh5io9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="parameter_constraint" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_filter_id" baseTableName="image_filter_project" constraintName="fk_3o01hjbh1h2pi57p3m87yt60m" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_filter" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="imaging_server_id" baseTableName="image_filter" constraintName="fk_8vxvssocyopn3ekmc1n4c5jnn" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="imaging_server" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="software_user_repository_id" baseTableName="software" constraintName="fk_elvfdq78s67rejx0phjfurp69" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="software_user_repository" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_group_id" baseTableName="image_sequence" constraintName="fk_5pcxdt1xkyaax3ewupaepkufa" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_group" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="group_id" baseTableName="image_grouphdf5" constraintName="fk_s1wtmpm1kg90q32h39jsk9li0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_group" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="value_id" baseTableName="job_data"
+                                 constraintName="fk_220nw7q94pw1vn4jcwn4ib57h" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="job_data_binary_value"
+                                 validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="parameter_constraint_id" baseTableName="software_parameter_constraint"
+                                 constraintName="fk_2kr7g52ehhuavyh6fcvuh5io9" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="parameter_constraint" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_filter_id" baseTableName="image_filter_project"
+                                 constraintName="fk_3o01hjbh1h2pi57p3m87yt60m" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_filter" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="imaging_server_id" baseTableName="image_filter"
+                                 constraintName="fk_8vxvssocyopn3ekmc1n4c5jnn" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="imaging_server" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="software_user_repository_id" baseTableName="software"
+                                 constraintName="fk_elvfdq78s67rejx0phjfurp69" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="software_user_repository"
+                                 validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_group_id" baseTableName="image_sequence"
+                                 constraintName="fk_5pcxdt1xkyaax3ewupaepkufa" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_group" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="group_id" baseTableName="image_grouphdf5"
+                                 constraintName="fk_s1wtmpm1kg90q32h39jsk9li0" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_group" validate="true"/>
         <addUniqueConstraint columnNames="class" constraintName="uk_iy7ua5fso3il3u3ymoc4uf35w" tableName="acl_class"/>
         <addUniqueConstraint columnNames="name" constraintName="uk_oy92ak6u4rmbq75jgb14npht7" tableName="group"/>
         <addUniqueConstraint columnNames="name" constraintName="uk_pber6ij6n37dx73gt6pnpu1yc" tableName="ontology"/>
-        <addForeignKeyConstraint baseColumnNames="annotation_filter_terms_id" baseTableName="annotation_filter_term" constraintName="fk_rpt4hj53gph9lvaapoygjf38n" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="annotation_filter" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="annotation_filter_users_id" baseTableName="annotation_filter_sec_user" constraintName="fk_s612xe9fe2awtoyu3i9cf4mkd" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="annotation_filter" validate="true"/>
-        <addUniqueConstraint columnNames="url" constraintName="uk_34fu6c264ka5wtn9m1mc9qv8l" tableName="imaging_server"/>
+        <addForeignKeyConstraint baseColumnNames="annotation_filter_terms_id" baseTableName="annotation_filter_term"
+                                 constraintName="fk_rpt4hj53gph9lvaapoygjf38n" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="annotation_filter" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="annotation_filter_users_id" baseTableName="annotation_filter_sec_user"
+                                 constraintName="fk_s612xe9fe2awtoyu3i9cf4mkd" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="annotation_filter" validate="true"/>
+        <addUniqueConstraint columnNames="url" constraintName="uk_34fu6c264ka5wtn9m1mc9qv8l"
+                             tableName="imaging_server"/>
         <addUniqueConstraint columnNames="name" constraintName="uk_rnn0tdmuxc8yr34ric2yhjbid" tableName="discipline"/>
-        <addForeignKeyConstraint baseColumnNames="sec_role_id" baseTableName="sec_user_sec_role" constraintName="fk_bshvqhdx8h9mb4rrbo1ahnp7q" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_role" validate="true"/>
-        <addUniqueConstraint columnNames="authority" constraintName="uk_oah023x2ltqw09mdue7w0mcxb" tableName="sec_role"/>
+        <addForeignKeyConstraint baseColumnNames="sec_role_id" baseTableName="sec_user_sec_role"
+                                 constraintName="fk_bshvqhdx8h9mb4rrbo1ahnp7q" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_role" validate="true"/>
+        <addUniqueConstraint columnNames="authority" constraintName="uk_oah023x2ltqw09mdue7w0mcxb"
+                             tableName="sec_role"/>
         <addUniqueConstraint columnNames="name" constraintName="uk_t3kmot8kxmuws6vj2etsp4ih5" tableName="relation"/>
         <addUniqueConstraint columnNames="name" constraintName="uk_4xh6udtlhrdr373f8ad060kxn" tableName="amqp_queue"/>
-        <addUniqueConstraint columnNames="exchange" constraintName="uk_70b340wewu6ygx5gaowcfeoot" tableName="amqp_queue"/>
-        <addForeignKeyConstraint baseColumnNames="image_server_id" baseTableName="image_server_storage" constraintName="fk_eeljdeqkardecnhmluhc0omnj" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_server" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_server_id" baseTableName="mime_image_server" constraintName="fk_rq7n6544wcycp6bn6btas7nqd" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_server" validate="true"/>
+        <addUniqueConstraint columnNames="exchange" constraintName="uk_70b340wewu6ygx5gaowcfeoot"
+                             tableName="amqp_queue"/>
+        <addForeignKeyConstraint baseColumnNames="image_server_id" baseTableName="image_server_storage"
+                                 constraintName="fk_eeljdeqkardecnhmluhc0omnj" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_server" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_server_id" baseTableName="mime_image_server"
+                                 constraintName="fk_rq7n6544wcycp6bn6btas7nqd" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_server" validate="true"/>
         <addUniqueConstraint columnNames="key" constraintName="uk_5wejhym1uspe4klluscbwo9r" tableName="configuration"/>
-        <addUniqueConstraint columnNames="name" constraintName="uk_qd8nvmlgro9wc7yvvkfr9iump" tableName="message_broker_server"/>
-        <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807" minValue="1" sequenceName="hibernate_sequence" startValue="1"/>
+        <addUniqueConstraint columnNames="name" constraintName="uk_qd8nvmlgro9wc7yvvkfr9iump"
+                             tableName="message_broker_server"/>
+        <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="1" maxValue="9223372036854775807"
+                        minValue="1" sequenceName="hibernate_sequence" startValue="1"/>
         <createTable tableName="algo_annotation">
             <column name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="algo_annotation_pkey"/>
@@ -2317,7 +2678,7 @@
         <!-- Not possible to specify the index type using liquibase, so we write a custom sql command-->
         <sql>
             CREATE INDEX algo_annotation_location_index
-                ON algo_annotation USING GIST (location);
+            ON algo_annotation USING GIST (location);
         </sql>
 
         <createIndex indexName="algo_annotation_project_id_index" tableName="algo_annotation">
@@ -2334,7 +2695,7 @@
         </createIndex>
         <sql>
             CREATE INDEX reviewed_annotation_location_index
-                ON reviewed_annotation USING GIST (location);
+            ON reviewed_annotation USING GIST (location);
         </sql>
         <createIndex indexName="reviewed_annotation_project_id_index" tableName="reviewed_annotation">
             <column name="project_id"/>
@@ -2367,7 +2728,7 @@
         <!-- Not possible to specify the index type using liquibase, so we write a custom sql command-->
         <sql>
             CREATE INDEX user_annotation_location_index
-                ON user_annotation USING GIST (location);
+            ON user_annotation USING GIST (location);
         </sql>
 
 
@@ -2384,31 +2745,109 @@
         <createIndex indexName="user_annotation_user_id_index" tableName="user_annotation">
             <column name="user_id"/>
         </createIndex>
-        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="algo_annotation" constraintName="fk_1qdju4knrk7toobg7n0ivltt4" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="algo_annotation" constraintName="fk_27qlqf6575ldhghmfapwbfy1b" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="uploaded_file" constraintName="fk_2i0u11nairnbqcxiihykjfrd6" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="reviewed_annotation" constraintName="fk_30svf5sownvmphoaycl110lsv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="review_user_id" baseTableName="reviewed_annotation" constraintName="fk_5f7mc0q3prv1iw7m8y189puu9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="roi_annotation" constraintName="fk_71fxrf96p4gdjapic407c4ln9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="roi_annotation" constraintName="fk_7jcom8790cdmsiidhphwdr53c" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="uploaded_file_id" baseTableName="abstract_image" constraintName="fk_9dirkh1o5a34eyqyko0b8fet9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="uploaded_file" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="algo_annotation" constraintName="fk_9eqqx7n2f3kbh4a4ogxy8rbk8" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="reviewed_annotation" constraintName="fk_cvaa1jfp32huoau3ldn1so0pk" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="storage_id" baseTableName="uploaded_file" constraintName="fk_ednveec54vgvlnjew6in5b5oa" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="storage" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="roi_annotation" constraintName="fk_eeaivtb750v2bmkk3f1gvyh52" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="user_annotation" constraintName="fk_g0e6mvitmag5jghdq5t3arg0u" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="reviewed_annotation_terms_id" baseTableName="reviewed_annotation_term" constraintName="fk_g1rqdsqh8o7uam53gbw88639o" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="reviewed_annotation" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_annotation" constraintName="fk_hey8qie1qqqmijq65n3er7udm" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_annotation_id" baseTableName="annotation_term" constraintName="fk_itea7ffu4d5f61o3r9bejj79a" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="user_annotation" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="user_annotation" constraintName="fk_j2b8vqjqbpqmw5g3rb3emupw9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_server_id" baseTableName="uploaded_file" constraintName="fk_jy7rfc162x2am5l8llgvcgv89" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_server" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="reviewed_annotation" constraintName="fk_n6p8xu8qcpsqk3ix8x8qb673q" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="user_annotation" constraintName="fk_nxgwfb0fg47xtctst2lefat2y" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="uploaded_file_id" baseTableName="abstract_slice" constraintName="fk_ofu9h6te8gghbjdmqh24so6cl" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="uploaded_file" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="uploaded_file_id" baseTableName="companion_file" constraintName="fk_pa1j55xx7lx1q5dkegsu2kvii" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="uploaded_file" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="uploaded_file" constraintName="fk_r7h853sqa7vwt5rm9nk1gw67q" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="uploaded_file" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="algo_annotation" constraintName="fk_s3yhotmnvw0mu2a01yyeved8o" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="roi_annotation" constraintName="fk_skvm9rulcag79vbil8mpgo8en" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
-        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="reviewed_annotation" constraintName="fk_t57p1fkwwbsl8mspqas7scl7l" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="algo_annotation"
+                                 constraintName="fk_1qdju4knrk7toobg7n0ivltt4" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="algo_annotation"
+                                 constraintName="fk_27qlqf6575ldhghmfapwbfy1b" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="uploaded_file"
+                                 constraintName="fk_2i0u11nairnbqcxiihykjfrd6" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="reviewed_annotation"
+                                 constraintName="fk_30svf5sownvmphoaycl110lsv" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="review_user_id" baseTableName="reviewed_annotation"
+                                 constraintName="fk_5f7mc0q3prv1iw7m8y189puu9" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="roi_annotation"
+                                 constraintName="fk_71fxrf96p4gdjapic407c4ln9" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="roi_annotation"
+                                 constraintName="fk_7jcom8790cdmsiidhphwdr53c" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="uploaded_file_id" baseTableName="abstract_image"
+                                 constraintName="fk_9dirkh1o5a34eyqyko0b8fet9" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="uploaded_file" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="algo_annotation"
+                                 constraintName="fk_9eqqx7n2f3kbh4a4ogxy8rbk8" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="reviewed_annotation"
+                                 constraintName="fk_cvaa1jfp32huoau3ldn1so0pk" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="storage_id" baseTableName="uploaded_file"
+                                 constraintName="fk_ednveec54vgvlnjew6in5b5oa" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="storage" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="roi_annotation"
+                                 constraintName="fk_eeaivtb750v2bmkk3f1gvyh52" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="user_annotation"
+                                 constraintName="fk_g0e6mvitmag5jghdq5t3arg0u" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="reviewed_annotation_terms_id" baseTableName="reviewed_annotation_term"
+                                 constraintName="fk_g1rqdsqh8o7uam53gbw88639o" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="reviewed_annotation" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_annotation"
+                                 constraintName="fk_hey8qie1qqqmijq65n3er7udm" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_annotation_id" baseTableName="annotation_term"
+                                 constraintName="fk_itea7ffu4d5f61o3r9bejj79a" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="user_annotation" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="user_annotation"
+                                 constraintName="fk_j2b8vqjqbpqmw5g3rb3emupw9" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_server_id" baseTableName="uploaded_file"
+                                 constraintName="fk_jy7rfc162x2am5l8llgvcgv89" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_server" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="image_id" baseTableName="reviewed_annotation"
+                                 constraintName="fk_n6p8xu8qcpsqk3ix8x8qb673q" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="image_instance" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="user_annotation"
+                                 constraintName="fk_nxgwfb0fg47xtctst2lefat2y" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="uploaded_file_id" baseTableName="abstract_slice"
+                                 constraintName="fk_ofu9h6te8gghbjdmqh24so6cl" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="uploaded_file" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="uploaded_file_id" baseTableName="companion_file"
+                                 constraintName="fk_pa1j55xx7lx1q5dkegsu2kvii" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="uploaded_file" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="uploaded_file"
+                                 constraintName="fk_r7h853sqa7vwt5rm9nk1gw67q" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="uploaded_file" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="algo_annotation"
+                                 constraintName="fk_s3yhotmnvw0mu2a01yyeved8o" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="project" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="roi_annotation"
+                                 constraintName="fk_skvm9rulcag79vbil8mpgo8en" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="sec_user" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="slice_id" baseTableName="reviewed_annotation"
+                                 constraintName="fk_t57p1fkwwbsl8mspqas7scl7l" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="slice_instance" validate="true"/>
     </changeSet>
 </databaseChangeLog>

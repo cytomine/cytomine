@@ -30,7 +30,8 @@ import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelati
 @RequiredArgsConstructor
 @Getter
 public class TermRelationCommandService implements
-    CRUDCommandService<CreateTermRelation, UpdateTermRelation, TermRelationCommandPayload, TermRelationEntity, TermRelationResponse> {
+    CRUDCommandService<CreateTermRelation, UpdateTermRelation, TermRelationCommandPayload, TermRelationEntity,
+        TermRelationResponse> {
     private final TermRepository termRepository;
     private final TermRelationRepository termRelationRepository;
     private final RelationRepository relationRepository;
@@ -46,13 +47,15 @@ public class TermRelationCommandService implements
 
     @Override
     public TermRelationCommandPayload map(TermRelationEntity entity) {
-        long ontologyId = termRepository.findById(entity.getTerm1Id()).orElseThrow().getOntologyId();
+        long ontologyId = termRepository.findById(entity.getTerm1Id())
+            .orElseThrow()
+            .getOntologyId();
         return termRelationMapper.mapToTermRelationCommandPayload(entity, ontologyId);
     }
 
 
     @Override
-    public TermRelationEntity updateWithPayload(TermRelationEntity entity, TermRelationCommandPayload payload,
+    public TermRelationEntity updateEntityWithPayload(TermRelationEntity entity, TermRelationCommandPayload payload,
         Timestamp now) {
         return termRelationMapper.updateTermRelationWithPayload(entity, payload, now);
     }
@@ -64,7 +67,8 @@ public class TermRelationCommandService implements
 
     @Override
     public TermRelationEntity mapCreateToEntity(CreateTermRelation createPayload, long userId, Timestamp creationDate) {
-        long parentId = relationRepository.findParent().getId();
+        long parentId = relationRepository.findParent()
+            .getId();
         return termRelationMapper.mapToTermRelationEntity(createPayload, creationDate, parentId);
     }
 
@@ -93,20 +97,30 @@ public class TermRelationCommandService implements
 
     @Override
     public boolean canWrite(long userId, long id) {
-        return termRelationRepository.findById(id).map(TermRelationEntity::getTerm1Id).flatMap(termRepository::findById)
-            .map(TermEntity::getOntologyId).map(ontologyId -> aclService.canWriteOntology(userId, id)).orElse(false);
+        return termRelationRepository.findById(id)
+            .map(TermRelationEntity::getTerm1Id)
+            .flatMap(termRepository::findById)
+            .map(TermEntity::getOntologyId)
+            .map(ontologyId -> aclService.canWriteOntology(userId, id))
+            .orElse(false);
     }
 
     @Override
     public boolean canDelete(long userId, long id) {
-        return termRelationRepository.findById(id).map(TermRelationEntity::getTerm1Id).flatMap(termRepository::findById)
-            .map(TermEntity::getOntologyId).map(ontologyId -> aclService.canDeleteOntology(userId, id)).orElse(false);
+        return termRelationRepository.findById(id)
+            .map(TermRelationEntity::getTerm1Id)
+            .flatMap(termRepository::findById)
+            .map(TermEntity::getOntologyId)
+            .map(ontologyId -> aclService.canDeleteOntology(userId, id))
+            .orElse(false);
     }
 
     @Override
-    public TermRelationEntity update(TermRelationEntity entity, UpdateTermRelation updatePayload, Timestamp now) {
-        return termRelationMapper.update(entity, updatePayload.term1Id().orElse(entity.getTerm1Id()),
-            updatePayload.term1Id().orElse(entity.getTerm2Id()), now);
+    public TermRelationEntity updateEntityWithEntity(TermRelationEntity entity, UpdateTermRelation updatePayload,
+        Timestamp now) {
+        return termRelationMapper.update(entity, updatePayload.term1Id()
+            .orElse(entity.getTerm1Id()), updatePayload.term1Id()
+            .orElse(entity.getTerm2Id()), now);
     }
 
 

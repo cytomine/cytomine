@@ -27,7 +27,7 @@ public interface TermRelationMapper {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updated", source = "creationDate")
     TermRelationEntity mapToTermRelationEntity(CreateTermRelation createTermRelation, Timestamp creationDate,
-                                               long relationId);
+        long relationId);
 
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
@@ -48,8 +48,8 @@ public interface TermRelationMapper {
     @Mapping(target = "relationId", source = "replace.relationId")
     @Mapping(target = "term1Id", source = "replace.term1Id")
     @Mapping(target = "term2Id", source = "replace.term2Id")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"ontologyId", "term2Id", "updated","name"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"ontologyId", "term2Id", "updated", "name"})
     TermRelationEntity updateTermRelationWithPayload(TermRelationEntity entity, TermRelationCommandPayload replace,
-                                                     Timestamp now);
+        Timestamp now);
 
 }

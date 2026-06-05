@@ -6,19 +6,18 @@ import be.cytomine.common.repository.model.command.payload.request.TermRelationC
 
 import static java.lang.String.format;
 
-public record UpdateTermRelationCommand( TermRelationCommandPayload before, TermRelationCommandPayload after,
-                                        long userId)
-    implements UpdateCommandRequest<TermRelationCommandPayload> {
+public record UpdateTermRelationCommand(TermRelationCommandPayload before, TermRelationCommandPayload after,
+                                        long userId) implements UpdateCommandRequest<TermRelationCommandPayload> {
 
     @Override
     public CommandType getCommandType() {
         return CommandType.UPDATE_TERM_RELATION_COMMAND;
     }
-    
+
     @Override
     public String getActionMessage() {
-        return format("Term relation %s (term1: %s => %s, term2: %s => %s) updated in ontology %s",
-            before.id(), before.term1Id(), after.term1Id(), before.term2Id(), after.term2Id(), before.ontologyId());
+        return format("Term relation %s (term1: %s => %s, term2: %s => %s) updated in ontology %s", before.id(),
+            before.term1Id(), after.term1Id(), before.term2Id(), after.term2Id(), before.ontologyId());
     }
 
     @Override

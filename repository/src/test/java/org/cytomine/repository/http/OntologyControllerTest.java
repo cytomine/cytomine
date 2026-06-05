@@ -31,7 +31,9 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     @Autowired
     JdbcTemplate jdbcTemplate;
     String apiURL = OntologyHttpContract.ROOT_PATH;
-    CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());
-    UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID().toString()));
+    CreateOntology createPayload = new CreateOntology(UUID.randomUUID()
+        .toString());
+    UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID()
+        .toString()));
 
 }

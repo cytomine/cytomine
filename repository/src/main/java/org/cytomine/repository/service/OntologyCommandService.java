@@ -61,12 +61,14 @@ public class OntologyCommandService implements
     }
 
     @Override
-    public OntologyEntity update(OntologyEntity entity, UpdateOntology updatePayload, Timestamp now) {
-        return ontologyMapper.update(entity, updatePayload.name().orElse(entity.getName()), now);
+    public OntologyEntity updateEntityWithEntity(OntologyEntity entity, UpdateOntology updatePayload, Timestamp now) {
+        return ontologyMapper.update(entity, updatePayload.name()
+            .orElse(entity.getName()), now);
     }
 
     @Override
-    public OntologyEntity updateWithPayload(OntologyEntity entity, OntologyCommandPayload payload, Timestamp now) {
+    public OntologyEntity updateEntityWithPayload(OntologyEntity entity, OntologyCommandPayload payload,
+        Timestamp now) {
         return ontologyMapper.updateWithPayload(entity, payload, now);
     }
 

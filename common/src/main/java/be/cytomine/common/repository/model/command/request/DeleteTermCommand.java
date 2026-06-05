@@ -6,7 +6,7 @@ import be.cytomine.common.repository.model.command.payload.request.TermCommandPa
 
 import static java.lang.String.format;
 
-public record DeleteTermCommand( TermCommandPayload before, long userId)
+public record DeleteTermCommand(TermCommandPayload before, long userId)
     implements DeleteCommandRequest<TermCommandPayload> {
 
     @Override

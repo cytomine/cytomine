@@ -69,21 +69,24 @@ class TermRelationCommandServiceTest {
 
     @Test
     void createTermRelationPersistsOntologyIds() {
-        LocalDateTime t0 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
+        LocalDateTime t0 = LocalDateTime.now()
+            .truncatedTo(ChronoUnit.MICROS);
 
         TermResponse term1Response =
-            (TermResponse) termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, null),
-                t0).orElseThrow().data();
+            (TermResponse) termCommandService.create(userId, new CreateTerm("term1", "#FF0000", ontologyId, null), t0)
+                .orElseThrow()
+                .data();
         TermResponse term2Response =
-            (TermResponse) termCommandService.create(userId, new CreateTerm("term2", "#00FF00", ontologyId, null),
-                t0).orElseThrow().data();
+            (TermResponse) termCommandService.create(userId, new CreateTerm("term2", "#00FF00", ontologyId, null), t0)
+                .orElseThrow()
+                .data();
 
         long term1Id = term1Response.id();
         long term2Id = term2Response.id();
 
         HttpCommandResponse response =
-            termRelationCommandService.create(userId, new CreateTermRelation(term1Id, term2Id, "parent"),
-                t0).orElseThrow();
+            termRelationCommandService.create(userId, new CreateTermRelation(term1Id, term2Id, "parent"), t0)
+                .orElseThrow();
 
         TermRelationResponse termRelationResponse = (TermRelationResponse) response.data();
         long termRelationId = termRelationResponse.id();
@@ -91,7 +94,8 @@ class TermRelationCommandServiceTest {
         entityManager.flush();
         entityManager.clear();
 
-        TermRelationEntity saved = termRelationRepository.findById(termRelationId).orElseThrow();
+        TermRelationEntity saved = termRelationRepository.findById(termRelationId)
+            .orElseThrow();
 
         assertNotNull(saved);
         assertEquals(term1Id, saved.getTerm1Id());

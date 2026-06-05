@@ -30,7 +30,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -53,6 +52,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -86,9 +86,11 @@ public class TermResourceTests {
                 LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
                 Optional.ofNullable(term.getComment()), Set.of())));
 
-        restTermControllerMockMvc.perform(get("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
+        restTermControllerMockMvc.perform(get("/api/term/{id}.json", term.getId()))
+            .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(term.getId().intValue()))
-            .andExpect(jsonPath("$.color").value(term.getColor())).andExpect(jsonPath("$.created").isNotEmpty())
+            .andExpect(jsonPath("$.color").value(term.getColor()))
+            .andExpect(jsonPath("$.created").isNotEmpty())
             .andExpect(jsonPath("$.ontologyId").value(term.getOntology().getId().intValue()));
     }
 
@@ -121,9 +123,10 @@ public class TermResourceTests {
                 Optional.ofNullable(term.getComment()), Set.of()))));
 
         restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.collection", hasSize(greaterThan(0)))).andExpect(
-                jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId").value(
-                    term.getOntology().getId().intValue()));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
+            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId").value(
+                term.getOntology().getId().intValue()));
     }
 
     @Test
@@ -135,7 +138,8 @@ public class TermResourceTests {
             any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.collection", hasSize(0)));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
     @Test
@@ -152,9 +156,10 @@ public class TermResourceTests {
                     Optional.ofNullable(term.getComment()), Set.of()))));
 
         restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", project.getId()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.collection", hasSize(greaterThan(0)))).andExpect(
-                jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId").value(
-                    term.getOntology().getId().intValue()));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
+            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId").value(
+                term.getOntology().getId().intValue()));
     }
 
     @Test
@@ -167,7 +172,8 @@ public class TermResourceTests {
             new PageImpl<>(List.of()));
 
         restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", project.getId()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.collection", hasSize(0)));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
     @Test
@@ -186,9 +192,9 @@ public class TermResourceTests {
             JsonObject.of("name", term.getName(), "color", term.getColor(), "ontology", term.getOntology().getId())
                 .toJsonString();
 
-        restTermControllerMockMvc.perform(
-                post("/api/term.json").contentType(MediaType.APPLICATION_JSON).content(createTermJson))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
+        restTermControllerMockMvc.perform(post("/api/term.json").contentType(APPLICATION_JSON).content(createTermJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value("be.cytomine.AddTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
@@ -205,9 +211,9 @@ public class TermResourceTests {
             JsonObject.of("name", term.getName(), "color", term.getColor(), "ontology", term.getOntology().getId())
                 .toJsonString();
 
-        restTermControllerMockMvc.perform(
-                post("/api/term.json").contentType(MediaType.APPLICATION_JSON).content(createTermJson))
-            .andExpect(status().isOk()).andExpect(jsonPath("$").doesNotExist());
+        restTermControllerMockMvc.perform(post("/api/term.json").contentType(APPLICATION_JSON).content(createTermJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").doesNotExist());
     }
 
     @Test
@@ -226,8 +232,9 @@ public class TermResourceTests {
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
 
         restTermControllerMockMvc.perform(
-                put("/api/term/{id}.json", term.getId()).contentType(MediaType.APPLICATION_JSON).content(updateTermJson))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
+                put("/api/term/{id}.json", term.getId()).contentType(APPLICATION_JSON).content(updateTermJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value("be.cytomine.EditTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
@@ -243,7 +250,7 @@ public class TermResourceTests {
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
 
         restTermControllerMockMvc.perform(
-                put("/api/term/{id}.json", term.getId()).contentType(MediaType.APPLICATION_JSON).content(updateTermJson))
+                put("/api/term/{id}.json", term.getId()).contentType(APPLICATION_JSON).content(updateTermJson))
             .andExpect(status().isNotFound());
     }
 
@@ -259,7 +266,8 @@ public class TermResourceTests {
                 LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
                 Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.DELETE_TERM)));
 
-        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
+        restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId()))
+            .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value("be.cytomine.DeleteTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))

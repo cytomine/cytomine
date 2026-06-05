@@ -32,22 +32,26 @@ public class OntologyController implements OntologyHttpContract {
 
     @Override
     public Optional<OntologyResponse> get(long id, long userId) {
-        return repository.findById(id).filter(termEntity -> aclService.canReadOntology(userId, termEntity.getId()))
+        return repository.findById(id)
+            .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getId()))
             .map(ontologyMapper::mapToOntologyResponse);
     }
 
     @Override
     public Optional<HttpCommandResponse> create(long userId, CreateOntology createPayload) {
-        return service.create(userId, createPayload, LocalDateTime.now().truncatedTo(MICROS));
+        return service.create(userId, createPayload, LocalDateTime.now()
+            .truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateOntology updateOntology) {
-        return service.update(userId, id, updateOntology, LocalDateTime.now().truncatedTo(MICROS));
+        return service.update(userId, id, updateOntology, LocalDateTime.now()
+            .truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+        return service.delete(userId, id, LocalDateTime.now()
+            .truncatedTo(MICROS));
     }
 }

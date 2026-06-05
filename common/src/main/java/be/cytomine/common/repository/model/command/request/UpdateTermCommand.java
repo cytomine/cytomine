@@ -6,7 +6,7 @@ import be.cytomine.common.repository.model.command.payload.request.TermCommandPa
 
 import static java.lang.String.format;
 
-public record UpdateTermCommand( TermCommandPayload before, TermCommandPayload after, long userId)
+public record UpdateTermCommand(TermCommandPayload before, TermCommandPayload after, long userId)
     implements UpdateCommandRequest<TermCommandPayload> {
 
     @Override

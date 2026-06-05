@@ -52,24 +52,36 @@ public interface CRUDCommandTests<C, R, U> {
     @SneakyThrows
     default void baseTest() {
         String userId = createUser();
-        String response = getMockMvc().perform(post(getApiURL()).param("userId", userId).contentType(APPLICATION_JSON)
-                .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk()).andReturn()
-            .getResponse().getContentAsString();
+        String response = getMockMvc().perform(post(getApiURL()).param("userId", userId)
+                .contentType(APPLICATION_JSON)
+                .content(getObjectMapper().writeValueAsString(getCreatePayload())))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
         assertTrue(result.data() != null);
         R dataResult = (R) result.data();
 
-        String get = getMockMvc().perform(
-                get(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String get = getMockMvc().perform(get(getApiURL() + "/" + result.data()
+                .id()).param("userId", userId)
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         assertEquals(dataResult, getObjectMapper().readValue(get, dataResult.getClass()));
 
-        String update = getMockMvc().perform(
-                put(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON)
-                    .content(getObjectMapper().writeValueAsString(getUpdatePayload()))).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String update = getMockMvc().perform(put(getApiURL() + "/" + result.data()
+                .id()).param("userId", userId)
+                .contentType(APPLICATION_JSON)
+                .content(getObjectMapper().writeValueAsString(getUpdatePayload())))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
         HttpCommandResponse updateResult = getObjectMapper().readValue(update, HttpCommandResponse.class);
         R updateDataResult = (R) updateResult.data();

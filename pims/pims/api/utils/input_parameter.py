@@ -94,7 +94,7 @@ def parse_planes(
     Parameters
     ----------
     planes_to_parse
-        list of plane indexes and ranges to parse.
+        List of plane indexes and ranges to parse.
     n_planes
         Number of planes. It is the maximum output set size.
     default

@@ -1,22 +1,26 @@
 package org.cytomine.repository.http;
 
+import java.time.LocalDateTime;
+
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
+import be.cytomine.common.repository.model.HasLocaleDateTimeCUD;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public interface CRUDCommandTests<C, R, U> {
+public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
     MockMvc getMockMvc();
 
     ObjectMapper getObjectMapper();
@@ -26,6 +30,10 @@ public interface CRUDCommandTests<C, R, U> {
     C getCreatePayload();
 
     U getUpdatePayload();
+
+    R expectedUpdatedResponse(R response, U updatePayload, LocalDateTime updatedTime);
+
+    R expectedDeletedResponse(R response, LocalDateTime deletedTime);
 
     JdbcTemplate getJdbcTemplate();
 
@@ -64,9 +72,8 @@ public interface CRUDCommandTests<C, R, U> {
         assertTrue(result.data() != null);
         R dataResult = (R) result.data();
 
-        String get = getMockMvc().perform(get(getApiURL() + "/" + result.data()
-                .id()).param("userId", userId)
-                .contentType(APPLICATION_JSON))
+        String get = getMockMvc().perform(
+                get(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
@@ -74,8 +81,7 @@ public interface CRUDCommandTests<C, R, U> {
 
         assertEquals(dataResult, getObjectMapper().readValue(get, dataResult.getClass()));
 
-        String update = getMockMvc().perform(put(getApiURL() + "/" + result.data()
-                .id()).param("userId", userId)
+        String update = getMockMvc().perform(put(getApiURL() + "/" + result.data().id()).param("userId", userId)
                 .contentType(APPLICATION_JSON)
                 .content(getObjectMapper().writeValueAsString(getUpdatePayload())))
             .andExpect(status().isOk())
@@ -86,7 +92,19 @@ public interface CRUDCommandTests<C, R, U> {
         HttpCommandResponse updateResult = getObjectMapper().readValue(update, HttpCommandResponse.class);
         R updateDataResult = (R) updateResult.data();
 
-        assertEquals(dataResult, updateDataResult);
+        assertEquals(expectedUpdatedResponse(dataResult, getUpdatePayload(), updateDataResult.updated()),
+            updateDataResult);
+
+        String delete = getMockMvc().perform(
+                delete(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+        HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
+        assertEquals(expectedDeletedResponse(updateDataResult, deleteResult.data().deleted().orElseThrow()),
+            deleteResult.data());
+
     }
 
 

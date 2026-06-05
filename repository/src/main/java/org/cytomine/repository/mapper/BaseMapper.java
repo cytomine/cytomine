@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface BaseMapper {
 
     default <T> Optional<T> map(T t) {

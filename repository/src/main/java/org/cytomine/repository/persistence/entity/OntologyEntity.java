@@ -5,6 +5,8 @@ import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -22,14 +24,15 @@ import be.cytomine.common.repository.model.HasUpdated;
 @NoArgsConstructor
 public class OntologyEntity implements HasDeleted, HasUpdated {
     @Id
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @Column
     private long version = 0;
     @Column
     private String name;
 
     @Column
-    private long userId;
+    private Long userId;
 
     @Column
     private Timestamp created;

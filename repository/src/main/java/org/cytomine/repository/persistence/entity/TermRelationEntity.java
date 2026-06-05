@@ -19,7 +19,7 @@ import be.cytomine.common.repository.model.HasUpdated;
 public class TermRelationEntity implements HasDeleted, HasUpdated {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column
     private long version;
     @Column

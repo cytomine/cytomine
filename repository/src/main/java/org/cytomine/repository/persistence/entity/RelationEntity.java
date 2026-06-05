@@ -14,7 +14,7 @@ import lombok.Getter;
 public class RelationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column
     private long version;
     @Column

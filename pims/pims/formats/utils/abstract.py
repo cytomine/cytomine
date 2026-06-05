@@ -60,7 +60,7 @@ class AbstractFormat(ABC, SimpleDataCache):
     checker_class: ClassVar[Type[AbstractChecker]]
     parser_class: ClassVar[Type[AbstractParser]]
     reader_class: ClassVar[Type[AbstractReader]]
-    convertor_class: ClassVar[Type[AbstractConvertor]]
+    convertor_class: ClassVar[Type[AbstractConvertor] | None] = None
 
     histogram_reader_class: ClassVar[Type[AbstractHistogramReader]]
 

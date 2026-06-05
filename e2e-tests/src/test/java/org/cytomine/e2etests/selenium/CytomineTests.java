@@ -563,4 +563,23 @@ public class CytomineTests {
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.logout(wait, cytomineUrl);
     }
+
+    @Test
+    void createAndDeleteImageGroup() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String projectName = "selenium-" + randomUUID();
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+        String imageName = "selenium-" + randomUUID() + ".png";
+        cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+
+        String imageGroupName = "selenium-" + randomUUID();
+        cytomineSteps.createImageGroup(wait, projectUrl, imageGroupName, Set.of(imageName));
+
+        cytomineSteps.deleteImageGroup(wait, projectUrl, imageGroupName);
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteOntology(wait, ontologyUrl);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
 }

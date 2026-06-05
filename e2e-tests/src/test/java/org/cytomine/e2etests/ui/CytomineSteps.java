@@ -664,4 +664,51 @@ public class CytomineSteps {
 
         webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Unvalidate and continue my review']]");
     }
+
+    public void createImageGroup(
+        Wait<WebDriver> wait,
+        String projectUrl,
+        String imageGroupName,
+        Set<String> imageNames
+    ) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "image-groups"));
+        webDriverUtils.xpathClick(wait, "//button[normalize-space()='Add image group']");
+        webDriverUtils.bySendKeys(wait, By.cssSelector("input[name='name']"), imageGroupName);
+        webDriverUtils.xpathClick(wait, "//button[normalize-space()='Save']");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'Image group successfully created')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'Image group successfully created')]"));
+
+        for (String imageName : imageNames) {
+            webDriverUtils.xpathClick(
+                wait,
+                "//tr[td[normalize-space()='" + imageName + "']]//button[normalize-space()='Add']"
+            );
+        }
+
+        webDriverUtils.xpathClick(wait, "//button[normalize-space()='Close']");
+    }
+
+    public void deleteImageGroup(
+        Wait<WebDriver> wait,
+        String projectUrl,
+        String imageGroupName
+    ) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "image-groups"));
+        webDriverUtils.xpathClick(
+            wait,
+            "//tr[td//a[normalize-space()='" + imageGroupName + "']]"
+                + "//td[contains(@class,'chevron-cell')]//a[@role='button']"
+        );
+        webDriverUtils.xpathClick(wait, "//button[normalize-space()='Delete']");
+        webDriverUtils.xpathClick(wait, "//button[normalize-space()='Confirm']");
+
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//div[contains(text(), 'Image group " + imageGroupName + " was successfully deleted')]")
+        );
+        webDriverUtils.waitUntilByEmpty(
+            wait,
+            By.xpath("//div[contains(text(), 'Image group " + imageGroupName + " was successfully deleted')]")
+        );
+    }
 }

@@ -141,9 +141,9 @@ def identity(v):
 
 
 RawImagePixels = np.ndarray | VIPSImage | PILImage.Image
-RawImagePixelstype = type[np.ndarray] | type[VIPSImage] | type[PILImage.Image]
+RawImagePixelsType = type[np.ndarray] | type[VIPSImage] | type[PILImage.Image]
 
-imglib_adapters: dict[tuple[RawImagePixelstype, RawImagePixelstype], Callable] = {
+imglib_adapters: dict[tuple[RawImagePixelsType, RawImagePixelsType], Callable] = {
     (np.ndarray, VIPSImage): numpy_to_vips,
     (np.ndarray, PILImage.Image): numpy_to_pil,
     (np.ndarray, np.ndarray): identity,
@@ -157,7 +157,7 @@ imglib_adapters: dict[tuple[RawImagePixelstype, RawImagePixelstype], Callable] =
 
 
 def convert_to(
-    image: RawImagePixels, new_image_type: RawImagePixelstype
+    image: RawImagePixels, new_image_type: RawImagePixelsType
 ) -> RawImagePixels:
     """
     Convert a convertible image (pixels) to a new convertible image type.

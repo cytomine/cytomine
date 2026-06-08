@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pint import Quantity
@@ -63,9 +63,7 @@ def read_tifffile(path, silent_fail=True):
     return tf
 
 
-def cached_tifffile(
-    format: Union[AbstractFormat, CachedDataPath]
-) -> tifffile.TiffFile:
+def cached_tifffile(format: AbstractFormat | CachedDataPath) -> tifffile.TiffFile:
     return format.get_cached(
         '_tf', read_tifffile, format.path.resolve(), silent_fail=True
     )
@@ -147,9 +145,7 @@ class TifffileParser(AbstractParser):
         return imd
 
     @staticmethod
-    def parse_acquisition_date(
-        date: Union[datetime, str]
-    ) -> Union[datetime, None]:
+    def parse_acquisition_date(date: datetime | str) -> datetime | None:
         """
         Parse a date(time) from a TiffTag to datetime.
 
@@ -171,9 +167,9 @@ class TifffileParser(AbstractParser):
 
     @staticmethod
     def parse_physical_size(
-        physical_size: Union[Tuple, float],
-        unit: Optional[Union[tifffile.TIFF.RESUNIT, str]] = None
-    ) -> Union[Quantity, None]:
+        physical_size: tuple | float,
+        unit: tifffile.TIFF.RESUNIT | str | None = None
+    ) -> Quantity | None:
         """
         Parse a physical size and its unit from a TiffTag to a Quantity.
         """
@@ -187,7 +183,7 @@ class TifffileParser(AbstractParser):
             rational = physical_size
         if rational[0] <= 0 or rational[1] <= 0:
             return None
-        if type(unit) is not str:
+        if not isinstance(unit, str):
             unit = unit.name.lower()
         return rational[1] / rational[0] * UNIT_REGISTRY(unit)
 
@@ -238,8 +234,8 @@ class TifffileParser(AbstractParser):
 
 
 def remove_tiff_comments(
-    filepath: Path, n_pages: Optional[int],
-    except_pages: Optional[List[int]] = None
+    filepath: Path, n_pages: int | None,
+    except_pages: list[int] | None = None
 ):
     if except_pages is None:
         except_pages = []

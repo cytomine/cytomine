@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from pims.formats.utils.structures.annotations import ParsedMetadataAnnotation
 from pims.formats.utils.structures.metadata import ImageMetadata, MetadataStore
@@ -110,7 +110,7 @@ class AbstractParser(ABC):
         pi = PlanesInfo(imd.n_channels, imd.depth, imd.duration)
         return pi
 
-    def parse_annotations(self) -> List[ParsedMetadataAnnotation]:
+    def parse_annotations(self) -> list[ParsedMetadataAnnotation]:
         """
         Parse annotations stored in image format metadata, together with
         optional terms and properties.

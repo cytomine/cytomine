@@ -13,7 +13,6 @@
 #  * limitations under the License.
 
 from copy import copy
-from typing import List, Optional, Union
 
 from pims.api.exceptions import BadRequestException
 from pims.api.utils.models import ChannelReduction, GenericReduction, TierIndexType
@@ -86,9 +85,9 @@ def parse_region(
 
 
 def parse_planes(
-    planes_to_parse: List[Union[int, str]], n_planes: int, default: Union[int, List[int]] = 0,
+    planes_to_parse: list[int | str], n_planes: int, default: int | list[int] = 0,
     name: str = 'planes'
-) -> List[int]:
+) -> list[int]:
     """
     Get a set of planes from a list of plane indexes and ranges.
 
@@ -135,7 +134,7 @@ def parse_planes(
     return plane_set
 
 
-def get_channel_indexes(image: Image, planes: List[Union[int, str]]) -> List[int]:
+def get_channel_indexes(image: Image, planes: list[int | str]) -> list[int]:
     """
     Image channels used to render the response.
     This parameter is interpreted as a set such that duplicates are ignored.
@@ -145,7 +144,7 @@ def get_channel_indexes(image: Image, planes: List[Union[int, str]]) -> List[int
     return parse_planes(planes, image.n_channels, default, 'channels')
 
 
-def get_zslice_indexes(image: Image, planes: List[int]) -> List[int]:
+def get_zslice_indexes(image: Image, planes: list[int | str]) -> list[int]:
     """
     Image focal planes used to render the response.
     This parameter is interpreted as a set such that duplicates are ignored.
@@ -155,7 +154,7 @@ def get_zslice_indexes(image: Image, planes: List[int]) -> List[int]:
     return parse_planes(planes, image.depth, default, 'z_slices')
 
 
-def get_timepoint_indexes(image: Image, planes: List[int]) -> List[int]:
+def get_timepoint_indexes(image: Image, planes: list[int | str]) -> list[int]:
     """
     Image timepoints used to render the response.
     This parameter is interpreted as a set such that duplicates are ignored.
@@ -166,7 +165,7 @@ def get_timepoint_indexes(image: Image, planes: List[int]) -> List[int]:
 
 
 def check_reduction_validity(
-    planes: List[int], reduction: Optional[Union[GenericReduction, ChannelReduction]],
+    planes: list[int], reduction: GenericReduction | ChannelReduction | None,
     name: str = 'planes'
 ):
     """

@@ -220,7 +220,7 @@ export default {
     confirmDeletion() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-image-group'),
-        message: this.$t('delete-image-group-confirmation-message', {imageName: this.imageGroup.name}),
+        message: this.$t('delete-image-group-confirmation-message', {groupName: this.imageGroup.name}),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -232,7 +232,7 @@ export default {
         await ImageGroup.delete(this.imageGroup.id);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-group-deletion', {imageName: this.imageGroup.name})
+          text: this.$t('notif-success-image-group-deletion', {groupName: this.imageGroup.name})
         });
         this.$emit('delete');
 
@@ -240,7 +240,7 @@ export default {
         console.log(err);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-group-deletion', {imageName: this.imageGroup.name})
+          text: this.$t('notif-error-image-group-deletion', {groupName: this.imageGroup.name})
         });
       }
     },

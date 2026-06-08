@@ -13,7 +13,7 @@
 #  * limitations under the License.
 from __future__ import annotations
 
-from typing import Callable, Dict, Tuple, Type, Union
+from typing import Callable
 
 import numpy as np
 from PIL import Image as PILImage
@@ -21,9 +21,7 @@ from pyvips import Image as VIPSImage
 from pyvips.vimage import FORMAT_TO_TYPESTR
 
 
-def numpy_to_vips(
-    np_array: np.ndarray,
-) -> VIPSImage:
+def numpy_to_vips(np_array: np.ndarray) -> VIPSImage:
     """
     Convert a Numpy array to a VIPS image.
 
@@ -142,10 +140,10 @@ def identity(v):
     return v
 
 
-RawImagePixels = Union[np.ndarray, VIPSImage, PILImage.Image]
-RawImagePixelsType = Union[Type[np.ndarray], Type[VIPSImage], Type[PILImage.Image]]
+RawImagePixels = np.ndarray | VIPSImage | PILImage.Image
+RawImagePixelsType = type[np.ndarray] | type[VIPSImage] | type[PILImage.Image]
 
-imglib_adapters: Dict[Tuple[RawImagePixelsType, RawImagePixelsType], Callable] = {
+imglib_adapters: dict[tuple[RawImagePixelsType, RawImagePixelsType], Callable] = {
     (np.ndarray, VIPSImage): numpy_to_vips,
     (np.ndarray, PILImage.Image): numpy_to_pil,
     (np.ndarray, np.ndarray): identity,
@@ -176,4 +174,4 @@ def convert_to(
     converted
         The image (pixels) in the new type
     """
-    return imglib_adapters.get((type(image), new_image_type))(image)
+    return imglib_adapters.get((type(image), new_image_type), identity)(image)

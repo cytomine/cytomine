@@ -12,7 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 import logging
-from typing import Optional
 
 from pint import Quantity
 
@@ -56,7 +55,7 @@ class BMPParser(PillowParser):
         return imd
 
     @staticmethod
-    def parse_physical_size(physical_size: Optional[str]) -> Optional[Quantity]:
+    def parse_physical_size(physical_size: str | None) -> Quantity | None:
         if physical_size is not None:
             physical_size = parse_float(physical_size)
             if physical_size is not None and physical_size > 0:

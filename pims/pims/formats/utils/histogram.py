@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import List, TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -27,7 +27,7 @@ log = logging.getLogger("pims.formats")
 if TYPE_CHECKING:
     from pims.formats import AbstractFormat
 
-PlaneIndex = Union[int, List[int]]
+PlaneIndex = int | list[int]
 
 
 class HistogramReaderInterface(ABC):
@@ -37,7 +37,7 @@ class HistogramReaderInterface(ABC):
         pass
 
     @abstractmethod
-    def image_bounds(self) -> Tuple[int, int]:
+    def image_bounds(self) -> tuple[int, int]:
         """
         Intensity bounds on the whole image (all planes merged).
 
@@ -68,7 +68,7 @@ class HistogramReaderInterface(ABC):
         pass
 
     @abstractmethod
-    def channels_bounds(self) -> List[Tuple[int, int]]:
+    def channels_bounds(self) -> list[tuple[int, int]]:
         """
         Intensity bounds for every channels
 
@@ -79,7 +79,7 @@ class HistogramReaderInterface(ABC):
         pass
 
     @abstractmethod
-    def channel_bounds(self, c: int) -> Tuple[int, int]:
+    def channel_bounds(self, c: int) -> tuple[int, int]:
         """
         Intensity bounds for a channel.
 
@@ -117,7 +117,7 @@ class HistogramReaderInterface(ABC):
         pass
 
     @abstractmethod
-    def planes_bounds(self) -> List[Tuple[int, int]]:
+    def planes_bounds(self) -> list[tuple[int, int]]:
         """
         Intensity bounds for every planes
 
@@ -128,7 +128,7 @@ class HistogramReaderInterface(ABC):
         pass
 
     @abstractmethod
-    def plane_bounds(self, c: int, z: int, t: int) -> Tuple[int, int]:
+    def plane_bounds(self, c: int, z: int, t: int) -> tuple[int, int]:
         """
         Intensity bounds for a plane
 
@@ -177,7 +177,7 @@ class DefaultHistogramReader(AbstractHistogramReader):
     def type(self) -> HistogramType:
         return HistogramType.FAST
 
-    def image_bounds(self) -> Tuple[int, int]:
+    def image_bounds(self) -> tuple[int, int]:
         log.warning(
             f"Impossible {self.format.path} to compute "
             f"image histogram bounds. Default values used."
@@ -189,7 +189,7 @@ class DefaultHistogramReader(AbstractHistogramReader):
             detail=f"No histogram found for {self.format.path}"
         )
 
-    def channels_bounds(self) -> List[Tuple[int, int]]:
+    def channels_bounds(self) -> list[tuple[int, int]]:
         log.warning(
             f"Impossible {self.format.path} to compute "
             f"channels histogram bounds. Default values used."
@@ -197,7 +197,7 @@ class DefaultHistogramReader(AbstractHistogramReader):
         return [(0, 2 ** self.format.main_imd.significant_bits)] \
                * self.format.main_imd.n_channels
 
-    def channel_bounds(self, c: int) -> Tuple[int, int]:
+    def channel_bounds(self, c: int) -> tuple[int, int]:
         log.warning(
             f"Impossible {self.format.path} to compute "
             f"channel histogram bounds. Default values used."
@@ -209,7 +209,7 @@ class DefaultHistogramReader(AbstractHistogramReader):
             detail=f"No histogram found for {self.format.path}"
         )
 
-    def planes_bounds(self) -> List[Tuple[int, int]]:
+    def planes_bounds(self) -> list[tuple[int, int]]:
         log.warning(
             f"Impossible {self.format.path} to compute "
             f"plane histogram bounds. Default values used."
@@ -217,7 +217,7 @@ class DefaultHistogramReader(AbstractHistogramReader):
         return [(0, 2 ** self.format.main_imd.significant_bits)] \
                * self.format.main_imd.n_planes
 
-    def plane_bounds(self, c: int, z: int, t: int) -> Tuple[int, int]:
+    def plane_bounds(self, c: int, z: int, t: int) -> tuple[int, int]:
         log.warning(
             f"Impossible {self.format.path} to compute "
             f"plane histogram bounds. Default values used."

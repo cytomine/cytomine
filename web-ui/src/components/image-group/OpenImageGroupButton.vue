@@ -1,12 +1,19 @@
 <template>
   <div class="field has-addons">
     <p class="control">
-      <router-link
-          :to="viewerURL(images)"
-          class="button is-small is-link"
-          :disabled="disabled"
+      <button
+        v-if="disabled"
+        class="button is-small is-link"
+        disabled
       >
-        {{$t('button-open')}}
+        {{ $t('button-open') }}
+      </button>
+      <router-link
+        v-else
+        :to="viewerURL(images)"
+        class="button is-small is-link"
+      >
+        {{ $t('button-open') }}
       </router-link>
     </p>
     <p class="control" v-if="images.length > 1">
@@ -48,13 +55,17 @@
 import ImageName from '@/components/image/ImageName';
 export default {
   name: 'open-image-group-button',
-  components: {ImageName},
+  components: {
+    ImageName,
+  },
   data() {
     return {
       batchSize: 4
     };
   },
-  props: ['imageGroup'],
+  props: {
+    imageGroup: {type: Object},
+  },
   computed: {
     images() {
       return this.imageGroup.imageInstances;

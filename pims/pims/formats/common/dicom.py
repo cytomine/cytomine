@@ -14,7 +14,6 @@
 
 import logging
 from datetime import datetime
-from typing import List, Optional
 
 import numpy as np
 import pyvips
@@ -126,8 +125,8 @@ class DicomParser(AbstractParser):
 
     @staticmethod
     def parse_acquisition_date(
-        date: str, time: Optional[str] = None
-    ) -> Optional[datetime]:
+        date: str, time: str | None = None
+    ) -> datetime | None:
         """
         Date examples: 20211105
         Time examples: 151034, 151034.123
@@ -145,7 +144,7 @@ class DicomParser(AbstractParser):
             return None
 
     @staticmethod
-    def parse_physical_size(physical_size: Optional[str]) -> Optional[Quantity]:
+    def parse_physical_size(physical_size: str | None) -> Quantity | None:
         if physical_size is not None:
             physical_size = parse_float(physical_size)
             if physical_size is not None and physical_size > 0:
@@ -174,7 +173,7 @@ class DicomParser(AbstractParser):
             store.set(name, value, namespace="DICOM")
         return store
 
-    def parse_annotations(self) -> List[ParsedMetadataAnnotation]:
+    def parse_annotations(self) -> list[ParsedMetadataAnnotation]:
         """
         DICOM/DICONDE extension for Annotations
         * 0x0077-0x1900 (US) - Annotation.Number

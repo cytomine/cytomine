@@ -14,7 +14,6 @@
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Dict, List, Optional, Union
 
 import numpy as np
 from matplotlib.cm import get_cmap, register_cmap
@@ -66,7 +65,7 @@ class Colormap(ABC):
     @abstractmethod
     def lut(
         self, size: int = 256, bitdepth: int = 8,
-        n_components: Optional[int] = None,
+        n_components: int | None = None,
         force_black_as_first: bool = False
     ) -> LookUpTable:
         """
@@ -129,7 +128,7 @@ class MatplotlibColormap(Colormap):
 
     def lut(
         self, size: int = 256, bitdepth: int = 8,
-        n_components: Optional[int] = None,
+        n_components: int | None = None,
         force_black_as_first: bool = False
     ) -> LookUpTable:
         if n_components is None or n_components > 3:
@@ -163,7 +162,7 @@ class ColorColormap(Colormap):
 
     def lut(
         self, size: int = 256, bitdepth: int = 8,
-        n_components: Optional[int] = None,
+        n_components: int | None = None,
         force_black_as_first: bool = False
     ) -> LookUpTable:
         components = self._color.as_float_tuple(alpha=False)
@@ -191,7 +190,7 @@ class ColorColormap(Colormap):
 
 def default_lut(
     size: int = 256, bitdepth: int = 8, n_components: int = 1,
-    force_black_as_first: Optional[bool] = False  # Ignored but here for compat
+    force_black_as_first: bool = False  # Ignored but here for compat
 ) -> LookUpTable:
     """Default LUT"""
     return np.rint(np.stack(
@@ -225,8 +224,8 @@ def combine_stacked_lut(
 
 
 def get_lut_from_stacked(
-    stack: Optional[StackedLookUpTables], index: int = 0, as_stack: bool = False
-) -> Union[None, LookUpTable, StackedLookUpTables]:
+    stack: StackedLookUpTables | None, index: int = 0, as_stack: bool = False
+) -> None | LookUpTable | StackedLookUpTables:
     """
     Get a LUT from a stack of LUTs.
 
@@ -295,7 +294,7 @@ for custom_cmap in _custom_cmaps:
     register_cmap(None, mpl)
     register_cmap(None, mpl.reversed())
     mpl_cmaps[ctype].append(mpl.name)
-ColormapsByName = Dict[str, Colormap]
+ColormapsByName = dict[str, Colormap]
 
 # Non-trivial colormaps
 COLORMAPS = {}
@@ -336,7 +335,7 @@ RGB_COLORMAPS = [
 RG_COLORMAPS = RGB_COLORMAPS[:2]
 
 
-def is_rgb_colormapping(colormaps: List[Colormap]) -> bool:
+def is_rgb_colormapping(colormaps: list[Colormap]) -> bool:
     """Check that given colormaps correspond to a RG(B) colormapping."""
     return ((len(colormaps) == 3 and colormaps == RGB_COLORMAPS)
             or (len(colormaps) == 2 and colormaps == RG_COLORMAPS))

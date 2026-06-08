@@ -18,7 +18,7 @@ import shutil
 from datetime import datetime
 from enum import Enum
 from pathlib import Path as _Path
-from typing import Callable, List, Union, Optional, Tuple, Type
+from typing import Callable
 
 import numpy as np
 from pint import Quantity
@@ -27,17 +27,28 @@ from pims.api.exceptions import NoMatchingFormatProblem
 from pims.api.utils.models import HistogramType
 from pims.cache import cached_property
 
-from pims.cache.redis import PIMSCache, PickleCodec, CACHE_KEY_NAMESPACE_IMAGE_FORMAT_METADATA, stable_hash
+from pims.cache.redis import (
+    PIMSCache,
+    PickleCodec,
+    CACHE_KEY_NAMESPACE_IMAGE_FORMAT_METADATA,
+    stable_hash,
+)
 from pims.config import get_settings
 from pims.formats import AbstractFormat
 from pims.formats.utils.factories import (
-    FormatFactory, SpatialReadableFormatFactory,
-    SpectralReadableFormatFactory
+    FormatFactory,
+    SpatialReadableFormatFactory,
+    SpectralReadableFormatFactory,
 )
 from pims.formats.utils.histogram import HistogramReaderInterface, PlaneIndex
 from pims.formats.utils.structures.annotations import ParsedMetadataAnnotation
-from pims.formats.utils.structures.metadata import ImageChannel, ImageObjective, ImageMicroscope, ImageAssociated, \
-    MetadataStore
+from pims.formats.utils.structures.metadata import (
+    ImageChannel,
+    ImageObjective,
+    ImageMicroscope,
+    ImageAssociated,
+    MetadataStore,
+)
 from pims.formats.utils.structures.pyramid import Pyramid
 from pims.processing.adapters import RawImagePixels
 from pims.processing.histograms import HISTOGRAM_FORMATS
@@ -71,11 +82,11 @@ class FileRole(str, Enum):
     * `NONE` - This file has no defined role for PIMS.
     """
 
-    UPLOAD = 'UPLOAD'
-    ORIGINAL = 'ORIGINAL'
-    SPATIAL = 'SPATIAL'
-    SPECTRAL = 'SPECTRAL'
-    NONE = 'NONE'
+    UPLOAD = "UPLOAD"
+    ORIGINAL = "ORIGINAL"
+    SPATIAL = "SPATIAL"
+    SPECTRAL = "SPECTRAL"
+    NONE = "NONE"
 
     @classmethod
     def from_path(cls, path: Path) -> FileRole:
@@ -91,7 +102,7 @@ class FileRole(str, Enum):
         return role
 
     @classmethod
-    def representations(cls) -> List[FileRole]:
+    def representations(cls) -> list[FileRole]:
         return [FileRole.UPLOAD, FileRole.ORIGINAL, FileRole.SPATIAL, FileRole.SPECTRAL]
 
 
@@ -103,8 +114,8 @@ class FileType(str, Enum):
     processing.
     """
 
-    SINGLE = 'SINGLE'
-    COLLECTION = 'COLLECTION'
+    SINGLE = "SINGLE"
+    COLLECTION = "COLLECTION"
 
     @classmethod
     def from_path(cls, path: Path) -> FileType:
@@ -116,7 +127,7 @@ class FileType(str, Enum):
 PlatformPath = type(_Path())
 
 
-class Path(PlatformPath, _Path, SafelyCopiable):
+class Path(PlatformPath, _Path, SafelyCopiable):  # pyrefly: ignore
     f"""
     Extends `Path` from `pathlib` for PIMS.
     
@@ -189,7 +200,7 @@ class Path(PlatformPath, _Path, SafelyCopiable):
         >>> Path("/a/b/c.ext1.ext2").extension
         ".ext1.ext2"
         """
-        return ''.join(self.suffixes)
+        return "".join(self.suffixes)
 
     @property
     def true_stem(self) -> str:
@@ -202,9 +213,9 @@ class Path(PlatformPath, _Path, SafelyCopiable):
         >>> Path("/a/b/c.ext1.ext2").true_stem
         "c"
         """
-        return self.stem.split('.')[0]
+        return self.stem.split(".")[0]
 
-    def mount_point(self) -> Union[Path, None]:
+    def mount_point(self) -> Path | None:
         for parent in self.parents:
             if parent.is_mount():
                 return parent
@@ -286,15 +297,26 @@ class Path(PlatformPath, _Path, SafelyCopiable):
 
     def get_upload(self) -> Path:
         upload = next(
-            (child for child in self.upload_root().iterdir() if child.has_upload_role()), None
+            (
+                child
+                for child in self.upload_root().iterdir()
+                if child.has_upload_role()
+            ),
+            None,
         )
         return upload
 
-    async def _get_cached_representation(self, representation: FileRole) -> Union[Image, None]:
+    async def _get_cached_representation(
+        self, representation: FileRole
+    ) -> Image | None:
         if representation not in (FileRole.ORIGINAL, FileRole.SPATIAL):
-            raise ValueError(f"Cached representation {representation} is not supported.")
+            raise ValueError(
+                f"Cached representation {representation} is not supported."
+            )
 
-        if not PIMSCache.is_enabled() or PIMSCache.is_disabled_namespace(CACHE_KEY_NAMESPACE_IMAGE_FORMAT_METADATA):
+        if not PIMSCache.is_enabled() or PIMSCache.is_disabled_namespace(
+            CACHE_KEY_NAMESPACE_IMAGE_FORMAT_METADATA
+        ):
             return await self.get_representation(representation)
 
         processed_root = self.processed_root()
@@ -304,18 +326,23 @@ class Path(PlatformPath, _Path, SafelyCopiable):
         stem = ORIGINAL_STEM if representation == FileRole.ORIGINAL else SPATIAL_STEM
         stem_path = str(processed_root / Path(stem))
         cache_key = stable_hash(stem_path.encode())
-        cached = await PIMSCache.get_backend().get(cache_key, namespace=CACHE_KEY_NAMESPACE_IMAGE_FORMAT_METADATA)
+        cached = await PIMSCache.get_backend().get(
+            cache_key, namespace=CACHE_KEY_NAMESPACE_IMAGE_FORMAT_METADATA
+        )
         if cached is not None:
             decoded = PickleCodec.decode(cached)
             return Image(f"{stem_path}.{decoded.get_identifier()}", format=decoded)
 
         image = await self.get_representation(representation)
-        await PIMSCache.get_backend().set(
-            cache_key, PickleCodec.encode(image.format.serialize()), namespace=CACHE_KEY_NAMESPACE_IMAGE_FORMAT_METADATA
-        )
+        if isinstance(image, Image):
+            await PIMSCache.get_backend().set(
+                cache_key,
+                PickleCodec.encode(image.format.serialize()),
+                namespace=CACHE_KEY_NAMESPACE_IMAGE_FORMAT_METADATA,
+            )
         return image
 
-    def get_original(self) -> Union[Image, None]:
+    def get_original(self) -> Image | None:
         if not self.processed_root().exists():
             return None
 
@@ -323,12 +350,16 @@ class Path(PlatformPath, _Path, SafelyCopiable):
             (child for child in self.processed_root().iterdir() if child.has_original_role()), None
         )
 
-        return Image(original, factory=FormatFactory(match_on_ext=True)) if original else None
+        return (
+            Image(original, factory=FormatFactory(match_on_ext=True))
+            if original
+            else None
+        )
 
-    async def get_cached_original(self) -> Union[Image, None]:
+    async def get_cached_original(self) -> Image | None:
         return await self._get_cached_representation(FileRole.ORIGINAL)
 
-    def get_spatial(self) -> Union[Image, None]:
+    def get_spatial(self) -> Image | None:
         processed_root = self.processed_root()
         if not processed_root.exists():
             return None
@@ -344,10 +375,10 @@ class Path(PlatformPath, _Path, SafelyCopiable):
             )
             return image
 
-    async def get_cached_spatial(self) -> Union[Image, None]:
+    async def get_cached_spatial(self) -> Image | None:
         return await self._get_cached_representation(FileRole.SPATIAL)
 
-    def get_spectral(self) -> Union[Image, None]:
+    def get_spectral(self) -> Image | None:
         if not self.processed_root().exists():
             return None
 
@@ -359,7 +390,7 @@ class Path(PlatformPath, _Path, SafelyCopiable):
             spectral, factory=SpectralReadableFormatFactory(match_on_ext=True)
         ) if spectral else None
 
-    def get_histogram(self) -> Union[Histogram, None]:
+    def get_histogram(self) -> Histogram | None:
         if not self.processed_root().exists():
             return None
 
@@ -370,7 +401,9 @@ class Path(PlatformPath, _Path, SafelyCopiable):
 
         return Histogram(histogram) if histogram else None
 
-    async def get_representation(self, role: FileRole, from_cache: bool = False) -> Union[Path, Image, None]:
+    async def get_representation(
+        self, role: FileRole, from_cache: bool = False
+    ) -> Path | Image | None:
         if role == FileRole.UPLOAD:
             return self.get_upload()
         elif role == FileRole.ORIGINAL:
@@ -382,7 +415,7 @@ class Path(PlatformPath, _Path, SafelyCopiable):
         else:
             return None
 
-    def get_extracted_children(self, stop_recursion_cond: Callable = None):
+    def get_extracted_children(self, stop_recursion_cond: Callable | None = None):
         if not self.is_collection():
             return []
 
@@ -419,7 +452,7 @@ class Path(PlatformPath, _Path, SafelyCopiable):
         """
         if not self.is_file():
             return bytearray()
-        with self.resolve().open('rb') as fp:
+        with self.resolve().open("rb") as fp:
             return bytearray(fp.read(_NUM_SIGNATURE_BYTES))
 
     @property
@@ -437,9 +470,12 @@ class Image(Path):
     An image. Acts as a facade in front of underlying technical details
     about specific image formats.
     """
+
     def __init__(
-        self, *pathsegments,
-        factory: FormatFactory = None, format: AbstractFormat = None
+        self,
+        *pathsegments,
+        factory: FormatFactory = None,
+        format: AbstractFormat = None,
     ):
         super().__init__(*pathsegments)
 
@@ -465,7 +501,7 @@ class Image(Path):
         return self._format.main_imd.width
 
     @property
-    def physical_size_x(self) -> Optional[Quantity]:
+    def physical_size_x(self) -> Quantity | None:
         return self._format.full_imd.physical_size_x
 
     @property
@@ -473,7 +509,7 @@ class Image(Path):
         return self._format.main_imd.height
 
     @property
-    def physical_size_y(self) -> Optional[Quantity]:
+    def physical_size_y(self) -> Quantity | None:
         return self._format.full_imd.physical_size_y
 
     @property
@@ -485,7 +521,7 @@ class Image(Path):
         return self._format.main_imd.depth
 
     @property
-    def physical_size_z(self) -> Optional[Quantity]:
+    def physical_size_z(self) -> Quantity | None:
         return self._format.full_imd.physical_size_z
 
     @property
@@ -493,7 +529,7 @@ class Image(Path):
         return self._format.main_imd.duration
 
     @property
-    def frame_rate(self) -> Optional[Quantity]:
+    def frame_rate(self) -> Quantity | None:
         return self._format.main_imd.frame_rate
 
     @property
@@ -526,7 +562,7 @@ class Image(Path):
 
     @property
     def max_value(self) -> int:
-        return 2 ** self.significant_bits - 1
+        return 2**self.significant_bits - 1
 
     @property
     def value_range(self) -> range:
@@ -541,7 +577,7 @@ class Image(Path):
         return self._format.full_imd.description
 
     @property
-    def channels(self) -> List[ImageChannel]:
+    def channels(self) -> list[ImageChannel]:
         return self._format.main_imd.channels
 
     @property
@@ -569,7 +605,7 @@ class Image(Path):
         return self._format.raw_metadata
 
     @property
-    def annotations(self) -> List[ParsedMetadataAnnotation]:
+    def annotations(self) -> list[ParsedMetadataAnnotation]:
         return self._format.annotations
 
     @property
@@ -620,8 +656,11 @@ class Image(Path):
         return self.histogram.plane_histogram(c, z, t)
 
     def tile(
-        self, tile: Tile, c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None,
-        t: Optional[int] = None
+        self,
+        tile: Tile,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
     ) -> RawImagePixels:
         """
         Get a tile.
@@ -657,9 +696,13 @@ class Image(Path):
             raise e
 
     def window(
-        self, region: Region, out_width: int, out_height: int,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None,
-        t: Optional[int] = None
+        self,
+        region: Region,
+        out_width: int,
+        out_height: int,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
     ) -> RawImagePixels:
         """
         Get an image window whose output dimensions are the nearest possible to
@@ -709,8 +752,13 @@ class Image(Path):
             raise e
 
     def thumbnail(
-        self, out_width: int, out_height: int, precomputed: bool = False,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+        self,
+        out_width: int,
+        out_height: int,
+        precomputed: bool = False,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
     ) -> RawImagePixels:
         """
         Get an image thumbnail whose dimensions are the nearest possible to
@@ -759,7 +807,7 @@ class Image(Path):
             # Get thumbnail from window ?
             raise e
 
-    def label(self, out_width: int, out_height: int) -> Optional[RawImagePixels]:
+    def label(self, out_width: int, out_height: int) -> RawImagePixels | None:
         """
         Get a precomputed image label whose output dimensions are the nearest
         possible to asked output dimensions.
@@ -789,7 +837,7 @@ class Image(Path):
         except NotImplementedError:
             return None
 
-    def macro(self, out_width: int, out_height: int) -> Optional[RawImagePixels]:
+    def macro(self, out_width: int, out_height: int) -> RawImagePixels | None:
         """
         Get a precomputed image macro whose output dimensions are the nearest
         possible to asked output dimensions.
@@ -820,10 +868,14 @@ class Image(Path):
             return None
 
     def check_integrity(
-        self, lazy_mode: bool = False, check_metadata: bool = True,
-        check_tile: bool = False, check_thumb: bool = False,
-        check_window: bool = False, check_associated: bool = False
-    ) -> List[Tuple[str, Exception]]:
+        self,
+        lazy_mode: bool = False,
+        check_metadata: bool = True,
+        check_tile: bool = False,
+        check_thumb: bool = False,
+        check_window: bool = False,
+        check_associated: bool = False,
+    ) -> list[tuple[str, Exception]]:
         """
         Check integrity of the image: ensure that asked checks do not raise
         errors. In lazy mode, stop at first error.
@@ -839,12 +891,27 @@ class Image(Path):
 
         if check_metadata:
             attributes = (
-                'width', 'height', 'depth', 'duration', 'n_channels',
-                'pixel_type', 'physical_size_x', 'physical_size_y',
-                'physical_size_z', 'frame_rate', 'description',
-                'acquisition_datetime', 'channels', 'objective', 'microscope',
-                'associated_thumb', 'associated_label', 'associated_macro',
-                'raw_metadata', 'annotations', 'pyramid'
+                "width",
+                "height",
+                "depth",
+                "duration",
+                "n_channels",
+                "pixel_type",
+                "physical_size_x",
+                "physical_size_y",
+                "physical_size_z",
+                "frame_rate",
+                "description",
+                "acquisition_datetime",
+                "channels",
+                "objective",
+                "microscope",
+                "associated_thumb",
+                "associated_label",
+                "associated_macro",
+                "raw_metadata",
+                "annotations",
+                "pyramid",
             )
             for attr in attributes:
                 try:
@@ -862,7 +929,7 @@ class Image(Path):
                 ty = tier.max_ty // 2
                 self.tile(Tile(tier, tx, ty))
             except Exception as e:
-                errors.append(('tile', e))
+                errors.append(("tile", e))
                 if lazy_mode:
                     return errors
 
@@ -870,7 +937,7 @@ class Image(Path):
             try:
                 self.thumbnail(128, 128)
             except Exception as e:
-                errors.append(('thumbnail', e))
+                errors.append(("thumbnail", e))
                 if lazy_mode:
                     return errors
 
@@ -878,11 +945,9 @@ class Image(Path):
             try:
                 w = round(0.1 * self.width)
                 h = round(0.1 * self.height)
-                self.window(
-                    Region(self.height - h, self.width - w, w, h), 128, 128
-                )
+                self.window(Region(self.height - h, self.width - w, w, h), 128, 128)
             except Exception as e:
-                errors.append(('window', e))
+                errors.append(("window", e))
                 if lazy_mode:
                     return errors
 
@@ -890,21 +955,21 @@ class Image(Path):
             try:
                 self.thumbnail(128, 128, precomputed=True)
             except Exception as e:
-                errors.append(('precomputed_thumbnail', e))
+                errors.append(("precomputed_thumbnail", e))
                 if lazy_mode:
                     return errors
 
             try:
                 self.label(128, 128)
             except Exception as e:
-                errors.append(('label', e))
+                errors.append(("label", e))
                 if lazy_mode:
                     return errors
 
             try:
                 self.macro(128, 128)
             except Exception as e:
-                errors.append(('macro', e))
+                errors.append(("macro", e))
                 if lazy_mode:
                     return errors
 
@@ -914,9 +979,8 @@ class Image(Path):
         super().__exit__(t, v, tb)
         self.close()
 
-
     def close(self):
-        if hasattr(self, '_format') and self._format is not None:
+        if hasattr(self, "_format") and self._format is not None:
             self._format.close()
             self._format._path = None
             del self._format
@@ -926,7 +990,7 @@ class Image(Path):
 
 
 class Histogram(Path, HistogramReaderInterface):
-    def __init__(self, *pathsegments, format: Type[HistogramFormat] = None):
+    def __init__(self, *pathsegments, format: type[HistogramFormat] | None = None):
         super().__init__(*pathsegments)
 
         _format = None
@@ -946,7 +1010,7 @@ class Histogram(Path, HistogramReaderInterface):
     def type(self) -> HistogramType:
         return self._format.type()
 
-    def image_bounds(self) -> Tuple[int, int]:
+    def image_bounds(self) -> tuple[int, int]:
         """Intensity bounds on the whole image (all planes merged)."""
         return self._format.image_bounds()
 
@@ -954,11 +1018,11 @@ class Histogram(Path, HistogramReaderInterface):
         """Intensity histogram on the whole image (all planes merged)."""
         return self._format.image_histogram()
 
-    def channels_bounds(self) -> List[Tuple[int, int]]:
+    def channels_bounds(self) -> list[tuple[int, int]]:
         """Intensity bounds for every channels."""
         return self._format.channels_bounds()
 
-    def channel_bounds(self, c: int) -> Tuple[int, int]:
+    def channel_bounds(self, c: int) -> tuple[int, int]:
         """Intensity bounds for a channel."""
         return self._format.channel_bounds(c)
 
@@ -966,11 +1030,11 @@ class Histogram(Path, HistogramReaderInterface):
         """Intensity histogram(s) for one of several channel(s)"""
         return self._format.channel_histogram(c)
 
-    def planes_bounds(self) -> List[Tuple[int, int]]:
+    def planes_bounds(self) -> list[tuple[int, int]]:
         """Intensity bounds for every planes."""
         return self._format.planes_bounds()
 
-    def plane_bounds(self, c: int, z: int, t: int) -> Tuple[int, int]:
+    def plane_bounds(self, c: int, z: int, t: int) -> tuple[int, int]:
         """Intensity bounds for a plane."""
         return self._format.plane_bounds(c, z, t)
 

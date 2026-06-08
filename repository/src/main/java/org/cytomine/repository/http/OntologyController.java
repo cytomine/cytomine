@@ -32,7 +32,7 @@ public class OntologyController implements OntologyHttpContract {
 
     @Override
     public Optional<OntologyResponse> get(long id, long userId) {
-        return repository.findById(id)
+        return repository.findByIdAndDeletedNull(id)
             .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getId()))
             .map(ontologyMapper::mapToOntologyResponse);
     }

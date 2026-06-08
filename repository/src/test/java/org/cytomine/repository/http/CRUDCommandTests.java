@@ -1,6 +1,7 @@
 package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import lombok.SneakyThrows;
 import org.cytomine.repository.RepositoryApp;
@@ -17,7 +18,6 @@ import be.cytomine.common.repository.model.HasLocaleDateTimeCUD;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -67,33 +67,33 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
     default void baseTest() {
         String userId = createUser();
         String response = getMockMvc().perform(post(getApiURL()).param("userId", userId)
-                .contentType(APPLICATION_JSON)
-                .content(getObjectMapper().writeValueAsString(getCreatePayload())))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+                                                   .contentType(APPLICATION_JSON)
+                                                   .content(getObjectMapper().writeValueAsString(getCreatePayload())))
+                              .andExpect(status().isOk())
+                              .andReturn()
+                              .getResponse()
+                              .getContentAsString();
 
         HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
-        assertTrue(result.data() != null);
+
         R dataResult = (R) result.data();
 
         String get = getMockMvc().perform(
                 get(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+                         .andExpect(status().isOk())
+                         .andReturn()
+                         .getResponse()
+                         .getContentAsString();
 
         assertEquals(dataResult, getObjectMapper().readValue(get, dataResult.getClass()));
 
         String update = getMockMvc().perform(put(getApiURL() + "/" + result.data().id()).param("userId", userId)
-                .contentType(APPLICATION_JSON)
-                .content(getObjectMapper().writeValueAsString(getUpdatePayload())))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+                                                 .contentType(APPLICATION_JSON)
+                                                 .content(getObjectMapper().writeValueAsString(getUpdatePayload())))
+                            .andExpect(status().isOk())
+                            .andReturn()
+                            .getResponse()
+                            .getContentAsString();
 
         HttpCommandResponse updateResult = getObjectMapper().readValue(update, HttpCommandResponse.class);
         R updateDataResult = (R) updateResult.data();
@@ -103,14 +103,52 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
         String delete = getMockMvc().perform(
                 delete(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+                            .andExpect(status().isOk())
+                            .andReturn()
+                            .getResponse()
+                            .getContentAsString();
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
         assertEquals(expectedDeletedResponse(updateDataResult, deleteResult.data().deleted().orElseThrow()),
             deleteResult.data());
 
+    }
+
+    @Test
+    @SneakyThrows
+    default void commandTest() {
+        String userId = createUser();
+        String response = getMockMvc().perform(post(getApiURL()).param("userId", userId)
+                                                   .contentType(APPLICATION_JSON)
+                                                   .content(getObjectMapper().writeValueAsString(getCreatePayload())))
+                              .andExpect(status().isOk())
+                              .andReturn()
+                              .getResponse()
+                              .getContentAsString();
+        HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
+
+
+        HttpCommandResponse commandResponse =
+            getObjectMapper().readValue(getMockMvc().perform(
+                    post(CommandController.ROOT_PATH + "/undo/" + result.commandId()).param("userId", userId)
+                        .contentType(APPLICATION_JSON)
+                        .content(getObjectMapper().writeValueAsString(
+                            getCreatePayload())))
+                                            .andExpect(status().isOk())
+                                            .andReturn()
+                                            .getResponse()
+                                            .getContentAsString(), HttpCommandResponse.class);
+
+        Optional<HttpCommandResponse> emptyResponse =
+            getObjectMapper().readValue(getMockMvc().perform(get(getApiURL()+ "/" + result.data().id()).param("userId", userId)
+                                                                 .contentType(APPLICATION_JSON)
+                    )
+                                            .andExpect(status().isOk())
+                                            .andReturn()
+                                            .getResponse()
+                                            .getContentAsString(),
+                getObjectMapper().constructType(Optional.class));
+
+        assertEquals(emptyResponse, Optional.empty());
     }
 
 

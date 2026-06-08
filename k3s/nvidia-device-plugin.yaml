@@ -1,0 +1,54 @@
+# Adapted from https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.19.2/deployments/static/nvidia-device-plugin.yml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvidia-device-plugin-daemonset
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: nvidia-device-plugin-ds
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: nvidia-device-plugin-ds
+    spec:
+      hostPID: true
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      priorityClassName: "system-node-critical"
+      containers:
+        - image: nvcr.io/nvidia/k8s-device-plugin:v0.19.2
+          name: nvidia-device-plugin-ctr
+          env: []
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: kubelet-device-plugins-dir
+              mountPath: /var/lib/kubelet/device-plugins
+            - name: libnvidia-ml
+              mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so
+              readOnly: true
+            - name: libnvidia-ml-1
+              mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
+              readOnly: true
+            - name: dev
+              mountPath: /dev
+      volumes:
+        - name: kubelet-device-plugins-dir
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+            type: Directory
+        - name: libnvidia-ml
+          hostPath:
+            path: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so
+        - name: libnvidia-ml-1
+          hostPath:
+            path: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
+        - name: dev
+          hostPath:
+            path: /dev

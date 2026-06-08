@@ -1,0 +1,19 @@
+services:
+  k3s:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+
+    volumes:
+      - /usr/bin/nvidia-container-runtime:/usr/bin/nvidia-container-runtime:ro
+      - /usr/bin/nvidia-container-toolkit:/usr/bin/nvidia-container-toolkit:ro
+      - ./k3s/nvidia-device-plugin.yaml:/var/lib/rancher/k3s/server/manifests/nvidia-device-plugin.yaml:ro

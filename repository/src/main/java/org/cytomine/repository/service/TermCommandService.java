@@ -91,15 +91,29 @@ public class TermCommandService
         return termRepository.findById(id);
     }
 
-
     @Override
-    public boolean canWrite(long userId, long id) {
-        return aclService.canWriteOntology(userId, id);
-
+    public boolean canWriteId(long userId, long id) {
+        return termRepository.findById(id)
+                   .map(TermEntity::getOntologyId)
+                   .map(ontologyId -> aclService.canWriteOntology(userId, ontologyId))
+                   .orElse(false);
     }
 
     @Override
-    public boolean canDelete(long userId, long id) {
+    public boolean canDeleteId(long userId, long id) {
+        return termRepository.findById(id)
+                   .map(TermEntity::getOntologyId)
+                   .map(ontologyId -> aclService.canDeleteOntology(userId, ontologyId))
+                   .orElse(false);
+    }
+
+    @Override
+    public boolean canWriteAclId(long userId, long id) {
+        return aclService.canWriteOntology(userId, id);
+    }
+
+    @Override
+    public boolean canDeleteAclId(long userId, long id) {
         return aclService.canDeleteOntology(userId, id);
     }
 }

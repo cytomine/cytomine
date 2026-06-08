@@ -88,12 +88,21 @@ public class OntologyCommandService implements
     }
 
     @Override
-    public boolean canWrite(long userId, long id) {
+    public boolean canWriteId(long userId, long id) {
         return aclService.canWriteOntology(userId, id);
     }
 
     @Override
-    public boolean canDelete(long userId, long id) {
+    public boolean canDeleteId(long userId, long id) {
+        return aclService.canDeleteOntology(userId, id);
+    }
+    @Override
+    public boolean canWriteAclId(long userId, long id) {
+        return aclService.canWriteOntology(userId, id);
+    }
+
+    @Override
+    public boolean canDeleteAclId(long userId, long id) {
         return aclService.canDeleteOntology(userId, id);
     }
 }

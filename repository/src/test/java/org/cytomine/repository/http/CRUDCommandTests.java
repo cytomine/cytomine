@@ -137,6 +137,7 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
                                          .getResponse().getContentAsString();
         Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString, new TypeReference<>() {
         });
+
         assertEquals(emptyResponse, Optional.empty());
 
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
@@ -147,6 +148,8 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
                                                                                             .getContentAsString(),
             new TypeReference<>() {
             });
+
+        assertTrue(redoCommandResponse.isPresent());
 
         String redoGetResponseString = getMockMvc().perform(
                 get(getApiURL() + "/" + entityID).param("userId", userId).contentType(APPLICATION_JSON))

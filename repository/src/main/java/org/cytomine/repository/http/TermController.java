@@ -40,7 +40,7 @@ public class TermController implements TermHttpContract {
 
     @Override
     public Optional<TermResponse> findTermByID(@PathVariable long id, @RequestParam long userId) {
-        return termRepository.findById(id)
+        return termRepository.findByIdAndDeletedNull(id)
             .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getOntologyId()))
             .map(termMapper::mapToTermResponse);
     }

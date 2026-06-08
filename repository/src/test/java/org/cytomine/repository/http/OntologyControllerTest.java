@@ -17,6 +17,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
@@ -50,5 +51,11 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     public OntologyResponse expectedDeletedResponse(OntologyResponse response, LocalDateTime deletedTime) {
         return new OntologyResponse(response.name(), response.id(), response.terms(), response.created(),
             response.updated(), Optional.of(deletedTime));
+    }
+
+    @Override
+    public OntologyResponse expectChangedUpdatedTime(OntologyResponse response, LocalDateTime updatedTime) {
+        return new OntologyResponse(response.name(), response.id(), response.terms(), response.created(),
+            updatedTime, response.deleted());
     }
 }

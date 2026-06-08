@@ -20,6 +20,7 @@ import be.cytomine.common.repository.model.HasLocaleDateTimeCUD;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -113,12 +114,12 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         Optional<HttpCommandResponse> firstCreate = getObjectMapper().readValue(getMockMvc().perform(
                     post(getApiURL()).param("userId", userId).contentType(APPLICATION_JSON)
                         .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-                                                                                 .andReturn().getResponse()
-                                                                                 .getContentAsString(),
+                                                                                    .andReturn().getResponse()
+                                                                                    .getContentAsString(),
             new TypeReference<>() {
             });
         String commandID = firstCreate.get().commandId().toString();
-        Long entityID = firstCreate.get().data().id();
+        long entityID = firstCreate.get().data().id();
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                     post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", userId)
                         .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
@@ -128,13 +129,14 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
             new TypeReference<>() {
             });
 
-        Optional<R> emptyResponse = getObjectMapper().readValue(getMockMvc().perform(
-                    get(getApiURL() + "/" + entityID).param("userId", userId).contentType(APPLICATION_JSON))
-                                                                    .andExpect(status().isOk()).andReturn()
-                                                                    .getResponse().getContentAsString(),
-            new TypeReference<>() {
-            });
+        assertTrue(undoCommandResponse.isPresent());
 
+        String emptyResponseString = getMockMvc().perform(
+                get(getApiURL() + "/" + entityID).param("userId", userId).contentType(APPLICATION_JSON))
+                                         .andExpect(status().isOk()).andReturn()
+                                         .getResponse().getContentAsString();
+        Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString, new TypeReference<>() {
+        });
         assertEquals(emptyResponse, Optional.empty());
 
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(

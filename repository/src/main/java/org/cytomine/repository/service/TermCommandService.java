@@ -40,8 +40,8 @@ public class TermCommandService
     @Override
     public TermEntity updateEntityWithEntity(TermEntity entity, UpdateTerm payload, Timestamp now) {
         return termMapper.update(entity, payload.name()
-            .orElse(entity.getName()), payload.color()
-            .orElse(entity.getColor()), now);
+                                             .orElse(entity.getName()), payload.color()
+                                                                            .orElse(entity.getColor()), now);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class TermCommandService
 
     @Override
     public UpdateCommandRequest<TermCommandPayload> mapUpdateCommand(long userId, TermCommandPayload before,
-        TermCommandPayload after) {
+                                                                     TermCommandPayload after) {
 
         return new UpdateTermCommand(before, after, userId);
     }
@@ -94,17 +94,12 @@ public class TermCommandService
 
     @Override
     public boolean canWrite(long userId, long id) {
-        return termRepository.findById(id)
-            .map(TermEntity::getOntologyId)
-            .map(ontologyId -> aclService.canWriteOntology(userId, ontologyId))
-            .orElse(false);
+        return aclService.canWriteOntology(userId, id);
+
     }
 
     @Override
     public boolean canDelete(long userId, long id) {
-        return termRepository.findById(id)
-            .map(TermEntity::getOntologyId)
-            .map(ontologyId -> aclService.canDeleteOntology(userId, ontologyId))
-            .orElse(false);
+        return aclService.canDeleteOntology(userId, id);
     }
 }

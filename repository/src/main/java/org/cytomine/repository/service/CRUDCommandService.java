@@ -104,13 +104,11 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
     default Optional<HttpCommandResponse> restore(UUID commandId, long userId, long id, String command,
                                                   LocalDateTime now) {
         if (canWrite(userId, id)) {
-            return get(id)
-
-                       .map(entity -> {
-                           entity.setDeleted(null);
-                           entity.setUpdated(Timestamp.valueOf(now));
-                           return saveAndBuildResponse(entity, command, commandId);
-                       });
+            return get(id).map(entity -> {
+                entity.setDeleted(null);
+                entity.setUpdated(Timestamp.valueOf(now));
+                return saveAndBuildResponse(entity, command, commandId);
+            });
         } else {
             return Optional.empty();
         }
@@ -141,7 +139,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         if (!canWrite(userId, deleteCommand.aclId())) {
             return Optional.empty();
         }
-        return restore(commandId, deleteCommand.id(), userId, deleteCommand.getCommand(), now);
+        return restore(commandId, deleteCommand.aclId(), userId, deleteCommand.getCommand(), now);
     }
 
     default Optional<HttpCommandResponse> redoDelete(UUID commandId, DeleteCommandRequest<P> deleteCommand, long userId,
@@ -165,7 +163,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         if (!canWrite(userId, createCommand.aclId())) {
             return Optional.empty();
         }
-        return restore(commandId, userId, createCommand.id(), createCommand.getCommand(), now);
+        return restore(commandId, userId, createCommand.aclId(), createCommand.getCommand(), now);
     }
 
     default Optional<HttpCommandResponse> undoUpdate(UUID commandId, UpdateCommandRequest<P> updateCommand, long userId,

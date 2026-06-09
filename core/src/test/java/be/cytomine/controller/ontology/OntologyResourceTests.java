@@ -5,8 +5,8 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,13 +24,16 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.model.command.Commands;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.project.Project;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
@@ -57,11 +60,10 @@ public class OntologyResourceTests {
     TermRelationHttpContract termRelationHttpContract;
     @MockitoBean
     private TermHttpContract termHttpContract;
+    @MockitoBean
+    private OntologyHttpContract ontologyHttpContract;
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
-
-    @Autowired
-    private EntityManager em;
 
     @Autowired
     private MockMvc mockMvc;
@@ -92,199 +94,152 @@ public class OntologyResourceTests {
     @Transactional
     public void shouldReturnOntology() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenAnOntology();
-        Term parent = basicInstanceBuilder.givenATerm(ontology);
-        Term child1 = basicInstanceBuilder.givenATerm(ontology);
-        Term child2 = basicInstanceBuilder.givenATerm(ontology);
-        Term directChild = basicInstanceBuilder.givenATerm(ontology);
-        basicInstanceBuilder.givenARelationTerm(parent, child1);
-        basicInstanceBuilder.givenARelationTerm(parent, child2);
-        Project project = basicInstanceBuilder.givenAProjectWithOntology(ontology);
-
-        em.refresh(ontology);
-        em.refresh(parent);
-        em.refresh(child1);
-        em.refresh(child2);
-        em.refresh(directChild);
+        Long userId = basicInstanceBuilder.givenSuperAdmin().getId();
+        when(ontologyHttpContract.get(eq(ontology.getId()), eq(userId)))
+            .thenReturn(Optional.of(new OntologyResponse(
+                ontology.getName(),
+                ontology.getId(),
+                Set.of(),
+                LocalDateTime.ofInstant(ontology.getCreated().toInstant(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(ontology.getUpdated().toInstant(), ZoneId.systemDefault()),
+                Optional.empty()
+            )));
 
         mockMvc.perform(get("/api/ontology/{id}.json", ontology.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(ontology.getId().intValue()))
-            .andExpect(jsonPath("$.class").value("be.cytomine.domain.ontology.Ontology"))
-            .andExpect(jsonPath("$.created").exists())
             .andExpect(jsonPath("$.name").value(ontology.getName()))
-            .andExpect(jsonPath("$.user").value(ontology.getUser().getId().intValue()))
-            .andExpect(jsonPath("$.attr.id").value(ontology.getId().intValue()))
-            .andExpect(jsonPath("$.attr.type").value("be.cytomine.domain.ontology.Ontology"))
-            .andExpect(jsonPath("$.data").value(ontology.getName()))
-            .andExpect(jsonPath("$.isFolder").value(true))
-            .andExpect(jsonPath("$.projects", hasSize(1)))
-            .andExpect(jsonPath("$.projects[0].id").value(project.getId().intValue()))
-
-            .andExpect(jsonPath("$.children", hasSize(2)))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')]").exists())
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].id").value(parent.getId()
-                .intValue()))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].title").value(parent.getName()))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].data").value(parent.getName()))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].color").value(parent.getColor()))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].class").value(
-                "be.cytomine.domain.ontology.Term"))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].attr.id").value(parent.getId()
-                .intValue()))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].attr.type").value(
-                "be.cytomine.domain.ontology.Term"))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].checked").value(false))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].key").value(parent.getId()
-                .intValue()))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].isFolder").value(true))
-            .andExpect(jsonPath("$.children[?(@.name=='" + parent.getName() + "')].hideCheckbox").value(true))
-
-            .andExpect(jsonPath("$.children[?(@.name=='"
-                + parent.getName()
-                + "')].children[?(@.name=='"
-                + child1.getName()
-                + "')]").exists())
-            .andExpect(jsonPath("$.children[?(@.name=='"
-                + parent.getName()
-                + "')].children[?(@.name=='"
-                + child1.getName()
-                + "')].id").value(child1.getId().intValue()))
-            .andExpect(jsonPath("$.children[?(@.name=='"
-                + parent.getName()
-                + "')].children[?(@.name=='"
-                + child1.getName()
-                + "')].isFolder").value(false))
-            .andExpect(jsonPath("$.children[?(@.name=='"
-                + parent.getName()
-                + "')].children[?(@.name=='"
-                + child1.getName()
-                + "')].parent").value(parent.getId().intValue()))
-
-            .andExpect(jsonPath("$.children[?(@.name=='"
-                + parent.getName()
-                + "')].children[?(@.name=='"
-                + child2.getName()
-                + "')]").exists())
-            .andExpect(jsonPath("$.children[?(@.name=='"
-                + parent.getName()
-                + "')].children[?(@.name=='"
-                + child2.getName()
-                + "')].id").value(child2.getId().intValue()))
-            .andExpect(jsonPath("$.children[?(@.name=='"
-                + parent.getName()
-                + "')].children[?(@.name=='"
-                + child2.getName()
-                + "')].isFolder").value(false))
-            .andExpect(jsonPath("$.children[?(@.name=='"
-                + parent.getName()
-                + "')].children[?(@.name=='"
-                + child2.getName()
-                + "')].parent").value(parent.getId().intValue()))
-
-            .andExpect(jsonPath("$.children[?(@.name=='" + directChild.getName() + "')]").exists())
-            .andExpect(jsonPath("$.children[?(@.name=='" + directChild.getName() + "')].id").value(directChild.getId()
-                .intValue()));
+            .andExpect(jsonPath("$.created").exists())
+            .andExpect(jsonPath("$.updated").exists());
     }
 
     @Test
     @Transactional
     public void addValidOntology() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
+        Long userId = basicInstanceBuilder.givenSuperAdmin().getId();
+        UUID commandId = UUID.randomUUID();
+        when(ontologyHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(
+            true,
+            new OntologyResponse(
+                ontology.getName(),
+                1L,
+                Set.of(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                Optional.empty()
+            ),
+            commandId,
+            Commands.CREATE_ONTOLOGY
+        )));
+
         mockMvc.perform(post("/api/ontology.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.ontologyID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddOntologyCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.ontology.id").exists())
-            .andExpect(jsonPath("$.ontology.name").value(ontology.getName()));
+            .andExpect(jsonPath("$.command").value(Commands.CREATE_ONTOLOGY))
+            .andExpect(jsonPath("$.data.name").value(ontology.getName()));
     }
 
     @Test
     @Transactional
-    public void addOntologyRefusedIfAlreadyExists() throws Exception {
+    public void addOntologyReturnsEmpty() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
-        basicInstanceBuilder.persistAndReturn(ontology);
-        mockMvc.perform(post("/api/ontology.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(ontology.toJSON()))
-            .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.success").value(false));
-    }
+        Long userId = basicInstanceBuilder.givenSuperAdmin().getId();
+        when(ontologyHttpContract.create(eq(userId), any())).thenReturn(Optional.empty());
 
-    @Test
-    @Transactional
-    public void addOntologyRefusedIfNameNotSet() throws Exception {
-        Ontology ontology = basicInstanceBuilder.givenANotPersistedOntology();
-        ontology.setName(null);
         mockMvc.perform(post("/api/ontology.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.success").value(false));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").doesNotExist());
     }
 
     @Test
     @Transactional
     public void editValidOntology() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenAnOntology();
+        Long userId = basicInstanceBuilder.givenSuperAdmin().getId();
+        UUID commandId = UUID.randomUUID();
+        when(ontologyHttpContract.update(eq(ontology.getId()), eq(userId), any())).thenReturn(Optional.of(
+            new HttpCommandResponse(
+                true,
+                new OntologyResponse(
+                    ontology.getName(),
+                    ontology.getId(),
+                    Set.of(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    Optional.empty()
+                ),
+                commandId,
+                Commands.UPDATE_ONTOLOGY
+            )));
+
         mockMvc.perform(put("/api/ontology/{id}.json", ontology.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.ontologyID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditOntologyCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.ontology.id").exists())
-            .andExpect(jsonPath("$.ontology.name").value(ontology.getName()));
+            .andExpect(jsonPath("$.command").value(Commands.UPDATE_ONTOLOGY))
+            .andExpect(jsonPath("$.data.id").value(ontology.getId()))
+            .andExpect(jsonPath("$.data.name").value(ontology.getName()));
     }
 
     @Test
     @Transactional
     public void failWhenEditingOntologyDoesNotExists() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenAnOntology();
-        em.remove(ontology);
+        Long userId = basicInstanceBuilder.givenSuperAdmin().getId();
+        when(ontologyHttpContract.update(eq(0L), eq(userId), any())).thenReturn(Optional.empty());
+
         mockMvc.perform(put("/api/ontology/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.errors").exists());
+            .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
     public void deleteOntology() throws Exception {
         Ontology ontology = basicInstanceBuilder.givenAnOntology();
+        Long userId = basicInstanceBuilder.givenSuperAdmin().getId();
+        UUID commandId = UUID.randomUUID();
+        when(ontologyHttpContract.delete(eq(ontology.getId()), eq(userId))).thenReturn(Optional.of(
+            new HttpCommandResponse(
+                true,
+                new OntologyResponse(
+                    ontology.getName(),
+                    ontology.getId(),
+                    Set.of(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    Optional.of(LocalDateTime.now())
+                ),
+                commandId,
+                Commands.DELETE_ONTOLOGY
+            )));
+
         mockMvc.perform(delete("/api/ontology/{id}.json", ontology.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.ontologyID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteOntologyCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.ontology.id").exists())
-            .andExpect(jsonPath("$.ontology.name").value(ontology.getName()));
+            .andExpect(jsonPath("$.command").value(Commands.DELETE_ONTOLOGY))
+            .andExpect(jsonPath("$.data.id").value(ontology.getId()))
+            .andExpect(jsonPath("$.data.name").value(ontology.getName()));
     }
 
     @Test
     @Transactional
     public void failWhenDeleteOntologyNotExists() throws Exception {
+        Long userId = basicInstanceBuilder.givenSuperAdmin().getId();
+        when(ontologyHttpContract.delete(eq(0L), eq(userId))).thenReturn(Optional.empty());
+
         mockMvc.perform(delete("/api/ontology/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.errors").exists());
+            .andExpect(status().isNotFound());
     }
 
     @Test

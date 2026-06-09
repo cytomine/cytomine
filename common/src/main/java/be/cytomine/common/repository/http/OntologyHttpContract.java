@@ -35,4 +35,8 @@ public interface OntologyHttpContract {
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
+
+    // Coming soon
+    // @GetExchange("")
+    // Set<OntologyLight> getAll(@RequestParam long userId);
 }

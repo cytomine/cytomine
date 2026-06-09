@@ -47,22 +47,19 @@ public class TermController implements TermHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> create(@RequestParam long userId, @RequestBody CreateTerm createTerm) {
-        return termCommandService.create(userId, createTerm, LocalDateTime.now()
-            .truncatedTo(ChronoUnit.MICROS));
+        return termCommandService.create(userId, createTerm, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
         @RequestBody UpdateTerm updateTerm) {
-        return termCommandService.update(id, userId, updateTerm, LocalDateTime.now()
-            .truncatedTo(ChronoUnit.MICROS));
+        return termCommandService.update(userId, id, updateTerm, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     }
 
     @Override
     @Transactional
     public Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId) {
-        return termCommandService.delete(id, userId, LocalDateTime.now()
-            .truncatedTo(ChronoUnit.MICROS));
+        return termCommandService.delete(userId, id, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     }
 
     @Override
@@ -70,7 +67,7 @@ public class TermController implements TermHttpContract {
     public Set<HttpCommandResponse> deleteAll(Set<Long> ids, long userId) {
         // Later we may implement it in OntologyHttpContract
         return ids.stream()
-            .map(id -> termCommandService.delete(id, userId, LocalDateTime.now()))
+            .map(id -> termCommandService.delete(userId, id, LocalDateTime.now()))
             .flatMap(Optional::stream)
             .collect(Collectors.toSet());
     }
@@ -80,8 +77,7 @@ public class TermController implements TermHttpContract {
         if (!aclService.canReadProject(userId, id)) {
             return Page.empty();
         }
-        return termRepository.findAllByProjectId(id, pageable)
-            .map(termMapper::mapToTermResponse);
+        return termRepository.findAllByProjectId(id, pageable).map(termMapper::mapToTermResponse);
     }
 
     @Override
@@ -89,8 +85,7 @@ public class TermController implements TermHttpContract {
         if (!aclService.canReadOntology(userId, id)) {
             return Page.empty();
         }
-        return termRepository.findAllByOntologyIdAndDeletedNull(id, pageable)
-            .map(termMapper::mapToTermResponse);
+        return termRepository.findAllByOntologyIdAndDeletedNull(id, pageable).map(termMapper::mapToTermResponse);
     }
 
     @Override

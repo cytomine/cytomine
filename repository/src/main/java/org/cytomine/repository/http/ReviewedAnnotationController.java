@@ -21,7 +21,6 @@ import static be.cytomine.common.repository.http.ReviewedAnnotationHttpContract.
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(ROOT_PATH)
-
 public class ReviewedAnnotationController implements ReviewedAnnotationHttpContract {
     private final ReviewedAnnotationLinkRepository reviewedAnnotationLinkRepository;
     private final ACLService aclService;

@@ -135,8 +135,7 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
                 get(getApiURL() + "/" + entityID).param("userId", userId).contentType(APPLICATION_JSON))
                                          .andExpect(status().isOk()).andReturn()
                                          .getResponse().getContentAsString();
-        Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString, new TypeReference<>() {
-        });
+        Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString, getObjectMapper().constructType(Optional.of(firstCreate.get().data()).getClass()));
 
         assertEquals(emptyResponse, Optional.empty());
 

@@ -14,6 +14,7 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import be.cytomine.common.repository.http.HealthService;
+import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
@@ -46,6 +47,11 @@ public class RepositoryClient {
     @Bean
     HealthService healthServiceClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, HealthService.class);
+    }
+
+    @Bean
+    OntologyHttpContract ontologyServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, OntologyHttpContract.class);
     }
 
     @Bean

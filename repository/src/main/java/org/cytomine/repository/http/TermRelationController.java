@@ -62,8 +62,8 @@ public class TermRelationController implements TermRelationHttpContract {
 
     @Override
     public Optional<TermRelationResponse> findTermRelationByID(long id, long userId) {
-        return termRelationRepository.findById(id)
-            .flatMap(termEntity -> termRepository.findById(termEntity.getTerm1Id())
+        return termRelationRepository.findByIdAndDeletedNull(id)
+            .flatMap(termEntity -> termRepository.findByIdAndDeletedNull(termEntity.getTerm1Id())
                 .filter(term1 -> aclService.canReadOntology(userId, term1.getOntologyId()))
                 .map(term1 -> termRelationMapper.mapToTermRelationResponse(termEntity)));
     }
@@ -83,18 +83,19 @@ public class TermRelationController implements TermRelationHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateTermRelation updateTermRelation) {
-        return termRelationCommandService.update(id, userId, updateTermRelation, LocalDateTime.now().truncatedTo(MICROS));
+        return termRelationCommandService.update(userId, id, updateTermRelation,
+            LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return termRelationCommandService.delete(id, userId, LocalDateTime.now().truncatedTo(MICROS));
+        return termRelationCommandService.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
     public Set<HttpCommandResponse> deleteAll(Set<Long> ids, long userId) {
         return ids.stream()
-            .map(id -> termRelationCommandService.delete(id, userId, LocalDateTime.now().truncatedTo(MICROS)))
+            .map(id -> termRelationCommandService.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS)))
             .flatMap(Optional::stream)
             .collect(toSet());
     }
@@ -102,10 +103,9 @@ public class TermRelationController implements TermRelationHttpContract {
     @Override
     public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1, @PathVariable long idTerm2,
         @RequestParam long userId) {
-        long parentRelationId = relationRepository.findParent()
-            .getId();
+        long parentRelationId = relationRepository.findParent().getId();
         return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2)
-            .flatMap(entity -> termRelationCommandService.delete(entity.getId(), userId, LocalDateTime.now().truncatedTo(
-                MICROS)));
+            .flatMap(entity -> termRelationCommandService.delete(userId, entity.getId(),
+                LocalDateTime.now().truncatedTo(MICROS)));
     }
 }

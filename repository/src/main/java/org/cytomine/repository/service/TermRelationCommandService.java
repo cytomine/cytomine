@@ -120,7 +120,7 @@ public class TermRelationCommandService implements
     public TermRelationEntity updateEntityWithEntity(TermRelationEntity entity, UpdateTermRelation updatePayload,
                                                      Timestamp now) {
         return termRelationMapper.update(entity, updatePayload.term1Id()
-            .orElse(entity.getTerm1Id()), updatePayload.term1Id()
+            .orElse(entity.getTerm1Id()), updatePayload.term2Id()
             .orElse(entity.getTerm2Id()), now);
     }
     @Override

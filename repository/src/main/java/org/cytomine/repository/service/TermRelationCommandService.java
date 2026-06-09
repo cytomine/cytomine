@@ -120,16 +120,13 @@ public class TermRelationCommandService implements
     public TermRelationEntity updateEntityWithEntity(TermRelationEntity entity, UpdateTermRelation updatePayload,
                                                      Timestamp now) {
         return termRelationMapper.update(entity, updatePayload.term1Id()
-                                                     .orElse(entity.getTerm1Id()), updatePayload.term1Id()
-                                                                                       .orElse(entity.getTerm2Id()),
-            now);
+            .orElse(entity.getTerm1Id()), updatePayload.term1Id()
+            .orElse(entity.getTerm2Id()), now);
     }
-
     @Override
     public boolean canWriteAclId(long userId, long id) {
         return aclService.canWriteOntology(userId, id);
     }
-
     @Override
     public boolean canDeleteAclId(long userId, long id) {
         return aclService.canDeleteOntology(userId, id);

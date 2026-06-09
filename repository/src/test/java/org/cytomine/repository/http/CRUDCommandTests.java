@@ -162,6 +162,4 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         assertEquals(expectChangedUpdatedTime((R) firstCreate.get().data(), redoGetResponse.updated()),
             getObjectMapper().readValue(redoGetResponseString, firstCreate.get().data().getClass()));
     }
-
-
 }

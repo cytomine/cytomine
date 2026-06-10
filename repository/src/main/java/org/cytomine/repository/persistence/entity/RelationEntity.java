@@ -1,6 +1,6 @@
 package org.cytomine.repository.persistence.entity;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,15 +14,16 @@ import lombok.Getter;
 public class RelationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column
     private long version;
     @Column
-    private Date created;
+    private Timestamp created;
     @Column
-    private Date deleted;
+    private Timestamp updated;
+    @Column
+    private Timestamp deleted;
     @Column
     private String name;
-    @Column
-    private Date updated;
+
 }

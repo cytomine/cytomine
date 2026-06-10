@@ -128,9 +128,8 @@ public class OntologyServiceTests {
     @Test
     void listLightOntology() {
         Ontology ontology = builder.givenAnOntology();
-        assertThat(ontologyService.listLight()
-            .stream()
-            .anyMatch(json -> json.get("id").equals(ontology.getId()))).isTrue();
+        assertThat(
+            ontologyService.listLight().stream().anyMatch(json -> json.get("id").equals(ontology.getId()))).isTrue();
     }
 
     @Test
@@ -192,10 +191,8 @@ public class OntologyServiceTests {
     void editValidOntologyWithSuccess() {
         Ontology ontology = builder.givenAnOntology();
 
-        CommandResponse commandResponse = ontologyService.update(
-            ontology,
-            ontology.toJsonObject().withChange("name", "NEW NAME")
-        );
+        CommandResponse commandResponse =
+            ontologyService.update(ontology, ontology.toJsonObject().withChange("name", "NEW NAME"));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -241,7 +238,6 @@ public class OntologyServiceTests {
         Term term1 = builder.givenATerm(ontology);
         Term term2 = builder.givenATerm(ontology);
         builder.givenARelationTerm(term1, term2);
-
 
 
         CommandResponse commandResponse = ontologyService.delete(ontology, null, null, true);
@@ -295,34 +291,19 @@ public class OntologyServiceTests {
         permissionService.addPermission(project, userAdminInProject.getUsername(), ADMINISTRATION);
         permissionService.addPermission(project, userNotAdminInProject.getUsername(), WRITE);
 
-        ontologyService.determineRightsForUsers(
-            ontology,
-            List.of(userAdminInProject, userNotAdminInProject, userNotInProject)
-        );
+        ontologyService.determineRightsForUsers(ontology,
+            List.of(userAdminInProject, userNotAdminInProject, userNotInProject));
 
-        assertThat(permissionService.hasACLPermission(
-            ontology,
-            userAdminInProject.getUsername(),
-            ADMINISTRATION
-        )).isTrue();
+        assertThat(
+            permissionService.hasACLPermission(ontology, userAdminInProject.getUsername(), ADMINISTRATION)).isTrue();
 
-        assertThat(permissionService.hasACLPermission(
-            ontology, userNotAdminInProject.getUsername(),
-            ADMINISTRATION
-        )).isFalse();
-        assertThat(permissionService.hasACLPermission(
-            ontology, userNotAdminInProject.getUsername(),
-            READ
-        )).isTrue();
+        assertThat(permissionService.hasACLPermission(ontology, userNotAdminInProject.getUsername(),
+            ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(ontology, userNotAdminInProject.getUsername(), READ)).isTrue();
 
-        assertThat(permissionService.hasACLPermission(
-            ontology, userNotInProject.getUsername(),
-            ADMINISTRATION
-        )).isFalse();
-        assertThat(permissionService.hasACLPermission(
-            ontology, userNotInProject.getUsername(),
-            READ
-        )).isFalse();
+        assertThat(
+            permissionService.hasACLPermission(ontology, userNotInProject.getUsername(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(ontology, userNotInProject.getUsername(), READ)).isFalse();
     }
 
     @Test
@@ -365,16 +346,13 @@ public class OntologyServiceTests {
         Ontology ontology = basicInstanceBuilder.givenAnOntology();
         Term term = basicInstanceBuilder.givenATerm(ontology);
         List<TermResponse> termResponses = List.of(
-            new TermResponse(
-                term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
+            new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                 LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
-                LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()),
-                Optional.empty(), term.getComment(), Set.of()
-            )
-        );
+                LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                Optional.of(term.getComment()), Set.of()));
 
-        when(termHttpContract.findTermsByOntology(eq(ontology.getId()), anyLong(), any(Pageable.class)))
-            .thenReturn(new PageImpl<>(termResponses));
+        when(termHttpContract.findTermsByOntology(eq(ontology.getId()), anyLong(), any(Pageable.class))).thenReturn(
+            new PageImpl<>(termResponses));
 
         OntologyExport result = ontologyService.export(ontology);
 

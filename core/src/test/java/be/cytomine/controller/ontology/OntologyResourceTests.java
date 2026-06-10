@@ -298,7 +298,7 @@ public class OntologyResourceTests {
                     term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                     LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
                     LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()),
-                    Optional.empty(), term.getComment(), Set.of()
+                    Optional.empty(), Optional.of(term.getComment()), Set.of()
                 )))
             );
 

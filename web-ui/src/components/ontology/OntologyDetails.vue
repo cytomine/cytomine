@@ -44,7 +44,7 @@
         <tr>
           <td><strong>{{$t('creator')}}</strong></td>
           <td>
-            {{creator?.fullName || $t('unknown')}}
+            {{creator.fullName || $t('unknown')}}
           </td>
         </tr>
         <tr v-if="canEdit">

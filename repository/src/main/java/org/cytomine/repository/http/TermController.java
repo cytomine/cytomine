@@ -41,8 +41,8 @@ public class TermController implements TermHttpContract {
     @Override
     public Optional<TermResponse> findTermByID(@PathVariable long id, @RequestParam long userId) {
         return termRepository.findByIdAndDeletedNull(id)
-            .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getOntologyId()))
-            .map(termMapper::mapToTermResponse);
+                   .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getOntologyId()))
+                   .map(termMapper::mapToTermResponse);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class TermController implements TermHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
-        @RequestBody UpdateTerm updateTerm) {
+                                                @RequestBody UpdateTerm updateTerm) {
         return termCommandService.update(userId, id, updateTerm, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     }
 
@@ -67,9 +67,9 @@ public class TermController implements TermHttpContract {
     public Set<HttpCommandResponse> deleteAll(Set<Long> ids, long userId) {
         // Later we may implement it in OntologyHttpContract
         return ids.stream()
-            .map(id -> termCommandService.delete(userId, id, LocalDateTime.now()))
-            .flatMap(Optional::stream)
-            .collect(Collectors.toSet());
+                   .map(id -> termCommandService.delete(userId, id, LocalDateTime.now()))
+                   .flatMap(Optional::stream)
+                   .collect(Collectors.toSet());
     }
 
     @Override

@@ -31,7 +31,7 @@ public interface OntologyHttpContract {
 
     @PutExchange("/{id}")
     Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
-        @RequestBody UpdateOntology updateOntology);
+                                         @RequestBody UpdateOntology updateOntology);
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);

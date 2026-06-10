@@ -41,7 +41,7 @@ public class OntologyCommandService implements
 
     @Override
     public UpdateCommandRequest<OntologyCommandPayload> mapUpdateCommand(long userId, OntologyCommandPayload before,
-        OntologyCommandPayload after) {
+                                                                         OntologyCommandPayload after) {
         return new UpdateOntologyCommand(before, after, userId);
     }
 
@@ -63,12 +63,12 @@ public class OntologyCommandService implements
     @Override
     public OntologyEntity updateEntityWithEntity(OntologyEntity entity, UpdateOntology updatePayload, Timestamp now) {
         return ontologyMapper.update(entity, updatePayload.name()
-            .orElse(entity.getName()), now);
+                                                 .orElse(entity.getName()), now);
     }
 
     @Override
     public OntologyEntity updateEntityWithPayload(OntologyEntity entity, OntologyCommandPayload payload,
-        Timestamp now) {
+                                                  Timestamp now) {
         return ontologyMapper.updateWithPayload(entity, payload, now);
     }
 
@@ -96,6 +96,7 @@ public class OntologyCommandService implements
     public boolean canDeleteId(long userId, long id) {
         return aclService.canDeleteOntology(userId, id);
     }
+
     @Override
     public boolean canWriteAclId(long userId, long id) {
         return aclService.canWriteOntology(userId, id);

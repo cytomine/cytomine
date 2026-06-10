@@ -73,7 +73,7 @@ class TermRelationControllerTest
 
     @Override
     public TermRelationResponse expectedUpdatedResponse(TermRelationResponse response, UpdateTermRelation updatePayload,
-        LocalDateTime updatedTime) {
+                                                        LocalDateTime updatedTime) {
         return new TermRelationResponse(response.id(), updatePayload.term1Id().orElse(response.term1Id()),
             updatePayload.term2Id().orElse(response.term2Id()),
             updatePayload.relationId().orElse(response.relationId()), updatedTime, response.deleted(),

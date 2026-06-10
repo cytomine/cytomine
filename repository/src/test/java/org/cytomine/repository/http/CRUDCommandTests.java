@@ -64,8 +64,7 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         Long userRoleId = getJdbcTemplate().queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         getJdbcTemplate().update(
             "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) SELECT ?, 0, ?, (SELECT id FROM "
-                + "sec_role WHERE authority = 'ROLE_ADMIN')",
-            userRoleId, userId);
+                + "sec_role WHERE authority = 'ROLE_ADMIN')", userRoleId, userId);
         beforeCreate(userId);
         return userId.toString();
     }
@@ -75,8 +74,9 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
     default void baseTest() {
         String userId = createUser();
         String response = getMockMvc().perform(post(getApiURL()).param("userId", userId).contentType(APPLICATION_JSON)
-                                                   .content(getObjectMapper().writeValueAsString(getCreatePayload())))
-                              .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                .content(getObjectMapper().writeValueAsString(
+                    getCreatePayload())))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
 
@@ -84,14 +84,14 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
         String get = getMockMvc().perform(
                 get(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
-                         .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         assertEquals(dataResult, getObjectMapper().readValue(get, dataResult.getClass()));
 
         String update = getMockMvc().perform(
                 put(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getUpdatePayload()))).andExpect(status().isOk())
-                            .andReturn().getResponse().getContentAsString();
+            .andReturn().getResponse().getContentAsString();
 
         HttpCommandResponse updateResult = getObjectMapper().readValue(update, HttpCommandResponse.class);
         R updateDataResult = (R) updateResult.data();
@@ -101,7 +101,7 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
         String delete = getMockMvc().perform(
                 delete(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
-                            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
         assertEquals(expectedDeletedResponse(updateDataResult, deleteResult.data().deleted().orElseThrow()),
             deleteResult.data());
@@ -114,18 +114,21 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         Optional<HttpCommandResponse> firstCreate = getObjectMapper().readValue(getMockMvc().perform(
                     post(getApiURL()).param("userId", userId).contentType(APPLICATION_JSON)
                         .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-                                                                                    .andReturn().getResponse()
-                                                                                    .getContentAsString(),
+                .andReturn().getResponse()
+                .getContentAsString(),
             new TypeReference<>() {
             });
         String commandID = firstCreate.get().commandId().toString();
         long entityID = firstCreate.get().data().id();
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                     post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", userId)
-                        .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
-                                                                                            .andExpect(status().isOk())
-                                                                                            .andReturn().getResponse()
-                                                                                            .getContentAsString(),
+                        .contentType(APPLICATION_JSON)
+                        .content(getObjectMapper().writeValueAsString(getCreatePayload())))
+                .andExpect(
+                    status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
             new TypeReference<>() {
             });
 
@@ -133,18 +136,21 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
         String emptyResponseString = getMockMvc().perform(
                 get(getApiURL() + "/" + entityID).param("userId", userId).contentType(APPLICATION_JSON))
-                                         .andExpect(status().isOk()).andReturn()
-                                         .getResponse().getContentAsString();
-        Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString, getObjectMapper().constructType(Optional.of(firstCreate.get().data()).getClass()));
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString,
+            getObjectMapper().constructType(Optional.of(firstCreate.get().data()).getClass()));
 
         assertEquals(emptyResponse, Optional.empty());
 
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                     post(CommandController.ROOT_PATH + "/redo/" + commandID).param("userId", userId)
-                        .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
-                                                                                            .andExpect(status().isOk())
-                                                                                            .andReturn().getResponse()
-                                                                                            .getContentAsString(),
+                        .contentType(APPLICATION_JSON)
+                        .content(getObjectMapper().writeValueAsString(getCreatePayload())))
+                .andExpect(
+                    status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
             new TypeReference<>() {
             });
 
@@ -152,11 +158,11 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
         String redoGetResponseString = getMockMvc().perform(
                 get(getApiURL() + "/" + entityID).param("userId", userId).contentType(APPLICATION_JSON))
-                                           .andExpect(status().isOk()).andReturn()
-                                           .getResponse().getContentAsString();
+            .andExpect(status().isOk()).andReturn().getResponse()
+            .getContentAsString();
 
-        R redoGetResponse = (R) getObjectMapper().readValue(redoGetResponseString,
-            ((R) firstCreate.get().data()).getClass());
+        R redoGetResponse =
+            (R) getObjectMapper().readValue(redoGetResponseString, ((R) firstCreate.get().data()).getClass());
 
         assertEquals(expectChangedUpdatedTime((R) firstCreate.get().data(), redoGetResponse.updated()),
             getObjectMapper().readValue(redoGetResponseString, firstCreate.get().data().getClass()));

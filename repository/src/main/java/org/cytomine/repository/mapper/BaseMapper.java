@@ -24,13 +24,13 @@ public interface BaseMapper {
 
     default LocalDateTime mapTimestamp(Timestamp value) {
         return value.toInstant()
-            .atZone(ZoneOffset.systemDefault())
-            .toLocalDateTime();
+                   .atZone(ZoneOffset.systemDefault())
+                   .toLocalDateTime();
     }
 
     default Optional<LocalDateTime> mapToLocalDateTime(Timestamp value) {
         return Optional.ofNullable(value)
-            .map(this::mapTimestamp);
+                   .map(this::mapTimestamp);
     }
 
 

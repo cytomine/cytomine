@@ -13,7 +13,6 @@
 #  * limitations under the License.
 
 from enum import Enum
-from typing import List, Optional, Union
 
 from fastapi import Query
 from pydantic import BaseModel, Field, RootModel
@@ -43,7 +42,7 @@ class SingleOrRangeChannelIndex(RootModel):
     """
     A single channel index or a range of indexes. **By default**, all channels are considered.
     """
-    root: Union[Annotated[int, Field(ge=0)], str]  # TODO: replace str by range pydantic model
+    root: Annotated[int, Field(ge=0)] | str  # TODO: replace str by range pydantic model
 
 
 class SingleZSliceIndex(RootModel):
@@ -80,10 +79,10 @@ class GenericReduction(str, Enum):
 class PlaneSelectionQueryParams(BaseDependency):
     def __init__(
         self,
-        channels: Optional[List[Union[str, Annotated[int, Field(ge=0)]]]] = Query(None),
+        channels: list[str | Annotated[int, Field(ge=0)]] | None = Query(None),
         # TODO: replace str by range pydantic model
-        z_slices: Optional[Annotated[int, Field(ge=0)]] = Query(None),
-        timepoints: Optional[Annotated[int, Field(ge=0)]] = Query(None),
+        z_slices: Annotated[int, Field(ge=0)] | None = Query(None),
+        timepoints: Annotated[int, Field(ge=0)] | None = Query(None),
         c_reduction: ChannelReduction = Query(ChannelReduction.ADD)
     ):
         self.channels = channels
@@ -100,11 +99,7 @@ class IntensitySelectionEnum(str, Enum):
 
 
 class IntensitySelection(RootModel):
-    root: Union[
-        IntensitySelectionEnum,
-        Annotated[int, Field(ge=0)],
-        List[Union[IntensitySelectionEnum, Annotated[int, Field(ge=0)]]],
-    ]
+    root: IntensitySelectionEnum | Annotated[int, Field(ge=0)] | list[IntensitySelectionEnum | Annotated[int, Field(ge=0)]]
 
 
 class Gamma(RootModel):
@@ -123,7 +118,7 @@ class GammaList(RootModel):
     If `gamma > 1`, medium-intensity objects become fainter
     while bright objects do not.
     """
-    root: Union[Gamma, List[Gamma]]
+    root: Gamma | list[Gamma]
 
 
 class Threshold(RootModel):
@@ -134,7 +129,7 @@ class Threshold(RootModel):
     format supporting transparency, pixel intensities below
     the threshold are transparent.
     """
-    root: Optional[Annotated[float, Field(ge=0.0, le=1.0)]] = None
+    root: Annotated[float, Field(ge=0.0, le=1.0)] | None = None
 
 
 class FilterId(RootModel):
@@ -153,7 +148,7 @@ class FilterIdList(RootModel):
 
     Valid filter names can be found with the endpoint `/filters`.
     """
-    root: Union[FilterId, List[FilterId]]
+    root: FilterId | list[FilterId]
 
 
 class FilterType(str, Enum):
@@ -185,9 +180,7 @@ class ColormapId(RootModel):
     CSS named and hexadecimal colors are valid colormap names (monotonic linear colormap).
     Colormaps can be inverted by prepending the colormap name with `!`.
     """
-    root: Union[str, ColormapEnum] = Field(
-        ..., examples=['JET', '!#f00', 'red']
-    )
+    root: str | ColormapEnum = Field(..., examples=['JET', '!#f00', 'red'])
 
 
 class ColormapIdList(RootModel):
@@ -199,7 +192,7 @@ class ColormapIdList(RootModel):
 
     Valid colormap names can be found with the endpoint `/colormaps`.
     """
-    root: Union[ColormapId, List[ColormapId]]
+    root: ColormapId | list[ColormapId]
 
 
 class ExistingColormapId(RootModel):
@@ -215,14 +208,14 @@ class ExistingColormapId(RootModel):
 
 
 class ImageIn(BaseModel):
-    channels: Optional[Union[SingleOrRangeChannelIndex, List[SingleOrRangeChannelIndex]]] = None
-    z_slices: Optional[SingleZSliceIndex] = None
-    timepoints: Optional[SingleTimepointIndex] = None
-    c_reduction: Optional[ChannelReduction] = ChannelReduction.ADD
-    min_intensities: Optional[IntensitySelection] = None
-    max_intensities: Optional[IntensitySelection] = None
-    colormaps: Optional[ColormapIdList] = ColormapEnum.DEFAULT
-    filters: Optional[FilterIdList] = None
+    channels: SingleOrRangeChannelIndex | list[SingleOrRangeChannelIndex] | None = None
+    z_slices: SingleZSliceIndex | None = None
+    timepoints: SingleTimepointIndex | None = None
+    c_reduction: ChannelReduction | None = ChannelReduction.ADD
+    min_intensities: IntensitySelection | None = None
+    max_intensities: IntensitySelection | None = None
+    colormaps: ColormapIdList | None = ColormapEnum.DEFAULT
+    filters: FilterIdList | None = None
     gammas: GammaList = 1.0
     threshold: Threshold = None
     # TODO[pydantic]: The following keys were removed: `fields`.
@@ -276,9 +269,9 @@ class ImageIn(BaseModel):
 
 
 class ImageOut(BaseModel):
-    height: Optional[Union[Annotated[int, Field(gt=1)], Annotated[float, Field(gt=0.0, le=1.0)]]] = None
-    width: Optional[Union[Annotated[int, Field(gt=1)], Annotated[float, Field(gt=0.0, le=1.0)]]] = None
-    length: Optional[Union[Annotated[int, Field(gt=1)], Annotated[float, Field(gt=0.0, le=1.0)]]] = None
+    height: Annotated[int, Field(gt=1)] | Annotated[float, Field(gt=0.0, le=1.0)] | None = None
+    width: Annotated[int, Field(gt=1)] | Annotated[float, Field(gt=0.0, le=1.0)] | None = None
+    length: Annotated[int, Field(gt=1)] | Annotated[float, Field(gt=0.0, le=1.0)] | None = None
     # TODO[pydantic]: The following keys were removed: `fields`.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     # model_config = ConfigDict(fields={
@@ -302,8 +295,8 @@ class ImageOut(BaseModel):
 
 
 class ImageInDisplay(ImageIn):
-    min_intensities: Optional[IntensitySelection] = IntensitySelectionEnum.AUTO_IMAGE
-    max_intensities: Optional[IntensitySelection] = IntensitySelectionEnum.AUTO_IMAGE
+    min_intensities: IntensitySelection | None = IntensitySelectionEnum.AUTO_IMAGE
+    max_intensities: IntensitySelection | None = IntensitySelectionEnum.AUTO_IMAGE
     log: bool = Field(
         False,
         description='Apply a logarithmic scale on image data to ease observation '
@@ -314,18 +307,16 @@ class ImageInDisplay(ImageIn):
 class ImageOpsDisplayQueryParams(BaseDependency):
     def __init__(
         self,
-        gammas: Optional[List[Annotated[float, Field(ge=0.0, le=10.0)]]] = Query([1.0]),
-        threshold: Optional[Annotated[float, Field(ge=0.0, le=1.0)]] = Query(None),
-        min_intensities: Optional[List[Union[IntensitySelectionEnum, Annotated[int, Field(ge=0)]]]] = Query(
-            [
-                IntensitySelectionEnum.AUTO_IMAGE]
+        gammas: list[Annotated[float, Field(ge=0.0, le=10.0)]] | None = Query([1.0]),
+        threshold: Annotated[float, Field(ge=0.0, le=1.0)] | None = Query(None),
+        min_intensities: list[IntensitySelectionEnum | Annotated[int, Field(ge=0)]] | None = Query(
+            [IntensitySelectionEnum.AUTO_IMAGE]
         ),
-        max_intensities: Optional[List[Union[IntensitySelectionEnum, Annotated[int, Field(ge=0)]]]] = Query(
-            [
-                IntensitySelectionEnum.AUTO_IMAGE]
+        max_intensities: list[IntensitySelectionEnum | Annotated[int, Field(ge=0)]] | None = Query(
+            [IntensitySelectionEnum.AUTO_IMAGE]
         ),
-        colormaps: Optional[List[Union[str, ColormapEnum]]] = Query([ColormapEnum.DEFAULT]),
-        filters: Optional[List[str]] = Query(None),
+        colormaps: list[str | ColormapEnum] | None = Query([ColormapEnum.DEFAULT]),
+        filters: list[str] | None = Query(None),
         log: bool = Query(False),
     ):
         self.gammas = gammas
@@ -338,15 +329,15 @@ class ImageOpsDisplayQueryParams(BaseDependency):
 
 
 class ImageOutDisplay(ImageOut):
-    length: Optional[Union[Annotated[int, Field(gt=1)], Annotated[float, Field(gt=0.0, le=1.0)]]] = 256
+    length: Annotated[int, Field(gt=1)] | Annotated[float, Field(gt=0.0, le=1.0)] | None = 256
 
 
 class ImageOutDisplayQueryParams(BaseDependency):
     def __init__(
         self,
-        height: Optional[Union[Annotated[int, Field(gt=1)], Annotated[float, Field(gt=0.0, le=1.0)]]] = Query(None),
-        width: Optional[Union[Annotated[int, Field(gt=1)], Annotated[float, Field(gt=0.0, le=1.0)]]] = Query(None),
-        length: Optional[Union[Annotated[int, Field(gt=1)], Annotated[float, Field(gt=0.0, le=1.0)]]] = Query(256)
+        height: Annotated[int, Field(gt=1)] | Annotated[float, Field(gt=0.0, le=1.0)] | None = Query(None),
+        width: Annotated[int, Field(gt=1)] | Annotated[float, Field(gt=0.0, le=1.0)] | None = Query(None),
+        length: Annotated[int, Field(gt=1)] | Annotated[float, Field(gt=0.0, le=1.0)] | None = Query(256)
     ):
         self.length = length
         self.width = width
@@ -363,7 +354,7 @@ class BitDepth(RootModel):
     depend on target content type.
     * `AUTO` - Try to set target bit depth equal to the source bit depth.
     """
-    root: Union[BitDepthEnum, int] = Field(BitDepthEnum.AUTO)
+    root: BitDepthEnum | int = Field(BitDepthEnum.AUTO)
 
 
 class Colorspace(str, Enum):
@@ -392,14 +383,14 @@ class ImageInProcessing(ImageIn):
 class ImageOpsProcessingQueryParams(BaseDependency):
     def __init__(
         self,
-        gammas: Optional[List[Annotated[float, Field(ge=0.0, le=10.0)]]] = Query([1.0]),
-        threshold: Optional[Annotated[float, Field(ge=0.0, le=1.0)]] = Query(None),
-        min_intensities: Optional[List[Union[IntensitySelectionEnum, Annotated[int, Field(ge=0)]]]] = Query(None),
-        max_intensities: Optional[List[Union[IntensitySelectionEnum, Annotated[int, Field(ge=0)]]]] = Query(None),
-        colormaps: Optional[List[Union[str, ColormapEnum]]] = Query([ColormapEnum.DEFAULT]),
-        filters: Optional[List[str]] = Query(None),
-        bits: Optional[Union[BitDepthEnum, int]] = Query(BitDepthEnum.AUTO),
-        colorspace: Optional[Colorspace] = Query(Colorspace.AUTO)
+        gammas: list[Annotated[float, Field(ge=0.0, le=10.0)]] | None = Query([1.0]),
+        threshold: Annotated[float, Field(ge=0.0, le=1.0)] | None = Query(None),
+        min_intensities: list[IntensitySelectionEnum | Annotated[int, Field(ge=0)]] | None = Query(None),
+        max_intensities: list[IntensitySelectionEnum | Annotated[int, Field(ge=0)]] | None = Query(None),
+        colormaps: list[str | ColormapEnum] | None = Query([ColormapEnum.DEFAULT]),
+        filters: list[str] | None = Query(None),
+        bits: BitDepthEnum | int | None = Query(BitDepthEnum.AUTO),
+        colorspace: Colorspace | None = Query(Colorspace.AUTO)
     ):
         self.gammas = gammas
         self.threshold = threshold
@@ -412,8 +403,8 @@ class ImageOpsProcessingQueryParams(BaseDependency):
 
 
 class ImageOutProcessing(ImageOut):
-    zoom: Optional[Annotated[int, Field(ge=0)]] = None
-    level: Optional[Annotated[int, Field(ge=0)]] = None
+    zoom: Annotated[int, Field(ge=0)] | None = None
+    level: Annotated[int, Field(ge=0)] | None = None
     # TODO[pydantic]: The following keys were removed: `fields`.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     # model_config = ConfigDict(fields={
@@ -435,8 +426,8 @@ class ImageOutProcessing(ImageOut):
 class ImageOutProcessingQueryParams(BaseDependency):
     def __init__(
         self,
-        zoom: Optional[Annotated[int, Field(ge=0)]] = Query(None),
-        level: Optional[Annotated[int, Field(ge=0)]] = Query(None)
+        zoom: Annotated[int, Field(ge=0)] | None = Query(None),
+        level: Annotated[int, Field(ge=0)] | None = Query(None)
     ):
         self.zoom = zoom
         self.level = level
@@ -464,7 +455,7 @@ class TierIndexType(str, Enum):
 
 
 class ReferenceTierIndex(BaseModel):
-    reference_tier_index: Optional[int] = Field(
+    reference_tier_index: int | None = Field(
         None,
         description="The index (zoom or level) denoting the tier "
                     "to use as reference coordinate system "
@@ -543,23 +534,23 @@ class Annotation(BaseModel):
         description='A geometry described in Well-known text (WKT)',
         examples=['POINT(10 10)'],
     )
-    fill_color: Optional[Color] = Field(
+    fill_color: Color | None = Field(
         Color("white"),
         description='A color to fill the annotation',
         examples=['#FF00FF']
     )
-    stroke_color: Optional[Color] = Field(
+    stroke_color: Color | None = Field(
         None,
         description='A color for the annotation stroke'
     )
-    stroke_width: Optional[Annotated[int, Field(ge=0, le=10)]] = Field(
+    stroke_width: Annotated[int, Field(ge=0, le=10)] | None = Field(
         0,
         description='A width for the annotation stroke'
     )
 
 
 class Annotations(RootModel):
-    root: Union[List[Annotation], Annotation]
+    root: list[Annotation] | Annotation
 
 
 class PointCross(str, Enum):
@@ -604,15 +595,15 @@ class AnnotationStyleMode(str, Enum):
 
 class AnnotationStyle(BaseModel):
     mode: AnnotationStyleMode
-    point_envelope_length: Optional[PointEnvelopeLength] = None
-    point_cross: Optional[PointCross] = PointCross.CROSS
-    background_transparency: Optional[AnnotationBgTransparency] = None
+    point_envelope_length: PointEnvelopeLength | None = None
+    point_cross: PointCross | None = PointCross.CROSS
+    background_transparency: AnnotationBgTransparency | None = None
 
 
 class WindowRequest(ImageInProcessing, ImageOutProcessing):
-    region: Union[WindowRegion, WindowTileIndex, WindowTileCoord]
-    annotations: Optional[Annotations] = None
-    annotation_style: Optional[AnnotationStyle] = None
+    region: WindowRegion | WindowTileIndex | WindowTileCoord
+    annotations: Annotations | None = None
+    annotation_style: AnnotationStyle | None = None
 
 
 class AnnotationContextFactor(RootModel):
@@ -633,21 +624,21 @@ class AnnotationTrySquare(RootModel):
 
 class AnnotationCropRequest(ImageInProcessing, ImageOutProcessing):
     annotations: Annotations
-    context_factor: Optional[AnnotationContextFactor] = 1.0
-    background_transparency: Optional[AnnotationBgTransparency] = 0
+    context_factor: AnnotationContextFactor | None = 1.0
+    background_transparency: AnnotationBgTransparency | None = 0
 
 
 class AnnotationMaskRequest(ImageOutProcessing):
     annotations: Annotations
-    context_factor: Optional[AnnotationContextFactor] = 1.0
+    context_factor: AnnotationContextFactor | None = 1.0
 
 
 class AnnotationDrawingRequest(ImageInDisplay, ImageOutProcessing):
     annotations: Annotations
-    context_factor: Optional[AnnotationContextFactor] = 1.0
-    try_square: Optional[AnnotationTrySquare] = False
-    point_envelope_length: Optional[PointEnvelopeLength] = 100
-    point_cross: Optional[PointCross] = PointCross.CROSS
+    context_factor: AnnotationContextFactor | None = 1.0
+    try_square: AnnotationTrySquare | None = False
+    point_envelope_length: PointEnvelopeLength | None = 100
+    point_cross: PointCross | None = PointCross.CROSS
 
 
 class TargetZoom(RootModel):
@@ -691,8 +682,7 @@ class TargetLevelTileCoordinates(BaseModel):
 
 
 class TileRequest(ImageInDisplay):
-    tile: Union[TargetZoomTileIndex, TargetZoomTileCoordinates,
-                TargetLevelTileIndex, TargetLevelTileCoordinates]
+    tile: TargetZoomTileIndex | TargetZoomTileCoordinates | TargetLevelTileIndex | TargetLevelTileCoordinates
 
 
 class AssociatedName(str, Enum):

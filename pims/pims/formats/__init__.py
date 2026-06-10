@@ -19,7 +19,6 @@ from inspect import isabstract, isclass
 from pkgutil import iter_modules
 
 from types import ModuleType
-from typing import Dict, List, Type, Union
 from pims.config import get_settings
 import csv
 import os
@@ -66,7 +65,7 @@ def reorder_plugins(
     return sorted_plugin_list
 
 
-def _discover_format_plugins() -> List[Union[str, EntryPoint]]:
+def _discover_format_plugins() -> list[str | EntryPoint]:
     """
     Discover format plugins in the Python env.
     Plugins are:
@@ -105,7 +104,7 @@ def _discover_format_plugins() -> List[Union[str, EntryPoint]]:
     return plugins
 
 
-def _find_formats_in_module(mod: ModuleType) -> List[Type[AbstractFormat]]:
+def _find_formats_in_module(mod: ModuleType) -> list[type[AbstractFormat]]:
     """
     Find all Format classes in a module.
 
@@ -146,7 +145,7 @@ def _find_formats_in_module(mod: ModuleType) -> List[Type[AbstractFormat]]:
     return formats
 
 
-def _get_all_formats() -> List[Type[AbstractFormat]]:
+def _get_all_formats() -> list[type[AbstractFormat]]:
     """
     Find all Format classes in modules specified in FORMAT_PLUGINS.
 
@@ -173,8 +172,8 @@ def _get_all_formats() -> List[Type[AbstractFormat]]:
     return formats
 
 
-FormatsByExt = Dict[str, Type[AbstractFormat]]
+FormatsByExt = dict[str, type[AbstractFormat]]
 
 
-FORMAT_PLUGINS: List[Union[str, EntryPoint]] = _discover_format_plugins()
+FORMAT_PLUGINS: list[str | EntryPoint] = _discover_format_plugins()
 FORMATS: FormatsByExt = {f.get_identifier(): f for f in _get_all_formats()}

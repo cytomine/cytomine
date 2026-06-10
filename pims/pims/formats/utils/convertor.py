@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pims.formats import AbstractFormat
@@ -49,7 +49,7 @@ class AbstractConvertor(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def conversion_format(self) -> Type[AbstractFormat]:
+    def conversion_format(self) -> type[AbstractFormat]:
         """
         Get the format to which the image in this format will be converted,
         if needed.

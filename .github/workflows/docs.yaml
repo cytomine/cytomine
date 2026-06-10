@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Load versions
         id: versions
@@ -57,7 +57,7 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Download Docs Artifacts
         uses: actions/download-artifact@v8

@@ -11,7 +11,6 @@
 #  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
-from typing import Optional
 
 from fastapi import APIRouter, Depends, Path as PathParam, Query
 from starlette.requests import Request
@@ -415,8 +414,8 @@ async def show_tile_v1(
     y: int,
     z: int,
     ops: ImageOpsDisplayQueryParams = Depends(),
-    mime_type: Optional[str] = Query(None, alias='mimeType'),  # noqa
-    tile_group: Optional[str] = Query(None, alias='tileGroup'),  # noqa
+    mime_type: str | None = Query(None, alias='mimeType'),  # noqa
+    tile_group: str | None = Query(None, alias='tileGroup'),  # noqa
     config: Settings = Depends(get_settings)
 ):
     """
@@ -442,13 +441,13 @@ async def show_tile_v1(
 async def show_tile_v2(
     request: Request, response: Response,
     z: int,
-    fif: Optional[str] = None,
-    zoomify: Optional[str] = None,
-    x: Optional[int] = None,
-    y: Optional[int] = None,
-    tile_index: Optional[int] = Query(None, alias='tileIndex'),
+    fif: str | None = None,
+    zoomify: str | None = None,
+    x: int | None = None,
+    y: int | None = None,
+    tile_index: int | None = Query(None, alias='tileIndex'),
     ops: ImageOpsDisplayQueryParams = Depends(),
-    tile_group: Optional[str] = Query(None, alias='tileGroup'),
+    tile_group: str | None = Query(None, alias='tileGroup'),
     mime_type: str = Query(None, alias='mimeType'),  # noqa
     config: Settings = Depends(get_settings)
 ):

@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 import be.cytomine.common.repository.model.HasDeleted;
 import be.cytomine.common.repository.model.HasUpdated;
@@ -42,5 +43,6 @@ public class OntologyEntity implements HasDeleted, HasUpdated {
     private Timestamp deleted;
 
     @OneToMany(mappedBy = "ontologyId")
+    @SQLRestriction("deleted IS NULL")
     private Set<TermEntity> terms;
 }

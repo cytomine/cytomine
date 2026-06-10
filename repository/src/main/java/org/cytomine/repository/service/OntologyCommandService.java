@@ -77,8 +77,8 @@ public class OntologyCommandService implements
 
     @Override
     public OntologyResponse mapToResponse(OntologyEntity entity) {
-        UserEntity userEntity = userRepository.findById(entity.getUserId()).orElseThrow();
-        return ontologyMapper.mapToOntologyResponse(entity,userEntity.getFullName());
+        UserEntity user = userRepository.findById(entity.getUserId()).orElseThrow();
+        return ontologyMapper.mapToOntologyResponse(entity,user.getFirstname() + ' ' + user.getLastname());
     }
 
     @Override

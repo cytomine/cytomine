@@ -37,8 +37,8 @@ public class OntologyController implements OntologyHttpContract {
         return repository.findByIdAndDeletedNull(id)
             .filter(ontologyEntity -> aclService.canReadOntology(userId, ontologyEntity.getId()))
             .flatMap(ontologyEntity -> userRepository.findById(userId)
-                .map(user -> ontologyMapper.mapToOntologyResponse(ontologyEntity, user.getFullName()))
-            );
+                .map(user -> ontologyMapper.mapToOntologyResponse(ontologyEntity,
+                    user.getFirstname() + ' ' + user.getLastname())));
 
     }
 

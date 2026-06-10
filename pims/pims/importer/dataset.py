@@ -4,11 +4,11 @@ import os
 from collections import defaultdict
 from collections.abc import Mapping
 from lxml import etree
-from typing import List
+from typing import List, Any
 from dataclasses import dataclass, fields, is_dataclass
 from datetime import datetime
 from enum import Enum
-from uuid import UUID
+import uuid
 
 from cytomine import Cytomine
 from cytomine.models import (
@@ -42,6 +42,7 @@ from bigpicture_metadata_interface.model.sample import (
 )
 from bigpicture_metadata_interface.model.observation import Observation
 from bigpicture_metadata_interface.model.stain import StainingList, Stain
+from bigpicture_metadata_interface.model.common import Code, CodeAttributes, Attributes
 
 logger = logging.getLogger("pims.app")
 
@@ -185,33 +186,59 @@ def run_import_datasets(
             image_summary=image_summary,
             annotation_summary=annotation_summary,
         )
-def dataclass_to_dict(obj):
-    """Recursively convert a dataclass (or list/dict of dataclasses) to a plain dict."""
+
+def dataclass_to_dict(obj: Any):
+    """Recursively convert dataclass objects (and nested structures) to plain dicts.
+    Handles Code, CodeAttributes, Attributes, CustomAttributes, lists, dicts, enums, dates, UUIDs.
+    """
     if obj is None:
         return None
+    # Primitives
     if isinstance(obj, (str, int, float, bool)):
         return obj
+    # Enums
     if isinstance(obj, Enum):
         return obj.value
+    # Datetime
     if isinstance(obj, datetime):
         return obj.isoformat()
-    if isinstance(obj, UUID):
+    # UUID
+    if isinstance(obj, uuid.UUID):
         return str(obj)
-    if isinstance(obj, dict):
-        return {k: dataclass_to_dict(v) for k, v in obj.items()}
+    # Code object
+    if isinstance(obj, Code):
+        return {
+            "code": obj.code,
+            "scheme": obj.scheme,
+            "meaning": obj.meaning,
+            "scheme_version": obj.scheme_version,
+        }
+    # CodeAttributes (which is a dict-like mapping from str to Code)
+    if isinstance(obj, CodeAttributes):
+        return {key: dataclass_to_dict(value) for key, value in obj.items()}
+    # Attributes / CustomAttributes (dict of str -> any)
+    if isinstance(obj, Attributes):
+        return {key: dataclass_to_dict(value) for key, value in obj.items()}
+    # List or tuple
     if isinstance(obj, (list, tuple)):
         return [dataclass_to_dict(item) for item in obj]
+    # Dict (handles any mapping, including from other libraries)
+    if isinstance(obj, dict):
+        return {key: dataclass_to_dict(value) for key, value in obj.items()}
+    # Any other dataclass
     if is_dataclass(obj):
         result = {}
-        for f in fields(obj):
-            value = getattr(obj, f.name)
-            # skip private/internal fields
-            if f.name.startswith("_") or f.name in ("private_attributes", "uid", "name"):
+        for field in fields(obj):
+            value = getattr(obj, field.name)
+            # Skip internal/private fields (optional, adjust as needed)
+            if field.name.startswith("_"):
                 continue
-            result[f.name] = dataclass_to_dict(value)
+            result[field.name] = dataclass_to_dict(value)
         return result
-    # fallback
+    # Fallback (should not happen)
     return str(obj)
+
+
 
 def build_slide_to_block_map(dataset: Dataset) -> dict[Slide, Block]:
     """Return a mapping from Slide instances to the Block that contains them."""

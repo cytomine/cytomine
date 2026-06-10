@@ -44,7 +44,7 @@ public class OntologyCommandService implements
 
     @Override
     public UpdateCommandRequest<OntologyCommandPayload> mapUpdateCommand(long userId, OntologyCommandPayload before,
-                                                                         OntologyCommandPayload after) {
+        OntologyCommandPayload after) {
         return new UpdateOntologyCommand(before, after, userId);
     }
 
@@ -65,20 +65,19 @@ public class OntologyCommandService implements
 
     @Override
     public OntologyEntity updateEntityWithEntity(OntologyEntity entity, UpdateOntology updatePayload, Timestamp now) {
-        return ontologyMapper.update(entity, updatePayload.name()
-                                                 .orElse(entity.getName()), now);
+        return ontologyMapper.update(entity, updatePayload.name().orElse(entity.getName()), now);
     }
 
     @Override
     public OntologyEntity updateEntityWithPayload(OntologyEntity entity, OntologyCommandPayload payload,
-                                                  Timestamp now) {
+        Timestamp now) {
         return ontologyMapper.updateWithPayload(entity, payload, now);
     }
 
     @Override
     public OntologyResponse mapToResponse(OntologyEntity entity) {
         UserEntity user = userRepository.findById(entity.getUserId()).orElseThrow();
-        return ontologyMapper.mapToOntologyResponse(entity,user.getFirstname() + ' ' + user.getLastname());
+        return ontologyMapper.mapToOntologyResponse(entity, user.getFirstname() + ' ' + user.getLastname());
     }
 
     @Override

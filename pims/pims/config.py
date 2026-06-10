@@ -74,7 +74,7 @@ class ReadableSettings(BaseSettings):
     @property
     def meilisearch_client(self) -> Client:
         """Returns a MeiliSearch client instance."""
-        return Client(self.meilisearch_host, self.meilisearch_api_key)
+        return Client(self.meilisearch_url, self.meilisearch_key)
 
 
 class Settings(ReadableSettings):

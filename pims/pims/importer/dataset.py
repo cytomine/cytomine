@@ -101,8 +101,8 @@ def run_import_datasets(
     credentials: ApiCredentials,
     storage_id: str,
 ) -> ImportResponse:
-#     client = get_settings().meilisearch_client
-#     index = client.index("metadata_index")
+    client = get_settings().meilisearch_client
+    index = client.index("imageMetadataIndex")
     buckets = (Path(entry.path) for entry in os.scandir(DATASET_ROOT) if entry.is_dir())
 
     with Cytomine(**cytomine_auth.model_dump(), configure_logging=False) as c:
@@ -176,10 +176,19 @@ def run_import_datasets(
             for image in parsed_dataset.images.values():
                 counter += 1
                 flat_dict = flatten_image(image, parsed_dataset, slide_to_block)
+                flat_dict["id"] = flat_dict["image"]["identifier"]
+                indexing_payload.append(flat_dict)
                 if counter == 1:
                     logger.info(json.dumps(flat_dict, indent=2, default=str))
-                    break
 
+            batch_size = 200
+            for i in range(0, len(indexing_payload), batch_size):
+                batch = indexing_payload[i:i+batch_size]
+                result = index.add_documents(batch)
+                task = client.wait_for_task(result.task_uid)
+                logger.info(f"Indexed batch {i//batch_size + 1} and the status is {task.status}")
+                if task.status == "failed":
+                    logger.info(f"Error details: {task.error}")
         except Exception as e:
             logger.error(f"Failed to parse xml files {e}", exc_info=True)
         return ImportResponse(

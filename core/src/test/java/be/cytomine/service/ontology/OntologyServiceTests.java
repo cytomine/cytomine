@@ -8,7 +8,6 @@ import java.util.Set;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -55,7 +54,6 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
-@Transactional
 public class OntologyServiceTests {
 
     @Autowired
@@ -349,7 +347,7 @@ public class OntologyServiceTests {
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                 LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
                 LocalDateTime.ofInstant(term.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                Optional.of(term.getComment()), Set.of()));
+                Optional.ofNullable(term.getComment()), Set.of()));
 
         when(termHttpContract.findTermsByOntology(eq(ontology.getId()), anyLong(), any(Pageable.class))).thenReturn(
             new PageImpl<>(termResponses));

@@ -30,12 +30,6 @@ spec:
           volumeMounts:
             - name: kubelet-device-plugins-dir
               mountPath: /var/lib/kubelet/device-plugins
-            - name: libnvidia-ml
-              mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so
-              readOnly: true
-            - name: libnvidia-ml-1
-              mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
-              readOnly: true
             - name: dev
               mountPath: /dev
       volumes:
@@ -43,12 +37,6 @@ spec:
           hostPath:
             path: /var/lib/kubelet/device-plugins
             type: Directory
-        - name: libnvidia-ml
-          hostPath:
-            path: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so
-        - name: libnvidia-ml-1
-          hostPath:
-            path: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
         - name: dev
           hostPath:
             path: /dev

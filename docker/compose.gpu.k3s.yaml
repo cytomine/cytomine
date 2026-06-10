@@ -1,19 +1,39 @@
 services:
   k3s:
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities:
-                - gpu
+    pid: host
+    ipc: host
+    cgroup: host
 
     environment:
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: all
 
+    devices:
+      - /dev/nvidia0:/dev/nvidia0
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia-uvm:/dev/nvidia-uvm
+      - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
+      - /dev/nvidia-modeset:/dev/nvidia-modeset
+      - /dev/nvidia-caps/nvidia-cap1:/dev/nvidia-caps/nvidia-cap1
+      - /dev/nvidia-caps/nvidia-cap2:/dev/nvidia-caps/nvidia-cap2
+
     volumes:
+      # REQUIRED for k3s-in-docker stability
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+
+      # NVIDIA tooling passthrough
+      - /usr/lib/nvidia:/usr/lib/nvidia:ro
+      - /usr/bin/nvidia-container-cli:/usr/bin/nvidia-container-cli:ro
       - /usr/bin/nvidia-container-runtime:/usr/bin/nvidia-container-runtime:ro
+      - /usr/bin/nvidia-container-runtime-hook:/usr/bin/nvidia-container-runtime-hook:ro
       - /usr/bin/nvidia-container-toolkit:/usr/bin/nvidia-container-toolkit:ro
+      - /usr/bin/nvidia-ctk:/usr/bin/nvidia-ctk:ro
+      - /usr/bin/nvidia-smi:/usr/bin/nvidia-smi:ro
+      - /lib64:/lib64:ro
+      - /usr/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:ro
+      - /lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:ro
+      - /sbin/ldconfig.real:/sbin/ldconfig.real:ro
+
+      # k3s config
       - ./k3s/nvidia-device-plugin.yaml:/var/lib/rancher/k3s/server/manifests/nvidia-device-plugin.yaml:ro
+      - ./k3s/config.toml.tmpl:/var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl:ro

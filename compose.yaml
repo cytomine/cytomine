@@ -308,7 +308,9 @@ services:
   # https://github.com/k3s-io/k3s/blob/3854eb56d4b8a183a1f8261aebd372111378a00f/docker-compose.yml
   k3s:
     image: rancher/k3s:v1.30.14-rc3-k3s3
-    command: server
+    command:
+      - server
+      - --kubelet-arg=cgroup-driver=cgroupfs
     tmpfs:
       - /run
       - /var/run

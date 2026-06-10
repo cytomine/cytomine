@@ -1,0 +1,102 @@
+{{ if .Values.meilisearch.deploy }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: meilisearch
+  annotations:
+    kube-score/ignore: container-security-context-user-group-id
+  labels:
+    role: meilisearch
+    app: {{ include "cytomine.name" . }}
+    component: {{ .Release.Name }}-meilisearch
+    release: {{ .Release.Name }}
+spec:
+  replicas: 1
+  serviceName: meilisearch
+  selector:
+    matchLabels:
+      app: meilisearch
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        role: meilisearch
+        app: meilisearch
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
+      {{- with .Values.global.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: temp
+          emptyDir: {}
+        {{ if not .Values.meilisearch.storageClassName -}}
+        - name: meilisearch-data
+          emptyDir: {}
+        {{ end }}
+      containers:
+        - name: meilisearch
+          image: "{{ .Values.images.meilisearch }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          volumeMounts:
+            - name: meilisearch-data
+              mountPath: /meili_data
+            - name: temp
+              mountPath: /tmp
+          ports:
+            - name: http
+              containerPort: {{ .Values.meilisearch.port }}
+              protocol: TCP
+          env:
+            - name: MEILI_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: meilisearch-secret
+                  key: masterKey
+          startupProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.meilisearch.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.meilisearch.port }}
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.meilisearch.port }}
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.meilisearch.resources | nindent 12 }}
+      {{- with .Values.global.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{ if .Values.meilisearch.storageClassName -}}
+  volumeClaimTemplates:
+    - metadata:
+        name: meilisearch-data
+      spec:
+        storageClassName: {{ .Values.meilisearch.storageClassName }}
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.meilisearch.storage }}
+  {{ end }}
+{{ end }}

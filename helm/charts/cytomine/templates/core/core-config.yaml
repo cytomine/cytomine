@@ -191,4 +191,5 @@ data:
   APPENGINE_API_URL: http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}
   APPENGINE_API_BASE_PATH: /app-engine/v1/
   REPOSITORY_URL: http://repository.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.repository.port }}
+  MEILISEARCH_URL: http://meilisearch.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.meilisearch.port }}
 {{ end }}

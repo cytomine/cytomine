@@ -30,7 +30,8 @@ jobs:
             libopenjp2-7-dev \
             libvips42 \
             libpng-dev \
-            openssh-client
+            openssh-client \
+            openssh-server
 
       - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.9.0

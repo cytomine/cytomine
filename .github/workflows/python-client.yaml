@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 2
 
@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Load versions
         id: versions

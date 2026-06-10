@@ -52,7 +52,7 @@ jobs:
             dockerfile_location: app-engine/task-runner
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           submodules: true
 

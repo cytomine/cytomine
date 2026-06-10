@@ -7,9 +7,10 @@ import java.util.Set;
 
 import be.cytomine.common.repository.model.HasLocaleDateTimeCUD;
 import be.cytomine.common.repository.model.command.DataType;
+import be.cytomine.common.repository.model.ontology.payload.OntologyUser;
 
 public record OntologyResponse(String name, long id, Set<TermResponse> terms, LocalDateTime created,
-                               LocalDateTime updated, Optional<LocalDateTime> deleted)
+                               LocalDateTime updated, Optional<LocalDateTime> deleted, OntologyUser user)
     implements ApplyCommandResponse, HasLocaleDateTimeCUD {
     public OntologyResponse {
         if (terms == null) {

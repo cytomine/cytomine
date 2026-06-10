@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.OntologyRepository;
+import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.OntologyCommandService;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,31 +28,32 @@ import static java.time.temporal.ChronoUnit.MICROS;
 public class OntologyController implements OntologyHttpContract {
     private final OntologyCommandService service;
     private final OntologyRepository repository;
+    private final UserRepository userRepository;
     private final ACLService aclService;
     private final OntologyMapper ontologyMapper;
 
     @Override
     public Optional<OntologyResponse> get(long id, long userId) {
         return repository.findByIdAndDeletedNull(id)
-                   .filter(termEntity -> aclService.canReadOntology(userId, termEntity.getId()))
-                   .map(ontologyMapper::mapToOntologyResponse);
+            .filter(ontologyEntity -> aclService.canReadOntology(userId, ontologyEntity.getId()))
+            .flatMap(ontologyEntity -> userRepository.findById(userId)
+                .map(user -> ontologyMapper.mapToOntologyResponse(ontologyEntity, user.getFullName()))
+            );
+
     }
 
     @Override
     public Optional<HttpCommandResponse> create(long userId, CreateOntology createPayload) {
-        return service.create(userId, createPayload, LocalDateTime.now()
-                                                         .truncatedTo(MICROS));
+        return service.create(userId, createPayload, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateOntology updateOntology) {
-        return service.update(userId, id, updateOntology, LocalDateTime.now()
-                                                              .truncatedTo(MICROS));
+        return service.update(userId, id, updateOntology, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, LocalDateTime.now()
-                                              .truncatedTo(MICROS));
+        return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
     }
 }

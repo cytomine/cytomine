@@ -9,7 +9,9 @@ import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.OntologyRepository;
+import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.persistence.entity.OntologyEntity;
+import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.OntologyCommandPayload;
@@ -32,6 +34,7 @@ public class OntologyCommandService implements
     private final ACLService aclService;
     private final OntologyMapper ontologyMapper;
     private final CommandV2Repository commandV2Repository;
+    private final UserRepository userRepository;
     private final CommandMapper commandMapper;
 
     @Override
@@ -74,7 +77,8 @@ public class OntologyCommandService implements
 
     @Override
     public OntologyResponse mapToResponse(OntologyEntity entity) {
-        return ontologyMapper.mapToOntologyResponse(entity);
+        UserEntity userEntity = userRepository.findById(entity.getUserId()).orElseThrow();
+        return ontologyMapper.mapToOntologyResponse(entity,userEntity.getFullName());
     }
 
     @Override

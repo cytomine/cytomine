@@ -13,6 +13,7 @@ import be.cytomine.common.repository.model.command.payload.request.OntologyComma
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.RelationResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import be.cytomine.common.repository.model.ontology.payload.OntologyUser;
 
 @Mapper(componentModel = "spring", uses = {TermMapper.class, BaseMapper.class})
 public interface OntologyMapper {
@@ -20,9 +21,11 @@ public interface OntologyMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     RelationResponse mapRelationResponse(RelationEntity relationEntity);
 
+    OntologyUser map(String fullName);
 
+    @Mapping(target = "user", source = "userFullName")
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "userId"})
-    OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity);
+    OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity, String userFullName);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)

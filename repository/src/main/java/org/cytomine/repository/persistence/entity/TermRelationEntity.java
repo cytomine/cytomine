@@ -7,15 +7,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import be.cytomine.common.repository.model.HasDeleted;
 import be.cytomine.common.repository.model.HasUpdated;
 
 @Entity(name = "relation_term")
-@Getter
-@Setter
+@Data
 public class TermRelationEntity implements HasDeleted, HasUpdated {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -103,6 +103,72 @@ def run_import_datasets(
 ) -> ImportResponse:
     client = get_settings().meilisearch_client
     index = client.index("imageMetadataIndex")
+    searchable_attributes = [
+        # Image identifiers
+        "image.identifier",
+        "image.uid",
+        "image.reference.alias",
+
+        # Slide identifiers
+        "slide.identifier",
+        "slide.alias",
+
+        # Block identifiers
+        "block.identifier",
+        "block.alias",
+
+        # Specimen & biological being identifiers
+        "specimens.identifier",
+        "specimens.alias",
+        "specimens.biological_being.identifier",
+        "specimens.biological_being.alias",
+        "specimens.biological_being.strain.meaning",        # e.g., "WISTAR HAN"
+        "specimens.biological_being.animal_species.meaning", # e.g., "RAT"
+        "specimens.biological_being.sex",                   # "Male"/"Female"
+        "specimens.biological_being.control_status.meaning", # "Controlled"/"Treated"
+        "specimens.biological_being.disposition.meaning",    # e.g., "TERMINAL SACRIFICE"
+
+        # Anatomical site
+        "specimens.anatomical_site.meaning",                # e.g., "KIDNEY", "BONE MARROW"
+
+        # Observations
+        "specimens.observations.identifier",
+        "specimens.observations.observation_alias",
+        "specimens.observations.code_attributes.MISTRESC.meaning",  # e.g., "UNREMARKABLE"
+        "specimens.observations.code_attributes.MITEST.meaning",    # e.g., "General Histopathologic Exam, Qual"
+        "specimens.observations.custom_attributes.MIORRES",         # free text: "No Abnormalities Detected"
+
+        # Observers
+        "specimens.observations.observers.identifier",
+        "specimens.observations.observers.alias",
+        "specimens.observations.observers.observer_type",           # "Human"
+
+        # Dataset
+        "dataset.title",
+        "dataset.description",
+        "dataset.accession",
+        "dataset.alias",
+
+        # Policy (if you want users to search by policy terms)
+        "policy.identifier",
+        "policy.type_of_dataset",
+        "policy.allowed_geographical_distribution",
+    ]
+    filterable_attributes = [
+        "specimens.biological_being.animal_species.meaning",
+        "specimens.anatomical_site.meaning",
+        "specimens.biological_being.sex",
+        "specimens.age_at_extraction.interval_start",
+        "slide.staining.stains.compound.meaning",
+        "specimens.fixation_type.meaning",
+        "block.block_preparation.meaning",
+        "specimens.specimen_type.meaning",
+    ]
+
+    index.update_settings({
+        "searchableAttributes": searchable_attributes,
+        "filterableAttributes": filterable_attributes
+    })
     buckets = (Path(entry.path) for entry in os.scandir(DATASET_ROOT) if entry.is_dir())
 
     with Cytomine(**cytomine_auth.model_dump(), configure_logging=False) as c:

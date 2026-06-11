@@ -64,3 +64,4 @@ compileJava {
             '-Amapstruct.unmappedSourcePolicy=ERROR'
     ]
 }
+

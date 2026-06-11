@@ -23,6 +23,7 @@ import be.cytomine.common.repository.model.command.request.DeleteOntologyCommand
 import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import be.cytomine.common.repository.model.ontology.payload.OntologyUser;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 @RequiredArgsConstructor
@@ -77,7 +78,8 @@ public class OntologyCommandService implements
     @Override
     public OntologyResponse mapToResponse(OntologyEntity entity) {
         UserEntity user = userRepository.findById(entity.getUserId()).orElseThrow();
-        return ontologyMapper.mapToOntologyResponse(entity, user.getFirstname() + ' ' + user.getLastname());
+        return ontologyMapper.mapToOntologyResponse(entity,
+            new OntologyUser(entity.getUserId(), user.getFirstname() + ' ' + user.getLastname()));
     }
 
     @Override

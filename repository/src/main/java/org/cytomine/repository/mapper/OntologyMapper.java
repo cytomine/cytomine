@@ -21,11 +21,13 @@ public interface OntologyMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     RelationResponse mapRelationResponse(RelationEntity relationEntity);
 
-    OntologyUser map(String fullName);
+    OntologyUser map(Long id, String fullName);
 
-    @Mapping(target = "user", source = "userFullName")
+    @Mapping(target = "user", source = "user")
+    // @Mapping(target = "user.fullName", source = "user.fullName")
+    @Mapping(target = "id", source = "ontologyEntity.id")
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "userId"})
-    OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity, String userFullName);
+    OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity, OntologyUser user);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)

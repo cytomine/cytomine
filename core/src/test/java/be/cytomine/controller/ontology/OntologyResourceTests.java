@@ -100,7 +100,7 @@ public class OntologyResourceTests {
             new OntologyResponse(ontology.getName(), ontology.getId(), Set.of(),
                 LocalDateTime.ofInstant(ontology.getCreated().toInstant(), ZoneId.systemDefault()),
                 LocalDateTime.ofInstant(ontology.getUpdated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                new OntologyUser(ontology.getUser().getFullName()))));
+                new OntologyUser(ontology.getUser().getId(), ontology.getUser().getFullName()))));
 
         mockMvc.perform(get("/api/ontology/{id}.json", ontology.getId()))
             .andExpect(status().isOk())
@@ -118,8 +118,8 @@ public class OntologyResourceTests {
         UUID commandId = UUID.randomUUID();
         when(ontologyHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(true,
             new OntologyResponse(ontology.getName(), 1L, Set.of(), LocalDateTime.now(), LocalDateTime.now(),
-                Optional.empty(), new OntologyUser(ontology.getUser().getFullName())), commandId,
-            Commands.CREATE_ONTOLOGY)));
+                Optional.empty(), new OntologyUser(ontology.getUser().getId(), ontology.getUser().getFullName())),
+            commandId, Commands.CREATE_ONTOLOGY)));
 
         mockMvc.perform(post("/api/ontology.json").contentType(MediaType.APPLICATION_JSON).content(ontology.toJSON()))
             .andExpect(status().isOk())
@@ -149,8 +149,9 @@ public class OntologyResourceTests {
         when(ontologyHttpContract.update(eq(ontology.getId()), eq(userId), any())).thenReturn(Optional.of(
             new HttpCommandResponse(true,
                 new OntologyResponse(ontology.getName(), ontology.getId(), Set.of(), LocalDateTime.now(),
-                    LocalDateTime.now(), Optional.empty(), new OntologyUser(ontology.getUser().getFullName())),
-                commandId, Commands.UPDATE_ONTOLOGY)));
+                    LocalDateTime.now(), Optional.empty(),
+                    new OntologyUser(ontology.getUser().getId(), ontology.getUser().getFullName())), commandId,
+                Commands.UPDATE_ONTOLOGY)));
 
         mockMvc.perform(put("/api/ontology/{id}.json", ontology.getId()).contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))
@@ -183,7 +184,8 @@ public class OntologyResourceTests {
             new HttpCommandResponse(true,
                 new OntologyResponse(ontology.getName(), ontology.getId(), Set.of(), LocalDateTime.now(),
                     LocalDateTime.now(), Optional.of(LocalDateTime.now()),
-                    new OntologyUser(ontology.getUser().getFullName())), commandId, Commands.DELETE_ONTOLOGY)));
+                    new OntologyUser(ontology.getUser().getId(), ontology.getUser().getFullName())), commandId,
+                Commands.DELETE_ONTOLOGY)));
 
         mockMvc.perform(delete("/api/ontology/{id}.json", ontology.getId()).contentType(MediaType.APPLICATION_JSON)
                 .content(ontology.toJSON()))

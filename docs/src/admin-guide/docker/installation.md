@@ -52,11 +52,25 @@ df -h
 
 2. Start all services:
 
+   <code-group>
+   <code-block title="CPU Only">
    ```bash
    docker compose up -d
    ```
+   </code-block>
+
+   <code-block title="GPU Support">
+   ```bash
+   make start-docker-gpu
+   ```
+   </code-block>
+   </code-group>
+
+   ::: tip
+   The GPU support is only used for the App Engine to run on GPUs (Only Nvidia is supported).
 
    _First startup takes around 10 minutes to pull all Docker images._
+   :::
 
 3. Cytomine is ready when all containers are healthy. Access the UI at:
 
@@ -92,7 +106,7 @@ If you encounter issues during startup, refer to the [troubleshooting](./trouble
 
 ## Data Persistence
 
-All persistent data is managed through Docker volumes, except for images and model weights, which are stored under ./data/ by default. You can override this location by setting DATA_PATH before starting:
+All persistent data is managed through Docker volumes, except for images and model weights, which are stored under ./data/ by default. You can override this location by setting `DATA_PATH` before starting:
 
 ```bash
 DATA_PATH=/mnt/data docker compose up -d

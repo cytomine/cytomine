@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -54,6 +54,7 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
+@Transactional
 public class OntologyServiceTests {
 
     @Autowired
@@ -76,23 +77,6 @@ public class OntologyServiceTests {
     private PermissionService permissionService;
     @Autowired
     private ProjectService projectService;
-
-    private Optional<Long> getTerm(Long termId) {
-        String request = "select count(*) from term where id = :id and deleted is null";
-        Query query = entityManager.createNativeQuery(request);
-        query.setParameter("id", termId);
-        long count = ((Number) query.getSingleResult()).longValue();
-        return count > 0 ? Optional.of(termId) : Optional.empty();
-    }
-
-    private Optional<Long> getTermRelation(Long termRelationId) {
-        String request = "select count(*) from term_relation where id = :id and deleted is null";
-        Query query = entityManager.createNativeQuery(request);
-        query.setParameter("id", termRelationId);
-        long count = ((Number) query.getSingleResult()).longValue();
-        return count > 0 ? Optional.of(termRelationId) : Optional.empty();
-    }
-
 
     @Test
     void listAllOntologyWithSuccess() {

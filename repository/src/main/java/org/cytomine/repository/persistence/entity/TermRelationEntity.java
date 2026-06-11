@@ -9,12 +9,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 
-import be.cytomine.common.repository.model.HasDeleted;
-import be.cytomine.common.repository.model.HasUpdated;
+import be.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "relation_term")
 @Data
-public class TermRelationEntity implements HasDeleted, HasUpdated {
+public class TermRelationEntity implements HasTimestampCUD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

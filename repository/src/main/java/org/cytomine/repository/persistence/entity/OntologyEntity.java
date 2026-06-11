@@ -9,21 +9,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import org.hibernate.annotations.SQLRestriction;
 
-import be.cytomine.common.repository.model.HasDeleted;
-import be.cytomine.common.repository.model.HasUpdated;
+import be.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "ontology")
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class OntologyEntity implements HasDeleted, HasUpdated {
+@Data
+public class OntologyEntity implements HasTimestampCUD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -74,10 +74,10 @@ public class RelationTermResourceTests {
     @MockitoBean
     private TermRelationHttpContract termRelationHttpContract;
 
-    private TermRelationResponse buildResponse(RelationTerm relationTerm, long ontologyId) {
+    private TermRelationResponse buildResponse(RelationTerm relationTerm) {
         return new TermRelationResponse(
             relationTerm.getId(), relationTerm.getTerm1().getId(),
-            relationTerm.getTerm2().getId(), ontologyId, relationTerm.getRelation().getId(),
+            relationTerm.getTerm2().getId(),  relationTerm.getRelation().getId(),
             LocalDateTime.ofInstant(relationTerm.getUpdated().toInstant(), ZoneId.systemDefault()),
             Optional.empty(),
             LocalDateTime.ofInstant(relationTerm.getCreated().toInstant(), ZoneId.systemDefault()),
@@ -89,9 +89,8 @@ public class RelationTermResourceTests {
     @Transactional
     public void getATermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long ontologyId = relationTerm.getTerm1().getOntology().getId();
         long userId = builder.givenSuperAdmin().getId();
-        TermRelationResponse expected = buildResponse(relationTerm, ontologyId);
+        TermRelationResponse expected = buildResponse(relationTerm);
         when(termRelationHttpContract.findTermRelationByID(eq(relationTerm.getId()), eq(userId)))
             .thenReturn(Optional.of(expected));
 
@@ -117,7 +116,6 @@ public class RelationTermResourceTests {
     @Transactional
     public void addTermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long ontologyId = relationTerm.getTerm1().getOntology().getId();
         long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         CreateTermRelation createTermRelation = new CreateTermRelation(
@@ -125,7 +123,7 @@ public class RelationTermResourceTests {
             relationTerm.getTerm2().getId(), RelationTerm.PARENT
         );
         HttpCommandResponse expected = new HttpCommandResponse(
-            true, buildResponse(relationTerm, ontologyId),
+            true, buildResponse(relationTerm),
             commandId, Commands.CREATE_TERM_RELATION
         );
         when(termRelationHttpContract.create(eq(userId), eq(createTermRelation))).thenReturn(Optional.of(expected));
@@ -169,7 +167,6 @@ public class RelationTermResourceTests {
     @Transactional
     public void editTermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long ontologyId = relationTerm.getTerm1().getOntology().getId();
         long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         UpdateTermRelation updateTermRelation = new UpdateTermRelation(
@@ -177,7 +174,7 @@ public class RelationTermResourceTests {
             Optional.of(relationTerm.getTerm2().getId()), Optional.empty()
         );
         HttpCommandResponse expected = new HttpCommandResponse(
-            true, buildResponse(relationTerm, ontologyId),
+            true, buildResponse(relationTerm),
             commandId, Commands.UPDATE_TERM_RELATION
         );
         when(termRelationHttpContract.update(eq(relationTerm.getId()), eq(userId), eq(updateTermRelation)))
@@ -220,11 +217,10 @@ public class RelationTermResourceTests {
     @Transactional
     public void deleteTermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long ontologyId = relationTerm.getTerm1().getOntology().getId();
         long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         HttpCommandResponse expected = new HttpCommandResponse(
-            true, buildResponse(relationTerm, ontologyId),
+            true, buildResponse(relationTerm),
             commandId, Commands.DELETE_TERM_RELATION
         );
         when(termRelationHttpContract.delete(eq(relationTerm.getId()), eq(userId))).thenReturn(Optional.of(expected));

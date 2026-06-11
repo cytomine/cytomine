@@ -43,20 +43,16 @@ public interface TermRelationHttpContract {
                                          @Valid @RequestBody CreateTermRelation createTermRelation);
 
     @PutExchange("/{id}")
-    Optional<HttpCommandResponse> update(@PathVariable long id,
-                                         @RequestParam long userId,
+    Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
                                          @RequestBody UpdateTermRelation updateTermRelation);
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse> delete(@PathVariable long id,
-                                         @RequestParam long userId);
+    Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
     @DeleteExchange("/all")
-    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids,
-        @RequestParam long userId);
+    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids, @RequestParam long userId);
 
     @DeleteExchange("/term1/{idTerm1}/term2/{idTerm2}")
-    Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1,
-                                                @PathVariable long idTerm2,
+    Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1, @PathVariable long idTerm2,
                                                 @RequestParam long userId);
 }

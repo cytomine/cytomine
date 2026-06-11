@@ -10,16 +10,15 @@ import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
 
 import be.cytomine.common.repository.model.HasAclId;
-import be.cytomine.common.repository.model.HasDeleted;
 import be.cytomine.common.repository.model.HasLongId;
-import be.cytomine.common.repository.model.HasUpdated;
+import be.cytomine.common.repository.model.HasTimestampCUD;
 import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
 
-public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E extends HasDeleted & HasUpdated,
+public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E extends HasTimestampCUD,
                                        R extends ApplyCommandResponse> {
     E updateEntityWithEntity(E entity, U payload, Timestamp now);
 

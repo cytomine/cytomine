@@ -8,10 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
+import lombok.Setter;
+
+import be.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "relation")
 @Getter
-public class RelationEntity {
+@Setter
+public class RelationEntity implements HasTimestampCUD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

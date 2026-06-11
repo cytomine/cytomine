@@ -17,12 +17,11 @@ public class ObjectMapperFactory {
 
     @Bean
     JsonMapperBuilderCustomizer jacksonCustomizer() {
-        return builder -> builder
-            .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS"))
-            .defaultTimeZone(TimeZone.getDefault())
-            .propertyNamingStrategy(LOWER_CAMEL_CASE)
-            .disable(WRITE_DATES_WITH_ZONE_ID)
-            .disable(WRITE_DATES_AS_TIMESTAMPS)
-            .disable(WRITE_DATES_WITH_CONTEXT_TIME_ZONE);
+        return builder -> builder.defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS"))
+                              .defaultTimeZone(TimeZone.getDefault())
+                              .propertyNamingStrategy(LOWER_CAMEL_CASE)
+                              .disable(WRITE_DATES_WITH_ZONE_ID)
+                              .disable(WRITE_DATES_AS_TIMESTAMPS)
+                              .disable(WRITE_DATES_WITH_CONTEXT_TIME_ZONE);
     }
 }

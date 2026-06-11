@@ -1,6 +1,7 @@
 package org.cytomine.repository.http;
 
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.cytomine.repository.RepositoryApp;
@@ -52,13 +53,16 @@ class ReviewedAnnotationControllerTest {
     @BeforeEach
     void setUp() {
         userId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
-        Long adminRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_role (id, version, authority) VALUES (?, 0, 'ROLE_ADMIN')", adminRoleId);
+        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)", userId,
+            UUID.randomUUID().toString());
+        jdbcTemplate.update(
+            "INSERT INTO sec_role (id, version, authority) SELECT nextval('hibernate_sequence'), 0, 'ROLE_ADMIN' "
+                + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
         Long userRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update(
-            "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) " + "VALUES (?, 0, ?, ?)",
-            userRoleId, userId, adminRoleId);
+            "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) SELECT ?, 0, ?, (SELECT id FROM "
+                + "sec_role WHERE authority = 'ROLE_ADMIN')",
+            userRoleId, userId);
 
         Long ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'ontology', ?)",
@@ -76,8 +80,9 @@ class ReviewedAnnotationControllerTest {
 
         Long imageInstanceId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO image_instance (id, version, base_image_id, count_image_job_annotations,"
-                + " count_image_reviewed_annotations, project_id, user_id, class) "
-                + "VALUES (?, 0, ?, 0, 0, ?, ?, 'be.cytomine.domain.image.ImageInstance')", imageInstanceId,
+                                + " count_image_reviewed_annotations, project_id, user_id, class) "
+                                + "VALUES (?, 0, ?, 0, 0, ?, ?, 'be.cytomine.domain.image.ImageInstance')",
+            imageInstanceId,
             abstractImageId, projectId, userId);
 
         termId1 = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
@@ -104,8 +109,12 @@ class ReviewedAnnotationControllerTest {
     void replaceAllTermIdsWhenNoExistingLinksCreatesAndReturnsNewLinks() {
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId1))))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of(termId1))))
+                              .andExpect(status().isOk())
+                              .andReturn()
+                              .getResponse()
+                              .getContentAsString();
 
         Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
         });
@@ -121,8 +130,12 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId2))))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of(termId2))))
+                              .andExpect(status().isOk())
+                              .andReturn()
+                              .getResponse()
+                              .getContentAsString();
 
         Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
         });
@@ -138,8 +151,12 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId1))))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of(termId1))))
+                              .andExpect(status().isOk())
+                              .andReturn()
+                              .getResponse()
+                              .getContentAsString();
 
         Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
         });
@@ -155,14 +172,18 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of())))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of())))
+                              .andExpect(status().isOk())
+                              .andReturn()
+                              .getResponse()
+                              .getContentAsString();
 
         Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
         });
         assertTrue(result.isEmpty());
-        assertTrue(
-            reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId).isEmpty());
+        assertTrue(reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId)
+                       .isEmpty());
     }
 
     @Test
@@ -176,9 +197,13 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId",
-                        nonAdminUserId.toString()).contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(Set.of(termId2)))).andExpect(status().isOk()).andReturn()
-            .getResponse().getContentAsString();
+                        nonAdminUserId.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of(termId2))))
+                              .andExpect(status().isOk())
+                              .andReturn()
+                              .getResponse()
+                              .getContentAsString();
 
         Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
         });
@@ -187,7 +212,9 @@ class ReviewedAnnotationControllerTest {
     }
 
     private Set<Long> termIdsForAnnotation(long annotationTermsId) {
-        return reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(annotationTermsId).stream()
-            .map(ReviewedAnnotationLinkEntity::getTermId).collect(java.util.stream.Collectors.toSet());
+        return reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(annotationTermsId)
+                   .stream()
+                   .map(ReviewedAnnotationLinkEntity::getTermId)
+                   .collect(java.util.stream.Collectors.toSet());
     }
 }

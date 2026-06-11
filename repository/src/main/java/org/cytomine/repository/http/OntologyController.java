@@ -16,7 +16,6 @@ import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
-import be.cytomine.common.repository.model.ontology.payload.OntologyUser;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 import static be.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
@@ -38,8 +37,7 @@ public class OntologyController implements OntologyHttpContract {
         return repository.findByIdAndDeletedNull(id)
             .filter(ontologyEntity -> aclService.canReadOntology(userId, ontologyEntity.getId()))
             .flatMap(ontologyEntity -> userRepository.findById(userId)
-                .map(user -> ontologyMapper.mapToOntologyResponse(ontologyEntity,
-                    new OntologyUser(userId, user.getFirstname() + ' ' + user.getLastname()))));
+                .map(user -> ontologyMapper.mapToOntologyResponse(ontologyEntity, userId)));
 
     }
 

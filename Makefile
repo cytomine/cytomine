@@ -21,6 +21,9 @@ clean:
 build:
 	docker compose -f compose.yaml -f compose.override.yaml build
 
+start-docker-gpu:
+	docker compose -f compose.yaml -f compose.override.yaml -f docker/compose.gpu.k3s.yaml up -d
+
 # Start K3s from helm/docker-compose.yaml
 start-k3s:
 	docker compose -f ./helm/compose.yaml up -d

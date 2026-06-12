@@ -4,5 +4,4 @@ import java.util.Optional;
 
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 
-public record UpdateTermCommandPayload(Optional<TermCommandPayload> before, Optional<TermCommandPayload> after) {
-}
+public record UpdateTermCommandPayload(Optional<TermCommandPayload> before, Optional<TermCommandPayload> after) {}

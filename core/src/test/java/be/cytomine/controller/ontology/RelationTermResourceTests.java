@@ -78,7 +78,7 @@ public class RelationTermResourceTests {
         return new TermRelationResponse(
             relationTerm.getId(), relationTerm.getTerm1().getId(),
             relationTerm.getTerm2().getId(),  relationTerm.getRelation().getId(),
-            LocalDateTime.ofInstant(relationTerm.getUpdated().toInstant(), ZoneId.systemDefault()),
+            Optional.empty(),
             Optional.empty(),
             LocalDateTime.ofInstant(relationTerm.getCreated().toInstant(), ZoneId.systemDefault()),
             relationTerm.getRelation().getName()

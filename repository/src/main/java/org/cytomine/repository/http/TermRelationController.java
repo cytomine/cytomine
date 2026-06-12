@@ -44,9 +44,9 @@ public class TermRelationController implements TermRelationHttpContract {
             return List.of();
         }
         return termRelationRepository.findAllByOntologyId(ontologyId)
-                   .stream()
-                   .map(termRelationMapper::mapToTermRelationResponse)
-                   .toList();
+            .stream()
+            .map(termRelationMapper::mapToTermRelationResponse)
+            .toList();
     }
 
     @Override
@@ -55,26 +55,25 @@ public class TermRelationController implements TermRelationHttpContract {
             return Set.of();
         }
         return termRelationRepository.findAllByOntologyId(ontologyId)
-                   .stream()
-                   .map(TermRelationEntity::getId)
-                   .collect(toSet());
+            .stream()
+            .map(TermRelationEntity::getId)
+            .collect(toSet());
     }
 
     @Override
     public Optional<TermRelationResponse> findTermRelationByID(long id, long userId) {
         return termRelationRepository.findByIdAndDeletedNull(id)
-                   .flatMap(termEntity -> termRepository.findByIdAndDeletedNull(termEntity.getTerm1Id())
-                                              .filter(
-                                                  term1 -> aclService.canReadOntology(userId, term1.getOntologyId()))
-                                              .map(term1 -> termRelationMapper.mapToTermRelationResponse(termEntity)));
+            .flatMap(termEntity -> termRepository.findByIdAndDeletedNull(termEntity.getTerm1Id())
+                .filter(term1 -> aclService.canReadOntology(userId, term1.getOntologyId()))
+                .map(term1 -> termRelationMapper.mapToTermRelationResponse(termEntity)));
     }
 
     @Override
     public Set<Long> findTermRelationsIdsByTermId(long termId, long userId) {
         return termRelationRepository.findAllByTerm1IdOrTerm2Id(termId, termId)
-                   .stream()
-                   .map(TermRelationEntity::getId)
-                   .collect(toSet());
+            .stream()
+            .map(TermRelationEntity::getId)
+            .collect(toSet());
     }
 
     @Override
@@ -84,7 +83,9 @@ public class TermRelationController implements TermRelationHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateTermRelation updateTermRelation) {
-        return termRelationCommandService.update(userId, id, updateTermRelation,
+        return termRelationCommandService.update(userId,
+            id,
+            updateTermRelation,
             LocalDateTime.now().truncatedTo(MICROS));
     }
 
@@ -96,17 +97,19 @@ public class TermRelationController implements TermRelationHttpContract {
     @Override
     public Set<HttpCommandResponse> deleteAll(Set<Long> ids, long userId) {
         return ids.stream()
-                   .map(id -> termRelationCommandService.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS)))
-                   .flatMap(Optional::stream)
-                   .collect(toSet());
+            .map(id -> termRelationCommandService.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS)))
+            .flatMap(Optional::stream)
+            .collect(toSet());
     }
 
     @Override
-    public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1, @PathVariable long idTerm2,
-                                                       @RequestParam long userId) {
+    public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1,
+        @PathVariable long idTerm2,
+        @RequestParam long userId) {
         long parentRelationId = relationRepository.findParent().getId();
         return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2)
-                   .flatMap(entity -> termRelationCommandService.delete(userId, entity.getId(),
-                       LocalDateTime.now().truncatedTo(MICROS)));
+            .flatMap(entity -> termRelationCommandService.delete(userId,
+                entity.getId(),
+                LocalDateTime.now().truncatedTo(MICROS)));
     }
 }

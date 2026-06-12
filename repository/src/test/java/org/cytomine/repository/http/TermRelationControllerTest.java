@@ -61,7 +61,6 @@ class TermRelationControllerTest
         long termId1 = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         long termId2 = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
 
-
         jdbcTemplate.update("INSERT INTO term (id, name, color,version,ontology_id) VALUES (?, ?, ?,0,?);", termId1,
             UUID.randomUUID().toString(), UUID.randomUUID().toString(), ontologyId);
         jdbcTemplate.update("INSERT INTO term (id, name, color,version,ontology_id) VALUES (?, ?, ?,0,?);", termId2,
@@ -70,13 +69,12 @@ class TermRelationControllerTest
         updatePayload = new UpdateTermRelation(Optional.of(termId1), Optional.of(termId2), Optional.of(1L));
     }
 
-
     @Override
     public TermRelationResponse expectedUpdatedResponse(TermRelationResponse response, UpdateTermRelation updatePayload,
-                                                        LocalDateTime updatedTime) {
+        LocalDateTime updatedTime) {
         return new TermRelationResponse(response.id(), updatePayload.term1Id().orElse(response.term1Id()),
             updatePayload.term2Id().orElse(response.term2Id()),
-            updatePayload.relationId().orElse(response.relationId()), updatedTime, response.deleted(),
+            updatePayload.relationId().orElse(response.relationId()), Optional.of(updatedTime), response.deleted(),
             response.created(), response.name());
     }
 
@@ -89,6 +87,6 @@ class TermRelationControllerTest
     @Override
     public TermRelationResponse expectChangedUpdatedTime(TermRelationResponse response, LocalDateTime updatedTime) {
         return new TermRelationResponse(response.id(), response.term1Id(), response.term2Id(), response.relationId(),
-            updatedTime, response.deleted(), response.created(), response.name());
+            Optional.of(updatedTime), response.deleted(), response.created(), response.name());
     }
 }

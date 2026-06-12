@@ -43,7 +43,7 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     public OntologyResponse expectedUpdatedResponse(OntologyResponse response, UpdateOntology updatePayload,
         LocalDateTime updated) {
         return new OntologyResponse(updatePayload.name().orElse(response.name()), response.id(), response.terms(),
-            response.created(), updated, response.deleted(), response.user());
+            response.created(), Optional.of(updated), response.deleted(), response.user());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
 
     @Override
     public OntologyResponse expectChangedUpdatedTime(OntologyResponse response, LocalDateTime updatedTime) {
-        return new OntologyResponse(response.name(), response.id(), response.terms(), response.created(), updatedTime,
-            response.deleted(), response.user());
+        return new OntologyResponse(response.name(), response.id(), response.terms(), response.created(),
+            Optional.of(updatedTime), response.deleted(), response.user());
     }
 }

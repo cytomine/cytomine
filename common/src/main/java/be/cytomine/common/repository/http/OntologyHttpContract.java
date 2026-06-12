@@ -30,8 +30,9 @@ public interface OntologyHttpContract {
     Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateOntology createPayload);
 
     @PutExchange("/{id}")
-    Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
-                                         @RequestBody UpdateOntology updateOntology);
+    Optional<HttpCommandResponse> update(@PathVariable long id,
+        @RequestParam long userId,
+        @RequestBody UpdateOntology updateOntology);
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);

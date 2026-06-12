@@ -6,7 +6,7 @@ import java.util.Optional;
 import be.cytomine.common.repository.model.HasAclId;
 import be.cytomine.common.repository.model.HasLongId;
 
-public record OntologyCommandPayload(long id, String name, LocalDateTime created, LocalDateTime updated,
+public record OntologyCommandPayload(long id, String name, LocalDateTime created, Optional<LocalDateTime> updated,
                                      Optional<LocalDateTime> deleted) implements HasLongId, HasAclId {
     @Override
     public long aclId() {

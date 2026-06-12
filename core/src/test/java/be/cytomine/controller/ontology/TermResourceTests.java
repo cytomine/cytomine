@@ -80,10 +80,16 @@ public class TermResourceTests {
     public void getATerm() throws Exception {
         Term term = builder.givenATerm();
         Long userId = builder.givenSuperAdmin().getId();
-        when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
-            new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of())));
+        when(termHttpContract.findTermByID(eq(term.getId()),
+            eq(userId))).thenReturn(Optional.of(new TermResponse(term.getId(),
+            term.getName(),
+            term.getColor(),
+            term.getOntology().getId(),
+            LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.ofNullable(term.getComment()),
+            Set.of())));
 
         restTermControllerMockMvc.perform(get("/api/term/{id}.json", term.getId()))
             .andExpect(status().isOk())
@@ -99,10 +105,16 @@ public class TermResourceTests {
         Term term = builder.givenATerm();
         Long userId = builder.givenSuperAdmin().getId();
         Long wrongUserId = userId + 1;
-        when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
-            new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of())));
+        when(termHttpContract.findTermByID(eq(term.getId()),
+            eq(userId))).thenReturn(Optional.of(new TermResponse(term.getId(),
+            term.getName(),
+            term.getColor(),
+            term.getOntology().getId(),
+            LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.ofNullable(term.getComment()),
+            Set.of())));
         when(termHttpContract.findTermByID(eq(term.getId()), eq(wrongUserId))).thenReturn(Optional.empty());
 
         restTermControllerMockMvc.perform(get("/api/term/{id}.json", term.getId())).andExpect(status().isOk());
@@ -113,17 +125,24 @@ public class TermResourceTests {
     public void listTermsByOntology() throws Exception {
         Term term = builder.givenATerm();
         Long userId = builder.givenSuperAdmin().getId();
-        when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId),
-            any(Pageable.class))).thenReturn(new PageImpl<>(List.of(
-            new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()))));
+        when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()),
+            eq(userId),
+            any(Pageable.class))).thenReturn(new PageImpl<>(List.of(new TermResponse(term.getId(),
+            term.getName(),
+            term.getColor(),
+            term.getOntology().getId(),
+            LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.ofNullable(term.getComment()),
+            Set.of()))));
 
         restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId").value(
-                term.getOntology().getId().intValue()));
+            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId").value(term.getOntology()
+                .getId()
+                .intValue()));
     }
 
     @Test
@@ -131,7 +150,8 @@ public class TermResourceTests {
     public void listTermsByOntologyWithWrongUserReturnsEmpty() throws Exception {
         Term term = builder.givenATerm();
         Long userId = builder.givenSuperAdmin().getId();
-        when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId),
+        when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()),
+            eq(userId),
             any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
@@ -145,17 +165,24 @@ public class TermResourceTests {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(term.getOntology());
         Long userId = builder.givenSuperAdmin().getId();
-        when(termHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(Pageable.class))).thenReturn(
-            new PageImpl<>(List.of(
-                new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                    LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                    Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()))));
+        when(termHttpContract.findTermsByProject(eq(project.getId()),
+            eq(userId),
+            any(Pageable.class))).thenReturn(new PageImpl<>(List.of(new TermResponse(term.getId(),
+            term.getName(),
+            term.getColor(),
+            term.getOntology().getId(),
+            LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.ofNullable(term.getComment()),
+            Set.of()))));
 
         restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId").value(
-                term.getOntology().getId().intValue()));
+            .andExpect(jsonPath("$.collection[?(@.name=='" + term.getName() + "')].ontologyId").value(term.getOntology()
+                .getId()
+                .intValue()));
     }
 
     @Test
@@ -164,8 +191,9 @@ public class TermResourceTests {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(term.getOntology());
         Long userId = builder.givenSuperAdmin().getId();
-        when(termHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(Pageable.class))).thenReturn(
-            new PageImpl<>(List.of()));
+        when(termHttpContract.findTermsByProject(eq(project.getId()),
+            eq(userId),
+            any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", project.getId()))
             .andExpect(status().isOk())
@@ -179,9 +207,17 @@ public class TermResourceTests {
         Long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(true,
-            new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.CREATE_TERM)));
+            new TermResponse(term.getId(),
+                term.getName(),
+                term.getColor(),
+                term.getOntology().getId(),
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.ofNullable(term.getComment()),
+                Set.of()),
+            commandId,
+            Commands.CREATE_TERM)));
 
         String createTermJson =
             JsonObject.of("name", term.getName(), "color", term.getColor(), "ontology", term.getOntology().getId())
@@ -217,17 +253,25 @@ public class TermResourceTests {
         Term term = builder.givenATerm();
         Long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
-        when(termHttpContract.update(eq(term.getId()), eq(userId), any())).thenReturn(Optional.of(
-            new HttpCommandResponse(true,
-                new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                    LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                    Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId,
-                Commands.UPDATE_TERM)));
+        when(termHttpContract.update(eq(term.getId()),
+            eq(userId),
+            any())).thenReturn(Optional.of(new HttpCommandResponse(true,
+            new TermResponse(term.getId(),
+                term.getName(),
+                term.getColor(),
+                term.getOntology().getId(),
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.ofNullable(term.getComment()),
+                Set.of()),
+            commandId,
+            Commands.UPDATE_TERM)));
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
 
-        restTermControllerMockMvc.perform(
-                put("/api/term/{id}.json", term.getId()).contentType(APPLICATION_JSON).content(updateTermJson))
+        restTermControllerMockMvc.perform(put("/api/term/{id}.json", term.getId()).contentType(APPLICATION_JSON)
+                .content(updateTermJson))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value("be.cytomine.EditTermCommand"))
@@ -244,9 +288,8 @@ public class TermResourceTests {
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
 
-        restTermControllerMockMvc.perform(
-                put("/api/term/{id}.json", term.getId()).contentType(APPLICATION_JSON).content(updateTermJson))
-            .andExpect(status().isNotFound());
+        restTermControllerMockMvc.perform(put("/api/term/{id}.json", term.getId()).contentType(APPLICATION_JSON)
+            .content(updateTermJson)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -256,9 +299,17 @@ public class TermResourceTests {
         Long userId = builder.givenSuperAdmin().getId();
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.of(new HttpCommandResponse(true,
-            new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.DELETE_TERM)));
+            new TermResponse(term.getId(),
+                term.getName(),
+                term.getColor(),
+                term.getOntology().getId(),
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.ofNullable(term.getComment()),
+                Set.of()),
+            commandId,
+            Commands.DELETE_TERM)));
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId()))
             .andExpect(status().isOk())

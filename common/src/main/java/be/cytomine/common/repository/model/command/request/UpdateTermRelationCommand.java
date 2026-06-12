@@ -16,8 +16,13 @@ public record UpdateTermRelationCommand(TermRelationCommandPayload before, TermR
 
     @Override
     public String getActionMessage() {
-        return format("Term relation %s (term1: %s => %s, term2: %s => %s) updated in ontology %s", before.id(),
-            before.term1Id(), after.term1Id(), before.term2Id(), after.term2Id(), before.ontologyId());
+        return format("Term relation %s (term1: %s => %s, term2: %s => %s) updated in ontology %s",
+            before.id(),
+            before.term1Id(),
+            after.term1Id(),
+            before.term2Id(),
+            after.term2Id(),
+            before.ontologyId());
     }
 
     @Override

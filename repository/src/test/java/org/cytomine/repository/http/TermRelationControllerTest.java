@@ -73,10 +73,10 @@ class TermRelationControllerTest
 
     @Override
     public TermRelationResponse expectedUpdatedResponse(TermRelationResponse response, UpdateTermRelation updatePayload,
-                                                        LocalDateTime updatedTime) {
+        LocalDateTime updatedTime) {
         return new TermRelationResponse(response.id(), updatePayload.term1Id().orElse(response.term1Id()),
             updatePayload.term2Id().orElse(response.term2Id()),
-            updatePayload.relationId().orElse(response.relationId()), updatedTime, response.deleted(),
+            updatePayload.relationId().orElse(response.relationId()), Optional.of(updatedTime), response.deleted(),
             response.created(), response.name());
     }
 
@@ -89,6 +89,6 @@ class TermRelationControllerTest
     @Override
     public TermRelationResponse expectChangedUpdatedTime(TermRelationResponse response, LocalDateTime updatedTime) {
         return new TermRelationResponse(response.id(), response.term1Id(), response.term2Id(), response.relationId(),
-            updatedTime, response.deleted(), response.created(), response.name());
+            Optional.of(updatedTime), response.deleted(), response.created(), response.name());
     }
 }

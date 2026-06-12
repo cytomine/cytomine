@@ -1,0 +1,13 @@
+{{ if .Values.meilisearch.deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: meilisearch
+spec:
+  clusterIP: None
+  selector:
+    app: meilisearch
+  ports:
+    - name: http
+      port: {{ .Values.meilisearch.port }}
+{{ end }}

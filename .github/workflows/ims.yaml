@@ -2,6 +2,9 @@ name: IMS
 
 on:
   workflow_call:
+    secrets:
+      BIGPICTURE_SSH_KEY:
+        required: true
 
 permissions:
   contents: read
@@ -26,7 +29,12 @@ jobs:
             libopenslide-dev \
             libopenjp2-7-dev \
             libvips42 \
-            libpng-dev
+            libpng-dev 
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.BIGPICTURE_SSH_KEY }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7

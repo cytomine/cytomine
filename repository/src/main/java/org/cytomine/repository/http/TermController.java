@@ -52,7 +52,7 @@ public class TermController implements TermHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
-                                                @RequestBody UpdateTerm updateTerm) {
+        @RequestBody UpdateTerm updateTerm) {
         return termCommandService.update(userId, id, updateTerm, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     }
 

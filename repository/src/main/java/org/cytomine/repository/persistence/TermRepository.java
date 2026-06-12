@@ -16,9 +16,9 @@ import org.springframework.data.jpa.repository.Query;
 public interface TermRepository extends JpaRepository<TermEntity, Long> {
 
     @Query(value = "SELECT t.* FROM term t JOIN project p ON t.ontology_id = p.ontology_id"
-                       + " WHERE p.id = :id and t.deleted is null",
+        + " WHERE p.id = :id and t.deleted is null",
         countQuery = "SELECT count(*) FROM term t JOIN project p ON t.ontology_id = p.ontology_id"
-                         + " WHERE p.id = :id and t.deleted = :deleted", nativeQuery = true)
+            + " WHERE p.id = :id and t.deleted = :deleted", nativeQuery = true)
     Page<TermEntity> findAllByProjectId(long id, Pageable pageable);
 
     Page<TermEntity> findAllByOntologyIdAndDeletedNull(long id, Pageable pageable);
@@ -56,7 +56,7 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
         ) AS _count
         """, nativeQuery = true)
     Page<StatTermProjection> findAllByProjectForStats(long projectId, LocalDateTime startDate, LocalDateTime endDate,
-                                                      Pageable pageable);
+        Pageable pageable);
 
 
     @Query(value = """
@@ -109,8 +109,7 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
         ) AS _count
         """, nativeQuery = true)
     Page<StatPerTermAndImageProjection> findAllPerTermAndImageByProjectForStats(long projectId, LocalDateTime startDate,
-                                                                                LocalDateTime endDate,
-                                                                                Pageable pageable);
+        LocalDateTime endDate, Pageable pageable);
 
     Optional<TermEntity> findByIdAndDeletedNull(long id);
 }

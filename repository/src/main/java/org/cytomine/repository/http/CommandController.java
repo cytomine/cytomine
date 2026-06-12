@@ -45,7 +45,6 @@ public class CommandController implements CommandHttpContract {
     @Override
     @GetMapping("/{commandId}")
     public Optional<CommandV2Response<?>> get(@PathVariable UUID commandId, @RequestParam long userId) {
-        return commandV2Repository.findById(commandId)
-                   .map(commandMapper::map);
+        return commandV2Repository.findById(commandId).map(commandMapper::map);
     }
 }

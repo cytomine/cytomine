@@ -185,6 +185,10 @@ jobs:
             --timeout=20m
 
       - name: Log k8s events
+        if: always()
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs cbir-0
+
+      - name: Log k8s events
         if: failure()
         run: kubectl get events --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} --sort-by='.lastTimestamp'
 

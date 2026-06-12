@@ -70,7 +70,7 @@ public class TermCommandService
 
     @Override
     public UpdateCommandRequest<TermCommandPayload> mapUpdateCommand(long userId, TermCommandPayload before,
-        TermCommandPayload after) {
+                                                                     TermCommandPayload after) {
 
         return new UpdateTermCommand(before, after, userId);
     }

@@ -19,7 +19,7 @@ import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
 
 public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E extends HasTimestampCUD,
-                                       R extends ApplyCommandResponse> {
+    R extends ApplyCommandResponse> {
     E updateEntityWithEntity(E entity, U payload, Timestamp now);
 
     E updateEntityWithPayload(E entity, P payload, Timestamp now);
@@ -87,7 +87,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         P commandPayload = map(savedEntity);
         CreateCommandRequest<?> createCommandRequest = mapCreateCommand(userId, commandPayload);
         CommandV2Entity commandV2Entity =
-            getCommandV2Repository().save(getCommandMapper().map(createCommandRequest, now, now, userId));
+            getCommandV2Repository().save(getCommandMapper().map(createCommandRequest, now, null, userId));
         R response = mapToResponse(savedEntity);
         return Optional.of(
             new HttpCommandResponse(true, response, commandV2Entity.getId(), createCommandRequest.getCommand()));

@@ -25,7 +25,7 @@ public interface TermRelationMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", source = "creationDate")
     @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "updated", source = "creationDate")
+    @Mapping(target = "updated", ignore = true)
     TermRelationEntity mapToTermRelationEntity(CreateTermRelation createTermRelation, Timestamp creationDate,
                                                long relationId);
 

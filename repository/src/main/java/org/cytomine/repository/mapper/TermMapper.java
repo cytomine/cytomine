@@ -48,6 +48,6 @@ public interface TermMapper {
     @Mapping(target = "ontologyId", source = "createTerm.ontology")
     @Mapping(target = "created", source = "creationDate")
     @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "updated", source = "creationDate")
+    @Mapping(target = "updated", ignore = true)
     TermEntity map(CreateTerm createTerm, Timestamp creationDate);
 }

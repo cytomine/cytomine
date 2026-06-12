@@ -31,7 +31,7 @@ public interface OntologyMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", source = "creationDate")
     @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "updated", source = "creationDate")
+    @Mapping(target = "updated", ignore = true)
     @Mapping(target = "terms", ignore = true)
     OntologyEntity mapToOntologyEntity(CreateOntology createOntology, long userId, Timestamp creationDate);
 

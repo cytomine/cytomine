@@ -28,16 +28,21 @@ public class StatsController implements StatsHttpContract {
 
     @Override
     @GetMapping("/project/{projectId}")
-    public Page<StatTerm> findTermsByProject(@PathVariable long projectId, @RequestParam long userId,
+    public Page<StatTerm> findTermsByProject(@PathVariable long projectId,
+        @RequestParam long userId,
         @RequestParam(required = false) Optional<LocalDateTime> startDate,
-        @RequestParam(required = false) Optional<LocalDateTime> endDate, Pageable pageable) {
-        return termRepository.findAllByProjectForStats(projectId, startDate.orElse(null), endDate.orElse(null),
+        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        Pageable pageable) {
+        return termRepository.findAllByProjectForStats(projectId,
+            startDate.orElse(null),
+            endDate.orElse(null),
             pageable).map(statsMapper::map);
     }
 
     @Override
     @GetMapping("/per-user/project/{projectId}")
-    public Page<FlatStatUserTerm> findUserTermsByProject(@PathVariable long projectId, @RequestParam long userId,
+    public Page<FlatStatUserTerm> findUserTermsByProject(@PathVariable long projectId,
+        @RequestParam long userId,
         Pageable pageable) {
         return termRepository.findAllByUsersByProjectForStats(projectId, pageable).map(statsMapper::map);
     }
@@ -46,8 +51,11 @@ public class StatsController implements StatsHttpContract {
     @GetMapping("/per-term-and-image/project/{projectId}")
     public Page<StatPerTermAndImage> findPerTermAndImageByProject(@PathVariable long projectId,
         @RequestParam(required = false) Optional<LocalDateTime> startDate,
-        @RequestParam(required = false) Optional<LocalDateTime> endDate, Pageable pageable) {
-        return termRepository.findAllPerTermAndImageByProjectForStats(projectId, startDate.orElse(null),
-            endDate.orElse(null), pageable).map(statsMapper::map);
+        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        Pageable pageable) {
+        return termRepository.findAllPerTermAndImageByProjectForStats(projectId,
+            startDate.orElse(null),
+            endDate.orElse(null),
+            pageable).map(statsMapper::map);
     }
 }

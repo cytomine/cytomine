@@ -83,7 +83,9 @@ public class TermRelationController implements TermRelationHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateTermRelation updateTermRelation) {
-        return termRelationCommandService.update(userId, id, updateTermRelation,
+        return termRelationCommandService.update(userId,
+            id,
+            updateTermRelation,
             LocalDateTime.now().truncatedTo(MICROS));
     }
 
@@ -101,11 +103,13 @@ public class TermRelationController implements TermRelationHttpContract {
     }
 
     @Override
-    public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1, @PathVariable long idTerm2,
+    public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1,
+        @PathVariable long idTerm2,
         @RequestParam long userId) {
         long parentRelationId = relationRepository.findParent().getId();
         return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2)
-            .flatMap(entity -> termRelationCommandService.delete(userId, entity.getId(),
+            .flatMap(entity -> termRelationCommandService.delete(userId,
+                entity.getId(),
                 LocalDateTime.now().truncatedTo(MICROS)));
     }
 }

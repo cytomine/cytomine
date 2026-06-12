@@ -53,7 +53,8 @@ public class TermRelationCommandService implements
 
 
     @Override
-    public TermRelationEntity updateEntityWithPayload(TermRelationEntity entity, TermRelationCommandPayload payload,
+    public TermRelationEntity updateEntityWithPayload(TermRelationEntity entity,
+        TermRelationCommandPayload payload,
         Timestamp now) {
         return termRelationMapper.updateTermRelationWithPayload(entity, payload, now);
     }
@@ -71,7 +72,8 @@ public class TermRelationCommandService implements
 
     @Override
     public UpdateCommandRequest<TermRelationCommandPayload> mapUpdateCommand(long userId,
-        TermRelationCommandPayload before, TermRelationCommandPayload after) {
+        TermRelationCommandPayload before,
+        TermRelationCommandPayload after) {
         return new UpdateTermRelationCommand(before, after, userId);
     }
 
@@ -113,10 +115,13 @@ public class TermRelationCommandService implements
     }
 
     @Override
-    public TermRelationEntity updateEntityWithEntity(TermRelationEntity entity, UpdateTermRelation updatePayload,
+    public TermRelationEntity updateEntityWithEntity(TermRelationEntity entity,
+        UpdateTermRelation updatePayload,
         Timestamp now) {
-        return termRelationMapper.update(entity, updatePayload.term1Id().orElse(entity.getTerm1Id()),
-            updatePayload.term2Id().orElse(entity.getTerm2Id()), now);
+        return termRelationMapper.update(entity,
+            updatePayload.term1Id().orElse(entity.getTerm1Id()),
+            updatePayload.term2Id().orElse(entity.getTerm2Id()),
+            now);
     }
 
     @Override

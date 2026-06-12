@@ -42,29 +42,54 @@ class TermControllerTest implements CRUDCommandTests<CreateTerm, TermResponse, U
     @Override
     public void beforeCreate(long userId) {
         ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, ?, ?)", ontologyId,
-            UUID.randomUUID(), userId);
-        createPayload = new CreateTerm(UUID.randomUUID().toString(), UUID.randomUUID().toString(), ontologyId,
+        jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, ?, ?)",
+            ontologyId,
+            UUID.randomUUID(),
+            userId);
+        createPayload = new CreateTerm(UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ontologyId,
             Optional.of(UUID.randomUUID().toString()));
     }
 
     @Override
-    public TermResponse expectedUpdatedResponse(TermResponse response, UpdateTerm updatePayload,
-                                                LocalDateTime updatedTime) {
-        return new TermResponse(response.id(), updatePayload.name().orElse(response.name()),
-            updatePayload.color().orElse(response.color()), response.ontologyId(), response.created(),
-          Optional.of(  updatedTime), response.deleted(), response.comment(), response.children());
+    public TermResponse expectedUpdatedResponse(TermResponse response,
+        UpdateTerm updatePayload,
+        LocalDateTime updatedTime) {
+        return new TermResponse(response.id(),
+            updatePayload.name().orElse(response.name()),
+            updatePayload.color().orElse(response.color()),
+            response.ontologyId(),
+            response.created(),
+            Optional.of(updatedTime),
+            response.deleted(),
+            response.comment(),
+            response.children());
     }
 
     @Override
     public TermResponse expectedDeletedResponse(TermResponse response, LocalDateTime deletedTime) {
-        return new TermResponse(response.id(), response.name(), response.color(), response.ontologyId(),
-            response.created(), response.updated(), Optional.of(deletedTime), response.comment(), response.children());
+        return new TermResponse(response.id(),
+            response.name(),
+            response.color(),
+            response.ontologyId(),
+            response.created(),
+            response.updated(),
+            Optional.of(deletedTime),
+            response.comment(),
+            response.children());
     }
 
     @Override
     public TermResponse expectChangedUpdatedTime(TermResponse response, LocalDateTime updatedTime) {
-        return new TermResponse(response.id(), response.name(), response.color(), response.ontologyId(),
-            response.created(), Optional.of(updatedTime), response.deleted(), response.comment(), response.children());
+        return new TermResponse(response.id(),
+            response.name(),
+            response.color(),
+            response.ontologyId(),
+            response.created(),
+            Optional.of(updatedTime),
+            response.deleted(),
+            response.comment(),
+            response.children());
     }
 }

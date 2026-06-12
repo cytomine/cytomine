@@ -14,7 +14,9 @@ public interface CommandMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "data", source = "commandV2Request")
-    CommandV2Entity map(CommandV2Request<?> commandV2Request, LocalDateTime created, LocalDateTime updated,
+    CommandV2Entity map(CommandV2Request<?> commandV2Request,
+        LocalDateTime created,
+        LocalDateTime updated,
         long userId);
 
     default CommandV2Response<?> map(CommandV2Entity commandV2Entity) {

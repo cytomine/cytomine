@@ -1,21 +1,5 @@
 package be.cytomine.authorization.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,7 +45,8 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     private static void setupStub() {
         /* Simulate call to PIMS */
-        wireMockServer.stubFor(WireMock.post(WireMock.urlPathMatching(IMS_API_BASE_PATH + "/image/.*/annotation/drawing"))
+        wireMockServer.stubFor(WireMock.post(WireMock.urlPathMatching(IMS_API_BASE_PATH
+                + "/image/.*/annotation/drawing"))
             .withRequestBody(WireMock.matching(".*"))
             .willReturn(WireMock.aResponse().withBody(UUID.randomUUID().toString().getBytes()))
         );
@@ -97,7 +82,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @BeforeEach
     public void before() throws Exception {
         if (userAnnotation == null) {
-            userAnnotation = builder.given_a_user_annotation();
+            userAnnotation = builder.givenAUserAnnotation();
 
             initACL(userAnnotation.container());
         }
@@ -107,74 +92,76 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_all_user_Annotations() {
+    public void shouldReturnAllUserAnnotationsWhenRequestedBySuperAdmin() {
         expectOK(() -> userAnnotationService.listLight());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list_all_user_Annotations() {
+    public void shouldForbidListingAllUserAnnotationsForReadOnlyUser() {
         expectForbidden(() -> userAnnotationService.listLight());
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_update_annotation_in_restricted_project() {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+    public void adminCanUpdateAnnotationInRestrictedProject() {
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.setProject(this.userAnnotation.getProject());
         Project project = (Project) userAnnotation.container();
         project.setMode(EditingMode.RESTRICTED);
         builder.persistAndReturn(project);
-        expectOK(this::when_i_add_domain);
-        expectOK(this::when_i_edit_domain);
-        expectOK(this::when_i_delete_domain);
+        expectOK(this::whenIAddDomain);
+        expectOK(this::whenIEditDomain);
+        expectOK(this::whenIDeleteDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_update_annotation_in_restricted_project() {
-        UserAnnotation userAnnotation = builder.given_a_user_annotation();
+    public void userCannotUpdateAnnotationInRestrictedProject() {
+        UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.setProject(this.userAnnotation.getProject());
         Project project = (Project) userAnnotation.container();
         project.setMode(EditingMode.RESTRICTED);
         builder.persistAndReturn(project);
-        expectForbidden(this::when_i_add_domain);
-        expectForbidden(this::when_i_edit_domain);
-        expectForbidden(this::when_i_delete_domain);
+        expectForbidden(this::whenIAddDomain);
+        expectForbidden(this::whenIEditDomain);
+        expectForbidden(this::whenIDeleteDomain);
 
         project.setMode(EditingMode.CLASSIC);
         builder.persistAndReturn(project);
-        expectOK(this::when_i_add_domain);
-        expectOK(this::when_i_edit_domain);
-        expectOK(this::when_i_delete_domain);
+        expectOK(this::whenIAddDomain);
+        expectOK(this::whenIEditDomain);
+        expectOK(this::whenIDeleteDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_its_annotation_even_if_other_users_has_set_terms() {
-        builder.given_an_annotation_term(userAnnotation);
+    public void userCanDeleteItsAnnotationEvenIfOtherUsersHasSetTerms() {
+        builder.givenAnAnnotationTerm(userAnnotation);
         userAnnotationService.delete(userAnnotation, null, null, false);
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         userAnnotationService.get(userAnnotation.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
-        UserAnnotation annotation = builder.given_a_not_persisted_user_annotation(this.userAnnotation.getProject());
+    protected void whenIAddDomain() {
+        UserAnnotation annotation = builder.givenANotPersistedUserAnnotation(this.userAnnotation.getProject());
         userAnnotationService.add(annotation.toJsonObject());
     }
 
     @Override
-    public void when_i_edit_domain() {
+    public void whenIEditDomain() {
         userAnnotationService.update(userAnnotation, userAnnotation.toJsonObject());
     }
 
     @Override
-    protected void when_i_delete_domain() {
-        UserAnnotation annotation = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(this.userAnnotation.getProject()));
+    protected void whenIDeleteDomain() {
+        UserAnnotation
+            annotation
+            = builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(this.userAnnotation.getProject()));
         userAnnotationService.delete(annotation, null, null, true);
     }
 

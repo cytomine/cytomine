@@ -31,7 +31,7 @@
           <template #default="{row: image}">
             <b-table-column :label="$t('overview')">
               <image-thumbnail
-                  :extra-parameters="{Authorization: 'Bearer ' + shortTermToken}"
+                  :extra-parameters="{authorization: 'Bearer ' + shortTermToken}"
                   :key="image.preview"
                   :size="128"
                   :url="image.preview"

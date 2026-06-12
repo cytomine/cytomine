@@ -17,6 +17,12 @@
 export default {
   STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW',
   DIGITAL_ZOOM_INCREMENT: 4,
+  CORE_URL: null,
+  IAM_URL: null,
+  PIMS_URL: null,
+  APPENGINE_URL: null,
+  CBIR_URL: null,
+  SAM_URL: null,
   // features switches
   APPENGINE_ENABLED: false,
   PRELOADED_SLICES: 50,
@@ -44,5 +50,4 @@ export default {
   // To keep the WebSockets alive by sending the broadcaster viewer position
   WS_POSITION_KEEP_ALIVE_INTERVAL: 10000,
   CYTOMINE_UPLOAD_URI: '/upload',
-  IAM_URL: null,
 };

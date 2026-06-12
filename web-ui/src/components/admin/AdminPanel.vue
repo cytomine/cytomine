@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-<div class="box error" v-if="!currentUser.adminByNow">
+<div class="box error" v-if="!isAdmin">
   <h2> {{ $t('access-denied') }} </h2>
   <p>{{ $t('insufficient-permission') }}</p>
 </div>
@@ -65,6 +65,9 @@ export default {
     currentUser: get('currentUser/user'),
     queriedTab() {
       return this.$route.query.tab;
+    },
+    isAdmin() {
+      return this.$keycloak.hasResourceRole('ADMIN');
     },
     // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {

@@ -12,7 +12,9 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - ./core:/app
+      - ./common:/app/common
+      - ./core:/app/core
+      - ./settings.gradle:/app/settings.gradle
       - /etc/localtime:/etc/localtime
       # gradle cache for faster build
       - ./cache/core/.gradle:/.gradle

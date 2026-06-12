@@ -1,14 +1,20 @@
 plugins {
     id 'java-library'
     id 'io.freefair.lombok' version '9.0.0-rc2'
+    id 'checkstyle'
 }
 
 group 'com.cytomine'
 version '0.0.0'  // do NOT change this, this will be automatically changed by CI
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
+}
+
+checkstyle {
+    toolVersion = '10.21.2'
+    configFile = file("${rootProject.projectDir}/checkstyle.xml")
 }
 
 repositories {
@@ -22,9 +28,10 @@ dependencies {
     implementation 'org.apache.commons:commons-compress:1.25.0'
     implementation 'org.slf4j:slf4j-api:2.0.9'
     testImplementation 'ch.qos.logback:logback-classic:1.4.14'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
     testImplementation 'org.testcontainers:testcontainers:2.0.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 test {

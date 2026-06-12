@@ -47,7 +47,7 @@
         <i class="fas fa-code"></i>
         {{ $t('app-engine.applications') }}
       </router-link>
-      <router-link v-if="currentUser.adminByNow" to="/admin" class="navbar-item">
+      <router-link v-if="isAdmin" to="/admin" class="navbar-item">
         <i class="fas fa-wrench"></i>
         {{ $t('admin-menu') }}
       </router-link>
@@ -68,14 +68,6 @@
         <router-link to="/activity" class="navbar-item">
           <span class="icon"><i class="fas fa-history fa-xs"></i></span> {{$t('activity-history')}}
         </router-link>
-        <template v-if="currentUser.admin">
-          <a v-if="!currentUser.adminByNow" class="navbar-item" @click="openAdminSession()">
-            <span class="icon"><i class="fas fa-star fa-xs"></i></span> {{$t('open-admin-session')}}
-          </a>
-          <a v-else class="navbar-item" @click="closeAdminSession()">
-            <span class="icon"><i class="far fa-star fa-xs"></i></span> {{$t('close-admin-session')}}
-          </a>
-        </template>
         <a class="navbar-item" @click="logout()">
           <span class="icon"><i class="fas fa-power-off fa-xs"></i></span> {{ $t('logout') }}
         </a>
@@ -125,6 +117,9 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    isAdmin() {
+      return this.$keycloak.hasResourceRole('ADMIN');
+    },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
     },

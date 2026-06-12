@@ -15,11 +15,25 @@ The URL will lead to the following page:
 
 ![KeyCloak login page](/images/user-guide/administration/admin-login.png)
 
-To retrieve the admin password, run the following command in the `cytomine-community-edition` folder:
+To retrieve the admin password, run the following command in the `cytomine` folder:
 
+<code-group>
+<code-block title="Docker installation">
 ```bash
-yq -r '.services.default.iam.constant.KEYCLOAK_ADMIN_PASSWORD' cytomine.yml
+yq -r '.services.iam.environment.KEYCLOAK_ADMIN_PASSWORD' compose.yaml
 ```
+</code-block>
+
+<code-block title="Kubernetes installation">
+```bash
+kubectl -n <your-cytomine-namespace> get secrets admin-iam-secret -o json | jq -r .data.password | base64 -d -
+```
+</code-block>
+</code-group>
+
+::: tip Kubernetes installation
+Where `<your-cytomine-namespace>` is the namespace used to install Cytomine.
+:::
 
 Use the retrieved password with the `admin` username to access the admin panel.
 

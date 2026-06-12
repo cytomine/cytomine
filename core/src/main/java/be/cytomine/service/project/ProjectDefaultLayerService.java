@@ -1,73 +1,53 @@
 package be.cytomine.service.project;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.*;
+import be.cytomine.domain.command.AddCommand;
+import be.cytomine.domain.command.Command;
+import be.cytomine.domain.command.DeleteCommand;
+import be.cytomine.domain.command.EditCommand;
+import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.project.ProjectDefaultLayerRepository;
+import be.cytomine.repository.project.ProjectRepository;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class ProjectDefaultLayerService extends ModelService {
 
-    @Autowired
-    private ProjectDefaultLayerRepository projectDefaultLayerRepository;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final ProjectDefaultLayerRepository projectDefaultLayerRepository;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final ProjectRepository projectRepository;
 
-    @Autowired
-    private ProjectRepository projectRepository;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private PermissionService permissionService;
-
-    @Autowired
-    private UserService userService;
-
+    private final UserRepository userRepository;
 
     @Override
     public Class currentDomain() {
@@ -80,16 +60,20 @@ public class ProjectDefaultLayerService extends ModelService {
 
     public Optional<ProjectDefaultLayer> find(Long id) {
         Optional<ProjectDefaultLayer> optionalProjectDefaultLayer = projectDefaultLayerRepository.findById(id);
-        optionalProjectDefaultLayer.ifPresent(projectDefaultLayer -> securityACLService.check(projectDefaultLayer,READ));
+        optionalProjectDefaultLayer.ifPresent(projectDefaultLayer -> securityACLService.check(
+            projectDefaultLayer,
+            READ
+        ));
         return optionalProjectDefaultLayer;
     }
 
     /**
      * Get all default layers of the current project
+     *
      * @return ProjectDefaultLayer list
      */
     public List<ProjectDefaultLayer> listByProject(Project project) {
-        securityACLService.check(project,READ);
+        securityACLService.check(project, READ);
         return projectDefaultLayerRepository.findAllByProject(project);
     }
 
@@ -97,32 +81,32 @@ public class ProjectDefaultLayerService extends ModelService {
     @Override
     public CommandResponse add(JsonObject jsonObject) {
         User currentUser = currentUserService.getCurrentUser();
-        securityACLService.check(jsonObject.getJSONAttrLong("project"),Project.class,WRITE);
-        User user = userService.findUser(jsonObject.getJSONAttrLong("user"))
-                .orElseThrow(() -> new ObjectNotFoundException("User", jsonObject.getJSONAttrStr("user")));
+        securityACLService.check(jsonObject.getJSONAttrLong("project"), Project.class, WRITE);
+        Long userId = jsonObject.getJSONAttrLong("user");
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectRepository.findById(jsonObject.getJSONAttrLong("project"))
-                .orElseThrow(() -> new ObjectNotFoundException("Project", jsonObject.getJSONAttrStr("project")));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", jsonObject.getJSONAttrStr("project")));
 
         securityACLService.checkIsUserInProject(user, project);
 
-        return executeCommand(new AddCommand(currentUser),null,jsonObject);
+        return executeCommand(new AddCommand(currentUser), null, jsonObject);
     }
 
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        securityACLService.check(domain,WRITE);
+        securityACLService.check(domain, WRITE);
         User currentUser = currentUserService.getCurrentUser();
-        return executeCommand(new EditCommand(currentUser, transaction), domain,jsonNewData);
+        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
         User currentUser = currentUserService.getCurrentUser();
-        securityACLService.check(domain.container(),WRITE);
+        securityACLService.check(domain.container(), WRITE);
         Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c,domain, null);
+        return executeCommand(c, domain, null);
     }
-
 
 
     @Override
@@ -131,16 +115,22 @@ public class ProjectDefaultLayerService extends ModelService {
     }
 
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
-        User user = ((ProjectDefaultLayer)domain).getUser();
+        User user = ((ProjectDefaultLayer) domain).getUser();
         return List.of(domain.getId(), user.getFullName());
     }
 
 
-    public void checkDoNotAlreadyExist(CytomineDomain domain){
-        ProjectDefaultLayer projectDefaultLayer = (ProjectDefaultLayer)domain;
-        if(projectDefaultLayer!=null) {
-            if(projectDefaultLayerRepository.findByProjectAndUser(projectDefaultLayer.getProject(), projectDefaultLayer.getUser()).stream().anyMatch(x -> !Objects.equals(x.getId(), projectDefaultLayer.getId())))  {
-                throw new AlreadyExistException("User "+projectDefaultLayer.getUser().getId()+" has already default layer of the project " + projectDefaultLayer.getProject().getId());
+    public void checkDoNotAlreadyExist(CytomineDomain domain) {
+        ProjectDefaultLayer projectDefaultLayer = (ProjectDefaultLayer) domain;
+        if (projectDefaultLayer != null) {
+            if (projectDefaultLayerRepository.findByProjectAndUser(
+                projectDefaultLayer.getProject(),
+                projectDefaultLayer.getUser()
+            ).stream().anyMatch(x -> !Objects.equals(x.getId(), projectDefaultLayer.getId()))) {
+                throw new AlreadyExistException("User "
+                    + projectDefaultLayer.getUser().getId()
+                    + " has already default layer of the project "
+                    + projectDefaultLayer.getProject().getId());
             }
         }
     }

@@ -1,34 +1,12 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
-<vl-layer-vector
-  :visible="layer.visible"
-  :extent="imageExtent"
-  :update-while-interacting="false"
->
+  <vl-layer-vector :visible="layer.visible" :extent="imageExtent" :update-while-interacting="false">
 
-  <vl-source-vector
-    ref="olSource"
-    :loader-factory="loaderFactory"
-    :strategy-factory="strategyFactory"
-    url="-"
-  > <!-- HACK because loader factory not used if URL not specified -->
-    <vl-style-func :factory="styleFunctionFactory" />
-  </vl-source-vector>
+    <vl-source-vector ref="olSource" :loader-factory="loaderFactory" :strategy-factory="strategyFactory" url="-">
+      <!-- HACK because loader factory not used if URL not specified -->
+      <vl-style-func :factory="styleFunctionFactory" />
+    </vl-source-vector>
 
-</vl-layer-vector>
+  </vl-layer-vector>
 </template>
 
 <script>
@@ -199,7 +177,7 @@ export default {
 
         if (this.$refs.olSource && this.resolution && this.clustered !== null && ( // some features have already been loaded
           !this.clustered && resolution > this.maxResolutionNoClusters // recluster
-                    || resolution !== this.resolution && this.clustered)) { // change of resolution while clustering
+          || resolution !== this.resolution && this.clustered)) { // change of resolution while clustering
 
           // clear loaded extents to force reloading features
           this.$refs.olSource.$source.loadedExtentsRtree_.clear();
@@ -256,7 +234,6 @@ export default {
       let isFeatureSelected = indexSelectedFeature !== -1;
 
       if (!annot) {
-        console.log(`Removing annot ${feature.getId()} in layer ${this.layer.id} (external action)`);
         this.$refs.olSource.removeFeature(feature);
         if (isFeatureSelected) {
           this.$store.commit(this.imageModule + 'clearSelectedFeatures');
@@ -273,17 +250,14 @@ export default {
       if (isFeatureSelected) {
         if (this.ongoingEdit) {
           // if feature is selected and under modification, updating it may lead to conflict
-          console.log(`Skipping update of selected annot ${annot.id} in layer ${this.layer.id} (ongoing edit)`);
           return;
         }
-        console.log(`Updating selected annot ${annot.id} in layer ${this.layer.id} (external action)`);
         this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {
           indexFeature: indexSelectedFeature,
           annot
         });
       }
 
-      console.log(`Updating annot ${annot.id} in layer ${this.layer.id} (external action)`);
       feature.set('annot', annot);
       feature.setGeometry(this.format.readGeometry(annot.location));
     },
@@ -297,7 +271,9 @@ export default {
 
       let arrayAnnots;
       try {
-        if (Object.prototype.hasOwnProperty.call(this.layer, 'username')) {
+        const isUserAnnotation = Object.prototype.hasOwnProperty.call(this.layer, 'username');
+        const isReviewedAnnotation = Object.prototype.hasOwnProperty.call(this.layer, 'isReview');
+        if (isUserAnnotation || isReviewedAnnotation) {
           arrayAnnots = await this.fetchAnnots(extent);
           // Order by size, so bigger ones are always sent to back
           arrayAnnots.sort(

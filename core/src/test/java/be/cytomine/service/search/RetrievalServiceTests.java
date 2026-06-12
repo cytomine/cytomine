@@ -1,179 +1,130 @@
 package be.cytomine.service.search;
 
-import java.util.List;
-import java.util.UUID;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.io.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.web.client.RestTemplate;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.config.PostGisTestConfiguration;
-import be.cytomine.controller.ontology.UserAnnotationResourceTests;
-import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.dto.search.SearchResponse;
+import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.domain.project.Project;
+import be.cytomine.dto.image.CropParameter;
+import be.cytomine.service.middleware.ImageServerService;
 
-import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
-import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = CytomineCoreApplication.class)
-@AutoConfigureMockMvc
-@WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@ExtendWith(MockitoExtension.class)
 public class RetrievalServiceTests {
 
-    @Autowired
-    private BasicInstanceBuilder builder;
+    @Mock
+    private ImageServerService imageServerService;
 
-    @Autowired
+    @Mock
+    private RestTemplate restTemplate;
+
+    @InjectMocks
     private RetrievalService retrievalService;
 
-    private static WireMockServer wireMockServer;
+    @Test
+    void createStorageShouldSucceedWhenApiReturnsOk() {
+        Long projectId = 42L;
+        when(restTemplate.exchange(any(URI.class), eq(HttpMethod.POST), any(), eq(String.class)))
+            .thenReturn(ResponseEntity.ok("created"));
 
-    private static void setupStub() {
-        /* Simulate call to PIMS */
-        wireMockServer.stubFor(WireMock.post(urlPathMatching(IMS_API_BASE_PATH + "/image/.*/annotation/drawing"))
-            .withRequestBody(WireMock.matching(".*"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withBody(UUID.randomUUID().toString().getBytes())
-            )
-        );
-    }
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
-
-        setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
+        assertDoesNotThrow(() -> retrievalService.createStorage(String.valueOf(projectId)));
     }
 
     @Test
-    void index_annotation_with_success() throws ParseException {
-        UserAnnotation annotation = UserAnnotationResourceTests.given_a_user_annotation_with_valid_image_server(builder);
+    void createStorageShouldThrowExceptionWhenApiReturnsError() {
+        Long projectId = 42L;
+        when(restTemplate.exchange(any(URI.class), eq(HttpMethod.POST), any(), eq(String.class)))
+            .thenReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("something went wrong"));
 
-        /* Simulate call to CBIR */
-        String expectedUrlPath = CBIR_API_BASE_PATH + "/images";
-        String expectedResponseBody = "{ \"ids\": [" + annotation.getId() + "]";
-        expectedResponseBody += ", \"storage\": " + annotation.getProject().getId().toString();
-        expectedResponseBody += ", \"index\": \"annotation\" }";
-
-        wireMockServer.stubFor(WireMock.post(urlPathEqualTo(expectedUrlPath))
-            .withQueryParam("storage", WireMock.equalTo(annotation.getProject().getId().toString()))
-            .withQueryParam("index", WireMock.equalTo("annotation"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", "application/json")
-                .withBody(expectedResponseBody)
-            )
+        RuntimeException exception = assertThrows(
+            RuntimeException.class,
+            () -> retrievalService.createStorage(String.valueOf(projectId))
         );
 
-        /* Test index annotation method */
-        ResponseEntity<String> response = retrievalService.indexAnnotation(annotation);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedResponseBody, response.getBody());
-
-        wireMockServer.verify(WireMock.postRequestedFor(urlPathEqualTo(expectedUrlPath))
-            .withQueryParam("storage", WireMock.equalTo(annotation.getProject().getId().toString()))
-            .withQueryParam("index", WireMock.equalTo("annotation")));
+        assertTrue(exception.getMessage().contains("Failed to create storage"));
     }
 
     @Test
-    void delete_index_with_success() {
-        UserAnnotation annotation = builder.given_a_user_annotation();
+    void deleteStorageShouldSucceedWhenApiReturnsOk() {
+        Long projectId = 42L;
+        when(restTemplate.exchange(any(URI.class), eq(HttpMethod.DELETE), eq(null), eq(String.class)))
+            .thenReturn(ResponseEntity.ok("deleted"));
 
-        /* Simulate call to CBIR */
-        String expectedUrlPath = CBIR_API_BASE_PATH + "/images/" + annotation.getId();
-        String expectedResponseBody = "{ \"id\": " + annotation.getId();
-        expectedResponseBody += ", \"storage\": " + annotation.getProject().getId().toString();
-        expectedResponseBody += ", \"index\": \"annotation\" }";
-
-        wireMockServer.stubFor(WireMock.delete(urlPathEqualTo(expectedUrlPath))
-            .withQueryParam("storage", WireMock.equalTo(annotation.getProject().getId().toString()))
-            .withQueryParam("index", WireMock.equalTo("annotation"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", "application/json")
-                .withBody(expectedResponseBody)
-            )
-        );
-
-        /* Test delete index method */
-        ResponseEntity<String> response = retrievalService.deleteIndex(annotation);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedResponseBody, response.getBody());
-
-        wireMockServer.verify(WireMock.deleteRequestedFor(urlPathEqualTo(expectedUrlPath))
-            .withQueryParam("storage", WireMock.equalTo(annotation.getProject().getId().toString()))
-            .withQueryParam("index", WireMock.equalTo("annotation")));
+        assertDoesNotThrow(() -> retrievalService.deleteStorage(String.valueOf(projectId)));
     }
 
     @Test
-    void search_similar_images_with_success() throws JsonProcessingException, ParseException {
-        UserAnnotation annotation = UserAnnotationResourceTests.given_a_user_annotation_with_valid_image_server(builder);
+    void deleteStorageShouldThrowExceptionWhenApiReturnsError() {
+        Long projectId = 42L;
+        when(restTemplate.exchange(any(URI.class), eq(HttpMethod.DELETE), eq(null), eq(String.class)))
+            .thenReturn(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("something went wrong"));
 
-        /* Simulate call to CBIR */
-        ObjectMapper objectMapper = new ObjectMapper();
-        String expectedUrlPath = CBIR_API_BASE_PATH + "/search";
-        SearchResponse expectedResponse = new SearchResponse(
-            annotation.getId().toString(),
-            "annotation",
-            List.of(annotation.getProject().getId().toString()),
-            List.of(
-                List.of(annotation.getId().toString(), 0.0),
-                List.of("1", 123.0),
-                List.of("2", 456.0)
-            )
+        RuntimeException exception = assertThrows(
+            RuntimeException.class,
+            () -> retrievalService.deleteStorage(String.valueOf(projectId))
         );
 
-        wireMockServer.stubFor(WireMock.post(urlPathEqualTo(expectedUrlPath))
-            .withQueryParam("storage", WireMock.equalTo(annotation.getProject().getId().toString()))
-            .withQueryParam("index", WireMock.equalTo("annotation"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", "application/json")
-                .withBody(objectMapper.writeValueAsString(expectedResponse))
-            )
-        );
+        assertTrue(exception.getMessage().contains("Failed to delete storage"));
+    }
 
-        /* Test retrieve similar images method */
-        Long neighbours = 2L;
-        ResponseEntity<SearchResponse> response = retrievalService.retrieveSimilarImages(
-            annotation,
-            neighbours
-        );
+    @Test
+    void indexAnnotationShouldSucceedWhenApiReturnsOk() throws UnsupportedEncodingException, ParseException {
+        Long projectId = 42L;
+        Project project = mock(Project.class);
+        when(project.getId()).thenReturn(projectId);
+        AnnotationDomain annotation = mock(AnnotationDomain.class);
+        when(annotation.getProject()).thenReturn(project);
+        when(annotation.getId()).thenReturn(1L);
+        when(annotation.getWktLocation()).thenReturn("POINT(1 1)");
+        when(imageServerService.crop(eq(annotation), any(CropParameter.class), eq(null), eq(null)))
+            .thenReturn(ResponseEntity.ok("image".getBytes()));
+        when(restTemplate.exchange(
+            any(URI.class),
+            eq(HttpMethod.POST),
+            any(),
+            eq(String.class)
+        )).thenReturn(ResponseEntity.ok("indexed"));
 
-        expectedResponse.setSimilarities(
-            List.of(List.of("1", 73.02631578947368), List.of("2", 0.0))
-        );
+        ResponseEntity<String> result = retrievalService.indexAnnotation(annotation);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedResponse, response.getBody());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    void deleteIndexShouldSucceedWhenApiReturnsOk() {
+        Long projectId = 42L;
+        Project project = mock(Project.class);
+        when(project.getId()).thenReturn(projectId);
+        AnnotationDomain annotation = mock(AnnotationDomain.class);
+        when(annotation.getProject()).thenReturn(project);
+        when(restTemplate.exchange(
+            any(URI.class),
+            eq(HttpMethod.DELETE),
+            eq(null),
+            eq(String.class)
+        )).thenReturn(ResponseEntity.ok("deleted"));
+
+        ResponseEntity<String> result = retrievalService.deleteIndex(annotation);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 }

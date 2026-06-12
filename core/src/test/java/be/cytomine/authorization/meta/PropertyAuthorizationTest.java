@@ -1,36 +1,7 @@
 package be.cytomine.authorization.meta;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+import java.util.Optional;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRUDAuthorizationTest;
-import be.cytomine.domain.image.AbstractImage;
-import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.meta.Description;
-import be.cytomine.domain.meta.Property;
-import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.domain.project.EditingMode;
-import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.meta.PropertyService;
-import be.cytomine.service.security.SecurityACLService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +12,17 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.domain.meta.Property;
+import be.cytomine.domain.ontology.AnnotationDomain;
+import be.cytomine.domain.ontology.UserAnnotation;
+import be.cytomine.domain.project.EditingMode;
+import be.cytomine.domain.project.Project;
+import be.cytomine.service.meta.PropertyService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -59,34 +40,24 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     private AbstractImage abstractImage = null;
     private ImageInstance imageInstance = null;
 
-
     @Autowired
     PropertyService propertyService;
 
     @Autowired
     BasicInstanceBuilder builder;
 
-    @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
-
     @BeforeEach
     public void before() throws Exception {
         if (propertyForProject == null) {
-            project = builder.given_a_project();
-            annotationDomain = builder.given_a_user_annotation();
-            abstractImage = builder.given_an_abstract_image();
-            imageInstance=builder.given_an_image_instance(project);
+            project = builder.givenAProject();
+            annotationDomain = builder.givenAUserAnnotation();
+            abstractImage = builder.givenAnAbstractImage();
+            imageInstance = builder.givenAnImageInstance(project);
 
-
-            propertyForProject = builder.given_a_property(project);
-            propertyForAnnotation = builder.given_a_property(annotationDomain);
-            propertyForAbstractImage = builder.given_a_property(abstractImage);
-            propertyForImageInstance=builder.given_a_property(imageInstance);
-
-
+            propertyForProject = builder.givenAProperty(project);
+            propertyForAnnotation = builder.givenAProperty(annotationDomain);
+            propertyForAbstractImage = builder.givenAProperty(abstractImage);
+            propertyForImageInstance = builder.givenAProperty(imageInstance);
 
             initACL(project);
             initACL(annotationDomain.getProject());
@@ -98,251 +69,276 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list() {
-        expectOK (() -> { propertyService.list(); });
+    public void adminCanList() {
+        expectOK(() -> propertyService.list());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list(){
-        expectForbidden(() -> {
-            propertyService.list();
-        });
+    public void userCannotList() {
+        expectForbidden(() -> propertyService.list());
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_without_read_cannot_list_for_domain(){
-        expectForbidden(() -> {
-            propertyService.list(abstractImage);
-        });
-        expectForbidden(() -> {
-            propertyService.list(imageInstance);
-        });
-
-        expectForbidden(() -> {
-            propertyService.list(project);
-        });
-        expectForbidden(() -> {
-            propertyService.list(annotationDomain);
-        });
+    public void userWithoutReadCannotListForDomain() {
+        expectForbidden(() -> propertyService.list(abstractImage));
+        expectForbidden(() -> propertyService.list(imageInstance));
+        expectForbidden(() -> propertyService.list(project));
+        expectForbidden(() -> propertyService.list(annotationDomain));
     }
 
-
-    //ANNOTATIONS
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_readonly_mode(){
+    public void userCannotAddInReadonlyMode() {
         project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode(){
+    public void userCannotAddInRestrictedMode() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode_for_annotation(){
+    public void userCannotAddInRestrictedModeForAnnotation() {
         project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> when_i_add_domain());
+        expectForbidden(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_in_restricted_mode_for_annotation_if_owner(){
+    public void userCanAddInRestrictedModeForAnnotationIfOwner() {
         project.setMode(EditingMode.RESTRICTED);
-        ((UserAnnotation)annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
+        ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
         expectOK(() -> {
-            AnnotationDomain annotationDomain = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(project));
-            ((UserAnnotation)annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
-            propertyService.add(builder.given_a_not_persisted_property(annotationDomain, "key", "value").toJsonObject());
+            AnnotationDomain annotationDomain = builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(
+                project));
+            ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ)
+                .get());
+            propertyService.add(builder.givenANotPersistedProperty(annotationDomain, "key", "value")
+                .toJsonObject());
         });
     }
-
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         propertyService.findByDomainAndKey(project, "key");
         propertyService.findByDomainAndKey(annotationDomain, "key");
         propertyService.findByDomainAndKey(abstractImage, "key");
     }
 
     @Override
-    protected void when_i_add_domain() {
-        AnnotationDomain annotationDomain = builder.persistAndReturn(builder.given_a_not_persisted_user_annotation(project));
-        propertyService.add(builder.given_a_not_persisted_property(annotationDomain, "key", "value").toJsonObject());
+    protected void whenIAddDomain() {
+        AnnotationDomain annotationDomain = builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(
+            project));
+        propertyService.add(builder.givenANotPersistedProperty(annotationDomain, "key", "value").toJsonObject());
     }
 
     @Override
-    protected void when_i_edit_domain() {
+    protected void whenIEditDomain() {
         propertyService.update(propertyForAnnotation, propertyForAnnotation.toJsonObject());
     }
 
-
     @Override
-    protected void when_i_delete_domain() {
-        Property property = builder.given_a_property(annotationDomain);
+    protected void whenIDeleteDomain() {
+        Property property = builder.givenAProperty(annotationDomain);
         propertyService.delete(property, null, null, true);
     }
 
-    //IMAGE
-
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_for_image(){
-        ImageInstance imageInstance=builder.given_an_image_instance(project);
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(imageInstance, "key", "value").toJsonObject()));
+    public void userCanAddForImage() {
+        ImageInstance imageInstance = builder.givenAnImageInstance(project);
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(imageInstance, "key", "value")
+            .toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_add_in_restricted_mode_for_image(){
-        ImageInstance imageInstance=builder.given_an_image_instance(project);
+    public void userCannotAddInRestrictedModeForImage() {
+        ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> propertyService.add(builder.given_a_not_persisted_property(imageInstance, "key", "value").toJsonObject()));
+        expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(imageInstance, "key", "value")
+            .toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_add_in_restricted_mode_for_image_if_owner(){
-        ImageInstance imageInstance=builder.given_an_image_instance(project);
+    public void userCanAddInRestrictedModeForImageIfOwner() {
+        ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(imageInstance, "key", "value").toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(imageInstance, "key", "value")
+            .toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_add_for_image(){
-        expectForbidden(() -> propertyService.add(builder.given_a_not_persisted_property(builder.given_an_image_instance(), "key", "value").toJsonObject()));
+    public void guestCannotAddForImage() {
+        expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(
+            builder.givenAnImageInstance(),
+            "key",
+            "value"
+        ).toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_edit_for_image(){
-        expectOK(() -> propertyService.update(propertyForImageInstance, propertyForImageInstance.toJsonObject(),null,null));
+    public void userCanEditForImage() {
+        expectOK(() -> propertyService.update(
+            propertyForImageInstance,
+            propertyForImageInstance.toJsonObject(),
+            null,
+            null
+        ));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_edit_in_restricted_mode_for_image(){
-        ImageInstance imageInstance=builder.given_an_image_instance(project);
+    public void userCannotEditInRestrictedModeForImage() {
+        ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> propertyService.update(builder.given_a_property(imageInstance), builder.given_a_property(imageInstance).toJsonObject(),null));
+        expectForbidden(() -> propertyService.update(
+            builder.givenAProperty(imageInstance),
+            builder.givenAProperty(imageInstance).toJsonObject(),
+            null
+        ));
 
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_edit_in_restricted_mode_for_image_if_owner(){
-        ImageInstance imageInstance=builder.given_an_image_instance(project);
+    public void userCanEditInRestrictedModeForImageIfOwner() {
+        ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
-        Property propertyForImageInstance = builder.given_a_property(imageInstance);
-        expectOK(() -> propertyService.update(propertyForImageInstance, propertyForImageInstance.toJsonObject(),null));
+        Property propertyForImageInstance = builder.givenAProperty(imageInstance);
+        expectOK(() -> propertyService.update(propertyForImageInstance, propertyForImageInstance.toJsonObject(), null));
     }
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_edit_image(){
-        Property propertyForImageInstanceLocal = builder.given_a_property(imageInstance);
-        expectForbidden(() -> propertyService.update(propertyForImageInstanceLocal, propertyForImageInstanceLocal.toJsonObject(),null));
+    public void guestCannotEditImage() {
+        Property propertyForImageInstanceLocal = builder.givenAProperty(imageInstance);
+        expectForbidden(() -> propertyService.update(
+            propertyForImageInstanceLocal,
+            propertyForImageInstanceLocal.toJsonObject(),
+            null
+        ));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_for_image(){
-        expectOK(() -> propertyService.delete(propertyForImageInstance, null,null,true));
+    public void userCanDeleteForImage() {
+        expectOK(() -> propertyService.delete(propertyForImageInstance, null, null, true));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_delete_in_restricted_mode_for_image(){
-        ImageInstance imageInstance=builder.given_an_image_instance(project);
+    public void userCannotDeleteInRestrictedModeForImage() {
+        ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> propertyService.delete(builder.given_a_property(imageInstance), null,null,true));
+        expectForbidden(() -> propertyService.delete(builder.givenAProperty(imageInstance), null, null, true));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_delete_in_restricted_mode_for_image_if_owner(){
-        ImageInstance imageInstance=builder.given_an_image_instance(project);
+    public void userCanDeleteInRestrictedModeForImageIfOwner() {
+        ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
-        expectOK(() -> propertyService.delete(builder.given_a_property(imageInstance), null,null,true));
+        expectOK(() -> propertyService.delete(builder.givenAProperty(imageInstance), null, null, true));
     }
 
     @Test
     @WithMockUser(username = GUEST)
-    public void guest_cannot_delete_for_image(){
-        expectForbidden(() -> propertyService.delete(propertyForImageInstance, null,null,true));
-    }
-
-    //PROJECT
-
-    @Test
-    @WithMockUser(username = SUPERADMIN)
-    public void admin_can_add_for_project(){
-        expectOK (() -> propertyService.add(builder.given_a_not_persisted_property(builder.given_a_project(), "key", "value").toJsonObject()));
-    }
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_add_for_project(){
-        expectForbidden (() -> propertyService.add(builder.given_a_not_persisted_property(builder.given_a_project(), "key", "value").toJsonObject()));
-    }
-
-    @Test
-    @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_add_for_project(){
-        Project projectLocal = builder.given_a_project();
-        initACL(projectLocal);
-        expectOK (() -> propertyService.add(builder.given_a_not_persisted_property(projectLocal,"key", "value").toJsonObject()));
+    public void guestCannotDeleteForImage() {
+        expectForbidden(() -> propertyService.delete(propertyForImageInstance, null, null, true));
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_edit_for_project(){
-        expectOK (() -> propertyService.update(propertyForProject,propertyForProject.toJsonObject(),null,null));
+    public void adminCanAddForProject() {
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(
+            builder.givenAProject(),
+            "key",
+            "value"
+        ).toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_edit_for_project(){
-        expectForbidden (() -> propertyService.update(propertyForProject,propertyForProject.toJsonObject(),null,null));
+    public void userWithReadCannotAddForProject() {
+        expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(
+            builder.givenAProject(),
+            "key",
+            "value"
+        ).toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_edit_for_project(){
-        Project projectLocal = builder.given_a_project();
+    public void userWithWriteCanAddForProject() {
+        Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
-        Property property = builder.given_a_property(projectLocal);
-        expectOK (() -> propertyService.update(property,property.toJsonObject(),null));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(projectLocal, "key", "value")
+            .toJsonObject()));
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_delete_for_project(){
-        expectOK (() -> propertyService.delete(builder.given_a_property(builder.given_a_project()),null,null,true));
+    public void adminCanEditForProject() {
+        expectOK(() -> propertyService.update(propertyForProject, propertyForProject.toJsonObject(), null, null));
     }
+
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_cannot_delete_for_project(){
-        expectForbidden (() -> propertyService.delete(builder.given_a_property(builder.given_a_project()),null,null,true));
+    public void userWithReadCannotEditForProject() {
+        expectForbidden(() -> propertyService.update(
+            propertyForProject,
+            propertyForProject.toJsonObject(),
+            null,
+            null
+        ));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    public void user_with_write_can_delete_for_project(){
-        Project projectLocal = builder.given_a_project();
+    public void userWithWriteCanEditForProject() {
+        Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
-        expectOK (() -> propertyService.delete(builder.given_a_property(projectLocal),null,null,true));
+        Property property = builder.givenAProperty(projectLocal);
+        expectOK(() -> propertyService.update(property, property.toJsonObject(), null));
     }
 
+    @Test
+    @WithMockUser(username = SUPERADMIN)
+    public void adminCanDeleteForProject() {
+        expectOK(() -> propertyService.delete(builder.givenAProperty(builder.givenAProject()), null, null, true));
+    }
+
+    @Test
+    @WithMockUser(username = USER_ACL_READ)
+    public void userWithReadCannotDeleteForProject() {
+        expectForbidden(() -> propertyService.delete(
+            builder.givenAProperty(builder.givenAProject()),
+            null,
+            null,
+            true
+        ));
+    }
+
+    @Test
+    @WithMockUser(username = USER_ACL_WRITE)
+    public void userWithWriteCanDeleteForProject() {
+        Project projectLocal = builder.givenAProject();
+        initACL(projectLocal);
+        expectOK(() -> propertyService.delete(builder.givenAProperty(projectLocal), null, null, true));
+    }
 
     @Override
     protected Optional<Permission> minimalPermissionForCreate() {
@@ -359,7 +355,6 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         return Optional.of(BasePermission.READ);
     }
 
-
     @Override
     protected Optional<String> minimalRoleForCreate() {
         return Optional.of("ROLE_GUEST");
@@ -374,6 +369,4 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<String> minimalRoleForEdit() {
         return Optional.of("ROLE_GUEST");
     }
-
-
 }

@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.0.2'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.gradle.test-retry' version '1.6.0'
+    id 'checkstyle'
 }
 
 group = 'org.cytomine'
@@ -10,7 +10,12 @@ version = '0.0.1-SNAPSHOT'
 description = 'Demo project for Spring Boot'
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
+}
+
+checkstyle {
+    toolVersion = '10.21.2'
+    configFile = file("${rootProject.projectDir}/checkstyle.xml")
 }
 
 bootJar {
@@ -37,18 +42,18 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.seleniumhq.selenium:selenium-java'
     implementation 'org.seleniumhq.selenium:selenium-java'
+    implementation group: 'org.keycloak', name: 'keycloak-admin-client', version: '24.0.2'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
-    systemProperty 'junit.jupiter.execution.parallel.enabled', 'true'
-    systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
-    systemProperty 'junit.jupiter.execution.parallel.mode.classes.default', 'concurrent'
-    systemProperty 'junit.jupiter.execution.parallel.config.strategy', 'dynamic'
-    systemProperty 'junit.jupiter.execution.parallel.config.dynamic.factor', '1'
-
-    retry {
-        maxRetries = 3
-        failOnPassedAfterRetry = false
+    def parallelEnabled = System.getenv('E2E_PARALLEL') == 'true'
+    systemProperty 'junit.jupiter.execution.parallel.enabled', parallelEnabled.toString()
+    if (parallelEnabled) {
+        systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
+        systemProperty 'junit.jupiter.execution.parallel.mode.classes.default', 'concurrent'
+        systemProperty 'junit.jupiter.execution.parallel.config.strategy', 'fixed'
+        systemProperty 'junit.jupiter.execution.parallel.config.fixed.parallelism', '8'
+        systemProperty 'junit.jupiter.execution.parallel.config.fixed.max-pool-size', '8'
     }
 }

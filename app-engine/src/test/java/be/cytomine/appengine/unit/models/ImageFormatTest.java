@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import be.cytomine.appengine.models.task.formats.WSIDicomFormat;
-import be.cytomine.appengine.models.task.formats.ZipFormat;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,6 +21,8 @@ import be.cytomine.appengine.models.task.formats.FileFormat;
 import be.cytomine.appengine.models.task.formats.JpegFormat;
 import be.cytomine.appengine.models.task.formats.PngFormat;
 import be.cytomine.appengine.models.task.formats.TiffFormat;
+import be.cytomine.appengine.models.task.formats.WSIDicomFormat;
+import be.cytomine.appengine.models.task.formats.ZipFormat;
 
 public class ImageFormatTest {
 

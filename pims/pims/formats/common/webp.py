@@ -12,7 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 import logging
-from typing import Optional
 
 from pint import Quantity
 
@@ -92,9 +91,7 @@ class WebPParser(VipsParser):
         return imd
 
     @staticmethod
-    def parse_physical_size(
-        physical_size: Optional[str], unit: Optional[str]
-    ) -> Optional[Quantity]:
+    def parse_physical_size(physical_size: str | None, unit: str | None) -> Quantity | None:
         supported_units = ("meters", "inches", "cm")
         if physical_size is not None and unit in supported_units:
             physical_size = parse_float(physical_size)

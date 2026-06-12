@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
@@ -30,27 +30,22 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class AnnotationLinkService extends ModelService {
 
-    @Autowired
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
-    @Autowired
-    private AnnotationGroupService annotationGroupService;
+    private final AnnotationGroupService annotationGroupService;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final AnnotationLinkRepository annotationLinkRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private TransactionService transactionService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private AnnotationLinkRepository annotationLinkRepository;
+    private final TransactionService transactionService;
 
     @Override
     public Class currentDomain() {
@@ -74,7 +69,9 @@ public class AnnotationLinkService extends ModelService {
     }
 
     public Optional<AnnotationLink> find(AnnotationGroup group, AnnotationDomain annotation) {
-        Optional<AnnotationLink> annotationLink = annotationLinkRepository.findByAnnotationIdentAndGroup(annotation.getId(), group);
+        Optional<AnnotationLink>
+            annotationLink
+            = annotationLinkRepository.findByAnnotationIdentAndGroup(annotation.getId(), group);
         annotationLink.ifPresent(link -> securityACLService.check(link.container(), READ));
         return annotationLink;
     }
@@ -97,7 +94,10 @@ public class AnnotationLinkService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
-        AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, json.getJSONAttrLong("annotationIdent"));
+        AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(
+            entityManager,
+            json.getJSONAttrLong("annotationIdent")
+        );
         securityACLService.check(annotation.getProject(), READ);
         securityACLService.checkIsNotReadOnly(annotation.getProject());
 
@@ -121,12 +121,18 @@ public class AnnotationLinkService extends ModelService {
         return executeCommand(new DeleteCommand(currentUser, transaction), domain, null);
     }
 
-    public CommandResponse addAnnotationLink(String annotationClassName, Long annotationIdent, Long groupId, Long imageId, Transaction transaction) {
+    public CommandResponse addAnnotationLink(
+        String annotationClassName,
+        Long annotationIdent,
+        Long groupId,
+        Long imageId,
+        Transaction transaction
+    ) {
         JsonObject jsonObject = JsonObject.of(
-                "annotationClassName", annotationClassName,
-                "annotationIdent", annotationIdent,
-                "group", groupId,
-                "image", imageId
+            "annotationClassName", annotationClassName,
+            "annotationIdent", annotationIdent,
+            "group", groupId,
+            "image", imageId
         );
 
         return executeCommand(new AddCommand(currentUserService.getCurrentUser(), transaction), null, jsonObject);

@@ -1,10 +1,10 @@
 package be.cytomine.utils.filters;
 
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.Map;
 
 @Getter
 @Setter

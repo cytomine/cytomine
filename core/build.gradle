@@ -11,7 +11,7 @@ bootJar {
 }
 
 java {
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 }
 
 checkstyle {
@@ -45,7 +45,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
     // Hibernate
     annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen'
     implementation 'org.hibernate.orm:hibernate-core'
@@ -55,7 +54,6 @@ dependencies {
     // Postgresql
     implementation 'org.postgresql:postgresql'
     implementation 'com.zaxxer:HikariCP'
-    implementation 'org.liquibase:liquibase-core'
 
     // Spring security
     implementation 'org.springframework.security:spring-security-acl'
@@ -75,10 +73,21 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6'
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // MapStruct (annotation processor order: Lombok → lombok-mapstruct-binding → MapStruct)
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
     // Tests
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.mapstruct:mapstruct:1.6.3'
+    testAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
     testImplementation 'com.github.tomakehurst:wiremock:1.58'
     testImplementation 'org.assertj:assertj-core:3.4.1' // TODO: upgrade to 3.23.1
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -88,6 +97,7 @@ dependencies {
     testImplementation 'org.testcontainers:testcontainers:2.0.3'
     testImplementation 'org.testcontainers:testcontainers-mongodb:2.0.3'
     testImplementation 'org.testcontainers:testcontainers-postgresql:2.0.3'
+    testImplementation testFixtures(project(':common'))
 
     // -----------------------------------------------------------------------------------------------------------------
     // Dependencies not managed by Spring dependency-management
@@ -132,6 +142,7 @@ dependencies {
     // Utils
     implementation 'org.apache.commons:commons-text:1.11.0'
     implementation 'net.bull.javamelody:javamelody-spring-boot-starter:2.1.0'
+    implementation project(":common")
 }
 
 test {
@@ -148,7 +159,7 @@ jacocoTestReport {
 }
 
 jacoco {
-    toolVersion = "0.8.11"
+    toolVersion = "0.8.14"
     reportsDirectory = file("$buildDir/jacoco")
 }
 
@@ -160,4 +171,11 @@ jacocoTestCoverageVerification {
             }
         }
     }
+}
+
+compileJava {
+    options.compilerArgs += [
+            '-Amapstruct.unmappedTargetPolicy=ERROR',
+            '-Amapstruct.unmappedSourcePolicy=ERROR'
+    ]
 }

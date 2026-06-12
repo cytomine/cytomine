@@ -1,56 +1,44 @@
 package be.cytomine.service.image;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractSliceRepository;
-import be.cytomine.repository.meta.PropertyRepository;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.utils.JsonObject;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+@RequiredArgsConstructor
 @Service
 @Transactional
 @Slf4j
 public class ImagePropertiesService {
 
-    private static Map<String, Integer> PIXEL_TYPE = Map.of("uint8", 8, "int8", 8, "uint16", 16, "int16", 16);
+    private final AbstractImageRepository abstractImageRepository;
 
-    @Autowired
-    AbstractImageRepository abstractImageRepository;
-    @Autowired
-    PropertyRepository propertyRepository;
+    private final ImageServerService imageServerService;
 
-    @Autowired
-    ImageServerService imageServerService;
+    private final AbstractSliceRepository abstractSliceRepository;
 
-    @Autowired
-    EntityManager entityManager;
-
-    @Autowired
-    AbstractSliceRepository abstractSliceRepository;
-
-    public void extractUseful(AbstractImage image) throws IOException, IllegalAccessException {
+    public void extractUseful(AbstractImage image) {
         extractUseful(image, false);
     }
 
-    public void extractUseful(AbstractImage image, boolean deep) throws IOException, IllegalAccessException {
+    public void extractUseful(AbstractImage image, boolean deep) {
 
         try {
             Map<String, Object> properties = imageServerService.properties(image);
-            Map<String, Object> imageProperties = (Map<String, Object>)properties.getOrDefault("image", Map.of());
+            Map<String, Object> imageProperties = (Map<String, Object>) properties.getOrDefault("image", Map.of());
             JsonObject imagePropertiesObject = new JsonObject(imageProperties);
 
 
@@ -68,34 +56,37 @@ public class ImagePropertiesService {
 
             image.setFps(imagePropertiesObject.getJSONAttrDouble("frame_rate"));
 
-            Map<String, Object> instrument = ((Map<String, Object>)properties.getOrDefault("instrument", Map.of()));
-            Map<String, Object> objective = ((Map<String, Object>)instrument.getOrDefault("objective", Map.of()));
-            Integer nominal_magnification = (Integer)objective.get("nominal_magnification");
+            Map<String, Object> instrument = ((Map<String, Object>) properties.getOrDefault("instrument", Map.of()));
+            Map<String, Object> objective = ((Map<String, Object>) instrument.getOrDefault("objective", Map.of()));
+            Integer nominalMagnification = (Integer) objective.get("nominal_magnification");
 
-            image.setMagnification(nominal_magnification);
+            image.setMagnification(nominalMagnification);
             image.setBitPerSample(imagePropertiesObject.getJSONAttrInteger("bits", 8));
             image.setTileSize(256);  // [PIMS] At this stage, we only support normalized-tiles.
 
             abstractImageRepository.save(image);
 
             if (deep) {
-                List<Map<String, Object>> channels = (List<Map<String, Object>>)properties.getOrDefault("channels", List.of());
+                List<Map<String, Object>> channels = (List<Map<String, Object>>) properties.getOrDefault(
+                    "channels",
+                    List.of()
+                );
                 for (int i = 0; i < image.getApparentChannels(); i += image.getSamplePerPixel()) {
-                    Map<String, Object> channel = (Map<String, Object>) channels.get(i);
-                    int index = Math.floorDiv((Integer)channel.get("index"), image.getSamplePerPixel());
+                    Map<String, Object> channel = channels.get(i);
+                    int index = Math.floorDiv((Integer) channel.get("index"), image.getSamplePerPixel());
                     String name = (String) channel.get("suggested_name");
                     String color = (String) channel.get("color");
                     if (image.getSamplePerPixel() != 1) {
                         color = null;
 
                         List<String> parts = new ArrayList<>();
-                        for (int j = 0; j<image.getSamplePerPixel() ; j++) {
-                            parts.add((String) channels.get(i+j).get("suggested_name"));
+                        for (int j = 0; j < image.getSamplePerPixel(); j++) {
+                            parts.add((String) channels.get(i + j).get("suggested_name"));
                         }
                         name = parts.stream().distinct().collect(Collectors.joining("|"));
                     }
                     List<AbstractSlice> slices = abstractSliceRepository.findAllByImageAndChannel(image, index)
-                            .stream().filter(x -> Objects.equals(x.getChannel(), (Integer)channel.get("index"))).toList();
+                        .stream().filter(x -> Objects.equals(x.getChannel(), channel.get("index"))).toList();
                     for (AbstractSlice slice : slices) {
                         slice.setChannelName(name);
                         slice.setChannelColor(color);
@@ -108,16 +99,7 @@ public class ImagePropertiesService {
         }
     }
 
-    public void regenerate(AbstractImage image, boolean deep) throws IOException, IllegalAccessException {
+    public void regenerate(AbstractImage image, boolean deep) {
         extractUseful(image, deep);
     }
-}
-
-@Getter
-@Setter
-@AllArgsConstructor
-class ImagePropertiesValue {
-    String key;
-    String name;
-    Function parser;
 }

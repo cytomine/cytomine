@@ -141,7 +141,7 @@ export default class Model {
   async save() {
     if (this.isNew()) {
       let {data} = await Cytomine.instance.api.post(this.uri, this.getPublicProperties());
-      this.populate(data[this.callbackIdentifier]);
+      this.populate(data.data ?? data[this.callbackIdentifier]);
       Cytomine.instance.lastCommand = data.command;
       return this;
     } else {
@@ -160,7 +160,7 @@ export default class Model {
     }
 
     let {data} = await Cytomine.instance.api.put(this.uri, this.getPublicProperties());
-    this.populate(data[this.callbackIdentifier]);
+    this.populate(data.data ?? data[this.callbackIdentifier]);
     Cytomine.instance.lastCommand = data.command;
     return this;
   }

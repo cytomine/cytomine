@@ -3,22 +3,22 @@ package be.cytomine.service.database;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Transactional
 @Service
 public class SequenceService {
 
-    public final static String SEQ_NAME = "hibernate_sequence";
+    public static final String SEQ_NAME = "hibernate_sequence";
 
-    @Autowired
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     /**
      * Get a new id number
      */
-    public Long generateID()  {
+    public Long generateID() {
         try {
             Query query = entityManager.createNativeQuery("select nextval('" + SEQ_NAME + "');");
             return (Long) query.getSingleResult();

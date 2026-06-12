@@ -59,14 +59,6 @@ class TestAbstractImage:
         # abstract_image.delete()
         # assert (not AbstractImage().fetch(abstract_image.id))
 
-    def test_abstract_image_server(
-        self,
-        connect: Cytomine,
-        dataset: Dict[str, Any],
-    ) -> None:
-        # TODO
-        pass
-
     def test_abstract_image_download(
         self,
         connect: Cytomine,

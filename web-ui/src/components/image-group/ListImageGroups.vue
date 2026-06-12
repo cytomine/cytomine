@@ -105,8 +105,11 @@ limitations under the License.-->
               sortable
               width="400"
           >
-            <router-link :to="viewerURL(imageGroup)">
-              {{imageGroup.name}}
+            <template v-if="imageGroup.imageInstances.length === 0">
+              {{ imageGroup.name }}
+            </template>
+            <router-link v-else :to="viewerURL(imageGroup)">
+              {{ imageGroup.name }}
             </router-link>
           </b-table-column>
 

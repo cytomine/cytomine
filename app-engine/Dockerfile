@@ -1,15 +1,13 @@
 # List ARGs here for better readability.
 ARG APP_ENGINE_VERSION
 ARG APP_ENGINE_REVISION
-ARG ENTRYPOINT_SCRIPTS_VERSION=1.4.0
-ARG JAVA_VERSION=17-jre
-ARG GRADLE_VERSION=8.14-jdk21-alpine
-ARG GRADLE_DEV_VERSION=8.14-jdk21-jammy
+ARG JAVA_VERSION=21-jre
+ARG GRADLE_VERSION=9.5.1-jdk21
 ARG PROXY_CACHE=registry.cytomine.org/docker
 
 #######################################################################################
 # Stage: dependencies download via gradle
-FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION} AS deps-downloader
+FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-alpine AS deps-downloader
 
 # We first copy the build.gradle file and the binaries stored in the source repository.
 # This way, we retrieve all gradle dependencies at the beginning. All these steps will be
@@ -19,25 +17,42 @@ RUN mkdir -p /opt/gradle/.gradle
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 
 WORKDIR /app
-COPY ./app-engine/src /app/app-engine/src
 COPY ./app-engine/build.gradle /app/app-engine/build.gradle
-
-COPY ./registry-client /app/registry-client
+COPY ./app-engine/src /app/app-engine/src
+COPY ./common/build.gradle /app/common/build.gradle
+COPY ./common/src /app/common/src
+COPY ./core/build.gradle /app/core/build.gradle
+COPY ./core/src /app/core/src
+COPY ./e2e-tests/build.gradle /app/e2e-tests/build.gradle
+COPY ./e2e-tests/src /app/e2e-tests/src
+COPY ./registry-client/build.gradle /app/registry-client/build.gradle
+COPY ./registry-client/src /app/registry-client/src
+COPY ./repository/build.gradle /app/repository/build.gradle
+COPY ./repository/src /app/repository/src
 COPY ./settings.gradle /app/settings.gradle
 
 RUN gradle :app-engine:clean :app-engine:compileJava --no-daemon --console=verbose
 
 #######################################################################################
 ## Stage: building the jar file
-FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION} AS jar-builder
+FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-alpine AS jar-builder
 
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 COPY --from=deps-downloader /opt/gradle/.gradle /opt/gradle/.gradle
 
 WORKDIR /app
-COPY ./registry-client /app/registry-client
-COPY ./app-engine/src /app/app-engine/src
 COPY ./app-engine/build.gradle /app/app-engine/build.gradle
+COPY ./app-engine/src /app/app-engine/src
+COPY ./common/build.gradle /app/common/build.gradle
+COPY ./common/src /app/common/src
+COPY ./core/build.gradle /app/core/build.gradle
+COPY ./core/src /app/core/src
+COPY ./e2e-tests/build.gradle /app/e2e-tests/build.gradle
+COPY ./e2e-tests/src /app/e2e-tests/src
+COPY ./registry-client/build.gradle /app/registry-client/build.gradle
+COPY ./registry-client/src /app/registry-client/src
+COPY ./repository/build.gradle /app/repository/build.gradle
+COPY ./repository/src /app/repository/src
 COPY ./settings.gradle /app/settings.gradle
 
 ARG APP_ENGINE_VERSION
@@ -48,29 +63,18 @@ RUN sed -i -- "s/version: ce-0.0.0/version: ${APP_ENGINE_VERSION}/g" /app/app-en
     gradle :app-engine:bootJar --console=verbose
 
 #######################################################################################
-## Stage: entrypoint script. Use a multi-stage because COPY --from cannot interpolate variables
-FROM ${PROXY_CACHE}/cytomine/entrypoint-scripts:${ENTRYPOINT_SCRIPTS_VERSION} AS entrypoint-scripts
-
-#######################################################################################
 ## Stage: App-Engine development image
-FROM ${PROXY_CACHE}/gradle:${GRADLE_DEV_VERSION} AS dev-server
+FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-alpine AS dev-server
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-      gettext \
-      openssh-server \
-      rsync
+RUN apk add --no-cache \
+    gettext \
+    openssh \
+    rsync
 
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 
-# startup scripts
-RUN mkdir /docker-entrypoint-cytomine.d/
-COPY --from=entrypoint-scripts --chmod=774 /cytomine-entrypoint.sh /usr/local/bin/
-COPY --from=entrypoint-scripts --chmod=774 /envsubst-on-templates-and-move.sh /docker-entrypoint-cytomine.d/500-envsubst-on-templates-and-move.sh
-COPY --from=entrypoint-scripts --chmod=774 /setup-ssh-dev-env.sh /docker-entrypoint-cytomine.d/1-start-ssh-dev-env.sh
-
 WORKDIR /app
-ENTRYPOINT ["cytomine-entrypoint.sh"]
+CMD ["/bin/sh"]
 
 #######################################################################################
 ## Stage: Cytomine core image
@@ -95,7 +99,7 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LANG=C.UTF-8
 
-# base librairies and configuration
+# base libraries and configuration
 COPY --from=jar-builder /app/app-engine/build/libs/cytomine-app-engine.jar /app/cytomine-app-engine.jar
 
 WORKDIR /app

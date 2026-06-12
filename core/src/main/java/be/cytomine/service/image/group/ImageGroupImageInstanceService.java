@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
@@ -34,27 +34,22 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class ImageGroupImageInstanceService extends ModelService {
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private ImageGroupService imageGroupService;
+    private final ImageGroupService imageGroupService;
 
-    @Autowired
-    private ImageInstanceService imageInstanceService;
+    private final ImageInstanceService imageInstanceService;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
 
-    @Autowired
-    private ImageGroupImageInstanceRepository imageGroupImageInstanceRepository;
+    private final ImageGroupImageInstanceRepository imageGroupImageInstanceRepository;
 
     @Override
     public Class currentDomain() {
@@ -69,9 +64,9 @@ public class ImageGroupImageInstanceService extends ModelService {
     @Override
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
         return List.of(
-                domain.getId(),
-                ((ImageGroupImageInstance) domain).getGroup().getName(),
-                ((ImageGroupImageInstance) domain).getImage().getBlindInstanceFilename()
+            domain.getId(),
+            ((ImageGroupImageInstance) domain).getGroup().getName(),
+            ((ImageGroupImageInstance) domain).getImage().getBlindInstanceFilename()
         );
     }
 
@@ -140,21 +135,21 @@ public class ImageGroupImageInstanceService extends ModelService {
         }
 
         return imageGroupImageInstanceRepository.findAllByGroup(group)
-                .stream()
-                .map((ImageGroupImageInstance::getImage))
-                .sorted(Comparator.comparing(ImageInstance::getBlindInstanceFilename))
-                .toList();
+            .stream()
+            .map((ImageGroupImageInstance::getImage))
+            .sorted(Comparator.comparing(ImageInstance::getBlindInstanceFilename))
+            .toList();
     }
 
     public List<Object> buildImageInstances(ImageGroup group) {
         List<Object> images = new ArrayList<>();
         for (ImageGroupImageInstance igii : list(group)) {
             images.add(Map.of(
-                    "id", igii.getImage().getId(),
-                    "instanceFilename", igii.getImage().getBlindInstanceFilename(),
-                    "thumb", UrlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
-                    "width", igii.getImage().getBaseImage().getWidth(),
-                    "height", igii.getImage().getBaseImage().getHeight()
+                "id", igii.getImage().getId(),
+                "instanceFilename", igii.getImage().getBlindInstanceFilename(),
+                "thumb", UrlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
+                "width", igii.getImage().getBaseImage().getWidth(),
+                "height", igii.getImage().getBaseImage().getHeight()
             ));
         }
 

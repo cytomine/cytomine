@@ -1,18 +1,24 @@
 package be.cytomine.controller.ontology;
 
-import be.cytomine.controller.RestCytomineController;
-import be.cytomine.repository.ontology.OntologyRepository;
-import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.service.ontology.OntologyService;
-import be.cytomine.service.utils.TaskService;
-import be.cytomine.utils.JsonObject;
-import be.cytomine.utils.Task;
+import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Map;
+import be.cytomine.controller.RestCytomineController;
+import be.cytomine.domain.ontology.Ontology;
+import be.cytomine.dto.ontology.OntologyExport;
+import be.cytomine.service.ontology.OntologyService;
 
 @RestController
 @RequestMapping("/api")
@@ -22,53 +28,28 @@ public class RestOntologyController extends RestCytomineController {
 
     private final OntologyService ontologyService;
 
-    private final OntologyRepository ontologyRepository;
-
-    private final ProjectRepository projectRepository;
-
-    private final TaskService taskService;
-
     /**
-     * List all ontology visible for the current user
-     * For each ontology, print the terms tree
+     * List all ontology visible for the current user For each ontology, print the terms tree
      */
     @GetMapping("/ontology.json")
-    public ResponseEntity<String> list(
-            @RequestParam Map<String,String> allParams
-    ) {
-        log.debug("REST request to list ontologys");
+    public ResponseEntity<String> list(@RequestParam Map<String, String> allParams) {
+        log.debug("REST request to list ontologies");
         boolean light = allParams.containsKey("light") && Boolean.parseBoolean(allParams.get("light"));
         return responseSuccess(light ? ontologyService.listLight() : ontologyService.list());
     }
 
-    @GetMapping("/ontology/{id}.json")
-    public ResponseEntity<String> show(
-            @PathVariable Long id
-    ) {
-        log.debug("REST request to get Ontology : {}", id);
-        return ontologyService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Ontology", id));
+    @GetMapping(value = "/ontology/{id}/export", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OntologyExport> export(@PathVariable Long id) {
+        log.debug("GET /ontology/{}/export", id);
+
+        Ontology ontology = ontologyService.find(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ontology not found with id: " + id));
+
+        OntologyExport export = ontologyService.export(ontology);
+
+        String filename = ontology.getName() + ".json";
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+            .body(export);
     }
-
-
-    @PostMapping("/ontology.json")
-    public ResponseEntity<String> add(@RequestBody String json) {
-        log.debug("REST request to save Ontology : " + json);
-        return add(ontologyService, json);
-    }
-
-    @PutMapping("/ontology/{id}.json")
-    public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json) {
-        log.debug("REST request to edit Ontology : " + id);
-        return update(ontologyService, json);
-    }
-
-    @DeleteMapping("/ontology/{id}.json")
-    public ResponseEntity<String> delete(@PathVariable String id, @RequestParam(required = false) Long task) {
-        log.debug("REST request to delete Ontology : " + id);
-        Task existingTask = taskService.get(task);
-        return delete(ontologyService, JsonObject.of("id", id), existingTask);
-    }
-
 }

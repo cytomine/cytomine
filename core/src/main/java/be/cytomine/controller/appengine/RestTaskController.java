@@ -16,7 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -46,8 +52,8 @@ public class RestTaskController extends RestCytomineController {
 
     @GetMapping("/tasks/{namespace}/{version}")
     public String description(
-            @PathVariable String namespace,
-            @PathVariable String version,
+        @PathVariable String namespace,
+        @PathVariable String version,
         @RequestParam(required = false, name = "host") Optional<String> maybeHost
     ) {
         log.info("GET /tasks/{}/{}?host={}", namespace, version, maybeHost);
@@ -97,45 +103,45 @@ public class RestTaskController extends RestCytomineController {
 
     @GetMapping("/tasks/{id}/inputs")
     public String inputsById(
-            @PathVariable UUID id
+        @PathVariable UUID id
     ) {
         return appEngineService.get("tasks/" + id + "/inputs");
     }
 
     @GetMapping("/tasks/{namespace}/{version}/inputs")
     public String inputs(
-            @PathVariable String namespace,
-            @PathVariable String version
+        @PathVariable String namespace,
+        @PathVariable String version
     ) {
         return appEngineService.get("tasks/" + namespace + "/" + version + "/inputs");
     }
 
     @GetMapping("/tasks/{id}/outputs")
     public String outputsById(
-            @PathVariable UUID id
+        @PathVariable UUID id
     ) {
         return appEngineService.get("tasks/" + id + "/outputs");
     }
 
     @GetMapping("/tasks/{namespace}/{version}/outputs")
     public String outputs(
-            @PathVariable String namespace,
-            @PathVariable String version
+        @PathVariable String namespace,
+        @PathVariable String version
     ) {
         return appEngineService.get("tasks/" + namespace + "/" + version + "/outputs");
     }
 
     @GetMapping("/tasks/{id}/descriptor.yml")
     public String descriptorById(
-            @PathVariable UUID id
+        @PathVariable UUID id
     ) {
         return appEngineService.get("tasks/" + id + "/descriptor.yml");
     }
 
     @GetMapping("/tasks/{namespace}/{version}/descriptor.yml")
     public String descriptor(
-            @PathVariable String namespace,
-            @PathVariable String version
+        @PathVariable String namespace,
+        @PathVariable String version
     ) {
         return appEngineService.get("tasks/" + namespace + "/" + version + "/descriptor.yml");
     }

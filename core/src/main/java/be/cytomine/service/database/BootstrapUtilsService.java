@@ -1,55 +1,46 @@
 package be.cytomine.service.database;
 
+import java.util.List;
+import java.util.UUID;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import be.cytomine.domain.image.Mime;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.domain.meta.ConfigurationReadingRole;
 import be.cytomine.domain.processing.ImageFilter;
-import be.cytomine.domain.security.*;
+import be.cytomine.domain.security.SecUserSecRole;
+import be.cytomine.domain.security.User;
 import be.cytomine.repository.image.MimeRepository;
 import be.cytomine.repository.meta.ConfigurationRepository;
-import be.cytomine.repository.ontology.RelationRepository;
 import be.cytomine.repository.processing.ImageFilterRepository;
 import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.repository.security.SecUserSecRoleRepository;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.image.server.StorageService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
-
+@RequiredArgsConstructor
 @Service
 @Slf4j
 @Transactional
 public class BootstrapUtilsService {
 
-    @Autowired
-    SecRoleRepository secRoleRepository;
+    private final SecRoleRepository secRoleRepository;
 
-    @Autowired
-    SecUserSecRoleRepository secSecUserSecRoleRepository;
+    private final SecUserSecRoleRepository secSecUserSecRoleRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    StorageService storageService;
+    private final StorageService storageService;
 
-    @Autowired
-    RelationRepository relationRepository;
+    private final ImageFilterRepository imageFilterRepository;
 
-    @Autowired
-    ImageFilterRepository imageFilterRepository;
+    private final MimeRepository mimeRepository;
 
-    @Autowired
-    MimeRepository mimeRepository;
-
-    @Autowired
-    ConfigurationRepository configurationRepository;
-
+    private final ConfigurationRepository configurationRepository;
 
     public void createRole(String role) {
         secRoleRepository.createIfNotExist(role);
@@ -78,13 +69,9 @@ public class BootstrapUtilsService {
         }
     }
 
-    public void createRelation(String name) {
-        relationRepository.createIfNotExist(name);
-    }
-
     public void createFilter(String name, String method, Boolean available) {
         ImageFilter filter = imageFilterRepository.findByName(name)
-                .orElseGet(ImageFilter::new);
+            .orElseGet(ImageFilter::new);
         filter.setName(name);
         filter.setMethod(method);
         filter.setAvailable(available);
@@ -100,7 +87,7 @@ public class BootstrapUtilsService {
         }
     }
 
-    public void createConfigurations(String key, String value, ConfigurationReadingRole readingRole){
+    public void createConfigurations(String key, String value, ConfigurationReadingRole readingRole) {
         Configuration configuration = new Configuration();
         configuration.setKey(key);
         configuration.setValue(value);

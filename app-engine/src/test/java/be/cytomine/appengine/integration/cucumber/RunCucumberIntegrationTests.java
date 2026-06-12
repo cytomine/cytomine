@@ -1,6 +1,7 @@
 package be.cytomine.appengine.integration.cucumber;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import com.cytomine.registry.client.RegistryClient;
 import io.cucumber.junit.Cucumber;
@@ -41,11 +42,12 @@ public class RunCucumberIntegrationTests {
 
     @Container
     static GenericContainer<?> registryContainer = new GenericContainer<>("registry:2.8.3")
-            .withExposedPorts(REGISTRY_INTERNAL_PORT);
+        .withExposedPorts(REGISTRY_INTERNAL_PORT);
 
     @Container
-    static K3sContainer k3sContainer = new K3sContainer(DockerImageName.parse("rancher/k3s:v1.21.3-k3s1"))
-            .withCommand("server", "--disable", "metrics-server");
+    static K3sContainer k3sContainer = new K3sContainer(DockerImageName.parse("rancher/k3s:v1.30.14-rc3-k3s3"))
+        .withCommand("server", "--disable", "metrics-server")
+        .withStartupTimeout(Duration.ofMinutes(5));
 
     @BeforeClass
     public static void startContainers() throws IOException {
@@ -53,9 +55,9 @@ public class RunCucumberIntegrationTests {
         k3sContainer.start();
 
         String registryUrl = String.format(
-                "http://%s:%d",
-                registryContainer.getHost(),
-                registryContainer.getMappedPort(REGISTRY_INTERNAL_PORT)
+            "http://%s:%d",
+            registryContainer.getHost(),
+            registryContainer.getMappedPort(REGISTRY_INTERNAL_PORT)
         );
 
         System.setProperty("registry.url", registryUrl);
@@ -69,22 +71,22 @@ public class RunCucumberIntegrationTests {
 
         try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
             client.namespaces()
-                    .resource(new NamespaceBuilder()
-                            .withNewMetadata()
-                            .withName("tasks")
-                            .endMetadata()
-                            .build())
-                    .create();
+                .resource(new NamespaceBuilder()
+                    .withNewMetadata()
+                    .withName("tasks")
+                    .endMetadata()
+                    .build())
+                .create();
 
             client.serviceAccounts()
-                    .inNamespace("tasks")
-                    .resource(new ServiceAccountBuilder()
-                            .withNewMetadata()
-                            .withName("app-engine")
-                            .withNamespace("tasks")
-                            .endMetadata()
-                            .build())
-                    .create();
+                .inNamespace("tasks")
+                .resource(new ServiceAccountBuilder()
+                    .withNewMetadata()
+                    .withName("app-engine")
+                    .withNamespace("tasks")
+                    .endMetadata()
+                    .build())
+                .create();
         }
     }
 }

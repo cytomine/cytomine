@@ -5,6 +5,7 @@ metadata:
   labels:
     app: iam
 spec:
+  progressDeadlineSeconds: 1200
   replicas: 1
   selector:
     matchLabels:
@@ -28,7 +29,7 @@ spec:
         emptyDir: {}
       initContainers:
       - name: wait-for-postgres
-        image: "{{ .Values.images.postgresql_iam }}"
+        image: "{{ .Values.images.postgresql }}"
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         env:
@@ -68,7 +69,7 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
         image: {{ .Values.images.eclipse_temurin }}
-        command: ['sh', '-c', 'keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -validity 365 -keystore /keystore/server.keystore -dname "cn=Server Administrator,o=Acme,c=GB" -keypass password -storepass password']
+        command: ['sh', '-c', '[ -f /keystore/server.keystore ] || keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -validity 365 -keystore /keystore/server.keystore -dname "cn=Server Administrator,o=Acme,c=GB" -keypass password -storepass password']
         volumeMounts:
         - name: keystore
           mountPath: "/keystore"
@@ -83,7 +84,8 @@ spec:
         command:
         - "/opt/keycloak/bin/kc.sh"
         - "start"
-        - "--log-level=DEBUG"
+        # Uncomment next line to print debug logs
+        # - "--log-level=DEBUG"
         envFrom:
         - configMapRef:
             name: iam
@@ -103,16 +105,40 @@ spec:
             secretKeyRef:
               name: admin-iam-secret
               key: password
+        startupProbe:
+          httpGet:
+            path: /iam/health/live
+            scheme: HTTPS
+            port: 9000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 30
+          timeoutSeconds: 10
         readinessProbe:
           exec:
             command:
               - /bin/sh
               - -c
               - /opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:{{ .Values.iam.port }}/iam --realm master --user admin --password $KC_BOOTSTRAP_ADMIN_PASSWORD --config /tmp/probe.config
-          initialDelaySeconds: 30
           periodSeconds: 10
-          failureThreshold: 12
+          failureThreshold: 3
           timeoutSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /iam/health/live
+            scheme: HTTPS
+            port: 9000
+          periodSeconds: 10
+          failureThreshold: 3
+          timeoutSeconds: 5
+
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "12Gi"
+            cpu: "4"
         volumeMounts:
         - name: opt-keycloak
           mountPath: "/opt/keycloak"

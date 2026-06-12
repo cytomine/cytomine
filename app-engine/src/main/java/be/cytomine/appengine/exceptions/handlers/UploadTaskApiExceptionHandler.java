@@ -31,7 +31,7 @@ public class UploadTaskApiExceptionHandler {
     ) {
         log.info("Internal server error [" + e.getMessage() + "]");
         e.printStackTrace();
-        return new ResponseEntity<AppEngineError>(e.getError(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(e.getError(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({ ValidationException.class })
@@ -41,17 +41,17 @@ public class UploadTaskApiExceptionHandler {
         log.info("Validation failure [" + e.getError().getMessage() + "]");
 
         if (internalError(e)) {
-            return new ResponseEntity<AppEngineError>(
+            return new ResponseEntity<>(
                 e.getError(),
                 HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
 
         if (violatingRequest(e)) {
-            return new ResponseEntity<AppEngineError>(e.getError(), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(e.getError(), HttpStatus.CONFLICT);
         }
 
-        return new ResponseEntity<AppEngineError>(e.getError(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getError(), HttpStatus.BAD_REQUEST);
     }
 
     private static boolean internalError(ValidationException e) {
@@ -68,7 +68,7 @@ public class UploadTaskApiExceptionHandler {
         WebRequest request
     ) {
         log.info("Bundle/Archive processing failure [{}]", e.getMessage());
-        return new ResponseEntity<AppEngineError>(e.getError(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getError(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({ MaxUploadSizeExceededException.class })
@@ -80,7 +80,7 @@ public class UploadTaskApiExceptionHandler {
         log.info("Bundle/Archive processing failure [{}]", message);
 
         AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_MAX_UPLOAD_SIZE_EXCEEDED);
-        return new ResponseEntity<AppEngineError>(error, HttpStatus.PAYLOAD_TOO_LARGE);
+        return new ResponseEntity<>(error, HttpStatus.PAYLOAD_TOO_LARGE);
     }
 
     @ExceptionHandler({ IllegalArgumentException.class })
@@ -89,7 +89,7 @@ public class UploadTaskApiExceptionHandler {
         log.info("Bundle/Archive processing failure [{}]", e.getMessage());
 
         AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_BUNDLE_FORMAT);
-        return new ResponseEntity<AppEngineError>(error, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({ NullPointerException.class })
@@ -100,6 +100,6 @@ public class UploadTaskApiExceptionHandler {
         log.info("Bundle/Archive processing failure [{}]", message);
 
         AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_BUNDLE_FORMAT);
-        return new ResponseEntity<AppEngineError>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

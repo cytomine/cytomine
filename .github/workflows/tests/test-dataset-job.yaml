@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: test-dataset-loader
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: wait-for-image
+          image: registry.cytomine.org/docker/library/alpine:3.18
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for cat.png..."
+              until [ -f /tmp/images/cat.png ]; do sleep 2; done
+              echo "cat.png found!"
+          volumeMounts:
+            - mountPath: /tmp/images
+              name: image-staging
+      containers:
+        - name: loader
+          image: registry.cytomine.org/docker/library/alpine:3.18
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /data/dataset-id/test-project/IMAGES
+              mkdir -p /data/dataset-id/test-project/METADATA
+              cp /tmp/metadata/dataset.xml /data/dataset-id/test-project/METADATA/dataset.xml
+              cp /tmp/images/cat.png /data/dataset-id/test-project/IMAGES/cat.png
+          volumeMounts:
+            - mountPath: /data
+              name: dataset-pvc
+            - mountPath: /tmp/metadata
+              name: dataset-metadata
+            - mountPath: /tmp/images
+              name: image-staging
+      volumes:
+        - name: dataset-pvc
+          persistentVolumeClaim:
+            claimName: test-dataset-pvc
+        - name: dataset-metadata
+          configMap:
+            name: test-dataset-metadata
+        - name: image-staging
+          emptyDir: {}

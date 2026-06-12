@@ -1,8 +1,13 @@
 package be.cytomine.domain.annotation;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +23,9 @@ public class AnnotationLayer extends CytomineDomain {
     @NotBlank
     @Column(unique = true, nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "annotationLayer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Annotation> annotations = new HashSet<>();
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         AnnotationLayer annotationLayer = (AnnotationLayer) domain;

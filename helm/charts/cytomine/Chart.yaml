@@ -18,3 +18,8 @@ maintainers:
     email: uliege@cytomine.org
 icon: https://raw.githubusercontent.com/cytomine/cytomine/main/docs/src/.vuepress/public/images/cytomine-org-icon.svg
 appVersion: "2025.1"
+dependencies:
+  - name: gateway-helm
+    version: "1.3.0"
+    repository: "oci://docker.io/envoyproxy"
+    condition: gateway.installController

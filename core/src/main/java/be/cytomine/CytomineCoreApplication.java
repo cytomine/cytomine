@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EntityScan("be.cytomine.domain")
 @SpringBootApplication
 public class CytomineCoreApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(CytomineCoreApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(CytomineCoreApplication.class, args);
+    }
 }

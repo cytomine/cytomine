@@ -11,15 +11,19 @@
 #  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
-from typing import List, Optional, Union
 
 from pyvips import Image as VIPSImage
 
 from pims.cache import cached_property
 from pims.formats import AbstractFormat
 from pims.formats.utils.abstract import CachedDataPath
-from pims.formats.utils.engines.tifffile import TIFF_FLAGS, TifffileChecker, TifffileParser
+from pims.formats.utils.engines.tifffile import (
+    TIFF_FLAGS,
+    TifffileChecker,
+    TifffileParser,
+)
 from pims.formats.utils.engines.vips import VipsReader, VipsSpatialConvertor
+
 # -----------------------------------------------------------------------------
 # PYRAMIDAL TIFF
 from pims.formats.utils.histogram import DefaultHistogramReader
@@ -34,7 +38,7 @@ class PyrTiffChecker(TifffileChecker):
 
             tf = cls.get_tifffile(pathlike)
             for name in TIFF_FLAGS:
-                if getattr(tf, 'is_' + name, False):
+                if getattr(tf, "is_" + name, False):
                     return False
 
             if len(tf.series) == 1:
@@ -55,26 +59,23 @@ class PyrTiffVipsReader(VipsReader):
     # (i.e it loads the right pyramid level according the requested dimensions)
 
     def read_window(
-        self, region, out_width, out_height,
-        c: Optional[Union[int, List[int]]] = None, **other
+        self, region, out_width, out_height, c: int | list[int] | None = None, **other
     ):
         tier = self.format.pyramid.most_appropriate_tier(
             region, (out_width, out_height)
         )
         region = region.scale_to_tier(tier)
 
-        page = tier.data.get('page_index')
+        page = tier.data.get("page_index")
         tiff_page = VIPSImage.tiffload(str(self.format.path), page=page)
         im = tiff_page.extract_area(
             region.left, region.top, region.width, region.height
         )
         return self._extract_channels(im, c)
 
-    def read_tile(
-        self, tile, c: Optional[Union[int, List[int]]] = None, **other
-    ):
+    def read_tile(self, tile, c: int | list[int] | None = None, **other):
         tier = tile.tier
-        page = tier.data.get('page_index')
+        page = tier.data.get("page_index")
         tiff_page = VIPSImage.tiffload(str(self.format.path), page=page)
 
         # There is no direct access to underlying tiles in vips
@@ -82,9 +83,7 @@ class PyrTiffVipsReader(VipsReader):
         # that has to be read is read.
         # https://github.com/jcupitt/tilesrv/blob/master/tilesrv.c#L461
         # TODO: is direct tile access significantly faster ?
-        im = tiff_page.extract_area(
-            tile.left, tile.top, tile.width, tile.height
-        )
+        im = tiff_page.extract_area(tile.left, tile.top, tile.width, tile.height)
         return self._extract_channels(im, c)
 
 
@@ -132,13 +131,12 @@ class PlanarTiffChecker(TifffileChecker):
 
             tf = cls.get_tifffile(pathlike)
             for name in TIFF_FLAGS:
-                if getattr(tf, 'is_' + name, False):
+                if getattr(tf, "is_" + name, False):
                     return False
 
             if len(tf.series) >= 1:
                 baseline = tf.series[0]
-                if baseline and not baseline.is_pyramidal\
-                        and len(baseline.levels) == 1:
+                if baseline and not baseline.is_pyramidal and len(baseline.levels) == 1:
                     return True
 
             return False

@@ -3,7 +3,7 @@ import os
 import traceback
 import warnings
 from distutils.util import strtobool
-from typing import Annotated, Optional
+from typing import Annotated
 
 from cytomine import Cytomine
 from cytomine.models import (
@@ -41,7 +41,7 @@ from pims.importer.dataset import run_import_datasets
 from pims.importer.importer import run_import
 from pims.importer.listeners import CytomineListener
 from pims.schemas.auth import ApiCredentials, CytomineAuth
-from pims.schemas.operations import ImportResponse
+from pims.schemas.operations import JobResponse
 from pims.tasks.queue import Task, send_task
 from pims.utils.iterables import ensure_list
 from pims.utils.strings import unique_name_generator
@@ -58,9 +58,10 @@ INTERNAL_URL_CORE = get_settings().internal_url_core
 @router.post("/import", tags=["Import"])
 def import_datasets(
     request: Request,
+    background_tasks: BackgroundTasks,
     config: Annotated[Settings, Depends(get_settings)],
     storage_id: int = Query(..., description="The storage where to import the datasets"),
-) -> ImportResponse:
+) -> JobResponse:
     """
     Import datasets from a predefined folder without moving the data.
     """
@@ -84,22 +85,23 @@ def import_datasets(
         signature=signature,
     )
 
-    return run_import_datasets(cytomine_auth, api_credentials, storage_id)
+    background_tasks.add_task(run_import_datasets, cytomine_auth, api_credentials, storage_id)
+    return JobResponse(status="running")
 
 
 @router.post('/upload', tags=['Import'])
 async def import_direct_chunks(
         request: Request,
         background: BackgroundTasks,
-        core: Optional[str] = None,
-        cytomine: Optional[str] = None,
-        storage: Optional[int] = None,
-        id_storage: Optional[int] = Query(None, alias='idStorage'),
-        projects: Optional[str] = None,
-        id_project: Optional[str] = Query(None, alias='idProject'),
-        sync: Optional[bool] = False,
-        keys: Optional[str] = None,
-        values: Optional[str] = None,
+        core: str | None = None,
+        cytomine: str | None = None,
+        storage: int | None = None,
+        id_storage: int | None = Query(None, alias='idStorage'),
+        projects: str | None = None,
+        id_project: str | None = Query(None, alias='idProject'),
+        sync: bool | None = False,
+        keys: str | None = None,
+        values: str | None = None,
         config: Settings = Depends(get_settings)
 ):
     """
@@ -197,7 +199,7 @@ async def import_direct_chunks(
 async def export_file(
         background: BackgroundTasks,
         path: Path = Depends(filepath_parameter),
-        filename: Optional[str] = Query(None, description="Suggested filename for returned file")
+        filename: str | None = Query(None, description="Suggested filename for returned file")
 ):
     """
     Export a file. All files with an identified PIMS role in the server base path can be exported.
@@ -240,7 +242,7 @@ async def export_file(
 async def export_upload(
         background: BackgroundTasks,
         path: Path = Depends(imagepath_parameter),
-        filename: Optional[str] = Query(None, description="Suggested filename for returned file")
+        filename: str | None = Query(None, description="Suggested filename for returned file")
 ):
     """
     Export the upload representation of an image.
@@ -297,9 +299,9 @@ async def delete(
 
 
 def connexion_to_core(
-        request: Request, upload_path: str, upload_size: str, upload_name: str, id_project: Optional[str],
-        id_storage: Optional[int], projects: Optional[str], storage: Optional[int],
-        config: Settings, keys: Optional[str], values: Optional[str]
+        request: Request, upload_path: str, upload_size: str, upload_name: str, id_project: str | None,
+        id_storage: int | None, projects: str | None, storage: int | None,
+        config: Settings, keys: str | None, values: str | None
 ):
     if not INTERNAL_URL_CORE:
         raise BadRequestException(detail="Internal URL core is missing.")
@@ -344,11 +346,11 @@ def connexion_to_core(
                 raise CytomineProblem(f"Project {pid} not found")
             projects.append(project)
 
-        keys = keys.split(',') if keys is not None else []
-        values = values.split(',') if values is not None else []
-        if len(keys) != len(values):
-            raise CytomineProblem(f"Keys {keys} and values {values} have varying size.")
-        user_properties = zip(keys, values)
+        property_keys = keys.split(',') if keys is not None else []
+        property_values = values.split(',') if values is not None else []
+        if len(property_keys) != len(property_values):
+            raise CytomineProblem(f"Keys {property_keys} and values {property_values} have varying size.")
+        user_properties = zip(property_keys, property_values)
 
         root = UploadedFile(
             upload_name, upload_path, upload_size, "", "",

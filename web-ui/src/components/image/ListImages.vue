@@ -161,7 +161,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100" :visible="isPropDisplayed('overview')">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken}"/>
+              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken}"/>
             </router-link>
           </b-table-column>
 

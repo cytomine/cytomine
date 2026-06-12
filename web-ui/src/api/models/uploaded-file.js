@@ -30,7 +30,6 @@ export default class UploadedFile extends Model {
     this.user = null;
     this.projects = null;
     this.storage = null;
-    this.imageServer = null;
 
     this.path = null;
     this.filename = null;
@@ -53,5 +52,4 @@ export default class UploadedFile extends Model {
   get downloadURL() {
     return `${Cytomine.instance.host}${Cytomine.instance.basePath}uploadedfile/${this.id}/download`;
   }
-
 }

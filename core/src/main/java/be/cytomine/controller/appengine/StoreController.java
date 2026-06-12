@@ -56,9 +56,9 @@ public class StoreController {
     @GetMapping("/tasks")
     public String getStoreTasks(@RequestParam String host) {
         String url = UriComponentsBuilder
-                .fromUriString(UriUtils.decode(host, StandardCharsets.UTF_8))
-                .pathSegment("api", "v1", "tasks")
-                .toUriString();
+            .fromUriString(UriUtils.decode(host, StandardCharsets.UTF_8))
+            .pathSegment("api", "v1", "tasks")
+            .toUriString();
 
         return restTemplate.exchange(url, HttpMethod.GET, null, String.class).getBody();
     }

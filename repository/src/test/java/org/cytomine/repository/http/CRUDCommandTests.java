@@ -128,8 +128,7 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
-                .getContentAsString(), new TypeReference<>() {
-            });
+                .getContentAsString(), new TypeReference<>() {});
         String commandID = firstCreate.get().commandId().toString();
         long entityID = firstCreate.get().data().id();
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(post(
@@ -139,8 +138,7 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
-            .getContentAsString(), new TypeReference<>() {
-        });
+            .getContentAsString(), new TypeReference<>() {});
 
         assertTrue(undoCommandResponse.isPresent());
 
@@ -158,8 +156,7 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
-            .getContentAsString(), new TypeReference<>() {
-        });
+            .getContentAsString(), new TypeReference<>() {});
 
         assertTrue(redoCommandResponse.isPresent());
 

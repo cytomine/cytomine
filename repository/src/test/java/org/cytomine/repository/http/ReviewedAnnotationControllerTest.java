@@ -128,8 +128,7 @@ class ReviewedAnnotationControllerTest {
             .getResponse()
             .getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertEquals(Set.of(termId1), result);
         assertEquals(Set.of(termId1), termIdsForAnnotation(reviewedAnnotationTermsId));
     }
@@ -150,8 +149,7 @@ class ReviewedAnnotationControllerTest {
             .getResponse()
             .getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertEquals(Set.of(termId2), result);
         assertEquals(Set.of(termId2), termIdsForAnnotation(reviewedAnnotationTermsId));
     }
@@ -172,8 +170,7 @@ class ReviewedAnnotationControllerTest {
             .getResponse()
             .getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertEquals(Set.of(termId1), result);
         assertEquals(Set.of(termId1), termIdsForAnnotation(reviewedAnnotationTermsId));
     }
@@ -194,8 +191,7 @@ class ReviewedAnnotationControllerTest {
             .getResponse()
             .getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertTrue(result.isEmpty());
         assertTrue(reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId)
             .isEmpty());
@@ -220,8 +216,7 @@ class ReviewedAnnotationControllerTest {
             .getResponse()
             .getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertTrue(result.isEmpty());
         assertEquals(Set.of(termId1), termIdsForAnnotation(reviewedAnnotationTermsId));
     }

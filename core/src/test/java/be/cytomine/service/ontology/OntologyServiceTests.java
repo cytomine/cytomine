@@ -29,11 +29,7 @@ import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.ontology.OntologyExport;
-import be.cytomine.repository.ontology.OntologyRepository;
-import be.cytomine.service.CommandService;
 import be.cytomine.service.PermissionService;
-import be.cytomine.service.command.TransactionService;
-import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,15 +52,9 @@ public class OntologyServiceTests {
     @Autowired
     private OntologyService ontologyService;
     @Autowired
-    private OntologyRepository ontologyRepository;
-    @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
     @Autowired
     private BasicInstanceBuilder builder;
-    @Autowired
-    private CommandService commandService;
-    @Autowired
-    private TransactionService transactionService;
     @Autowired
     private PermissionService permissionService;
 
@@ -92,66 +82,6 @@ public class OntologyServiceTests {
         assertThat(ontologyService.listLight()
             .stream()
             .anyMatch(json -> json.get("id").equals(ontology.getId()))).isTrue();
-    }
-
-    @Test
-    void deleteOntologyWithSuccess() {
-        Ontology ontology = builder.givenAnOntology();
-
-        CommandResponse commandResponse = ontologyService.delete(ontology, null, null, true);
-
-        assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(ontologyService.find(ontology.getId()).isEmpty());
-    }
-
-    @Test
-    void deleteOntologyWithDependenciesWithSuccess() {
-        Ontology ontology = builder.givenAnOntology();
-        Term term1 = builder.givenATerm(ontology);
-        Term term2 = builder.givenATerm(ontology);
-        builder.givenARelationTerm(term1, term2);
-
-
-
-        CommandResponse commandResponse = ontologyService.delete(ontology, null, null, true);
-
-        assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(ontologyService.find(ontology.getId()).isEmpty());
-    }
-
-
-    @Test
-    void undoRedoOntologyDeletionWithSuccess() {
-        Ontology ontology = builder.givenAnOntology();
-
-        ontologyService.delete(ontology, null, null, true);
-
-        assertThat(ontologyService.find(ontology.getId()).isEmpty());
-
-        commandService.undo();
-
-        assertThat(ontologyService.find(ontology.getId()).isPresent());
-
-        commandService.redo();
-
-        assertThat(ontologyService.find(ontology.getId()).isEmpty());
-    }
-
-    @Test
-    void undoRedoOntologyDeletionRestoreDependencies() {
-        Ontology ontology = builder.givenAnOntology();
-
-        ontologyService.delete(ontology, transactionService.start(), null, true);
-
-        assertThat(ontologyService.find(ontology.getId()).isEmpty());
-        commandService.undo();
-
-        assertThat(ontologyService.find(ontology.getId()).isPresent());
-        commandService.redo();
-
-        assertThat(ontologyService.find(ontology.getId()).isEmpty());
     }
 
     @Test

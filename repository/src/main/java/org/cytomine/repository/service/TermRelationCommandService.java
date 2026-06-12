@@ -54,7 +54,7 @@ public class TermRelationCommandService implements
 
     @Override
     public TermRelationEntity updateEntityWithPayload(TermRelationEntity entity, TermRelationCommandPayload payload,
-        Timestamp now) {
+                                                      Timestamp now) {
         return termRelationMapper.updateTermRelationWithPayload(entity, payload, now);
     }
 
@@ -71,19 +71,20 @@ public class TermRelationCommandService implements
 
     @Override
     public UpdateCommandRequest<TermRelationCommandPayload> mapUpdateCommand(long userId,
-        TermRelationCommandPayload before, TermRelationCommandPayload after) {
+                                                                             TermRelationCommandPayload before,
+                                                                             TermRelationCommandPayload after) {
         return new UpdateTermRelationCommand(before, after, userId);
     }
 
     @Override
     public CreateCommandRequest<TermRelationCommandPayload> mapCreateCommand(long userId,
-        TermRelationCommandPayload after) {
+                                                                             TermRelationCommandPayload after) {
         return new CreateTermRelationCommand(after, userId);
     }
 
     @Override
     public DeleteCommandRequest<TermRelationCommandPayload> mapDeleteCommand(long userId,
-        TermRelationCommandPayload before) {
+                                                                             TermRelationCommandPayload before) {
         return new DeleteTermRelationCommand(before, userId);
     }
 
@@ -114,7 +115,7 @@ public class TermRelationCommandService implements
 
     @Override
     public TermRelationEntity updateEntityWithEntity(TermRelationEntity entity, UpdateTermRelation updatePayload,
-        Timestamp now) {
+                                                     Timestamp now) {
         return termRelationMapper.update(entity, updatePayload.term1Id().orElse(entity.getTerm1Id()),
             updatePayload.term2Id().orElse(entity.getTerm2Id()), now);
     }

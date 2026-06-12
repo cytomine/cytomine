@@ -6,8 +6,9 @@ import be.cytomine.common.repository.model.command.payload.request.TermCommandPa
 
 import static java.lang.String.format;
 
-public record UpdateTermCommand(TermCommandPayload before, TermCommandPayload after, long userId)
-    implements UpdateCommandRequest<TermCommandPayload> {
+public record UpdateTermCommand(TermCommandPayload before,
+                                TermCommandPayload after,
+                                long userId) implements UpdateCommandRequest<TermCommandPayload> {
 
     @Override
     public CommandType getCommandType() {
@@ -16,13 +17,8 @@ public record UpdateTermCommand(TermCommandPayload before, TermCommandPayload af
 
     @Override
     public String getActionMessage() {
-        return format("Term %s (%s => %s),color (%s => %s) updated in ontology %s",
-            before.id(),
-            before.name(),
-            after.name(),
-            before.color(),
-            after.color(),
-            after.ontology());
+        return format("Term %s (%s => %s),color (%s => %s) updated in ontology %s", before.id(), before.name(),
+                after.name(), before.color(), after.color(), after.ontology());
     }
 
     @Override

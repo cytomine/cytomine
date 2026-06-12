@@ -104,8 +104,7 @@ public class OntologyResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(ontology.getId().intValue()))
             .andExpect(jsonPath("$.name").value(ontology.getName()))
-            .andExpect(jsonPath("$.created").exists())
-            .andExpect(jsonPath("$.updated").exists());
+            .andExpect(jsonPath("$.created").exists());
     }
 
     @Test

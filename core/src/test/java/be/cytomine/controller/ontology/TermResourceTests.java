@@ -255,8 +255,7 @@ public class TermResourceTests {
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.update(eq(term.getId()),
             eq(userId),
-            any())).thenReturn(Optional.of(new HttpCommandResponse(true,
-            new TermResponse(term.getId(),
+            any())).thenReturn(Optional.of(new HttpCommandResponse(true, new TermResponse(term.getId(),
                 term.getName(),
                 term.getColor(),
                 term.getOntology().getId(),

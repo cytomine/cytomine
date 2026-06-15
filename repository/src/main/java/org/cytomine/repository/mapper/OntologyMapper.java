@@ -24,8 +24,8 @@ public interface OntologyMapper {
     OntologyUser map(Long id, String fullName);
 
     @Mapping(target = "user", source = "userId")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "userId"})
-    OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity, long userId);
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity);
 
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "userId", "created", "updated", "deleted", "terms"})

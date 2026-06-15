@@ -38,8 +38,7 @@ public class OntologyController implements OntologyHttpContract {
     public Optional<OntologyResponse> get(long id, long userId) {
         return repository.findByIdAndDeletedNull(id)
             .filter(ontologyEntity -> aclService.canReadOntology(userId, ontologyEntity.getId()))
-            .flatMap(ontologyEntity -> userRepository.findById(ontologyEntity.getUserId())
-                .map(user -> ontologyMapper.mapToOntologyResponse(ontologyEntity, userId)));
+            .map(ontologyMapper::mapToOntologyResponse);
 
     }
 
@@ -69,14 +68,14 @@ public class OntologyController implements OntologyHttpContract {
     @Override
     public Set<OntologyLight> getAllLightForUser(long userId) {
         return repository.findAllByUserId(userId).stream()
-            .map(ontologyEntity -> ontologyMapper.mapToOntologyLight(ontologyEntity))
+            .map(ontologyMapper::mapToOntologyLight)
             .collect(toSet());
     }
 
     @Override
     public Set<OntologyResponse> getAllForUser(long userId) {
         return repository.findAllByUserId(userId).stream()
-            .map(ontologyEntity -> ontologyMapper.mapToOntologyResponse(ontologyEntity, userId))
+            .map(ontologyMapper::mapToOntologyResponse)
             .collect(toSet());
     }
 }

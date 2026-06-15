@@ -33,27 +33,27 @@ public class StorageController {
     private final CurrentUserService currentUserService;
     private final StorageHttpContract storageHttpContract;
 
-    @PostMapping("/storages")
+    @PostMapping("/storage.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateStorage payload) {
         long userId = currentUserService.getCurrentUser().getId();
         return storageHttpContract.create(userId, payload);
     }
 
-    @GetMapping("/storages/{id}")
+    @GetMapping("/storage/{id}.json")
     public StorageResponse show(@PathVariable long id) {
         long userId = currentUserService.getCurrentUser().getId();
         return storageHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_STORAGE, id)));
     }
 
-    @PutMapping("/storages/{id}")
+    @PutMapping("/storage/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateStorage payload) {
         long userId = currentUserService.getCurrentUser().getId();
         return storageHttpContract.update(id, userId, payload)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_STORAGE, id)));
     }
 
-    @DeleteMapping("/storages/{id}")
+    @DeleteMapping("/storage/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         long userId = currentUserService.getCurrentUser().getId();
         return storageHttpContract.delete(id, userId)

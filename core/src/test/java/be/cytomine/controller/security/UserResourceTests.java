@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.Optional;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +29,15 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.OntologyMapper;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.image.server.Storage;
+import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastConnection;
@@ -59,6 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -116,6 +122,12 @@ public class UserResourceTests {
 
     @Autowired
     private PermissionService permissionService;
+
+    @MockitoBean
+    private OntologyHttpContract ontologyHttpContract;
+
+    @Autowired
+    private OntologyMapper ontologyMapper;
 
     @BeforeEach
     public void init() {
@@ -247,6 +259,27 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.collection[?(@.username=='" + projectUser.getUsername() + "')]").doesNotExist());
     }
 
+    @Test
+    @Transactional
+    public void listOntologyUser() throws Exception {
+        User projectAdmin = builder.givenAUser();
+        User projectUser = builder.givenAUser();
+        User simpleUser = builder.givenAUser();
+        Ontology ontology = builder.givenAnOntology();
+        Project project = builder.givenAProjectWithOntology(ontology);
+        builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
+        builder.addUserToProject(project, projectUser.getUsername(), READ);
+
+        when(ontologyHttpContract.get(ontology.getId(), projectUser.getId())).thenReturn(
+            Optional.ofNullable(ontologyMapper.map(ontology)));
+
+        restUserControllerMockMvc.perform(get("/api/ontology/{id}/user.json", ontology.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
+            .andExpect(jsonPath("$.collection[?(@.username=='" + projectAdmin.getUsername() + "')]").exists())
+            .andExpect(jsonPath("$.collection[?(@.username=='" + projectUser.getUsername() + "')]").exists())
+            .andExpect(jsonPath("$.collection[?(@.username=='" + simpleUser.getUsername() + "')]").doesNotExist());
+    }
 
     @Test
     @Transactional

@@ -92,3 +92,18 @@ jobs:
           allow: network.host
           network: host
           target: ${{ matrix.image.target || '' }}
+
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: registry.cytomine.org/cytomine/${{ matrix.image.name }}:${{ env.DEPLOYMENT_NAME }}
+          format: table
+          output: trivy-${{ matrix.image.name }}.txt
+          exit-code: '0'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+
+      - name: Add Trivy results to job summary
+        run: |
+          echo "## Trivy scan - ${{ matrix.image.name }}" >> $GITHUB_STEP_SUMMARY
+          cat trivy-${{ matrix.image.name }}.txt >> $GITHUB_STEP_SUMMARY

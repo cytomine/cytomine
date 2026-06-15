@@ -12,4 +12,8 @@ public interface Commands {
     String DELETE_TERM = "be.cytomine.DeleteTermCommand";
     String DELETE_TERM_RELATION = "be.cytomine.DeleteTermRelationCommand";
     String DELETE_ONTOLOGY = "be.cytomine.DeleteOntologyCommand";
+
+    String CREATE_STORAGE = "be.cytomine.AddStorageCommand";
+    String UPDATE_STORAGE = "be.cytomine.EditStorageCommand";
+    String DELETE_STORAGE = "be.cytomine.DeleteStorageCommand";
 }

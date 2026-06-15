@@ -14,6 +14,7 @@ public class ACLService {
 
     private static final String ONTOLOGY_CLASS = "be.cytomine.domain.ontology.Ontology";
     private static final String PROJECT_CLASS = "be.cytomine.domain.project.Project";
+    private static final String STORAGE_CLASS = "be.cytomine.domain.image.server.Storage";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -31,6 +32,14 @@ public class ACLService {
 
     public boolean canDeleteOntology(long userId, long ontologyId) {
         return isAdmin(userId) || hasPermission(userId, ontologyId, ONTOLOGY_CLASS, DELETE_MASK);
+    }
+
+    public boolean canWriteStorage(long userId, long storageId) {
+        return isAdmin(userId) || hasPermission(userId, storageId, STORAGE_CLASS, WRITE_MASK);
+    }
+
+    public boolean canDeleteStorage(long userId, long storageId) {
+        return isAdmin(userId) || hasPermission(userId, storageId, STORAGE_CLASS, DELETE_MASK);
     }
 
     private boolean isAdmin(long userId) {

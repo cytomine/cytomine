@@ -39,8 +39,10 @@ public class TermCommandService
 
     @Override
     public TermEntity updateEntityWithEntity(TermEntity entity, UpdateTerm payload, Timestamp now) {
-        return termMapper.update(entity, payload.name().orElse(entity.getName()),
-            payload.color().orElse(entity.getColor()), now);
+        return termMapper.update(entity,
+            payload.name().orElse(entity.getName()),
+            payload.color().orElse(entity.getColor()),
+            now);
     }
 
     @Override
@@ -69,7 +71,8 @@ public class TermCommandService
     }
 
     @Override
-    public UpdateCommandRequest<TermCommandPayload> mapUpdateCommand(long userId, TermCommandPayload before,
+    public UpdateCommandRequest<TermCommandPayload> mapUpdateCommand(long userId,
+        TermCommandPayload before,
         TermCommandPayload after) {
 
         return new UpdateTermCommand(before, after, userId);

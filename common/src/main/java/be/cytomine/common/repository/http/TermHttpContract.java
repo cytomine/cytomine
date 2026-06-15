@@ -33,8 +33,9 @@ public interface TermHttpContract {
     Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateTerm createTerm);
 
     @PutExchange("/{id}")
-    Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
-                                         @RequestBody UpdateTerm updateTerm);
+    Optional<HttpCommandResponse> update(@PathVariable long id,
+        @RequestParam long userId,
+        @RequestBody UpdateTerm updateTerm);
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);

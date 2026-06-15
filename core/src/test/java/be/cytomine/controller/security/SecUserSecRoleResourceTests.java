@@ -182,7 +182,7 @@ public class SecUserSecRoleResourceTests {
         UUID commandId = UUID.randomUUID();
         TermRelationResponse response = new TermRelationResponse(
             relationId, term1.getId(), term2.getId(),  1L,
-            LocalDateTime.now(), Optional.empty(), LocalDateTime.now(), "parent"
+            Optional.empty(), Optional.empty(), LocalDateTime.now(), "parent"
         );
 
         when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(

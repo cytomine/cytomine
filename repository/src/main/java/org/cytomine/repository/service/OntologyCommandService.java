@@ -43,7 +43,8 @@ public class OntologyCommandService implements
     }
 
     @Override
-    public UpdateCommandRequest<OntologyCommandPayload> mapUpdateCommand(long userId, OntologyCommandPayload before,
+    public UpdateCommandRequest<OntologyCommandPayload> mapUpdateCommand(long userId,
+        OntologyCommandPayload before,
         OntologyCommandPayload after) {
         return new UpdateOntologyCommand(before, after, userId);
     }
@@ -69,7 +70,8 @@ public class OntologyCommandService implements
     }
 
     @Override
-    public OntologyEntity updateEntityWithPayload(OntologyEntity entity, OntologyCommandPayload payload,
+    public OntologyEntity updateEntityWithPayload(OntologyEntity entity,
+        OntologyCommandPayload payload,
         Timestamp now) {
         return ontologyMapper.updateWithPayload(entity, payload, now);
     }

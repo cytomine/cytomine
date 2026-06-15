@@ -50,21 +50,23 @@ class TermControllerTest implements CRUDCommandTests<CreateTerm, TermResponse, U
 
     @Override
     public TermResponse expectedUpdatedResponse(TermResponse response, UpdateTerm updatePayload,
-                                                LocalDateTime updatedTime) {
+        LocalDateTime updatedTime) {
         return new TermResponse(response.id(), updatePayload.name().orElse(response.name()),
             updatePayload.color().orElse(response.color()), response.ontologyId(), response.created(),
-            updatedTime, response.deleted(), response.comment(), response.children());
+            Optional.of(updatedTime), response.deleted(), response.comment(), response.children());
     }
 
     @Override
     public TermResponse expectedDeletedResponse(TermResponse response, LocalDateTime deletedTime) {
         return new TermResponse(response.id(), response.name(), response.color(), response.ontologyId(),
-            response.created(), response.updated(), Optional.of(deletedTime), response.comment(), response.children());
+            response.created(), response.updated(), Optional.of(deletedTime), response.comment(),
+            response.children());
     }
 
     @Override
     public TermResponse expectChangedUpdatedTime(TermResponse response, LocalDateTime updatedTime) {
         return new TermResponse(response.id(), response.name(), response.color(), response.ontologyId(),
-            response.created(), updatedTime, response.deleted(), response.comment(), response.children());
+            response.created(), Optional.of(updatedTime), response.deleted(), response.comment(),
+            response.children());
     }
 }

@@ -17,8 +17,8 @@ dependencies = [
   "python-multipart==0.0.27",
   "redis==6.4.0",
   "timm==1.0.19",
-  "torch==2.8.0",
-  "torchvision==0.23.0",
+  "torch==2.10.0",
+  "torchvision==0.25.0",
   "uvicorn[standard]==0.35.0",
 ]
 

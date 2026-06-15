@@ -61,8 +61,7 @@ class ReviewedAnnotationControllerTest {
         Long userRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update(
             "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) SELECT ?, 0, ?, (SELECT id FROM "
-                + "sec_role WHERE authority = 'ROLE_ADMIN')",
-            userRoleId, userId);
+                + "sec_role WHERE authority = 'ROLE_ADMIN')", userRoleId, userId);
 
         Long ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'ontology', ?)",
@@ -80,9 +79,8 @@ class ReviewedAnnotationControllerTest {
 
         Long imageInstanceId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO image_instance (id, version, base_image_id, count_image_job_annotations,"
-                                + " count_image_reviewed_annotations, project_id, user_id, class) "
-                                + "VALUES (?, 0, ?, 0, 0, ?, ?, 'be.cytomine.domain.image.ImageInstance')",
-            imageInstanceId,
+                + " count_image_reviewed_annotations, project_id, user_id, class) "
+                + "VALUES (?, 0, ?, 0, 0, ?, ?, 'be.cytomine.domain.image.ImageInstance')", imageInstanceId,
             abstractImageId, projectId, userId);
 
         termId1 = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
@@ -109,15 +107,10 @@ class ReviewedAnnotationControllerTest {
     void replaceAllTermIdsWhenNoExistingLinksCreatesAndReturnsNewLinks() {
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(Set.of(termId1))))
-                              .andExpect(status().isOk())
-                              .andReturn()
-                              .getResponse()
-                              .getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId1))))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertEquals(Set.of(termId1), result);
         assertEquals(Set.of(termId1), termIdsForAnnotation(reviewedAnnotationTermsId));
     }
@@ -130,15 +123,10 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(Set.of(termId2))))
-                              .andExpect(status().isOk())
-                              .andReturn()
-                              .getResponse()
-                              .getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId2))))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertEquals(Set.of(termId2), result);
         assertEquals(Set.of(termId2), termIdsForAnnotation(reviewedAnnotationTermsId));
     }
@@ -151,15 +139,10 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(Set.of(termId1))))
-                              .andExpect(status().isOk())
-                              .andReturn()
-                              .getResponse()
-                              .getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId1))))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertEquals(Set.of(termId1), result);
         assertEquals(Set.of(termId1), termIdsForAnnotation(reviewedAnnotationTermsId));
     }
@@ -172,18 +155,13 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(Set.of())))
-                              .andExpect(status().isOk())
-                              .andReturn()
-                              .getResponse()
-                              .getContentAsString();
+                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of())))
+            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertTrue(result.isEmpty());
-        assertTrue(reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId)
-                       .isEmpty());
+        assertTrue(
+            reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId).isEmpty());
     }
 
     @Test
@@ -197,24 +175,17 @@ class ReviewedAnnotationControllerTest {
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId",
-                        nonAdminUserId.toString())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(Set.of(termId2))))
-                              .andExpect(status().isOk())
-                              .andReturn()
-                              .getResponse()
-                              .getContentAsString();
+                        nonAdminUserId.toString()).contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(Set.of(termId2)))).andExpect(status().isOk()).andReturn()
+            .getResponse().getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertTrue(result.isEmpty());
         assertEquals(Set.of(termId1), termIdsForAnnotation(reviewedAnnotationTermsId));
     }
 
     private Set<Long> termIdsForAnnotation(long annotationTermsId) {
-        return reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(annotationTermsId)
-                   .stream()
-                   .map(ReviewedAnnotationLinkEntity::getTermId)
-                   .collect(java.util.stream.Collectors.toSet());
+        return reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(annotationTermsId).stream()
+            .map(ReviewedAnnotationLinkEntity::getTermId).collect(java.util.stream.Collectors.toSet());
     }
 }

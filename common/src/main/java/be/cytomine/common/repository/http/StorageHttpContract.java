@@ -21,7 +21,7 @@ import static be.cytomine.common.repository.http.StorageHttpContract.ROOT_PATH;
 
 @HttpExchange(ROOT_PATH)
 public interface StorageHttpContract {
-    String ROOT_PATH = "/storage";
+    String ROOT_PATH = "/storages";
 
     @GetExchange("/{id}")
     Optional<StorageResponse> get(@PathVariable long id, @RequestParam long userId);

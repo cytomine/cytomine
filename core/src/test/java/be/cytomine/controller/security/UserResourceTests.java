@@ -64,6 +64,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -226,18 +228,18 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void listProjectRepresentatives() throws Exception {
-        User projectPrepresentative = builder.givenAUser();
+        User projectRepresentative = builder.givenAUser();
         User projectUser = builder.givenAUser();
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, projectPrepresentative.getUsername(), ADMINISTRATION);
+        builder.addUserToProject(project, projectRepresentative.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
-        builder.givenAProjectRepresentativeUser(project, projectPrepresentative);
+        builder.givenAProjectRepresentativeUser(project, projectRepresentative);
 
         restUserControllerMockMvc.perform(
                 get("/api/project/{id}/users/representative.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.username=='" + projectPrepresentative.getUsername() + "')]").exists())
+            .andExpect(jsonPath("$.collection[?(@.username=='" + projectRepresentative.getUsername() + "')]").exists())
             .andExpect(jsonPath("$.collection[?(@.username=='" + projectUser.getUsername() + "')]").doesNotExist());
     }
 
@@ -269,8 +271,7 @@ public class UserResourceTests {
         Project project = builder.givenAProjectWithOntology(ontology);
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
-
-        when(ontologyHttpContract.get(ontology.getId(), projectUser.getId())).thenReturn(
+        when(ontologyHttpContract.get(eq(ontology.getId()), anyLong())).thenReturn(
             Optional.ofNullable(ontologyMapper.map(ontology)));
 
         restUserControllerMockMvc.perform(get("/api/ontology/{id}/user.json", ontology.getId()))

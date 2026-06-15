@@ -1,7 +1,6 @@
 package be.cytomine.service.ontology;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -59,25 +58,6 @@ public class OntologyService extends ModelService {
         Optional<Ontology> optionalOntology = ontologyRepository.findByIdAndDeletedNull(id);
         optionalOntology.ifPresent(ontology -> securityACLService.check(ontology, READ));
         return optionalOntology;
-    }
-
-    /**
-     * List ontology with full tree structure (term, relation,...) Security check is done inside method
-     */
-    public List<Ontology> list() {
-        return securityACLService.getOntologyList(currentUserService.getCurrentUser());
-    }
-
-    /**
-     * List ontology with just id/name Security check is done inside method
-     */
-    public List<JsonObject> listLight() {
-        List<Ontology> ontologies = list();
-        List<JsonObject> data = new ArrayList<>();
-        for (Ontology ontology : ontologies) {
-            data.add(JsonObject.of("id", ontology.getId(), "name", ontology.getName()));
-        }
-        return data;
     }
 
     @Override

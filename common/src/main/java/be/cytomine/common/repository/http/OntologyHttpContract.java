@@ -1,6 +1,7 @@
 package be.cytomine.common.repository.http;
 
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.service.annotation.PutExchange;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 import static be.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
@@ -31,12 +33,15 @@ public interface OntologyHttpContract {
 
     @PutExchange("/{id}")
     Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
-                                         @RequestBody UpdateOntology updateOntology);
+        @RequestBody UpdateOntology updateOntology);
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
-    // Coming soon
-    // @GetExchange("")
-    // Set<OntologyLight> getAll(@RequestParam long userId);
+    @GetExchange("/all-light")
+    Set<OntologyLight> getAllLightForUser(@RequestParam long userId);
+
+    @GetExchange("/all")
+    Set<OntologyResponse> getAllForUser(@RequestParam long userId);
+
 }

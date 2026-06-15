@@ -1,6 +1,8 @@
 package be.cytomine.authorization.security;
 
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Disabled;
@@ -15,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.AbstractAuthorizationTest;
+import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.project.ProjectMemberService;
@@ -25,6 +29,9 @@ import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -47,6 +54,9 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Autowired
     SecUserSecRoleService secSecUserSecRoleService;
+
+    @MockitoBean
+    private OntologyHttpContract ontologyHttpContract;
 
     @Test
     @WithMockUser(username = GUEST)
@@ -178,6 +188,10 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void adminCanDeleteAnotherUser() {
+
+        when(ontologyHttpContract.getAllLightForUser(anyLong())).thenReturn(Set.of(new OntologyLight(100, "test")));
+        when(ontologyHttpContract.delete(eq(100), anyLong())).thenReturn(Optional.empty());
+
         User user = builder.givenAUser();
         expectOK(() -> userService.delete(user, null, null, false));
     }

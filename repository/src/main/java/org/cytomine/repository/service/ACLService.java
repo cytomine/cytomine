@@ -34,6 +34,10 @@ public class ACLService {
         return isAdmin(userId) || hasPermission(userId, ontologyId, ONTOLOGY_CLASS, DELETE_MASK);
     }
 
+    public boolean canReadStorage(long userId, long storageId) {
+        return isAdmin(userId) || hasPermission(userId, storageId, STORAGE_CLASS, READ_MASK);
+    }
+
     public boolean canWriteStorage(long userId, long storageId) {
         return isAdmin(userId) || hasPermission(userId, storageId, STORAGE_CLASS, WRITE_MASK);
     }

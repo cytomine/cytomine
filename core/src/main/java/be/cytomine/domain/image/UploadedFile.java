@@ -45,11 +45,11 @@ public class UploadedFile extends CytomineDomain implements Serializable {
     public static Set<String> ARCHIVE_FORMATS = Set.of("ZIP", "TAR", "GZTAR", "BZTAR", "XZTAR");
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "storage_id", nullable = true)
+    @JoinColumn(name = "storage_id")
     private Storage storage;
 
     @Convert(converter = LongArrayToBytesConverter.class)

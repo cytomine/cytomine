@@ -1,5 +1,8 @@
 package be.cytomine.common.repository.model.command;
 
 public enum DataType {
-    TERM, TERM_RELATION, ONTOLOGY
+    ONTOLOGY,
+    TERM,
+    TERM_RELATION,
+    UPLOADED_FILE
 }

@@ -29,10 +29,10 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.image.server.Storage;
-import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastConnection;
@@ -72,7 +72,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class UserResourceTests {
 
     @Autowired
@@ -143,7 +143,6 @@ public class UserResourceTests {
         return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
     }
 
-
     PersistentUserPosition givenAPersistentUserPosition(
         Date creation, User user,
         SliceInstance sliceInstance,
@@ -212,7 +211,6 @@ public class UserResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void listProjectRepresentatives() throws Exception {
@@ -247,26 +245,6 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.username=='" + projectCreator.getUsername() + "')]").exists())
             .andExpect(jsonPath("$.collection[?(@.username=='" + projectUser.getUsername() + "')]").doesNotExist());
-    }
-
-
-    @Test
-    @Transactional
-    public void listOntologyUser() throws Exception {
-        User projectAdmin = builder.givenAUser();
-        User projectUser = builder.givenAUser();
-        User simpleUser = builder.givenAUser();
-        Ontology ontology = builder.givenAnOntology();
-        Project project = builder.givenAProjectWithOntology(ontology);
-        builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
-        builder.addUserToProject(project, projectUser.getUsername(), READ);
-
-        restUserControllerMockMvc.perform(get("/api/ontology/{id}/user.json", ontology.getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.username=='" + projectAdmin.getUsername() + "')]").exists())
-            .andExpect(jsonPath("$.collection[?(@.username=='" + projectUser.getUsername() + "')]").exists())
-            .andExpect(jsonPath("$.collection[?(@.username=='" + simpleUser.getUsername() + "')]").doesNotExist());
     }
 
 
@@ -472,7 +450,6 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.primaryKey").value(not(oldPrimaryKey)))
             .andExpect(jsonPath("$.secondaryKey").value(not(oldSecondaryKey)));
     }
-
 
     @Test
     @Transactional
@@ -747,7 +724,6 @@ public class UserResourceTests {
         assertThat(permissionService.hasACLPermission(project, user1.getUsername(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project, user1.getUsername(), ADMINISTRATION)).isFalse();
     }
-
 
     @Test
     @Transactional

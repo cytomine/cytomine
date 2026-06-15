@@ -1,9 +1,14 @@
 package be.cytomine.controller.repository;
 
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,10 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
+import be.cytomine.dto.ontology.OntologyExport;
+import be.cytomine.dto.ontology.TermSummary;
 import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
@@ -33,6 +43,7 @@ public class OntologyController {
     public static final String UNABLE_TO_FIND_ONTOLOGY = "Unable to find ontology with id: %s";
 
     private final OntologyHttpContract ontologyHttpContract;
+    private final TermHttpContract termHttpContract;
     private final CurrentUserService currentUserService;
 
     @GetMapping("/ontology/{id}.json")
@@ -41,6 +52,37 @@ public class OntologyController {
         long userId = currentUserService.getCurrentUser().getId();
         return ontologyHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_ONTOLOGY, id)));
+    }
+
+    @GetMapping("/ontology_light.json")
+    public Set<OntologyLight> getAllLightForUser(@PathVariable long id) {
+        log.debug("REST request to get Ontology : {}", id);
+        long userId = currentUserService.getCurrentUser().getId();
+        return ontologyHttpContract.getAllLightForUser(userId);
+    }
+
+    @GetMapping("/ontology.json")
+    public Set<OntologyResponse> getAll(@PathVariable long id) {
+        log.debug("REST request to get Ontology : {}", id);
+        long userId = currentUserService.getCurrentUser().getId();
+        return ontologyHttpContract.getAllForUser(userId);
+    }
+
+    @GetMapping(value = "/ontology/{id}/export")
+    public ResponseEntity<OntologyExport> export(@PathVariable Long id) {
+        log.debug("GET /ontology/{}/export", id);
+
+        Long userId = currentUserService.getCurrentUser().getId();
+        OntologyLight ontology = ontologyHttpContract.getLight(id, userId)
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_ONTOLOGY, id)));
+
+        Page<TermResponse> terms = termHttpContract.findTermsByOntology(id, userId, Pageable.unpaged());
+        OntologyExport export =
+            new OntologyExport(ontology.name(), terms.getContent().stream().map(TermSummary::from).toList());
+
+        String filename = ontology.name() + ".json";
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+            .body(export);
     }
 
     @PostMapping("/ontology.json")

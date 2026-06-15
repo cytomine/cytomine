@@ -28,6 +28,9 @@ public interface OntologyHttpContract {
     @GetExchange("/{id}")
     Optional<OntologyResponse> get(@PathVariable long id, @RequestParam long userId);
 
+    @GetExchange("/{id}/light")
+    Optional<OntologyLight> getLight(@PathVariable long id, @RequestParam long userId);
+
     @PostExchange
     Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateOntology createPayload);
 

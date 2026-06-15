@@ -2,6 +2,7 @@ package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
@@ -16,11 +17,12 @@ import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 import static be.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
-
+import static java.util.stream.Collectors.toSet;
 
 @RequiredArgsConstructor
 @RestController
@@ -36,9 +38,17 @@ public class OntologyController implements OntologyHttpContract {
     public Optional<OntologyResponse> get(long id, long userId) {
         return repository.findByIdAndDeletedNull(id)
             .filter(ontologyEntity -> aclService.canReadOntology(userId, ontologyEntity.getId()))
-            .flatMap(ontologyEntity -> userRepository.findById(userId)
+            .flatMap(ontologyEntity -> userRepository.findById(ontologyEntity.getUserId())
                 .map(user -> ontologyMapper.mapToOntologyResponse(ontologyEntity, userId)));
 
+    }
+
+    @Override
+    public Optional<OntologyLight> getLight(long id, long userId) {
+        return repository.findByIdAndDeletedNull(id)
+            .filter(ontologyEntity -> aclService.canReadOntology(userId, ontologyEntity.getId()))
+            .flatMap(ontologyEntity -> userRepository.findById(ontologyEntity.getUserId())
+                .map(user -> ontologyMapper.mapToOntologyLight(ontologyEntity)));
     }
 
     @Override
@@ -54,5 +64,19 @@ public class OntologyController implements OntologyHttpContract {
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
         return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+    }
+
+    @Override
+    public Set<OntologyLight> getAllLightForUser(long userId) {
+        return repository.findAllByUserId(userId).stream()
+            .map(ontologyEntity -> ontologyMapper.mapToOntologyLight(ontologyEntity))
+            .collect(toSet());
+    }
+
+    @Override
+    public Set<OntologyResponse> getAllForUser(long userId) {
+        return repository.findAllByUserId(userId).stream()
+            .map(ontologyEntity -> ontologyMapper.mapToOntologyResponse(ontologyEntity, userId))
+            .collect(toSet());
     }
 }

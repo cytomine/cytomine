@@ -67,11 +67,11 @@ public class OntologyController implements OntologyHttpContract {
 
     @Override
     public Page<OntologyLight> getAllLightForUser(long userId, Pageable pageable) {
-        return repository.findAllByUserId(userId).map(ontologyMapper::mapToOntologyLight);
+        return repository.findAllByUserId(userId, pageable).map(ontologyMapper::mapToOntologyLight);
     }
 
     @Override
     public Page<OntologyResponse> getAllForUser(long userId, Pageable pageable) {
-        return repository.findAllByUserId(userId).map(ontologyMapper::mapToOntologyResponse);
+        return repository.findAllByUserId(userId, pageable).map(ontologyMapper::mapToOntologyResponse);
     }
 }

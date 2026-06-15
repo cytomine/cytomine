@@ -57,15 +57,15 @@ public class OntologyController {
     }
 
     @GetMapping("/ontology_light.json")
-    public CollectionResponse<OntologyLight> getAllLightForUser(@PathVariable long id, Pageable pageable) {
-        log.debug("REST request to get Ontology : {}", id);
+    public CollectionResponse<OntologyLight> getAllLightForUser(Pageable pageable) {
+        log.debug("REST request to get Ontologies");
         long userId = currentUserService.getCurrentUser().getId();
         return pageMapper.toCollectionResponse(ontologyHttpContract.getAllLightForUser(userId, pageable));
     }
 
     @GetMapping("/ontology.json")
-    public CollectionResponse<OntologyResponse> getAll(@PathVariable long id, Pageable pageable) {
-        log.debug("REST request to get Ontology : {}", id);
+    public CollectionResponse<OntologyResponse> getAll(Pageable pageable) {
+        log.debug("REST request to get Ontologies");
         long userId = currentUserService.getCurrentUser().getId();
         return pageMapper.toCollectionResponse(ontologyHttpContract.getAllForUser(userId, pageable));
     }

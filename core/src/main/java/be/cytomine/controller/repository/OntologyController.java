@@ -1,7 +1,6 @@
 package be.cytomine.controller.repository;
 
 import java.util.Optional;
-import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,14 +54,14 @@ public class OntologyController {
     }
 
     @GetMapping("/ontology_light.json")
-    public Set<OntologyLight> getAllLightForUser(@PathVariable long id) {
+    public Page<OntologyLight> getAllLightForUser(@PathVariable long id) {
         log.debug("REST request to get Ontology : {}", id);
         long userId = currentUserService.getCurrentUser().getId();
         return ontologyHttpContract.getAllLightForUser(userId);
     }
 
     @GetMapping("/ontology.json")
-    public Set<OntologyResponse> getAll(@PathVariable long id) {
+    public Page<OntologyResponse> getAll(@PathVariable long id) {
         log.debug("REST request to get Ontology : {}", id);
         long userId = currentUserService.getCurrentUser().getId();
         return ontologyHttpContract.getAllForUser(userId);

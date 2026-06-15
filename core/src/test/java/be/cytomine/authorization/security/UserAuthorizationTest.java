@@ -1,8 +1,8 @@
 package be.cytomine.authorization.security;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Disabled;
@@ -19,6 +19,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.AbstractAuthorizationTest;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
+import be.cytomine.common.repository.utils.SpringPage;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.project.ProjectMemberService;
@@ -40,21 +41,16 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
-    @MockitoBean
-    private AccountService accountService;
-
     @Autowired
     ProjectMemberService projectMemberService;
-
     @Autowired
     UserService userService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     SecUserSecRoleService secSecUserSecRoleService;
-
+    @MockitoBean
+    private AccountService accountService;
     @MockitoBean
     private OntologyHttpContract ontologyHttpContract;
 
@@ -189,7 +185,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @WithMockUser(username = SUPERADMIN)
     public void adminCanDeleteAnotherUser() {
 
-        when(ontologyHttpContract.getAllLightForUser(anyLong())).thenReturn(Set.of(new OntologyLight(100, "test")));
+        when(ontologyHttpContract.getAllLightForUser(anyLong())).thenReturn(new SpringPage<>(
+            List.of(new OntologyLight(100, "test")), 1, 1, 1));
         when(ontologyHttpContract.delete(eq(100), anyLong())).thenReturn(Optional.empty());
 
         User user = builder.givenAUser();

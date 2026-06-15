@@ -1,9 +1,9 @@
 package be.cytomine.common.repository.http;
 
 import java.util.Optional;
-import java.util.Set;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,9 +42,9 @@ public interface OntologyHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
     @GetExchange("/all-light")
-    Set<OntologyLight> getAllLightForUser(@RequestParam long userId);
+    Page<OntologyLight> getAllLightForUser(@RequestParam long userId);
 
     @GetExchange("/all")
-    Set<OntologyResponse> getAllForUser(@RequestParam long userId);
+    Page<OntologyResponse> getAllForUser(@RequestParam long userId);
 
 }

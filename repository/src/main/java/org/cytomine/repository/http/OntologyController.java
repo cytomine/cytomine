@@ -2,7 +2,6 @@ package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.OntologyMapper;
@@ -10,6 +9,7 @@ import org.cytomine.repository.persistence.OntologyRepository;
 import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.OntologyCommandService;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +22,6 @@ import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 import static be.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
-import static java.util.stream.Collectors.toSet;
 
 @RequiredArgsConstructor
 @RestController
@@ -45,9 +44,9 @@ public class OntologyController implements OntologyHttpContract {
     @Override
     public Optional<OntologyLight> getLight(long id, long userId) {
         return repository.findByIdAndDeletedNull(id)
-            .filter(ontologyEntity -> aclService.canReadOntology(userId, ontologyEntity.getId()))
-            .flatMap(ontologyEntity -> userRepository.findById(ontologyEntity.getUserId())
-                .map(user -> ontologyMapper.mapToOntologyLight(ontologyEntity)));
+            .filter(ontologyEntity -> aclService.canReadOntology(userId, ontologyEntity.getId())).flatMap(
+                ontologyEntity -> userRepository.findById(ontologyEntity.getUserId())
+                    .map(user -> ontologyMapper.mapToOntologyLight(ontologyEntity)));
     }
 
     @Override
@@ -66,16 +65,12 @@ public class OntologyController implements OntologyHttpContract {
     }
 
     @Override
-    public Set<OntologyLight> getAllLightForUser(long userId) {
-        return repository.findAllByUserId(userId).stream()
-            .map(ontologyMapper::mapToOntologyLight)
-            .collect(toSet());
+    public Page<OntologyLight> getAllLightForUser(long userId) {
+        return repository.findAllByUserId(userId).map(ontologyMapper::mapToOntologyLight);
     }
 
     @Override
-    public Set<OntologyResponse> getAllForUser(long userId) {
-        return repository.findAllByUserId(userId).stream()
-            .map(ontologyMapper::mapToOntologyResponse)
-            .collect(toSet());
+    public Page<OntologyResponse> getAllForUser(long userId) {
+        return repository.findAllByUserId(userId).map(ontologyMapper::mapToOntologyResponse);
     }
 }

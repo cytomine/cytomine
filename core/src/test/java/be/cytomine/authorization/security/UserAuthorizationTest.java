@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -185,8 +186,10 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @WithMockUser(username = SUPERADMIN)
     public void adminCanDeleteAnotherUser() {
 
-        when(ontologyHttpContract.getAllLightForUser(anyLong())).thenReturn(new SpringPage<>(
+        when(ontologyHttpContract.getAllLightForUser(anyLong(), eq(PageRequest.of(0, 50)))).thenReturn(new SpringPage<>(
             List.of(new OntologyLight(100, "test")), 1, 1, 1));
+        when(ontologyHttpContract.getAllLightForUser(anyLong(), eq(PageRequest.of(1, 50)))).thenReturn(new SpringPage<>(
+            List.of(), 0, 1, 0));
         when(ontologyHttpContract.delete(eq(100), anyLong())).thenReturn(Optional.empty());
 
         User user = builder.givenAUser();

@@ -26,6 +26,8 @@ import be.cytomine.common.repository.model.command.payload.response.TermResponse
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
+import be.cytomine.controller.utils.CollectionResponse;
+import be.cytomine.controller.utils.PageMapper;
 import be.cytomine.dto.ontology.OntologyExport;
 import be.cytomine.dto.ontology.TermSummary;
 import be.cytomine.service.CurrentUserService;
@@ -44,6 +46,7 @@ public class OntologyController {
     private final OntologyHttpContract ontologyHttpContract;
     private final TermHttpContract termHttpContract;
     private final CurrentUserService currentUserService;
+    private final PageMapper pageMapper;
 
     @GetMapping("/ontology/{id}.json")
     public OntologyResponse show(@PathVariable long id) {
@@ -54,17 +57,17 @@ public class OntologyController {
     }
 
     @GetMapping("/ontology_light.json")
-    public Page<OntologyLight> getAllLightForUser(@PathVariable long id) {
+    public CollectionResponse<OntologyLight> getAllLightForUser(@PathVariable long id, Pageable pageable) {
         log.debug("REST request to get Ontology : {}", id);
         long userId = currentUserService.getCurrentUser().getId();
-        return ontologyHttpContract.getAllLightForUser(userId);
+        return pageMapper.toCollectionResponse(ontologyHttpContract.getAllLightForUser(userId, pageable));
     }
 
     @GetMapping("/ontology.json")
-    public Page<OntologyResponse> getAll(@PathVariable long id) {
+    public CollectionResponse<OntologyResponse> getAll(@PathVariable long id, Pageable pageable) {
         log.debug("REST request to get Ontology : {}", id);
         long userId = currentUserService.getCurrentUser().getId();
-        return ontologyHttpContract.getAllForUser(userId);
+        return pageMapper.toCollectionResponse(ontologyHttpContract.getAllForUser(userId, pageable));
     }
 
     @GetMapping(value = "/ontology/{id}/export")

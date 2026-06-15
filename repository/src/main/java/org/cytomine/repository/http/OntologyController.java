@@ -10,6 +10,7 @@ import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.OntologyCommandService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,12 +66,12 @@ public class OntologyController implements OntologyHttpContract {
     }
 
     @Override
-    public Page<OntologyLight> getAllLightForUser(long userId) {
+    public Page<OntologyLight> getAllLightForUser(long userId, Pageable pageable) {
         return repository.findAllByUserId(userId).map(ontologyMapper::mapToOntologyLight);
     }
 
     @Override
-    public Page<OntologyResponse> getAllForUser(long userId) {
+    public Page<OntologyResponse> getAllForUser(long userId, Pageable pageable) {
         return repository.findAllByUserId(userId).map(ontologyMapper::mapToOntologyResponse);
     }
 }

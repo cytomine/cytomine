@@ -30,6 +30,7 @@ import org.springframework.util.ReflectionUtils;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
+import be.cytomine.common.repository.utils.SpringPageCrawler;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -193,6 +194,8 @@ public class UserService extends ModelService {
     private final UserPositionService userPositionService;
 
     private final UserRepository userRepository;
+
+    private final SpringPageCrawler springPageCrawler;
 
     public Optional<User> find(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
@@ -1113,7 +1116,8 @@ public class UserService extends ModelService {
 
     public void deleteDependentOntology(User user) {
         if (user instanceof User) {
-            for (OntologyLight ontology : ontologyHttpContract.getAllLightForUser(user.getId())) {
+            for (OntologyLight ontology : springPageCrawler.getAllPages(
+                pageable -> ontologyHttpContract.getAllLightForUser(user.getId(), pageable))) {
                 ontologyHttpContract.delete(ontology.id(), user.getId());
             }
         }

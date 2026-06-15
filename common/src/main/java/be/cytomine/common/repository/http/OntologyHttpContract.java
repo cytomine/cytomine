@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,9 +43,9 @@ public interface OntologyHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
     @GetExchange("/all-light")
-    Page<OntologyLight> getAllLightForUser(@RequestParam long userId);
+    Page<OntologyLight> getAllLightForUser(@RequestParam long userId, Pageable pageable);
 
     @GetExchange("/all")
-    Page<OntologyResponse> getAllForUser(@RequestParam long userId);
+    Page<OntologyResponse> getAllForUser(@RequestParam long userId, Pageable pageable);
 
 }

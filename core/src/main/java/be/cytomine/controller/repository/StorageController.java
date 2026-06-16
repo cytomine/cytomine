@@ -3,6 +3,7 @@ package be.cytomine.controller.repository;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 @RequiredArgsConstructor
 public class StorageController {
 
@@ -39,18 +41,21 @@ public class StorageController {
 
     @GetMapping("/storage.json")
     public CollectionResponse<StorageResponse> getAllReadableByUser(Pageable pageable) {
+        log.debug("GET /storage.json");
         long userId = currentUserService.getCurrentUser().getId();
         return pageMapper.toCollectionResponse(storageHttpContract.getAll(userId, pageable));
     }
 
     @PostMapping("/storage.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateStorage payload) {
+        log.debug("POST /storage.json - {}", payload);
         long userId = currentUserService.getCurrentUser().getId();
         return storageHttpContract.create(userId, payload);
     }
 
     @GetMapping("/storage/{id}.json")
     public StorageResponse show(@PathVariable long id) {
+        log.debug("GET /storage/{}.json", id);
         long userId = currentUserService.getCurrentUser().getId();
         return storageHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_STORAGE, id)));
@@ -58,6 +63,7 @@ public class StorageController {
 
     @PutMapping("/storage/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateStorage payload) {
+        log.debug("PUT /storage/{}.json - {}", id, payload);
         long userId = currentUserService.getCurrentUser().getId();
         return storageHttpContract.update(id, userId, payload)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_STORAGE, id)));
@@ -65,6 +71,7 @@ public class StorageController {
 
     @DeleteMapping("/storage/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
+        log.debug("DELETE /storage/{}.json", id);
         long userId = currentUserService.getCurrentUser().getId();
         return storageHttpContract.delete(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_STORAGE, id)));

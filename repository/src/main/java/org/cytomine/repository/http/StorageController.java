@@ -8,6 +8,8 @@ import org.cytomine.repository.mapper.StorageMapper;
 import org.cytomine.repository.persistence.StorageRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.StorageCommandService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,5 +51,13 @@ public class StorageController implements StorageHttpContract {
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
         return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+    }
+
+    @Override
+    public Page<StorageResponse> getAll(long userId, Pageable pageable) {
+        if (aclService.isAdmin(userId)) {
+            return repository.findAllByDeletedNull(pageable).map(mapper::mapToStorageResponse);
+        }
+        return repository.findAllReadableByUser(userId, pageable).map(mapper::mapToStorageResponse);
     }
 }

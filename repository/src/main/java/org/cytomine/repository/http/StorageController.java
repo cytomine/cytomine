@@ -32,6 +32,14 @@ public class StorageController implements StorageHttpContract {
     private final StorageRepository repository;
 
     @Override
+    public Page<StorageResponse> getAll(long userId, Pageable pageable) {
+        if (aclService.isAdmin(userId)) {
+            return repository.findAllByDeletedNull(pageable).map(mapper::mapToStorageResponse);
+        }
+        return repository.findAllReadableByUser(userId, pageable).map(mapper::mapToStorageResponse);
+    }
+
+    @Override
     public Optional<StorageResponse> get(long id, long userId) {
         return repository.findByIdAndDeletedNull(id)
             .filter(entity -> aclService.canReadStorage(userId, entity.getId()))
@@ -51,13 +59,5 @@ public class StorageController implements StorageHttpContract {
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
         return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
-    }
-
-    @Override
-    public Page<StorageResponse> getAll(long userId, Pageable pageable) {
-        if (aclService.isAdmin(userId)) {
-            return repository.findAllByDeletedNull(pageable).map(mapper::mapToStorageResponse);
-        }
-        return repository.findAllReadableByUser(userId, pageable).map(mapper::mapToStorageResponse);
     }
 }

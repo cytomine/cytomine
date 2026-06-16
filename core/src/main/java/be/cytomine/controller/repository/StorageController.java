@@ -3,6 +3,7 @@ package be.cytomine.controller.repository;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,8 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.storage.payload.CreateStorage;
 import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
+import be.cytomine.controller.utils.CollectionResponse;
+import be.cytomine.controller.utils.PageMapper;
 import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
@@ -31,7 +34,14 @@ public class StorageController {
     public static final String UNABLE_TO_FIND_STORAGE = "Unable to find storage with id: %s";
 
     private final CurrentUserService currentUserService;
+    private final PageMapper pageMapper;
     private final StorageHttpContract storageHttpContract;
+
+    @GetMapping("/storage.json")
+    public CollectionResponse<StorageResponse> getAllReadableByUser(Pageable pageable) {
+        long userId = currentUserService.getCurrentUser().getId();
+        return pageMapper.toCollectionResponse(storageHttpContract.getAll(userId, pageable));
+    }
 
     @PostMapping("/storage.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateStorage payload) {

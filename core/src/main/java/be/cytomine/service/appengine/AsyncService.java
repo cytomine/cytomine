@@ -27,8 +27,8 @@ import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.repository.image.server.StorageRepository;
 import be.cytomine.service.image.AbstractImageService;
-import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.middleware.ImageServerService;
 
 @Slf4j
@@ -42,7 +42,7 @@ public class AsyncService {
 
     private final RestTemplate restTemplate;
 
-    private final StorageService storageService;
+    private final StorageRepository storageRepository;
 
     private final ImageServerService imageServerService;
 
@@ -119,7 +119,7 @@ public class AsyncService {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        Storage userStorage = storageService.list(currentUser).stream().findFirst().orElseThrow();
+        Storage userStorage = storageRepository.findAllByUser(currentUser).stream().findFirst().orElseThrow();
         String queryString = "?idStorage=" + userStorage.getId() + "&idProject=" + projectId;
         // Send the request
         String uploadUrl = imageServerService.internalImageServerURL() + "/upload";

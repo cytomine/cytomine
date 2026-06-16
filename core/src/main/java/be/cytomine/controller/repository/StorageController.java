@@ -1,7 +1,6 @@
 package be.cytomine.controller.repository;
 
 import java.util.Optional;
-import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,6 @@ import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.storage.payload.CreateStorage;
-import be.cytomine.common.repository.model.storage.payload.StorageUser;
 import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
@@ -70,11 +68,5 @@ public class StorageController {
         long userId = currentUserService.getCurrentUser().getId();
         return storageHttpContract.delete(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_STORAGE, id)));
-    }
-
-    @GetMapping("/storage/{id}/user.json")
-    public Set<StorageUser> showUsersByStorage(@PathVariable long id) {
-        long userId = currentUserService.getCurrentUser().getId();
-        return storageHttpContract.getUsersByStorage(id, userId);
     }
 }

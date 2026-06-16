@@ -2,13 +2,10 @@ package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.StorageMapper;
 import org.cytomine.repository.persistence.StorageRepository;
-import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.StorageCommandService;
 import org.springframework.data.domain.Page;
@@ -20,7 +17,6 @@ import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.storage.payload.CreateStorage;
-import be.cytomine.common.repository.model.storage.payload.StorageUser;
 import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
 
 import static be.cytomine.common.repository.http.StorageHttpContract.ROOT_PATH;
@@ -34,7 +30,6 @@ public class StorageController implements StorageHttpContract {
     private final StorageCommandService service;
     private final StorageMapper mapper;
     private final StorageRepository repository;
-    private final UserRepository userRepository;
 
     @Override
     public Page<StorageResponse> getAll(long userId, Pageable pageable) {
@@ -64,16 +59,5 @@ public class StorageController implements StorageHttpContract {
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
         return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
-    }
-
-    @Override
-    public Set<StorageUser> getUsersByStorage(long id, long userId) {
-        if (!aclService.canReadStorage(userId, id)) {
-            return Set.of();
-        }
-        return userRepository.findAllByStorageId(id)
-            .stream()
-            .map(mapper::mapToStorageUser)
-            .collect(Collectors.toSet());
     }
 }

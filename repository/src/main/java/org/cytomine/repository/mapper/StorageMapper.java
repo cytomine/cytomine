@@ -3,7 +3,6 @@ package org.cytomine.repository.mapper;
 import java.sql.Timestamp;
 
 import org.cytomine.repository.persistence.entity.StorageEntity;
-import org.cytomine.repository.persistence.entity.UserEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,17 +10,12 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.request.StorageCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.storage.payload.CreateStorage;
-import be.cytomine.common.repository.model.storage.payload.StorageUser;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface StorageMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     StorageResponse mapToStorageResponse(StorageEntity entity);
-
-    @Mapping(target = "fullName", expression = "java(entity.getFirstname() + \" \" + entity.getLastname())")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"firstname", "lastname"})
-    StorageUser mapToStorageUser(UserEntity entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)

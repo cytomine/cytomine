@@ -72,8 +72,6 @@ tags:
     description: Manage project representative users
   - name: Storage
     description: Manage storages (virtual disk space)
-  - name: Storage | Member
-    description: Manage storage members
   - name: Storage | Uploaded file
     description: Manage uploaded files in a storage
   - name: Track
@@ -6672,83 +6670,6 @@ paths:
               schema:
                 "$ref": "#/components/schemas/Storage"
           description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/storage/{id}/user.json:
-    get:
-      tags:
-        - Storage | Member
-      description: List storage members
-      parameters:
-        - $ref: "#/components/schemas/path-storage-id"
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserCollection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/storage/{id}/user/{iduser}.json:
-    post:
-      tags:
-        - Storage | Member
-      description: Add user in a storage
-      parameters:
-        - $ref: "#/components/schemas/path-storage-id"
-        - name: iduser
-          in: path
-          description: The user id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: empty
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-    delete:
-      tags:
-        - Storage | Member
-      description: Remove user from a storage
-      parameters:
-        - $ref: "#/components/schemas/path-storage-id"
-        - name: iduser
-          in: path
-          description: The user id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: empty
         "400":
           $ref: "#/components/responses/bad-request"
         "401":

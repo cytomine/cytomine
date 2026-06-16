@@ -30,7 +30,6 @@ import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.controller.JsonResponseEntity;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
@@ -39,14 +38,12 @@ import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.ImageInstanceService;
-import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.ontology.OntologyService;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.search.UserSearchExtension;
-import be.cytomine.service.security.AccountService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
@@ -75,11 +72,7 @@ public class RestUserController extends RestCytomineController {
 
     private final OntologyService ontologyService;
 
-    private final StorageService storageService;
-
     private final ReportService reportService;
-
-    private final AccountService accountService;
 
     @GetMapping("/project/{id}/admin.json")
     public ResponseEntity<String> showAdminByProject(
@@ -452,34 +445,6 @@ public class RestUserController extends RestCytomineController {
             securityACLService.check(project, ADMINISTRATION);
         }
         projectMemberService.deleteUserFromProject(user, project, true);
-        return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
-    }
-
-    @PostMapping("/storage/{storage}/user/{user}.json")
-    public ResponseEntity<String> addUserToStorage(
-        @PathVariable("storage") Long storageId,
-        @PathVariable("user") Long userId
-    ) {
-        log.debug("REST request to add User {} to storage {}", userId, storageId);
-        User user = userService.find(userId)
-            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        Storage storage = storageService.find(storageId)
-            .orElseThrow(() -> new ObjectNotFoundException("Storage", storageId));
-        userService.addUserToStorage(user, storage);
-        return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
-    }
-
-    @DeleteMapping("/storage/{storage}/user/{user}.json")
-    public ResponseEntity<String> deleteUserFromStorage(
-        @PathVariable("storage") Long storageId,
-        @PathVariable("user") Long userId
-    ) {
-        log.debug("REST request to remove User {} from storage {}", userId, storageId);
-        User user = userService.find(userId)
-            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        Storage storage = storageService.find(storageId)
-            .orElseThrow(() -> new ObjectNotFoundException("Storage", storageId));
-        userService.deleteUserFromStorage(user, storage);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 

@@ -1,6 +1,7 @@
 package be.cytomine.common.repository.http;
 
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.web.service.annotation.PutExchange;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.storage.payload.CreateStorage;
+import be.cytomine.common.repository.model.storage.payload.StorageUser;
 import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
 
 import static be.cytomine.common.repository.http.StorageHttpContract.ROOT_PATH;
@@ -46,4 +48,7 @@ public interface StorageHttpContract {
 
     @GetExchange("/all")
     Page<StorageResponse> getAll(@RequestParam long userId, Pageable pageable);
+
+    @GetExchange("/{id}/users")
+    Set<StorageUser> getUsersByStorage(@PathVariable long id, @RequestParam long userId);
 }

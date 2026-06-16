@@ -141,16 +141,6 @@ public class RestUserController extends RestCytomineController {
 
     }
 
-    @GetMapping("/storage/{id}/user.json")
-    public ResponseEntity<String> showUserByStorage(
-        @PathVariable Long id
-    ) {
-        log.debug("REST request to list user from storage {}", id);
-        Storage storage = storageService.find(id)
-            .orElseThrow(() -> new ObjectNotFoundException("Storage", id));
-        return responseSuccess(userService.listUsers(storage), isFilterRequired());
-    }
-
     @GetMapping("/user.json")
     public ResponseEntity<String> list(
         @RequestParam(value = "sort", defaultValue = "username", required = false) String sortColumn,

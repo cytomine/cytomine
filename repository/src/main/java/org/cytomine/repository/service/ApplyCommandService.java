@@ -11,12 +11,15 @@ import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.request.CreateOntologyCommand;
+import be.cytomine.common.repository.model.command.request.CreateStorageCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.DeleteOntologyCommand;
+import be.cytomine.common.repository.model.command.request.DeleteStorageCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
+import be.cytomine.common.repository.model.command.request.UpdateStorageCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
 
@@ -24,6 +27,7 @@ import be.cytomine.common.repository.model.command.request.UpdateTermRelationCom
 @AllArgsConstructor
 public class ApplyCommandService {
     private final CommandV2Repository commandRepository;
+    private final StorageCommandService storageCommandService;
     private final TermCommandService termCommandService;
     private final TermRelationCommandService termRelationCommandService;
     private final OntologyCommandService ontologyCommandService;
@@ -46,6 +50,9 @@ public class ApplyCommandService {
                 ontologyCommandService.undoDelete(commandEntity.getId(), deleteOntologyCommand, userId, now);
             case UpdateOntologyCommand updateOntologyCommand ->
                 ontologyCommandService.undoUpdate(commandEntity.getId(), updateOntologyCommand, userId, now);
+            case CreateStorageCommand csc -> storageCommandService.undoCreate(commandEntity.getId(), csc, userId, now);
+            case UpdateStorageCommand usc -> storageCommandService.undoUpdate(commandEntity.getId(), usc, userId, now);
+            case DeleteStorageCommand dsc -> storageCommandService.undoDelete(commandEntity.getId(), dsc, userId, now);
         });
     }
 
@@ -66,8 +73,9 @@ public class ApplyCommandService {
                 ontologyCommandService.redoDelete(commandEntity.getId(), deleteOntologyCommand, userId, now);
             case UpdateOntologyCommand updateOntologyCommand ->
                 ontologyCommandService.redoUpdate(commandEntity.getId(), updateOntologyCommand, userId, now);
+            case CreateStorageCommand csc -> storageCommandService.redoCreate(commandEntity.getId(), csc, userId, now);
+            case UpdateStorageCommand usc -> storageCommandService.redoUpdate(commandEntity.getId(), usc, userId, now);
+            case DeleteStorageCommand dsc -> storageCommandService.redoDelete(commandEntity.getId(), dsc, userId, now);
         });
     }
-
-
 }

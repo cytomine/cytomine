@@ -49,7 +49,7 @@ if __name__ == "__main__":
         # To import the datasets, we need to know the ID of your Cytomine storage.
         storages = StorageCollection().fetch()
         storage = next(
-            filter(lambda storage: storage.user == cytomine.current_user.id, storages)
+            filter(lambda storage: storage.userId == cytomine.current_user.id, storages)
         )
         if not storage:
             raise ValueError("Storage not found")

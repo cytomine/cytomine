@@ -280,7 +280,7 @@ export default {
           }
         });
 
-        this.selectedStorage = this.storages.find(storage => storage.user === this.currentUser.id);
+        this.selectedStorage = this.storages.find(storage => storage.userId === this.currentUser.id);
       } catch (error) {
         console.log(error);
         this.newUploadError = true;

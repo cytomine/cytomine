@@ -1,21 +1,5 @@
 package be.cytomine.service.security;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,25 +14,16 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
-import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
-import be.cytomine.service.CommandService;
 import be.cytomine.service.PermissionService;
-import be.cytomine.service.command.TransactionService;
-import be.cytomine.service.ontology.UserAnnotationService;
-import be.cytomine.service.project.ProjectService;
-import be.cytomine.service.social.ProjectConnectionService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -57,28 +32,7 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 public class SecurityAclServiceTests {
 
     @Autowired
-    ProjectService projectService;
-
-    @Autowired
-    ProjectRepository projectRepository;
-
-    @Autowired
     BasicInstanceBuilder builder;
-
-    @Autowired
-    CommandService commandService;
-
-    @Autowired
-    TransactionService transactionService;
-
-    @Autowired
-    PersistentProjectConnectionRepository persistentProjectConnectionRepository;
-
-    @Autowired
-    ProjectConnectionService projectConnectionService;
-
-    @Autowired
-    UserAnnotationService userAnnotationService;
 
     @Autowired
     SecurityACLService securityACLService;
@@ -93,27 +47,20 @@ public class SecurityAclServiceTests {
         User user = builder.givenDefaultUser();
 
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                securityACLService.check(project.getId(), project.getClass().getName(), READ);
-            }
+            ForbiddenException.class,
+            () -> securityACLService.check(project.getId(), project.getClass().getName(), READ)
         );
-
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                securityACLService.check(project.getId(), project.getClass(), READ);
-            }
+            ForbiddenException.class,
+            () -> securityACLService.check(project.getId(), project.getClass(), READ)
         );
-
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                securityACLService.check(project, READ, user);
-            }
+            ForbiddenException.class,
+            () -> securityACLService.check(project, READ, user)
         );
-
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                securityACLService.check(project, READ);
-            }
+            ForbiddenException.class,
+            () -> securityACLService.check(project, READ)
         );
 
         builder.addUserToProject(project, user.getUsername());
@@ -131,14 +78,12 @@ public class SecurityAclServiceTests {
         User user = builder.givenDefaultUser();
 
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                securityACLService.checkIsAdminContainer(project);
-            }
+            ForbiddenException.class,
+            () -> securityACLService.checkIsAdminContainer(project)
         );
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                securityACLService.checkIsAdminContainer(project, user);
-            }
+            ForbiddenException.class,
+            () -> securityACLService.checkIsAdminContainer(project, user)
         );
 
         builder.addUserToProject(project, user.getUsername(), ADMINISTRATION);
@@ -178,22 +123,6 @@ public class SecurityAclServiceTests {
         assertThat(securityACLService.hasRightToReadAbstractImageWithProject(imageInstance.getBaseImage())).isTrue();
 
     }
-
-    @WithMockUser(username = "user")
-    @Test
-    void listAuthorizedStorages() {
-        Storage storage = builder.givenAStorage();
-        User user = builder.givenDefaultUser();
-
-        assertThat(securityACLService.getStorageList(user, false)).doesNotContain(storage);
-
-        permissionService.addPermission(storage, user.getUsername(), READ);
-
-        assertThat(securityACLService.getStorageList(user, false)).contains(storage);
-        assertThat(securityACLService.getStorageList(user, false, storage.getName())).contains(storage);
-
-    }
-
 
     @WithMockUser(username = "user")
     @Test
@@ -243,9 +172,8 @@ public class SecurityAclServiceTests {
     void checkSameUser() {
         User user = builder.givenDefaultUser();
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                securityACLService.checkIsSameUser(builder.givenSuperAdmin(), user);
-            }
+            ForbiddenException.class,
+            () -> securityACLService.checkIsSameUser(builder.givenSuperAdmin(), user)
         );
         securityACLService.checkIsSameUser(user, user);
         securityACLService.checkIsSameUser(user, builder.givenSuperAdmin());
@@ -256,9 +184,8 @@ public class SecurityAclServiceTests {
     void checkIsAdmin() {
         User user = builder.givenDefaultUser();
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                securityACLService.checkAdmin(user);
-            }
+            ForbiddenException.class,
+            () -> securityACLService.checkAdmin(user)
         );
         securityACLService.checkAdmin(builder.givenSuperAdmin());
     }
@@ -270,9 +197,8 @@ public class SecurityAclServiceTests {
         User guest = builder.givenAGuest();
 
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                securityACLService.checkAdmin(guest);
-            }
+            ForbiddenException.class,
+            () -> securityACLService.checkAdmin(guest)
         );
         securityACLService.checkUser(user);
         securityACLService.checkUser(builder.givenSuperAdmin());
@@ -301,9 +227,8 @@ public class SecurityAclServiceTests {
         project.setMode(EditingMode.READ_ONLY);
 
         Assertions.assertThrows(
-            ForbiddenException.class, () -> {
-                securityACLService.checkIsNotReadOnly(project);
-            }
+            ForbiddenException.class,
+            () -> securityACLService.checkIsNotReadOnly(project)
         );
 
         permissionService.addPermission(project, user.getUsername(), ADMINISTRATION);
@@ -316,11 +241,8 @@ public class SecurityAclServiceTests {
     void checkIsUserInProject() {
         Project project = builder.givenAProject();
         User user = builder.givenAUser();
-        assertThat(securityACLService.isUserInProject(user, project))
-            .isFalse();
+        assertThat(securityACLService.isUserInProject(user, project)).isFalse();
         builder.addUserToProject(project, user.getUsername());
-        assertThat(securityACLService.isUserInProject(user, project))
-            .isTrue();
+        assertThat(securityACLService.isUserInProject(user, project)).isTrue();
     }
-
 }

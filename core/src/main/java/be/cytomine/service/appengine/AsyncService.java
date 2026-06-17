@@ -14,6 +14,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,11 +24,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import be.cytomine.common.repository.http.StorageHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.config.security.ApiKeyFilter;
-import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
-import be.cytomine.repository.image.server.StorageRepository;
+import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.middleware.ImageServerService;
 
@@ -42,7 +44,7 @@ public class AsyncService {
 
     private final RestTemplate restTemplate;
 
-    private final StorageRepository storageRepository;
+    private final StorageHttpContract storageHttpContract;
 
     private final ImageServerService imageServerService;
 
@@ -119,8 +121,12 @@ public class AsyncService {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        Storage userStorage = storageRepository.findAllByUser(currentUser).stream().findFirst().orElseThrow();
-        String queryString = "?idStorage=" + userStorage.getId() + "&idProject=" + projectId;
+        StorageResponse userStorage = storageHttpContract.getAll(currentUser.getId(), Pageable.unpaged())
+            .stream()
+            .filter(storageResponse -> storageResponse.name().contains(currentUser.getUsername()))
+            .findFirst()
+            .orElseThrow(() -> new ObjectNotFoundException("User with storage", currentUser.getId()));
+        String queryString = "?idStorage=" + userStorage.id() + "&idProject=" + projectId;
         // Send the request
         String uploadUrl = imageServerService.internalImageServerURL() + "/upload";
         restTemplate.postForEntity(

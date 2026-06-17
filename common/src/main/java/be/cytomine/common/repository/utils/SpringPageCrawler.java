@@ -17,10 +17,10 @@ public class SpringPageCrawler {
         boolean lastCallHasResult = true;
         HashSet<T> allResults = new HashSet<>();
         while (lastCallHasResult) {
-            next = next.next();
             Set<T> currentResult = caller.apply(next).toSet();
             lastCallHasResult = !currentResult.isEmpty();
             allResults.addAll(currentResult);
+            next = next.next();
         }
         return allResults;
     }

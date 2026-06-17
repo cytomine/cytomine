@@ -105,7 +105,6 @@ import be.cytomine.utils.filters.SearchParameterEntry;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
-import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -1026,25 +1025,6 @@ public class UserService extends ModelService {
         }
     }
 
-    public void addUserToStorage(User user, Storage storage) {
-        securityACLService.check(storage, ADMINISTRATION);
-        log.info("Add user {} to storage {}", user, storage);
-        permissionService.addPermission(storage, user.getUsername(), READ);
-        permissionService.addPermission(storage, user.getUsername(), WRITE);
-    }
-
-    public void deleteUserFromStorage(User user, Storage storage) {
-        securityACLService.checkIsSameUserOrAdminContainer(storage, user, currentUserService.getCurrentUser());
-
-        if (user == storage.getUser()) {
-            throw new WrongArgumentException("The storage owner cannot be deleted.");
-        }
-
-        log.info("Remove user {} from storage {}", user, storage);
-        permissionService.deletePermission(storage, user.getUsername(), READ);
-        permissionService.deletePermission(storage, user.getUsername(), WRITE);
-    }
-
     @Override
     protected void beforeDelete(CytomineDomain domain) {
         User user = (User) domain;
@@ -1090,8 +1070,6 @@ public class UserService extends ModelService {
         deleteDependentUserAnnotation((User) domain, transaction, task);
         deleteDependentUploadedFile((User) domain, transaction, task);
         deleteDependentStorage((User) domain, transaction, task);
-        //deleteDependentSharedAnnotation((User) domain, transaction, task);
-        //deleteDependentHasManySharedAnnotation((User) domain, transaction, task);
         deleteDependentAnnotationIndex((User) domain, transaction, task);
         deleteDependentNestedImageInstance((User) domain, transaction, task);
         deleteDependentProjectDefaultLayer((User) domain, transaction, task);
@@ -1163,20 +1141,6 @@ public class UserService extends ModelService {
             } else {
                 storageService.delete(storage, transaction, null, false);
             }
-        }
-    }
-
-    public void deleteDependentSharedAnnotation(User user, Transaction transaction, Task task) {
-        if (user instanceof User) {
-            //TODO:: implement cascade deleteting/update for shared annotation
-            throw new CytomineMethodNotYetImplementedException("todo");
-        }
-    }
-
-    public void deleteDependentHasManySharedAnnotation(User user, Transaction transaction, Task task) {
-        if (user instanceof User) {
-            //TODO:: implement cascade deleteting/update for shared annotation
-            throw new CytomineMethodNotYetImplementedException("todo");
         }
     }
 

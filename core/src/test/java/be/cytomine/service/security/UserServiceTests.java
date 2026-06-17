@@ -1190,23 +1190,4 @@ public class UserServiceTests {
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
     }
-
-    @Test
-    void addAndDeleteUserToStorage() {
-        User user = builder.givenAUser();
-        Storage storage = builder.givenAStorage();
-
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isFalse();
-
-        userService.addUserToStorage(user, storage);
-
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isTrue();
-
-        userService.deleteUserFromStorage(user, storage);
-
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isFalse();
-    }
 }

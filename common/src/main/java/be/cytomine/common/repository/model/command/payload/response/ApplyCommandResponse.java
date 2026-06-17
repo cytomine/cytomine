@@ -8,10 +8,13 @@ import be.cytomine.common.repository.model.HasLongId;
 import be.cytomine.common.repository.model.command.DataType;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "dataType")
-@JsonSubTypes({@JsonSubTypes.Type(value = TermResponse.class, name = "TERM"),
-    @JsonSubTypes.Type(value = TermRelationResponse.class, name = "TERM_RELATION"),
-    @JsonSubTypes.Type(value = OntologyResponse.class, name = "ONTOLOGY")})
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = OntologyResponse.class, name = "ONTOLOGY"),
+    @JsonSubTypes.Type(value = StorageResponse.class, name = "STORAGE"),
+    @JsonSubTypes.Type(value = TermResponse.class, name = "TERM"),
+    @JsonSubTypes.Type(value = TermRelationResponse.class, name = "TERM_RELATION")
+})
 public sealed interface ApplyCommandResponse extends HasLongId, HasLocaleDateTimeCUD
-    permits OntologyResponse, TermRelationResponse, TermResponse {
+    permits OntologyResponse, StorageResponse, TermRelationResponse, TermResponse {
     DataType getDataType();
 }

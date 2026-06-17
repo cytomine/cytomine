@@ -31,7 +31,6 @@ import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -266,25 +265,6 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.username=='" + projectAdmin.getUsername() + "')]").exists())
             .andExpect(jsonPath("$.collection[?(@.username=='" + projectUser.getUsername() + "')]").exists())
-            .andExpect(jsonPath("$.collection[?(@.username=='" + simpleUser.getUsername() + "')]").doesNotExist());
-    }
-
-
-    @Test
-    @Transactional
-    public void listStorageUser() throws Exception {
-        User storageAdmin = builder.givenAUser();
-        User storageUser = builder.givenAUser();
-        User simpleUser = builder.givenAUser();
-        Storage storage = builder.givenAStorage();
-        builder.addUserToStorage(storage, storageAdmin.getUsername(), ADMINISTRATION);
-        builder.addUserToStorage(storage, storageUser.getUsername(), READ);
-
-        restUserControllerMockMvc.perform(get("/api/storage/{id}/user.json", storage.getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.username=='" + storageAdmin.getUsername() + "')]").exists())
-            .andExpect(jsonPath("$.collection[?(@.username=='" + storageUser.getUsername() + "')]").exists())
             .andExpect(jsonPath("$.collection[?(@.username=='" + simpleUser.getUsername() + "')]").doesNotExist());
     }
 
@@ -831,35 +811,6 @@ public class UserResourceTests {
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
-    }
-
-    @Test
-    @Transactional
-    public void addUserToStorage() throws Exception {
-        Storage storage = builder.givenAStorage();
-        User user = builder.givenAUser();
-        restUserControllerMockMvc.perform(
-                post("/api/storage/{storage}/user/{user}.json", storage.getId(), user.getId())
-                    .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
-    }
-
-    @Test
-    @Transactional
-    public void deleteUserFromStorage() throws Exception {
-        Storage storage = builder.givenAStorage();
-        User user = builder.givenAUser();
-        builder.addUserToStorage(storage, user.getUsername(), READ);
-        restUserControllerMockMvc.perform(
-                delete("/api/storage/{storage}/user/{user}.json", storage.getId(), user.getId())
-                    .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
     }
 
     @Test

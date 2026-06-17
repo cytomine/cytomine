@@ -14,8 +14,6 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=invalid-name
-
 from typing import Any, Dict, List, Optional
 
 from cytomine.models.collection import Collection
@@ -31,7 +29,7 @@ class Storage(Model):
     ) -> None:
         super().__init__()
         self.name = name
-        self.user = id_user
+        self.userId = id_user
         self.populate(attributes)
 
 

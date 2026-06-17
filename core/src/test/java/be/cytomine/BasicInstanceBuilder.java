@@ -323,10 +323,6 @@ public class BasicInstanceBuilder {
         permissionService.addPermission(project, username, ADMINISTRATION, this.givenSuperAdmin());
     }
 
-    public void addUserToStorage(Storage storage, String username, Permission permission) {
-        permissionService.addPermission(storage, username, permission);
-    }
-
     public <T> T persistAndReturn(T instance) {
         em.persist(instance);
         em.flush();

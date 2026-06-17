@@ -117,6 +117,18 @@ jobs:
       - name: Install chart
         run: |
           NS=cytomine-${{ env.DEPLOYMENT_NAME }}
+
+          (
+            while true; do
+              echo "=== $(date -u '+%H:%M:%S') pods ==="
+              kubectl get pods -n "$NS" --no-headers 2>/dev/null || true
+              echo "=== $(date -u '+%H:%M:%S') jobs ==="
+              kubectl get jobs -n "$NS" --no-headers 2>/dev/null || true
+              sleep 30
+            done
+          ) &
+          WATCHER_PID=$!
+
           helm install $NS helm/charts/cytomine/ \
             --namespace=$NS \
             -f helm/charts/cytomine/ci/test-values.yaml \
@@ -149,6 +161,9 @@ jobs:
             --set images.pullPolicy=Always \
             --set test.e2eTestCount=${{ env.E2E_TEST_COUNT }} \
             --wait --timeout=20m
+          HELM_EXIT=$?
+          kill "$WATCHER_PID" 2>/dev/null || true
+          exit $HELM_EXIT
 
       - name: Log k8s events
         if: failure()

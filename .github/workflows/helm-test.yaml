@@ -120,10 +120,14 @@ jobs:
 
           (
             while true; do
-              echo "=== $(date -u '+%H:%M:%S') pods ==="
-              kubectl get pods -n "$NS" --no-headers 2>/dev/null || true
+              echo "=== $(date -u '+%H:%M:%S') pods (all namespaces) ==="
+              kubectl get pods --all-namespaces --no-headers 2>/dev/null || true
+              echo "=== $(date -u '+%H:%M:%S') deployments ==="
+              kubectl get deployments -n "$NS" --no-headers 2>/dev/null || true
               echo "=== $(date -u '+%H:%M:%S') jobs ==="
               kubectl get jobs -n "$NS" --no-headers 2>/dev/null || true
+              echo "=== $(date -u '+%H:%M:%S') events ==="
+              kubectl get events -n "$NS" --sort-by='.lastTimestamp' --no-headers 2>/dev/null | tail -10 || true
               sleep 30
             done
           ) &
@@ -160,7 +164,7 @@ jobs:
             --set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ env.DEPLOYMENT_NAME }} \
             --set images.pullPolicy=Always \
             --set test.e2eTestCount=${{ env.E2E_TEST_COUNT }} \
-            --wait --timeout=20m
+            --wait --timeout=20m --debug
           HELM_EXIT=$?
           kill "$WATCHER_PID" 2>/dev/null || true
           exit $HELM_EXIT

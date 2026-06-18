@@ -89,6 +89,8 @@ jobs:
           tags: |
             registry.cytomine.org/cytomine/${{ matrix.image.name }}:${{ env.DEPLOYMENT_NAME }}
             ${{ github.ref_name == 'main' && format('cytomine/{0}:latest', matrix.image.name) || '' }}
+          cache-from: type=registry,ref=registry.cytomine.org/cytomine/${{ matrix.image.name }}-build-cache
+          cache-to: type=registry,ref=registry.cytomine.org/cytomine/${{ matrix.image.name }}-build-cache,mode=min
           allow: network.host
           network: host
           target: ${{ matrix.image.target || '' }}

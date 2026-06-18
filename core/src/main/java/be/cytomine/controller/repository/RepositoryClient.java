@@ -17,6 +17,7 @@ import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import be.cytomine.common.repository.http.StatsHttpContract;
+import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.utils.SpringPage;
@@ -67,6 +68,11 @@ public class RepositoryClient {
     @Bean
     StatsHttpContract statsServiceClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, StatsHttpContract.class);
+    }
+
+    @Bean
+    StorageHttpContract storageServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, StorageHttpContract.class);
     }
 
     @Bean

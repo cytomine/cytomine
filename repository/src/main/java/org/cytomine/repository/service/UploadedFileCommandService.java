@@ -27,7 +27,12 @@ import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFi
 @RequiredArgsConstructor
 @Getter
 public class UploadedFileCommandService
-    implements CRUDCommandService<CreateUploadedFile, UpdateUploadedFile, UploadedFileCommandPayload, UploadedFileEntity, UploadedFileResponse> {
+    implements CRUDCommandService<
+    CreateUploadedFile,
+    UpdateUploadedFile,
+    UploadedFileCommandPayload,
+    UploadedFileEntity,
+    UploadedFileResponse> {
 
     private final ACLService aclService;
     private final CommandMapper commandMapper;
@@ -61,7 +66,11 @@ public class UploadedFileCommandService
     }
 
     @Override
-    public UploadedFileEntity updateEntityWithEntity(UploadedFileEntity entity, UpdateUploadedFile payload, Timestamp now) {
+    public UploadedFileEntity updateEntityWithEntity(
+        UploadedFileEntity entity,
+        UpdateUploadedFile payload,
+        Timestamp now
+    ) {
         payload.filename().ifPresent(entity::setFilename);
         payload.originalFilename().ifPresent(entity::setOriginalFilename);
         payload.ext().ifPresent(entity::setExt);
@@ -74,12 +83,19 @@ public class UploadedFileCommandService
     }
 
     @Override
-    public UploadedFileEntity updateEntityWithPayload(UploadedFileEntity entity, UploadedFileCommandPayload payload, Timestamp now) {
+    public UploadedFileEntity updateEntityWithPayload(
+        UploadedFileEntity entity,
+        UploadedFileCommandPayload payload,
+        Timestamp now
+    ) {
         return uploadedFileMapper.updateWithPayload(entity, payload, now);
     }
 
     @Override
-    public CreateCommandRequest<UploadedFileCommandPayload> mapCreateCommand(long userId, UploadedFileCommandPayload after) {
+    public CreateCommandRequest<UploadedFileCommandPayload> mapCreateCommand(
+        long userId,
+        UploadedFileCommandPayload after
+    ) {
         return new CreateUploadedFileCommand(after, userId);
     }
 
@@ -93,7 +109,10 @@ public class UploadedFileCommandService
     }
 
     @Override
-    public DeleteCommandRequest<UploadedFileCommandPayload> mapDeleteCommand(long userId, UploadedFileCommandPayload before) {
+    public DeleteCommandRequest<UploadedFileCommandPayload> mapDeleteCommand(
+        long userId,
+        UploadedFileCommandPayload before
+    ) {
         return new DeleteUploadedFileCommand(before, userId);
     }
 

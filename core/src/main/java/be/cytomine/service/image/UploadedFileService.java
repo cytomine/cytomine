@@ -49,7 +49,6 @@ import be.cytomine.utils.DomainUtils;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.SQLUtils;
 import be.cytomine.utils.Task;
-import be.cytomine.utils.TokenUtils;
 import be.cytomine.utils.filters.SQLSearchParameter;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
@@ -381,15 +380,6 @@ public class UploadedFileService extends ModelService {
     public Optional<UploadedFile> find(Long id) {
         Optional<UploadedFile> uploadedFile = uploadedFileRepository.findById(id);
         uploadedFile.ifPresent(file -> securityACLService.check(file.container(), READ));
-        return uploadedFile;
-    }
-
-    public Optional<UploadedFile> find(Long id, String authHeader) {
-        Optional<UploadedFile> uploadedFile = uploadedFileRepository.findById(id);
-        String token = authHeader.replace("Bearer ", "");
-        String username = TokenUtils.getUsernameFromToken(token);
-        User user = currentUserService.getCurrentUser(username);
-        uploadedFile.ifPresent(file -> securityACLService.check(file.container(), READ, user));
         return uploadedFile;
     }
 

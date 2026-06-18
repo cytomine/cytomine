@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -25,9 +24,7 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
-import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.image.UploadedFileService;
 import be.cytomine.service.middleware.ImageServerService;
 
 import static java.lang.String.format;
@@ -44,7 +41,6 @@ public class UploadedFileController {
     private final CurrentUserService currentUserService;
     private final ImageServerService imageServerService;
     private final UploadedFileHttpContract uploadedFileHttpContract;
-    private final UploadedFileService uploadedFileService;
 
     @PostMapping("/uploadedfile.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateUploadedFile payload) {
@@ -78,20 +74,18 @@ public class UploadedFileController {
     }
 
     @GetMapping("/uploadedfile/{id}/download")
-    public ResponseEntity<StreamingResponseBody> download(
-        @PathVariable Long id,
-        @RequestParam String authorization
-    ) throws IOException {
+    public ResponseEntity<StreamingResponseBody> download(@PathVariable Long id) throws IOException {
         log.debug("GET /uploadedfile/{}/download", id);
+        long userId = currentUserService.getCurrentUser().getId();
 
-        UploadedFile uploadedFile = uploadedFileService.find(id, authorization)
+        UploadedFileResponse uploadedFile = uploadedFileHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
 
         StreamingResponseBody stream = outputStream -> imageServerService.streamDownload(uploadedFile, outputStream);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", uploadedFile.getOriginalFilename());
+        headers.setContentDispositionFormData("attachment", uploadedFile.originalFilename());
 
         return ResponseEntity
             .ok()

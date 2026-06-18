@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.CompanionFile;
@@ -219,8 +220,8 @@ public class ImageServerService {
         streamDownload("image", abstractImage.getPath(), abstractImage.getOriginalFilename(), outputStream);
     }
 
-    public void streamDownload(UploadedFile uploadedFile, OutputStream outputStream) {
-        streamDownload("file", uploadedFile.getPath(), uploadedFile.getOriginalFilename(), outputStream);
+    public void streamDownload(UploadedFileResponse uploadedFile, OutputStream outputStream) {
+        streamDownload("file", uploadedFile.path(), uploadedFile.originalFilename(), outputStream);
     }
 
     public void streamDownload(String type, String path, String filename, OutputStream outputStream) {

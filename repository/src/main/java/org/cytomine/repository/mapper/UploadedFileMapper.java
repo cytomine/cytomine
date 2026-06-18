@@ -19,7 +19,7 @@ import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFi
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface UploadedFileMapper {
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "lTree"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "LTree"})
     @Mapping(target = "user", source = "userId", qualifiedByName = "wrapLong")
     @Mapping(target = "parent", source = "parent", qualifiedByName = "mapParentToId")
     @Mapping(target = "storage", source = "storageId", qualifiedByName = "wrapLong")
@@ -28,7 +28,7 @@ public interface UploadedFileMapper {
     @Mapping(target = "projects", source = "projects", qualifiedByName = "mapArrayToSet")
     UploadedFileResponse mapToUploadedFileResponse(UploadedFileEntity entity);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "lTree", "userId"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "LTree", "userId"})
     @Mapping(target = "parent", source = "parent", qualifiedByName = "mapParentToId")
     @Mapping(target = "projects", source = "projects", qualifiedByName = "mapArrayToSet")
     UploadedFileCommandPayload mapToUploadedFileCommandPayload(UploadedFileEntity entity);
@@ -42,7 +42,7 @@ public interface UploadedFileMapper {
     @Mapping(target = "created", source = "creationDate")
     @Mapping(target = "updated", ignore = true)
     @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "lTree", ignore = true)
+    @Mapping(target = "LTree", ignore = true)
     UploadedFileEntity mapToUploadedFileEntity(CreateUploadedFile createPayload, Timestamp creationDate);
 
     @Mapping(target = "filename", source = "replace.filename")
@@ -59,7 +59,7 @@ public interface UploadedFileMapper {
     @Mapping(target = "userId", source = "entity.userId")
     @Mapping(target = "created", source = "entity.created")
     @Mapping(target = "deleted", source = "entity.deleted")
-    @Mapping(target = "lTree", source = "entity.lTree")
+    @Mapping(target = "LTree", source = "entity.LTree")
     @Mapping(target = "version", source = "entity.version")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "deleted"})
     UploadedFileEntity updateWithPayload(UploadedFileEntity entity, UploadedFileCommandPayload replace, Timestamp now);

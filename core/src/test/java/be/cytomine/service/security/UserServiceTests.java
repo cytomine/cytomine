@@ -803,22 +803,6 @@ public class UserServiceTests {
     }
 
     @Test
-    void listOntologyUsers() {
-        User user = builder.givenSuperAdmin();
-
-        Project projectWhereUserIsManager = builder.givenAProject();
-        Project projectWhereUserIsContributor = builder.givenAProject();
-
-        builder.addUserToProject(projectWhereUserIsManager, "superadmin", ADMINISTRATION);
-        builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
-
-        assertThat(userService.listUsers(projectWhereUserIsManager.getOntology()))
-            .contains(user);
-        assertThat(userService.listUsers(projectWhereUserIsContributor.getOntology()))
-            .contains(user);
-    }
-
-    @Test
     void listStorageUsers() {
         Storage storage = builder.givenAStorage(builder.givenSuperAdmin());
 

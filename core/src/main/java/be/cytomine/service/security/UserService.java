@@ -28,6 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
+import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
+import be.cytomine.common.repository.utils.SpringPageCrawler;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -37,7 +40,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.ontology.AnnotationTerm;
-import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
@@ -86,7 +88,6 @@ import be.cytomine.service.PermissionService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.ontology.AnnotationTermService;
-import be.cytomine.service.ontology.OntologyService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectDefaultLayerService;
@@ -143,7 +144,7 @@ public class UserService extends ModelService {
 
     private final OntologyRepository ontologyRepository;
 
-    private final OntologyService ontologyService;
+    private final OntologyHttpContract ontologyHttpContract;
 
     private final PermissionService permissionService;
 
@@ -192,6 +193,8 @@ public class UserService extends ModelService {
     private final UserPositionService userPositionService;
 
     private final UserRepository userRepository;
+
+    private final SpringPageCrawler springPageCrawler;
 
     public Optional<User> find(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
@@ -606,7 +609,6 @@ public class UserService extends ModelService {
                 + ") ";
         }
 
-
         if (projectRoleSearch.isPresent()) {
             List<String> roles = (projectRoleSearch.get().getValue() instanceof String)
                 ? List.of((String) projectRoleSearch.get().getValue())
@@ -664,7 +666,6 @@ public class UserService extends ModelService {
         Page<JsonObject> page = PageUtils.buildPageFromPageResults(results, max, offset, count);
         return page;
 
-
     }
 
     public List<User> listAdmins(Project project) {
@@ -688,12 +689,10 @@ public class UserService extends ModelService {
         return userRepository.findAllUsersByProjectId(project.getId());
     }
 
-
-    public List<User> listUsers(Ontology ontology) {
-        securityACLService.check(ontology, READ);
+    public List<User> listUsers(long ontologyId) {
         //TODO:: Not optim code a single SQL request will be very faster
         List<User> users = new ArrayList<>();
-        List<Project> projects = projectRepository.findAllByOntologyId(ontology.getId());
+        List<Project> projects = projectRepository.findAllByOntologyId(ontologyId);
         for (Project project : projects) {
             users.addAll(listUsers(project));
         }
@@ -759,7 +758,6 @@ public class UserService extends ModelService {
         return usersWithPosition;
     }
 
-
     public JsonObject getResumeActivities(Project project, User user) {
         securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
         JsonObject jsonObject = new JsonObject();
@@ -801,7 +799,6 @@ public class UserService extends ModelService {
     public List<JsonObject> getUsersWithLastActivities(Project project) {
         List<JsonObject> results = new ArrayList<>();
         List<User> users = listUsers(project).stream().sorted(Comparator.comparing(CytomineDomain::getId)).toList();
-
 
         Map<Long, JsonObject> connections = projectConnectionService.lastConnectionInProject(
                 project,
@@ -929,7 +926,6 @@ public class UserService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param json New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     public CommandResponse add(JsonObject json) {
@@ -964,7 +960,6 @@ public class UserService extends ModelService {
      *
      * @param domain      Domain to update
      * @param jsonNewData New domain datas
-     *
      * @return Response structure (new domain data, old domain data..)
      */
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
@@ -992,7 +987,6 @@ public class UserService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     // TODO IAM: refactor. ADMIN ROLE can delete IAM account (and delete the underlying Cytomine user from the cache)
@@ -1069,7 +1063,7 @@ public class UserService extends ModelService {
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
         deleteDependentAnnotationTerm((User) domain, transaction, task);
         deleteDependentImageInstance((User) domain, transaction, task);
-        deleteDependentOntology((User) domain, transaction, task);
+        deleteDependentOntology((User) domain);
         deleteDependentReviewedAnnotation((User) domain, transaction, task);
         deleteDependentSecUserSecRole((User) domain, transaction, task);
         deleteDependentAbstractImage((User) domain, transaction, task);
@@ -1098,10 +1092,11 @@ public class UserService extends ModelService {
         }
     }
 
-    public void deleteDependentOntology(User user, Transaction transaction, Task task) {
+    public void deleteDependentOntology(User user) {
         if (user instanceof User) {
-            for (Ontology ontology : ontologyRepository.findAllByUser((User) user)) {
-                ontologyService.delete(ontology, transaction, task, false);
+            for (OntologyLight ontology : springPageCrawler.getAllPages(
+                pageable -> ontologyHttpContract.getAllLightForUser(user.getId(), pageable))) {
+                ontologyHttpContract.delete(ontology.id(), user.getId());
             }
         }
     }

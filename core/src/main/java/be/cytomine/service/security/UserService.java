@@ -67,7 +67,6 @@ import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.repository.image.server.StorageRepository;
 import be.cytomine.repository.ontology.AnnotationIndexRepository;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
-import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.repository.project.ProjectDefaultLayerRepository;
@@ -141,8 +140,6 @@ public class UserService extends ModelService {
     private final LastConnectionRepository lastConnectionRepository;
 
     private final NestedImageInstanceRepository nestedImageInstanceRepository;
-
-    private final OntologyRepository ontologyRepository;
 
     private final OntologyHttpContract ontologyHttpContract;
 

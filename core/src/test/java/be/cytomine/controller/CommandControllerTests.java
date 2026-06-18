@@ -19,7 +19,6 @@ import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.repository.command.CommandRepository;
-import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.service.image.UploadedFileService;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -38,9 +37,6 @@ public class CommandControllerTests {
 
     @Autowired
     private BasicInstanceBuilder builder;
-
-    @Autowired
-    private OntologyRepository ontologyRepository;
 
     @Autowired
     private MockMvc restCommandControllerMockMvc;

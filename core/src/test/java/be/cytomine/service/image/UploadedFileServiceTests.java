@@ -1,28 +1,11 @@
 package be.cytomine.service.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,19 +19,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.domain.image.AbstractImage;
-import be.cytomine.domain.image.AbstractSlice;
-import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.UploadedFile;
-import be.cytomine.domain.image.server.Storage;
-import be.cytomine.domain.ontology.Ontology;
-import be.cytomine.exceptions.ForbiddenException;
-import be.cytomine.exceptions.WrongArgumentException;
-import be.cytomine.repository.image.AbstractImageRepository;
-import be.cytomine.repository.image.UploadedFileRepository;
-import be.cytomine.service.CommandService;
-import be.cytomine.service.command.TransactionService;
-import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
@@ -66,22 +37,10 @@ public class UploadedFileServiceTests {
     UploadedFileService uploadedFileService;
 
     @Autowired
-    UploadedFileRepository uploadedFileRepository;
-
-    @Autowired
     BasicInstanceBuilder builder;
 
     @Autowired
-    CommandService commandService;
-
-    @Autowired
-    TransactionService transactionService;
-
-    @Autowired
     EntityManager entityManager;
-
-    @Autowired
-    AbstractImageRepository abstractImageRepository;
 
     @Test
     void listAllUploadedFileWithSuccess() {
@@ -170,20 +129,16 @@ public class UploadedFileServiceTests {
         assertThat(list.stream().map(x -> x.get("id"))).doesNotContain(uploadedFileNoMatch.getId());
     }
 
-
     @Test
     void listUploadedFileWithHierarchicalTree() {
         UploadedFile uploadedFileToAdd = builder.givenAUploadedFile();
         uploadedFileToAdd.setOriginalFilename("parent");
         builder.persistAndReturn(uploadedFileToAdd);
 
-        UploadedFile uploadedfileChildToAdd = builder.givenANotPersistedUploadedFile();
-        uploadedfileChildToAdd.setOriginalFilename("child");
-        uploadedfileChildToAdd.setParent(uploadedFileToAdd);
-        CommandResponse response = uploadedFileService.add(uploadedfileChildToAdd.toJsonObject());
-        UploadedFile uploadedfileChild = (UploadedFile) response.getObject();
-        assertThat(uploadedfileChild.getLTree()).isEqualTo(uploadedFileToAdd.getId() + "." + uploadedfileChild.getId());
-
+        UploadedFile uploadedfileChild = builder.givenAUploadedFile();
+        uploadedfileChild.setOriginalFilename("child");
+        uploadedfileChild.setParent(entityManager.find(UploadedFile.class, uploadedFileToAdd.getId()));
+        builder.persistAndReturn(uploadedfileChild);
 
         UploadedFile uploadedfileSubChildToAdd = builder.givenAUploadedFile();
         uploadedfileSubChildToAdd.setParent(uploadedfileChild);
@@ -240,7 +195,6 @@ public class UploadedFileServiceTests {
         assertThat(list.get(0).get("globalSize")).isNotNull();
     }
 
-
     @Test
     void testLtree() {
         UploadedFile uploadedFileToAdd = builder.givenAUploadedFile();
@@ -269,162 +223,5 @@ public class UploadedFileServiceTests {
         assertThat(uploadedfileChildToAdd.getLTree()).contains(uploadedFileToAdd.getLTree());
 
         assertThat(uploadedfileSubSubChildToAdd.getParent().getId()).isEqualTo(uploadedfileSubChildToAdd.getId());
-    }
-
-    @Test
-    void getUploadedFileByUser() {
-        UploadedFile uploadedFile = builder.givenAUploadedFile();
-        assertThat(uploadedFile).isEqualTo(uploadedFileService.get(uploadedFile.getId()));
-    }
-
-    @Test
-    void getUnexistingUploadedFileReturnNull() {
-        assertThat(uploadedFileService.get(0L)).isNull();
-    }
-
-    @Test
-    void findUploadedFileWithSuccess() {
-        UploadedFile uploadedFile = builder.givenAUploadedFile();
-        assertThat(uploadedFileService.find(uploadedFile.getId()).isPresent());
-        assertThat(uploadedFile).isEqualTo(uploadedFileService.find(uploadedFile.getId()).get());
-    }
-
-    @Test
-    void findUnexistingUploadedFileReturnEmpty() {
-        assertThat(uploadedFileService.find(0L)).isEmpty();
-    }
-
-    @Test
-    void addValidUploadedFileWithSuccess() {
-        Ontology ontology = builder.givenAnOntology();
-        UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
-
-        CommandResponse commandResponse = uploadedFileService.add(uploadedFile.toJsonObject());
-
-        assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(uploadedFileService.find(commandResponse.getObject().getId())).isPresent();
-        UploadedFile created = uploadedFileService.find(commandResponse.getObject().getId()).get();
-    }
-
-    @Test
-    void addUploadedFileWithNullStorageFail() {
-        UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
-        uploadedFile.setStorage(null);
-        Assertions.assertThrows(
-            WrongArgumentException.class, () -> {
-                uploadedFileService.add(uploadedFile.toJsonObject());
-            }
-        );
-    }
-
-
-    @Test
-    void editValidUploadedFileWithSuccess() {
-        UploadedFile uploadedFile = builder.givenAUploadedFile();
-
-        CommandResponse commandResponse = uploadedFileService.update(
-            uploadedFile,
-            uploadedFile.toJsonObject().withChange("originalFilename", "NEW NAME")
-        );
-
-        assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(uploadedFileService.find(commandResponse.getObject().getId())).isPresent();
-        UploadedFile edited = uploadedFileService.find(commandResponse.getObject().getId()).get();
-        assertThat(edited.getOriginalFilename()).isEqualTo("NEW NAME");
-    }
-
-    @Test
-    void editValidUploadedFileStorageWithSuccess() {
-        UploadedFile uploadedFile = builder.givenAUploadedFile();
-        Storage storage = builder.givenAStorage();
-
-        CommandResponse commandResponse = uploadedFileService.update(
-            uploadedFile,
-            uploadedFile.toJsonObject().withChange("storage", storage.getId())
-        );
-
-        assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(uploadedFileService.find(commandResponse.getObject().getId())).isPresent();
-        UploadedFile edited = uploadedFileService.find(commandResponse.getObject().getId()).get();
-        assertThat(edited.getStorage().getId()).isEqualTo(storage.getId());
-    }
-
-
-    @Test
-    void deleteUploadedFileWithSuccess() {
-        UploadedFile uploadedFile = builder.givenAUploadedFile();
-
-        CommandResponse commandResponse = uploadedFileService.delete(uploadedFile, null, null, true);
-
-        assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(uploadedFileService.find(uploadedFile.getId()).isEmpty());
-    }
-
-    @Test
-    void deleteUploadedFileWithDependenciesWithSuccess() {
-        UploadedFile uploadedFile = builder.givenAUploadedFile();
-        uploadedFile.setProjects(new Long[]{123L});
-        builder.persistAndReturn(uploadedFile);
-
-        UploadedFile uploadedFileChild = builder.givenAUploadedFile();
-        uploadedFileChild.setOriginalFilename("child");
-        uploadedFileChild.setParent(entityManager.find(UploadedFile.class, uploadedFile.getId()));
-        builder.persistAndReturn(uploadedFileChild);
-
-        UploadedFile uploadedFileSubChild = builder.givenAUploadedFile();
-        uploadedFileSubChild.setParent(uploadedFileChild);
-        builder.persistAndReturn(uploadedFileSubChild);
-
-        AbstractImage abstractImage = builder.givenAnAbstractImage();
-        abstractImage.setUploadedFile(uploadedFileSubChild);
-
-        AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
-        abstractSlice.setUploadedFile(uploadedFileSubChild);
-
-        CommandResponse commandResponse = uploadedFileService.delete(uploadedFile, null, null, true);
-
-        assertThat(commandResponse).isNotNull();
-        assertThat(commandResponse.getStatus()).isEqualTo(200);
-        assertThat(uploadedFileService.find(abstractImage.getUploadedFile().getId()).isEmpty());
-        assertThat(uploadedFileService.find(uploadedFileChild.getId()).isEmpty());
-        assertThat(uploadedFileService.find(uploadedFileSubChild.getId()).isEmpty());
-        assertThat(abstractImageRepository.findById(abstractImage.getId()).isEmpty());
-    }
-
-    @Test
-    void deleteUploadedFileWithImageInProject() {
-        ImageInstance imageInstance = builder.givenAnImageInstance();
-        Assertions.assertThrows(
-            ForbiddenException.class, () ->
-                uploadedFileService.delete(imageInstance.getBaseImage().getUploadedFile(), null, null, false)
-        );
-    }
-
-    @Test
-    void deleteUploadedFileChild() {
-        UploadedFile uploadedFile = builder.givenAUploadedFile();
-        uploadedFile.setOriginalFilename("parent");
-        builder.persistAndReturn(uploadedFile);
-
-        entityManager.detach(uploadedFile);
-
-        UploadedFile uploadedFileChild = builder.givenAUploadedFile();
-        uploadedFileChild.setOriginalFilename("child");
-        uploadedFileChild.setParent(entityManager.find(UploadedFile.class, uploadedFile.getId()));
-        builder.persistAndReturn(uploadedFileChild);
-
-
-        UploadedFile uploadedFileSubChild = builder.givenAUploadedFile();
-        uploadedFileSubChild.setParent(uploadedFileChild);
-        builder.persistAndReturn(uploadedFileSubChild);
-
-        Assertions.assertThrows(
-            ForbiddenException.class, () ->
-                uploadedFileService.delete(uploadedFileChild, null, null, false)
-        );
     }
 }

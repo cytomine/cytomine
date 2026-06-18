@@ -17,38 +17,16 @@ package be.cytomine.controller.image;
  */
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.nimbusds.jose.Algorithm;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.crypto.RSASSASigner;
-import com.nimbusds.jose.jwk.KeyUse;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.SignedJWT;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -61,22 +39,11 @@ import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.utils.JsonObject;
 
-import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -95,70 +62,6 @@ public class UploadedFileResourceTests {
 
     @Autowired
     private UploadedFileRepository uploadedFileRepository;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
-    private static RSAKey rsaKey;
-
-    private static final String KEY_ID = "some random string";
-
-    @BeforeAll
-    public static void beforeAll() throws JOSEException {
-        configureWireMock(wireMockServer);
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
-
-    public static void configureWireMock(WireMockServer wireMockServer) throws JOSEException {
-        rsaKey = new RSAKeyGenerator(2048)
-            .keyUse(KeyUse.SIGNATURE)
-            .algorithm(new Algorithm("RS256"))
-            .keyID(KEY_ID)
-            .generate();
-
-        RSAKey rsaPublicJWK = rsaKey.toPublicJWK();
-        String jwkResponse = String.format("{\"keys\": [%s]}", rsaPublicJWK.toJSONString());
-
-        wireMockServer.stubFor(com.github.tomakehurst.wiremock.client.WireMock.get(urlMatching("/"))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(jwkResponse)));
-    }
-
-    private String getSignedNotExpiredJwt() throws Exception {
-        return getSignedJwt(Instant.now().plus(10, ChronoUnit.MINUTES));
-    }
-
-    private String getSignedJwt(Instant expiresAt) throws Exception {
-        RSASSASigner signer = new RSASSASigner(rsaKey);
-        Instant issuedAt = Instant.now();
-        Map<String, Object> resourceAccessClaim = new HashMap<>();
-        Map<String, Object> resource = new HashMap<>();
-        List<String> resourceRoles = List.of("ADMIN");
-        resource.put("roles", resourceRoles);
-        resourceAccessClaim.put("core", resource);
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-            .issuer("http://localhost:8888/")
-            .expirationTime(Date.from(expiresAt))
-            .issueTime(Date.from(issuedAt))
-            .claim("iss", "http://localhost:8888/")
-            .claim("sub", UUID.randomUUID())
-            .claim("name", "Some User")
-            .claim("preferred_username", "superadmin")
-            .claim("resource_access", resourceAccessClaim)
-            .build();
-        SignedJWT signedJWT = new SignedJWT(
-            new JWSHeader.Builder(JWSAlgorithm.RS256)
-                .keyID(rsaKey.getKeyID())
-                .build(), claimsSet
-        );
-        signedJWT.sign(signer);
-        return signedJWT.serialize();
-    }
 
     @Test
     @Transactional
@@ -445,120 +348,4 @@ public class UploadedFileResourceTests {
         assertThat(ids.get(0)).isNotEqualTo(first);
     }
 
-    @Test
-    @Transactional
-    public void getAnUploadedFile() throws Exception {
-        UploadedFile image = builder.givenAUploadedFile();
-
-        restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}.json", image.getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(image.getId().intValue()))
-            .andExpect(jsonPath("$.class").value("be.cytomine.domain.image.UploadedFile"))
-            .andExpect(jsonPath("$.created").exists())
-            .andExpect(jsonPath("$.projects").hasJsonPath())
-            .andExpect(jsonPath("$.storage").hasJsonPath())
-            .andExpect(jsonPath("$.path").hasJsonPath())
-            .andExpect(jsonPath("$.filename").hasJsonPath())
-            .andExpect(jsonPath("$.size").hasJsonPath())
-            .andExpect(jsonPath("$.user").hasJsonPath())
-            .andExpect(jsonPath("$.contentType").hasJsonPath())
-            .andExpect(jsonPath("$.originalFilename").hasJsonPath())
-            .andExpect(jsonPath("$.status").hasJsonPath());
-    }
-
-    @Test
-    @Transactional
-    public void getAnUploadedFileNotExist() throws Exception {
-        restUploadedFileControllerMockMvc.perform(get("/api/uploadedfile/{id}.json", 0))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.errors.message").exists());
-    }
-
-    @Test
-    @Transactional
-    public void addValidUploadedFile() throws Exception {
-        UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
-        restUploadedFileControllerMockMvc.perform(post("/api/uploadedfile.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(uploadedFile.toJSON()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.uploadedfileID").exists())
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.uploadedfile.id").exists());
-    }
-
-    @Test
-    @Transactional
-    public void editValidUploadedFile() throws Exception {
-        UploadedFile uploadedFile = builder.givenAUploadedFile();
-        JsonObject jsonObject = uploadedFile.toJsonObject();
-        jsonObject.put("filename", "new");
-        restUploadedFileControllerMockMvc.perform(put("/api/uploadedfile/{id}.json", uploadedFile.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonObject.toJsonString()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.uploadedfileID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditUploadedFileCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.uploadedfile.id").exists())
-            .andExpect(jsonPath("$.uploadedfile.filename").value("new"));
-    }
-
-    @Test
-    @Transactional
-    public void deleteUploadedFile() throws Exception {
-        UploadedFile uploadedFile = builder.givenAUploadedFile();
-        restUploadedFileControllerMockMvc.perform(delete("/api/uploadedfile/{id}.json", uploadedFile.getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.uploadedfileID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteUploadedFileCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.uploadedfile.id").exists());
-    }
-
-    @Test
-    @Disabled("Randomly fails")
-    public void downloadUploadedFile() throws Exception {
-        UploadedFile uploadedFile = builder.givenAUploadedFile();
-        uploadedFile.setFilename("1636379100999/CMU-2/CMU-2.mrxs");
-        uploadedFile.setOriginalFilename("CMU-2.mrxs");
-        uploadedFile.setContentType("MRXS");
-
-        byte[] mockResponse = UUID.randomUUID().toString().getBytes();
-        configureFor("localhost", 8888);
-        stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/file/" + URLEncoder.encode(
-                uploadedFile.getPath(),
-                StandardCharsets.UTF_8
-            ).replace("%2F", "/") + "/export?filename=" + URLEncoder.encode(
-                uploadedFile.getOriginalFilename(),
-                StandardCharsets.UTF_8
-            )))
-                .willReturn(
-                    aResponse().withBody(mockResponse)
-                )
-        );
-
-        MvcResult mvcResult = restUploadedFileControllerMockMvc.perform(get(
-                "/api/uploadedfile/{id}/download?Authorization=Bearer " + getSignedNotExpiredJwt(),
-                uploadedFile.getId()
-            ))
-            .andExpect(status().isOk())
-            .andReturn();
-
-        mvcResult = restUploadedFileControllerMockMvc
-            .perform(asyncDispatch(mvcResult))
-            .andExpect(status().isOk())
-            .andReturn();
-
-        assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
-    }
 }

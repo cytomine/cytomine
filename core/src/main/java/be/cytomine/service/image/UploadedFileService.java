@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,41 +20,26 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.AddCommand;
-import be.cytomine.domain.command.Command;
-import be.cytomine.domain.command.DeleteCommand;
-import be.cytomine.domain.command.EditCommand;
-import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.AbstractImage;
-import be.cytomine.domain.image.AbstractSlice;
-import be.cytomine.domain.image.CompanionFile;
 import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.domain.image.UploadedFileStatus;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.image.AbstractImageRepository;
-import be.cytomine.repository.image.AbstractSliceRepository;
-import be.cytomine.repository.image.CompanionFileRepository;
 import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.utils.TaskService;
-import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.DomainUtils;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.SQLUtils;
-import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SQLSearchParameter;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 import be.cytomine.utils.filters.SearchParameterProcessed;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
-import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -68,20 +52,6 @@ public class UploadedFileService extends ModelService {
     private final SecurityACLService securityACLService;
 
     private final UploadedFileRepository uploadedFileRepository;
-
-    private final AbstractImageRepository abstractImageRepository;
-
-    private final AbstractSliceRepository abstractSliceRepository;
-
-    private final AbstractImageService abstractImageService;
-
-    private final AbstractSliceService abstractSliceService;
-
-    private final CompanionFileService companionFileService;
-
-    private final CompanionFileRepository companionFileRepository;
-
-    private final TaskService taskService;
 
     @Override
     public Class currentDomain() {
@@ -381,148 +351,5 @@ public class UploadedFileService extends ModelService {
         Optional<UploadedFile> uploadedFile = uploadedFileRepository.findById(id);
         uploadedFile.ifPresent(file -> securityACLService.check(file.container(), READ));
         return uploadedFile;
-    }
-
-    public UploadedFile get(Long id) {
-        return find(id).orElse(null);
-    }
-
-    /**
-     * Add the new domain with JSON data
-     *
-     * @param json New domain data
-     *
-     * @return Response structure (created domain data,..)
-     */
-    public CommandResponse add(JsonObject json) {
-        User currentUser = currentUserService.getCurrentUser();
-        securityACLService.checkUser(currentUser);
-        if (!json.isMissing("storage")) {
-            securityACLService.check(json.getJSONAttrLong("storage"), Storage.class, WRITE);
-        }
-        return executeCommand(new AddCommand(currentUser), null, json);
-
-    }
-
-    protected void afterAdd(CytomineDomain domain, CommandResponse response) {
-        UploadedFile file = (UploadedFile) domain;
-        file.updateLtree();
-        uploadedFileRepository.save(file);
-    }
-
-    /**
-     * Update this domain with new data from json
-     *
-     * @param domain      Domain to update
-     * @param jsonNewData New domain datas
-     *
-     * @return Response structure (new domain data, old domain data..)
-     */
-    @Override
-    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
-        securityACLService.checkUser(currentUser);
-        securityACLService.check(domain.container(), WRITE);
-        if (jsonNewData.get("storage") != null && !Objects.equals(
-            jsonNewData.getJSONAttrLong("storage"),
-            ((UploadedFile) domain).getStorage().getId()
-        )) {
-            securityACLService.check(jsonNewData.getJSONAttrLong("storage"), Storage.class, WRITE);
-        }
-        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
-    }
-
-    /**
-     * Delete an uploaded file root. As a consequence, all children are also deleted.
-     *
-     * @param domain       Domain to delete
-     * @param transaction  Transaction link with this command
-     * @param task         Task for this command
-     * @param printMessage Flag if client will print or not confirm message
-     *
-     * @return Response structure (code, old domain,..)
-     */
-    @Override
-    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
-        securityACLService.checkUser(currentUser);
-        securityACLService.check(domain.container(), WRITE);
-
-        if (((UploadedFile) domain).getParent() != null) {
-            throw new ForbiddenException("Uploaded File has a parent and can not be deleted.");
-        }
-
-        Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c, domain, null);
-    }
-
-    /**
-     * Delete an uploaded file child.
-     */
-    private CommandResponse deleteChild(CytomineDomain domain, Transaction transaction) {
-        /* We need another method than `delete()` because
-           * uploaded file children have reference to uploaded file parent, thus they are no root.
-           * `delete()` signature is standardized for its usage in RestCytomineController,
-              so it is not possible to add a flag in the method.
-         */
-        User currentUser = currentUserService.getCurrentUser();
-        securityACLService.checkUser(currentUser);
-        securityACLService.check(domain.container(), WRITE);
-
-        Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c, domain, null);
-    }
-
-    @Override
-    public List<String> getStringParamsI18n(CytomineDomain domain) {
-        UploadedFile uploadedFile = (UploadedFile) domain;
-        return Arrays.asList(String.valueOf(uploadedFile.getId()), uploadedFile.getFilename());
-    }
-
-    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
-        deleteDependentAbstractSlice(domain, transaction, task);
-        deleteDependentAbstractImage(domain, transaction, task);
-        deleteDependentCompanionFile(domain, transaction, task);
-        deleteDependentUploadedFile(domain, transaction, task);
-    }
-
-    private void deleteDependentAbstractImage(CytomineDomain domain, Transaction transaction, Task task) {
-        log.info("deleteDependentAbstractImage");
-
-        for (AbstractImage abstractImage : abstractImageRepository.findAllByUploadedFile((UploadedFile) domain)) {
-            abstractImageService.delete(abstractImage, transaction, task, false);
-        }
-    }
-
-    private void deleteDependentAbstractSlice(CytomineDomain domain, Transaction transaction, Task task) {
-        log.info("deleteDependentAbstractSlice");
-
-        for (AbstractSlice abstractSlice : abstractSliceRepository.findAllByUploadedFile((UploadedFile) domain)) {
-            abstractSliceService.delete(abstractSlice, transaction, task, false);
-        }
-    }
-
-    private void deleteDependentCompanionFile(CytomineDomain domain, Transaction transaction, Task task) {
-        log.info("deleteDependentCompanionFile");
-
-        for (CompanionFile companionFile : companionFileRepository.findAllByUploadedFile((UploadedFile) domain)) {
-            companionFileService.delete(companionFile, transaction, task, false);
-        }
-    }
-
-    private void deleteDependentUploadedFile(CytomineDomain domain, Transaction transaction, Task task) {
-        log.info("deleteDependentUploadedFile");
-        UploadedFile uploadedFile = (UploadedFile) domain;
-        taskService.updateTask(
-            task,
-            task != null
-                ? "Delete " + uploadedFileRepository.countByParent(uploadedFile) + " uploadedFiles children"
-                : ""
-        );
-
-        // Dependent uploaded files are necessarily children, because only a root can be deleted.
-        for (UploadedFile child : uploadedFileRepository.findAllByParent(uploadedFile)) {
-            this.deleteChild(child, transaction);
-        }
     }
 }

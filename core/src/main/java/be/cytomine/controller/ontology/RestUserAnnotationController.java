@@ -3,6 +3,7 @@ package be.cytomine.controller.ontology;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
@@ -65,6 +67,8 @@ public class RestUserAnnotationController extends RestCytomineController {
     private final SharedAnnotationService sharedAnnotationService;
 
     private final AnnotationListingBuilder annotationListingBuilder;
+
+    private final TermHttpContract termHttpContract;
 
     @GetMapping("/userannotation.json")
     public ResponseEntity<String> listLight() {
@@ -119,7 +123,12 @@ public class RestUserAnnotationController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
         String userIds = users.filter(s -> !s.isBlank())
             .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
-        // terms = termService.fillEmptyTermIds(terms, project);
+        terms =
+            terms == null || terms.isBlank()
+                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().getId())
+                .stream().map(String::valueOf).collect(
+                    Collectors.joining(",")) :
+                terms;
         JsonObject params = mergeQueryParamsAndBodyParams();
         byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format,
             currentUserService.getCurrentUser().getId());

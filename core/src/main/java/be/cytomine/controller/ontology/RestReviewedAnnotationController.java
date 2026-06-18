@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
@@ -68,6 +70,8 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     private final ImageInstanceService imageInstanceService;
 
     private final TaskService taskService;
+
+    private final TermHttpContract termHttpContract;
 
     @GetMapping("/reviewedannotation.json")
     public ResponseEntity<String> list(
@@ -270,7 +274,12 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         String users = reviewUsers.filter(s -> !s.isBlank())
             .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
 
-        // terms = termService.fillEmptyTermIds(terms, project);
+        terms =
+            terms == null || terms.isBlank()
+                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().getId())
+                .stream().map(String::valueOf).collect(
+                    Collectors.joining(",")) :
+                terms;
 
         JsonObject params = mergeQueryParamsAndBodyParams();
         params.put("reviewed", true);

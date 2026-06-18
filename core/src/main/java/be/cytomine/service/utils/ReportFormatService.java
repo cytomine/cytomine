@@ -9,9 +9,9 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.dto.image.Point;
-import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.report.ReportColumn;
 import be.cytomine.utils.DateUtils;
 import be.cytomine.utils.JsonObject;
@@ -21,7 +21,7 @@ import be.cytomine.utils.StringUtils;
 @AllArgsConstructor
 public class ReportFormatService {
 
-    private final TermService termService;
+    private final TermHttpContract termService;
 
     private Map<Long, String> termNameCache;
 
@@ -113,7 +113,8 @@ public class ReportFormatService {
      *
      * @return {@code Object[][]}
      */
-    public Object[][] formatAnnotationsForReport(List<ReportColumn> columns, List<Map<String, Object>> data) {
+    public Object[][] formatAnnotationsForReport(List<ReportColumn> columns, List<Map<String, Object>> data,
+        long userId) {
         Object[] headers = getColumnHeaders(columns);
         Object[][] report = initReport(data, headers);
 
@@ -121,7 +122,7 @@ public class ReportFormatService {
             Map<String, Object> element = data.get(i);
             for (int j = 0; j < headers.length; j++) {
 
-                Object value = getAnnotationValue(element.get(headers[j]), element, headers[j].toString());
+                Object value = getAnnotationValue(element.get(headers[j]), element, headers[j].toString(), userId);
 
                 if (value == null) {
                     value = "";
@@ -138,7 +139,7 @@ public class ReportFormatService {
      *
      * @return String
      */
-    private Object getAnnotationValue(Object value, Map<String, Object> annotation, String header) {
+    private Object getAnnotationValue(Object value, Map<String, Object> annotation, String header, long userId) {
         Point centroid = (Point) annotation.get("centroid");
         switch (header) {
             case "user":
@@ -146,7 +147,7 @@ public class ReportFormatService {
             case "filename":
                 return annotation.get("instanceFilename");
             case "term":
-                return String.join("- ", getTermsName(value));
+                return String.join("- ", getTermsName(value, userId));
             case "area":
             case "perimeter":
                 return StringUtils.decimalFormatter(value);
@@ -163,7 +164,7 @@ public class ReportFormatService {
      * @param value Object representing the list of term ids
      * @return String[] terms name
      */
-    public String[] getTermsName(Object value) {
+    public String[] getTermsName(Object value, long userId) {
         String[] termsId = value.toString()
             .replace("[", "")
             .replace("]", "")
@@ -173,7 +174,7 @@ public class ReportFormatService {
         if (!termsId[0].trim().isEmpty()) {
             int k = 0;
             for (String termId : termsId) {
-                termNames[k] = getTermName(Long.parseLong(termId.trim())).orElse(null);
+                termNames[k] = getTermName(Long.parseLong(termId.trim()), userId).orElse(null);
                 k++;
             }
         }
@@ -203,9 +204,9 @@ public class ReportFormatService {
      *
      * @return String term name
      */
-    private Optional<String> getTermName(Long termId) {
+    private Optional<String> getTermName(Long termId, long userId) {
         return Optional.ofNullable(termNameCache.get(termId))
-            .or(() -> termService.find(termId)
+            .or(() -> termService.findTermByID(termId, userId)
                 .map(TermResponse::name))
             .map(term -> {
                 termNameCache.put(termId, term);

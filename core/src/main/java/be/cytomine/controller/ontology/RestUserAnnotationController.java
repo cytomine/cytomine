@@ -32,10 +32,10 @@ import be.cytomine.dto.json.JsonMultipleObject;
 import be.cytomine.dto.json.JsonSingleObject;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.ontology.SharedAnnotationService;
-import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
@@ -56,7 +56,7 @@ public class RestUserAnnotationController extends RestCytomineController {
 
     private final UserService userService;
 
-    private final TermService termService;
+    private final CurrentUserService currentUserService;
 
     private final ReportService reportService;
 
@@ -72,7 +72,6 @@ public class RestUserAnnotationController extends RestCytomineController {
         return responseSuccess(userAnnotationService.listLight());
     }
 
-
     @GetMapping("/user/{idUser}/userannotation/count.json")
     public ResponseEntity<String> countByUser(
         @PathVariable(value = "idUser") Long idUser,
@@ -86,9 +85,8 @@ public class RestUserAnnotationController extends RestCytomineController {
             project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
         }
-        return responseSuccess(JsonObject.of("total", userAnnotationService.count((User) user, project)));
+        return responseSuccess(JsonObject.of("total", userAnnotationService.count(user, project)));
     }
-
 
     @GetMapping("/project/{idProject}/userannotation/count.json")
     public ResponseEntity<String> countByProject(
@@ -121,9 +119,10 @@ public class RestUserAnnotationController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
         String userIds = users.filter(s -> !s.isBlank())
             .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
-        terms = termService.fillEmptyTermIds(terms, project);
+        // terms = termService.fillEmptyTermIds(terms, project);
         JsonObject params = mergeQueryParamsAndBodyParams();
-        byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format);
+        byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format,
+            currentUserService.getCurrentUser().getId());
         responseReportFile(reportService.getAnnotationReportFileName(format, idProject), report, format);
     }
 
@@ -142,7 +141,6 @@ public class RestUserAnnotationController extends RestCytomineController {
         json.put("annotationClassName", annotation.getClass().getName());
         return responseSuccess(sharedAnnotationService.add(json));
     }
-
 
     /**
      * Show a single comment for an annotation
@@ -172,7 +170,6 @@ public class RestUserAnnotationController extends RestCytomineController {
         return responseSuccess(sharedAnnotationService.listComments(annotation));
     }
 
-
     @GetMapping("/userannotation/{id}.json")
     public ResponseEntity<String> show(
         @PathVariable Long id
@@ -183,12 +180,10 @@ public class RestUserAnnotationController extends RestCytomineController {
             .orElseGet(() -> responseNotFound("UserAnnotation", id));
     }
 
-
     /**
      * Add a new term Use next add relation-term to add relation with another term
      *
      * @param json JSON with Term data
-     *
      * @return Response map with .code = http response code and .data.term = new created Term
      */
     @PostMapping("/userannotation.json")
@@ -225,7 +220,6 @@ public class RestUserAnnotationController extends RestCytomineController {
         return service.add(json);
     }
 
-
     @PutMapping("/userannotation/{id}.json")
     public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json) {
         log.debug("REST request to edit user annotation : " + id);
@@ -237,7 +231,6 @@ public class RestUserAnnotationController extends RestCytomineController {
         log.debug("REST request to delete an annotation : " + id);
         return delete(userAnnotationService, JsonObject.of("id", id), null);
     }
-
 
     @PostMapping("/userannotation/{id}/repeat.json")
     public ResponseEntity<String> repeat(
@@ -251,7 +244,6 @@ public class RestUserAnnotationController extends RestCytomineController {
         return responseSuccess(userAnnotationService.repeat(
             annotation, json.getJSONAttrLong("repeat", 1L), json.getJSONAttrInteger("slice", null)));
     }
-
 
     @SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
     @RequestMapping(value = "/userannotation/{id}/crop.{format}", method = {RequestMethod.GET, RequestMethod.POST})

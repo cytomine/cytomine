@@ -17,7 +17,6 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.service.AnnotationListingService;
-import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.JsonObject;
@@ -37,9 +36,7 @@ public class AnnotationReportService {
 
     private final ProjectService projectService;
 
-    private final TermService termService;
-
-    public byte[] downloadDocumentByProject(JsonObject params, Project project) {
+    public byte[] downloadDocumentByProject(JsonObject params, Project project, long userId) {
 
         Long idProject = params.getJSONAttrLong("project");
         boolean reviewed = params.getJSONAttrBoolean("reviewed", false);
@@ -54,7 +51,7 @@ public class AnnotationReportService {
             .filter(s -> !s.isBlank())
             .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
 
-        terms = termService.fillEmptyTermIds(terms, project);
+        // terms = termService.fillEmptyTermIds(terms, project);
 
         if (reviewed) {
             params.put("reviewed", true);
@@ -62,7 +59,7 @@ public class AnnotationReportService {
 
         log.info("Download report for project {} with users {} and terms {}", idProject, userIds, terms);
 
-        return annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format);
+        return annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format, userId);
     }
 
     public Map<String, Object> exportAnnotations(Long projectId) {

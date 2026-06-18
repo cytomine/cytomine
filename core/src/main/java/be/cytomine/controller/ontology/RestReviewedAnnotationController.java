@@ -31,7 +31,6 @@ import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
-import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.utils.ParamsService;
@@ -69,8 +68,6 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     private final ImageInstanceService imageInstanceService;
 
     private final TaskService taskService;
-
-    private final TermService termService;
 
     @GetMapping("/reviewedannotation.json")
     public ResponseEntity<String> list(
@@ -112,7 +109,6 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         return responseSuccess(JsonObject.of("total", reviewedAnnotationService.countByProject(project, start, end)));
     }
 
-
     @GetMapping("/imageinstance/{image}/reviewedannotation/stats.json")
     public ResponseEntity<String> stats(
         @PathVariable(value = "image") Long idImage
@@ -122,7 +118,6 @@ public class RestReviewedAnnotationController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", idImage));
         return responseSuccess(reviewedAnnotationService.statsGroupByUser(imageInstance));
     }
-
 
     @GetMapping("/reviewedannotation/{id}.json")
     public ResponseEntity<String> show(
@@ -155,7 +150,6 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         log.debug("REST request to delete an annotation : " + id);
         return delete(reviewedAnnotationService, JsonObject.of("id", id), null);
     }
-
 
     /**
      * Start the review mode on an image To review annotation, a user must enable review mode in the current image
@@ -201,7 +195,6 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         ));
     }
 
-
     @RequestMapping(value = "/annotation/{annotation}/review.json", method = {GET, POST, PUT})
     public ResponseEntity<String> addAnnotationReview(
         @PathVariable(value = "annotation") Long idAnnotation
@@ -217,7 +210,6 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         return responseSuccess(response);
     }
 
-
     @DeleteMapping(value = "/annotation/{annotation}/review.json")
     public ResponseEntity<String> deleteAnnotationReview(@PathVariable(value = "annotation") Long idAnnotation) {
         log.debug("REST request to create review of annotation {}", idAnnotation);
@@ -226,7 +218,6 @@ public class RestReviewedAnnotationController extends RestCytomineController {
 
         return responseSuccess(response);
     }
-
 
     /**
      * Review all annotation in image for a user It support the task functionnality, if task param is set, this method
@@ -278,10 +269,13 @@ public class RestReviewedAnnotationController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
         String users = reviewUsers.filter(s -> !s.isBlank())
             .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
-        terms = termService.fillEmptyTermIds(terms, project);
+
+        // terms = termService.fillEmptyTermIds(terms, project);
+
         JsonObject params = mergeQueryParamsAndBodyParams();
         params.put("reviewed", true);
-        byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, users, params, terms, format);
+        byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, users, params, terms, format,
+            currentUserService.getCurrentUser().getId());
         responseReportFile(reportService.getAnnotationReportFileName(format, idProject), report, format);
     }
 

@@ -98,7 +98,7 @@ jobs:
       - name: Cache Trivy DB
         uses: actions/cache@v4
         with:
-          path: ~/.cache/trivy
+          path: ${{ github.workspace }}/.cache/trivy
           key: trivy-${{ runner.os }}-${{ github.run_id }}
           restore-keys: trivy-${{ runner.os }}-
 
@@ -110,4 +110,4 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
           severity: CRITICAL,HIGH
-          cache-dir: ~/.cache/trivy
+          cache-dir: ${{ github.workspace }}/.cache/trivy

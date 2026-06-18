@@ -11,5 +11,5 @@ public interface OntologyRepository extends JpaRepository<OntologyEntity, Long> 
 
     Optional<OntologyEntity> findByIdAndDeletedNull(long id);
 
-    Page<OntologyEntity> findAllByUserId(long userId, Pageable pageable);
+    Page<OntologyEntity> findAllByUserIdAndDeletedNull(long userId, Pageable pageable);
 }

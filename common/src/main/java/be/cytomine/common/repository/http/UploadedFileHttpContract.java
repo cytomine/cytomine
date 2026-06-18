@@ -1,4 +1,4 @@
-package be.cytomine.common.repository.http.image;
+package be.cytomine.common.repository.http;
 
 import java.util.Optional;
 
@@ -17,7 +17,7 @@ import be.cytomine.common.repository.model.command.payload.response.UploadedFile
 import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 
-import static be.cytomine.common.repository.http.image.UploadedFileHttpContract.ROOT_PATH;
+import static be.cytomine.common.repository.http.UploadedFileHttpContract.ROOT_PATH;
 
 @HttpExchange(ROOT_PATH)
 public interface UploadedFileHttpContract {

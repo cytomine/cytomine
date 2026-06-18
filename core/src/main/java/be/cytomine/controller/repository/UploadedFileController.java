@@ -26,6 +26,7 @@ import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFi
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.middleware.ImageServerService;
+import be.cytomine.service.middleware.ImageServerService.DownloadType;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -81,7 +82,12 @@ public class UploadedFileController {
         UploadedFileResponse uploadedFile = uploadedFileHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
 
-        StreamingResponseBody stream = outputStream -> imageServerService.streamDownload(uploadedFile, outputStream);
+        StreamingResponseBody stream = outputStream -> imageServerService.streamDownload(
+            DownloadType.FILE,
+            uploadedFile.path(),
+            uploadedFile.originalFilename(),
+            outputStream
+        );
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);

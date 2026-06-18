@@ -7,12 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +20,6 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.UploadedFileService;
 import be.cytomine.service.middleware.ImageServerService;
-import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.RequestParams;
 
 @RestController
@@ -71,34 +66,6 @@ public class RestUploadedFileController extends RestCytomineController {
                 retrievePageable()
             ));
         }
-    }
-
-    @GetMapping("/uploadedfile/{id}.json")
-    public ResponseEntity<String> show(
-        @PathVariable Long id
-    ) {
-        log.debug("REST request to get uploadedFile {}", id);
-        return uploadedFileService.find(id)
-            .map(this::responseSuccess)
-            .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
-    }
-
-    @PostMapping(value = "/uploadedfile.json")
-    public ResponseEntity<String> add(@RequestBody String json) {
-        log.debug("REST request to save uploadedFile : " + json);
-        return add(uploadedFileService, json);
-    }
-
-    @PutMapping("/uploadedfile/{id}.json")
-    public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json) {
-        log.debug("REST request to edit uploadedFile : " + id);
-        return update(uploadedFileService, json);
-    }
-
-    @DeleteMapping("/uploadedfile/{id}.json")
-    public ResponseEntity<String> delete(@PathVariable String id) {
-        log.debug("REST request to delete uploadedFile : " + id);
-        return delete(uploadedFileService, JsonObject.of("id", id), null);
     }
 
     @GetMapping("/uploadedfile/{id}/download")

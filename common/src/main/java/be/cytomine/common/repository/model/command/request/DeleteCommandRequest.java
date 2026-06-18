@@ -7,7 +7,8 @@ import be.cytomine.common.repository.model.HasLongId;
 import be.cytomine.common.repository.model.command.payload.request.UpdateCommandPayload;
 
 public sealed interface DeleteCommandRequest<T extends HasLongId & HasAclId> extends CommandV2Request<T>
-    permits DeleteOntologyCommand, DeleteTermCommand, DeleteTermRelationCommand, DeleteStorageCommand {
+    permits DeleteOntologyCommand, DeleteTermCommand, DeleteTermRelationCommand, DeleteStorageCommand,
+        DeleteUploadedFileCommand {
 
     T before();
 

@@ -14,14 +14,17 @@ import be.cytomine.common.repository.model.command.request.CreateOntologyCommand
 import be.cytomine.common.repository.model.command.request.CreateStorageCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.CreateUploadedFileCommand;
 import be.cytomine.common.repository.model.command.request.DeleteOntologyCommand;
 import be.cytomine.common.repository.model.command.request.DeleteStorageCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.DeleteUploadedFileCommand;
 import be.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.UpdateStorageCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.UpdateUploadedFileCommand;
 
 @Component
 @AllArgsConstructor
@@ -31,6 +34,7 @@ public class ApplyCommandService {
     private final TermCommandService termCommandService;
     private final TermRelationCommandService termRelationCommandService;
     private final OntologyCommandService ontologyCommandService;
+    private final UploadedFileCommandService uploadedFileCommandService;
 
     @Transactional
     public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
@@ -53,6 +57,12 @@ public class ApplyCommandService {
             case CreateStorageCommand csc -> storageCommandService.undoCreate(commandEntity.getId(), csc, userId, now);
             case UpdateStorageCommand usc -> storageCommandService.undoUpdate(commandEntity.getId(), usc, userId, now);
             case DeleteStorageCommand dsc -> storageCommandService.undoDelete(commandEntity.getId(), dsc, userId, now);
+            case CreateUploadedFileCommand cufc ->
+                uploadedFileCommandService.undoCreate(commandEntity.getId(), cufc, userId, now);
+            case UpdateUploadedFileCommand uufc ->
+                uploadedFileCommandService.undoUpdate(commandEntity.getId(), uufc, userId, now);
+            case DeleteUploadedFileCommand dufc ->
+                uploadedFileCommandService.undoDelete(commandEntity.getId(), dufc, userId, now);
         });
     }
 
@@ -76,6 +86,12 @@ public class ApplyCommandService {
             case CreateStorageCommand csc -> storageCommandService.redoCreate(commandEntity.getId(), csc, userId, now);
             case UpdateStorageCommand usc -> storageCommandService.redoUpdate(commandEntity.getId(), usc, userId, now);
             case DeleteStorageCommand dsc -> storageCommandService.redoDelete(commandEntity.getId(), dsc, userId, now);
+            case CreateUploadedFileCommand cufc ->
+                uploadedFileCommandService.redoCreate(commandEntity.getId(), cufc, userId, now);
+            case UpdateUploadedFileCommand uufc ->
+                uploadedFileCommandService.redoUpdate(commandEntity.getId(), uufc, userId, now);
+            case DeleteUploadedFileCommand dufc ->
+                uploadedFileCommandService.redoDelete(commandEntity.getId(), dufc, userId, now);
         });
     }
 }

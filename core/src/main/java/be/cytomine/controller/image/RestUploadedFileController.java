@@ -1,25 +1,16 @@
 package be.cytomine.controller.image;
 
-import java.io.IOException;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import be.cytomine.controller.RestCytomineController;
-import be.cytomine.domain.image.UploadedFile;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.UploadedFileService;
-import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.utils.RequestParams;
 
 @RestController
@@ -29,8 +20,6 @@ import be.cytomine.utils.RequestParams;
 public class RestUploadedFileController extends RestCytomineController {
 
     private final UploadedFileService uploadedFileService;
-
-    private final ImageServerService imageServerService;
 
     private final CurrentUserService currentUserService;
 
@@ -66,27 +55,5 @@ public class RestUploadedFileController extends RestCytomineController {
                 retrievePageable()
             ));
         }
-    }
-
-    @GetMapping("/uploadedfile/{id}/download")
-    public ResponseEntity<StreamingResponseBody> download(
-        @PathVariable Long id,
-        @RequestParam String authorization
-    ) throws IOException {
-        log.debug("GET /uploadedfile/{}/download", id);
-
-        UploadedFile uploadedFile = uploadedFileService.find(id, authorization)
-            .orElseThrow(() -> new ObjectNotFoundException("UploadedFile", id));
-
-        StreamingResponseBody stream = outputStream -> imageServerService.streamDownload(uploadedFile, outputStream);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", uploadedFile.getOriginalFilename());
-
-        return ResponseEntity
-            .ok()
-            .headers(headers)
-            .body(stream);
     }
 }

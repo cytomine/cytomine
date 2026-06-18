@@ -26,11 +26,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.controller.JsonResponseEntity;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
@@ -38,7 +39,6 @@ import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.ImageInstanceService;
-import be.cytomine.service.ontology.OntologyService;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
@@ -70,7 +70,7 @@ public class RestUserController extends RestCytomineController {
 
     private final ProjectRepresentativeUserService projectRepresentativeUserService;
 
-    private final OntologyService ontologyService;
+    private final OntologyHttpContract ontologyHttpContract;
 
     private final ReportService reportService;
 
@@ -115,9 +115,9 @@ public class RestUserController extends RestCytomineController {
         @PathVariable Long id
     ) {
         log.debug("REST request to list user from ontology {}", id);
-        Ontology ontology = ontologyService.find(id)
+        OntologyResponse ontology = ontologyHttpContract.get(id, currentUserService.getCurrentUser().getId())
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
-        return responseSuccess(userService.listUsers(ontology), isFilterRequired());
+        return responseSuccess(userService.listUsers(ontology.id()), isFilterRequired());
     }
 
     @GetMapping("/project/{id}/userlayer.json")
@@ -221,7 +221,6 @@ public class RestUserController extends RestCytomineController {
 
     /******************************************************************************************************************/
 
-
     @GetMapping("/user/current.json")
     public ResponseEntity<String> getCurrentUser(
     ) {
@@ -247,7 +246,6 @@ public class RestUserController extends RestCytomineController {
         log.debug("REST request to delete User: {}", id);
         return delete(userService, JsonObject.of("id", Long.parseLong(id)), null);
     }
-
 
     @GetMapping("/project/{id}/user.json")
     public ResponseEntity<String> showByProject(

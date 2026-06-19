@@ -233,7 +233,6 @@ public class UploadedFileService extends ModelService {
                     ? UrlApi.getAbstractImageThumbUrl((Long) result.get("image"), "png")
                     : null
             );
-            result.put("isArchive", UploadedFile.ARCHIVE_FORMATS.contains(result.get("contentType")));
             results.add(result);
         }
         return results;
@@ -333,7 +332,6 @@ public class UploadedFileService extends ModelService {
                 result.put("thumbURL", UrlApi.getAbstractSliceThumbUrl(slice, "png"));
             }
 
-            result.put("isArchive", UploadedFile.ARCHIVE_FORMATS.contains(result.get("contentType")));
             results.add(result);
         }
         return results;

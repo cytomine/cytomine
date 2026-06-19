@@ -110,7 +110,6 @@ public class UploadedFile extends CytomineDomain implements Serializable {
         returnArray.put("contentType", uploadedFile.getContentType());
         returnArray.put("size", uploadedFile.getSize());
         returnArray.put("path", uploadedFile.getPath());
-        returnArray.put("isArchive", uploadedFile.isArchive());
         returnArray.put("status", uploadedFile.getStatus());
         returnArray.put("statusText", uploadedFile.getStatusText());
         returnArray.put("projects", uploadedFile.getProjects());
@@ -124,10 +123,6 @@ public class UploadedFile extends CytomineDomain implements Serializable {
     public String getPath() {
         // //TODO: use a directory per storage
         return filename;
-    }
-
-    boolean isArchive() {
-        return ARCHIVE_FORMATS.contains(contentType);
     }
 
     @PreUpdate

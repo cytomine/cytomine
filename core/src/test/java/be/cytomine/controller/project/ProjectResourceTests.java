@@ -2,6 +2,7 @@ package be.cytomine.controller.project;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -19,12 +20,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.ontology.AnnotationTerm;
@@ -54,6 +58,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -69,6 +74,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class ProjectResourceTests {
 
+    private static WireMockServer wireMockServer;
+    @Autowired
+    ProjectConnectionService projectConnectionService;
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
 
@@ -88,9 +96,6 @@ public class ProjectResourceTests {
     private AclRepository aclRepository;
 
     @Autowired
-    ProjectConnectionService projectConnectionService;
-
-    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
@@ -99,7 +104,8 @@ public class ProjectResourceTests {
     @Autowired
     private PersistentProjectConnectionRepository persistentProjectConnectionRepository;
 
-    private static WireMockServer wireMockServer;
+    @MockitoBean
+    private OntologyHttpContract ontologyHttpContract;
 
     private static void setupStub() {
         /* Simulate call to PIMS */
@@ -128,18 +134,6 @@ public class ProjectResourceTests {
         );
     }
 
-    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
-        return projectConnectionService.add(
-            user,
-            project,
-            "xxx",
-            "linux",
-            "chrome",
-            "123",
-            created
-        );
-    }
-
     @BeforeAll
     public static void beforeAll() {
         wireMockServer = new WireMockServer(8888);
@@ -151,6 +145,18 @@ public class ProjectResourceTests {
     @AfterAll
     public static void afterAll() {
         wireMockServer.stop();
+    }
+
+    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
+        return projectConnectionService.add(
+            user,
+            project,
+            "xxx",
+            "linux",
+            "chrome",
+            "123",
+            created
+        );
     }
 
     @BeforeEach
@@ -260,7 +266,6 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id=='" + projectWithCriteria.getId() + "')]").exists())
             .andExpect(jsonPath("$.collection[?(@.id=='" + projectWithoutCriteria.getId() + "')]").doesNotExist());
     }
-
 
     @Test
     @Transactional
@@ -424,7 +429,6 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
-
     @Test
     @Transactional
     public void listAllProjectsWithPagination() throws Exception {
@@ -485,7 +489,6 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.collection[1].id").value(project1.getId()))
         ;
     }
-
 
     @Test
     @Transactional
@@ -570,7 +573,6 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.project.name").value(project.getName()))
             .andExpect(jsonPath("$.ontology").doesNotExist());
     }
-
 
     @Test
     @Transactional
@@ -818,9 +820,12 @@ public class ProjectResourceTests {
     @Transactional
     public void listByOntology() throws Exception {
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
-
-        restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", project.getOntology().getId()))
+        User user = builder.givenSuperAdmin();
+        builder.addUserToProject(project, user.getUsername());
+        Long ontologyId = project.getOntology().getId();
+        when(ontologyHttpContract.getLight(ontologyId, user.getId())).thenReturn(
+            Optional.of(new OntologyLight(ontologyId, "ontology")));
+        restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", ontologyId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[0].id").value(project.getId()));
 
@@ -830,7 +835,11 @@ public class ProjectResourceTests {
     @Transactional
     public void listByOntologyThatDoesNotExist() throws Exception {
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
+        User user = builder.givenSuperAdmin();
+        builder.addUserToProject(project, user.getUsername());
+        Long ontologyId = project.getOntology().getId();
+        when(ontologyHttpContract.getLight(ontologyId, user.getId())).thenReturn(
+            Optional.of(new OntologyLight(ontologyId, "ontology")));
         restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", 0L))
             .andExpect(status().isNotFound());
     }

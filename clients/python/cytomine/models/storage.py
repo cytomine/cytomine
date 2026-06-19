@@ -117,5 +117,4 @@ class UploadedFileCollection(Collection):
 
         self.all = None
         self.parent = None
-        self.onlyRoots = None
         self.set_parameters(parameters)

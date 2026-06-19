@@ -28,7 +28,6 @@ public class RestUploadedFileController extends RestCytomineController {
     public ResponseEntity<String> list(
         @RequestParam(defaultValue = "false") Boolean onlyRootsWithDetails,
         @RequestParam(defaultValue = "true") Boolean withTreeDetails,
-        @RequestParam(defaultValue = "false") Boolean onlyRoots,
         @RequestParam(required = false) Long parent,
         @RequestParam(required = false) Long root,
         @RequestParam(defaultValue = "false") Boolean all

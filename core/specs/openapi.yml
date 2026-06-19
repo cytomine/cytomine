@@ -7164,12 +7164,6 @@ paths:
           required: true
           schema:
             type: boolean
-        - name: onlyRoots
-          in: query
-          description: If set, only return uploaded files which are roots (no parent).
-          required: true
-          schema:
-            type: boolean
         - name: parent
           in: query
           description: If set, only return uploaded files having the given parent.

@@ -155,9 +155,9 @@ import {
   StorageCollection,
   ProjectCollection,
   UploadedFile,
-  UploadedFileStatus,
   User,
 } from '@/api';
+import {UploadedFileStatus} from '@/constants/UploadedFileStatus';
 
 import {get} from '@/utils/store-helpers';
 import constants from '@/utils/constants.js';

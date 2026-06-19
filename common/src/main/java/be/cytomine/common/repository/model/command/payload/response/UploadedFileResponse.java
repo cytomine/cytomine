@@ -23,7 +23,7 @@ public record UploadedFileResponse(
     LocalDateTime created,
     Optional<LocalDateTime> updated,
     Optional<LocalDateTime> deleted,
-    String thumbnailUrl
+    Optional<String> thumbnailUrl
 ) implements ApplyCommandResponse {
 
     public UploadedFileResponse {

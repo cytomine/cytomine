@@ -11299,7 +11299,8 @@ components:
           writeOnly: true
         thumbnailUrl:
           type: string
-          description: The URL of the thumbnail
+          description: The URL of the thumbnail, absent if the file has not yet been deployed.
+          nullable: true
           readOnly: true
       required:
         - user
@@ -11310,7 +11311,6 @@ components:
         - ext
         - contentType
         - projects
-        - thumbnailUrl
     user:
       description: A cytomine human user
       type: object

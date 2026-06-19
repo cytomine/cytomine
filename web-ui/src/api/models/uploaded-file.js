@@ -43,7 +43,7 @@ export default class UploadedFile extends Model {
     this.userId = null;
 
     this.parent = null;
-    this.thumbURL = null;
+    this.thumbnailUrl = null;
 
     this.status = null;
     this.statusText = null;

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -36,6 +37,7 @@ import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.middleware.ImageServerService;
+import be.cytomine.utils.TokenUtils;
 import be.cytomine.service.middleware.ImageServerService.DownloadType;
 
 import static java.lang.String.format;
@@ -105,9 +107,13 @@ public class UploadedFileController {
     }
 
     @GetMapping("/uploadedfile/{id}/download")
-    public ResponseEntity<StreamingResponseBody> download(@PathVariable Long id) throws IOException {
+    public ResponseEntity<StreamingResponseBody> download(
+        @PathVariable Long id,
+        @RequestParam String authorization
+    ) throws IOException {
         log.debug("GET /uploadedfile/{}/download", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        String username = TokenUtils.getUsernameFromToken(authorization.replace("Bearer ", ""));
+        long userId = currentUserService.getCurrentUser(username).getId();
 
         UploadedFileResponse uploadedFile = uploadedFileHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));

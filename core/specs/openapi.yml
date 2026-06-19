@@ -11297,6 +11297,10 @@ components:
           type: string
           description: Hierarchical tree of uploaded files
           writeOnly: true
+        thumbnailUrl:
+          type: string
+          description: The URL of the thumbnail
+          readOnly: true
       required:
         - user
         - parent
@@ -11306,6 +11310,7 @@ components:
         - ext
         - contentType
         - projects
+        - thumbnailUrl
     user:
       description: A cytomine human user
       type: object

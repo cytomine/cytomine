@@ -22,7 +22,8 @@ public record UploadedFileResponse(
     Set<Long> projects,
     LocalDateTime created,
     Optional<LocalDateTime> updated,
-    Optional<LocalDateTime> deleted
+    Optional<LocalDateTime> deleted,
+    String thumbnailUrl
 ) implements ApplyCommandResponse {
 
     public UploadedFileResponse {

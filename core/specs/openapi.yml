@@ -11295,14 +11295,13 @@ components:
           nullable: true
           readOnly: true
       required:
-        - user
-        - parent
-        - storage
-        - originalFilename
-        - filename
-        - ext
         - contentType
+        - ext
+        - filename
+        - originalFilename
         - projects
+        - storage
+        - user
     user:
       description: A cytomine human user
       type: object

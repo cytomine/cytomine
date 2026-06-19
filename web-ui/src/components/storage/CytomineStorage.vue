@@ -287,14 +287,14 @@ export default {
     },
 
     async refreshStatusSessionUploads() {
-      let pendingStatus = [
+      const PENDING_STATUSES = [
         UploadedFileStatus.UPLOADED,
         UploadedFileStatus.DETECTING_FORMAT,
         UploadedFileStatus.EXTRACTING_DATA,
         UploadedFileStatus.CONVERTING,
         UploadedFileStatus.DEPLOYING,
-        50,
-        60
+        UploadedFileStatus.UNPACKING,
+        UploadedFileStatus.CHECKING_INTEGRITY,
       ];
 
       let unfinishedConversions = false;
@@ -304,7 +304,7 @@ export default {
         await Promise.all(this.dropFiles.map(async wrapper => {
           if (wrapper.uploadedFile) {
             let oldStatus = wrapper.uploadedFile.status;
-            if (!pendingStatus.includes(oldStatus)) {
+            if (!PENDING_STATUSES.includes(oldStatus)) {
               return;
             }
 
@@ -313,7 +313,7 @@ export default {
             if (status !== oldStatus) {
               statusChange = true;
             }
-            if (pendingStatus.includes(status)) {
+            if (PENDING_STATUSES.includes(status)) {
               unfinishedConversions = true;
             }
           }

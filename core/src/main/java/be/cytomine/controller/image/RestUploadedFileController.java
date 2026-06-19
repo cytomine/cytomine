@@ -51,7 +51,7 @@ public class RestUploadedFileController extends RestCytomineController {
             return responseSuccess(uploadedFileService.list(
                 currentUserService.getCurrentUser(),
                 parent,
-                onlyRoots,
+                false,
                 retrievePageable()
             ));
         }

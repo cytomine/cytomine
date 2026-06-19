@@ -1,6 +1,7 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 import lombok.Getter;
@@ -10,6 +11,8 @@ import org.cytomine.repository.mapper.UploadedFileMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.UploadedFileRepository;
 import org.cytomine.repository.persistence.entity.UploadedFileEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.UploadedFileCommandPayload;
@@ -134,5 +137,11 @@ public class UploadedFileCommandService
     @Override
     public boolean canDeleteAclId(long userId, long aclId) {
         return aclService.canDeleteStorage(userId, aclId);
+    }
+
+    public Page<UploadedFileResponse> getAll(long userId, Pageable pageable) {
+        List<Long> storageIds = aclService.getAccessibleStorageIds(userId);
+        return uploadedFileRepository.search(storageIds, pageable)
+            .map(uploadedFileMapper::mapToUploadedFileResponse);
     }
 }

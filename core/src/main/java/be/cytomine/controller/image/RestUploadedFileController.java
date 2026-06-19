@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.UploadedFileHttpContract;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.UploadedFileService;

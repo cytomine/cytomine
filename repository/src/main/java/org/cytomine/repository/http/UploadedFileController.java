@@ -8,7 +8,10 @@ import org.cytomine.repository.mapper.UploadedFileMapper;
 import org.cytomine.repository.persistence.UploadedFileRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.UploadedFileCommandService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.UploadedFileHttpContract;
@@ -49,5 +52,10 @@ public class UploadedFileController implements UploadedFileHttpContract {
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
         return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+    }
+
+    @Override
+    public Page<UploadedFileResponse> getAll(long userId, Pageable pageable) {
+        return service.getAll(userId, pageable);
     }
 }

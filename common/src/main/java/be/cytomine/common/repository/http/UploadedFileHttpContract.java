@@ -3,6 +3,8 @@ package be.cytomine.common.repository.http;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,4 +43,7 @@ public interface UploadedFileHttpContract {
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
+
+    @GetExchange("/all")
+    Page<UploadedFileResponse> getAll(@RequestParam long userId, Pageable pageable);
 }

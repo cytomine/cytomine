@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.command.CommandHistory;
-import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
@@ -52,7 +52,7 @@ public class RestProjectController extends RestCytomineController {
 
     private final CurrentRoleService currentRoleService;
 
-    private final OntologyRepository ontologyRepository;
+    private final OntologyHttpContract ontologyHttpContract;
 
     private final UserService userService;
 
@@ -152,9 +152,10 @@ public class RestProjectController extends RestCytomineController {
     @GetMapping("/ontology/{id}/project.json")
     public ResponseEntity<String> listByOntology(@PathVariable Long id) {
         log.debug("REST request to list project with ontology {}", id);
-        Ontology ontology = ontologyRepository.findById(id)
+        long ontologyId = ontologyHttpContract.getLight(id, currentUserService.getCurrentUser().getId())
+            .map(OntologyLight::id)
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
-        return responseSuccess(projectService.listByOntology(ontology.getId()));
+        return responseSuccess(projectService.listByOntology(ontologyId));
     }
 
     /**

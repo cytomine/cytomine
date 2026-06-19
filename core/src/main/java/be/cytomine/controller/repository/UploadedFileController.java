@@ -1,10 +1,14 @@
 package be.cytomine.controller.repository;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,7 +31,11 @@ import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFi
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
+import be.cytomine.dto.image.UploadedFileView;
+import be.cytomine.repository.image.AbstractImageRepository;
+import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.middleware.ImageServerService.DownloadType;
 
@@ -42,16 +50,23 @@ public class UploadedFileController {
 
     public static final String UNABLE_TO_FIND_UPLOADED_FILE = "Unable to find uploaded file with id: %s";
 
+    private final AbstractImageRepository abstractImageRepository;
     private final CurrentUserService currentUserService;
     private final ImageServerService imageServerService;
     private final PageMapper pageMapper;
     private final UploadedFileHttpContract uploadedFileHttpContract;
 
     @GetMapping("/uploadedfile.json")
-    public CollectionResponse<UploadedFileResponse> getAll(Pageable pageable) {
+    public CollectionResponse<UploadedFileView> getAll(Pageable pageable) {
         log.debug("GET /uploadedfile.json");
         long userId = currentUserService.getCurrentUser().getId();
-        return pageMapper.toCollectionResponse(uploadedFileHttpContract.getAll(userId, pageable));
+        Page<UploadedFileResponse> page = uploadedFileHttpContract.getAll(userId, pageable);
+        Set<Long> ids = page.getContent().stream().map(UploadedFileResponse::id).collect(Collectors.toSet());
+        Map<Long, Long> abstractImageIdByUploadedFileId = abstractImageRepository
+            .findIdsByUploadedFileIds(ids)
+            .stream()
+            .collect(Collectors.toMap(AbstractImageIds::uploadedFileId, AbstractImageIds::abstractImageId));
+        return pageMapper.toCollectionResponse(page.map(r -> toView(r, abstractImageIdByUploadedFileId.get(r.id()))));
     }
 
     @PostMapping("/uploadedfile.json")
@@ -62,11 +77,13 @@ public class UploadedFileController {
     }
 
     @GetMapping("/uploadedfile/{id}.json")
-    public UploadedFileResponse show(@PathVariable Long id) {
+    public UploadedFileView show(@PathVariable Long id) {
         log.debug("GET /uploadedFile/{}.json", id);
         long userId = currentUserService.getCurrentUser().getId();
-        return uploadedFileHttpContract.get(id, userId)
+        UploadedFileResponse response = uploadedFileHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
+        Long abstractImageId = abstractImageRepository.findIdByUploadedFileId(id).orElse(null);
+        return toView(response, abstractImageId);
     }
 
     @PutMapping("/uploadedfile/{id}.json")
@@ -108,5 +125,11 @@ public class UploadedFileController {
             .ok()
             .headers(headers)
             .body(stream);
+    }
+
+    private UploadedFileView toView(UploadedFileResponse r, Long abstractImageId) {
+        Optional<String> thumbnailUrl = Optional.ofNullable(abstractImageId)
+            .map(id -> UrlApi.getAbstractImageThumbUrl(id, "png"));
+        return UploadedFileView.from(r, thumbnailUrl);
     }
 }

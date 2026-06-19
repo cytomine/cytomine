@@ -46,7 +46,6 @@ export default class UploadedFile extends Model {
     this.thumbnailUrl = null;
 
     this.status = null;
-    this.statusText = null;
   }
 
   get downloadURL() {

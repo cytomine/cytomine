@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Cytomine Core API
-  version: 0.2.0
+  version: 0.2.1
   description: core API provides requests for core features of Cytomine.
 
 servers:
@@ -9656,10 +9656,6 @@ components:
           description: File status
           format: int32
           readOnly: true
-        statusText:
-          type: string
-          description: Textual file status
-          readOnly: true
       required:
         - uploadedFile
         - image
@@ -11283,10 +11279,6 @@ components:
           type: integer
           description: File status
           format: int32
-        statusText:
-          type: string
-          description: Textual file status
-          readOnly: true
         projects:
           type: integer
           description:

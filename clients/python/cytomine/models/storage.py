@@ -96,7 +96,6 @@ class UploadedFile(Model):
         self.storage = id_storage
         self.user = id_user
         self.status = status
-        self.statusText = None
         self.parent = id_parent
         self.populate(attributes)
 

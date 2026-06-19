@@ -111,13 +111,8 @@ public class UploadedFile extends CytomineDomain implements Serializable {
         returnArray.put("size", uploadedFile.getSize());
         returnArray.put("path", uploadedFile.getPath());
         returnArray.put("status", uploadedFile.getStatus());
-        returnArray.put("statusText", uploadedFile.getStatusText());
         returnArray.put("projects", uploadedFile.getProjects());
         return returnArray;
-    }
-
-    String getStatusText() {
-        return UploadedFileStatus.findByCode(status).map(Enum::name).orElse(null);
     }
 
     public String getPath() {

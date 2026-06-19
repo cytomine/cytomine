@@ -18,7 +18,6 @@ public record UploadedFileResponse(
     Long size,
     String path,
     int status,
-    String statusText,
     Set<Long> projects,
     LocalDateTime created,
     Optional<LocalDateTime> updated,

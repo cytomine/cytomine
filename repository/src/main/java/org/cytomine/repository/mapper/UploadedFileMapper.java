@@ -24,7 +24,6 @@ public interface UploadedFileMapper {
     @Mapping(target = "parent", source = "parent", qualifiedByName = "mapParentToId")
     @Mapping(target = "storage", source = "storageId", qualifiedByName = "wrapLong")
     @Mapping(target = "path", expression = "java(entity.getFilename())")
-    @Mapping(target = "statusText", expression = "java(String.valueOf(entity.getStatus()))")
     @Mapping(target = "projects", source = "projects", qualifiedByName = "mapArrayToSet")
     @Mapping(target = "thumbnailUrl", expression = "java(java.util.Optional.empty())")
     UploadedFileResponse mapToUploadedFileResponse(UploadedFileEntity entity);

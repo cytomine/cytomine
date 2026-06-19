@@ -86,7 +86,6 @@ public class CompanionFile extends CytomineDomain {
         returnArray.put("type", companionFile.getType());
         returnArray.put("progress", companionFile.getProgress());
         returnArray.put("status", companionFile.getUploadedFileStatus());
-        returnArray.put("statusText", companionFile.getUploadedFileStatusText());
         return returnArray;
     }
 
@@ -101,11 +100,6 @@ public class CompanionFile extends CytomineDomain {
 
     public Integer getUploadedFileStatus() {
         return this.getUploadedFile() != null ? this.getUploadedFile().getStatus() : null;
-    }
-
-
-    public String getUploadedFileStatusText() {
-        return this.getUploadedFile() != null ? this.getUploadedFile().getStatusText() : null;
     }
 
     public String getPath() {

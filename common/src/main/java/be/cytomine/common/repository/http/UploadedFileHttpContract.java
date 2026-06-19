@@ -31,7 +31,7 @@ public interface UploadedFileHttpContract {
     @PostExchange
     Optional<HttpCommandResponse> create(
         @RequestParam long userId,
-        @Valid @RequestBody CreateUploadedFile createPayload
+        @Valid @RequestBody CreateUploadedFile payload
     );
 
     @PutExchange("/{id}")

@@ -40,8 +40,8 @@ public class UploadedFileController implements UploadedFileHttpContract {
     }
 
     @Override
-    public Optional<HttpCommandResponse> create(long userId, CreateUploadedFile createPayload) {
-        return service.create(userId, createPayload, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> create(long userId, CreateUploadedFile payload) {
+        return service.create(userId, payload, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override

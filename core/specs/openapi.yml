@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Cytomine Core API
-  version: 0.2.1
+  version: 0.3.0
   description: core API provides requests for core features of Cytomine.
 
 servers:

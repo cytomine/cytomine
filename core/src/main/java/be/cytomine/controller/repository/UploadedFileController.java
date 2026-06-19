@@ -31,7 +31,6 @@ import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFi
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
-import be.cytomine.dto.image.UploadedFileView;
 import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
 import be.cytomine.service.CurrentUserService;
@@ -57,7 +56,7 @@ public class UploadedFileController {
     private final UploadedFileHttpContract uploadedFileHttpContract;
 
     @GetMapping("/uploadedfile.json")
-    public CollectionResponse<UploadedFileView> getAll(Pageable pageable) {
+    public CollectionResponse<UploadedFileResponse> getAll(Pageable pageable) {
         log.debug("GET /uploadedfile.json");
         long userId = currentUserService.getCurrentUser().getId();
         Page<UploadedFileResponse> page = uploadedFileHttpContract.getAll(userId, pageable);
@@ -66,7 +65,10 @@ public class UploadedFileController {
             .findIdsByUploadedFileIds(ids)
             .stream()
             .collect(Collectors.toMap(AbstractImageIds::uploadedFileId, AbstractImageIds::abstractImageId));
-        return pageMapper.toCollectionResponse(page.map(r -> toView(r, abstractImageIdByUploadedFileId.get(r.id()))));
+
+        return pageMapper.toCollectionResponse(
+            page.map(r -> withThumbnailUrl(r, abstractImageIdByUploadedFileId.get(r.id())))
+        );
     }
 
     @PostMapping("/uploadedfile.json")
@@ -77,13 +79,13 @@ public class UploadedFileController {
     }
 
     @GetMapping("/uploadedfile/{id}.json")
-    public UploadedFileView show(@PathVariable Long id) {
+    public UploadedFileResponse show(@PathVariable Long id) {
         log.debug("GET /uploadedFile/{}.json", id);
         long userId = currentUserService.getCurrentUser().getId();
         UploadedFileResponse response = uploadedFileHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
         Long abstractImageId = abstractImageRepository.findIdByUploadedFileId(id).orElse(null);
-        return toView(response, abstractImageId);
+        return withThumbnailUrl(response, abstractImageId);
     }
 
     @PutMapping("/uploadedfile/{id}.json")
@@ -127,9 +129,9 @@ public class UploadedFileController {
             .body(stream);
     }
 
-    private UploadedFileView toView(UploadedFileResponse r, Long abstractImageId) {
+    private UploadedFileResponse withThumbnailUrl(UploadedFileResponse r, Long abstractImageId) {
         Optional<String> thumbnailUrl = Optional.ofNullable(abstractImageId)
             .map(id -> UrlApi.getAbstractImageThumbUrl(id, "png"));
-        return UploadedFileView.from(r, thumbnailUrl);
+        return UploadedFileResponse.withThumbnailUrl(r, thumbnailUrl);
     }
 }

@@ -25,6 +25,7 @@ public interface UploadedFileMapper {
     @Mapping(target = "storage", source = "storageId", qualifiedByName = "wrapLong")
     @Mapping(target = "path", expression = "java(entity.getFilename())")
     @Mapping(target = "projects", source = "projects", qualifiedByName = "mapArrayToSet")
+    @Mapping(target = "thumbnailUrl", ignore = true)
     UploadedFileResponse mapToUploadedFileResponse(UploadedFileEntity entity);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "LTree", "userId"})

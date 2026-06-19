@@ -90,7 +90,8 @@ public class UploadedFileControllerTest
             response.projects(),
             response.created(),
             Optional.of(updatedTime),
-            response.deleted()
+            response.deleted(),
+            response.thumbnailUrl()
         );
     }
 
@@ -132,7 +133,8 @@ public class UploadedFileControllerTest
             response.projects(),
             response.created(),
             Optional.of(updatedTime),
-            response.deleted()
+            response.deleted(),
+            response.thumbnailUrl()
         );
     }
 }

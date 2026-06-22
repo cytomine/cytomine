@@ -37,8 +37,8 @@ import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.middleware.ImageServerService;
-import be.cytomine.utils.TokenUtils;
 import be.cytomine.service.middleware.ImageServerService.DownloadType;
+import be.cytomine.utils.TokenUtils;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;

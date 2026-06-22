@@ -112,7 +112,8 @@ public class UploadedFileControllerTest
             response.projects(),
             response.created(),
             response.updated(),
-            Optional.of(deletedTime)
+            Optional.of(deletedTime),
+            response.thumbnailUrl()
         );
     }
 

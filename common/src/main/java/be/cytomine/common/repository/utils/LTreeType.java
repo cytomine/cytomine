@@ -1,7 +1,5 @@
 package be.cytomine.common.repository.utils;
 
-// Duplicate of https://github.com/cytomine/cytomine/blob/d1404a97e5669051c26bdd6a0904bd2e9dafa38a/core/src/main/java/be/cytomine/utils/LTreeType.java
-
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

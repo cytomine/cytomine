@@ -1,7 +1,5 @@
 package be.cytomine.common.repository.utils;
 
-// Duplicate from https://github.com/cytomine/cytomine/blob/d1404a97e5669051c26bdd6a0904bd2e9dafa38a/core/src/main/java/be/cytomine/utils/LongArrayToBytesConverter.java
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,13 +33,10 @@ public class LongArrayToBytesConverter implements AttributeConverter<Long[], byt
         }
         try (ByteArrayInputStream b = new ByteArrayInputStream(dbData)) {
             try (ObjectInputStream o = new ObjectInputStream(b)) {
-                Long[] data = (Long[]) o.readObject();
-                return data;
+                return (Long[]) o.readObject();
             }
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
             throw new RuntimeException("cannot deserialize", e);
         }
-
     }
 }

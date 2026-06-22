@@ -131,6 +131,4 @@ public class UploadedFile extends CytomineDomain implements Serializable {
     public boolean isVirtual() {
         return contentType.equalsIgnoreCase("VIRTUALSTACK");
     }
-
-
 }

@@ -1,5 +1,7 @@
 package be.cytomine.common.repository.utils;
 
+// Duplicate from https://github.com/cytomine/cytomine/blob/d1404a97e5669051c26bdd6a0904bd2e9dafa38a/core/src/main/java/be/cytomine/utils/LongArrayToBytesConverter.java
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

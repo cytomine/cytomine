@@ -2,6 +2,7 @@ package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
@@ -64,7 +65,7 @@ public class UploadedFileControllerTest
             "image/tiff",
             1024L,
             0,
-            Optional.empty()
+            Set.<Long>of()
         );
     }
 

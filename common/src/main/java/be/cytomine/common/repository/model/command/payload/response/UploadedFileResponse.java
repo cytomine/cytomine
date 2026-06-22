@@ -34,27 +34,6 @@ public record UploadedFileResponse(
         }
     }
 
-    public static UploadedFileResponse withThumbnailUrl(UploadedFileResponse r, Optional<String> thumbnailUrl) {
-        return new UploadedFileResponse(
-            r.id(),
-            r.user(),
-            r.parent(),
-            r.storage(),
-            r.filename(),
-            r.originalFilename(),
-            r.ext(),
-            r.contentType(),
-            r.size(),
-            r.path(),
-            r.status(),
-            r.projects(),
-            r.created(),
-            r.updated(),
-            r.deleted(),
-            thumbnailUrl
-        );
-    }
-
     @Override
     public DataType getDataType() {
         return DataType.UPLOADED_FILE;

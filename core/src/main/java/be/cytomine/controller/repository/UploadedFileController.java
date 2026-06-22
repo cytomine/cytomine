@@ -32,6 +32,7 @@ import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFi
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
+import be.cytomine.mapper.UploadedFileMapper;
 import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
 import be.cytomine.service.CurrentUserService;
@@ -56,6 +57,7 @@ public class UploadedFileController {
     private final ImageServerService imageServerService;
     private final PageMapper pageMapper;
     private final UploadedFileHttpContract uploadedFileHttpContract;
+    private final UploadedFileMapper uploadedFileMapper;
 
     @GetMapping("/uploadedfile.json")
     public CollectionResponse<UploadedFileResponse> getAll(Pageable pageable) {
@@ -138,6 +140,6 @@ public class UploadedFileController {
     private UploadedFileResponse withThumbnailUrl(UploadedFileResponse r, Long abstractImageId) {
         Optional<String> thumbnailUrl = Optional.ofNullable(abstractImageId)
             .map(id -> UrlApi.getAbstractImageThumbUrl(id, "png"));
-        return UploadedFileResponse.withThumbnailUrl(r, thumbnailUrl);
+        return uploadedFileMapper.withThumbnailUrl(r, thumbnailUrl);
     }
 }

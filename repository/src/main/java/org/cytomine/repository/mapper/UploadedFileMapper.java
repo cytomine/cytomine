@@ -38,7 +38,7 @@ public interface UploadedFileMapper {
     @Mapping(target = "userId", source = "createPayload.user")
     @Mapping(target = "storageId", source = "createPayload.storage")
     @Mapping(target = "parent", source = "createPayload.parent", qualifiedByName = "mapIdToParent")
-    @Mapping(target = "projects", source = "createPayload.projects", qualifiedByName = "mapOptionalSetToArray")
+    @Mapping(target = "projects", source = "createPayload.projects", qualifiedByName = "mapSetToArray")
     @Mapping(target = "created", source = "creationDate")
     @Mapping(target = "updated", ignore = true)
     @Mapping(target = "deleted", ignore = true)
@@ -90,11 +90,6 @@ public interface UploadedFileMapper {
             return Set.of();
         }
         return Arrays.stream(projects).collect(Collectors.toSet());
-    }
-
-    @Named("mapOptionalSetToArray")
-    default Long[] mapOptionalSetToArray(Optional<Set<Long>> projects) {
-        return projects.map(set -> set.toArray(Long[]::new)).orElse(null);
     }
 
     @Named("mapSetToArray")

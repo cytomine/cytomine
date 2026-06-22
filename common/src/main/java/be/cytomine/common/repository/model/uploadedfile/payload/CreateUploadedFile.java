@@ -15,5 +15,5 @@ public record CreateUploadedFile(
     String contentType,
     Long size,
     int status,
-    Optional<Set<Long>> projects
+    Set<Long> projects
 ) {}

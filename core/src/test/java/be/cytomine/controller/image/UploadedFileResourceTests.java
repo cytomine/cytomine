@@ -177,7 +177,7 @@ class UploadedFileResourceTests {
         CreateUploadedFile payload = new CreateUploadedFile(
             1L, 1L, Optional.empty(),
             "test.tif", "test.tif", "tif", "PYRTIFF",
-            100L, 0, Optional.empty()
+            100L, 0, Set.of()
         );
 
         mockMvc.perform(post("/api/uploadedfile.json")

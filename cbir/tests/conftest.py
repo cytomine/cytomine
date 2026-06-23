@@ -16,7 +16,7 @@ from cbir import config
 
 
 @pytest.fixture(scope="session")
-def redis_container():
+def redis_container() -> Generator[RedisContainer, None, None]:
     """Start a Redis container for the test session."""
 
     image_prefix = os.environ.get("PROXY_CACHE", "")

@@ -225,7 +225,7 @@ class ImageConsultationCollection(Collection):
         max: int = 0,
         offset: int = 0,
         **parameters: Any,
-    ):
+    ) -> None:
         super().__init__(ImageConsultation, filters, max, offset)
         self._allowed_filters = [None]
         self.project = project

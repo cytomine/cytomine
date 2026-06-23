@@ -81,7 +81,7 @@ class UploadedFile(Model):
         status: int | None = None,
         id_parent: int | None = None,
         **attributes: Any,
-    ):
+    ) -> None:
         super().__init__()
         self.originalFilename = original_filename
         self.filename = filename

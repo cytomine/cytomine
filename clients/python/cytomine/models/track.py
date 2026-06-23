@@ -54,7 +54,7 @@ class AnnotationTrack(Model):
         id_annotation: int | None = None,
         id_track: int | None = None,
         **attributes: Any,
-    ):
+    ) -> None:
         super().__init__()
         self.annotationClassName = annotation_class_name
         self.annotationIdent = id_annotation

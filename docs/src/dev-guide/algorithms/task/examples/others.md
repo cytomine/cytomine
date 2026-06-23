@@ -46,3 +46,12 @@ Repository: [cytomine/task-stardist](https://github.com/cytomine/task-stardist)
 
 Detects and segments cell nuclei using the [StarDist](https://github.com/stardist/stardist) deep learning model.
 StarDist represents nuclei as star-convex polygons, making it well-suited for densely packed nuclei in fluorescence and H&E images.
+
+### TIA Centre Cytomine tasks
+
+Repository: [TissueImageAnalytics/cytomine-app](https://github.com/TissueImageAnalytics/cytomine-app)
+
+A collection of Cytomine tasks developed by the [TIA Centre](https://warwick.ac.uk/fac/cross_fac/tia/), University of Warwick, wrapping pre-trained models from [TIAToolbox](https://github.com/TissueImageAnalytics/tiatoolbox). The repository currently contains two tasks:
+
+- **cytomine-hovernet**: nucleus instance segmentation and classification using [HoVer-Net](https://github.com/vqdang/hover_net), trained on the PanNuke dataset.
+- **cytomine-kongnet**: nucleus detection using KongNet, trained on the [MONKEY Challenge](https://monkey.grand-challenge.org/) dataset.

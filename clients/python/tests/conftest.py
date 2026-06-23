@@ -130,7 +130,6 @@ def dataset(request: pytest.FixtureRequest) -> dict[str, Any]:
         z_stack=0,
         time=0,
         id_uploaded_file=data["uploaded_file"].id,
-        mime="image/pyrtiff",
     ).save()
 
     data["image_instance"] = ImageInstance(

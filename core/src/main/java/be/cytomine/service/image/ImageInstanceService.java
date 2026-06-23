@@ -244,7 +244,6 @@ public class ImageInstanceService extends ModelService {
         );
 
         String abstractImageAlias = "ai";
-        String imageInstanceAlias = "ii";
         validParameters.addAll(
             SQLSearchParameter.getDomainAssociatedSearchParameters(
                 AbstractImage.class,
@@ -263,8 +262,7 @@ public class ImageInstanceService extends ModelService {
                     getEntityManager()
                 )
                 .stream()
-                .map(
-                    x -> new SearchParameterEntry("mime." + x.getProperty(), x.getOperation(), x.getValue()))
+                .map(x -> new SearchParameterEntry("mime." + x.getProperty(), x.getOperation(), x.getValue()))
                 .collect(Collectors.toList()));
 
         for (SearchParameterEntry parameter : searchParameters) {

@@ -9387,10 +9387,6 @@ components:
           type: integer
           description: The abstract image encapsulating this slice
           format: int64
-        mime:
-          type: integer
-          description: The Cytomine internal slice mime type.
-          format: int64
         channel:
           type: integer
           description:
@@ -9422,7 +9418,6 @@ components:
       required:
         - uploadedFile
         - image
-        - mime
         - channel
         - zStack
         - time
@@ -11011,11 +11006,6 @@ components:
         path:
           type: string
           description: The internal path of the file
-          readOnly: true
-        mime:
-          type: integer
-          description: The Cytomine internal slice mime type.
-          format: int64
           readOnly: true
         channel:
           type: integer

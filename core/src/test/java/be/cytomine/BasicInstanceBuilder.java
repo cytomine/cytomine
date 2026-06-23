@@ -1,7 +1,6 @@
 package be.cytomine;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -24,7 +23,6 @@ import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.CompanionFile;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.image.Mime;
 import be.cytomine.domain.image.NestedImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.image.UploadedFile;
@@ -61,7 +59,6 @@ import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.image.MimeRepository;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.PermissionService;
@@ -88,8 +85,6 @@ public class BasicInstanceBuilder {
 
     SecRoleRepository secRoleRepository;
 
-    MimeRepository mimeRepository;
-
     UserRepository userRepository;
 
     ApplicationBootstrap applicationBootstrap;
@@ -104,7 +99,6 @@ public class BasicInstanceBuilder {
         UserRepository userRepository,
         PermissionService permissionService,
         SecRoleRepository secRoleRepository,
-        MimeRepository mimeRepository,
         ApplicationBootstrap applicationBootstrap
     ) {
         if (secRoleRepository.count() == 0) {
@@ -114,7 +108,6 @@ public class BasicInstanceBuilder {
         this.userRepository = userRepository;
         this.permissionService = permissionService;
         this.secRoleRepository = secRoleRepository;
-        this.mimeRepository = mimeRepository;
         this.transactionTemplate = transactionTemplate;
 
         this.transactionTemplate.execute(new TransactionCallbackWithoutResult() {
@@ -435,7 +428,6 @@ public class BasicInstanceBuilder {
 
     public AbstractSlice givenAnAbstractSlice(AbstractImage abstractImage, int c, int z, int t) {
         AbstractSlice slice = givenANotPersistedAbstractSlice(abstractImage, abstractImage.getUploadedFile());
-        slice.setMime(givenAMime("openslide/mrxs"));
         slice.setChannel(c);
         slice.setZStack(z);
         slice.setTime(t);
@@ -454,7 +446,6 @@ public class BasicInstanceBuilder {
         AbstractSlice slice = new AbstractSlice();
         slice.setImage(abstractImage);
         slice.setUploadedFile(uploadedFile);
-        slice.setMime(givenAMime());
         slice.setChannel(0);
         slice.setZStack(0);
         slice.setTime(0);
@@ -493,23 +484,6 @@ public class BasicInstanceBuilder {
 
     public SliceInstance givenANotPersistedSliceInstance() {
         return givenANotPersistedSliceInstance(givenAnImageInstance(), givenAnAbstractSlice());
-    }
-
-    public Mime givenAMime() {
-        Optional<Mime> optionalMime = mimeRepository.findByMimeType("image/pyrtiff");
-        if (optionalMime.isPresent()) {
-            return optionalMime.get();
-        } else {
-            Mime mime = new Mime();
-            mime.setExtension("tif");
-            mime.setMimeType("image/pyrtiff");
-            return persistAndReturn(mime);
-        }
-    }
-
-    public Mime givenAMime(String mimeType) {
-        return mimeRepository.findByMimeType(mimeType)
-            .orElseThrow(() -> new ObjectNotFoundException("MimeType", mimeType));
     }
 
     public NestedImageInstance givenANestedImageInstance() {

@@ -15,7 +15,7 @@
 import logging
 from enum import Enum
 from importlib import import_module
-from typing import Callable
+from collections.abc import Callable
 
 from celery import Celery
 from starlette.background import BackgroundTasks

@@ -14,27 +14,25 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=invalid-name,unused-argument
 
 import json
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 from cytomine.cytomine import Cytomine
-
 
 class Model:
     def __init__(self, **attributes: Any) -> None:
         # In some cases, a model can have some request parameters.
-        self._query_parameters: Dict[str, Any] = {}
+        self._query_parameters: dict[str, Any] = {}
 
         # Attributes common to all models
-        self.id: Optional[int] = None
+        self.id: int | None = None
         self.created = None
         self.updated = None
         self.deleted = None
-        self.name: Optional[str] = None
+        self.name: str | None = None
 
-    def fetch(self, id: Optional[int] = None) -> Union[bool, "Model"]:
+    def fetch(self, id: int | None = None) -> "bool | Model":
         if self.id is None and id is None:
             raise ValueError("Cannot fetch a model with no ID.")
         if id is not None:
@@ -42,13 +40,13 @@ class Model:
 
         return Cytomine.get_instance().get_model(self, self.query_parameters)
 
-    def save(self) -> Union[bool, "Model"]:
+    def save(self) -> "bool | Model":
         if self.id is None:
             return Cytomine.get_instance().post_model(self)
 
         return self.update()
 
-    def delete(self, id: Optional[int] = None) -> bool:
+    def delete(self, id: int | None = None) -> bool:
         if self.id is None and id is None:
             raise ValueError("Cannot delete a model with no ID.")
         if id is not None:
@@ -58,9 +56,9 @@ class Model:
 
     def update(
         self,
-        id: Optional[int] = None,
+        id: int | None = None,
         **attributes: Any,
-    ) -> Union[bool, "Model"]:
+    ) -> "bool | Model":
         if self.id is None and id is None:
             raise ValueError("Cannot update a model with no ID.")
         if id is not None:
@@ -73,7 +71,7 @@ class Model:
     def is_new(self) -> bool:
         return self.id is None
 
-    def populate(self, attributes: Dict[Any, Any]) -> "Model":
+    def populate(self, attributes: dict[Any, Any]) -> "Model":
         if attributes:
             for key, value in attributes.items():
                 if key.startswith("id_"):
@@ -103,7 +101,7 @@ class Model:
         return f"{self.callback_identifier}/{self.id}.json"
 
     @property
-    def query_parameters(self) -> Dict[str, Any]:
+    def query_parameters(self) -> dict[str, Any]:
         return self._query_parameters
 
     @property
@@ -113,7 +111,6 @@ class Model:
     def __str__(self) -> str:
         return f"[{self.callback_identifier}] {self.id} : {self.name}"
 
-
 class DomainModel(Model):
     def __init__(self, object: "Model", **attributes: Any) -> None:
         super().__init__(**attributes)
@@ -121,8 +118,8 @@ class DomainModel(Model):
         if object.is_new():
             raise ValueError("The object must be fetched or saved before.")
 
-        self.domainClassName: Optional[str] = None
-        self.domainIdent: Optional[int] = None
+        self.domainClassName: str | None = None
+        self.domainIdent: int | None = None
         self.obj = object
 
     def uri(self) -> str:

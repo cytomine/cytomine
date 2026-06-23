@@ -31,10 +31,7 @@ from argparse import ArgumentParser
 from json.decoder import JSONDecodeError
 from time import gmtime, strftime
 from collections.abc import Callable
-from typing import (
-    TYPE_CHECKING,
-    Any,
-)
+from typing import TYPE_CHECKING, Any
 
 import requests  # type: ignore
 from cachecontrol import CacheControlAdapter

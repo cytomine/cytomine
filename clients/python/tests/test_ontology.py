@@ -16,7 +16,7 @@
 
 # pylint: disable=unused-argument
 
-from typing import Any, Dict
+from typing import Any
 
 from cytomine.cytomine import Cytomine
 from cytomine.models import (
@@ -28,9 +28,8 @@ from cytomine.models import (
 )
 from tests.conftest import random_string
 
-
 class TestOntology:
-    def test_ontology(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_ontology(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         name = random_string()
         ontology = Ontology(name).save()
         assert isinstance(ontology, Ontology)
@@ -49,7 +48,7 @@ class TestOntology:
         ontology.delete()
         assert not Ontology().fetch(ontology.id)
 
-    def test_ontologies(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_ontologies(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         ontologies = OntologyCollection().fetch()
         assert isinstance(ontologies, OntologyCollection)
 
@@ -57,9 +56,8 @@ class TestOntology:
         ontologies.append(Ontology(random_string()))
         assert ontologies.save()
 
-
 class TestTerm:
-    def test_term(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_term(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         name = random_string()
         term = Term(name, dataset["ontology"].id, "#AAAAAA").save()
         assert isinstance(term, Term)
@@ -81,7 +79,7 @@ class TestTerm:
     def test_terms(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         terms = TermCollection().fetch()
         assert isinstance(terms, TermCollection)
@@ -93,7 +91,7 @@ class TestTerm:
     def test_terms_by_project(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         terms = TermCollection().fetch_with_filter("project", dataset["project"].id)
         assert isinstance(terms, TermCollection)
@@ -101,7 +99,7 @@ class TestTerm:
     def test_terms_by_ontology(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         terms = TermCollection().fetch_with_filter("ontology", dataset["ontology"].id)
         assert isinstance(terms, TermCollection)
@@ -109,7 +107,7 @@ class TestTerm:
     def test_terms_by_annotation(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         terms = TermCollection().fetch_with_filter(
             "annotation",
@@ -117,9 +115,8 @@ class TestTerm:
         )
         assert isinstance(terms, TermCollection)
 
-
 class TestRelationTerm:
-    def test_relation_term(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_relation_term(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         rt = RelationTerm(dataset["term1"].id, dataset["term2"].id).save()
         assert isinstance(rt, RelationTerm)
 

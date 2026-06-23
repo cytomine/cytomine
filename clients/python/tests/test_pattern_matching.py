@@ -15,13 +15,11 @@
 # * limitations under the License.
 
 from collections import namedtuple
-from typing import Type
 
 from cytomine.models._utilities.pattern_matching import resolve_pattern
 
-
 class TestPatternMatching:
-    def get_fake_type(self) -> Type:
+    def get_fake_type(self) -> type:
         return namedtuple("fakeobj", ["lst", "atomstr", "atomfloat"])
 
     def test_no_iterable_pattern(self) -> None:

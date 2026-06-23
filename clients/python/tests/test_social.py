@@ -16,7 +16,7 @@
 
 # pylint: disable=unused-argument
 
-from typing import Any, Dict
+from typing import Any
 
 from cytomine.cytomine import Cytomine
 from cytomine.models import (
@@ -26,9 +26,8 @@ from cytomine.models import (
     PositionCollection,
 )
 
-
 class TestPosition:
-    def test_positions(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_positions(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         positions = PositionCollection().fetch_with_filter(
             "imageinstance",
             dataset["image_instance"].id,
@@ -39,12 +38,11 @@ class TestPosition:
             position = Position().fetch(positions[0].id)
             assert isinstance(position, Position)
 
-
 class TestAnnotationAction:
     def test_annotationactions(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         annot_actions = AnnotationActionCollection().fetch_with_filter(
             "imageinstance",

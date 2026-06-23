@@ -16,15 +16,14 @@
 
 # pylint: disable=unused-argument
 
-from typing import Any, Dict
+from typing import Any
 
 from cytomine.cytomine import Cytomine
 from cytomine.models import Project, ProjectCollection
 from tests.conftest import random_string
 
-
 class TestProject:
-    def test_project(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_project(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         name = random_string()
         project = Project(name, dataset["ontology"].id).save()
         assert isinstance(project, Project)
@@ -43,14 +42,14 @@ class TestProject:
         project.delete()
         assert not Project().fetch(project.id)
 
-    def test_projects(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_projects(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         projects = ProjectCollection().fetch()
         assert isinstance(projects, ProjectCollection)
 
     def test_projects_by_user(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         projects = ProjectCollection().fetch_with_filter("user", dataset["user"].id)
         assert isinstance(projects, ProjectCollection)
@@ -58,7 +57,7 @@ class TestProject:
     def test_projects_by_ontology(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         projects = ProjectCollection().fetch_with_filter(
             "ontology",

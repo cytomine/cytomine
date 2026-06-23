@@ -23,18 +23,17 @@ __copyright__ = (
     "Copyright 2010-2022 University of Liège, Belgium, http://www.cytomine.be/"
 )
 
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 from cytomine.cytomine import Cytomine
 from cytomine.models.collection import Collection
 from cytomine.models.model import Model
 
-
 class ImageGroup(Model):
     def __init__(
         self,
-        name: Optional[str] = None,
-        id_project: Optional[int] = None,
+        name: str | None = None,
+        id_project: int | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__()
@@ -42,11 +41,10 @@ class ImageGroup(Model):
         self.project = id_project
         self.populate(attributes)
 
-
 class ImageGroupCollection(Collection):
     def __init__(
         self,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,
@@ -55,12 +53,11 @@ class ImageGroupCollection(Collection):
         self._allowed_filters = ["project"]
         self.set_parameters(parameters)
 
-
 class ImageGroupImageInstance(Model):
     def __init__(
         self,
-        id_image_group: Optional[int] = None,
-        id_image_instance: Optional[int] = None,
+        id_image_group: int | None = None,
+        id_image_instance: int | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__()
@@ -73,9 +70,9 @@ class ImageGroupImageInstance(Model):
 
     def fetch(
         self,
-        id_image_group: Optional[int] = None,
-        id_image_instance: Optional[int] = None,
-    ) -> Union[bool, Model]:
+        id_image_group: int | None = None,
+        id_image_instance: int | None = None,
+    ) -> bool | Model:
         self.id = -1
 
         if self.group is None and id_image_group is None:
@@ -92,7 +89,7 @@ class ImageGroupImageInstance(Model):
 
         return Cytomine.get_instance().get_model(self, self.query_parameters)
 
-    def update(self, *args: Any, **kwargs: Any) -> Union[bool, Model]:
+    def update(self, *args: Any, **kwargs: Any) -> bool | Model:
         raise NotImplementedError(
             "Cannot update a image group-image instance relation."
         )
@@ -103,11 +100,10 @@ class ImageGroupImageInstance(Model):
             f"- Image {self.image}"
         )
 
-
 class ImageGroupImageInstanceCollection(Collection):
     def __init__(
         self,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,

@@ -629,7 +629,8 @@ public class ImageInstanceService extends ModelService {
             .anyMatch(x -> x.getProperty().contains(abstractImageAlias + ".") || finalSortedProperty.contains(
                 abstractImageAlias + "."));
         boolean joinContentType = validatedSearchParameters.stream()
-            .anyMatch(x -> x.getProperty().contains(contentTypeAlias + ".") || finalSortedProperty.contains(contentTypeAlias + "."));
+            .anyMatch(x -> x.getProperty().contains(contentTypeAlias + ".") || finalSortedProperty.contains(
+                contentTypeAlias + "."));
         boolean joinImageGroup = validatedSearchParameters.stream()
             .anyMatch(x -> x.getProperty().contains(imageGroupAlias + ".") || finalSortedProperty.contains(
                 imageGroupAlias + ".")) || withImageGroup;

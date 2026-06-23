@@ -16,4 +16,8 @@ public interface Commands {
     String CREATE_STORAGE = "be.cytomine.AddStorageCommand";
     String UPDATE_STORAGE = "be.cytomine.EditStorageCommand";
     String DELETE_STORAGE = "be.cytomine.DeleteStorageCommand";
+
+    String CREATE_UPLOADED_FILE = "be.cytomine.AddUploadedFileCommand";
+    String UPDATE_UPLOADED_FILE = "be.cytomine.EditUploadedFileCommand";
+    String DELETE_UPLOADED_FILE = "be.cytomine.DeleteUploadedFileCommand";
 }

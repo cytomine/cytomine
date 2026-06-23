@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Cytomine Core API
-  version: 0.2.0
+  version: 0.3.0
   description: core API provides requests for core features of Cytomine.
 
 servers:
@@ -7134,7 +7134,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UploadedFile"
+                "$ref": "#/components/schemas/HttpCommandResponse"
           description: ""
         "400":
           $ref: "#/components/responses/bad-request"
@@ -7147,59 +7147,24 @@ paths:
         "409":
           $ref: "#/components/responses/conflict"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/UploadedFile"
+              "$ref": "#/components/schemas/CreateUploadedFile"
     get:
       tags:
         - Storage | Uploaded file
       description: Get all uploaded files made by the current user
       parameters:
-        - name: onlyRootsWithDetails
-          in: query
-          description:
-            If set, only return uploaded files which are roots (no parent)
-            with supplementary details such global size.
-          required: true
-          schema:
-            type: boolean
-        - name: onlyRoots
-          in: query
-          description: If set, only return uploaded files which are roots (no parent).
-          required: true
-          schema:
-            type: boolean
-        - name: parent
-          in: query
-          description: If set, only return uploaded files having the given parent.
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: root
-          in: query
-          description:
-            If set, only return uploaded files which are children of the
-            given root. Returned attributes are a subset of uploaded files attributes.
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: all
-          in: query
-          description:
-            True to list uploaded files for all users the current user has
-            access to
-          required: true
-          schema:
-            type: boolean
+        - $ref: "#/components/parameters/pagination-max"
+        - $ref: "#/components/parameters/pagination-offset"
       responses:
         "200":
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UploadedFile"
+                "$ref": "#/components/schemas/UploadedFileCollection"
           description: ""
         "400":
           $ref: "#/components/responses/bad-request"
@@ -7255,7 +7220,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UploadedFile"
+                "$ref": "#/components/schemas/HttpCommandResponse"
           description: ""
         "400":
           $ref: "#/components/responses/bad-request"
@@ -7268,10 +7233,11 @@ paths:
         "409":
           $ref: "#/components/responses/conflict"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/UploadedFile"
+              "$ref": "#/components/schemas/UpdateUploadedFile"
     delete:
       tags:
         - Storage | Uploaded file
@@ -7291,7 +7257,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UploadedFile"
+                "$ref": "#/components/schemas/HttpCommandResponse"
           description: ""
         "400":
           $ref: "#/components/responses/bad-request"
@@ -7406,13 +7372,20 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: authorization
+          in: query
+          description: Bearer token used to authenticate the download request
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           content:
-            application/json:
+            application/octet-stream:
               schema:
-                "$ref": "#/components/schemas/UploadedFile"
-          description: ""
+                type: string
+                format: binary
+          description: The file content
         "400":
           $ref: "#/components/responses/bad-request"
         "401":
@@ -9662,10 +9635,6 @@ components:
           description: File status
           format: int32
           readOnly: true
-        statusText:
-          type: string
-          description: Textual file status
-          readOnly: true
       required:
         - uploadedFile
         - image
@@ -11243,8 +11212,6 @@ components:
       description: A file uploaded on the server
       type: object
       properties:
-        class:
-          $ref: "#/components/schemas/attribute-class"
         id:
           $ref: "#/components/schemas/attribute-id"
         created:
@@ -11257,14 +11224,17 @@ components:
           type: integer
           description: The uploader
           format: int64
+          nullable: true
         parent:
           type: integer
           description: The parent uploaded file in the hierarchy
           format: int64
+          nullable: true
         storage:
           type: integer
           description: The virtual storage where the file is uploaded
           format: int64
+          nullable: true
         originalFilename:
           type: string
           description: The original filename, including extension
@@ -11289,29 +11259,133 @@ components:
           type: integer
           description: File status
           format: int32
-        statusText:
-          type: string
-          description: Textual file status
-          readOnly: true
         projects:
-          type: integer
-          description:
-            List of projects (id) that will have the image, if it can be
-            deployed
-          format: int64
-        lTree:
+          type: array
+          description: List of project ids the image will be linked to once deployed
+          items:
+            type: integer
+            format: int64
+        thumbnailUrl:
           type: string
-          description: Hierarchical tree of uploaded files
-          writeOnly: true
+          description: The URL of the thumbnail, absent if the file has not yet been deployed.
+          nullable: true
+          readOnly: true
+      required:
+        - contentType
+        - ext
+        - filename
+        - originalFilename
+        - projects
+        - status
+    UploadedFileCollection:
+      description: A paginated list of uploaded files
+      type: object
+      properties:
+        collection:
+          type: array
+          items:
+            $ref: "#/components/schemas/UploadedFile"
+        size:
+          type: integer
+          description: Total number of uploaded files
+        offset:
+          type: integer
+          description: Pagination offset
+    CreateUploadedFile:
+      description: Payload to create an uploaded file record
+      type: object
+      properties:
+        user:
+          type: integer
+          format: int64
+          description: The uploader
+        storage:
+          type: integer
+          format: int64
+          description: The virtual storage where the file is uploaded
+        parent:
+          type: integer
+          format: int64
+          description: The parent uploaded file in the hierarchy
+          nullable: true
+        filename:
+          type: string
+          description: The internal filename path
+        originalFilename:
+          type: string
+          description: The original filename, including extension
+        ext:
+          type: string
+          description: Extension name
+        contentType:
+          type: string
+          description: File content type
+        size:
+          type: integer
+          format: int64
+          description: File size
+        status:
+          type: integer
+          format: int32
+          description: File status
+        projects:
+          type: array
+          description: List of project ids to link the image to once deployed
+          items:
+            type: integer
+            format: int64
       required:
         - user
-        - parent
         - storage
-        - originalFilename
         - filename
-        - ext
-        - contentType
-        - projects
+        - originalFilename
+        - status
+    UpdateUploadedFile:
+      description: Payload to update an uploaded file record (all fields optional)
+      type: object
+      properties:
+        filename:
+          type: string
+          description: The internal filename path
+        originalFilename:
+          type: string
+          description: The original filename, including extension
+        ext:
+          type: string
+          description: Extension name
+        contentType:
+          type: string
+          description: File content type
+        size:
+          type: integer
+          format: int64
+          description: File size
+        status:
+          type: integer
+          format: int32
+          description: File status
+        projects:
+          type: array
+          description: List of project ids to link the image to once deployed
+          items:
+            type: integer
+            format: int64
+    HttpCommandResponse:
+      description: Response wrapper returned by write operations on uploaded files
+      type: object
+      properties:
+        printMessage:
+          type: boolean
+          description: Whether the client should display a confirmation message
+        data:
+          $ref: "#/components/schemas/UploadedFile"
+        commandId:
+          type: string
+          format: uuid
+          description: The id of the command that was executed
+        command:
+          type: string
+          description: The fully qualified name of the command class
     user:
       description: A cytomine human user
       type: object

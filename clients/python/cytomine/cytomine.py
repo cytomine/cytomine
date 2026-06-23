@@ -647,14 +647,18 @@ class Cytomine:
     ) -> Union[bool, "Model"]:
         response = self._put(model.uri(), model.to_json(), query_parameters)
         if response.status_code == requests.codes.ok:
-            if model.callback_identifier.lower() in response.json():
-                model = model.populate(
-                    response.json()[model.callback_identifier.lower()]
-                )
-            else:
-                model = model.populate(
-                    response.json()[model.__class__.__name__.lower()]
-                )  # remove when REST URL are normalized
+            try:
+                resp_json = response.json()
+                if model.callback_identifier.lower() in resp_json:
+                    model = model.populate(resp_json[model.callback_identifier.lower()])
+                elif "data" in resp_json:
+                    model = model.populate(resp_json["data"])
+                else:
+                    model = model.populate(
+                        resp_json[model.__class__.__name__.lower()]
+                    )  # remove when REST URL are normalized
+            except KeyError:
+                self._logger.warning(response.json())
 
         self._log_response(response, model)
         if not response.status_code == requests.codes.ok:
@@ -745,13 +749,14 @@ class Cytomine:
 
         if response.status_code == requests.codes.ok:
             try:
-                if model.callback_identifier.lower() in response.json():
-                    model = model.populate(
-                        response.json()[model.callback_identifier.lower()]
-                    )
+                resp_json = response.json()
+                if model.callback_identifier.lower() in resp_json:
+                    model = model.populate(resp_json[model.callback_identifier.lower()])
+                elif "data" in resp_json:
+                    model = model.populate(resp_json["data"])
                 else:
                     model = model.populate(
-                        response.json()[model.__class__.__name__.lower()]
+                        resp_json[model.__class__.__name__.lower()]
                     )  # remove when REST URL are normalized
             except KeyError:
                 self._logger.warning(response.json())

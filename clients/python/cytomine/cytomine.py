@@ -14,7 +14,6 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=import-outside-toplevel
 
 import base64
 import functools
@@ -30,16 +29,8 @@ import warnings
 from argparse import ArgumentParser
 from json.decoder import JSONDecodeError
 from time import gmtime, strftime
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 import requests  # type: ignore
 from cachecontrol import CacheControlAdapter
@@ -53,7 +44,7 @@ if TYPE_CHECKING:
     from cytomine.models.user import CurrentUser
 
 
-def _cytomine_parameter_name_synonyms(name: str, prefix: str = "--") -> List[str]:
+def _cytomine_parameter_name_synonyms(name: str, prefix: str = "--") -> list[str]:
     """For a given parameter name, returns all the possible usual synonym
     (and the parameter itself). Optionally, the
     function can prepend a string to the found names.
@@ -192,9 +183,9 @@ class Cytomine:
         host: str,
         public_key: str,
         private_key: str,
-        verbose: Optional[int] = None,
+        verbose: int | None = None,
         use_cache: bool = True,
-        protocol: Optional[str] = None,
+        protocol: str | None = None,
         working_path: str = "/tmp",
         configure_logging: bool = True,
         **kwargs: Any,
@@ -306,7 +297,7 @@ class Cytomine:
         return cls(host, public_key, private_key, verbose, use_cache)
 
     @classmethod
-    def connect_from_cli(cls, argv: List[str], use_cache: bool = True) -> "Cytomine":
+    def connect_from_cli(cls, argv: list[str], use_cache: bool = True) -> "Cytomine":
         """
         Connect with data taken from a command line interface.
 
@@ -397,8 +388,8 @@ class Cytomine:
     @staticmethod
     def _parse_url(
         host: str,
-        provided_protocol: Optional[str] = None,
-    ) -> Tuple[str, str]:
+        provided_protocol: str | None = None,
+    ) -> tuple[str, str]:
         """
         Process the provided host and protocol to return them in a standardized
         way that can be subsequently used by Cytomine methods.
@@ -470,7 +461,7 @@ class Cytomine:
         return self._host
 
     @property
-    def current_user(self) -> Optional["CurrentUser"]:
+    def current_user(self) -> "CurrentUser | None":
         return self._current_user
 
     def set_current_user(self) -> None:
@@ -492,8 +483,8 @@ class Cytomine:
     @staticmethod
     def _headers(
         accept: str = "application/json, */*",
-        content_type: Optional[str] = None,
-    ) -> Dict[str, str]:
+        content_type: str | None = None,
+    ) -> dict[str, str]:
         headers = {}
 
         if accept is not None:
@@ -510,7 +501,7 @@ class Cytomine:
     def _log_response(
         self,
         response: requests.Response,
-        message: Union[str, "Collection", "Model"],
+        message: "str | Collection | Model",
     ) -> None:
         try:
             msg = (
@@ -533,7 +524,7 @@ class Cytomine:
             self._logger.debug("DUMP:\n%s", dump.dump_all(response).decode("utf-8"))
         except (UnicodeDecodeError, JSONDecodeError):
             self._logger.debug("DUMP:\nImpossible to decode.")
-        except URLRedirectionException:  # pylint: disable=try-except-raise
+        except URLRedirectionException:
             raise
 
     def log(self, msg: str, level: int = logging.INFO) -> None:
@@ -546,7 +537,7 @@ class Cytomine:
     def _get(
         self,
         uri: str,
-        query_parameters: Optional[Dict[str, Any]],
+        query_parameters: dict[str, Any] | None,
         with_base_path: bool = True,
     ) -> requests.Response:
         return self._session.get(
@@ -565,8 +556,8 @@ class Cytomine:
     def get(
         self,
         uri: str,
-        query_parameters: Optional[Dict[str, Any]] = None,
-    ) -> Union[bool, Dict[str, str]]:
+        query_parameters: dict[str, Any] | None = None,
+    ) -> bool | dict[str, str]:
         response = self._get(uri, query_parameters)
         self._log_response(response, uri)
         if not response.status_code == requests.codes.ok:
@@ -577,8 +568,8 @@ class Cytomine:
     def get_model(
         self,
         model: "Model",
-        query_parameters: Optional[Dict[str, Any]] = None,
-    ) -> Union[bool, "Model"]:
+        query_parameters: dict[str, Any] | None = None,
+    ) -> "bool | Model":
         response = self._get(model.uri(), query_parameters)
 
         if response.status_code == requests.codes.ok:
@@ -595,9 +586,9 @@ class Cytomine:
     def get_collection(
         self,
         collection: "Collection",
-        query_parameters: Optional[Dict[str, Any]] = None,
+        query_parameters: dict[str, Any] | None = None,
         append_mode: bool = False,
-    ) -> Union[bool, "Collection"]:
+    ) -> "bool | Collection":
         response = self._get(collection.uri(), query_parameters)
         if response.status_code == requests.codes.ok:
             collection = collection.populate(response.json(), append_mode)
@@ -611,8 +602,8 @@ class Cytomine:
     def _put(
         self,
         uri: str,
-        data: Optional[Any] = None,
-        query_parameters: Optional[Dict[str, Any]] = None,
+        data: Any | None = None,
+        query_parameters: dict[str, Any] | None = None,
     ) -> requests.Response:
         return self._session.put(
             f"{self._base_url()}{uri}",
@@ -630,9 +621,9 @@ class Cytomine:
     def put(
         self,
         uri: str,
-        data: Optional[Any] = None,
-        query_parameters: Optional[Dict[str, Any]] = None,
-    ) -> Union[bool, Dict[str, str]]:
+        data: Any | None = None,
+        query_parameters: dict[str, Any] | None = None,
+    ) -> bool | dict[str, str]:
         response = self._put(uri, data=data, query_parameters=query_parameters)
         self._log_response(response, uri)
         if not response.status_code == requests.codes.ok:
@@ -643,8 +634,8 @@ class Cytomine:
     def put_model(
         self,
         model: "Model",
-        query_parameters: Optional[Dict[str, Any]] = None,
-    ) -> Union[bool, "Model"]:
+        query_parameters: dict[str, Any] | None = None,
+    ) -> "bool | Model":
         response = self._put(model.uri(), model.to_json(), query_parameters)
         if response.status_code == requests.codes.ok:
             try:
@@ -669,7 +660,7 @@ class Cytomine:
     def _delete(
         self,
         uri: str,
-        query_parameters: Optional[Dict[str, Any]] = None,
+        query_parameters: dict[str, Any] | None = None,
     ) -> requests.Response:
         return self._session.delete(
             f"{self._base_url()}{uri}",
@@ -686,7 +677,7 @@ class Cytomine:
     def delete(
         self,
         uri: str,
-        query_parameters: Optional[Dict[str, Any]] = None,
+        query_parameters: dict[str, Any] | None = None,
     ) -> bool:
         response = self._delete(uri, query_parameters)
         self._log_response(response, uri)
@@ -698,7 +689,7 @@ class Cytomine:
     def delete_model(
         self,
         model: "Model",
-        query_parameters: Optional[Dict[str, Any]] = None,
+        query_parameters: dict[str, Any] | None = None,
     ) -> bool:
         response = self._delete(model.uri(), query_parameters)
         self._log_response(response, model)
@@ -710,8 +701,8 @@ class Cytomine:
     def _post(
         self,
         uri: str,
-        data: Optional[Any] = None,
-        query_parameters: Optional[Dict[str, Any]] = None,
+        data: Any | None = None,
+        query_parameters: dict[str, Any] | None = None,
         with_base_path: bool = True,
     ) -> requests.Response:
         return self._session.post(
@@ -730,9 +721,9 @@ class Cytomine:
     def post(
         self,
         uri: str,
-        data: Optional[Any] = None,
-        query_parameters: Optional[Dict[str, Any]] = None,
-    ) -> Union[bool, Dict[str, str]]:
+        data: Any | None = None,
+        query_parameters: dict[str, Any] | None = None,
+    ) -> bool | dict[str, str]:
         response = self._post(uri, data=data, query_parameters=query_parameters)
         self._log_response(response, uri)
         if not response.status_code == requests.codes.ok:
@@ -743,8 +734,8 @@ class Cytomine:
     def post_model(
         self,
         model: "Model",
-        query_parameters: Optional[Dict[str, Any]] = None,
-    ) -> Union[bool, "Model"]:
+        query_parameters: dict[str, Any] | None = None,
+    ) -> "bool | Model":
         response = self._post(model.uri(), model.to_json(), query_parameters)
 
         if response.status_code == requests.codes.ok:
@@ -771,7 +762,7 @@ class Cytomine:
     def post_collection(
         self,
         collection: "Collection",
-        query_parameters: Optional[Dict[str, Any]] = None,
+        query_parameters: dict[str, Any] | None = None,
     ) -> bool:
         response = self._post(
             collection.uri(without_filters=True),
@@ -809,7 +800,7 @@ class Cytomine:
             response = self._get(uri, None, with_base_path=False)
             self._log_response(response, uri)
             return response.status_code == requests.codes.ok
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             return False
 
     def wait_to_accept_connection(
@@ -828,9 +819,9 @@ class Cytomine:
         self,
         model: "Model",
         filename: str,
-        query_parameters: Optional[Dict[str, Any]] = None,
-        uri: Optional[str] = None,
-    ) -> Union[bool, "Model"]:
+        query_parameters: dict[str, Any] | None = None,
+        uri: str | None = None,
+    ) -> "bool | Model":
         if not uri:
             uri = model.uri()
 
@@ -908,13 +899,13 @@ class Cytomine:
         self,
         filename: str,
         id_storage: int,
-        id_project: Optional[int] = None,
-        properties: Optional[Dict[str, Any]] = None,
+        id_project: int | None = None,
+        properties: dict[str, Any] | None = None,
         sync: bool = False,
-    ) -> Union[bool, "UploadedFile"]:
+    ) -> "bool | UploadedFile":
         upload_host = self._base_url(with_base_path=False)
 
-        query_parameters: Dict[str, Any] = {
+        query_parameters: dict[str, Any] = {
             "idStorage": id_storage,  # backwards compatibility
             "storage": id_storage,
             "sync": sync,
@@ -947,7 +938,7 @@ class Cytomine:
         self._logger.error("Error during image upload.")
         return False
 
-    def _process_upload_response(self, response_data: Dict[str, Any]) -> "UploadedFile":
+    def _process_upload_response(self, response_data: dict[str, Any]) -> "UploadedFile":
         from .models.image import (
             AbstractImage,
             ImageInstance,
@@ -965,7 +956,7 @@ class Cytomine:
         uf.images = []  # type: ignore
         if "images" in response_data:
             for image in response_data["images"]:
-                data: Dict[str, Any] = {}
+                data: dict[str, Any] = {}
 
                 if "imageInstances" in image:
                     image_instances = ImageInstanceCollection()
@@ -984,8 +975,8 @@ class Cytomine:
         self,
         storage_id: int,
         pims_url: str,
-        dataset_names: Optional[str] = None,
-    ) -> Dict[str, str]:
+        dataset_names: str | None = None,
+    ) -> dict[str, str]:
         """Import datasets from a given path."""
 
         response = self._session.post(

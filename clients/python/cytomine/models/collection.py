@@ -14,11 +14,10 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=invalid-name
 
 import copy
-from collections.abc import MutableSequence
-from typing import Any, Callable, Dict, Iterable, List, Optional, TypeVar, Union
+from collections.abc import Callable, Iterable, MutableSequence
+from typing import Any, TypeVar
 
 from cytomine.cytomine import Cytomine
 from cytomine.models.model import Model
@@ -26,7 +25,6 @@ from cytomine.models.model import Model
 from ._utilities.parallel import generic_chunk_parallel
 
 T = TypeVar("T")
-
 
 class CollectionPartialUploadException(Exception):
     """To be thrown when a collection is saved but
@@ -36,8 +34,8 @@ class CollectionPartialUploadException(Exception):
     def __init__(
         self,
         desc: str,
-        created: Optional["Collection"] = None,
-        failed: Optional["Collection"] = None,
+        created: "Collection | None" = None,
+        failed: "Collection | None" = None,
     ) -> None:
         """
         Parameters
@@ -56,35 +54,34 @@ class CollectionPartialUploadException(Exception):
         self._failed = failed
 
     @property
-    def created(self) -> Optional["Collection"]:
+    def created(self) -> "Collection | None":
         return self._created
 
     @property
-    def failed(self) -> Optional["Collection"]:
+    def failed(self) -> "Collection | None":
         return self._failed
-
 
 class Collection(MutableSequence):
     def __init__(
         self,
         model: Any,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
     ) -> None:
         self._model: Any = model
-        self._data: List[Any] = []
+        self._data: list[Any] = []
 
-        self._allowed_filters: List[Optional[str]] = []
+        self._allowed_filters: list[str | None] = []
         self._filters = filters if filters is not None else {}
 
         self._total: int = 0  # total number of resources
-        self._total_pages: Optional[int] = None  # total number of pages
+        self._total_pages: int | None = None  # total number of pages
 
         self.max: int = max
         self.offset: int = offset
 
-    def _fetch(self, append_mode: bool = False) -> Union[bool, "Collection"]:
+    def _fetch(self, append_mode: bool = False) -> "bool | Collection":
         if len(self._filters) == 0 and None not in self._allowed_filters:
             raise ValueError("This collection cannot be fetched without a filter.")
 
@@ -94,7 +91,7 @@ class Collection(MutableSequence):
             append_mode,
         )
 
-    def fetch(self, max: Optional[int] = None) -> Union[bool, "Collection"]:
+    def fetch(self, max: int | None = None) -> "bool | Collection":
         """
         Fetch all collection by pages of `max` items.
         Parameters
@@ -121,27 +118,27 @@ class Collection(MutableSequence):
         self,
         key: str,
         value: Any,
-        max: Optional[int] = None,
-    ) -> Union[bool, "Collection"]:
+        max: int | None = None,
+    ) -> "bool | Collection":
         self._filters[key] = value
         return self.fetch(max)
 
-    def fetch_next_page(self, append_mode: bool = False) -> Union[bool, "Collection"]:
+    def fetch_next_page(self, append_mode: bool = False) -> "bool | Collection":
         self.offset = min(self._total, self.offset + self.max)
         return self._fetch(append_mode)
 
-    def fetch_previous_page(self) -> Union[bool, "Collection"]:
+    def fetch_previous_page(self) -> "bool | Collection":
         self.offset = max(0, self.offset - self.max)
         return self._fetch()
 
-    def _upload_fn(self, collection: "Collection") -> Union[bool, "Collection"]:
+    def _upload_fn(self, collection: "Collection") -> "bool | Collection":
         if not isinstance(collection, Collection):
             _tmp = self.__class__(model=self._model)
             _tmp.extend(collection)
             collection = _tmp
         return Cytomine.get_instance().post_collection(collection)
 
-    def save(self, chunk: int = 15, n_workers: int = 0) -> Union[bool, "Collection"]:
+    def save(self, chunk: int = 15, n_workers: int = 0) -> "bool | Collection":
         """
         chunk: int|None
             Maximum number of object to send at once in a single HTTP request.
@@ -162,8 +159,8 @@ class Collection(MutableSequence):
                 n_workers=n_workers,
             )
 
-            added: List[Any] = []
-            failed: List[Any] = []
+            added: list[Any] = []
+            failed: list[Any] = []
             for (start, end), success in results:
                 (added if success else failed).extend(self[start:end])
 
@@ -178,12 +175,12 @@ class Collection(MutableSequence):
 
         raise ValueError(f"Invalid value '{chunk}' for chunk parameter.")
 
-    def to_json(self, **dump_parameters: Dict[str, Any]) -> str:
+    def to_json(self, **dump_parameters: dict[str, Any]) -> str:
         return f"[{','.join([d.to_json(**dump_parameters) for d in self._data])}]"
 
     def populate(
         self,
-        attributes: Dict[str, Any],
+        attributes: dict[str, Any],
         append_mode: bool = False,
     ) -> "Collection":
         data = [
@@ -201,7 +198,7 @@ class Collection(MutableSequence):
         return self
 
     @property
-    def filters(self) -> Dict[str, Any]:
+    def filters(self) -> dict[str, Any]:
         return self._filters
 
     def is_filtered_by(self, key: str) -> bool:
@@ -210,7 +207,7 @@ class Collection(MutableSequence):
     def add_filter(self, key: str, value: Any) -> None:
         self._filters[key] = value
 
-    def set_parameters(self, parameters: Dict[str, Any]) -> "Collection":
+    def set_parameters(self, parameters: dict[str, Any]) -> "Collection":
         if parameters:
             for key, value in parameters.items():
                 if not key.startswith("_"):
@@ -218,7 +215,7 @@ class Collection(MutableSequence):
         return self
 
     @property
-    def parameters(self) -> Dict[str, Any]:
+    def parameters(self) -> dict[str, Any]:
         params = {}
         for k, v in self.__dict__.items():
             if v is not None and not k.startswith("_"):
@@ -249,7 +246,7 @@ class Collection(MutableSequence):
 
         return f"{uri}{self.callback_identifier}.json"
 
-    def find_by_attribute(self, attr: str, value: Any) -> Optional[Model]:
+    def find_by_attribute(self, attr: str, value: Any) -> Model | None:
         """Retrieve the first item of which the item.attr matches 'value'
         Parameters
         ----------
@@ -275,13 +272,13 @@ class Collection(MutableSequence):
     def __len__(self) -> int:
         return len(self._data)
 
-    def __getitem__(self, item: Union[int, slice]) -> Any:
+    def __getitem__(self, item: int | slice) -> Any:
         return self._data[item]
 
     def __setitem__(
         self,
-        index: Union[int, slice],
-        value: Union[Any, Iterable[Any]],
+        index: int | slice,
+        value: Any | Iterable[Any],
     ) -> None:
         if not isinstance(value, self._model):
             raise TypeError(
@@ -290,7 +287,7 @@ class Collection(MutableSequence):
             )
         self._data[index] = value
 
-    def __delitem__(self, index: Union[int, slice]) -> None:
+    def __delitem__(self, index: int | slice) -> None:
         del self._data[index]
 
     def insert(self, index: int, value: Any) -> None:
@@ -316,7 +313,7 @@ class Collection(MutableSequence):
         collection += other
         return collection
 
-    def data(self) -> List[Any]:
+    def data(self) -> list[Any]:
         return self._data
 
     def filter(self, fn: Callable[[T], bool]) -> "Collection":
@@ -324,16 +321,15 @@ class Collection(MutableSequence):
         the current collection that the function evaluates to true.
         """
         collection = copy.copy(self)
-        collection._data = list(filter(fn, self))  # pylint: disable=protected-access
+        collection._data = list(filter(fn, self))
         return collection
-
 
 class DomainCollection(Collection):
     def __init__(
         self,
         model: Any,
         object: Model,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
     ) -> None:
@@ -342,8 +338,8 @@ class DomainCollection(Collection):
         if object.is_new():
             raise ValueError("The object must be fetched or saved before.")
 
-        self._domainClassName: Optional[str] = None
-        self._domainIdent: Optional[int] = None
+        self._domainClassName: str | None = None
+        self._domainIdent: int | None = None
         self._obj = object
 
     def uri(self, without_filters: bool = False) -> str:

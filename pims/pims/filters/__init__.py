@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 from importlib import import_module
 from inspect import isabstract, isclass
 from pkgutil import iter_modules
-from typing import Callable
+from collections.abc import Callable
 
 from pims.processing.adapters import RawImagePixels, RawImagePixelsType, imglib_adapters
 

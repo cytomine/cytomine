@@ -12,7 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 from datetime import datetime
-from typing import Optional
 
 from pims.cache import cached_property
 from pims.formats import AbstractFormat
@@ -53,7 +52,7 @@ class BifParser(OpenslideVipsParser):
         return imd
 
     @staticmethod
-    def parse_acquisition_date(date: str) -> Optional[datetime]:
+    def parse_acquisition_date(date: str) -> datetime | None:
         # Have seen: 8/18/2014 09:44:30 | 8/30/2017 12:04:52 PM
         return parse_datetime(
             date, ["%m/%d/%Y %H:%M:%S", "%m/%d/%Y %H:%M:%S %p"]

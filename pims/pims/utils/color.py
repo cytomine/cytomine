@@ -1,4 +1,4 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 import numpy as np
 from pydantic.color import RGBA, float_to_255, ints_to_rgba, parse_str, parse_tuple

@@ -12,7 +12,8 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 import logging
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 import orjson
 from cytomine.models import Model as CytomineModel

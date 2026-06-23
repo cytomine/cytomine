@@ -14,7 +14,8 @@
 
 from datetime import date, datetime, time
 from enum import Enum
-from typing import AbstractSet, Any, Sequence, ValuesView
+from collections.abc import Sequence, Set, ValuesView
+from typing import Any
 
 import numpy as np
 from pint import Quantity
@@ -190,10 +191,10 @@ class MetadataStore:
     def flatten(self):
         return self._flatten(self._namedstores)
 
-    def items(self) -> AbstractSet[tuple[str, Metadata]]:
+    def items(self) -> Set[tuple[str, Metadata]]:
         return self.flatten().items()
 
-    def keys(self) -> AbstractSet[str]:
+    def keys(self) -> Set[str]:
         return self.flatten().keys()
 
     def values(self) -> ValuesView[Metadata]:

@@ -15,7 +15,7 @@
 import logging
 from copy import copy
 from enum import Enum
-from typing import Iterator
+from collections.abc import Iterator
 
 from cytomine.models import (
     AbstractImage, AbstractSlice, AbstractSliceCollection, Annotation, AnnotationCollection,

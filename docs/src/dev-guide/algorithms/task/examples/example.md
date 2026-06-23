@@ -11,7 +11,7 @@ This section provides a step-by-step guide to integrate your algorithm as a Cyto
 3. Building the Docker image
 4. Testing the Docker image
 5. Writing the descriptor
-6. Packagig the task bundle
+6. Packaging the task bundle
 7. Uploading the task to Cytomine
 
 ## Create a simple algorithm

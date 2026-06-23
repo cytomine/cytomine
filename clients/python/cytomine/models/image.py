@@ -19,7 +19,7 @@ import os
 import re
 from typing import Any
 
-from cytomine.cytomine import Cytomine, deprecated
+from cytomine.cytomine import Cytomine
 from cytomine.models.collection import Collection
 from cytomine.models.model import Model
 
@@ -109,7 +109,7 @@ class AbstractImageCollection(Collection):
         **parameters: Any,
     ) -> None:
         super().__init__(AbstractImage, filters, max, offset)
-        self._allowed_filters = [None]  # "project"]
+        self._allowed_filters = [None]
         self.set_parameters(parameters)
 
 class AbstractSlice(Model):
@@ -117,7 +117,6 @@ class AbstractSlice(Model):
         self,
         id_image: int | None = None,
         id_uploaded_file: int | None = None,
-        mime: str | None = None,
         channel: int | None = None,
         z_stack: int | None = None,
         time: int | None = None,
@@ -126,7 +125,6 @@ class AbstractSlice(Model):
         super().__init__()
         self.image = id_image
         self.uploadedFile = id_uploaded_file
-        self.mime = mime
         self.channel = channel
         self.zStack = z_stack
         self.time = time
@@ -492,7 +490,6 @@ class SliceInstance(Model):
         self.project = id_project
         self.image = id_image
         self.baseSlice = id_base_slice
-        self.mime = None
         self.channel = None
         self.zStack = None
         self.time = None

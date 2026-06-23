@@ -98,4 +98,7 @@
     <include file="/config/liquibase/changelog/2026-06-18-uploaded-file-id-sequence.sql"
              relativeToChangelogFile="false"/>
 
+    <include file="/config/liquibase/changelog/2026-06-23-drop-mime.sql"
+             relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

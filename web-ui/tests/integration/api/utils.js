@@ -47,7 +47,7 @@ export async function getAbstractImage({filename = randomString(), uploadedFile,
   let abstractImageCollection = new cytomine.AbstractImageCollection({nbPerPage: 1});
   abstractImage = await getModel(abstractImage, abstractImageCollection, forceCreation);
 
-  await new cytomine.AbstractSlice({uploadedFile, image: abstractImage.id, mime: 'image/pyrtiff'}).save();
+  await new cytomine.AbstractSlice({uploadedFile, image: abstractImage.id}).save();
   return abstractImage;
 }
 

@@ -12,9 +12,10 @@ import be.cytomine.common.repository.model.command.DataType;
     @JsonSubTypes.Type(value = OntologyResponse.class, name = "ONTOLOGY"),
     @JsonSubTypes.Type(value = StorageResponse.class, name = "STORAGE"),
     @JsonSubTypes.Type(value = TermResponse.class, name = "TERM"),
-    @JsonSubTypes.Type(value = TermRelationResponse.class, name = "TERM_RELATION")
+    @JsonSubTypes.Type(value = TermRelationResponse.class, name = "TERM_RELATION"),
+    @JsonSubTypes.Type(value = UploadedFileResponse.class, name = "UPLOADED_FILE")
 })
 public sealed interface ApplyCommandResponse extends HasLongId, HasLocaleDateTimeCUD
-    permits OntologyResponse, StorageResponse, TermRelationResponse, TermResponse {
+    permits OntologyResponse, StorageResponse, TermRelationResponse, TermResponse, UploadedFileResponse {
     DataType getDataType();
 }

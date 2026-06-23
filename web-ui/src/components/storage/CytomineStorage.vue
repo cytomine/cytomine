@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="storage-wrapper content-wrapper">
   <div class="panel">
@@ -27,7 +13,6 @@
       <b-message type="is-info" has-icon icon-size="is-small">
         <h2>{{$t('important-notes')}}</h2>
         <ul class="small-text">
-<!--          <li>{{$t('max-size-upload-info')}}</li>-->
           <li>
             {{$t('allowed-formats-upload-info')}}
             <template v-if="formatInfos.length">
@@ -170,9 +155,9 @@ import {
   StorageCollection,
   ProjectCollection,
   UploadedFile,
-  UploadedFileStatus,
   User,
 } from '@/api';
+import {UploadedFileStatus} from '@/constants/UploadedFileStatus';
 
 import {get} from '@/utils/store-helpers';
 import constants from '@/utils/constants.js';
@@ -302,14 +287,14 @@ export default {
     },
 
     async refreshStatusSessionUploads() {
-      let pendingStatus = [
+      const PENDING_STATUSES = [
         UploadedFileStatus.UPLOADED,
         UploadedFileStatus.DETECTING_FORMAT,
         UploadedFileStatus.EXTRACTING_DATA,
         UploadedFileStatus.CONVERTING,
         UploadedFileStatus.DEPLOYING,
-        50,
-        60
+        UploadedFileStatus.UNPACKING,
+        UploadedFileStatus.CHECKING_INTEGRITY,
       ];
 
       let unfinishedConversions = false;
@@ -319,7 +304,7 @@ export default {
         await Promise.all(this.dropFiles.map(async wrapper => {
           if (wrapper.uploadedFile) {
             let oldStatus = wrapper.uploadedFile.status;
-            if (!pendingStatus.includes(oldStatus)) {
+            if (!PENDING_STATUSES.includes(oldStatus)) {
               return;
             }
 
@@ -328,7 +313,7 @@ export default {
             if (status !== oldStatus) {
               statusChange = true;
             }
-            if (pendingStatus.includes(status)) {
+            if (PENDING_STATUSES.includes(status)) {
               unfinishedConversions = true;
             }
           }

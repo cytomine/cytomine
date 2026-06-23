@@ -33,7 +33,7 @@ export {default as Tag} from './models/tag.js';
 export {default as TagDomainAssociation} from './models/tag-domain-association.js';
 export {default as Term} from './models/term.js';
 export {default as Track} from './models/track.js';
-export {default as UploadedFile, UploadedFileStatus} from './models/uploaded-file.js';
+export {default as UploadedFile} from './models/uploaded-file.js';
 export {default as User} from './models/user.js';
 export {default as UserPosition} from './models/user-position.js';
 export {default as UserRole} from './models/user-role.js';

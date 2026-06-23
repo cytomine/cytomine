@@ -1,5 +1,7 @@
 package org.cytomine.repository.service;
 
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,22 @@ public class ACLService {
 
     public boolean canDeleteStorage(long userId, long storageId) {
         return isAdmin(userId) || hasPermission(userId, storageId, STORAGE_CLASS, DELETE_MASK);
+    }
+
+    public List<Long> getAccessibleStorageIds(long userId) {
+        if (isAdmin(userId)) {
+            return null;
+        }
+        String sql = """
+            SELECT aoi.object_id_identity
+            FROM sec_user u
+            JOIN acl_sid sid ON sid.sid = u.username
+            JOIN acl_entry ae ON ae.sid = sid.id AND (ae.mask & ?) > 0
+            JOIN acl_object_identity aoi ON aoi.id = ae.acl_object_identity
+            JOIN acl_class ac ON ac.id = aoi.object_id_class AND ac.class = ?
+            WHERE u.id = ?
+            """;
+        return jdbcTemplate.queryForList(sql, Long.class, READ_MASK, STORAGE_CLASS, userId);
     }
 
     public boolean isAdmin(long userId) {

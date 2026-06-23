@@ -1,25 +1,11 @@
-<!-- Copyright (c) 2009-2019. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div v-if="!iconOnly">
   <span v-if="!isSuccessful || file.nbChildren === undefined" class="tag" :class="tagClass" :data-status="result">
-    {{$t(labels[file.status])}}
+    {{ $t(labels[file.status]) }}
   </span>
   <div v-else class="tags has-addons">
-    <span class="tag" :class="tagClass" :data-status="result">{{$t(labels[file.status])}}</span>
-    <span class="tag is-light">{{$tc("count-files", file.nbChildren + 1, {count: file.nbChildren + 1})}}</span>
+    <span class="tag" :class="tagClass" :data-status="result">{{ $t(labels[file.status]) }}</span>
+    <span class="tag is-light">{{ $tc("count-files", file.nbChildren + 1, { count: file.nbChildren + 1 }) }}</span>
   </div>
 </div>
 <span v-else :class="['icon', textClass]">
@@ -28,7 +14,7 @@
 </template>
 
 <script>
-import {UploadedFileStatus} from '@/api';
+import {UploadedFileStatus} from '@/constants/UploadedFileStatus';
 
 export default {
   name: 'uploaded-file-status',
@@ -54,14 +40,13 @@ export default {
         [UploadedFileStatus.ERROR_EXTRACTION]: 'error-extraction',
         [UploadedFileStatus.CONVERTING]: 'converting',
         [UploadedFileStatus.DEPLOYING]: 'deploying',
-        50: 'unpacking',
-        51: 'error-unpacking',
-        60: 'checking-integrity',
-        61: 'error-integrity',
-        106: 'unpacked'
+        [UploadedFileStatus.UNPACKING]: 'unpacking',
+        [UploadedFileStatus.ERROR_UNPACKING]: 'error-unpacking',
+        [UploadedFileStatus.CHECKING_INTEGRITY]: 'checking-integrity',
+        [UploadedFileStatus.ERROR_INTEGRITY]: 'error-integrity',
+        [UploadedFileStatus.UNPACKED]: 'unpacked',
       };
     },
-    // eslint-disable-next-line vue/return-in-computed-property
     result() {
       switch (this.file.status) {
         case UploadedFileStatus.UPLOADED:
@@ -70,19 +55,19 @@ export default {
         case UploadedFileStatus.CONVERTING:
         case UploadedFileStatus.DEPLOYING:
         case UploadedFileStatus.EXTRACTED:
-        case 50:
-        case 60:
+        case UploadedFileStatus.UNPACKING:
+        case UploadedFileStatus.CHECKING_INTEGRITY:
           return 'info';
         case UploadedFileStatus.CONVERTED:
         case UploadedFileStatus.DEPLOYED:
-        case 106:
+        case UploadedFileStatus.UNPACKED:
           return 'success';
         case UploadedFileStatus.ERROR_FORMAT:
         case UploadedFileStatus.ERROR_CONVERSION:
         case UploadedFileStatus.ERROR_DEPLOYMENT:
         case UploadedFileStatus.ERROR_EXTRACTION:
-        case 51:
-        case 61:
+        case UploadedFileStatus.ERROR_UNPACKING:
+        case UploadedFileStatus.ERROR_INTEGRITY:
           return 'danger';
         default:
           return null;

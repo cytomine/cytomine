@@ -14,7 +14,6 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=unused-argument
 
 import os
 from typing import Any
@@ -36,7 +35,7 @@ from tests.conftest import random_string
 class TestProperty:
     def test_property(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         value = random_string()
-        property = Property(  # pylint: disable=redefined-builtin
+        property = Property(
             dataset["project"],
             "key",
             value,

@@ -14,7 +14,6 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=import-outside-toplevel
 
 import base64
 import functools
@@ -525,7 +524,7 @@ class Cytomine:
             self._logger.debug("DUMP:\n%s", dump.dump_all(response).decode("utf-8"))
         except (UnicodeDecodeError, JSONDecodeError):
             self._logger.debug("DUMP:\nImpossible to decode.")
-        except URLRedirectionException:  # pylint: disable=try-except-raise
+        except URLRedirectionException:
             raise
 
     def log(self, msg: str, level: int = logging.INFO) -> None:
@@ -796,7 +795,7 @@ class Cytomine:
             response = self._get(uri, None, with_base_path=False)
             self._log_response(response, uri)
             return response.status_code == requests.codes.ok
-        except Exception:  # pylint: disable=broad-except
+        except Exception:
             return False
 
     def wait_to_accept_connection(

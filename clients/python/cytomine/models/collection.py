@@ -14,7 +14,6 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=invalid-name
 
 import copy
 from collections.abc import Callable, Iterable, MutableSequence
@@ -322,7 +321,7 @@ class Collection(MutableSequence):
         the current collection that the function evaluates to true.
         """
         collection = copy.copy(self)
-        collection._data = list(filter(fn, self))  # pylint: disable=protected-access
+        collection._data = list(filter(fn, self))
         return collection
 
 class DomainCollection(Collection):

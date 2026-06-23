@@ -14,7 +14,6 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=invalid-name
 
 import os
 from typing import Any
@@ -149,7 +148,7 @@ class Annotation(Model):
         def dump_url_fn(
             model: "Annotation",
             file_path: str,
-            **kwargs: Any,  # pylint: disable=unused-argument
+            **kwargs: Any,
         ) -> str:
             extension = os.path.basename(file_path).split(".")[-1]
             if mask and alpha:

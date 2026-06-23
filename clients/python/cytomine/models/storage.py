@@ -93,7 +93,6 @@ class UploadedFile(Model):
         self.storage = id_storage
         self.user = id_user
         self.status = status
-        self.statusText = None
         self.parent = id_parent
         self.populate(attributes)
 
@@ -113,5 +112,4 @@ class UploadedFileCollection(Collection):
 
         self.all = None
         self.parent = None
-        self.onlyRoots = None
         self.set_parameters(parameters)

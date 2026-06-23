@@ -4,5 +4,6 @@ public enum DataType {
     ONTOLOGY,
     STORAGE,
     TERM,
-    TERM_RELATION
+    TERM_RELATION,
+    UPLOADED_FILE
 }

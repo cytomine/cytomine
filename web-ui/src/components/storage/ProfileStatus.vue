@@ -28,7 +28,8 @@
 
 <script>
 import UploadedFileStatus from '@/components/storage/UploadedFileStatus';
-import {UploadedFileStatus as UFStatus, CompanionFileCollection, CompanionFile} from '@/api';
+import {UploadedFileStatus as UFStatus} from '@/constants/UploadedFileStatus';
+import {CompanionFileCollection, CompanionFile} from '@/api';
 
 export default {
   name: 'profile-status',

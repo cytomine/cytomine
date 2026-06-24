@@ -16,8 +16,13 @@ public record CreateTagDomainAssociationCommand(TagDomainAssociationCommandPaylo
 
     @Override
     public String getActionMessage() {
-        return format("TagDomainAssociation %s (tag=%s, domain=%s/%s) added",
-            after.id(), after.tagId(), after.domainClassName(), after.domainId());
+        return format(
+            "TagDomainAssociation %s (tag=%s, domain=%s/%s) added",
+            after.id(),
+            after.tagId(),
+            after.domainClassName(),
+            after.domainId()
+        );
     }
 
     @Override

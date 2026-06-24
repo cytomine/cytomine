@@ -19,11 +19,16 @@ public record UpdateTagDomainAssociationCommand(
 
     @Override
     public String getActionMessage() {
-        return format("TagDomainAssociation %s updated (tag: %s => %s, domain: %s/%s => %s/%s)",
+        return format(
+            "TagDomainAssociation %s updated (tag: %s => %s, domain: %s/%s => %s/%s)",
             before.id(),
-            before.tagId(), after.tagId(),
-            before.domainClassName(), before.domainId(),
-            after.domainClassName(), after.domainId());
+            before.tagId(),
+            after.tagId(),
+            before.domainClassName(),
+            before.domainId(),
+            after.domainClassName(),
+            after.domainId()
+        );
     }
 
     @Override

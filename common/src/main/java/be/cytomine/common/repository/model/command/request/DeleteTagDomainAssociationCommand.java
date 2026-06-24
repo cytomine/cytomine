@@ -16,8 +16,13 @@ public record DeleteTagDomainAssociationCommand(TagDomainAssociationCommandPaylo
 
     @Override
     public String getActionMessage() {
-        return format("TagDomainAssociation %s (tag=%s, domain=%s/%s) deleted",
-            before.id(), before.tagId(), before.domainClassName(), before.domainId());
+        return format(
+            "TagDomainAssociation %s (tag=%s, domain=%s/%s) deleted",
+            before.id(),
+            before.tagId(),
+            before.domainClassName(),
+            before.domainId()
+        );
     }
 
     @Override

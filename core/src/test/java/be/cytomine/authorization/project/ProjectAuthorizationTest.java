@@ -28,7 +28,6 @@ import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.meta.Description;
 import be.cytomine.domain.meta.Property;
-import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
@@ -38,7 +37,6 @@ import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.meta.AttachedFileService;
 import be.cytomine.service.meta.DescriptionService;
 import be.cytomine.service.meta.PropertyService;
-import be.cytomine.service.meta.TagDomainAssociationService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
@@ -92,9 +90,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Autowired
     private ImageInstanceService imageInstanceService;
-
-    @Autowired
-    private TagDomainAssociationService tagDomainAssociationService;
 
     @Autowired
     private UserAnnotationService userAnnotationService;
@@ -251,10 +246,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         ));
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(project, "xxxx", "xxxxxx")
             .toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            project
-        ).toJsonObject()));
     }
 
     @Test
@@ -299,8 +290,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
                 "value"
             )
             .toJsonObject()));
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenATagAssociation(builder.givenATag(), project)
-            .toJsonObject()));
     }
 
     @Test
@@ -319,7 +308,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -328,7 +316,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -337,7 +324,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
@@ -374,26 +360,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(() -> descriptionService.delete(description, null, null, false));
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotation).toJsonObject()));
 
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationUser
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationAdmin
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotation
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tda, null, null, false));
 
         //add,update, delete attachedFile (simple user data)
         expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
@@ -487,7 +453,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -496,7 +461,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -505,7 +469,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
@@ -542,26 +505,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(() -> descriptionService.delete(description, null, null, false));
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotation).toJsonObject()));
 
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationUser
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationAdmin
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotation
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tda, null, null, false));
 
         //add,update, delete attachedFile (simple user data)
         expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
@@ -679,10 +622,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         ));
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(project, "xxxxxx", "yyy")
             .toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            project
-        ).toJsonObject()));
     }
 
     @Test
@@ -726,8 +665,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
             project.getClass().getName()
         ));
         expectForbidden(() -> propertyService.add(builder.givenAProperty(project).toJsonObject()));
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenATagAssociation(builder.givenATag(), project)
-            .toJsonObject()));
     }
 
     @Test
@@ -746,7 +683,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -755,7 +691,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -764,7 +699,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
@@ -794,26 +728,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
             .toJsonObject()));
         //TODO description doesn't have a user or creator field. Doesn't check neither if admin or not so all is 200
 
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationUser
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationAdmin
-        ).toJsonObject()));
-        expectForbidden(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotation
-        ).toJsonObject()));
-        expectForbidden(() -> tagDomainAssociationService.delete(tda, null, null, false));
 
         //add,update, delete attachedFile (simple user data)
         expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
@@ -909,7 +823,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -918,7 +831,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -927,7 +839,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
@@ -964,26 +875,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(() -> descriptionService.delete(description, null, null, false));
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotation).toJsonObject()));
 
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationUser
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationAdmin
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotation
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tda, null, null, false));
 
         //add,update, delete attachedFile (simple user data)
         expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
@@ -1100,10 +991,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
             project.getClass().getName()
         ));
         expectOK(() -> propertyService.add(builder.givenAProperty(project).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            project
-        ).toJsonObject()));
     }
 
     @Test
@@ -1147,8 +1034,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
             project.getClass().getName()
         ));
         expectForbidden(() -> propertyService.add(builder.givenAProperty(project).toJsonObject()));
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenATagAssociation(builder.givenATag(), project)
-            .toJsonObject()));
     }
 
     @Test
@@ -1167,7 +1052,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -1176,7 +1060,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -1185,7 +1068,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
         expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
@@ -1222,29 +1104,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(() -> descriptionService.update(description, description.toJsonObject()));
         expectForbidden(() -> descriptionService.delete(description, null, null, false));
 
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenATagAssociation(
-                builder.givenATag(),
-                annotationUser
-            )
-            .toJsonObject()));
-        expectForbidden(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenATagAssociation(
-                builder.givenATag(),
-                annotationAdmin
-            )
-            .toJsonObject()));
-        expectForbidden(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenATagAssociation(
-                builder.givenATag(),
-                annotation
-            )
-            .toJsonObject()));
-        expectForbidden(() -> tagDomainAssociationService.delete(tda, null, null, false));
 
         //add,update, delete attachedFile (simple user data)
         expectForbidden(() -> attachedFileService.delete(attachedFileUser, null, null, false));
@@ -1336,7 +1195,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -1345,7 +1203,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -1354,7 +1211,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
@@ -1391,26 +1247,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(() -> descriptionService.delete(description, null, null, false));
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotation).toJsonObject()));
 
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationUser
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationAdmin
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotation
-        ).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tda, null, null, false));
 
         //add,update, delete attachedFile (simple user data)
         expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
@@ -1510,8 +1346,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Property property = builder.givenAProperty(annotation);
         //Create an attached file
         AttachedFile attachedFile = builder.givenAnAttachedFile(annotation);
-        //Create a tag
-        TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), annotation);
 
         result.put("image", image);
         result.put("slice", slice);
@@ -1519,7 +1353,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         result.put("description", description);
         result.put("property", property);
         result.put("attachedFile", attachedFile);
-        result.put("tagDomainAssociation", tda);
 
         /*admin data*/
         //Create an annotation (by admin)
@@ -1537,8 +1370,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Property propertyAdmin = builder.givenAProperty(annotationAdmin);
         //Create an attached file
         AttachedFile attachedFileAdmin = builder.givenAnAttachedFile(annotationAdmin);
-        //Create a tag
-        TagDomainAssociation tdaAdmin = builder.givenATagAssociation(builder.givenATag(), annotationAdmin);
 
         result.put("imageAdmin", imageAdmin);
         result.put("sliceAdmin", sliceAdmin);
@@ -1546,7 +1377,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         result.put("descriptionAdmin", descriptionAdmin);
         result.put("propertyAdmin", propertyAdmin);
         result.put("attachedFileAdmin", attachedFileAdmin);
-        result.put("tagDomainAssociationAdmin", tdaAdmin);
 
         /*simple user data*/
         //Create an annotation (by user)
@@ -1564,8 +1394,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Property propertyUser = builder.givenAProperty(annotationUser);
         //Create an attached file
         AttachedFile attachedFileUser = builder.givenAnAttachedFile(annotationUser);
-        //Create a tag
-        TagDomainAssociation tdaUser = builder.givenATagAssociation(builder.givenATag(), annotationUser);
 
         result.put("imageUser", imageUser);
         result.put("sliceUser", sliceUser);
@@ -1573,7 +1401,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         result.put("descriptionUser", descriptionUser);
         result.put("propertyUser", propertyUser);
         result.put("attachedFileUser", attachedFileUser);
-        result.put("tagDomainAssociationUser", tdaUser);
 
         return result;
     }

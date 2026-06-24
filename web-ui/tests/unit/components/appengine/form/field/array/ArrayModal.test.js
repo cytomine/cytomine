@@ -1,10 +1,11 @@
 import {createLocalVue, mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
-import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect';
 import ArrayModal from '@/components/appengine/forms/fields/array/ArrayModal';
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import CytomineModal from '@/components/utils/CytomineModal';
+import GeometryArrayField from '@/components/appengine/forms/fields/array/GeometryArrayField';
+import ImageArrayField from '@/components/appengine/forms/fields/array/ImageArrayField';
 
 jest.mock('@/api', () => ({
   Cytomine: {
@@ -36,6 +37,7 @@ describe('ArrayModal.vue', () => {
       },
       stubs: {
         AnnotationMultiSelect: true,
+        ImageMultiSelect: true,
       },
       propsData: {
         type: {id: 'boolean'},
@@ -44,12 +46,12 @@ describe('ArrayModal.vue', () => {
     });
   });
 
-  it('The component should be rendered correctly', () => {
+  it('should be rendered correctly', () => {
     expect(wrapper.exists()).toBe(true);
     expect(wrapper.findComponent(CytomineModal).exists()).toBe(true);
   });
 
-  test('The component should render a boolean field when clicking on add', async () => {
+  it('should render a boolean field when clicking on add', async () => {
     expect(wrapper.findComponent(BooleanField).exists()).toBe(false);
 
     await wrapper.vm.add();
@@ -58,13 +60,16 @@ describe('ArrayModal.vue', () => {
     expect(wrapper.vm.items.length).toBe(1);
   });
 
-  test('The component should render a complex field when type is complex', async () => {
-    await wrapper.setProps({type: {id: 'geometry'}});
+  it.each([
+    ['geometry', GeometryArrayField],
+    ['image', ImageArrayField],
+  ])('should render the correct complex field when type is %s', async (typeId, expectedComponent) => {
+    await wrapper.setProps({type: {id: typeId}});
 
-    expect(wrapper.findComponent(AnnotationMultiSelect).exists()).toBe(true);
+    expect(wrapper.findComponent(expectedComponent).exists()).toBe(true);
   });
 
-  test('The items should be correctly updated when adding or removing items', async () => {
+  it('should correctly update items when adding or removing', async () => {
     wrapper.vm.add();
     wrapper.vm.add();
     expect(wrapper.vm.items.length).toBe(2);
@@ -73,14 +78,14 @@ describe('ArrayModal.vue', () => {
     expect(wrapper.vm.items.length).toBe(1);
   });
 
-  test('Click on cancel should emit update:active false', () => {
+  it('should emit update:active false when cancelling', () => {
     wrapper.vm.cancel();
 
     expect(wrapper.emitted('update:active')).toBeTruthy();
     expect(wrapper.emitted('update:active')[0]).toEqual([false]);
   });
 
-  test('Click on select should show an error when the list is empty', () => {
+  it('should show an error when selecting with an empty list', () => {
     wrapper.vm.select();
 
     expect(wrapper.vm.$notify).toHaveBeenCalledWith({
@@ -89,7 +94,7 @@ describe('ArrayModal.vue', () => {
     });
   });
 
-  test('Click on select should show an error when not enough items', async () => {
+  it('should show an error when selecting with not enough items', async () => {
     await wrapper.setProps({minSize: 2});
     await wrapper.setData({items: [true]});
 
@@ -101,7 +106,7 @@ describe('ArrayModal.vue', () => {
     });
   });
 
-  test('Click on select should emits events and resets when valid', async () => {
+  it('should emit events and reset when selecting with valid items', async () => {
     await wrapper.setData({items: [true]});
 
     wrapper.vm.select();

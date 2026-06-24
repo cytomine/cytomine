@@ -1,29 +1,17 @@
 package be.cytomine.controller.meta;
 
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.controller.RestCytomineController;
-import be.cytomine.domain.CytomineDomain;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.meta.TagDomainAssociationService;
-import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
-import be.cytomine.utils.RequestParams;
-import be.cytomine.utils.Task;
-import be.cytomine.utils.filters.SearchParameterEntry;
 
 @RestController
 @RequestMapping("/api")
@@ -32,48 +20,6 @@ import be.cytomine.utils.filters.SearchParameterEntry;
 public class RestTagDomainAssociationController extends RestCytomineController {
 
     private final TagDomainAssociationService tagDomainAssociationService;
-
-    private final TaskService taskService;
-
-    private final AnnotationDomainRepository annotationDomainRepository;
-
-    @GetMapping("/tag_domain_association/{id}.json")
-    public ResponseEntity<String> show(
-        @PathVariable Long id
-    ) {
-        log.debug("REST request to get Tag domain association : {}", id);
-        return tagDomainAssociationService.find(id)
-            .map(this::responseSuccess)
-            .orElseGet(() -> responseNotFound("Tag", id));
-    }
-
-    @GetMapping("/tag_domain_association.json")
-    public ResponseEntity<String> list() {
-        log.debug("REST request to list tags");
-        List<SearchParameterEntry> searchParameterEntries = retrieveSearchParameters();
-        RequestParams requestParams = retrievePageableParameters();
-        return responseSuccess(
-            tagDomainAssociationService.list(searchParameterEntries), requestParams.getOffset(), requestParams.getMax()
-        );
-    }
-
-    @GetMapping("/domain/{domainClassName}/{domainIdent}/tag_domain_association.json")
-    public ResponseEntity<String> listByDomain(
-        @PathVariable String domainClassName,
-        @PathVariable Long domainIdent
-    ) {
-        log.debug("REST request to list tags for domain {} {}", domainClassName, domainIdent);
-        CytomineDomain domain = null;
-        if (domainClassName.contains("AnnotationDomain")) {
-            domain = annotationDomainRepository.findById(domainIdent).orElse(null);
-        } else {
-            domain = tagDomainAssociationService.getCytomineDomain(domainClassName, domainIdent);
-        }
-        if (domain == null) {
-            throw new ObjectNotFoundException(domainClassName, domainIdent);
-        }
-        return responseSuccess(tagDomainAssociationService.listAllByDomain(domain));
-    }
 
     @PostMapping({
         "/tag_domain_association.json",
@@ -86,12 +32,5 @@ public class RestTagDomainAssociationController extends RestCytomineController {
     ) {
         log.debug("REST request to save Tag association: " + json);
         return add(tagDomainAssociationService, json);
-    }
-
-    @DeleteMapping("/tag_domain_association/{id}.json")
-    public ResponseEntity<String> delete(@PathVariable String id, @RequestParam(required = false) Long task) {
-        log.debug("REST request to delete Tag association: " + id);
-        Task existingTask = taskService.get(task);
-        return delete(tagDomainAssociationService, JsonObject.of("id", id), existingTask);
     }
 }

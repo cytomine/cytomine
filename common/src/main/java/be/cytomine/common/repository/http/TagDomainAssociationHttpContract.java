@@ -23,7 +23,7 @@ import static be.cytomine.common.repository.http.TagDomainAssociationHttpContrac
 
 @HttpExchange(ROOT_PATH)
 public interface TagDomainAssociationHttpContract {
-    String ROOT_PATH = "/tag-domain-association";
+    String ROOT_PATH = "/tag-domain-associations";
 
     @GetExchange
     Page<TagDomainAssociationResponse> readAll(@RequestParam long userId, Pageable pageable);

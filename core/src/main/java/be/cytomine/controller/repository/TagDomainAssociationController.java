@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -39,11 +38,9 @@ public class TagDomainAssociationController {
     private final TagDomainAssociationHttpContract httpContract;
 
     @GetMapping("/tag_domain_association.json")
-    public CollectionResponse<TagDomainAssociationResponse> readAll(
-        @RequestParam long userId,
-        Pageable pageable
-    ) {
+    public CollectionResponse<TagDomainAssociationResponse> readAll(Pageable pageable) {
         log.debug("GET /tag_domain_association.json");
+        long userId = currentUserService.getCurrentUser().getId();
         return pageMapper.toCollectionResponse(httpContract.readAll(userId, pageable));
     }
 
@@ -51,10 +48,10 @@ public class TagDomainAssociationController {
     public CollectionResponse<TagDomainAssociationResponse> listByDomain(
         @PathVariable String domainClassName,
         @PathVariable long domainId,
-        @RequestParam long userId,
         Pageable pageable
     ) {
         log.debug("GET /domain/{}/{}/tag_domain_association.json", domainClassName, domainId);
+        long userId = currentUserService.getCurrentUser().getId();
         return pageMapper.toCollectionResponse(
             httpContract.readAllByDomain(
                 domainClassName,

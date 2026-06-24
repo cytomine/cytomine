@@ -1,39 +1,10 @@
-import {createLocalVue, mount} from '@vue/test-utils';
-import Buefy from 'buefy';
+import {shallowMount} from '@vue/test-utils';
 
 import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect';
 import GeometryArrayField from '@/components/appengine/forms/fields/array/GeometryArrayField';
 
-jest.mock('@/api', () => ({
-  AnnotationCollection: jest.fn().mockImplementation(() => ({
-    fetchAll: jest.fn().mockResolvedValue({array: []}),
-  })),
-}));
-
 describe('GeometryArrayField.vue', () => {
-  let localVue;
-
-  beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
-  });
-
-  const createWrapper = () => mount(GeometryArrayField, {
-    localVue,
-    computed: {
-      project: () => ({id: 42}),
-    },
-    mocks: {
-      $store: {
-        getters: {
-          'currentProject/currentViewer': {images: [{imageInstance: {id: 1}}]},
-        },
-      },
-    },
-    stubs: {
-      AnnotationMultiSelect: true,
-    },
-  });
+  const createWrapper = () => shallowMount(GeometryArrayField, {});
 
   it('should render an AnnotationMultiSelect', () => {
     const wrapper = createWrapper();

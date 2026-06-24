@@ -423,7 +423,7 @@ public class ImageInstanceService extends ModelService {
             search += abstractImageCondition;
         }
         if (!tagsCondition.isBlank()) {
-            from += "LEFT OUTER JOIN tag_domain_association tda ON ui.id = tda.domain_ident "
+            from += "LEFT OUTER JOIN tag_domain_association tda ON ui.id = tda.domain_id "
                 + "AND tda.domain_class_name = 'be.cytomine.domain.image.ImageInstance' ";
             search += " AND ";
             search += tagsCondition;
@@ -700,7 +700,7 @@ public class ImageInstanceService extends ModelService {
             search += contentTypeCondition;
         }
         if (!tagsCondition.isBlank()) {
-            from += "LEFT OUTER JOIN tag_domain_association tda ON ii.id = tda.domain_ident "
+            from += "LEFT OUTER JOIN tag_domain_association tda ON ii.id = tda.domain_id "
                 + "AND tda.domain_class_name = 'be.cytomine.domain.image.ImageInstance' ";
             search += " AND ";
             search += tagsCondition;

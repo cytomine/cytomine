@@ -16,6 +16,7 @@ package be.cytomine.domain.meta;
  * limitations under the License.
  */
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
@@ -44,6 +45,7 @@ public class TagDomainAssociation extends CytomineDomain {
     private String domainClassName;
 
     @NotNull
+    @Column(name = "domain_id")
     private Long domainIdent;
 
     public void setDomain(CytomineDomain domain) {

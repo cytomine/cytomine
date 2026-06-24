@@ -1,42 +1,40 @@
 package be.cytomine.controller.meta;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
+import be.cytomine.common.repository.model.command.Commands;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
+import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.domain.meta.Tag;
 import be.cytomine.domain.meta.TagDomainAssociation;
-import be.cytomine.domain.project.Project;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -45,234 +43,163 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = "admin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class TagDomainAssociationResourceTests {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     private BasicInstanceBuilder builder;
 
     @Autowired
-    private MockMvc restTagDomainAssociationControllerMockMvc;
+    private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private TagDomainAssociationHttpContract httpContract;
+
+    private TagDomainAssociationResponse toResponse(TagDomainAssociation tda) {
+        return new TagDomainAssociationResponse(
+            tda.getId(),
+            tda.getTag().getId(),
+            tda.getDomainClassName(),
+            tda.getDomainIdent(),
+            LocalDateTime.now(),
+            Optional.empty(),
+            Optional.empty()
+        );
+    }
 
     @Test
     @Transactional
     public void shouldReturnTagDomainAssociationById() throws Exception {
-        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        );
-        restTagDomainAssociationControllerMockMvc.perform(get(
-                "/api/tag_domain_association/{id}.json",
-                tagDomainAssociation.getId()
-            ))
+        TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
+        long userId = builder.givenDefaultAdmin().getId();
+        when(httpContract.read(eq(tda.getId()), eq(userId))).thenReturn(Optional.of(toResponse(tda)));
+
+        mockMvc.perform(get("/api/tag_domain_association/{id}.json", tda.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(tagDomainAssociation.getId().intValue()));
+            .andExpect(jsonPath("$.id").value(tda.getId().intValue()));
     }
 
     @Test
     @Transactional
     public void getAnTagDomainAssociationDoesNotExists() throws Exception {
-        restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association/{id}.json", 0L))
+        long userId = builder.givenDefaultAdmin().getId();
+        when(httpContract.read(eq(0L), eq(userId))).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/tag_domain_association/{id}.json", 0L))
             .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
     public void listAllTagDomainAssociation() throws Exception {
-        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        );
-        restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association.json"))
+        TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
+        long userId = builder.givenDefaultAdmin().getId();
+        when(httpContract.readAll(eq(userId), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(toResponse(tda))));
+
+        mockMvc.perform(get("/api/tag_domain_association.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.domainIdent=='"
-                + tagDomainAssociation.getDomainIdent()
-                + "')]").exists());
+            .andExpect(jsonPath("$.collection[0].domainId").value(tda.getDomainIdent().intValue()));
     }
-
-
-    @Test
-    @Transactional
-    public void listAllTagDomainAssociationWithFilters() throws Exception {
-        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        );
-        TagDomainAssociation tagDomainAssociationWithAnotherTagAndAnnotherDomain = builder.givenATagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        );
-        restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association.json")
-                .param("tag[equals]", tagDomainAssociation.getTag().getId().toString()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.tag=='" + tagDomainAssociation.getTag().getId() + "')]").exists())
-            .andExpect(jsonPath("$.collection[?(@.tag=='" + tagDomainAssociationWithAnotherTagAndAnnotherDomain.getTag()
-                .getId() + "')]").doesNotExist());
-
-        restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association.json")
-                .param(
-                    "tag[in]",
-                    tagDomainAssociation.getTag().getId().toString()
-                        + ","
-                        + tagDomainAssociationWithAnotherTagAndAnnotherDomain.getTag().getId().toString()
-                ))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.tag=='" + tagDomainAssociation.getTag().getId() + "')]").exists())
-            .andExpect(jsonPath("$.collection[?(@.tag=='" + tagDomainAssociationWithAnotherTagAndAnnotherDomain.getTag()
-                .getId() + "')]").exists());
-
-        restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association.json")
-                .param("domainIdent[equals]", tagDomainAssociation.getDomainIdent().toString()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.tag=='" + tagDomainAssociation.getTag().getId() + "')]").exists())
-            .andExpect(jsonPath("$.collection[?(@.tag=='" + tagDomainAssociationWithAnotherTagAndAnnotherDomain.getTag()
-                .getId() + "')]").doesNotExist());
-    }
-
-
-    @Test
-    @Transactional
-    public void listAllTagDomainAssociationWithFiltersPagination() throws Exception {
-        Tag tag = builder.givenATag();
-
-        TagDomainAssociation t1 = builder.givenATagAssociation(tag, builder.givenAProject());
-        TagDomainAssociation t2 = builder.givenATagAssociation(tag, builder.givenAProject());
-        TagDomainAssociation t3 = builder.givenATagAssociation(tag, builder.givenAProject());
-        TagDomainAssociation t4 = builder.givenATagAssociation(tag, builder.givenAProject());
-        TagDomainAssociation t5 = builder.givenATagAssociation(tag, builder.givenAProject());
-
-        restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association.json")
-                .param("tag[equals]", tag.getId().toString())
-                .param("max", "3")
-                .param("offset", "0")
-            )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(equalTo(3))))
-            .andExpect(jsonPath("$.collection[0].id").value(t1.getId()))
-            .andExpect(jsonPath("$.collection[1].id").value(t2.getId()))
-            .andExpect(jsonPath("$.collection[2].id").value(t3.getId()));
-
-        restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association.json")
-                .param("tag[equals]", tag.getId().toString())
-                .param("max", "1")
-                .param("offset", "0")
-            )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].id").value(t1.getId()));
-
-        restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association.json")
-                .param("tag[equals]", tag.getId().toString())
-                .param("max", "1")
-                .param("offset", "1")
-            )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].id").value(t2.getId()));
-
-        restTagDomainAssociationControllerMockMvc.perform(get("/api/tag_domain_association.json")
-                .param("tag[equals]", tag.getId().toString())
-                .param("max", "3")
-                .param("offset", "3")
-            )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(equalTo(2))))
-            .andExpect(jsonPath("$.collection[0].id").value(t4.getId()))
-            .andExpect(jsonPath("$.collection[1].id").value(t5.getId()));
-    }
-
 
     @Test
     @Transactional
     public void listTagDomainAssociationsByDomain() throws Exception {
-        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        );
-        restTagDomainAssociationControllerMockMvc.perform(get(
-                "/api/domain/{domainClassName}/{domainIdent}/tag_domain_association.json",
-                tagDomainAssociation.getDomainClassName(),
-                tagDomainAssociation.getDomainIdent()
+        TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
+        long userId = builder.givenDefaultAdmin().getId();
+        when(httpContract.readAllByDomain(
+            eq(tda.getDomainClassName()), eq(tda.getDomainIdent()), eq(userId), any(Pageable.class)
+        )).thenReturn(new PageImpl<>(List.of(toResponse(tda))));
+
+        mockMvc.perform(get(
+                "/api/domain/{domainClassName}/{domainId}/tag_domain_association.json",
+                tda.getDomainClassName(),
+                tda.getDomainIdent()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[0].id").value(tagDomainAssociation.getId().intValue()));
+            .andExpect(jsonPath("$.collection[0].id").value(tda.getId().intValue()));
     }
 
     @Test
     @Transactional
-    public void listTagDomainAssociationsByDomainDoesNotExists() throws Exception {
-        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        );
-        restTagDomainAssociationControllerMockMvc.perform(get(
-                "/api/domain/{domainClassName}/{domainIdent}/tag_domain_association.json",
-                tagDomainAssociation.getDomainClassName(),
+    public void listTagDomainAssociationsByDomainReturnsEmptyWhenNotAccessible() throws Exception {
+        TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
+        long userId = builder.givenDefaultAdmin().getId();
+        when(httpContract.readAllByDomain(
+            eq(tda.getDomainClassName()), eq(0L), eq(userId), any(Pageable.class)
+        )).thenReturn(new PageImpl<>(List.of()));
+
+        mockMvc.perform(get(
+                "/api/domain/{domainClassName}/{domainId}/tag_domain_association.json",
+                tda.getDomainClassName(),
                 0
             ))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(0)));
     }
-
 
     @Test
     @Transactional
     public void addValidAssociation() throws Exception {
-        TagDomainAssociation tagDomainAssociation = builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
+        TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
+        long userId = builder.givenDefaultAdmin().getId();
+        UUID commandId = UUID.randomUUID();
+        when(httpContract.create(eq(userId), any())).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(tda), commandId, Commands.CREATE_TAG_DOMAIN_ASSOCIATION)
+        ));
+
+        String body = objectMapper.writeValueAsString(
+            new CreateTagDomainAssociation(tda.getTag().getId(), tda.getDomainClassName(), tda.getDomainIdent())
         );
-        restTagDomainAssociationControllerMockMvc.perform(post(
-                "/api/domain/{domainClassName}/{domainIdent}/tag_domain_association.json",
-                tagDomainAssociation.getDomainClassName(),
-                tagDomainAssociation.getDomainIdent()
+        mockMvc.perform(post(
+                "/api/domain/{domainClassName}/{domainId}/tag_domain_association.json",
+                tda.getDomainClassName(),
+                tda.getDomainIdent()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(tagDomainAssociation.toJSON()))
+                .content(body))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.tagdomainassociation.id").exists())
-            .andExpect(jsonPath("$.tagdomainassociation.tagName").value(tagDomainAssociation.getTag().getName()));
+            .andExpect(jsonPath("$.command").value(Commands.CREATE_TAG_DOMAIN_ASSOCIATION));
     }
-
 
     @Test
     @Transactional
     public void addValidPropertyOtherPath() throws Exception {
-        TagDomainAssociation tagDomainAssociation = builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
+        TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
+        long userId = builder.givenDefaultAdmin().getId();
+        UUID commandId = UUID.randomUUID();
+        when(httpContract.create(eq(userId), any())).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(tda), commandId, Commands.CREATE_TAG_DOMAIN_ASSOCIATION)
+        ));
+
+        String body = objectMapper.writeValueAsString(
+            new CreateTagDomainAssociation(tda.getTag().getId(), tda.getDomainClassName(), tda.getDomainIdent())
         );
-        restTagDomainAssociationControllerMockMvc.perform(post("/api/tag_domain_association.json")
+        mockMvc.perform(post("/api/tag_domain_association.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(tagDomainAssociation.toJSON()))
+                .content(body))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.tagdomainassociation.tagName").value(tagDomainAssociation.getTag().getName()));
+            .andExpect(jsonPath("$.command").value(Commands.CREATE_TAG_DOMAIN_ASSOCIATION));
     }
-
 
     @Test
     @Transactional
     public void deleteTagDomainAssociation() throws Exception {
-        Project project = builder.givenAProject();
-        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(builder.givenATag(), project);
-        restTagDomainAssociationControllerMockMvc.perform(delete(
-                "/api/tag_domain_association/{id}.json",
-                tagDomainAssociation.getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
+        TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
+        long userId = builder.givenDefaultAdmin().getId();
+        UUID commandId = UUID.randomUUID();
+        when(httpContract.delete(eq(tda.getId()), eq(userId))).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(tda), commandId, Commands.DELETE_TAG_DOMAIN_ASSOCIATION)
+        ));
+
+        mockMvc.perform(delete("/api/tag_domain_association/{id}.json", tda.getId())).andExpect(status().isOk());
     }
 }

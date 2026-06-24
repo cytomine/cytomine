@@ -20,4 +20,8 @@ public interface Commands {
     String CREATE_UPLOADED_FILE = "be.cytomine.AddUploadedFileCommand";
     String UPDATE_UPLOADED_FILE = "be.cytomine.EditUploadedFileCommand";
     String DELETE_UPLOADED_FILE = "be.cytomine.DeleteUploadedFileCommand";
+
+    String CREATE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.AddTagDomainAssociationCommand";
+    String UPDATE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.EditTagDomainAssociationCommand";
+    String DELETE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.DeleteTagDomainAssociationCommand";
 }

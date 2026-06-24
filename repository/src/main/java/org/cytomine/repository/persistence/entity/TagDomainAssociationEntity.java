@@ -16,7 +16,7 @@ import be.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "tag_domain_association")
 @Data
-public class TagDomainAssociation implements HasTimestampCUD {
+public class TagDomainAssociationEntity implements HasTimestampCUD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,7 +31,7 @@ public class TagDomainAssociation implements HasTimestampCUD {
     private String domainClassName;
     @Column
     @NotNull
-    private Long domainIdent;
+    private Long domainId;
 
     @Column
     private Timestamp created;

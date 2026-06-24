@@ -3,6 +3,7 @@ package be.cytomine.common.repository.model.command;
 public enum DataType {
     ONTOLOGY,
     STORAGE,
+    TAG_DOMAIN_ASSOCIATION,
     TERM,
     TERM_RELATION,
     UPLOADED_FILE

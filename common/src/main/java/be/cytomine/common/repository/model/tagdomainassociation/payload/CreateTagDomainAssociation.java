@@ -1,3 +1,9 @@
 package be.cytomine.common.repository.model.tagdomainassociation.payload;
 
-public record CreateTagDomainAssociation() {}
+import jakarta.validation.constraints.NotBlank;
+
+public record CreateTagDomainAssociation(
+    long tagId,
+    @NotBlank String domainClassName,
+    long domainId
+) {}

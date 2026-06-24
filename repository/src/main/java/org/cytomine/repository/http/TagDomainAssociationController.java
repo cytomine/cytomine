@@ -1,9 +1,18 @@
 package org.cytomine.repository.http;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.repository.mapper.TagDomainAssociationMapper;
+import org.cytomine.repository.persistence.TagDomainAssociationRepository;
+import org.cytomine.repository.service.ACLService;
+import org.cytomine.repository.service.TagDomainAssociationCommandService;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
@@ -18,19 +27,46 @@ import static be.cytomine.common.repository.http.TagDomainAssociationHttpContrac
 @RestController
 @RequestMapping(ROOT_PATH)
 public class TagDomainAssociationController implements TagDomainAssociationHttpContract {
-    @Override public Optional<HttpCommandResponse> create(long userId, CreateTagDomainAssociation payload) {
-        return Optional.empty();
+    private final ACLService aclService;
+    private final TagDomainAssociationMapper mapper;
+    private final TagDomainAssociationRepository repository;
+    private final TagDomainAssociationCommandService service;
+
+    @Override
+    public Optional<HttpCommandResponse> create(
+        @RequestParam long userId,
+        @RequestBody CreateTagDomainAssociation payload
+    ) {
+        return service.create(
+            userId, payload,
+            LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
+        );
     }
 
-    @Override public Optional<TagDomainAssociationResponse> read(long id, long userId) {
-        return Optional.empty();
+    @Override
+    public Optional<TagDomainAssociationResponse> read(@PathVariable long id, @RequestParam long userId) {
+        return repository.findByIdAndDeletedNull(id)
+            .filter(e -> aclService.isAdmin(userId))
+            .map(mapper::mapToResponse);
     }
 
-    @Override public Optional<HttpCommandResponse> update(long id, long userId, UpdateTagDomainAssociation payload) {
-        return Optional.empty();
+    @Override
+    public Optional<HttpCommandResponse> update(
+        @PathVariable long id,
+        @RequestParam long userId,
+        @RequestBody UpdateTagDomainAssociation payload
+    ) {
+        return service.update(
+            userId, id, payload,
+            LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
+        );
     }
 
-    @Override public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return Optional.empty();
+    @Override
+    public Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId) {
+        return service.delete(
+            userId, id,
+            LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
+        );
     }
 }

@@ -406,7 +406,7 @@ public class ProjectService extends ModelService {
         }
 
         if (!tags.isBlank()) {
-            from += "LEFT OUTER JOIN tag_domain_association t ON p.id = t.domain_ident "
+            from += "LEFT OUTER JOIN tag_domain_association t ON p.id = t.domain_id "
                 + "AND t.domain_class_name = 'be.cytomine.domain.project.Project' ";
             search += " AND ";
             search += tags;

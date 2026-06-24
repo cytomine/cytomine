@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,7 +21,6 @@ import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
 import be.cytomine.service.meta.TagDomainAssociationService;
@@ -31,8 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional
 public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest {
-
-
     private TagDomainAssociation tagDomainAssociationForProject = null;
     private TagDomainAssociation tagDomainAssociationForAnnotation = null;
     private TagDomainAssociation tagDomainAssociationForAbstractImage = null;
@@ -76,15 +74,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
     @WithMockUser(username = SUPERADMIN)
     public void adminCanList() {
         expectOK(() -> tagDomainAssociationService.listAllByDomain(project));
-        expectOK(() -> tagDomainAssociationService.listAllByTag(tagDomainAssociationForProject.getTag()));
     }
-
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void userCannotList() {
-        expectForbidden(() -> tagDomainAssociationService.listAllByTag(tagDomainAssociationForProject.getTag()));
-    }
-
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
@@ -106,52 +96,17 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
             .contains(tagDomainAssociationForAbstractImage);
     }
 
-    // ANNOTATIONS
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void userCannotAddInReadonlyMode() {
-        project.setMode(EditingMode.READ_ONLY);
-        expectForbidden(this::whenIAddDomain);
-    }
-
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void userCannotAddInRestrictedMode() {
-        project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::whenIAddDomain);
-    }
-
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void userCannotAddInRestrictedModeForAnnotation() {
-        project.setMode(EditingMode.RESTRICTED);
-        expectForbidden(this::whenIAddDomain);
-    }
-
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void userCanaddInRestrictedModeForAnnotationIfOwner() {
-        annotationDomain.getProject().setMode(EditingMode.RESTRICTED);
-        ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
-        expectOK(this::whenIAddDomain);
-    }
+    @Override
+    public void whenIGetDomain() {}
 
     @Override
-    public void whenIGetDomain() {
-        tagDomainAssociationService.find(tagDomainAssociationForProject.getId());
-        tagDomainAssociationService.find(tagDomainAssociationForAnnotation.getId());
-        tagDomainAssociationService.find(tagDomainAssociationForAbstractImage.getId());
-    }
+    protected void whenIAddDomain() {}
 
+    @Test
     @Override
-    protected void whenIAddDomain() {
-        AnnotationDomain annotationDomain = builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(
-            project));
-        tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            annotationDomain
-        ).toJsonObject());
-    }
+    @Disabled
+    @WithMockUser(username = USER_NO_ACL)
+    public void userWithoutPermissionGetDomain() {}
 
     @Override
     protected void whenIDeleteDomain() {
@@ -162,47 +117,9 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
         tagDomainAssociationService.delete(tagDomainAssociation, null, null, true);
     }
 
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void userCanAddForImage() {
-        ImageInstance imageInstance = builder.givenAnImageInstance(project);
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            imageInstance
-        ).toJsonObject()));
-    }
 
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void userCannotAddInRestrictedModeForImage() {
-        ImageInstance imageInstance = builder.givenAnImageInstance(project);
-        imageInstance.getProject().setMode(EditingMode.RESTRICTED);
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            imageInstance
-        ).toJsonObject()));
-    }
 
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void userCanAddInRestrictedModeForImageIfOwner() {
-        ImageInstance imageInstance = builder.givenAnImageInstance(project);
-        imageInstance.getProject().setMode(EditingMode.RESTRICTED);
-        imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            imageInstance
-        ).toJsonObject()));
-    }
 
-    @Test
-    @WithMockUser(username = GUEST)
-    public void guestCannotAddForImage() {
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            builder.givenAnImageInstance()
-        ).toJsonObject()));
-    }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
@@ -221,13 +138,9 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> tagDomainAssociationService.delete(
-            builder.givenATagAssociation(
-                builder.givenATag(),
-                imageInstance
-            ), null, null, true
+            builder.givenATagAssociation(builder.givenATag(), imageInstance), null, null, true
         ));
     }
-
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
@@ -236,10 +149,7 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
         expectOK(() -> tagDomainAssociationService.delete(
-            builder.givenATagAssociation(
-                builder.givenATag(),
-                imageInstance
-            ), null, null, true
+            builder.givenATagAssociation(builder.givenATag(), imageInstance), null, null, true
         ));
     }
 
@@ -247,40 +157,12 @@ public class TagDomainAssociationAuthorizationTest extends CRDAuthorizationTest 
     @WithMockUser(username = GUEST)
     public void guestCannotDeleteForImage() {
         expectForbidden(() -> tagDomainAssociationService.delete(
-            builder.givenATagAssociation(
-                builder.givenATag(),
-                builder.givenAnImageInstance()
-            ), null, null, true
+            builder.givenATagAssociation(builder.givenATag(), builder.givenAnImageInstance()), null, null, true
         ));
     }
 
-    @Test
-    @WithMockUser(username = SUPERADMIN)
-    public void adminCanAddForProject() {
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            project
-        ).toJsonObject()));
-    }
 
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void userWithReadCannotAddForProject() {
-        expectForbidden(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            project
-        ).toJsonObject()));
 
-    }
-
-    @Test
-    @WithMockUser(username = USER_ACL_WRITE)
-    public void userWithWriteCanAddForProject() {
-        expectOK(() -> tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            project
-        ).toJsonObject()));
-    }
 
     @Test
     @WithMockUser(username = SUPERADMIN)

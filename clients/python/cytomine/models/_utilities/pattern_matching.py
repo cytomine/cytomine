@@ -16,8 +16,7 @@
 
 import re
 from copy import copy
-from typing import Any, List
-
+from typing import Any
 
 def is_iterable(obj: Any) -> bool:
     """Portable way to check that an object is iterable"""
@@ -27,8 +26,7 @@ def is_iterable(obj: Any) -> bool:
     except TypeError:
         return False
 
-
-def resolve_pattern(pattern: str, attr_source: object) -> List[str]:
+def resolve_pattern(pattern: str, attr_source: object) -> list[str]:
     """Resolve a string pattern using values from an attribute source.
     If one attribute is an iterable (and not a string)
     the pattern will be resolved once for each value in the iterable.

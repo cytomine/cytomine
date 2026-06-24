@@ -244,7 +244,6 @@ public class ImageInstanceService extends ModelService {
         );
 
         String abstractImageAlias = "ai";
-        String imageInstanceAlias = "ii";
         validParameters.addAll(
             SQLSearchParameter.getDomainAssociatedSearchParameters(
                 AbstractImage.class,
@@ -263,8 +262,7 @@ public class ImageInstanceService extends ModelService {
                     getEntityManager()
                 )
                 .stream()
-                .map(
-                    x -> new SearchParameterEntry("mime." + x.getProperty(), x.getOperation(), x.getValue()))
+                .map(x -> new SearchParameterEntry("mime." + x.getProperty(), x.getOperation(), x.getValue()))
                 .collect(Collectors.toList()));
 
         for (SearchParameterEntry parameter : searchParameters) {
@@ -558,7 +556,7 @@ public class ImageInstanceService extends ModelService {
 
         String imageInstanceAlias = "ii";
         String abstractImageAlias = "ai";
-        String mimeAlias = "mime";
+        String contentTypeAlias = "mime";
 
         if (sortColumn == null) {
             sortColumn = "created";
@@ -593,7 +591,7 @@ public class ImageInstanceService extends ModelService {
                                                                                                   + sortColumn : null;
         }
         if (sortedProperty == null) {
-            sortedProperty = ReflectionUtils.findField(UploadedFile.class, sortColumn) != null ? mimeAlias
+            sortedProperty = ReflectionUtils.findField(UploadedFile.class, sortColumn) != null ? contentTypeAlias
                                                                                                  + "."
                                                                                                  + sortColumn : null;
         }
@@ -630,8 +628,9 @@ public class ImageInstanceService extends ModelService {
         boolean joinAI = validatedSearchParameters.stream()
             .anyMatch(x -> x.getProperty().contains(abstractImageAlias + ".") || finalSortedProperty.contains(
                 abstractImageAlias + "."));
-        boolean joinMime = validatedSearchParameters.stream()
-            .anyMatch(x -> x.getProperty().contains(mimeAlias + ".") || finalSortedProperty.contains(mimeAlias + "."));
+        boolean joinContentType = validatedSearchParameters.stream()
+            .anyMatch(x -> x.getProperty().contains(contentTypeAlias + ".") || finalSortedProperty.contains(
+                contentTypeAlias + "."));
         boolean joinImageGroup = validatedSearchParameters.stream()
             .anyMatch(x -> x.getProperty().contains(imageGroupAlias + ".") || finalSortedProperty.contains(
                 imageGroupAlias + ".")) || withImageGroup;
@@ -649,9 +648,9 @@ public class ImageInstanceService extends ModelService {
             .filter(x -> x.getProperty().startsWith(abstractImageAlias + "."))
             .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
-        String mimeCondition = sqlSearchConditions.getData()
+        String contentTypeCondition = sqlSearchConditions.getData()
             .stream()
-            .filter(x -> x.getProperty().startsWith(mimeAlias + "."))
+            .filter(x -> x.getProperty().startsWith(contentTypeAlias + "."))
             .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String tagsCondition = sqlSearchConditions.getData()
@@ -696,9 +695,9 @@ public class ImageInstanceService extends ModelService {
             search += " AND ";
             search += abstractImageCondition;
         }
-        if (!mimeCondition.isBlank()) {
+        if (!contentTypeCondition.isBlank()) {
             search += " AND ";
-            search += mimeCondition;
+            search += contentTypeCondition;
         }
         if (!tagsCondition.isBlank()) {
             from += "LEFT OUTER JOIN tag_domain_association tda ON ii.id = tda.domain_ident "
@@ -749,17 +748,17 @@ public class ImageInstanceService extends ModelService {
         String sort = " ORDER BY " + sortedProperty;
         sort += (sortDirection.equals("desc")) ? " DESC " : " ASC ";
 
-        if (joinAI || joinMime) {
+        if (joinAI || joinContentType) {
             select += ", " + ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH.stream()
                 .map(x -> abstractImageAlias + "." + x)
                 .collect(Collectors.joining(",")) + " ";
             from += "JOIN abstract_image " + abstractImageAlias + " ON " + abstractImageAlias
                 + ".id = " + imageInstanceAlias + ".base_image_id ";
         }
-        if (joinMime) {
-            select += ", " + mimeAlias + ".content_type ";
-            from += "JOIN uploaded_file  " + mimeAlias + " ON "
-                + mimeAlias + ".id = " + abstractImageAlias + ".uploaded_file_id ";
+        if (joinContentType) {
+            select += ", " + contentTypeAlias + ".content_type ";
+            from += "JOIN uploaded_file  " + contentTypeAlias + " ON "
+                + contentTypeAlias + ".id = " + abstractImageAlias + ".uploaded_file_id ";
         }
         if (joinImageGroup) {
             select += ", igii.group_id as image_group_id ";

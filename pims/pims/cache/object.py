@@ -13,7 +13,8 @@
 #  * limitations under the License.
 import copy
 from functools import cached_property as _cached_property
-from typing import Any, Callable, KeysView
+from collections.abc import Callable, KeysView
+from typing import Any
 
 from pims.utils.copy import SafelyCopiable
 

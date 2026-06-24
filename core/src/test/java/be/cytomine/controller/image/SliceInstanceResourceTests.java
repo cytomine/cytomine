@@ -99,7 +99,6 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.image.SliceInstance"))
             .andExpect(jsonPath("$.created").exists())
             .andExpect(jsonPath("$.image").value(image.getImage().getId()))
-            .andExpect(jsonPath("$.mime").hasJsonPath())
             .andExpect(jsonPath("$.baseSlice").hasJsonPath())
             .andExpect(jsonPath("$.path").hasJsonPath())
             .andExpect(jsonPath("$.zStack").hasJsonPath())
@@ -495,7 +494,6 @@ public class SliceInstanceResourceTests {
 
     private SliceInstance givenTestSliceInstance() {
         AbstractSlice image = builder.givenAnAbstractSlice();
-        image.setMime(builder.givenAMime("openslide/mrxs"));
         image.getImage().setWidth(109240);
         image.getImage().setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");

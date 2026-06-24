@@ -12,7 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 from datetime import datetime
-from typing import Optional
 
 from pint import Quantity
 from tifffile import astype
@@ -74,8 +73,8 @@ class SVSParser(TifffileParser):
 
     @staticmethod
     def parse_physical_size(
-        physical_size: Optional[str], unit: Optional[str] = None
-    ) -> Optional[Quantity]:
+        physical_size: str | None, unit: str | None = None
+    ) -> Quantity | None:
         if physical_size is not None:
             physical_size = parse_float(physical_size)
             if physical_size is not None and physical_size > 0:
@@ -84,8 +83,8 @@ class SVSParser(TifffileParser):
 
     @staticmethod
     def parse_acquisition_date(
-        date: Optional[str], time: Optional[str] = None
-    ) -> Optional[datetime]:
+        date: str | None, time: str | None = None
+    ) -> datetime | None:
         """
         Date examples: 11/25/13 , 2013-12-05T12:49:03.69Z
         Time examples: 15:10:34

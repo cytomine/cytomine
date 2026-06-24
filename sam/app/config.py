@@ -27,7 +27,7 @@ class Settings(BaseSettings):
 
 
 @lru_cache()
-def get_settings():
+def get_settings() -> Settings:
     env_file = os.getenv("CONFIG_FILE", ".env")
     logger.info(f"Loading config from {env_file}")
     return Settings(_env_file=env_file)

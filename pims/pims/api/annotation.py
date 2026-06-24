@@ -263,11 +263,3 @@ async def _show_drawing(
             extension, headers, config,
             colormaps, c_reduction, z_reduction, t_reduction
         )
-
-
-def show_spectra(filepath, body):
-    pass
-
-
-def show_footprint(filepath, body):
-    pass

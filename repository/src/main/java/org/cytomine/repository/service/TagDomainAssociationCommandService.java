@@ -117,14 +117,14 @@ public class TagDomainAssociationCommandService implements
     @Override
     public boolean canWriteId(long userId, long id) {
         return tagDomainAssociationRepository.findById(id)
-            .map(e -> aclService.isAdmin(userId))
+            .map(e -> aclService.canWriteDomain(userId, e.getDomainId(), e.getDomainClassName()))
             .orElse(false);
     }
 
     @Override
     public boolean canDeleteId(long userId, long id) {
         return tagDomainAssociationRepository.findById(id)
-            .map(e -> aclService.isAdmin(userId))
+            .map(e -> aclService.canDeleteDomain(userId, e.getDomainId(), e.getDomainClassName()))
             .orElse(false);
     }
 

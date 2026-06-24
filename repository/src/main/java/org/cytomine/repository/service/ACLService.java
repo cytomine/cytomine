@@ -64,6 +64,18 @@ public class ACLService {
         return jdbcTemplate.queryForList(sql, Long.class, READ_MASK, STORAGE_CLASS, userId);
     }
 
+    public boolean canReadDomain(long userId, long domainId, String domainClassName) {
+        return isAdmin(userId) || hasPermission(userId, domainId, domainClassName, READ_MASK);
+    }
+
+    public boolean canWriteDomain(long userId, long domainId, String domainClassName) {
+        return isAdmin(userId) || hasPermission(userId, domainId, domainClassName, WRITE_MASK);
+    }
+
+    public boolean canDeleteDomain(long userId, long domainId, String domainClassName) {
+        return isAdmin(userId) || hasPermission(userId, domainId, domainClassName, DELETE_MASK);
+    }
+
     public boolean isAdmin(long userId) {
         String sql = """
             SELECT COUNT(*) > 0

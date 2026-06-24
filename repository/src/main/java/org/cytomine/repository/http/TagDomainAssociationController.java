@@ -46,7 +46,7 @@ public class TagDomainAssociationController implements TagDomainAssociationHttpC
     @Override
     public Optional<TagDomainAssociationResponse> read(@PathVariable long id, @RequestParam long userId) {
         return repository.findByIdAndDeletedNull(id)
-            .filter(e -> aclService.isAdmin(userId))
+            .filter(e -> aclService.canReadDomain(userId, e.getDomainId(), e.getDomainClassName()))
             .map(mapper::mapToResponse);
     }
 

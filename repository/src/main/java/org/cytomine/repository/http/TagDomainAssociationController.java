@@ -9,6 +9,8 @@ import org.cytomine.repository.mapper.TagDomainAssociationMapper;
 import org.cytomine.repository.persistence.TagDomainAssociationRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.TagDomainAssociationCommandService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +43,14 @@ public class TagDomainAssociationController implements TagDomainAssociationHttpC
             userId, payload,
             LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
         );
+    }
+
+    @Override
+    public Page<TagDomainAssociationResponse> readAll(@RequestParam long userId, Pageable pageable) {
+        if (aclService.isAdmin(userId)) {
+            return repository.findAllByDeletedNull(pageable).map(mapper::mapToResponse);
+        }
+        return repository.findAllReadableByUser(userId, pageable).map(mapper::mapToResponse);
     }
 
     @Override

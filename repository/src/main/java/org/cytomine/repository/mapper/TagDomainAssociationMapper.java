@@ -29,14 +29,16 @@ public interface TagDomainAssociationMapper {
 
     @Mapping(target = "tagId", source = "newTagId")
     @Mapping(target = "domainClassName", source = "newDomainClassName")
-    @Mapping(target = "domainId", source = "newDomainIdent")
+    @Mapping(target = "domainId", source = "newDomainId")
     @Mapping(target = "updated", source = "now")
     @BeanMapping(ignoreUnmappedSourceProperties = {"tagId", "domainClassName", "domainId", "updated"})
-    TagDomainAssociationEntity update(TagDomainAssociationEntity entity,
+    TagDomainAssociationEntity update(
+        TagDomainAssociationEntity entity,
         long newTagId,
         String newDomainClassName,
-        long newDomainIdent,
-        Timestamp now);
+        long newDomainId,
+        Timestamp now
+    );
 
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "tagId", source = "payload.tagId")
@@ -46,7 +48,9 @@ public interface TagDomainAssociationMapper {
     @Mapping(target = "deleted", source = "payload.deleted")
     @Mapping(target = "updated", source = "now")
     @BeanMapping(ignoreUnmappedSourceProperties = {"tagId", "domainClassName", "domainId", "updated"})
-    TagDomainAssociationEntity updateWithPayload(TagDomainAssociationEntity entity,
+    TagDomainAssociationEntity updateWithPayload(
+        TagDomainAssociationEntity entity,
         TagDomainAssociationCommandPayload payload,
-        Timestamp now);
+        Timestamp now
+    );
 }

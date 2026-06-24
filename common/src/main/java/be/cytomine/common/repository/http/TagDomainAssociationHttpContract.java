@@ -3,6 +3,8 @@ package be.cytomine.common.repository.http;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +24,9 @@ import static be.cytomine.common.repository.http.TagDomainAssociationHttpContrac
 @HttpExchange(ROOT_PATH)
 public interface TagDomainAssociationHttpContract {
     String ROOT_PATH = "/tag-domain-association";
+
+    @GetExchange
+    Page<TagDomainAssociationResponse> readAll(@RequestParam long userId, Pageable pageable);
 
     @PostExchange
     Optional<HttpCommandResponse> create(

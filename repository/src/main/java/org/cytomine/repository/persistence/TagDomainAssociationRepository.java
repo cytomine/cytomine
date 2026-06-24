@@ -11,6 +11,12 @@ import org.springframework.data.jpa.repository.Query;
 public interface TagDomainAssociationRepository extends JpaRepository<TagDomainAssociationEntity, Long> {
     Optional<TagDomainAssociationEntity> findByIdAndDeletedNull(long id);
 
+    Page<TagDomainAssociationEntity> findAllByDomainClassNameAndDomainIdAndDeletedNull(
+        String domainClassName,
+        long domainId,
+        Pageable pageable
+    );
+
     Page<TagDomainAssociationEntity> findAllByDeletedNull(Pageable pageable);
 
     @Query(

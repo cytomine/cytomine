@@ -28,6 +28,14 @@ public interface TagDomainAssociationHttpContract {
     @GetExchange
     Page<TagDomainAssociationResponse> readAll(@RequestParam long userId, Pageable pageable);
 
+    @GetExchange("/domain/{domainClassName}/{domainId}")
+    Page<TagDomainAssociationResponse> readAllByDomain(
+        @PathVariable String domainClassName,
+        @PathVariable long domainId,
+        @RequestParam long userId,
+        Pageable pageable
+    );
+
     @PostExchange
     Optional<HttpCommandResponse> create(
         @RequestParam long userId,

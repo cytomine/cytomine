@@ -35,6 +35,29 @@ public class TagDomainAssociationController implements TagDomainAssociationHttpC
     private final TagDomainAssociationCommandService service;
 
     @Override
+    public Page<TagDomainAssociationResponse> readAll(@RequestParam long userId, Pageable pageable) {
+        if (aclService.isAdmin(userId)) {
+            return repository.findAllByDeletedNull(pageable).map(mapper::mapToResponse);
+        }
+        return repository.findAllReadableByUser(userId, pageable).map(mapper::mapToResponse);
+    }
+
+    @Override
+    public Page<TagDomainAssociationResponse> readAllByDomain(
+        @PathVariable String domainClassName,
+        @PathVariable long domainId,
+        @RequestParam long userId,
+        Pageable pageable
+    ) {
+        if (!aclService.canReadDomain(userId, domainId, domainClassName)) {
+            return Page.empty();
+        }
+        return repository
+            .findAllByDomainClassNameAndDomainIdAndDeletedNull(domainClassName, domainId, pageable)
+            .map(mapper::mapToResponse);
+    }
+
+    @Override
     public Optional<HttpCommandResponse> create(
         @RequestParam long userId,
         @RequestBody CreateTagDomainAssociation payload
@@ -43,14 +66,6 @@ public class TagDomainAssociationController implements TagDomainAssociationHttpC
             userId, payload,
             LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
         );
-    }
-
-    @Override
-    public Page<TagDomainAssociationResponse> readAll(@RequestParam long userId, Pageable pageable) {
-        if (aclService.isAdmin(userId)) {
-            return repository.findAllByDeletedNull(pageable).map(mapper::mapToResponse);
-        }
-        return repository.findAllReadableByUser(userId, pageable).map(mapper::mapToResponse);
     }
 
     @Override

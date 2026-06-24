@@ -327,7 +327,12 @@ public class CollectionType extends Type {
                 try {
                     JsonNode rootNode = objectMapper.readTree(stringValueObject);
                     if (rootNode.has("type")) {
-                        validateGeoJsonCollection(stringValueObject);
+                        String geoType = rootNode.get("type").asText();
+                        if (geoType.equals("FeatureCollection") || geoType.equals("GeometryCollection")) {
+                            validateGeoJsonCollection(stringValueObject);
+                        } else {
+                            validatePrimitiveCollectionItem(stringValueObject);
+                        }
                     } else {
                         validatePrimitiveCollectionItem(stringValueObject);
                     }

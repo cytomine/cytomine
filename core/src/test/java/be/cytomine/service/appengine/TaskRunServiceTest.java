@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,11 +33,14 @@ import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.annotation.AnnotationLayerService;
 import be.cytomine.service.annotation.AnnotationService;
+import be.cytomine.domain.ontology.UserAnnotation;
+import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.utils.GeometryService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -79,6 +83,9 @@ public class TaskRunServiceTest {
 
     @Mock
     private AsyncService asyncService;
+
+    @Mock
+    private UserAnnotationService userAnnotationService;
 
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -303,5 +310,59 @@ public class TaskRunServiceTest {
         verify(asyncService, times(1)).launchImageAdditionJob(
             ArgumentMatchers.any(), eq(projectId), eq(currentUser)
         );
+    }
+
+    @DisplayName("Successfully call provisionCollectionItem for each annotation in a geometry array")
+    @Test
+    public void shouldProvisionGeometryArrayForEachAnnotation() throws JsonProcessingException {
+        Long projectId = 1L;
+        UUID taskRunId = UUID.randomUUID();
+
+        JsonNode json = objectMapper.readTree("""
+            {
+                "parameterName": "myParam",
+                "type": {
+                    "id": "array",
+                    "subType": { "id": "geometry" }
+                },
+                "value": {
+                    "ids": [1, 2],
+                    "type": "annotation"
+                }
+            }
+            """);
+
+        User currentUser = new User();
+        Project project = new Project();
+        TaskRun taskRun = new TaskRun();
+
+        UserAnnotation annotation1 = new UserAnnotation();
+        annotation1.setWktLocation("POINT(1 2)");
+        UserAnnotation annotation2 = new UserAnnotation();
+        annotation2.setWktLocation("POINT(3 4)");
+
+        String geoJson1 = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}";
+        String geoJson2 = "{\"type\":\"Point\",\"coordinates\":[3.0,4.0]}";
+
+        doNothing().when(securityACLService).checkUser(currentUser);
+        doNothing().when(securityACLService).check(project, READ);
+        doNothing().when(securityACLService).checkIsNotReadOnly(project);
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+        when(projectService.get(projectId)).thenReturn(project);
+        when(taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)).thenReturn(Optional.of(taskRun));
+        when(userAnnotationService.get(1L)).thenReturn(annotation1);
+        when(userAnnotationService.get(2L)).thenReturn(annotation2);
+        when(geometryService.wktToGeoJson("POINT(1 2)")).thenReturn(geoJson1);
+        when(geometryService.wktToGeoJson("POINT(3 4)")).thenReturn(geoJson2);
+        when(appEngineService.putWithParams(any(), any(), any(), any()))
+            .thenReturn("{\"index\":0}")
+            .thenReturn("{\"index\":1}");
+
+        String result = taskRunService.provisionTaskRun(json, projectId, taskRunId, "myParam");
+
+        verify(appEngineService, times(2)).putWithParams(any(), any(), any(), any());
+        JsonNode resultNode = objectMapper.readTree(result);
+        assertTrue(resultNode.isArray());
+        assertEquals(2, resultNode.size());
     }
 }

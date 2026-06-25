@@ -440,9 +440,13 @@ public class CollectionType extends Type {
         for (int i = 0; i < indexes.length; i++) {
             if (currentType instanceof CollectionType) {
                 if (i == 0) { // first item which is the parameter
-                    persistedProvision =
-                        collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                            indexes[i], runId, ParameterType.INPUT);
+                    persistedProvision = collectionRepo
+                        .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                            indexes[i],
+                            runId,
+                            ParameterType.INPUT
+                        )
+                        .orElse(null);
                     if (Objects.isNull(persistedProvision)) {
                         persistedProvision = new CollectionPersistence();
                         persistedProvision.setRunId(runId);
@@ -727,9 +731,13 @@ public class CollectionType extends Type {
         CollectionPersistenceRepository collectionRepo =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
         if (node.isArray()) {
-            CollectionPersistence persistedProvision =
-                collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                parameterName, runId, ParameterType.INPUT);
+            CollectionPersistence persistedProvision = collectionRepo
+                .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                    parameterName,
+                    runId,
+                    ParameterType.INPUT
+                )
+                .orElse(null);
             if (persistedProvision == null) {
                 persistedProvision = new CollectionPersistence();
                 persistedProvision.setValueType(ValueType.ARRAY);
@@ -786,9 +794,12 @@ public class CollectionType extends Type {
             if (node.has("type")
                 && (node.get("type").asText().equals("GeometryCollection")
                 || node.get("type").asText().equals("FeatureCollection"))) {
-                CollectionPersistence persistedProvision =
-                    collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                    parameterName, runId, ParameterType.INPUT);
+                CollectionPersistence persistedProvision = collectionRepo
+                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                        parameterName,
+                        runId,
+                        ParameterType.INPUT
+                    ).orElse(null);
                 if (persistedProvision == null) {
                     persistedProvision = new CollectionPersistence();
                     persistedProvision.setValueType(ValueType.ARRAY);

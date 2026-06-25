@@ -1094,7 +1094,6 @@ public class TaskProvisioningService {
         }
         log.info("Running Task: valid run");
 
-
         checkBeforeExecutionMatches(run);
 
         log.info("Running Task: contacting scheduler...");
@@ -1108,6 +1107,7 @@ public class TaskProvisioningService {
             .stream()
             .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
             .collect(Collectors.toSet());
+
         // loop input parameters
         List<Symlink> links = new ArrayList<>();
         for (Parameter parameter : inputs) {
@@ -1116,7 +1116,6 @@ public class TaskProvisioningService {
                 CollectionPersistence collectionPersistence = collectionPersistenceRepository
                     .findCollectionPersistenceByParameterNameAndRunId(parameter.getName(),run.getId());
                 if (collectionPersistence.isReferenced()) {
-
                     CollectionSymlink collectionSymlink = new CollectionSymlink();
                     collectionSymlink.setParameterName(parameter.getName());
                     collectionSymlink.setSymlinks(new HashMap<>());
@@ -1142,13 +1141,11 @@ public class TaskProvisioningService {
             }
         }
 
-
         // populate schedule object
         schedule.setLinks(links);
         schedulerHandler.schedule(schedule);
         log.info("Running Task: scheduling done");
 
-        // update the final state
         run.setState(TaskRunState.QUEUING);
         runRepository.saveAndFlush(run);
         log.info("Running Task: updated Run state to QUEUING");
@@ -1161,8 +1158,11 @@ public class TaskProvisioningService {
 
     private void checkBeforeExecutionMatches(Run run) throws ProvisioningException {
         AppEngineError error;
-        List<Match> matches = run.getTask().getMatches().stream().filter(match ->
-            match.getCheckTime().equals(CheckTime.BEFORE_EXECUTION)).toList();
+        List<Match> matches = run.getTask()
+            .getMatches()
+            .stream()
+            .filter(match -> match.getCheckTime().equals(CheckTime.BEFORE_EXECUTION))
+            .toList();
 
         if (!matches.isEmpty()) {
             for (Match match : matches) {

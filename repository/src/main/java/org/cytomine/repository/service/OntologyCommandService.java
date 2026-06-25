@@ -1,7 +1,9 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.OntologyCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.CreateOntologyCommand;
@@ -36,6 +39,7 @@ public class OntologyCommandService implements
     private final CommandV2Repository commandV2Repository;
     private final UserRepository userRepository;
     private final CommandMapper commandMapper;
+    private final TermCommandService termCommandService;
 
     @Override
     public OntologyEntity save(OntologyEntity entity) {
@@ -110,5 +114,10 @@ public class OntologyCommandService implements
     @Override
     public boolean canDeleteAclId(long userId, long id) {
         return aclService.canDeleteOntology(userId, id);
+    }
+
+    @Override
+    public Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now) {
+        return termCommandService.deleteByOntologyId(userId, id, now);
     }
 }

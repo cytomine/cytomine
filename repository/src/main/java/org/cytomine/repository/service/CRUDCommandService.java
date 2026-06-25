@@ -45,13 +45,13 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
 
     Optional<E> get(long id);
 
-    default Set<HttpCommandResponse> deleteSubEntities() {
+    default Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now) {
         return Set.of();
     }
 
     default Optional<HttpCommandResponse> delete(long userId, long id, LocalDateTime now) {
         if (canDeleteId(userId, id)) {
-            Set<HttpCommandResponse> subEntities = deleteSubEntities();
+            Set<HttpCommandResponse> subEntities = deleteSubEntities(userId,id,now);
             return get(id).map(entity -> {
                 DeleteCommandRequest<P> deleteCommandRequest = mapDeleteCommand(userId, map(entity));
                 CommandV2Entity commandV2Entity =

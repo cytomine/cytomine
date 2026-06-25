@@ -1,7 +1,10 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +17,7 @@ import org.cytomine.repository.persistence.entity.TermEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
@@ -117,5 +121,11 @@ public class TermCommandService
     @Override
     public boolean canDeleteAclId(long userId, long id) {
         return aclService.canDeleteOntology(userId, id);
+    }
+
+    public Set<HttpCommandResponse> deleteByOntologyId(long userId, long ontologyId, LocalDateTime now){
+        return termRepository.findAllIdsByOntologyId(ontologyId).stream().map(termId -> delete(userId,termId,now))
+            .flatMap(Optional::stream)
+            .collect(Collectors.toSet());
     }
 }

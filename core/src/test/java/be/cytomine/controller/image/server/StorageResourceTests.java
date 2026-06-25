@@ -3,6 +3,7 @@ package be.cytomine.controller.image.server;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -137,7 +138,7 @@ public class StorageResourceTests {
                     Optional.empty()
                 ),
                 commandId, Commands.CREATE_STORAGE
-            )));
+                , Set.of())));
 
         mockMvc.perform(post("/api/storage.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -160,7 +161,7 @@ public class StorageResourceTests {
                 toResponse(storage),
                 commandId,
                 Commands.UPDATE_STORAGE
-            )));
+                , Set.of())));
 
         mockMvc.perform(put("/api/storage/{id}.json", storage.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -197,7 +198,7 @@ public class StorageResourceTests {
                 toResponse(storage),
                 commandId,
                 Commands.DELETE_STORAGE
-            )));
+                , Set.of())));
 
         mockMvc.perform(delete("/api/storage/{id}.json", storage.getId())
                 .contentType(MediaType.APPLICATION_JSON))

@@ -9,13 +9,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
 import be.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "ontology")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class OntologyEntity implements HasTimestampCUD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,12 +1,17 @@
 package org.cytomine.repository.http;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.persistence.TermRepository;
+import org.cytomine.repository.persistence.entity.TermEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -35,9 +40,19 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     @Autowired
     OntologyMapper ontologyController;
 
+    @Autowired
+    TermRepository termRepository;
+
     String apiURL = OntologyHttpContract.ROOT_PATH;
     CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());
     UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID().toString()));
+
+    @Override
+    public void createSubEntities(long userId, long currentId) {
+        termRepository.save(
+            new TermEntity(null, 0, currentId, UUID.randomUUID().toString(), UUID.randomUUID().toString(),
+                Timestamp.from(Instant.now()), null, null, "", Set.of()));
+    }
 
     @Override
     public OntologyResponse expectedUpdatedResponse(OntologyResponse response, UpdateOntology updatePayload,

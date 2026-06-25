@@ -50,6 +50,10 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
     JdbcTemplate getJdbcTemplate();
 
+    default void createSubEntities(long userId, long currentId){
+
+    }
+
     default void beforeCreate(long userId) {
     }
 

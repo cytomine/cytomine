@@ -112,8 +112,8 @@ public class TermResourceTests {
         Term term = builder.givenATerm();
         Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId),
-            any(Pageable.class))).thenReturn(new PageImpl<>(
-            List.of(new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
+            any(Pageable.class))).thenReturn(new PageImpl<>(List.of(
+            new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                 LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
                 Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()))));
 
@@ -175,7 +175,8 @@ public class TermResourceTests {
         when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                 LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.CREATE_TERM)));
+                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.CREATE_TERM,
+            Set.of())));
 
         String createTermJson =
             JsonObject.of("name", term.getName(), "color", term.getColor(), "ontology", term.getOntology().getId())
@@ -214,7 +215,7 @@ public class TermResourceTests {
                 new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                     LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
                     Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId,
-                Commands.UPDATE_TERM)));
+                Commands.UPDATE_TERM, Set.of())));
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
 
@@ -249,7 +250,8 @@ public class TermResourceTests {
         when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.of(new HttpCommandResponse(true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                 LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.DELETE_TERM)));
+                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.DELETE_TERM,
+            Set.of())));
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))

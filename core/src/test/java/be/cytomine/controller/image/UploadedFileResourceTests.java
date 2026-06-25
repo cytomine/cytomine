@@ -51,15 +51,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class UploadedFileResourceTests {
 
-    @Autowired
-    private BasicInstanceBuilder builder;
-
-    @Autowired
-    private MockMvc mockMvc;
-
     private final ObjectMapper objectMapper = new ObjectMapper()
         .registerModule(new Jdk8Module())
         .registerModule(new JavaTimeModule());
+    @Autowired
+    private BasicInstanceBuilder builder;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
     void shouldListUploadedFiles() throws Exception {
@@ -170,7 +168,7 @@ class UploadedFileResourceTests {
                     null,
                     commandId,
                     Commands.CREATE_UPLOADED_FILE
-                )))
+                    , Set.of())))
             )
         );
 
@@ -200,7 +198,7 @@ class UploadedFileResourceTests {
                     null,
                     commandId,
                     Commands.UPDATE_UPLOADED_FILE
-                )))
+                    , Set.of())))
             )
         );
 
@@ -245,7 +243,7 @@ class UploadedFileResourceTests {
                     null,
                     commandId,
                     Commands.DELETE_UPLOADED_FILE
-                )))
+                    , Set.of())))
             )
         );
 

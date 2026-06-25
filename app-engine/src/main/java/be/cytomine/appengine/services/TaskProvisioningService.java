@@ -1114,9 +1114,7 @@ public class TaskProvisioningService {
             if (parameter.getType() instanceof CollectionType) {
                 // if referenced, fetch the paths from the database
                 CollectionPersistence collectionPersistence = collectionPersistenceRepository
-                    .findCollectionPersistenceByParameterNameAndRunId(
-                    parameter.getName(),
-                    run.getId());
+                    .findCollectionPersistenceByParameterNameAndRunId(parameter.getName(),run.getId());
                 if (collectionPersistence.isReferenced()) {
 
                     CollectionSymlink collectionSymlink = new CollectionSymlink();
@@ -1169,13 +1167,19 @@ public class TaskProvisioningService {
         if (!matches.isEmpty()) {
             for (Match match : matches) {
                 CollectionPersistence matching = collectionPersistenceRepository
-                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(match
-                    .getMatching()
-                    .getName(), run.getId(), ParameterType.INPUT);
+                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                        match.getMatching().getName(),
+                        run.getId(),
+                        ParameterType.INPUT
+                    )
+                    .orElseThrow(() -> new RuntimeException("matching cannot be null"));
                 CollectionPersistence matched = collectionPersistenceRepository
-                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(match
-                    .getMatched()
-                    .getName(), run.getId(), ParameterType.INPUT);
+                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                        match.getMatched().getName(),
+                        run.getId(),
+                        ParameterType.INPUT
+                    )
+                    .orElseThrow(() -> new RuntimeException("matching cannot be null"));
                 // compare size
                 if (!Objects.equals(matching.getSize(), matched.getSize())) {
                     error = ErrorBuilder.build(ErrorCode.INTERNAL_NOT_MATCHING_DIFF_SIZE);

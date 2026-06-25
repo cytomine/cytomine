@@ -1205,20 +1205,16 @@ public class TaskProvisioningService {
     private List<AppEngineError> checkAfterExecutionMatches(Run run) {
         List<AppEngineError> multipleErrors = new ArrayList<>();
         List<Match> matches = run.getTask()
-                .getMatches()
-                .stream()
-                .filter(match -> match.getCheckTime().equals(CheckTime.AFTER_EXECUTION))
-                .toList();
+            .getMatches()
+            .stream()
+            .filter(match -> match.getCheckTime().equals(CheckTime.AFTER_EXECUTION))
+            .toList();
 
         for (Match match : matches) {
             CollectionPersistence matching = collectionPersistenceRepository
-                .findCollectionPersistenceByParameterNameAndRunId(match
-                .getMatching()
-                .getName(), run.getId());
+                .findCollectionPersistenceByParameterNameAndRunId(match.getMatching().getName(), run.getId());
             CollectionPersistence matched = collectionPersistenceRepository
-                .findCollectionPersistenceByParameterNameAndRunId(match
-                .getMatched()
-                .getName(), run.getId());
+                .findCollectionPersistenceByParameterNameAndRunId(match.getMatched().getName(), run.getId());
 
             // compare size
             if (!Objects.equals(matching.getSize(), matched.getSize())) {
@@ -1228,20 +1224,18 @@ public class TaskProvisioningService {
             }
             // map indexes
             for (TypePersistence item : matching.getItems()) {
-                String matchingItemIndex = item
-                    .getCollectionIndex()
+                String matchingItemIndex = item.getCollectionIndex()
                     .substring(item.getCollectionIndex().lastIndexOf('['));
-                List<TypePersistence> matchedItemIndexes = matched
-                    .getItems()
+                List<TypePersistence> matchedItemIndexes = matched.getItems()
                     .stream()
-                    .filter(typePersistence -> typePersistence
-                    .getCollectionIndex()
-                    .endsWith(matchingItemIndex))
+                    .filter(typePersistence -> typePersistence.getCollectionIndex().endsWith(matchingItemIndex))
                     .toList();
                 if (matchedItemIndexes.size() != 1) {
                     ParameterError parameterError = new ParameterError(matching.getParameterName());
-                    AppEngineError error = ErrorBuilder
-                        .build(ErrorCode.INTERNAL_NOT_MATCHING_NOT_ALIGNED_INDEXES, parameterError);
+                    AppEngineError error = ErrorBuilder.build(
+                        ErrorCode.INTERNAL_NOT_MATCHING_NOT_ALIGNED_INDEXES,
+                        parameterError
+                    );
                     multipleErrors.add(error);
                 }
             }

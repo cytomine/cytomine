@@ -12,4 +12,16 @@ public interface Commands {
     String DELETE_TERM = "be.cytomine.DeleteTermCommand";
     String DELETE_TERM_RELATION = "be.cytomine.DeleteTermRelationCommand";
     String DELETE_ONTOLOGY = "be.cytomine.DeleteOntologyCommand";
+
+    String CREATE_STORAGE = "be.cytomine.AddStorageCommand";
+    String UPDATE_STORAGE = "be.cytomine.EditStorageCommand";
+    String DELETE_STORAGE = "be.cytomine.DeleteStorageCommand";
+
+    String CREATE_UPLOADED_FILE = "be.cytomine.AddUploadedFileCommand";
+    String UPDATE_UPLOADED_FILE = "be.cytomine.EditUploadedFileCommand";
+    String DELETE_UPLOADED_FILE = "be.cytomine.DeleteUploadedFileCommand";
+
+    String CREATE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.AddTagDomainAssociationCommand";
+    String UPDATE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.EditTagDomainAssociationCommand";
+    String DELETE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.DeleteTagDomainAssociationCommand";
 }

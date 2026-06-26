@@ -1,21 +1,5 @@
 package be.cytomine.domain.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.io.Serializable;
 import java.util.Set;
 
@@ -30,12 +14,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
+import be.cytomine.common.repository.utils.LTreeType;
+import be.cytomine.common.repository.utils.LongArrayToBytesConverter;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;
 import be.cytomine.utils.JsonObject;
-import be.cytomine.utils.LTreeType;
-import be.cytomine.utils.LongArrayToBytesConverter;
 
 @Entity
 @Getter
@@ -45,11 +29,11 @@ public class UploadedFile extends CytomineDomain implements Serializable {
     public static Set<String> ARCHIVE_FORMATS = Set.of("ZIP", "TAR", "GZTAR", "BZTAR", "XZTAR");
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "storage_id", nullable = true)
+    @JoinColumn(name = "storage_id")
     private Storage storage;
 
     @Convert(converter = LongArrayToBytesConverter.class)
@@ -110,24 +94,14 @@ public class UploadedFile extends CytomineDomain implements Serializable {
         returnArray.put("contentType", uploadedFile.getContentType());
         returnArray.put("size", uploadedFile.getSize());
         returnArray.put("path", uploadedFile.getPath());
-        returnArray.put("isArchive", uploadedFile.isArchive());
         returnArray.put("status", uploadedFile.getStatus());
-        returnArray.put("statusText", uploadedFile.getStatusText());
         returnArray.put("projects", uploadedFile.getProjects());
         return returnArray;
-    }
-
-    String getStatusText() {
-        return UploadedFileStatus.findByCode(status).map(Enum::name).orElse(null);
     }
 
     public String getPath() {
         // //TODO: use a directory per storage
         return filename;
-    }
-
-    boolean isArchive() {
-        return ARCHIVE_FORMATS.contains(contentType);
     }
 
     @PreUpdate
@@ -157,6 +131,4 @@ public class UploadedFile extends CytomineDomain implements Serializable {
     public boolean isVirtual() {
         return contentType.equalsIgnoreCase("VIRTUALSTACK");
     }
-
-
 }

@@ -45,6 +45,11 @@ public class ParamServiceTests {
         configureFor("localhost", wireMockServer.port());
     }
 
+    @Autowired
+    ParamsService paramsService;
+    @Autowired
+    BasicInstanceBuilder builder;
+
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
         registry.add("application.repositoryURL", () -> "http://localhost:" + wireMockServer.port());
@@ -54,12 +59,6 @@ public class ParamServiceTests {
     public static void afterAll() {
         wireMockServer.stop();
     }
-
-    @Autowired
-    ParamsService paramsService;
-
-    @Autowired
-    BasicInstanceBuilder builder;
 
     @Test
     public void paramsUser() {
@@ -112,13 +111,13 @@ public class ParamServiceTests {
             )
         );
 
-        assertThat(paramsService.getParamsTermList(null, project))
+        assertThat(paramsService.getParamsTermList(null, project, 1))
             .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
-        assertThat(paramsService.getParamsTermList("null", project))
+        assertThat(paramsService.getParamsTermList("null", project, 1))
             .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
-        assertThat(paramsService.getParamsTermList(termInProject.getId() + "_" + termNotInProject.getId(), project))
+        assertThat(paramsService.getParamsTermList(termInProject.getId() + "_" + termNotInProject.getId(), project, 1))
             .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
-        assertThat(paramsService.getParamsTermList(termNotInProject.getId() + "", project))
+        assertThat(paramsService.getParamsTermList(termNotInProject.getId() + "", project, 1))
             .doesNotContain(termInProject.getId(), termNotInProject.getId());
     }
 

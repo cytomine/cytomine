@@ -19,7 +19,6 @@ import be.cytomine.domain.GenericCytomineDomainContainer;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.server.Storage;
-import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ConstraintException;
@@ -27,7 +26,6 @@ import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.ImageInstanceRepository;
-import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.security.AclRepository;
 import be.cytomine.service.CurrentRoleService;
@@ -53,8 +51,6 @@ public class SecurityACLService {
     private final CurrentRoleService currentRoleService;
 
     private final ImageInstanceRepository imageInstanceRepository;
-
-    private final OntologyRepository ontologyRepository;
 
     private final PermissionService permissionService;
 
@@ -151,7 +147,6 @@ public class SecurityACLService {
      * Check if user has permission on the curret domain
      *
      * @param permission Permission to check (READ,...)
-     *
      * @return true if user has this permission on current domain
      */
     public boolean hasPermission(CytomineDomain domain, Permission permission, boolean isAdmin) {
@@ -200,8 +195,8 @@ public class SecurityACLService {
                     + user.getUsername()
                     + "'"
                     + (StringUtils.isNotBlank(searchString) ? " and lower(storage.name) like '%"
-                                                              + searchString.toLowerCase()
-                                                              + "%'" : ""));
+                    + searchString.toLowerCase()
+                    + "%'" : ""));
 
         }
         return (List<Storage>) query.getResultList();
@@ -239,26 +234,6 @@ public class SecurityACLService {
                 + "and aclEntry.sid = aclSid and project.id = " + project.getId());
         List<String> usernames = query.getResultList();
         return usernames;
-    }
-
-    public List<Ontology> getOntologyList(User user) {
-        if (currentRoleService.isAdminByNow(user)) {
-            return ontologyRepository.findAllByDeletedNull();
-        }
-        Query query = entityManager.createQuery(
-            "select distinct ontology "
-                + "from AclObjectIdentity as aclObjectId, "
-                + "AclEntry as aclEntry, "
-                + "AclSid as aclSid, "
-                + "Ontology as ontology "
-                + "where aclObjectId.objectId = ontology.id "
-                + "and ontology.deleted is null "
-                + "and aclEntry.aclObjectIdentity = aclObjectId "
-                + "and aclEntry.sid = aclSid "
-                + "and aclSid.sid like '"
-                + user.getUsername()
-                + "'");
-        return (List<Ontology>) query.getResultList();
     }
 
     public void checkIsCurrentUserSameUser(Long userId) {
@@ -499,7 +474,6 @@ public class SecurityACLService {
         }
         return domain.container();
     }
-
 
     public void checkUserAccessRightsForMeta(CytomineDomain domain, User currentUser) {
         //Is domain Project?

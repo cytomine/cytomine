@@ -1,4 +1,4 @@
-from typing import Iterable
+from collections.abc import Iterable
 
 from shapely.affinity import affine_transform
 from shapely.errors import ShapelyError

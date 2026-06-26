@@ -54,6 +54,17 @@ public class ImageServerService {
     // Internal communication to image server must use this base path as a convention.
     public static final String IMS_API_BASE_PATH = "/ims";
 
+    public enum DownloadType {
+        IMAGE("image"),
+        FILE("file");
+
+        final String pathSegment;
+
+        DownloadType(String pathSegment) {
+            this.pathSegment = pathSegment;
+        }
+    }
+
     private final SliceCoordinatesService sliceCoordinatesService;
 
     private final SimplifyGeometryService simplifyGeometryService;
@@ -216,17 +227,13 @@ public class ImageServerService {
     }
 
     public void streamDownload(AbstractImage abstractImage, OutputStream outputStream) {
-        streamDownload("image", abstractImage.getPath(), abstractImage.getOriginalFilename(), outputStream);
+        streamDownload(DownloadType.IMAGE, abstractImage.getPath(), abstractImage.getOriginalFilename(), outputStream);
     }
 
-    public void streamDownload(UploadedFile uploadedFile, OutputStream outputStream) {
-        streamDownload("file", uploadedFile.getPath(), uploadedFile.getOriginalFilename(), outputStream);
-    }
-
-    public void streamDownload(String type, String path, String filename, OutputStream outputStream) {
+    public void streamDownload(DownloadType type, String path, String filename, OutputStream outputStream) {
         String url = UriComponentsBuilder
             .fromUriString(this.internalImageServerURL())
-            .pathSegment(type)
+            .pathSegment(type.pathSegment)
             .pathSegment(path)
             .pathSegment("export")
             .queryParam("filename", filename)

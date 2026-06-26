@@ -15,7 +15,7 @@
 import logging
 from copy import copy
 from enum import Enum
-from typing import Iterator
+from collections.abc import Iterator
 
 from cytomine.models import (
     AbstractImage, AbstractSlice, AbstractSliceCollection, Annotation, AnnotationCollection,
@@ -456,13 +456,15 @@ class CytomineListener(ImportListener):
 
             for z in range(image.depth):
                 for t in range(image.duration):
-                    mime = "image/pyrtiff"  # TODO: remove
-                    asc.append(
-                        AbstractSlice(
-                            ai.id, uf.id, mime, cc, z, t,
-                            channelName=name, channelColor=color
-                        )
-                    )
+                    asc.append(AbstractSlice(
+                        id_image=ai.id,
+                        id_uploaded_file=uf.id,
+                        channel=cc,
+                        z_stack=z,
+                        time=t,
+                        channelName=name,
+                        channelColor=color,
+                    ))
         asc.save()
 
         uf.status = UploadedFile.DEPLOYED

@@ -130,7 +130,7 @@ public class ReviewedAnnotationListing extends AnnotationListing {
 
         if (tags != null) {
             from +=
-                " LEFT OUTER JOIN tag_domain_association tda ON a.id = tda.domain_ident AND tda.domain_class_name = '"
+                " LEFT OUTER JOIN tag_domain_association tda ON a.id = tda.domain_id AND tda.domain_class_name = '"
                     + getDomainClass()
                     + "' ";
         }

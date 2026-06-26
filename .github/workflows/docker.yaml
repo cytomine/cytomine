@@ -12,8 +12,6 @@ on:
         required: true
       REGISTRY_TOKEN:
         required: true
-      BIGPICTURE_SSH_KEY:
-        required: true
 jobs:
   build-push:
     runs-on: self-hosted
@@ -38,7 +36,6 @@ jobs:
             context: .
             dockerfile_location: pims
             target: production
-            ssh: true
           - name: sam
             target: production
           - name: web-ui
@@ -55,15 +52,9 @@ jobs:
             dockerfile_location: app-engine/task-runner
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
         with:
           submodules: true
-
-      - name: Set up SSH agent
-        if: matrix.image.ssh
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.BIGPICTURE_SSH_KEY }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -98,7 +89,17 @@ jobs:
           tags: |
             registry.cytomine.org/cytomine/${{ matrix.image.name }}:${{ env.DEPLOYMENT_NAME }}
             ${{ github.ref_name == 'main' && format('cytomine/{0}:latest', matrix.image.name) || '' }}
+          cache-from: type=registry,ref=registry.cytomine.org/cytomine/${{ matrix.image.name }}-build-cache
+          cache-to: type=registry,ref=registry.cytomine.org/cytomine/${{ matrix.image.name }}-build-cache,mode=min
           allow: network.host
           network: host
           target: ${{ matrix.image.target || '' }}
-          ssh: ${{ matrix.image.ssh && 'default' || '' }}
+
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: registry.cytomine.org/cytomine/${{ matrix.image.name }}:${{ env.DEPLOYMENT_NAME }}
+          format: table
+          exit-code: '0'
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH

@@ -1,6 +1,5 @@
 package org.cytomine.repository.mapper;
 
-
 import java.sql.Timestamp;
 
 import org.cytomine.repository.persistence.entity.OntologyEntity;
@@ -13,6 +12,7 @@ import be.cytomine.common.repository.model.command.payload.request.OntologyComma
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.RelationResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.ontology.payload.OntologyUser;
 
 @Mapper(componentModel = "spring", uses = {TermMapper.class, BaseMapper.class})
@@ -23,9 +23,13 @@ public interface OntologyMapper {
 
     OntologyUser map(Long id, String fullName);
 
-    @Mapping(target = "user", source = "user")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "userId"})
-    OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity, long user);
+    @Mapping(target = "user", source = "userId")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity);
+
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "userId", "created", "updated", "deleted", "terms"})
+    OntologyLight mapToOntologyLight(OntologyEntity ontologyEntity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -50,6 +54,5 @@ public interface OntologyMapper {
     @Mapping(target = "deleted", source = "entity.deleted")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated"})
     OntologyEntity updateWithPayload(OntologyEntity entity, OntologyCommandPayload replace, Timestamp now);
-
 
 }

@@ -39,9 +39,6 @@ public class AbstractSlice extends CytomineDomain {
     @ManyToOne(fetch = FetchType.LAZY)
     private UploadedFile uploadedFile;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = true)
-    private Mime mime; // [PIMS] Deprecated.
-
     private Integer channel;
 
     private Integer zStack;
@@ -67,15 +64,6 @@ public class AbstractSlice extends CytomineDomain {
             false
         );
         abstractSlice.image = (AbstractImage) json.getJSONAttrDomain(entityManager, "image", new AbstractImage(), true);
-        abstractSlice.mime = (Mime) json.getJSONAttrDomain(
-            entityManager,
-            "mime",
-            new Mime(),
-            "mimeType",
-            "String",
-            false
-        );
-
         abstractSlice.channel = json.getJSONAttrInteger("channel", 0);
         abstractSlice.zStack = json.getJSONAttrInteger("zStack", 0);
         abstractSlice.time = json.getJSONAttrInteger("time", 0);
@@ -94,8 +82,6 @@ public class AbstractSlice extends CytomineDomain {
         returnArray.put("uploadedFile", abstractSlice.getUploadedFileId());
         returnArray.put("path", abstractSlice.getPath());
         returnArray.put("image", abstractSlice.getImageId());
-        returnArray.put("mime", abstractSlice.getMimeType());
-
         returnArray.put("channel", abstractSlice.getChannel());
         returnArray.put("zStack", abstractSlice.getZStack());
         returnArray.put("time", abstractSlice.getTime());
@@ -115,10 +101,6 @@ public class AbstractSlice extends CytomineDomain {
 
     public Long getImageId() {
         return this.getImage() != null ? this.getImage().getId() : null;
-    }
-
-    public String getMimeType() {
-        return this.getMime() != null ? this.getMime().getMimeType() : null;
     }
 
     public String getPath() {

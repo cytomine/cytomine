@@ -259,11 +259,13 @@ public abstract class ModelService<T extends CytomineDomain> {
         beforeAdd(domain);
         saveDomain(domain);
 
-        CommandResponse response =
-            responseService.createResponseMessage(
-                domain, getStringParamsI18n(domain), printMessage,
-                "Add", domain.getCallBack()
-            );
+        CommandResponse response = responseService.createResponseMessage(
+            domain,
+            getStringParamsI18n(domain),
+            printMessage,
+            "Add",
+            domain.getCallBack()
+        );
         afterAdd(domain, response);
         //Build response message
         return response;
@@ -306,11 +308,13 @@ public abstract class ModelService<T extends CytomineDomain> {
         //Build response message
         beforeUpdate(domain);
         saveDomain(domain);
-        CommandResponse response =
-            responseService.createResponseMessage(
-                domain, getStringParamsI18n(domain), printMessage,
-                "Edit", domain.getCallBack()
-            );
+        CommandResponse response = responseService.createResponseMessage(
+            domain,
+            getStringParamsI18n(domain),
+            printMessage,
+            "Edit",
+            domain.getCallBack()
+        );
         afterUpdate(domain, response);
         return response;
     }
@@ -414,8 +418,7 @@ public abstract class ModelService<T extends CytomineDomain> {
     }
 
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
-        throw new ServerException(
-            "getStringParamsI18n must be implemented for " + this.getClass().toString());
+        throw new ServerException("getStringParamsI18n must be implemented for " + this.getClass());
     }
 
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData) {
@@ -436,8 +439,7 @@ public abstract class ModelService<T extends CytomineDomain> {
         if (task == null) {
             return update(domain, jsonNewData, transaction);
         } else {
-            throw new CytomineMethodNotYetImplementedException(
-                "No update method implemented with" + " task");
+            throw new CytomineMethodNotYetImplementedException("No update method implemented with task");
         }
     }
 
@@ -489,13 +491,10 @@ public abstract class ModelService<T extends CytomineDomain> {
         CytomineDomain domain,
         Transaction transaction, Task task
     ) {
-        for (TagDomainAssociation tagDomainAssociation :
-            tagDomainAssociationService.listAllByDomain(
-                domain)) {
+        for (TagDomainAssociation tagDomainAssociation : tagDomainAssociationService.listAllByDomain(domain)) {
             tagDomainAssociationService.delete(tagDomainAssociation, transaction, task, false);
         }
     }
-
 
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         // do nothing by default
@@ -507,17 +506,13 @@ public abstract class ModelService<T extends CytomineDomain> {
 
     public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {}
 
-    public CytomineDomain getCytomineDomain(String domainClassName, Long domainIdent) {
+    public CytomineDomain getCytomineDomain(String domainClassName, Long domainId) {
         try {
-            return (CytomineDomain) getEntityManager().find(
-                Class.forName(domainClassName),
-                domainIdent
-            );
+            return (CytomineDomain) getEntityManager().find(Class.forName(domainClassName), domainId);
         } catch (ClassNotFoundException e) {
-            throw new ObjectNotFoundException(domainClassName, domainIdent);
+            throw new ObjectNotFoundException(domainClassName, domainId);
         }
     }
-
 
     public CommandResponse addOne(JsonObject json) {
         return add(json);
@@ -544,7 +539,7 @@ public abstract class ModelService<T extends CytomineDomain> {
                     "status", commandResponse.getStatus()
                 );
             } catch (CytomineException e) {
-                log.info(((CytomineException) e).getMessage());
+                log.info(e.getMessage());
                 errors.add(JsonObject.of("data", jsonObject, "message", e.msg));
                 resp = JsonObject.of("message", e.msg, "status", e.code);
             } catch (Exception e) {
@@ -558,8 +553,7 @@ public abstract class ModelService<T extends CytomineDomain> {
         JsonObject response = new JsonObject();
 
         List<JsonObject> succeeded = result.stream()
-            .filter(x -> x.getJSONAttrInteger("status") >= 200
-                && x.getJSONAttrInteger("status") <= 300)
+            .filter(x -> x.getJSONAttrInteger("status") >= 200 && x.getJSONAttrInteger("status") <= 300)
             .toList();
 
         if (succeeded.size() == result.size()) {
@@ -600,5 +594,4 @@ public abstract class ModelService<T extends CytomineDomain> {
         }
         return response;
     }
-
 }

@@ -18,7 +18,8 @@ import json
 from contextlib import AsyncExitStack
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Callable, Coroutine, Mapping, Sequence
+from collections.abc import Callable, Coroutine, Mapping, Sequence
+from typing import Any
 
 from fastapi import params, routing
 from fastapi._compat import _regenerate_error_with_loc, get_missing_field_error, _normalize_errors, Undefined, \

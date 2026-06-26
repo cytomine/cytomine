@@ -205,10 +205,7 @@ public class CollectionType extends Type {
     }
 
     @Override
-    public void validateFiles(
-        Run run,
-        Parameter currentOutput,
-        StorageData currentOutputStorageData)
+    public void validateFiles(Run run, Parameter currentOutput, StorageData currentOutputStorageData)
         throws TypeValidationException {
         // make sure we have the right file structure
         Type currentType = new CollectionType(this);
@@ -283,6 +280,7 @@ public class CollectionType extends Type {
             if (arrayYmlFound == 0) {
                 throw new TypeValidationException(ErrorCode.INTERNAL_MISSING_METADATA);
             }
+            collection.removeIf(item -> ((Map<?, ?>) item).containsKey("array.yml"));
         }
 
         validate(lists.get(currentOutput.getName()));
@@ -305,6 +303,7 @@ public class CollectionType extends Type {
         );
 
         if (!excludedTypes.contains(valueObject.getClass())) {
+
             throw new TypeValidationException(ErrorCode.INTERNAL_WRONG_PROVISION_STRUCTURE);
         }
 
@@ -337,6 +336,7 @@ public class CollectionType extends Type {
                         validatePrimitiveCollectionItem(stringValueObject);
                     }
                 } catch (JsonProcessingException e) {
+
                     throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_FEATURE_COLLECTION);
                 }
 
@@ -356,8 +356,7 @@ public class CollectionType extends Type {
         }
     }
 
-    private void validateGeoJsonCollection(String valueObject)
-        throws TypeValidationException {
+    private void validateGeoJsonCollection(String valueObject) throws TypeValidationException {
         GeometryType geometryType = new GeometryType();
         try {
             validateFeatureCollection(valueObject, geometryType);
@@ -1209,6 +1208,9 @@ public class CollectionType extends Type {
             }
         }
 
+        if (root.getSize() == null || root.getSize() == 0) {
+            root.setSize(root.getItems().size());
+        }
         collectionPersistenceRepository.save(root);
     }
 

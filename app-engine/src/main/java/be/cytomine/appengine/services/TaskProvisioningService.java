@@ -1059,7 +1059,6 @@ public class TaskProvisioningService {
             case PROVISIONED -> updateToProvisioned(run);
             case RUNNING -> run(run);
             case FINISHED -> updateToFinished(run);
-            // to safeguard against unknown state transition requests
             default -> throw new ProvisioningException(ErrorBuilder.build(ErrorCode.UNKNOWN_STATE));
         };
     }
@@ -1220,7 +1219,6 @@ public class TaskProvisioningService {
             CollectionPersistence matched = collectionPersistenceRepository
                 .findCollectionPersistenceByParameterNameAndRunId(match.getMatched().getName(), run.getId());
 
-            // compare size
             if (!Objects.equals(matching.getSize(), matched.getSize())) {
                 ParameterError parameterError = new ParameterError(matching.getParameterName());
                 AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_NOT_MATCHING_DIFF_SIZE, parameterError);
@@ -1269,13 +1267,12 @@ public class TaskProvisioningService {
             throw new ProvisioningException(error);
         }
 
-        // list all outputs of the task
-        Set<Parameter> outputs = run
-            .getTask()
+        Set<Parameter> outputs = run.getTask()
             .getParameters()
             .stream()
             .filter(parameter -> parameter.getParameterType().equals(ParameterType.OUTPUT))
             .collect(Collectors.toSet());
+
         log.info("Provisioning: reading outputs...");
         List<AppEngineError> multipleErrors = new ArrayList<>();
         for (Parameter parameter : outputs) {

@@ -56,19 +56,6 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
     JdbcTemplate getJdbcTemplate();
 
-
-    default HttpCommandResponse fillSubEntities(HttpCommandResponse createResponse) {
-        return createResponse;
-    }
-
-    ;
-
-    default ApplyCommandResponse fillSubResponses(ApplyCommandResponse response) {
-        return response;
-    }
-
-    ;
-
     default void createSubEntities(long userId, long currentId) {
 
     }
@@ -97,11 +84,10 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
     default void baseTest() {
         long userId = createUser();
         String stringUserId = String.valueOf(userId);
-        String response =
-            getMockMvc().perform(post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
+        String response = getMockMvc().perform(
+                post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-                .andReturn()
-                .getResponse().getContentAsString();
+            .andReturn().getResponse().getContentAsString();
 
         HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
         createSubEntities(userId, result.data().id());
@@ -125,9 +111,9 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         HttpCommandResponse updateResult = getObjectMapper().readValue(update, HttpCommandResponse.class);
         R updateDataResult = (R) updateResult.data();
 
-        assertEquals(
-            expectedUpdatedResponse(getResponseData, getUpdatePayload(), updateDataResult.updated().orElseThrow(
-                () -> new IllegalStateException("Newly created entity should " + "not have `updated` empty."))),
+        assertEquals(expectedUpdatedResponse(getResponseData, getUpdatePayload(), updateDataResult.updated()
+                .orElseThrow(
+                    () -> new IllegalStateException("Newly created entity should " + "not have `updated` empty."))),
             updateDataResult);
 
 
@@ -137,26 +123,29 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
         assertEquals(expectedDeletedResponse(updateDataResult, deleteResult.data().deleted().orElseThrow()),
             deleteResult.data());
-//        assertEquals(expectDeletedSubEntities(getResponseData.deleted().orElseThrow(
-//                () -> new IllegalStateException("Newly deleted entity should " + "not have `deleted` empty."))),
-//            result.subCommands().stream().map(HttpCommandResponse::data).collect(Collectors.toSet()));
     }
 
     @Test
     @SneakyThrows
     default void createCommandTest() {
-        long userId1 = createUser();
-        String userId = String.valueOf(userId1);
+        long userId = createUser();
+        String stringUserId = String.valueOf(userId);
 
-        Optional<HttpCommandResponse> firstCreate = getObjectMapper().readValue(getMockMvc().perform(
-                post(getApiURL()).param("userId", userId).contentType(APPLICATION_JSON)
+        Optional<HttpCommandResponse> maybeFirstCreate = getObjectMapper().readValue(getMockMvc().perform(
+                post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
         });
-        String commandID = firstCreate.get().commandId().toString();
-        long entityID = firstCreate.get().data().id();
+
+        HttpCommandResponse firstCreate =
+            maybeFirstCreate.orElseThrow(() -> new IllegalStateException("First creation should not be empty."));
+
+        createSubEntities(userId, firstCreate.data().id());
+
+        String commandID = firstCreate.commandId().toString();
+        long entityID = firstCreate.data().id();
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
-                post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", userId)
+                post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", stringUserId)
                     .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), new TypeReference<>() {
         });
@@ -164,15 +153,15 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         assertTrue(undoCommandResponse.isPresent());
 
         String emptyResponseString = getMockMvc().perform(
-                get(getApiURL() + "/" + entityID).param("userId", userId).contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + entityID).param("userId", stringUserId).contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString,
-            getObjectMapper().constructType(Optional.of(firstCreate.get().data()).getClass()));
+            getObjectMapper().constructType(Optional.of(firstCreate.data()).getClass()));
 
         assertEquals(emptyResponse, Optional.empty());
 
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
-                post(CommandController.ROOT_PATH + "/redo/" + commandID).param("userId", userId)
+                post(CommandController.ROOT_PATH + "/redo/" + commandID).param("userId", stringUserId)
                     .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), new TypeReference<>() {
         });
@@ -180,14 +169,13 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         assertTrue(redoCommandResponse.isPresent());
 
         String redoGetResponseString = getMockMvc().perform(
-                get(getApiURL() + "/" + entityID).param("userId", userId).contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + entityID).param("userId", stringUserId).contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        R redoGetResponse =
-            (R) getObjectMapper().readValue(redoGetResponseString, ((R) firstCreate.get().data()).getClass());
+        R redoGetResponse = (R) getObjectMapper().readValue(redoGetResponseString, ((R) firstCreate.data()).getClass());
 
-        assertEquals(expectChangedUpdatedTime((R) firstCreate.get().data(), redoGetResponse.updated().orElseThrow(
+        assertEquals(expectChangedUpdatedTime((R) firstCreate.data(), redoGetResponse.updated().orElseThrow(
                 () -> new IllegalStateException("Newly created entity should not have `updated` " + "empty."))),
-            getObjectMapper().readValue(redoGetResponseString, firstCreate.get().data().getClass()));
+            getObjectMapper().readValue(redoGetResponseString, firstCreate.data().getClass()));
     }
 }

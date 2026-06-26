@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -123,10 +124,11 @@ public class TermCommandService
         return aclService.canDeleteOntology(userId, id);
     }
 
-    public Set<HttpCommandResponse> deleteByOntologyId(long userId, long ontologyId, LocalDateTime now) {
+    public Set<HttpCommandResponse> deleteByOntologyId(long userId, long ontologyId, LocalDateTime now,
+        UUID parentCommandId) {
         Set<Long> allIdsByOntologyId = termRepository.findAllIdsByOntologyId(ontologyId);
         return allIdsByOntologyId
-            .stream().map(termId -> delete(userId, termId, now))
+            .stream().map(termId -> delete(userId, termId, now, Optional.of(parentCommandId)))
             .flatMap(Optional::stream)
             .collect(Collectors.toSet());
     }

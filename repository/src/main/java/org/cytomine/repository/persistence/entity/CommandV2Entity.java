@@ -27,6 +27,9 @@ public class CommandV2Entity {
     private UUID id;
 
     @Column
+    private UUID parentCommandId;
+
+    @Column
     private LocalDateTime created;
 
     @Column

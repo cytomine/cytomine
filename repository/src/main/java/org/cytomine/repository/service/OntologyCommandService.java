@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -117,7 +118,7 @@ public class OntologyCommandService implements
     }
 
     @Override
-    public Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now) {
-        return termCommandService.deleteByOntologyId(userId, id, now);
+    public Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now, UUID commandId) {
+        return termCommandService.deleteByOntologyId(userId, id, now,commandId);
     }
 }

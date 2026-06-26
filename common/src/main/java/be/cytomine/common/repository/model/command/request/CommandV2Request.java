@@ -1,5 +1,8 @@
 package be.cytomine.common.repository.model.command.request;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

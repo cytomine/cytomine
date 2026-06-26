@@ -23,6 +23,7 @@ import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.CropOffset;
 import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
+import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
@@ -33,7 +34,6 @@ import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.annotation.AnnotationLayerService;
 import be.cytomine.service.annotation.AnnotationService;
-import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
@@ -320,7 +320,7 @@ public class TaskRunServiceTest {
 
         JsonNode json = objectMapper.readTree("""
             {
-                "parameterName": "myParam",
+                "parameterName": "test-parameter",
                 "type": {
                     "id": "array",
                     "subType": { "id": "geometry" }
@@ -358,7 +358,7 @@ public class TaskRunServiceTest {
             .thenReturn("{\"index\":0}")
             .thenReturn("{\"index\":1}");
 
-        String result = taskRunService.provisionTaskRun(json, projectId, taskRunId, "myParam");
+        String result = taskRunService.provisionTaskRun(json, projectId, taskRunId, "test-parameter");
 
         verify(appEngineService, times(2)).putWithParams(any(), any(), any(), any());
         JsonNode resultNode = objectMapper.readTree(result);

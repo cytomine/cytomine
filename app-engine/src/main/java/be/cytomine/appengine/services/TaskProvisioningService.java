@@ -1113,7 +1113,7 @@ public class TaskProvisioningService {
             if (parameter.getType() instanceof CollectionType) {
                 // if referenced, fetch the paths from the database
                 CollectionPersistence collectionPersistence = collectionPersistenceRepository
-                    .findCollectionPersistenceByParameterNameAndRunId(parameter.getName(),run.getId());
+                    .findCollectionPersistenceByParameterNameAndRunId(parameter.getName(), run.getId());
                 if (collectionPersistence.isReferenced()) {
                     CollectionSymlink collectionSymlink = new CollectionSymlink();
                     collectionSymlink.setParameterName(parameter.getName());

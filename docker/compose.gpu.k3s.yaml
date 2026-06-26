@@ -1,5 +1,7 @@
 services:
   k3s:
+    cgroup: host
+    entrypoint: /entrypoint.sh
     environment:
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: all
@@ -33,3 +35,4 @@ services:
       # k3s config
       - ./k3s/nvidia-device-plugin.yaml:/var/lib/rancher/k3s/server/manifests/nvidia-device-plugin.yaml:ro
       - ./k3s/config.toml.tmpl:/var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl:ro
+      - ./k3s/entrypoint.sh:/entrypoint.sh:ro

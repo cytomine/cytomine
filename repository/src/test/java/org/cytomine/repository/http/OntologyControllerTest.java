@@ -6,10 +6,12 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,10 @@ import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
@@ -43,15 +48,35 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     @Autowired
     TermRepository termRepository;
 
+    @Autowired
+    TermMapper termMapper;
+
     String apiURL = OntologyHttpContract.ROOT_PATH;
     CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());
     UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID().toString()));
+    Set<TermResponse> subEntities;
 
     @Override
     public void createSubEntities(long userId, long currentId) {
-        termRepository.save(
+        TermEntity subEntity = termRepository.save(
             new TermEntity(null, 0, currentId, UUID.randomUUID().toString(), UUID.randomUUID().toString(),
                 Timestamp.from(Instant.now()), null, null, "", Set.of()));
+        subEntities = Set.of(termMapper.mapToTermResponse(subEntity));
+    }
+
+
+    @Override
+    public HttpCommandResponse fillSubEntities(HttpCommandResponse createResponse) {
+        return new HttpCommandResponse(createResponse.printMessage(), createResponse.data(), createResponse.commandId()
+            , createResponse.command(), subEntities.stream().map(se -> new HttpCommandResponse(true, se,
+            UUID.randomUUID(), "", Set.of())).collect(Collectors.toSet()));
+    }
+
+
+    @Override
+    public Set<ApplyCommandResponse> expectDeletedSubEntities(LocalDateTime deletionTime) {
+        return subEntities.stream().map(e -> termMapper.updateDeleteTime(e, Optional.of(deletionTime)))
+            .collect(Collectors.toSet());
     }
 
     @Override

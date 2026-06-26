@@ -123,8 +123,10 @@ public class TermCommandService
         return aclService.canDeleteOntology(userId, id);
     }
 
-    public Set<HttpCommandResponse> deleteByOntologyId(long userId, long ontologyId, LocalDateTime now){
-        return termRepository.findAllIdsByOntologyId(ontologyId).stream().map(termId -> delete(userId,termId,now))
+    public Set<HttpCommandResponse> deleteByOntologyId(long userId, long ontologyId, LocalDateTime now) {
+        Set<Long> allIdsByOntologyId = termRepository.findAllIdsByOntologyId(ontologyId);
+        return allIdsByOntologyId
+            .stream().map(termId -> delete(userId, termId, now))
             .flatMap(Optional::stream)
             .collect(Collectors.toSet());
     }

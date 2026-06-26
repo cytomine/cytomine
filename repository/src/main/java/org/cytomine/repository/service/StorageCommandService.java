@@ -32,6 +32,7 @@ public class StorageCommandService
     private final ACLService aclService;
     private final CommandMapper commandMapper;
     private final CommandV2Repository commandV2Repository;
+    private final ApplyCommandService applyCommandService;
     private final StorageMapper storageMapper;
     private final StorageRepository storageRepository;
 

@@ -110,8 +110,10 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
                 Set.of()));
     }
 
-    default Optional<HttpCommandResponse> logicalDelete(UUID commandId, long id, String command, LocalDateTime now) {
+    default Optional<HttpCommandResponse> logicalDelete(long userId, UUID commandId, long id, String command,
+        LocalDateTime now) {
         return get(id).map(entity -> {
+            deleteSubEntities(userId, id, now, commandId);
             entity.setDeleted(Timestamp.valueOf(now));
             return saveAndBuildResponse(entity, command, commandId);
         });
@@ -121,8 +123,8 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         LocalDateTime now) {
         if (canWriteAclId(userId, aclId)) {
 
-            getCommandV2Repository().findByParentId(commandId).forEach(
-                command -> getApplyCommandService().redoCommand()
+            getCommandV2Repository().findByParentCommandId(commandId).forEach(
+                commandV2Entity -> getApplyCommandService().redoCommand(userId, commandV2Entity.getId(), now)
             );
 
             return get(id).map(entity -> {
@@ -171,7 +173,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         if (!canDeleteAclId(userId, deleteCommand.aclId())) {
             return Optional.empty();
         }
-        return logicalDelete(commandId, deleteCommand.id(), deleteCommand.getCommand(), now);
+        return logicalDelete(userId, commandId, deleteCommand.id(), deleteCommand.getCommand(), now);
     }
 
     default Optional<HttpCommandResponse> undoCreate(UUID commandId, CreateCommandRequest<P> createCommand, long userId,
@@ -179,7 +181,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         if (!canWriteAclId(userId, createCommand.aclId())) {
             return Optional.empty();
         }
-        return logicalDelete(commandId, createCommand.id(), createCommand.getCommand(), now);
+        return logicalDelete(userId, commandId, createCommand.id(), createCommand.getCommand(), now);
     }
 
     default Optional<HttpCommandResponse> redoCreate(UUID commandId, CreateCommandRequest<P> createCommand, long userId,

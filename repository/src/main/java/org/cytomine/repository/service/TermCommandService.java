@@ -39,6 +39,7 @@ public class TermCommandService
     private final TermRelationRepository termRelationRepository;
     private final TermMapper termMapper;
     private final CommandV2Repository commandV2Repository;
+    private final ApplyCommandService applyCommandService;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
 

@@ -11,6 +11,6 @@ public interface CommandV2Repository extends JpaRepository<CommandV2Entity, UUID
 
     Optional<CommandV2Entity> findById(UUID id);
 
-    Set<CommandV2Entity> findByParentId(UUID id);
+    Set<CommandV2Entity> findByParentCommandId(UUID id);
 
 }

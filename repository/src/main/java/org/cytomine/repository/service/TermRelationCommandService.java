@@ -37,6 +37,7 @@ public class TermRelationCommandService implements
     private final RelationRepository relationRepository;
     private final TermRelationMapper termRelationMapper;
     private final CommandV2Repository commandV2Repository;
+    private final ApplyCommandService applyCommandService;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
 

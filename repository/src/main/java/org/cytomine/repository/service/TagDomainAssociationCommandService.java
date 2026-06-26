@@ -33,6 +33,7 @@ public class TagDomainAssociationCommandService implements
     private final TagDomainAssociationRepository tagDomainAssociationRepository;
     private final TagDomainAssociationMapper tagDomainAssociationMapper;
     private final CommandV2Repository commandV2Repository;
+    private final ApplyCommandService applyCommandService;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
 

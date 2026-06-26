@@ -16,6 +16,7 @@ import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.TermEntity;
+import org.cytomine.repository.service.ApplyCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -54,6 +55,10 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
 
     @Autowired
     BaseMapper baseMapper;
+
+    @Autowired
+    ApplyCommandService applyCommandService;
+
 
     String apiURL = OntologyHttpContract.ROOT_PATH;
     CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());

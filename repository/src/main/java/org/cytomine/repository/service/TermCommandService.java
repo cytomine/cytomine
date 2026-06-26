@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -30,7 +32,7 @@ import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
 public class TermCommandService
     implements CRUDCommandService<CreateTerm, UpdateTerm, TermCommandPayload, TermEntity, TermResponse> {
@@ -39,7 +41,8 @@ public class TermCommandService
     private final TermRelationRepository termRelationRepository;
     private final TermMapper termMapper;
     private final CommandV2Repository commandV2Repository;
-    private final ApplyCommandService applyCommandService;
+    @Setter
+    private ApplyCommandService applyCommandService;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
 

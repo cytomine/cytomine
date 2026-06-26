@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -41,7 +42,9 @@ public class OntologyCommandService implements
     private final UserRepository userRepository;
     private final CommandMapper commandMapper;
     private final TermCommandService termCommandService;
-    private final ApplyCommandService applyCommandService;
+
+    @Setter
+    private  ApplyCommandService applyCommandService;
 
     @Override
     public OntologyEntity save(OntologyEntity entity) {

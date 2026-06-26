@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.UploadedFileMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -42,7 +43,8 @@ public class UploadedFileCommandService
     private final CommandV2Repository commandV2Repository;
     private final UploadedFileMapper uploadedFileMapper;
     private final UploadedFileRepository uploadedFileRepository;
-    private final ApplyCommandService applyCommandService;
+    @Setter
+     private  ApplyCommandService applyCommandService;
 
     @Override
     public UploadedFileEntity save(UploadedFileEntity entity) {

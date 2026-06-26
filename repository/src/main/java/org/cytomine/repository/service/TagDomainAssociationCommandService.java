@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.TagDomainAssociationMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -33,7 +34,8 @@ public class TagDomainAssociationCommandService implements
     private final TagDomainAssociationRepository tagDomainAssociationRepository;
     private final TagDomainAssociationMapper tagDomainAssociationMapper;
     private final CommandV2Repository commandV2Repository;
-    private final ApplyCommandService applyCommandService;
+    @Setter
+     private  ApplyCommandService applyCommandService;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
 

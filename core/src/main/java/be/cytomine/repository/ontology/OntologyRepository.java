@@ -38,6 +38,6 @@ public interface OntologyRepository extends JpaRepository<Ontology, Long>, JpaSp
     List<Ontology> findAllByUser(User user);
 
     @Query("SELECT DISTINCT o FROM Ontology o LEFT JOIN FETCH o.terms t "
-        + "WHERE o.id = :id AND (t IS NULL OR t.deleted IS NULL)")
+               + "WHERE o.id = :id AND (t IS NULL OR t.deleted IS NULL)")
     Optional<Ontology> findByIdWithTerms(@Param("id") Long id);
 }

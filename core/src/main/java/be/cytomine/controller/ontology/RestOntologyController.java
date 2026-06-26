@@ -8,12 +8,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,9 +19,6 @@ import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.dto.ontology.OntologyExport;
 import be.cytomine.service.ontology.OntologyService;
-import be.cytomine.service.utils.TaskService;
-import be.cytomine.utils.JsonObject;
-import be.cytomine.utils.Task;
 
 @RestController
 @RequestMapping("/api")
@@ -35,8 +28,6 @@ public class RestOntologyController extends RestCytomineController {
 
     private final OntologyService ontologyService;
 
-    private final TaskService taskService;
-
     /**
      * List all ontology visible for the current user For each ontology, print the terms tree
      */
@@ -45,33 +36,6 @@ public class RestOntologyController extends RestCytomineController {
         log.debug("REST request to list ontologies");
         boolean light = allParams.containsKey("light") && Boolean.parseBoolean(allParams.get("light"));
         return responseSuccess(light ? ontologyService.listLight() : ontologyService.list());
-    }
-
-    @GetMapping("/ontology/{id}.json")
-    public ResponseEntity<String> show(@PathVariable Long id) {
-        log.debug("REST request to get Ontology : {}", id);
-        return ontologyService.find(id)
-            .map(this::responseSuccess)
-            .orElseGet(() -> responseNotFound("Ontology", id));
-    }
-
-    @PostMapping("/ontology.json")
-    public ResponseEntity<String> add(@RequestBody String json) {
-        log.debug("REST request to save Ontology : " + json);
-        return add(ontologyService, json);
-    }
-
-    @PutMapping("/ontology/{id}.json")
-    public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json) {
-        log.debug("REST request to edit Ontology : " + id);
-        return update(ontologyService, json);
-    }
-
-    @DeleteMapping("/ontology/{id}.json")
-    public ResponseEntity<String> delete(@PathVariable String id, @RequestParam(required = false) Long task) {
-        log.debug("REST request to delete Ontology : " + id);
-        Task existingTask = taskService.get(task);
-        return delete(ontologyService, JsonObject.of("id", id), existingTask);
     }
 
     @GetMapping(value = "/ontology/{id}/export", produces = MediaType.APPLICATION_JSON_VALUE)

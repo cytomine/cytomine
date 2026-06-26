@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +18,6 @@ import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.AddCommand;
-import be.cytomine.domain.command.Command;
-import be.cytomine.domain.command.DeleteCommand;
-import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
@@ -43,9 +38,7 @@ import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
 
-import static org.springframework.security.acls.domain.BasePermission.DELETE;
 import static org.springframework.security.acls.domain.BasePermission.READ;
-import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -61,10 +54,6 @@ public class OntologyService extends ModelService {
     private final TermHttpContract termHttpContract;
     private final TermRelationHttpContract termRelationHttpContract;
     private final UserRepository userRepository;
-
-    public Ontology get(Long id) {
-        return find(id).orElse(null);
-    }
 
     public Optional<Ontology> find(Long id) {
         Optional<Ontology> optionalOntology = ontologyRepository.findByIdAndDeletedNull(id);
@@ -89,44 +78,6 @@ public class OntologyService extends ModelService {
             data.add(JsonObject.of("id", ontology.getId(), "name", ontology.getName()));
         }
         return data;
-    }
-
-    @Override
-    public CommandResponse add(JsonObject jsonObject) {
-        User currentUser = currentUserService.getCurrentUser();
-        securityACLService.checkUser(currentUser);
-        jsonObject.put("user", currentUser.getId());
-        return executeCommand(new AddCommand(currentUser), null, jsonObject);
-    }
-
-    @Override
-    public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
-        securityACLService.check(domain, WRITE);
-        securityACLService.checkUser(currentUser);
-        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
-    }
-
-    @Override
-    public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
-        securityACLService.check(domain, DELETE);
-        securityACLService.checkUser(currentUser);
-
-        Long ontologyId = domain.getId();
-        Set<Long> allTermRelationIdsByOntology = termRelationHttpContract.findAllIdsByOntologyId(ontologyId,
-            currentUser.getId());
-        if (!allTermRelationIdsByOntology.isEmpty()) {
-            termRelationHttpContract.deleteAll(allTermRelationIdsByOntology, currentUser.getId());
-        }
-
-        Set<Long> allTermIdsByOntology = termHttpContract.findAllTermIdsByOntology(ontologyId, currentUser.getId());
-        if (!allTermIdsByOntology.isEmpty()) {
-            termHttpContract.deleteAll(allTermIdsByOntology, currentUser.getId());
-        }
-
-        Command c = new DeleteCommand(currentUser, transaction);
-        return executeCommand(c, domain, null);
     }
 
     @Override

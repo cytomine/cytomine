@@ -1,6 +1,6 @@
 package org.cytomine.repository.persistence.entity;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,21 +8,26 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
+import lombok.Setter;
+
+import be.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "relation")
 @Getter
-public class RelationEntity {
+@Setter
+public class RelationEntity implements HasTimestampCUD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column
     private long version;
     @Column
-    private Date created;
+    private Timestamp created;
     @Column
-    private Date deleted;
+    private Timestamp updated;
+    @Column
+    private Timestamp deleted;
     @Column
     private String name;
-    @Column
-    private Date updated;
+
 }

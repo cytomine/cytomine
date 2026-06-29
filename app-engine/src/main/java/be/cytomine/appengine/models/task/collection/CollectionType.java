@@ -205,10 +205,7 @@ public class CollectionType extends Type {
     }
 
     @Override
-    public void validateFiles(
-        Run run,
-        Parameter currentOutput,
-        StorageData currentOutputStorageData)
+    public void validateFiles(Run run, Parameter currentOutput, StorageData currentOutputStorageData)
         throws TypeValidationException {
         // make sure we have the right file structure
         Type currentType = new CollectionType(this);
@@ -283,6 +280,7 @@ public class CollectionType extends Type {
             if (arrayYmlFound == 0) {
                 throw new TypeValidationException(ErrorCode.INTERNAL_MISSING_METADATA);
             }
+            collection.removeIf(item -> ((Map<?, ?>) item).containsKey("array.yml"));
         }
 
         validate(lists.get(currentOutput.getName()));
@@ -305,6 +303,7 @@ public class CollectionType extends Type {
         );
 
         if (!excludedTypes.contains(valueObject.getClass())) {
+
             throw new TypeValidationException(ErrorCode.INTERNAL_WRONG_PROVISION_STRUCTURE);
         }
 
@@ -327,11 +326,17 @@ public class CollectionType extends Type {
                 try {
                     JsonNode rootNode = objectMapper.readTree(stringValueObject);
                     if (rootNode.has("type")) {
-                        validateGeoJsonCollection(stringValueObject);
+                        String geoType = rootNode.get("type").asText();
+                        if (geoType.equals("FeatureCollection") || geoType.equals("GeometryCollection")) {
+                            validateGeoJsonCollection(stringValueObject);
+                        } else {
+                            validatePrimitiveCollectionItem(stringValueObject);
+                        }
                     } else {
                         validatePrimitiveCollectionItem(stringValueObject);
                     }
                 } catch (JsonProcessingException e) {
+
                     throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_FEATURE_COLLECTION);
                 }
 
@@ -351,8 +356,7 @@ public class CollectionType extends Type {
         }
     }
 
-    private void validateGeoJsonCollection(String valueObject)
-        throws TypeValidationException {
+    private void validateGeoJsonCollection(String valueObject) throws TypeValidationException {
         GeometryType geometryType = new GeometryType();
         try {
             validateFeatureCollection(valueObject, geometryType);
@@ -435,9 +439,13 @@ public class CollectionType extends Type {
         for (int i = 0; i < indexes.length; i++) {
             if (currentType instanceof CollectionType) {
                 if (i == 0) { // first item which is the parameter
-                    persistedProvision =
-                        collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                            indexes[i], runId, ParameterType.INPUT);
+                    persistedProvision = collectionRepo
+                        .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                            indexes[i],
+                            runId,
+                            ParameterType.INPUT
+                        )
+                        .orElse(null);
                     if (Objects.isNull(persistedProvision)) {
                         persistedProvision = new CollectionPersistence();
                         persistedProvision.setRunId(runId);
@@ -722,9 +730,13 @@ public class CollectionType extends Type {
         CollectionPersistenceRepository collectionRepo =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
         if (node.isArray()) {
-            CollectionPersistence persistedProvision =
-                collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                parameterName, runId, ParameterType.INPUT);
+            CollectionPersistence persistedProvision = collectionRepo
+                .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                    parameterName,
+                    runId,
+                    ParameterType.INPUT
+                )
+                .orElse(null);
             if (persistedProvision == null) {
                 persistedProvision = new CollectionPersistence();
                 persistedProvision.setValueType(ValueType.ARRAY);
@@ -781,9 +793,12 @@ public class CollectionType extends Type {
             if (node.has("type")
                 && (node.get("type").asText().equals("GeometryCollection")
                 || node.get("type").asText().equals("FeatureCollection"))) {
-                CollectionPersistence persistedProvision =
-                    collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                    parameterName, runId, ParameterType.INPUT);
+                CollectionPersistence persistedProvision = collectionRepo
+                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                        parameterName,
+                        runId,
+                        ParameterType.INPUT
+                    ).orElse(null);
                 if (persistedProvision == null) {
                     persistedProvision = new CollectionPersistence();
                     persistedProvision.setValueType(ValueType.ARRAY);
@@ -1193,6 +1208,9 @@ public class CollectionType extends Type {
             }
         }
 
+        if (root.getSize() == null || root.getSize() == 0) {
+            root.setSize(root.getItems().size());
+        }
         collectionPersistenceRepository.save(root);
     }
 

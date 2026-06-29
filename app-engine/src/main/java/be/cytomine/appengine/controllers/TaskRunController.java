@@ -150,7 +150,13 @@ public class TaskRunController {
         @RequestParam String value,
         @RequestBody JsonNode provision
     ) throws ProvisioningException, TypeValidationException {
-        log.info("/task-runs/{run_id}/input-provisions/{param_name} JSON PUT");
+        log.info(
+            "PUT /task-runs/{}/input-provisions/{} - value={}, provision={}",
+            runId,
+            parameterName,
+            value,
+            provision
+        );
         String regex = "^(0(/[0-9]+)*|[1-9][0-9]*(/[0-9]+)*)$";
         boolean isValid = Pattern.matches(regex, value);
         if (!isValid) {
@@ -273,7 +279,7 @@ public class TaskRunController {
         @RequestParam("value") String value,
         HttpServletRequest request
     ) throws ProvisioningException, TypeValidationException, IOException {
-        log.info("/task-runs/{run_id}/input-provisions/{param_name} Binary POST");
+        log.info("POST /task-runs/{}/input-provisions/{} - value={}", runId, parameterName, value);
         String regex = "^(0(/[0-9]+)*|[1-9][0-9]*(/[0-9]+)*)$";
         boolean isValid = Pattern.matches(regex, value);
         if (!isValid) {

@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -30,8 +30,8 @@ public class StatsController implements StatsHttpContract {
     @GetMapping("/project/{projectId}")
     public Page<StatTerm> findTermsByProject(@PathVariable long projectId,
         @RequestParam long userId,
-        @RequestParam(required = false) Optional<LocalDateTime> startDate,
-        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        @RequestParam(required = false) Optional<Instant> startDate,
+        @RequestParam(required = false) Optional<Instant> endDate,
         Pageable pageable) {
         return termRepository.findAllByProjectForStats(projectId,
             startDate.orElse(null),
@@ -50,8 +50,8 @@ public class StatsController implements StatsHttpContract {
     @Override
     @GetMapping("/per-term-and-image/project/{projectId}")
     public Page<StatPerTermAndImage> findPerTermAndImageByProject(@PathVariable long projectId,
-        @RequestParam(required = false) Optional<LocalDateTime> startDate,
-        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        @RequestParam(required = false) Optional<Instant> startDate,
+        @RequestParam(required = false) Optional<Instant> endDate,
         Pageable pageable) {
         return termRepository.findAllPerTermAndImageByProjectForStats(projectId,
             startDate.orElse(null),

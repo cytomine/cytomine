@@ -1,7 +1,7 @@
 package org.cytomine.repository.persistence.entity;
 
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -27,10 +27,10 @@ public class CommandV2Entity {
     private UUID id;
 
     @Column
-    private LocalDateTime created;
+    private Instant created;
 
     @Column
-    private LocalDateTime updated;
+    private Instant updated;
 
     @Column(columnDefinition = "jsonb")
     @JdbcTypeCode(SqlTypes.JSON)

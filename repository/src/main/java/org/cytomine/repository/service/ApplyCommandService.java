@@ -1,6 +1,6 @@
 package org.cytomine.repository.service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,7 +41,7 @@ public class ApplyCommandService {
     private final UploadedFileCommandService uploadedFileCommandService;
 
     @Transactional
-    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
+    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, Instant now) {
         return commandRepository.findById(undoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
             case DeleteTermCommand dtc -> termCommandService.undoDelete(commandEntity.getId(), dtc, userId, now);
             case CreateTermCommand icr -> termCommandService.undoCreate(commandEntity.getId(), icr, userId, now);
@@ -76,7 +76,7 @@ public class ApplyCommandService {
         });
     }
 
-    public Optional<HttpCommandResponse> redoCommand(long userId, UUID redoCommand, LocalDateTime now) {
+    public Optional<HttpCommandResponse> redoCommand(long userId, UUID redoCommand, Instant now) {
         return commandRepository.findById(redoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
             case DeleteTermCommand dtc -> termCommandService.redoDelete(commandEntity.getId(), dtc, userId, now);
             case CreateTermCommand icr -> termCommandService.redoCreate(commandEntity.getId(), icr, userId, now);

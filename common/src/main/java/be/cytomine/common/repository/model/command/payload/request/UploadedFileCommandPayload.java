@@ -1,6 +1,6 @@
 package be.cytomine.common.repository.model.command.payload.request;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,9 +18,9 @@ public record UploadedFileCommandPayload(
     Long size,
     int status,
     Set<Long> projects,
-    LocalDateTime created,
-    Optional<LocalDateTime> updated,
-    Optional<LocalDateTime> deleted
+    Instant created,
+    Optional<Instant> updated,
+    Optional<Instant> deleted
 ) implements HasLongId, HasAclId {
     @Override
     public long aclId() {

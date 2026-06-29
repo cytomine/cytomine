@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,6 @@ import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFi
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 
 import static be.cytomine.common.repository.http.UploadedFileHttpContract.ROOT_PATH;
-import static java.time.temporal.ChronoUnit.MICROS;
 
 @RestController
 @RequestMapping(ROOT_PATH)
@@ -40,17 +39,17 @@ public class UploadedFileController implements UploadedFileHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> create(long userId, CreateUploadedFile payload) {
-        return service.create(userId, payload, LocalDateTime.now().truncatedTo(MICROS));
+        return service.create(userId, payload, Instant.now());
     }
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateUploadedFile payload) {
-        return service.update(userId, id, payload, LocalDateTime.now().truncatedTo(MICROS));
+        return service.update(userId, id, payload, Instant.now());
     }
 
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+        return service.delete(userId, id, Instant.now());
     }
 
     @Override

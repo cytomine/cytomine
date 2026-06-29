@@ -1,6 +1,6 @@
 package org.cytomine.repository.persistence;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -55,11 +55,12 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
             GROUP BY at.term_id
         ) AS _count
         """, nativeQuery = true)
-    Page<StatTermProjection> findAllByProjectForStats(long projectId,
-        LocalDateTime startDate,
-        LocalDateTime endDate,
-        Pageable pageable);
-
+    Page<StatTermProjection> findAllByProjectForStats(
+        long projectId,
+        Instant startDate,
+        Instant endDate,
+        Pageable pageable
+    );
 
     @Query(value = """
         SELECT u.userId AS userId, u.username AS key, t.userId AS termId, t.name AS termName,
@@ -110,10 +111,12 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
             GROUP BY ua.image_id, at.term_id
         ) AS _count
         """, nativeQuery = true)
-    Page<StatPerTermAndImageProjection> findAllPerTermAndImageByProjectForStats(long projectId,
-        LocalDateTime startDate,
-        LocalDateTime endDate,
-        Pageable pageable);
+    Page<StatPerTermAndImageProjection> findAllPerTermAndImageByProjectForStats(
+        long projectId,
+        Instant startDate,
+        Instant endDate,
+        Pageable pageable
+    );
 
     Optional<TermEntity> findByIdAndDeletedNull(long id);
 }

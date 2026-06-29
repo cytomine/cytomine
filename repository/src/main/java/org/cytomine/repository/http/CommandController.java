@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,13 +33,13 @@ public class CommandController implements CommandHttpContract {
     @Override
     @PostMapping("/undo/{commandId}")
     public Optional<HttpCommandResponse> undo(UUID commandId, long userId) {
-        return applyCommandService.undoCommand(userId, commandId, LocalDateTime.now());
+        return applyCommandService.undoCommand(userId, commandId, Instant.now());
     }
 
     @Override
     @PostMapping("/redo/{commandId}")
     public Optional<HttpCommandResponse> redo(UUID commandId, long userId) {
-        return applyCommandService.redoCommand(userId, commandId, LocalDateTime.now());
+        return applyCommandService.redoCommand(userId, commandId, Instant.now());
     }
 
     @Override

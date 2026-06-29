@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -24,7 +24,6 @@ import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelati
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 import static be.cytomine.common.repository.http.TermRelationHttpContract.ROOT_PATH;
-import static java.time.temporal.ChronoUnit.MICROS;
 import static java.util.stream.Collectors.toSet;
 
 @RequiredArgsConstructor
@@ -78,38 +77,35 @@ public class TermRelationController implements TermRelationHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> create(long userId, CreateTermRelation createTermRelation) {
-        return termRelationCommandService.create(userId, createTermRelation, LocalDateTime.now().truncatedTo(MICROS));
+        return termRelationCommandService.create(userId, createTermRelation, Instant.now());
     }
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateTermRelation updateTermRelation) {
-        return termRelationCommandService.update(userId,
-            id,
-            updateTermRelation,
-            LocalDateTime.now().truncatedTo(MICROS));
+        return termRelationCommandService.update(userId, id, updateTermRelation, Instant.now());
     }
 
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return termRelationCommandService.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+        return termRelationCommandService.delete(userId, id, Instant.now());
     }
 
     @Override
     public Set<HttpCommandResponse> deleteAll(Set<Long> ids, long userId) {
         return ids.stream()
-            .map(id -> termRelationCommandService.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS)))
+            .map(id -> termRelationCommandService.delete(userId, id, Instant.now()))
             .flatMap(Optional::stream)
             .collect(toSet());
     }
 
     @Override
-    public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1,
+    public Optional<HttpCommandResponse> deleteByTerms(
+        @PathVariable long idTerm1,
         @PathVariable long idTerm2,
-        @RequestParam long userId) {
+        @RequestParam long userId
+    ) {
         long parentRelationId = relationRepository.findParent().getId();
         return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2)
-            .flatMap(entity -> termRelationCommandService.delete(userId,
-                entity.getId(),
-                LocalDateTime.now().truncatedTo(MICROS)));
+            .flatMap(entity -> termRelationCommandService.delete(userId, entity.getId(), Instant.now()));
     }
 }

@@ -18,10 +18,12 @@ import be.cytomine.common.repository.model.command.request.DeleteOntologyCommand
 import be.cytomine.common.repository.model.command.request.DeleteStorageCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.UndoCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.UpdateStorageCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
+import be.cytomine.common.repository.model.storage.payload.CreateStorage;
 
 @Component
 @AllArgsConstructor
@@ -53,29 +55,19 @@ public class ApplyCommandService {
             case CreateStorageCommand csc -> storageCommandService.undoCreate(commandEntity.getId(), csc, userId, now);
             case UpdateStorageCommand usc -> storageCommandService.undoUpdate(commandEntity.getId(), usc, userId, now);
             case DeleteStorageCommand dsc -> storageCommandService.undoDelete(commandEntity.getId(), dsc, userId, now);
-        });
-    }
 
-    public Optional<HttpCommandResponse> redoCommand(long userId, UUID redoCommand, LocalDateTime now) {
-        return commandRepository.findById(redoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
-            case DeleteTermCommand dtc -> termCommandService.redoDelete(commandEntity.getId(), dtc, userId, now);
-            case CreateTermCommand icr -> termCommandService.redoCreate(commandEntity.getId(), icr, userId, now);
-            case UpdateTermCommand ucr -> termCommandService.redoUpdate(commandEntity.getId(), ucr, userId, now);
-            case DeleteTermRelationCommand ucr ->
-                termRelationCommandService.redoDelete(commandEntity.getId(), ucr, userId, now);
-            case CreateTermRelationCommand ctrc ->
-                termRelationCommandService.redoCreate(commandEntity.getId(), ctrc, userId, now);
-            case UpdateTermRelationCommand utrc ->
-                termRelationCommandService.redoUpdate(commandEntity.getId(), utrc, userId, now);
-            case CreateOntologyCommand createOntologyCommand ->
-                ontologyCommandService.redoCreate(commandEntity.getId(), createOntologyCommand, userId, now);
-            case DeleteOntologyCommand deleteOntologyCommand ->
-                ontologyCommandService.redoDelete(commandEntity.getId(), deleteOntologyCommand, userId, now);
-            case UpdateOntologyCommand updateOntologyCommand ->
-                ontologyCommandService.redoUpdate(commandEntity.getId(), updateOntologyCommand, userId, now);
-            case CreateStorageCommand csc -> storageCommandService.redoCreate(commandEntity.getId(), csc, userId, now);
-            case UpdateStorageCommand usc -> storageCommandService.redoUpdate(commandEntity.getId(), usc, userId, now);
-            case DeleteStorageCommand dsc -> storageCommandService.redoDelete(commandEntity.getId(), dsc, userId, now);
+            // Actually we undo an undo command here
+            case UndoCommandRequest<?> v -> switch (v.command()) {
+                case DeleteStorageCommand dsc ->
+                    storageCommandService.create(userId, new CreateStorage(dsc.before().name()), now);
+                case CreateTermCommand ctc -> termCommandService.delete(userId, ctc.id(), now);
+                case DeleteTermCommand dtc ->
+                    termCommandService.restore(v.commandId(), userId, dtc.id(), dtc.aclId(), dtc.getCommand(), now);
+                case UpdateTermCommand updateTermCommand ->
+                    termCommandService.updateWithExistingCommand(userId, v.commandId(), updateTermCommand.getCommand(),
+                        updateTermCommand.after(), now);
+                default -> null;
+            };
         });
     }
 }

@@ -37,12 +37,6 @@ public class CommandController implements CommandHttpContract {
     }
 
     @Override
-    @PostMapping("/redo/{commandId}")
-    public Optional<HttpCommandResponse> redo(UUID commandId, long userId) {
-        return applyCommandService.redoCommand(userId, commandId, LocalDateTime.now());
-    }
-
-    @Override
     @GetMapping("/{commandId}")
     public Optional<CommandV2Response<?>> get(@PathVariable UUID commandId, @RequestParam long userId) {
         return commandV2Repository.findById(commandId).map(commandMapper::map);

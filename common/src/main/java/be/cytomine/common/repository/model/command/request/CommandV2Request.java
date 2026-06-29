@@ -21,9 +21,12 @@ import be.cytomine.common.repository.model.command.payload.request.UpdateCommand
     @JsonSubTypes.Type(value = DeleteOntologyCommand.class, name = "DELETE_ONTOLOGY_COMMAND"),
     @JsonSubTypes.Type(value = CreateStorageCommand.class, name = "INSERT_STORAGE_COMMAND"),
     @JsonSubTypes.Type(value = UpdateStorageCommand.class, name = "UPDATE_STORAGE_COMMAND"),
-    @JsonSubTypes.Type(value = DeleteStorageCommand.class, name = "DELETE_STORAGE_COMMAND")})
+    @JsonSubTypes.Type(value = DeleteStorageCommand.class, name = "DELETE_STORAGE_COMMAND"),
+    @JsonSubTypes.Type(value = UndoCommandRequest.class, name = "UNDO_COMMAND")
+})
+
 public sealed interface CommandV2Request<T extends HasLongId & HasAclId>
-    permits DeleteCommandRequest, CreateCommandRequest, UpdateCommandRequest {
+    permits DeleteCommandRequest, CreateCommandRequest, UpdateCommandRequest, UndoCommandRequest {
 
     UpdateCommandPayload<T> data();
 

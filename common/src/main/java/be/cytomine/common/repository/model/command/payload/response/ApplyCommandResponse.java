@@ -3,7 +3,7 @@ package be.cytomine.common.repository.model.command.payload.response;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import be.cytomine.common.repository.model.HasLocaleDateTimeCUD;
+import be.cytomine.common.repository.model.HasInstantCUD;
 import be.cytomine.common.repository.model.HasLongId;
 import be.cytomine.common.repository.model.command.DataType;
 
@@ -16,7 +16,7 @@ import be.cytomine.common.repository.model.command.DataType;
     @JsonSubTypes.Type(value = TermRelationResponse.class, name = "TERM_RELATION"),
     @JsonSubTypes.Type(value = UploadedFileResponse.class, name = "UPLOADED_FILE")
 })
-public sealed interface ApplyCommandResponse extends HasLongId, HasLocaleDateTimeCUD
+public sealed interface ApplyCommandResponse extends HasLongId, HasInstantCUD
     permits OntologyResponse, StorageResponse, TagDomainAssociationResponse, TermRelationResponse, TermResponse,
         UploadedFileResponse {
     DataType getDataType();

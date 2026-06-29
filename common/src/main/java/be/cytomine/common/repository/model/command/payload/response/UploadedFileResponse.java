@@ -1,6 +1,6 @@
 package be.cytomine.common.repository.model.command.payload.response;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,9 +19,9 @@ public record UploadedFileResponse(
     String path,
     int status,
     Set<Long> projects,
-    LocalDateTime created,
-    Optional<LocalDateTime> updated,
-    Optional<LocalDateTime> deleted,
+    Instant created,
+    Optional<Instant> updated,
+    Optional<Instant> deleted,
     Optional<String> thumbnailUrl
 ) implements ApplyCommandResponse {
 

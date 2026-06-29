@@ -16,7 +16,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.model.HasLocaleDateTimeCUD;
+import be.cytomine.common.repository.model.HasInstantCUD;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
 @Import(PostGisTestConfiguration.class)
-public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
+public interface CRUDCommandTests<C, R extends HasInstantCUD, U> {
     MockMvc getMockMvc();
 
     ObjectMapper getObjectMapper();

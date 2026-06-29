@@ -1,8 +1,6 @@
 package be.cytomine.controller.stats;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 
@@ -85,12 +83,11 @@ public class RestStatsController extends RestCytomineController {
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        Optional<LocalDateTime> startLocalDateTime = startDateLong.map(Instant::ofEpochMilli)
-            .map(i -> LocalDateTime.ofInstant(i, ZoneId.systemDefault()));
-        Optional<LocalDateTime> endLocalDateTime = endDateLong.map(Instant::ofEpochMilli)
-            .map(i -> LocalDateTime.ofInstant(i, ZoneId.systemDefault()));
-
-        return responseSuccess(statsService.statTermSlide(project, startLocalDateTime, endLocalDateTime));
+        return responseSuccess(statsService.statTermSlide(
+            project,
+            startDateLong.map(Instant::ofEpochMilli),
+            endDateLong.map(Instant::ofEpochMilli)
+        ));
     }
 
     @GetMapping("/project/{project}/stats/termimage.json")

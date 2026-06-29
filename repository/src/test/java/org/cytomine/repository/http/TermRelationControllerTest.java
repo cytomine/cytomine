@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,7 +71,7 @@ class TermRelationControllerTest
 
     @Override
     public TermRelationResponse expectedUpdatedResponse(TermRelationResponse response, UpdateTermRelation updatePayload,
-        LocalDateTime updatedTime) {
+        Instant updatedTime) {
         return new TermRelationResponse(response.id(), updatePayload.term1Id().orElse(response.term1Id()),
             updatePayload.term2Id().orElse(response.term2Id()),
             updatePayload.relationId().orElse(response.relationId()), Optional.of(updatedTime), response.deleted(),
@@ -79,13 +79,13 @@ class TermRelationControllerTest
     }
 
     @Override
-    public TermRelationResponse expectedDeletedResponse(TermRelationResponse response, LocalDateTime deletedTime) {
+    public TermRelationResponse expectedDeletedResponse(TermRelationResponse response, Instant deletedTime) {
         return new TermRelationResponse(response.id(), response.term1Id(), response.term2Id(), response.relationId(),
             response.updated(), Optional.of(deletedTime), response.created(), response.name());
     }
 
     @Override
-    public TermRelationResponse expectChangedUpdatedTime(TermRelationResponse response, LocalDateTime updatedTime) {
+    public TermRelationResponse expectChangedUpdatedTime(TermRelationResponse response, Instant updatedTime) {
         return new TermRelationResponse(response.id(), response.term1Id(), response.term2Id(), response.relationId(),
             Optional.of(updatedTime), response.deleted(), response.created(), response.name());
     }

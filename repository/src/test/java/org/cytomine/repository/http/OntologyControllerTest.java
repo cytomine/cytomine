@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,19 +41,19 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
 
     @Override
     public OntologyResponse expectedUpdatedResponse(OntologyResponse response, UpdateOntology updatePayload,
-        LocalDateTime updated) {
+        Instant updated) {
         return new OntologyResponse(updatePayload.name().orElse(response.name()), response.id(), response.terms(),
             response.created(), Optional.of(updated), response.deleted(), response.user());
     }
 
     @Override
-    public OntologyResponse expectedDeletedResponse(OntologyResponse response, LocalDateTime deletedTime) {
+    public OntologyResponse expectedDeletedResponse(OntologyResponse response, Instant deletedTime) {
         return new OntologyResponse(response.name(), response.id(), response.terms(), response.created(),
             response.updated(), Optional.of(deletedTime), response.user());
     }
 
     @Override
-    public OntologyResponse expectChangedUpdatedTime(OntologyResponse response, LocalDateTime updatedTime) {
+    public OntologyResponse expectChangedUpdatedTime(OntologyResponse response, Instant updatedTime) {
         return new OntologyResponse(response.name(), response.id(), response.terms(), response.created(),
             Optional.of(updatedTime), response.deleted(), response.user());
     }

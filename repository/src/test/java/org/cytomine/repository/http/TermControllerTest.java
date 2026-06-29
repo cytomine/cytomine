@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,22 +49,21 @@ class TermControllerTest implements CRUDCommandTests<CreateTerm, TermResponse, U
     }
 
     @Override
-    public TermResponse expectedUpdatedResponse(TermResponse response, UpdateTerm updatePayload,
-        LocalDateTime updatedTime) {
+    public TermResponse expectedUpdatedResponse(TermResponse response, UpdateTerm updatePayload, Instant updatedTime) {
         return new TermResponse(response.id(), updatePayload.name().orElse(response.name()),
             updatePayload.color().orElse(response.color()), response.ontologyId(), response.created(),
             Optional.of(updatedTime), response.deleted(), response.comment(), response.children());
     }
 
     @Override
-    public TermResponse expectedDeletedResponse(TermResponse response, LocalDateTime deletedTime) {
+    public TermResponse expectedDeletedResponse(TermResponse response, Instant deletedTime) {
         return new TermResponse(response.id(), response.name(), response.color(), response.ontologyId(),
             response.created(), response.updated(), Optional.of(deletedTime), response.comment(),
             response.children());
     }
 
     @Override
-    public TermResponse expectChangedUpdatedTime(TermResponse response, LocalDateTime updatedTime) {
+    public TermResponse expectChangedUpdatedTime(TermResponse response, Instant updatedTime) {
         return new TermResponse(response.id(), response.name(), response.color(), response.ontologyId(),
             response.created(), Optional.of(updatedTime), response.deleted(), response.comment(),
             response.children());

@@ -16,8 +16,6 @@ package be.cytomine.controller.ontology;
  * limitations under the License.
  */
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -80,7 +78,7 @@ public class RelationTermResourceTests {
             relationTerm.getTerm2().getId(),  relationTerm.getRelation().getId(),
             Optional.empty(),
             Optional.empty(),
-            LocalDateTime.ofInstant(relationTerm.getCreated().toInstant(), ZoneId.systemDefault()),
+            relationTerm.getCreated().toInstant(),
             relationTerm.getRelation().getName()
         );
     }

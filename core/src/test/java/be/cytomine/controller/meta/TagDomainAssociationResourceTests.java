@@ -1,6 +1,6 @@
 package be.cytomine.controller.meta;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -65,7 +65,7 @@ public class TagDomainAssociationResourceTests {
             tda.getTag().getId(),
             tda.getDomainClassName(),
             tda.getDomainIdent(),
-            LocalDateTime.now(),
+            Instant.now(),
             Optional.empty(),
             Optional.empty()
         );

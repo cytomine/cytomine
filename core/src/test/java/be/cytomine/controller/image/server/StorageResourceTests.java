@@ -1,6 +1,6 @@
 package be.cytomine.controller.image.server;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,7 +63,7 @@ public class StorageResourceTests {
             storage.getId(),
             storage.getUser().getId(),
             storage.getName(),
-            LocalDateTime.now(),
+            Instant.now(),
             Optional.empty(),
             Optional.empty()
         );
@@ -132,7 +132,7 @@ public class StorageResourceTests {
                     1L,
                     userId,
                     storage.getName(),
-                    LocalDateTime.now(),
+                    Instant.now(),
                     Optional.empty(),
                     Optional.empty()
                 ),

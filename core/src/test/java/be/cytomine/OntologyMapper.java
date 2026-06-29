@@ -1,5 +1,11 @@
 package be.cytomine;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
+import java.util.Optional;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -11,4 +17,12 @@ public interface OntologyMapper {
 
     @Mapping(target = "user", source = "user.id")
     OntologyResponse map(Ontology ontology);
+
+    default Optional<Instant> map(Date value) {
+        return Optional.ofNullable(value).map(Date::toInstant);
+    }
+
+    default Optional<Instant> map(LocalDateTime value) {
+        return Optional.ofNullable(value).map(ldt -> ldt.toInstant(ZoneOffset.UTC));
+    }
 }

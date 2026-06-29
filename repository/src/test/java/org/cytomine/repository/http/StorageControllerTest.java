@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,7 +40,7 @@ public class StorageControllerTest implements CRUDCommandTests<CreateStorage, St
     public StorageResponse expectedUpdatedResponse(
         StorageResponse response,
         UpdateStorage updatePayload,
-        LocalDateTime updatedTime
+        Instant updatedTime
     ) {
         return new StorageResponse(
             response.id(),
@@ -53,7 +53,7 @@ public class StorageControllerTest implements CRUDCommandTests<CreateStorage, St
     }
 
     @Override
-    public StorageResponse expectedDeletedResponse(StorageResponse response, LocalDateTime deletedTime) {
+    public StorageResponse expectedDeletedResponse(StorageResponse response, Instant deletedTime) {
         return new StorageResponse(
             response.id(),
             response.userId(),
@@ -65,7 +65,7 @@ public class StorageControllerTest implements CRUDCommandTests<CreateStorage, St
     }
 
     @Override
-    public StorageResponse expectChangedUpdatedTime(StorageResponse response, LocalDateTime updatedTime) {
+    public StorageResponse expectChangedUpdatedTime(StorageResponse response, Instant updatedTime) {
         return new StorageResponse(
             response.id(),
             response.userId(),

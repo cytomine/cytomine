@@ -1,6 +1,6 @@
 package be.cytomine.controller.image;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -278,7 +278,7 @@ class UploadedFileResourceTests {
             "/data/file_" + id + ".tif",
             0,
             Set.of(),
-            LocalDateTime.of(2024, 1, 1, 0, 0),
+            Instant.parse("2024-01-01T00:00:00Z"),
             Optional.empty(),
             Optional.empty(),
             Optional.empty()

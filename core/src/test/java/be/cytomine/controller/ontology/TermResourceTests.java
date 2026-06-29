@@ -16,8 +16,6 @@ package be.cytomine.controller.ontology;
  * limitations under the License.
  */
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -82,7 +80,7 @@ public class TermResourceTests {
         Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                term.getCreated().toInstant(), Optional.empty(),
                 Optional.empty(), Optional.ofNullable(term.getComment()), Set.of())));
 
         restTermControllerMockMvc.perform(get("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
@@ -99,7 +97,7 @@ public class TermResourceTests {
         Long wrongUserId = userId + 1;
         when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                term.getCreated().toInstant(), Optional.empty(),
                 Optional.empty(), Optional.ofNullable(term.getComment()), Set.of())));
         when(termHttpContract.findTermByID(eq(term.getId()), eq(wrongUserId))).thenReturn(Optional.empty());
 
@@ -114,7 +112,7 @@ public class TermResourceTests {
         when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId),
             any(Pageable.class))).thenReturn(new PageImpl<>(
             List.of(new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                term.getCreated().toInstant(), Optional.empty(),
                 Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()))));
 
         restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
@@ -144,7 +142,7 @@ public class TermResourceTests {
         when(termHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(Pageable.class))).thenReturn(
             new PageImpl<>(List.of(
                 new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                    LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                    term.getCreated().toInstant(), Optional.empty(),
                     Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()))));
 
         restTermControllerMockMvc.perform(get("/api/project/{id}/term.json", project.getId()))
@@ -174,7 +172,7 @@ public class TermResourceTests {
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                term.getCreated().toInstant(), Optional.empty(),
                 Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.CREATE_TERM)));
 
         String createTermJson =
@@ -212,7 +210,7 @@ public class TermResourceTests {
         when(termHttpContract.update(eq(term.getId()), eq(userId), any())).thenReturn(Optional.of(
             new HttpCommandResponse(true,
                 new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                    LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                    term.getCreated().toInstant(), Optional.empty(),
                     Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId,
                 Commands.UPDATE_TERM)));
 
@@ -248,7 +246,7 @@ public class TermResourceTests {
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.of(new HttpCommandResponse(true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                term.getCreated().toInstant(), Optional.empty(),
                 Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.DELETE_TERM)));
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isOk())

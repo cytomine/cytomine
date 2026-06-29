@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,11 +42,11 @@ public interface CRUDCommandTests<C, R extends HasInstantCUD, U> {
 
     U getUpdatePayload();
 
-    R expectedUpdatedResponse(R response, U updatePayload, LocalDateTime updatedTime);
+    R expectedUpdatedResponse(R response, U updatePayload, Instant updatedTime);
 
-    R expectedDeletedResponse(R response, LocalDateTime deletedTime);
+    R expectedDeletedResponse(R response, Instant deletedTime);
 
-    R expectChangedUpdatedTime(R response, LocalDateTime updatedTime);
+    R expectChangedUpdatedTime(R response, Instant updatedTime);
 
     JdbcTemplate getJdbcTemplate();
 

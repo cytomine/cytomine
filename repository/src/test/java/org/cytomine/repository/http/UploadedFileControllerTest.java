@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -73,7 +73,7 @@ public class UploadedFileControllerTest
     public UploadedFileResponse expectedUpdatedResponse(
         UploadedFileResponse response,
         UpdateUploadedFile updatePayload,
-        LocalDateTime updatedTime
+        Instant updatedTime
     ) {
         String newFilename = updatePayload.filename().orElse(response.filename());
         return new UploadedFileResponse(
@@ -97,7 +97,7 @@ public class UploadedFileControllerTest
     }
 
     @Override
-    public UploadedFileResponse expectedDeletedResponse(UploadedFileResponse response, LocalDateTime deletedTime) {
+    public UploadedFileResponse expectedDeletedResponse(UploadedFileResponse response, Instant deletedTime) {
         return new UploadedFileResponse(
             response.id(),
             response.user(),
@@ -119,7 +119,7 @@ public class UploadedFileControllerTest
     }
 
     @Override
-    public UploadedFileResponse expectChangedUpdatedTime(UploadedFileResponse response, LocalDateTime updatedTime) {
+    public UploadedFileResponse expectChangedUpdatedTime(UploadedFileResponse response, Instant updatedTime) {
         return new UploadedFileResponse(
             response.id(),
             response.user(),

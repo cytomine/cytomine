@@ -20,6 +20,7 @@ import be.cytomine.common.repository.model.storage.payload.CreateStorage;
 import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
 
 import static be.cytomine.common.repository.http.StorageHttpContract.ROOT_PATH;
+import static java.time.temporal.ChronoUnit.MICROS;
 
 @RestController
 @RequestMapping(ROOT_PATH)
@@ -47,16 +48,16 @@ public class StorageController implements StorageHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> create(long userId, CreateStorage payload) {
-        return service.create(userId, payload, Instant.now());
+        return service.create(userId, payload, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateStorage payload) {
-        return service.update(userId, id, payload, Instant.now());
+        return service.update(userId, id, payload, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, Instant.now());
+        return service.delete(userId, id, Instant.now().truncatedTo(MICROS));
     }
 }

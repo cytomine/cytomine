@@ -1,6 +1,6 @@
 package org.cytomine.repository.mapper;
 
-import java.time.Instant;
+import java.sql.Timestamp;
 
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.mapstruct.Mapper;
@@ -14,7 +14,7 @@ public interface CommandMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "data", source = "commandV2Request")
-    CommandV2Entity map(CommandV2Request<?> commandV2Request, Instant created, Instant updated, long userId);
+    CommandV2Entity map(CommandV2Request<?> commandV2Request, Timestamp created, Timestamp updated, long userId);
 
     default CommandV2Response<?> map(CommandV2Entity commandV2Entity) {
         return new CommandV2Response<>(commandV2Entity.getId(), commandV2Entity.getData());

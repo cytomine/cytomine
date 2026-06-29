@@ -50,8 +50,8 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
                 DeleteCommandRequest<P> deleteCommandRequest = mapDeleteCommand(userId, map(entity));
                 CommandV2Entity commandV2Entity = getCommandV2Repository().save(getCommandMapper().map(
                     deleteCommandRequest,
-                    now,
-                    now,
+                    Timestamp.from(now),
+                    Timestamp.from(now),
                     userId
                 ));
                 entity.setDeleted(Timestamp.from(now));
@@ -82,8 +82,8 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
                 );
                 CommandV2Entity commandV2Entity = getCommandV2Repository().save(getCommandMapper().map(
                     updateCommandRequest,
-                    now,
-                    now,
+                    Timestamp.from(now),
+                    Timestamp.from(now),
                     userId
                 ));
                 R response = mapToResponse(savedEntity);
@@ -106,7 +106,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         CreateCommandRequest<?> createCommandRequest = mapCreateCommand(userId, commandPayload);
         CommandV2Entity commandV2Entity = getCommandV2Repository().save(getCommandMapper().map(
             createCommandRequest,
-            now,
+            Timestamp.from(now),
             null,
             userId
         ));

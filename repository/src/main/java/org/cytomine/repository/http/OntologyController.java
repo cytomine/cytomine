@@ -22,6 +22,7 @@ import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 import static be.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
+import static java.time.temporal.ChronoUnit.MICROS;
 
 @RequiredArgsConstructor
 @RestController
@@ -51,17 +52,17 @@ public class OntologyController implements OntologyHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> create(long userId, CreateOntology createPayload) {
-        return service.create(userId, createPayload, Instant.now());
+        return service.create(userId, createPayload, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateOntology updateOntology) {
-        return service.update(userId, id, updateOntology, Instant.now());
+        return service.update(userId, id, updateOntology, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, Instant.now());
+        return service.delete(userId, id, Instant.now().truncatedTo(MICROS));
     }
 
     @Override

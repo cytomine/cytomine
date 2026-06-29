@@ -2,6 +2,7 @@ package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class CommandController implements CommandHttpContract {
 
     @Override
     @PostMapping("/redo/{commandId}")
-    public Optional<HttpCommandResponse> redo(UUID commandId, long userId) {
+    public Set<HttpCommandResponse> redo(UUID commandId, long userId) {
         return applyCommandService.redoCommand(userId, commandId, LocalDateTime.now());
     }
 

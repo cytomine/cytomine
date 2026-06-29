@@ -38,8 +38,6 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
 
     CommandMapper getCommandMapper();
 
-    ApplyCommandService getApplyCommandService();
-
     UpdateCommandRequest<P> mapUpdateCommand(long userId, P before, P after);
 
     CreateCommandRequest<P> mapCreateCommand(long userId, P after);
@@ -121,11 +119,6 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
     default Optional<HttpCommandResponse> restore(UUID commandId, long userId, long id, long aclId, String command,
         LocalDateTime now) {
         if (canWriteAclId(userId, aclId)) {
-
-            getCommandV2Repository().findByParentCommandId(commandId).forEach(
-                commandV2Entity -> getApplyCommandService().redoCommand(userId, commandV2Entity.getId(), now)
-            );
-
             return get(id).map(entity -> {
                 entity.setDeleted(null);
                 entity.setUpdated(Timestamp.valueOf(now));
@@ -141,7 +134,6 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         R response = mapToResponse(saved);
         return new HttpCommandResponse(true, response, commandId, command, Set.of());
     }
-
 
     default Optional<HttpCommandResponse> updateWithExistingCommand(UUID commandId, String command, P payload,
         LocalDateTime now) {
@@ -206,6 +198,5 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         }
         return updateWithExistingCommand(commandId, updateCommand.getCommand(), updateCommand.after(), now);
     }
-
 
 }

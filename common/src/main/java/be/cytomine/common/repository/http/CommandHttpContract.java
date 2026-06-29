@@ -1,6 +1,7 @@
 package be.cytomine.common.repository.http;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +23,7 @@ public interface CommandHttpContract {
     Optional<HttpCommandResponse> undo(@PathVariable UUID commandId, @RequestParam long userId);
 
     @PostExchange("/redo/{commandId}")
-    Optional<HttpCommandResponse> redo(@PathVariable UUID commandId, @RequestParam long userId);
+    Set<HttpCommandResponse> redo(@PathVariable UUID commandId, @RequestParam long userId);
 
     @GetExchange("/{commandId}")
     Optional<CommandV2Response<?>> get(@PathVariable UUID commandId, @RequestParam long userId);

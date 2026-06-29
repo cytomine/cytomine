@@ -41,7 +41,6 @@ public class OntologyCommandService implements
     private final UserRepository userRepository;
     private final CommandMapper commandMapper;
     private final TermCommandService termCommandService;
-    private final ApplyCommandService applyCommandService;
 
     @Override
     public OntologyEntity save(OntologyEntity entity) {

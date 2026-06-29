@@ -10,8 +10,6 @@ import jakarta.transaction.Transactional;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 
 import be.cytomine.common.repository.model.HasAclId;
 import be.cytomine.common.repository.model.HasLongId;
@@ -53,10 +51,6 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
     default Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now, UUID parentCommandId) {
         return Set.of();
     }
-
-    @Autowired
-    void setApplyCommandService(@Lazy ApplyCommandService applyCommandService);
-
 
     default Optional<HttpCommandResponse> delete(long userId, long id, LocalDateTime now) {
         return delete(userId, id, now, Optional.empty());

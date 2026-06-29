@@ -1,7 +1,5 @@
 package org.cytomine.repository.http;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -58,8 +56,6 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
 
     @Autowired
     ApplyCommandService applyCommandService;
-
-
     String apiURL = OntologyHttpContract.ROOT_PATH;
     CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());
     UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID().toString()));
@@ -69,7 +65,7 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     public void createSubEntities(long userId, long currentId) {
         TermEntity subEntity = termRepository.save(
             new TermEntity(null, 0, currentId, UUID.randomUUID().toString(), UUID.randomUUID().toString(),
-             baseMapper.map(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)), null, null, "", Set.of()));
+                baseMapper.map(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)), null, null, "", Set.of()));
         subEntities = Set.of(termMapper.mapToTermResponse(subEntity));
     }
 

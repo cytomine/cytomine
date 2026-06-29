@@ -19,22 +19,21 @@ import os
 import queue
 from multiprocessing import cpu_count
 from threading import Thread
-from typing import Any, Callable, Iterable, List, Optional, Tuple, TypeVar
+from collections.abc import Callable, Iterable
+from typing import Any, TypeVar
 
 T = TypeVar("T")  # Type of elements in data
 R = TypeVar("R")  # Return type of worker_fn
-
 
 def is_false(v: Any) -> bool:
     """Check if v is 'False'"""
     return isinstance(v, bool) and not v
 
-
 def generic_parallel(
     data: Iterable[T],
-    worker_fn: Callable[[T], Optional[R]],
+    worker_fn: Callable[[T], R | None],
     n_workers: int = 0,
-) -> List[Tuple[T, Optional[R]]]:
+) -> list[tuple[T, R | None]]:
     """Run a function on a batch of data in parallel using a given processing function.
 
     Parameters
@@ -95,13 +94,12 @@ def generic_parallel(
 
     return results
 
-
 def generic_chunk_parallel(
-    data: List[T],
-    worker_fn: Callable[[List[T]], R],
+    data: list[T],
+    worker_fn: Callable[[list[T]], R],
     chunk_size: int = 1,
     n_workers: int = 0,
-) -> List[Tuple[Tuple[int, int], R]]:
+) -> list[tuple[tuple[int, int], R]]:
     """Execute a worker function on all elements of a data list.
     Items are processed by batch of size 'chunk_size'.
 
@@ -132,18 +130,17 @@ def generic_chunk_parallel(
         end = start + chunk_size
         chunk_limits.append([start, end])
 
-    def worker_wrapper(startend: Tuple[int, int]) -> R:
+    def worker_wrapper(startend: tuple[int, int]) -> R:
         _start, _end = startend
         return worker_fn(data[_start:_end])
 
     return generic_parallel(chunk_limits, worker_wrapper, n_workers=n_workers)  # type: ignore
 
-
 def generic_download(
     data: Iterable[T],
-    download_instance_fn: Callable[[T], Optional[R]],
+    download_instance_fn: Callable[[T], R | None],
     n_workers: int = 0,
-) -> List[Tuple[T, Optional[R]]]:
+) -> list[tuple[T, R | None]]:
     """Download a set of data in parallel using a given download function.
 
     Parameters
@@ -165,7 +162,6 @@ def generic_download(
         is the value returned by `download_instance_fn` for this item.
     """
     return generic_parallel(data, download_instance_fn, n_workers=n_workers)
-
 
 def makedirs(path: str, exist_ok: bool = True) -> None:
     """Python 2.7 compatinle"""

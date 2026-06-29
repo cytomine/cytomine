@@ -14,10 +14,9 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=invalid-name
 
 import re
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 from cytomine.cytomine import Cytomine
 from cytomine.models.annotation import Annotation
@@ -29,8 +28,8 @@ class Property(DomainModel):
     def __init__(
         self,
         object: Model,
-        key: Optional[str] = None,
-        value: Optional[Any] = None,
+        key: str | None = None,
+        value: Any | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__(object)
@@ -62,9 +61,9 @@ class Property(DomainModel):
 
     def fetch(
         self,
-        id: Optional[int] = None,
-        key: Optional[str] = None,
-    ) -> Union[bool, Model]:
+        id: int | None = None,
+        key: str | None = None,
+    ) -> bool | Model:
         if self.id is None and id is None and self.key is None and key is None:
             raise ValueError("Cannot fetch a model with no ID and no key.")
         if id is not None:
@@ -85,12 +84,12 @@ class Property(DomainModel):
 
 
 class PropertyCollection(DomainCollection):
-    _domainClassName: Optional[str]
+    _domainClassName: str | None
 
     def __init__(
         self,
         object: Model,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,
@@ -105,7 +104,7 @@ class PropertyCollection(DomainCollection):
             uri = uri.replace("domain/", "")
         return uri
 
-    def as_dict(self) -> Dict[str, "Property"]:
+    def as_dict(self) -> dict[str, "Property"]:
         """Transform the property collection into a python dictionary mapping keys
         with their respective Property objects.
         """
@@ -129,8 +128,8 @@ class AttachedFile(DomainModel):
     def __init__(
         self,
         object: Model,
-        filename: Optional[str] = None,
-        file: Optional[str] = None,
+        filename: str | None = None,
+        file: str | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__(object)
@@ -145,13 +144,13 @@ class AttachedFile(DomainModel):
 
         return f"{self.callback_identifier}/{self.id}.json"
 
-    def save(self) -> Union[bool, Model]:
+    def save(self) -> bool | Model:
         return self.upload()
 
-    def update(self, id: Optional[int] = None, **attributes: Any) -> Union[bool, Model]:
+    def update(self, id: int | None = None, **attributes: Any) -> bool | Model:
         return self.upload()
 
-    def upload(self) -> Union[bool, Model]:
+    def upload(self) -> bool | Model:
         if self.file:
             return Cytomine.get_instance().upload_file(
                 self,
@@ -198,7 +197,7 @@ class AttachedFileCollection(DomainCollection):
     def __init__(
         self,
         object: Model,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,
@@ -212,7 +211,7 @@ class Description(DomainModel):
     def __init__(
         self,
         object: Model,
-        data: Optional[Any] = None,
+        data: Any | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__(object)
@@ -223,7 +222,7 @@ class Description(DomainModel):
         class_value = getattr(self._object, "class_", None)
         return f"domain/{class_value}/{self._object.id}/{self.callback_identifier}.json"
 
-    def fetch(self, id: Optional[int] = None) -> Union[bool, Model]:
+    def fetch(self, id: int | None = None) -> bool | Model:
         if id is not None:
             self.id = id
 
@@ -231,16 +230,16 @@ class Description(DomainModel):
 
 
 class Tag(Model):
-    def __init__(self, name: Optional[str] = None, **attributes: Any) -> None:
+    def __init__(self, name: str | None = None, **attributes: Any) -> None:
         super().__init__()
-        self.name: Optional[str] = name
+        self.name: str | None = name
         self.populate(attributes)
 
 
 class TagCollection(Collection):
     def __init__(
         self,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,
@@ -252,7 +251,10 @@ class TagCollection(Collection):
 
 class TagDomainAssociation(DomainModel):
     def __init__(
-        self, object: Model, tag: Optional[int] = None, **attributes: Any
+        self,
+        object: Model,
+        tag: int | None = None,
+        **attributes: Any,
     ) -> None:
         super().__init__(object)
         self.tag = tag
@@ -276,7 +278,7 @@ class TagDomainAssociationCollection(DomainCollection):
     def __init__(
         self,
         object: Any,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,

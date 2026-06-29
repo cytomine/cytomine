@@ -28,17 +28,6 @@ public class BootstrapDataService {
 
         initImageFilters();
 
-        bootstrapUtilsService.createMime("tif", "image/pyrtiff");
-        bootstrapUtilsService.createMime("jp2", "image/jp2");
-        bootstrapUtilsService.createMime("ndpi", "openslide/ndpi");
-        bootstrapUtilsService.createMime("mrxs", "openslide/mrxs");
-        bootstrapUtilsService.createMime("vms", "openslide/vms");
-        bootstrapUtilsService.createMime("svs", "openslide/svs");
-        bootstrapUtilsService.createMime("scn", "openslide/scn");
-        bootstrapUtilsService.createMime("bif", "openslide/bif");
-        bootstrapUtilsService.createMime("tif", "openslide/ventana");
-        bootstrapUtilsService.createMime("tif", "philips/tif");
-
         bootstrapUtilsService.createRole("ROLE_USER");
         bootstrapUtilsService.createRole("ROLE_ADMIN");
         bootstrapUtilsService.createRole("ROLE_SUPER_ADMIN");

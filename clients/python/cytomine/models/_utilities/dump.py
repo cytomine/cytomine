@@ -16,7 +16,8 @@
 
 import os
 from shutil import copyfile
-from typing import Any, Callable, List, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 from cytomine import Cytomine
 from cytomine.models.model import Model
@@ -26,10 +27,8 @@ from .pattern_matching import resolve_pattern
 
 T = TypeVar("T", bound=Model)
 
-
 class DumpError(Exception):
     """A class for image dump errors"""
-
 
 def generic_image_dump(
     dest_pattern: str,
@@ -38,7 +37,7 @@ def generic_image_dump(
     override: bool = True,
     check_extension: bool = True,
     **parameters: Any,
-) -> List[str]:
+) -> list[str]:
     """A generic function for 'dumping' a model as an image (crop, windows,...).
     Parameters
     ----------

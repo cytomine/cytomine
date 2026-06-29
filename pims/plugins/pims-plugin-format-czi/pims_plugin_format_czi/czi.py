@@ -4,7 +4,7 @@ import numpy as np
 from operator import itemgetter
 from pyvips import Image as VIPSImage
 from struct import Struct
-from typing import Callable, List, Optional, Union
+from collections.abc import Callable
 
 from pims_plugin_format_czi.czi_parser.czi_file import CZIFile
 from pims.formats.utils.histogram import DefaultHistogramReader
@@ -208,7 +208,7 @@ class CZIParser(AbstractParser):
 class CZIReader(AbstractReader):
 
     @staticmethod
-    def _extract_channels(im: VIPSImage, c: Optional[Union[int, List[int]]]) -> VIPSImage:
+    def _extract_channels(im: VIPSImage, c: int | list[int] | None) -> VIPSImage:
         if c is None or im.bands == len(c):
             return im
         elif type(c) is int or len(c) == 1:
@@ -222,10 +222,10 @@ class CZIReader(AbstractReader):
 
     def _multichannel_read(
             self,
-            read_func: Callable[[int, Optional[int], Optional[int]], VIPSImage],
-            c: Optional[Union[int, List[int]]] = None,
-            z: Optional[int] = None,
-            t: Optional[int] = None):
+            read_func: Callable[[int, int | None, int | None], VIPSImage],
+            c: int | list[int] | None = None,
+            z: int | None = None,
+            t: int | None = None):
         """
         Internal method to perform a multi channel image composition. The actual image reading is performed by the
         given read_func callable parameter.
@@ -262,7 +262,7 @@ class CZIReader(AbstractReader):
 
     def read_thumb(
         self, out_width: int, out_height: int, precomputed: bool = None,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+        c: int | list[int] | None = None, z: int | None = None, t: int | None = None
     ) -> RawImagePixels:
         czi_file = cached_czi_file(self.format)
         if precomputed and czi_file.thumbnail_image is not None:
@@ -275,7 +275,7 @@ class CZIReader(AbstractReader):
         czi_file = cached_czi_file(self.format)
         return czi_file.label_image.read()
 
-    def read_macro(self, out_width: int, out_height: int, c: Optional[Union[int, List[int]]] = None) -> RawImagePixels:
+    def read_macro(self, out_width: int, out_height: int, c: int | list[int] | None = None) -> RawImagePixels:
         czi_file = cached_czi_file(self.format)
         if czi_file.macro_image is not None:
             return czi_file.macro_image.read()
@@ -284,7 +284,7 @@ class CZIReader(AbstractReader):
 
     def read_window(
         self, region: Region, out_width: int, out_height: int,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+        c: int | list[int] | None = None, z: int | None = None, t: int | None = None
     ) -> RawImagePixels:
         czi_file = cached_czi_file(self.format)
         tier = self.format.pyramid.most_appropriate_tier(
@@ -297,7 +297,7 @@ class CZIReader(AbstractReader):
 
     def read_tile(
         self, tile: Tile,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+        c: int | list[int] | None = None, z: int | None = None, t: int | None = None
     ) -> RawImagePixels:
         czi_file = cached_czi_file(self.format)
         x = tile.tx * czi_file.tile_size[0]

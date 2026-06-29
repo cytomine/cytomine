@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +14,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.AbstractImage;
-import be.cytomine.domain.meta.Tag;
 import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
@@ -55,21 +52,6 @@ public class TagDomainAssociationService extends ModelService {
     @Override
     public Class currentDomain() {
         return TagDomainAssociation.class;
-    }
-
-
-    public TagDomainAssociation get(Long id) {
-        return find(id).orElse(null);
-    }
-
-    public Optional<TagDomainAssociation> find(Long id) {
-        Optional<TagDomainAssociation> op = tagDomainAssociationRepository.findById(id);
-        op.ifPresent(x -> {
-            if (!x.getDomainClassName().contains("AbstractImage")) {
-                securityACLService.check(x.container(), READ);
-            }
-        });
-        return op;
     }
 
     public List<TagDomainAssociation> list(List<SearchParameterEntry> searchParameters) {
@@ -118,11 +100,6 @@ public class TagDomainAssociationService extends ModelService {
         return results;
     }
 
-    public List<TagDomainAssociation> listAllByTag(Tag tag) {
-        securityACLService.checkAdmin(currentUserService.getCurrentUser());
-        return list(new ArrayList<>(List.of(new SearchParameterEntry("tag", SearchOperation.in, tag.getId()))));
-    }
-
     public List<TagDomainAssociation> listAllByDomain(CytomineDomain domain) {
         if (!(domain instanceof AbstractImage)) {
             securityACLService.check(domain.container(), READ);
@@ -132,26 +109,6 @@ public class TagDomainAssociationService extends ModelService {
             new SearchParameterEntry("domainIdent", SearchOperation.equals, domain.getId())
         )));
     }
-
-
-    @Override
-    public CommandResponse add(JsonObject jsonObject) {
-        User currentUser = currentUserService.getCurrentUser();
-        //Get the associated domain
-        CytomineDomain domain = getCytomineDomain(
-            jsonObject.getJSONAttrStr("domainClassName"),
-            jsonObject.getJSONAttrLong("domainIdent")
-        );
-        if (!domain.getClass().getName().contains("AbstractImage")) {
-            securityACLService.checkUserAccessRightsForMeta(domain, currentUser);
-        } else {
-            //TODO when is this used ?
-            securityACLService.checkUser(currentUser);
-        }
-        jsonObject.put("user", currentUser.getId());
-        return executeCommand(new AddCommand(currentUser), null, jsonObject);
-    }
-
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
@@ -183,7 +140,6 @@ public class TagDomainAssociationService extends ModelService {
         return new TagDomainAssociation().buildDomainFromJson(json, getEntityManager());
     }
 
-
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         TagDomainAssociation tagDomainAssociation = (TagDomainAssociation) domain;
         if (tagDomainAssociation != null && tagDomainAssociation.getTag() != null) {
@@ -203,6 +159,4 @@ public class TagDomainAssociationService extends ModelService {
             }
         }
     }
-
-
 }

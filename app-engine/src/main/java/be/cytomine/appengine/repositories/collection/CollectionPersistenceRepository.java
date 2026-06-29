@@ -1,5 +1,6 @@
 package be.cytomine.appengine.repositories.collection;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +12,7 @@ import be.cytomine.appengine.models.task.collection.CollectionPersistence;
 @Repository
 public interface CollectionPersistenceRepository
     extends JpaRepository<CollectionPersistence, UUID> {
-    CollectionPersistence findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+    Optional<CollectionPersistence> findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
         String parameterName,
         UUID run,
         ParameterType parameterType

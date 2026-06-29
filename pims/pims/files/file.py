@@ -18,7 +18,7 @@ import shutil
 from datetime import datetime
 from enum import Enum
 from pathlib import Path as _Path
-from typing import Callable
+from collections.abc import Callable
 
 import numpy as np
 from pint import Quantity

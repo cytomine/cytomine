@@ -330,12 +330,15 @@ public class TaskRunService {
             String subtype = json.get("type").get("subType").get("id").asText();
 
             JsonNode value = json.get("value");
-            if (!json.get("value").isNull()) {
-                String type = value.get("type").asText();
-
+            if (!value.isNull()) {
                 Long[] itemsArray = objectMapper.convertValue(value.get("ids"), Long[].class);
 
                 if (subtype.equals("image")) {
+                    String type = value.path("type").asText(null);
+                    if (type == null) {
+                        throw new RuntimeException("type cannot be null for image array provision");
+                    }
+
                     ArrayNode responseArray = objectMapper.createArrayNode();
                     for (int i = 0; i < itemsArray.length; i++) {
                         Long id = itemsArray[i];
@@ -374,21 +377,22 @@ public class TaskRunService {
                 }
 
                 if (subtype.equals("geometry")) {
-                    ObjectNode provision = json.deepCopy();
-                    provision.remove("type");
-                    provision.remove("value");
-
-                    ArrayNode valueListNode = objectMapper.createArrayNode();
+                    ArrayNode responseArray = objectMapper.createArrayNode();
                     for (int i = 0; i < itemsArray.length; i++) {
                         Long annotationId = itemsArray[i];
                         UserAnnotation annotation = userAnnotationService.get(annotationId);
+                        String geoJson = geometryService.wktToGeoJson(annotation.getWktLocation());
 
-                        ObjectNode itemJsonObject = objectMapper.createObjectNode();
-                        itemJsonObject.put("index", i);
-                        itemJsonObject.put("value", geometryService.wktToGeoJson(annotation.getWktLocation()));
+                        ObjectNode body = objectMapper.createObjectNode();
+                        body.put("value", geoJson);
 
-                        valueListNode.add(itemJsonObject);
+                        String response = provisionCollectionItemJson(arrayTypeUri, i, body);
+                        if (response != null) {
+                            JsonNode itemNode = objectMapper.readTree(response);
+                            responseArray.add(itemNode);
+                        }
                     }
+                    return responseArray.toString();
                 }
             }
         }
@@ -459,6 +463,13 @@ public class TaskRunService {
         params.put("value", String.valueOf(i));
 
         return appEngineService.postWithParams(arrayTypeUri, body, MediaType.MULTIPART_FORM_DATA, params);
+    }
+
+    private String provisionCollectionItemJson(String arrayTypeUri, int i, ObjectNode body) {
+        Map<String, String> params = new HashMap<>();
+        params.put("value", String.valueOf(i));
+
+        return appEngineService.putWithParams(arrayTypeUri, body, MediaType.APPLICATION_JSON, params);
     }
 
     public File downloadFile(URI uri, File destinationFile) {

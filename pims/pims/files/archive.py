@@ -15,7 +15,7 @@
 import shutil
 import sys
 from functools import lru_cache
-from typing import Callable
+from collections.abc import Callable
 from zipfile import ZipFile
 
 from pims.api.exceptions import NoMatchingFormatProblem

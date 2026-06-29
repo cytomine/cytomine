@@ -44,39 +44,48 @@ public class ApplyCommandService {
     private final UploadedFileCommandService uploadedFileCommandService;
 
     @Transactional
-    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
-        return commandRepository.findById(undoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
-            case DeleteTermCommand dtc -> termCommandService.undoDelete(commandEntity.getId(), dtc, userId, now);
-            case CreateTermCommand icr -> termCommandService.undoCreate(commandEntity.getId(), icr, userId, now);
-            case UpdateTermCommand ucr -> termCommandService.undoUpdate(commandEntity.getId(), ucr, userId, now);
-            case DeleteTermRelationCommand deleteTermRelationCommand ->
-                termRelationCommandService.undoDelete(commandEntity.getId(), deleteTermRelationCommand, userId, now);
-            case CreateTermRelationCommand ctrc ->
-                termRelationCommandService.undoCreate(commandEntity.getId(), ctrc, userId, now);
-            case UpdateTermRelationCommand utrc ->
-                termRelationCommandService.undoUpdate(commandEntity.getId(), utrc, userId, now);
-            case CreateOntologyCommand createOntologyCommand ->
-                ontologyCommandService.undoCreate(commandEntity.getId(), createOntologyCommand, userId, now);
-            case DeleteOntologyCommand deleteOntologyCommand ->
-                ontologyCommandService.undoDelete(commandEntity.getId(), deleteOntologyCommand, userId, now);
-            case UpdateOntologyCommand updateOntologyCommand ->
-                ontologyCommandService.undoUpdate(commandEntity.getId(), updateOntologyCommand, userId, now);
-            case CreateStorageCommand csc -> storageCommandService.undoCreate(commandEntity.getId(), csc, userId, now);
-            case UpdateStorageCommand usc -> storageCommandService.undoUpdate(commandEntity.getId(), usc, userId, now);
-            case DeleteStorageCommand dsc -> storageCommandService.undoDelete(commandEntity.getId(), dsc, userId, now);
-            case CreateUploadedFileCommand cufc ->
-                uploadedFileCommandService.undoCreate(commandEntity.getId(), cufc, userId, now);
-            case UpdateUploadedFileCommand uufc ->
-                uploadedFileCommandService.undoUpdate(commandEntity.getId(), uufc, userId, now);
-            case DeleteUploadedFileCommand dufc ->
-                uploadedFileCommandService.undoDelete(commandEntity.getId(), dufc, userId, now);
-            case CreateTagDomainAssociationCommand ctdac ->
-                tagDomainAssociationCommandService.undoCreate(commandEntity.getId(), ctdac, userId, now);
-            case UpdateTagDomainAssociationCommand utdac ->
-                tagDomainAssociationCommandService.undoUpdate(commandEntity.getId(), utdac, userId, now);
-            case DeleteTagDomainAssociationCommand dtdac ->
-                tagDomainAssociationCommandService.undoDelete(commandEntity.getId(), dtdac, userId, now);
-        });
+    public Set<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
+        Stream<HttpCommandResponse> subCommands = commandRepository.findByParentCommandId(undoCommand).stream()
+            .map(rc -> undoCommand(userId, rc.getId(), now)).flatMap(Set::stream);
+
+        Optional<HttpCommandResponse> mainCommandResponse =
+            commandRepository.findById(undoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
+                case DeleteTermCommand dtc -> termCommandService.undoDelete(commandEntity.getId(), dtc, userId, now);
+                case CreateTermCommand icr -> termCommandService.undoCreate(commandEntity.getId(), icr, userId, now);
+                case UpdateTermCommand ucr -> termCommandService.undoUpdate(commandEntity.getId(), ucr, userId, now);
+                case DeleteTermRelationCommand deleteTermRelationCommand ->
+                    termRelationCommandService.undoDelete(commandEntity.getId(), deleteTermRelationCommand, userId,
+                        now);
+                case CreateTermRelationCommand ctrc ->
+                    termRelationCommandService.undoCreate(commandEntity.getId(), ctrc, userId, now);
+                case UpdateTermRelationCommand utrc ->
+                    termRelationCommandService.undoUpdate(commandEntity.getId(), utrc, userId, now);
+                case CreateOntologyCommand createOntologyCommand ->
+                    ontologyCommandService.undoCreate(commandEntity.getId(), createOntologyCommand, userId, now);
+                case DeleteOntologyCommand deleteOntologyCommand ->
+                    ontologyCommandService.undoDelete(commandEntity.getId(), deleteOntologyCommand, userId, now);
+                case UpdateOntologyCommand updateOntologyCommand ->
+                    ontologyCommandService.undoUpdate(commandEntity.getId(), updateOntologyCommand, userId, now);
+                case CreateStorageCommand csc ->
+                    storageCommandService.undoCreate(commandEntity.getId(), csc, userId, now);
+                case UpdateStorageCommand usc ->
+                    storageCommandService.undoUpdate(commandEntity.getId(), usc, userId, now);
+                case DeleteStorageCommand dsc ->
+                    storageCommandService.undoDelete(commandEntity.getId(), dsc, userId, now);
+                case CreateUploadedFileCommand cufc ->
+                    uploadedFileCommandService.undoCreate(commandEntity.getId(), cufc, userId, now);
+                case UpdateUploadedFileCommand uufc ->
+                    uploadedFileCommandService.undoUpdate(commandEntity.getId(), uufc, userId, now);
+                case DeleteUploadedFileCommand dufc ->
+                    uploadedFileCommandService.undoDelete(commandEntity.getId(), dufc, userId, now);
+                case CreateTagDomainAssociationCommand ctdac ->
+                    tagDomainAssociationCommandService.undoCreate(commandEntity.getId(), ctdac, userId, now);
+                case UpdateTagDomainAssociationCommand utdac ->
+                    tagDomainAssociationCommandService.undoUpdate(commandEntity.getId(), utdac, userId, now);
+                case DeleteTagDomainAssociationCommand dtdac ->
+                    tagDomainAssociationCommandService.undoDelete(commandEntity.getId(), dtdac, userId, now);
+            });
+        return Stream.concat(mainCommandResponse.stream(), subCommands).collect(Collectors.toSet());
     }
 
     public Set<HttpCommandResponse> redoCommand(long userId, UUID redoCommand, LocalDateTime now) {

@@ -23,7 +23,6 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -144,12 +143,12 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
         String commandID = firstCreate.commandId().toString();
         long entityID = firstCreate.data().id();
-        Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
+        Set<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", stringUserId)
                     .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
 
-        assertTrue(undoCommandResponse.isPresent());
+        assertFalse(undoCommandResponse.isEmpty());
 
         String emptyResponseString = getMockMvc().perform(
                 get(getApiURL() + "/" + entityID).param("userId", stringUserId).contentType(APPLICATION_JSON))

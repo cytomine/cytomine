@@ -33,7 +33,7 @@ public class CommandController implements CommandHttpContract {
 
     @Override
     @PostMapping("/undo/{commandId}")
-    public Optional<HttpCommandResponse> undo(UUID commandId, long userId) {
+    public Set<HttpCommandResponse> undo(UUID commandId, long userId) {
         return applyCommandService.undoCommand(userId, commandId, LocalDateTime.now());
     }
 

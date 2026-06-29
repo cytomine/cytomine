@@ -15,10 +15,10 @@ import be.cytomine.common.repository.model.command.payload.response.TermResponse
 public interface ApplyCommandResponseMapper {
 
     default ApplyCommandResponse setDeleteTime(ApplyCommandResponse applyCommandResponse,
-        Optional<LocalDateTime> updateTime) {
+        Optional<LocalDateTime> deleteTime) {
         return switch (applyCommandResponse) {
-            case OntologyResponse or -> setDeleteTime(or, updateTime);
-            case TermResponse tr -> setDeleteTime(tr, updateTime);
+            case OntologyResponse or -> setDeleteTime(or, deleteTime);
+            case TermResponse tr -> setDeleteTime(tr, deleteTime);
             default -> null;
         };
     }
@@ -31,8 +31,21 @@ public interface ApplyCommandResponseMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
     OntologyResponse setDeleteTime(OntologyResponse or, Optional<LocalDateTime> deleteTime);
 
-    // ApplyCommandResponse setDeleteTime(ApplyCommandResponse applyCommandResponse, LocalDateTime deleteTime);
+    default ApplyCommandResponse setUpdateTime(ApplyCommandResponse applyCommandResponse,
+        Optional<LocalDateTime> updateTime) {
+        return switch (applyCommandResponse) {
+            case OntologyResponse or -> setUpdateTime(or, updateTime);
+            case TermResponse tr -> setUpdateTime(tr, updateTime);
+            default -> null;
+        };
+    }
 
-    // ApplyCommandResponse setCreateTime(ApplyCommandResponse applyCommandResponse, LocalDateTime createTime);
+    @Mapping(target = "updated", source = "updateTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
+    TermResponse setUpdateTime(TermResponse or, Optional<LocalDateTime> updateTime);
+
+    @Mapping(target = "updated", source = "updateTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
+    OntologyResponse setUpdateTime(OntologyResponse or, Optional<LocalDateTime> updateTime);
 
 }

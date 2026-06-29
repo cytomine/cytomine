@@ -38,10 +38,13 @@ import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, OntologyResponse, UpdateOntology> {
     @Autowired
     MockMvc mockMvc;
+
     @Autowired
     ObjectMapper objectMapper;
+
     @Autowired
     JdbcTemplate jdbcTemplate;
+
     @Autowired
     OntologyMapper ontologyController;
 

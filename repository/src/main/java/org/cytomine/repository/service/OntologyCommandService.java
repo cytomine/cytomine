@@ -121,4 +121,5 @@ public class OntologyCommandService implements
     public Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now, UUID commandId) {
         return termCommandService.deleteByOntologyId(userId, id, now, commandId);
     }
+
 }

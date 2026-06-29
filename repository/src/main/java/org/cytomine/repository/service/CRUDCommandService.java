@@ -115,8 +115,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
             Set<HttpCommandResponse> subCommandResponses = deleteSubEntities(userId, id, now, commandId);
             entity.setDeleted(Timestamp.valueOf(now));
             return Stream.concat(Stream.of(saveAndBuildResponse(entity, command, commandId)),
-                subCommandResponses.stream()).collect(
-                Collectors.toSet());
+                subCommandResponses.stream()).collect(Collectors.toSet());
         }).orElse(Set.of());
     }
 
@@ -124,6 +123,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         LocalDateTime now) {
         if (canWriteAclId(userId, aclId)) {
             return get(id).map(entity -> {
+
                 entity.setDeleted(null);
                 entity.setUpdated(Timestamp.valueOf(now));
                 return Set.of(saveAndBuildResponse(entity, command, commandId));
@@ -160,8 +160,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         if (!canWriteAclId(userId, deleteCommand.aclId())) {
             return Set.of();
         }
-        return
-            restore(commandId, userId, deleteCommand.id(), deleteCommand.aclId(), deleteCommand.getCommand(), now);
+        return restore(commandId, userId, deleteCommand.id(), deleteCommand.aclId(), deleteCommand.getCommand(), now);
     }
 
     default Set<HttpCommandResponse> redoDelete(UUID commandId, DeleteCommandRequest<P> deleteCommand, long userId,

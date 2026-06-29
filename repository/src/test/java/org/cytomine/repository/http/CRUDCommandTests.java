@@ -153,7 +153,8 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
                     .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
 
-        LocalDateTime deletedTime = undoCommandResponse.stream().findFirst().get().data().deleted()
+        LocalDateTime deletedTime = undoCommandResponse.stream().findFirst()
+            .orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data().deleted()
             .orElseThrow(() -> new IllegalStateException("Deleted should not be empty."));
         assertEquals(Stream.concat(Stream.of(expectedDeletedResponse(getResponseData, deletedTime)),
                     subEntities.stream().map(se -> getApplyCommandResponseMapper().setDeleteTime(se,
@@ -174,15 +175,24 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
                     .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
 
+        LocalDateTime updateTime = redoCommandResponse.stream().findFirst()
+            .orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data().updated()
+            .orElseThrow(() -> new IllegalStateException("Updated should not be empty."));
 
+        R firstCreateData = (R) firstCreate.data();
+        assertEquals(Stream.concat(Stream.of(expectChangedUpdatedTime(firstCreateData, updateTime)),
+                    subEntities.stream().map(se -> getApplyCommandResponseMapper().setUpdateTime(se,
+                        Optional.of(updateTime))))
+                .collect(Collectors.toSet()),
+            redoCommandResponse.stream().map(HttpCommandResponse::data).collect(Collectors.toSet()));
 
         String redoGetResponseString = getMockMvc().perform(
                 get(getApiURL() + "/" + entityID).param("userId", stringUserId).contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        R redoGetResponse = (R) getObjectMapper().readValue(redoGetResponseString, ((R) firstCreate.data()).getClass());
+        R redoGetResponse = (R) getObjectMapper().readValue(redoGetResponseString, (firstCreateData).getClass());
 
-        assertEquals(expectChangedUpdatedTime((R) firstCreate.data(), redoGetResponse.updated().orElseThrow(
+        assertEquals(expectChangedUpdatedTime(firstCreateData, redoGetResponse.updated().orElseThrow(
                 () -> new IllegalStateException("Newly created entity should not have `updated` " + "empty."))),
             getObjectMapper().readValue(redoGetResponseString, firstCreate.data().getClass()));
     }

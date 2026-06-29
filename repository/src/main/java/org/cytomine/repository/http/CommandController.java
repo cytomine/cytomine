@@ -21,6 +21,7 @@ import be.cytomine.common.repository.model.command.payload.response.CommandV2Res
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
 import static be.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
+import static java.time.temporal.ChronoUnit.MICROS;
 
 @RequiredArgsConstructor
 @RestController
@@ -34,13 +35,13 @@ public class CommandController implements CommandHttpContract {
     @Override
     @PostMapping("/undo/{commandId}")
     public Set<HttpCommandResponse> undo(UUID commandId, long userId) {
-        return applyCommandService.undoCommand(userId, commandId, LocalDateTime.now());
+        return applyCommandService.undoCommand(userId, commandId, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
     @PostMapping("/redo/{commandId}")
     public Set<HttpCommandResponse> redo(UUID commandId, long userId) {
-        return applyCommandService.redoCommand(userId, commandId, LocalDateTime.now());
+        return applyCommandService.redoCommand(userId, commandId, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override

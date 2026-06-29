@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.transaction.Transactional;
 import org.cytomine.repository.mapper.CommandMapper;
@@ -107,25 +109,27 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
                 Set.of()));
     }
 
-    default Optional<HttpCommandResponse> logicalDelete(long userId, UUID commandId, long id, String command,
+    default Set<HttpCommandResponse> logicalDelete(long userId, UUID commandId, long id, String command,
         LocalDateTime now) {
         return get(id).map(entity -> {
-            deleteSubEntities(userId, id, now, commandId);
+            Set<HttpCommandResponse> subCommandResponses = deleteSubEntities(userId, id, now, commandId);
             entity.setDeleted(Timestamp.valueOf(now));
-            return saveAndBuildResponse(entity, command, commandId);
-        });
+            return Stream.concat(Stream.of(saveAndBuildResponse(entity, command, commandId)),
+                subCommandResponses.stream()).collect(
+                Collectors.toSet());
+        }).orElse(Set.of());
     }
 
-    default Optional<HttpCommandResponse> restore(UUID commandId, long userId, long id, long aclId, String command,
+    default Set<HttpCommandResponse> restore(UUID commandId, long userId, long id, long aclId, String command,
         LocalDateTime now) {
         if (canWriteAclId(userId, aclId)) {
             return get(id).map(entity -> {
                 entity.setDeleted(null);
                 entity.setUpdated(Timestamp.valueOf(now));
-                return saveAndBuildResponse(entity, command, commandId);
-            });
+                return Set.of(saveAndBuildResponse(entity, command, commandId));
+            }).orElse(Set.of());
         } else {
-            return Optional.empty();
+            return Set.of();
         }
     }
 
@@ -151,52 +155,55 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
 
     boolean canDeleteAclId(long userId, long id);
 
-    default Optional<HttpCommandResponse> undoDelete(UUID commandId, DeleteCommandRequest<P> deleteCommand, long userId,
+    default Set<HttpCommandResponse> undoDelete(UUID commandId, DeleteCommandRequest<P> deleteCommand, long userId,
         LocalDateTime now) {
         if (!canWriteAclId(userId, deleteCommand.aclId())) {
-            return Optional.empty();
+            return Set.of();
         }
-        return restore(commandId, userId, deleteCommand.id(), deleteCommand.aclId(), deleteCommand.getCommand(), now);
+        return
+            restore(commandId, userId, deleteCommand.id(), deleteCommand.aclId(), deleteCommand.getCommand(), now);
     }
 
-    default Optional<HttpCommandResponse> redoDelete(UUID commandId, DeleteCommandRequest<P> deleteCommand, long userId,
+    default Set<HttpCommandResponse> redoDelete(UUID commandId, DeleteCommandRequest<P> deleteCommand, long userId,
         LocalDateTime now) {
         if (!canDeleteAclId(userId, deleteCommand.aclId())) {
-            return Optional.empty();
+            return Set.of();
         }
         return logicalDelete(userId, commandId, deleteCommand.id(), deleteCommand.getCommand(), now);
     }
 
-    default Optional<HttpCommandResponse> undoCreate(UUID commandId, CreateCommandRequest<P> createCommand, long userId,
+    default Set<HttpCommandResponse> undoCreate(UUID commandId, CreateCommandRequest<P> createCommand, long userId,
         LocalDateTime now) {
         if (!canWriteAclId(userId, createCommand.aclId())) {
-            return Optional.empty();
+            return Set.of();
         }
         return logicalDelete(userId, commandId, createCommand.id(), createCommand.getCommand(), now);
     }
 
-    default Optional<HttpCommandResponse> redoCreate(UUID commandId, CreateCommandRequest<P> createCommand, long userId,
+    default Set<HttpCommandResponse> redoCreate(UUID commandId, CreateCommandRequest<P> createCommand, long userId,
         LocalDateTime now) {
         if (!canWriteAclId(userId, createCommand.aclId())) {
-            return Optional.empty();
+            return Set.of();
         }
         return restore(commandId, userId, createCommand.id(), createCommand.aclId(), createCommand.getCommand(), now);
     }
 
-    default Optional<HttpCommandResponse> undoUpdate(UUID commandId, UpdateCommandRequest<P> updateCommand, long userId,
+    default Set<HttpCommandResponse> undoUpdate(UUID commandId, UpdateCommandRequest<P> updateCommand, long userId,
         LocalDateTime now) {
         if (!canWriteAclId(userId, updateCommand.aclId())) {
-            return Optional.empty();
+            return Set.of();
         }
-        return updateWithExistingCommand(commandId, updateCommand.getCommand(), updateCommand.before(), now);
+        return updateWithExistingCommand(commandId, updateCommand.getCommand(), updateCommand.before(), now).stream()
+            .collect(Collectors.toSet());
     }
 
-    default Optional<HttpCommandResponse> redoUpdate(UUID commandId, UpdateCommandRequest<P> updateCommand, long userId,
+    default Set<HttpCommandResponse> redoUpdate(UUID commandId, UpdateCommandRequest<P> updateCommand, long userId,
         LocalDateTime now) {
         if (!canWriteAclId(userId, updateCommand.aclId())) {
-            return Optional.empty();
+            return Set.of();
         }
-        return updateWithExistingCommand(commandId, updateCommand.getCommand(), updateCommand.after(), now);
+        return updateWithExistingCommand(commandId, updateCommand.getCommand(), updateCommand.after(), now).stream()
+            .collect(Collectors.toSet());
     }
 
 }

@@ -1,7 +1,6 @@
 package org.cytomine.repository.service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,8 +47,8 @@ public class ApplyCommandService {
         Stream<HttpCommandResponse> subCommands = commandRepository.findByParentCommandId(undoCommand).stream()
             .map(rc -> undoCommand(userId, rc.getId(), now)).flatMap(Set::stream);
 
-        Optional<HttpCommandResponse> mainCommandResponse =
-            commandRepository.findById(undoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
+        Set<HttpCommandResponse> mainCommandResponse =
+            commandRepository.findById(undoCommand).map(commandEntity -> switch (commandEntity.getData()) {
                 case DeleteTermCommand dtc -> termCommandService.undoDelete(commandEntity.getId(), dtc, userId, now);
                 case CreateTermCommand icr -> termCommandService.undoCreate(commandEntity.getId(), icr, userId, now);
                 case UpdateTermCommand ucr -> termCommandService.undoUpdate(commandEntity.getId(), ucr, userId, now);
@@ -84,7 +83,7 @@ public class ApplyCommandService {
                     tagDomainAssociationCommandService.undoUpdate(commandEntity.getId(), utdac, userId, now);
                 case DeleteTagDomainAssociationCommand dtdac ->
                     tagDomainAssociationCommandService.undoDelete(commandEntity.getId(), dtdac, userId, now);
-            });
+            }).orElse(Set.of());
         return Stream.concat(mainCommandResponse.stream(), subCommands).collect(Collectors.toSet());
     }
 
@@ -92,8 +91,8 @@ public class ApplyCommandService {
         Stream<HttpCommandResponse> subCommands = commandRepository.findByParentCommandId(redoCommand).stream()
             .map(rc -> redoCommand(userId, rc.getId(), now)).flatMap(Set::stream);
 
-        Optional<HttpCommandResponse> mainCommandResponse =
-            commandRepository.findById(redoCommand).flatMap(commandEntity -> switch (commandEntity.getData()) {
+        Set<HttpCommandResponse> mainCommandResponse =
+            commandRepository.findById(redoCommand).map(commandEntity -> switch (commandEntity.getData()) {
                 case DeleteTermCommand dtc -> termCommandService.redoDelete(commandEntity.getId(), dtc, userId, now);
                 case CreateTermCommand icr -> termCommandService.redoCreate(commandEntity.getId(), icr, userId, now);
                 case UpdateTermCommand ucr -> termCommandService.redoUpdate(commandEntity.getId(), ucr, userId, now);
@@ -127,7 +126,7 @@ public class ApplyCommandService {
                     tagDomainAssociationCommandService.redoUpdate(commandEntity.getId(), utdac, userId, now);
                 case DeleteTagDomainAssociationCommand dtdac ->
                     tagDomainAssociationCommandService.redoDelete(commandEntity.getId(), dtdac, userId, now);
-            });
+            }).orElse(Set.of());
         return Stream.concat(mainCommandResponse.stream(), subCommands).collect(Collectors.toSet());
     }
 }

@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.persistence.OntologyRepository;
 import org.cytomine.repository.persistence.entity.OntologyEntity;
@@ -47,7 +48,8 @@ class TermControllerTest implements CRUDCommandTests<CreateTerm, TermResponse, U
 
     @Autowired
     private OntologyRepository ontologyRepository;
-
+@Autowired
+ApplyCommandResponseMapper applyCommandResponseMapper;
     private long ontologyId;
 
     @Override

@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.RepositoryApp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +35,9 @@ public class UploadedFileControllerTest
     ObjectMapper objectMapper;
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    ApplyCommandResponseMapper applyCommandResponseMapper;
 
     String apiURL = UploadedFileHttpContract.ROOT_PATH;
 

@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lombok.Getter;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TermRelationRepository;
@@ -49,7 +50,8 @@ class TermRelationControllerTest
 
     @Autowired
     private ObjectMapper objectMapper;
-
+    @Autowired
+    ApplyCommandResponseMapper applyCommandResponseMapper;
     private CreateTermRelation createPayload;
     private UpdateTermRelation updatePayload;
 

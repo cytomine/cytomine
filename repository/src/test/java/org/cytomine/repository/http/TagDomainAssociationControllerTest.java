@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lombok.Getter;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.RepositoryApp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +42,8 @@ class TagDomainAssociationControllerTest
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ObjectMapper objectMapper;
-
+@Autowired
+ApplyCommandResponseMapper applyCommandResponseMapper;
     @Override
     public void beforeCreate(long userId) {
         Long tagId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);

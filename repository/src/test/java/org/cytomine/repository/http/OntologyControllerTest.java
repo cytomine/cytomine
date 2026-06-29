@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.mapper.BaseMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.TermEntity;
-import org.cytomine.repository.service.ApplyCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -55,18 +55,20 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     BaseMapper baseMapper;
 
     @Autowired
-    ApplyCommandService applyCommandService;
+    ApplyCommandResponseMapper applyCommandResponseMapper;
+
     String apiURL = OntologyHttpContract.ROOT_PATH;
     CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());
     UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID().toString()));
     Set<TermResponse> subEntities;
 
     @Override
-    public void createSubEntities(long userId, long currentId) {
+    public Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
         TermEntity subEntity = termRepository.save(
             new TermEntity(null, 0, currentId, UUID.randomUUID().toString(), UUID.randomUUID().toString(),
                 baseMapper.map(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)), null, null, "", Set.of()));
         subEntities = Set.of(termMapper.mapToTermResponse(subEntity));
+        return subEntities;
     }
 
     @Override

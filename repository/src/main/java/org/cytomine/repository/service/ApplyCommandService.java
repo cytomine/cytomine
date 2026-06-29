@@ -12,17 +12,23 @@ import org.springframework.stereotype.Component;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.request.CreateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.CreateStorageCommand;
+import be.cytomine.common.repository.model.command.request.CreateTagDomainAssociationCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.CreateUploadedFileCommand;
 import be.cytomine.common.repository.model.command.request.DeleteOntologyCommand;
 import be.cytomine.common.repository.model.command.request.DeleteStorageCommand;
+import be.cytomine.common.repository.model.command.request.DeleteTagDomainAssociationCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.DeleteUploadedFileCommand;
 import be.cytomine.common.repository.model.command.request.UndoCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.UpdateStorageCommand;
+import be.cytomine.common.repository.model.command.request.UpdateTagDomainAssociationCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
+import be.cytomine.common.repository.model.command.request.UpdateUploadedFileCommand;
 import be.cytomine.common.repository.model.storage.payload.CreateStorage;
 
 @Component
@@ -30,9 +36,11 @@ import be.cytomine.common.repository.model.storage.payload.CreateStorage;
 public class ApplyCommandService {
     private final CommandV2Repository commandRepository;
     private final StorageCommandService storageCommandService;
+    private final TagDomainAssociationCommandService tagDomainAssociationCommandService;
     private final TermCommandService termCommandService;
     private final TermRelationCommandService termRelationCommandService;
     private final OntologyCommandService ontologyCommandService;
+    private final UploadedFileCommandService uploadedFileCommandService;
 
     @Transactional
     public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
@@ -55,6 +63,18 @@ public class ApplyCommandService {
             case CreateStorageCommand csc -> storageCommandService.undoCreate(commandEntity.getId(), csc, userId, now);
             case UpdateStorageCommand usc -> storageCommandService.undoUpdate(commandEntity.getId(), usc, userId, now);
             case DeleteStorageCommand dsc -> storageCommandService.undoDelete(commandEntity.getId(), dsc, userId, now);
+            case CreateUploadedFileCommand cufc ->
+                uploadedFileCommandService.undoCreate(commandEntity.getId(), cufc, userId, now);
+            case UpdateUploadedFileCommand uufc ->
+                uploadedFileCommandService.undoUpdate(commandEntity.getId(), uufc, userId, now);
+            case DeleteUploadedFileCommand dufc ->
+                uploadedFileCommandService.undoDelete(commandEntity.getId(), dufc, userId, now);
+            case CreateTagDomainAssociationCommand ctdac ->
+                tagDomainAssociationCommandService.undoCreate(commandEntity.getId(), ctdac, userId, now);
+            case UpdateTagDomainAssociationCommand utdac ->
+                tagDomainAssociationCommandService.undoUpdate(commandEntity.getId(), utdac, userId, now);
+            case DeleteTagDomainAssociationCommand dtdac ->
+                tagDomainAssociationCommandService.undoDelete(commandEntity.getId(), dtdac, userId, now);
 
             // Actually we undo an undo command here
             case UndoCommandRequest<?> v -> switch (v.command()) {

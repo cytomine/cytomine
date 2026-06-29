@@ -120,7 +120,7 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", userId)
-                    .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
+                    .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
 
         assertTrue(undoCommandResponse.isPresent());

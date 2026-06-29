@@ -1,5 +1,6 @@
 package org.cytomine.repository.service;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -7,9 +8,11 @@ import java.util.UUID;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.entity.TermEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.command.request.CreateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.CreateStorageCommand;
 import be.cytomine.common.repository.model.command.request.CreateTagDomainAssociationCommand;
@@ -81,8 +84,23 @@ public class ApplyCommandService {
                 case DeleteStorageCommand dsc ->
                     storageCommandService.create(userId, new CreateStorage(dsc.before().name()), now);
                 case CreateTermCommand ctc -> termCommandService.delete(userId, ctc.id(), now);
-                case DeleteTermCommand dtc ->
-                    termCommandService.restore(v.commandId(), userId, dtc.id(), dtc.aclId(), dtc.getCommand(), now);
+                case DeleteTermCommand dtc -> {
+                    Optional<HttpCommandResponse> result;
+                    long id = dtc.id();
+                    long aclId = dtc.aclId();
+                    if (termCommandService.canWriteAclId(userId, aclId)) {
+                        result = termCommandService.get(id).map(entity -> {
+                            entity.setDeleted(null);
+                            entity.setUpdated(Timestamp.valueOf(now));
+                            TermEntity saved = termCommandService.save(entity);
+                            TermResponse response = termCommandService.mapToResponse(saved);
+                            return new HttpCommandResponse(true, response, v.commandId(), dtc.getCommand());
+                        });
+                    } else {
+                        result = Optional.empty();
+                    }
+                    yield result;
+                }
                 case UpdateTermCommand updateTermCommand ->
                     termCommandService.updateWithExistingCommand(userId, v.commandId(), updateTermCommand.getCommand(),
                         updateTermCommand.after(), now);

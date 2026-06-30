@@ -63,6 +63,7 @@ public class CytomineSteps {
     public void deleteProject(Wait<WebDriver> wait, String projectURL) {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'Confirm')]"));
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
@@ -614,10 +615,10 @@ public class CytomineSteps {
         String imageName
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + projectName + ")]"));
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No project recently opened')]"));
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No image recently opened')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + projectName + "')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + imageName + "')]"));
     }
 
     public void checkPimsImportProject(

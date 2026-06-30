@@ -58,6 +58,34 @@ public class CollectionTypeTest {
     }
 
     @Test
+    void multipleSingleItemProvisionsShouldWriteCorrectArrayYmlSize() throws FileStorageException, IOException {
+        CollectionType ct = new CollectionType();
+        ct.setMinSize(1);
+        ct.setMaxSize(10);
+        ct.setSubType(new IntegerType());
+
+        GenericParameterCollectionItemProvision item0 = new GenericParameterCollectionItemProvision();
+        item0.setIndex("nuclei/0");
+        item0.setValue(1);
+
+        GenericParameterCollectionItemProvision item1 = new GenericParameterCollectionItemProvision();
+        item1.setIndex("nuclei/1");
+        item1.setValue(2);
+
+        GenericParameterCollectionItemProvision item2 = new GenericParameterCollectionItemProvision();
+        item2.setIndex("nuclei/2");
+        item2.setValue(3);
+
+        StorageData result0 = ct.mapToStorageFileData(mapper.valueToTree(item0), new Run());
+        StorageData result1 = ct.mapToStorageFileData(mapper.valueToTree(item1), new Run());
+        StorageData result2 = ct.mapToStorageFileData(mapper.valueToTree(item2), new Run());
+
+        assertThat(readArrayYmlContent(result0)).isEqualTo("size: 1");
+        assertThat(readArrayYmlContent(result1)).isEqualTo("size: 2");
+        assertThat(readArrayYmlContent(result2)).isEqualTo("size: 3");
+    }
+
+    @Test
     void batchItemProvisionShouldWriteCorrectArrayYmlSize() throws FileStorageException, IOException {
         CollectionType ct = new CollectionType();
         ct.setMinSize(1);

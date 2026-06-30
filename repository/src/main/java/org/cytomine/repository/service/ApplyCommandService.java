@@ -90,7 +90,18 @@ public class ApplyCommandService {
                     case CreateOntologyCommand coc ->
                         ontologyCommandService.undoDelete(v.commandId(), new DeleteOntologyCommand(coc.after(), userId),
                             userId, now);
-
+                    case CreateStorageCommand csc ->
+                        storageCommandService.undoDelete(v.commandId(), new DeleteStorageCommand(csc.after(), userId),
+                            userId, now);
+                    case CreateTagDomainAssociationCommand ctdac ->
+                        tagDomainAssociationCommandService.undoDelete(v.commandId(),
+                            new DeleteTagDomainAssociationCommand(ctdac.after(), userId), userId, now);
+                    case CreateTermRelationCommand ctrc ->
+                        termRelationCommandService.undoDelete(v.commandId(),
+                            new DeleteTermRelationCommand(ctrc.after(), userId), userId, now);
+                    case CreateUploadedFileCommand cufc ->
+                        uploadedFileCommandService.undoDelete(v.commandId(),
+                            new DeleteUploadedFileCommand(cufc.after(), userId), userId, now);
                 };
                 case UndoDeleteCommand<?> v -> switch (v.target()) {
                     case DeleteStorageCommand dsc ->
@@ -101,15 +112,32 @@ public class ApplyCommandService {
                             userId, now);
                     case DeleteOntologyCommand doc -> ontologyCommandService.undoCreate(v.commandId(),
                         new CreateOntologyCommand(doc.before(), userId), userId, now);
-
+                    case DeleteTagDomainAssociationCommand dtdac ->
+                        tagDomainAssociationCommandService.undoCreate(v.commandId(),
+                            new CreateTagDomainAssociationCommand(dtdac.before(), userId), userId, now);
+                    case DeleteTermRelationCommand dtrc ->
+                        termRelationCommandService.undoCreate(v.commandId(),
+                            new CreateTermRelationCommand(dtrc.before(), userId), userId, now);
+                    case DeleteUploadedFileCommand dufc ->
+                        uploadedFileCommandService.undoCreate(v.commandId(),
+                            new CreateUploadedFileCommand(dufc.before(), userId), userId, now);
                 };
                 case UndoUpdateCommand<?> v -> switch (v.target()) {
                     case UpdateTermCommand utc -> termCommandService.undoUpdate(v.commandId(),
                         new UpdateTermCommand(utc.after(), utc.before(), userId), userId, now);
-
                     case UpdateOntologyCommand uoc -> ontologyCommandService.undoUpdate(v.commandId(),
                         new UpdateOntologyCommand(uoc.after(), uoc.before(), userId), userId, now);
-
+                    case UpdateStorageCommand usc -> storageCommandService.undoUpdate(v.commandId(),
+                        new UpdateStorageCommand(usc.after(), usc.before(), userId), userId, now);
+                    case UpdateTagDomainAssociationCommand utdac ->
+                        tagDomainAssociationCommandService.undoUpdate(v.commandId(),
+                            new UpdateTagDomainAssociationCommand(utdac.after(), utdac.before(), userId), userId, now);
+                    case UpdateTermRelationCommand utrc ->
+                        termRelationCommandService.undoUpdate(v.commandId(),
+                            new UpdateTermRelationCommand(utrc.after(), utrc.before(), userId), userId, now);
+                    case UpdateUploadedFileCommand uufc ->
+                        uploadedFileCommandService.undoUpdate(v.commandId(),
+                            new UpdateUploadedFileCommand(uufc.after(), uufc.before(), userId), userId, now);
                 };
             });
     }

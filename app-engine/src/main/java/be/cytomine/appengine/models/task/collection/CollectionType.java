@@ -1273,11 +1273,16 @@ public class CollectionType extends Type {
             }
 
             container.getEntryList().removeIf(tempYml -> tempYml.getName().endsWith("array.yml"));
-            int minusParameterDirectory = container.getEntryList().size() - 1;
+            String dirPrefix = "/" + ymlPath + "/";
+            long filesInDir = container.getEntryList().stream()
+                .filter(e -> e.getStorageDataType() == StorageDataType.FILE)
+                .filter(e -> e.getName().startsWith(dirPrefix) &&
+                    !e.getName().substring(dirPrefix.length()).contains("/"))
+                .count();
             container.add(itemFileEntry);
-            String arrayDotYmpData = "size: " + (minusParameterDirectory + 1);
+            String arraySize = "size: " + (filesInDir + 1);
             container.add(new StorageDataEntry(
-                FileHelper.write("array.yml", arrayDotYmpData.getBytes(StandardCharsets.UTF_8)),
+                FileHelper.write("array.yml", arraySize.getBytes(StandardCharsets.UTF_8)),
                 ymlPath + "/array.yml",
                 StorageDataType.FILE
             ));

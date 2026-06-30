@@ -144,7 +144,7 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.sliceinstanceID").exists())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.sliceinstance.id").exists());
 
     }
@@ -163,7 +163,7 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.callback.sliceinstanceID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditSliceInstanceCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.sliceinstance.id").exists());
     }
 
@@ -178,7 +178,7 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.callback.sliceinstanceID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteSliceInstanceCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.sliceinstance.id").exists());
     }
 

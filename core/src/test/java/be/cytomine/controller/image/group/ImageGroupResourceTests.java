@@ -85,7 +85,7 @@ public class ImageGroupResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.imagegroupID").exists())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.imagegroup.id").exists());
     }
 
@@ -105,7 +105,7 @@ public class ImageGroupResourceTests {
             .andExpect(jsonPath("$.callback.imagegroupID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditImageGroupCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.imagegroup.id").exists())
             .andExpect(jsonPath("$.imagegroup.name").value(name));
     }
@@ -121,7 +121,7 @@ public class ImageGroupResourceTests {
             .andExpect(jsonPath("$.callback.imagegroupID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteImageGroupCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.imagegroup.id").exists());
     }
 }

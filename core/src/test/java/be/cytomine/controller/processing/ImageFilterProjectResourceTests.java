@@ -100,7 +100,7 @@ public class ImageFilterProjectResourceTests {
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.imagefilterproject.id").exists());
     }
 

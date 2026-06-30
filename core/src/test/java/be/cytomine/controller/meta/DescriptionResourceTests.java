@@ -105,7 +105,7 @@ public class DescriptionResourceTests {
             .andExpect(jsonPath("$.callback.descriptionID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddDescriptionCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.description.id").exists());
     }
 
@@ -127,7 +127,7 @@ public class DescriptionResourceTests {
             .andExpect(jsonPath("$.callback.descriptionID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditDescriptionCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.description.id").exists())
             .andExpect(jsonPath("$.description.data").value("v2"));
     }

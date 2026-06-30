@@ -161,7 +161,7 @@ public class CompanionFileResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.companionfileID").exists())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.companionfile.id").exists());
     }
 
@@ -180,7 +180,7 @@ public class CompanionFileResourceTests {
             .andExpect(jsonPath("$.callback.companionfileID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditCompanionFileCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.companionfile.id").exists())
             .andExpect(jsonPath("$.companionfile.filename").value("toto"));
     }
@@ -196,7 +196,7 @@ public class CompanionFileResourceTests {
             .andExpect(jsonPath("$.callback.companionfileID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteCompanionFileCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.companionfile.id").exists());
     }
 

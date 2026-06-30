@@ -103,7 +103,7 @@ application:
 
   authentication:
     jwt:
-      # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
+      # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your target line to generate a 512 bits one)
       secret: +MbQeThWmZq4t6w9z$C&F)J@NcRfUjXn2r5u8x!A%D*G-KaPdSgVkYp3s6v9y$B?
       # Token is valid 24 hours
       token-validity-in-seconds: ${TOKEN_VALIDITY_IN_SECONDS:86400}

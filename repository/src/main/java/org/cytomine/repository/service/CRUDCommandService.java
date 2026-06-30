@@ -123,17 +123,16 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         CommandV2Entity commandV2Entity =
             getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId));
 
-        long id = deleteCommand.id();
         long aclId = deleteCommand.aclId();
-        String command = deleteCommand.getCommand();
+
         if (canWriteAclId(userId, aclId)) {
-            return get(id).map(entity -> {
+            return get(deleteCommand.id()).map(entity -> {
                 entity.setDeleted(null);
                 entity.setUpdated(Timestamp.valueOf(now));
                 E saved = save(entity);
                 R response = mapToResponse(saved);
                 return new HttpCommandResponse(true, new UndoCommandResponse(response), commandV2Entity.getId(),
-                    command);
+                    undoCommandRequest.getCommand());
             });
         } else {
             return Optional.empty();
@@ -150,13 +149,12 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         CommandV2Entity commandV2Entity =
             getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId));
 
-        long id = createCommand.id();
-        String command = createCommand.getCommand();
-        return get(id).map(entity -> {
+        return get(createCommand.id()).map(entity -> {
             entity.setDeleted(Timestamp.valueOf(now));
             E saved = save(entity);
             R response = mapToResponse(saved);
-            return new HttpCommandResponse(true, new UndoCommandResponse(response), commandV2Entity.getId(), command);
+            return new HttpCommandResponse(true, new UndoCommandResponse(response), commandV2Entity.getId(),
+                undoCommandRequest.getCommand());
         });
     }
 
@@ -170,7 +168,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         CommandV2Entity commandV2Entity =
             getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId));
 
-        return updateWithExistingCommand(userId, commandV2Entity.getId(), updateCommand.getCommand(),
+        return updateWithExistingCommand(userId, commandV2Entity.getId(), undoCommandRequest.getCommand(),
             updateCommand.before(), now);
     }
 }

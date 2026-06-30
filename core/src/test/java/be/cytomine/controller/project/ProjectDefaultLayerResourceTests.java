@@ -135,7 +135,7 @@ public class ProjectDefaultLayerResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddProjectDefaultLayerCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.projectdefaultlayer.id").exists());
     }
 
@@ -169,7 +169,7 @@ public class ProjectDefaultLayerResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditProjectDefaultLayerCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.projectdefaultlayer.id").exists())
             .andExpect(jsonPath("$.projectdefaultlayer.hideByDefault").value(true));
     }
@@ -205,7 +205,7 @@ public class ProjectDefaultLayerResourceTests {
             .andExpect(jsonPath("$.callback.projectdefaultlayerID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteProjectDefaultLayerCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists());
+            .andExpect(jsonPath("$.target").exists());
     }
 
     @Test

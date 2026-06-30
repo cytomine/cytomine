@@ -47,7 +47,7 @@ public class AnnotationLinkResourceTests {
             .andExpect(jsonPath("$.callback.annotationlinkID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddAnnotationLinkCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.annotationlink.id").exists())
             .andExpect(jsonPath("$.annotationlink.group").exists());
     }
@@ -91,7 +91,7 @@ public class AnnotationLinkResourceTests {
             .andExpect(jsonPath("$.callback.annotationlinkID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteAnnotationLinkCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.annotationlink.id").exists());
     }
 }

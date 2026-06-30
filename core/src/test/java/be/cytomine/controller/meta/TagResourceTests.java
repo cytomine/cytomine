@@ -95,7 +95,7 @@ public class TagResourceTests {
             .andExpect(jsonPath("$.callback.tagID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddTagCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.tag.id").exists())
             .andExpect(jsonPath("$.tag.name").value(tag.getName()));
     }
@@ -136,7 +136,7 @@ public class TagResourceTests {
             .andExpect(jsonPath("$.callback.tagID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditTagCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.tag.id").exists())
             .andExpect(jsonPath("$.tag.name").value("new name"));
     }
@@ -167,7 +167,7 @@ public class TagResourceTests {
             .andExpect(jsonPath("$.callback.tagID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteTagCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.tag.id").exists())
             .andExpect(jsonPath("$.tag.name").value(tag.getName()));
     }

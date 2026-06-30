@@ -1239,7 +1239,7 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.callback.userannotationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddUserAnnotationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.annotation.id").exists());
     }
 
@@ -1273,7 +1273,7 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.callback.userannotationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditUserAnnotationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.annotation.id").exists());
 
     }
@@ -1291,7 +1291,7 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.callback.reviewedannotationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditReviewedAnnotationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists());
+            .andExpect(jsonPath("$.target").exists());
     }
 
     @Test
@@ -1314,7 +1314,7 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.callback.userannotationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteUserAnnotationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.annotation.id").exists());
     }
 
@@ -1334,7 +1334,7 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.callback.reviewedannotationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteReviewedAnnotationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists());
+            .andExpect(jsonPath("$.target").exists());
 
     }
 

@@ -165,7 +165,7 @@ public class AbstractSliceResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.abstractsliceID").exists())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.abstractslice.id").exists());
 
     }
@@ -185,7 +185,7 @@ public class AbstractSliceResourceTests {
             .andExpect(jsonPath("$.callback.abstractsliceID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditAbstractSliceCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.abstractslice.id").exists())
             .andExpect(jsonPath("$.abstractslice.time").value(3));
     }
@@ -201,7 +201,7 @@ public class AbstractSliceResourceTests {
             .andExpect(jsonPath("$.callback.abstractsliceID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteAbstractSliceCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.abstractslice.id").exists());
     }
 

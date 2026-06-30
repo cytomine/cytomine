@@ -505,7 +505,7 @@ public class UserResourceTests {
     //                .andExpect(jsonPath("$.callback.userID").exists())
     //                .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddUserCommand"))
     //                .andExpect(jsonPath("$.message").exists())
-    //                .andExpect(jsonPath("$.command").exists())
+    //                .andExpect(jsonPath("$.target").exists())
     //                .andExpect(jsonPath("$.user.id").exists())
     //                .andExpect(jsonPath("$.user.username").value("TEST_CREATE"));
     //
@@ -568,7 +568,7 @@ public class UserResourceTests {
     //                .andExpect(jsonPath("$.printMessage").value(true))
     //                .andExpect(jsonPath("$.callback").exists())
     //                .andExpect(jsonPath("$.message").exists())
-    //                .andExpect(jsonPath("$.command").exists())
+    //                .andExpect(jsonPath("$.target").exists())
     //                .andExpect(jsonPath("$.user.id").exists())
     //                .andExpect(jsonPath("$.user.name").value("TEST_CREATE_CHANGE"));
     //    }
@@ -587,7 +587,7 @@ public class UserResourceTests {
     //                .andExpect(jsonPath("$.callback.userID").exists())
     //                .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteUserCommand"))
     //                .andExpect(jsonPath("$.message").exists())
-    //                .andExpect(jsonPath("$.command").exists())
+    //                .andExpect(jsonPath("$.target").exists())
     //                .andExpect(jsonPath("$.user.id").exists());
     //    }
 

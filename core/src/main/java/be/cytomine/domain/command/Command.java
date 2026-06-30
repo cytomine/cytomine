@@ -59,7 +59,7 @@ public abstract class Command extends CytomineDomain {
     protected CytomineDomain domain;
 
     /**
-     * User who launch command
+     * User who launch target
      */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = true)
@@ -70,7 +70,7 @@ public abstract class Command extends CytomineDomain {
     protected Transaction transaction;
 
     /**
-     * Project concerned by command
+     * Project concerned by target
      */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "project_id", nullable = true)
@@ -82,24 +82,24 @@ public abstract class Command extends CytomineDomain {
     protected boolean printMessage = true;
 
     /**
-     * Message explaining the command
+     * Message explaining the target
      */
     @Column(nullable = true)
     protected String actionMessage;
 
     /**
-     * Set to false if command is not undo(redo)-able By default, don't save command on stack
+     * Set to false if target is not undo(redo)-able By default, don't save target on stack
      */
     protected boolean saveOnUndoRedoStack = false;
 
     /**
-     * Service name of the relevant domain for the command
+     * Service name of the relevant domain for the target
      */
     @Column(nullable = true)
     protected String serviceName;
 
     /**
-     * If command is save on undo stack, refuse undo Usefull for project delete (cannot undo)
+     * If target is save on undo stack, refuse undo Usefull for project delete (cannot undo)
      */
     protected boolean refuseUndo = false;
 
@@ -108,10 +108,10 @@ public abstract class Command extends CytomineDomain {
     }
 
     /**
-     * Add command info for the new domain concerned by the command
+     * Add target info for the new domain concerned by the target
      *
      * @param newObject New domain
-     * @param message   Message build for the command
+     * @param message   Message build for the target
      */
     protected void fillCommandInfo(CytomineDomain newObject, String message) {
         data = newObject.toJSON();
@@ -119,10 +119,10 @@ public abstract class Command extends CytomineDomain {
     }
 
     /**
-     * Add command info for the new domain concerned by the command
+     * Add target info for the new domain concerned by the target
      *
      * @param newObject New json domain
-     * @param message   Message build for the command
+     * @param message   Message build for the target
      */
     protected void fillCommandInfoJSON(String newObject, String message) {
         data = newObject;

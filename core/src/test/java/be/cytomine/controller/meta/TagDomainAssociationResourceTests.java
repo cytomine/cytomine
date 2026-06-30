@@ -166,7 +166,7 @@ public class TagDomainAssociationResourceTests {
                 .content(body))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.command").value(Commands.CREATE_TAG_DOMAIN_ASSOCIATION));
+            .andExpect(jsonPath("$.target").value(Commands.CREATE_TAG_DOMAIN_ASSOCIATION));
     }
 
     @Test
@@ -187,7 +187,7 @@ public class TagDomainAssociationResourceTests {
                 .content(body))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.command").value(Commands.CREATE_TAG_DOMAIN_ASSOCIATION));
+            .andExpect(jsonPath("$.target").value(Commands.CREATE_TAG_DOMAIN_ASSOCIATION));
     }
 
     @Test

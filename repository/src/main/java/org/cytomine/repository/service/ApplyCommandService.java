@@ -1,6 +1,5 @@
 package org.cytomine.repository.service;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,11 +7,9 @@ import java.util.UUID;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.persistence.entity.TermEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.command.request.CreateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.CreateStorageCommand;
 import be.cytomine.common.repository.model.command.request.CreateTagDomainAssociationCommand;
@@ -79,31 +76,20 @@ public class ApplyCommandService {
             case DeleteTagDomainAssociationCommand dtdac ->
                 tagDomainAssociationCommandService.undoDelete(commandEntity.getId(), dtdac, userId, now);
 
-            // Actually we undo an undo command here
-            case UndoCommandRequest<?> v -> switch (v.command()) {
+            // Actually we undo an undo target here
+            case UndoCommandRequest<?> v -> switch (v.target()) {
                 case DeleteStorageCommand dsc ->
                     storageCommandService.create(userId, new CreateStorage(dsc.before().name()), now);
                 case CreateTermCommand ctc -> termCommandService.delete(userId, ctc.id(), now);
-                case DeleteTermCommand dtc -> {
-                    Optional<HttpCommandResponse> result;
-                    long id = dtc.id();
-                    long aclId = dtc.aclId();
-                    if (termCommandService.canWriteAclId(userId, aclId)) {
-                        result = termCommandService.get(id).map(entity -> {
-                            entity.setDeleted(null);
-                            entity.setUpdated(Timestamp.valueOf(now));
-                            TermEntity saved = termCommandService.save(entity);
-                            TermResponse response = termCommandService.mapToResponse(saved);
-                            return new HttpCommandResponse(true, response, v.commandId(), dtc.getCommand());
-                        });
-                    } else {
-                        result = Optional.empty();
-                    }
-                    yield result;
-                }
+                case DeleteTermCommand dtc -> termCommandService.undoDelete(v.commandId(), dtc, userId, now);
                 case UpdateTermCommand updateTermCommand ->
                     termCommandService.updateWithExistingCommand(userId, v.commandId(), updateTermCommand.getCommand(),
                         updateTermCommand.after(), now);
+                case CreateOntologyCommand coc -> ontologyCommandService.undoCreate(v.commandId(), coc, userId, now);
+                case DeleteOntologyCommand doc -> ontologyCommandService.undoDelete(v.commandId(), doc, userId, now);
+                case UpdateOntologyCommand uoc ->
+                    ontologyCommandService.updateWithExistingCommand(userId, v.commandId(), uoc.getCommand(),
+                        uoc.after(), now);
                 default -> null;
             };
         });

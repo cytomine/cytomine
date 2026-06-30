@@ -2314,7 +2314,7 @@
         <createIndex indexName="algo_annotation_image_id_index" tableName="algo_annotation">
             <column name="image_id"/>
         </createIndex>
-        <!-- Not possible to specify the index type using liquibase, so we write a custom sql command-->
+        <!-- Not possible to specify the index type using liquibase, so we write a custom sql target-->
         <sql>
             CREATE INDEX algo_annotation_location_index
                 ON algo_annotation USING GIST (location);
@@ -2364,7 +2364,7 @@
             <column name="image_id"/>
         </createIndex>
 
-        <!-- Not possible to specify the index type using liquibase, so we write a custom sql command-->
+        <!-- Not possible to specify the index type using liquibase, so we write a custom sql target-->
         <sql>
             CREATE INDEX user_annotation_location_index
                 ON user_annotation USING GIST (location);

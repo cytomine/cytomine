@@ -65,16 +65,16 @@ public class CommandService {
     }
 
     /**
-     * Execute a 'command' c with json data Store command in undo stack if necessary and in command history if success,
+     * Execute a 'target' c with json data Store target in undo stack if necessary and in target history if success,
      * put http response code as successCode
      */
     CommandResponse processCommand(Command c, ModelService service, int successCode) throws CytomineException {
-        //execute command
+        //execute target
         log.debug("processCommand");
         CommandResponse result = c.execute(service);
         if (result.getStatus() == successCode) {
             if ((service instanceof ProjectService && c instanceof DeleteCommand)) {
-                // project has been deleted in this command, so we cannot link the command to the deleted project
+                // project has been deleted in this target, so we cannot link the target to the deleted project
                 c.setProject(null);
             }
 
@@ -110,7 +110,7 @@ public class CommandService {
         }
 
         if (lastUndoStackItem.isEmpty()) {
-            //There is no command, so nothing to undo
+            //There is no target, so nothing to undo
             CommandResponse commandResponse = new CommandResponse();
             commandResponse.setData(responseService.createResponseData(true, "be.cytomine.UndoCommand", null, true));
             commandResponse.setStatus(200);
@@ -130,17 +130,17 @@ public class CommandService {
 
         if (transaction == null) {
             log.debug("Transaction not in progress");
-            //Not Transaction, no other command must be deleted
+            //Not Transaction, no other target must be deleted
             result = performUndo(undoItem.getCommand());
-            //An undo command must be move to redo stack
+            //An undo target must be move to redo stack
             moveToRedoStack(undoItem);
             results.add(result);
         } else {
             log.debug("Transaction in progress");
-            //Its a transaction, many other command will be deleted
+            //Its a transaction, many other target will be deleted
             List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user, transaction);
             for (UndoStackItem undoStack : undoStacks) {
-                //browse all command and undo it while its the same transaction
+                //browse all target and undo it while its the same transaction
                 if (undoStack.getCommand().isRefuseUndo()) {
                     //undo delete project is not possible
                     //responseError(new ObjectNotFoundException("You cannot delete your last operation!"))
@@ -192,17 +192,17 @@ public class CommandService {
 
         if (transaction == null) {
             log.debug("Transaction not in progress");
-            //Not Transaction, no other command must be deleted
+            //Not Transaction, no other target must be deleted
             result = performRedo(redoItem.getCommand());
-            //An undo command must be move to redo stack
+            //An undo target must be move to redo stack
             moveToUndoStack(redoItem);
             results.add(result);
         } else {
             log.debug("Transaction in progress");
-            //Its a transaction, many other command will be deleted
+            //Its a transaction, many other target will be deleted
             List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(user, transaction);
             for (RedoStackItem redoStack : redoStacks) {
-                //Redo each command from the same transaction
+                //Redo each target from the same transaction
                 result = performRedo(redoStack.getCommand());
                 moveToUndoStack(redoStack);
                 results.add(result);
@@ -221,7 +221,7 @@ public class CommandService {
         }
 
         if (lastRedoStackItem.isEmpty()) {
-            //There is no command, so nothing to undo
+            //There is no target, so nothing to undo
             CommandResponse commandResponse = new CommandResponse();
             commandResponse.setData(responseService.createResponseData(true, "be.cytomine.RedoCommand", null, true));
             commandResponse.setStatus(200);

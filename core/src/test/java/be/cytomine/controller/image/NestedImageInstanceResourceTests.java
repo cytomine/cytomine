@@ -119,7 +119,7 @@ public class NestedImageInstanceResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.nestedimageinstanceID").exists())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.nestedimageinstance.id").exists());
 
     }
@@ -143,7 +143,7 @@ public class NestedImageInstanceResourceTests {
             .andExpect(jsonPath("$.callback.nestedimageinstanceID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditNestedImageInstanceCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.nestedimageinstance.id").exists())
             .andExpect(jsonPath("$.nestedimageinstance.x").value("123"));
 
@@ -166,7 +166,7 @@ public class NestedImageInstanceResourceTests {
             .andExpect(jsonPath("$.callback.nestedimageinstanceID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteNestedImageInstanceCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.nestedimageinstance.id").exists());
 
 

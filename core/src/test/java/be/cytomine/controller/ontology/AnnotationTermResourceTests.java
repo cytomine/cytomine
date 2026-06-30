@@ -202,7 +202,7 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.callback.annotationtermID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddAnnotationTermCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.annotationterm.id").exists())
             .andExpect(jsonPath("$.annotationterm.term").exists());
 
@@ -303,7 +303,7 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.callback.annotationtermID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddAnnotationTermCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.annotationterm.id").exists())
             .andExpect(jsonPath("$.annotationterm.term").exists());
 
@@ -358,7 +358,7 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.callback.annotationtermID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddAnnotationTermCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.annotationterm.id").exists())
             .andExpect(jsonPath("$.annotationterm.term").exists());
 
@@ -397,7 +397,7 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.callback.annotationtermID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteAnnotationTermCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.annotationterm.id").exists());
     }
 
@@ -418,7 +418,7 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.callback.annotationtermID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteAnnotationTermCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
+            .andExpect(jsonPath("$.target").exists())
             .andExpect(jsonPath("$.annotationterm.id").exists());
     }
 

@@ -24,4 +24,6 @@ public interface Commands {
     String CREATE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.AddTagDomainAssociationCommand";
     String UPDATE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.EditTagDomainAssociationCommand";
     String DELETE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.DeleteTagDomainAssociationCommand";
+
+    String UNDO_COMMAND = "be.cytominte.UndoCommand";
 }

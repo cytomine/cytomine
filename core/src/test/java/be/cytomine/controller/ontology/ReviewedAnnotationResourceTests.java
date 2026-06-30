@@ -332,7 +332,7 @@ public class ReviewedAnnotationResourceTests {
             .andExpect(jsonPath("$.callback.reviewedannotationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddReviewedAnnotationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists());
+            .andExpect(jsonPath("$.target").exists());
 
     }
 
@@ -352,7 +352,7 @@ public class ReviewedAnnotationResourceTests {
             .andExpect(jsonPath("$.callback.reviewedannotationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditReviewedAnnotationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists());
+            .andExpect(jsonPath("$.target").exists());
 
     }
 
@@ -373,7 +373,7 @@ public class ReviewedAnnotationResourceTests {
             .andExpect(jsonPath("$.callback.reviewedannotationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteReviewedAnnotationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists());
+            .andExpect(jsonPath("$.target").exists());
 
     }
 

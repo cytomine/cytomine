@@ -31,7 +31,7 @@ import be.cytomine.utils.CommandResponse;
 @Getter
 @Setter
 @Entity
-@DiscriminatorValue("be.cytomine.domain.command.DeleteCommand")
+@DiscriminatorValue("be.cytomine.domain.target.DeleteCommand")
 public class DeleteCommand extends Command {
 
 
@@ -47,19 +47,19 @@ public class DeleteCommand extends Command {
     Object backup;
 
     /**
-     * Add project link in command
+     * Add project link in target
      */
     boolean linkProject = true;
 
     /**
-     * Process an Add operation for this command
+     * Process an Add operation for this target
      *
      * @return Message
      */
     public CommandResponse execute(ModelService service) {
         //Retrieve domain to delete it
         CytomineDomain oldDomain = domain;
-        //Init command info
+        //Init target info
         CytomineDomain container = oldDomain.container();
         if (container != null && container instanceof Project && linkProject) {
             super.setProject((Project) container);

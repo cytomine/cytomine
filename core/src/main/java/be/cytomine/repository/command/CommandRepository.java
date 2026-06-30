@@ -62,7 +62,7 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
     List<RedoStackItem> findAllRedoOrderByCreatedDesc(User user, Transaction transaction);
 
     @Query(
-        "SELECT usi FROM UndoStackItem usi WHERE usi.command = :command AND usi.user = :user ORDER BY usi.created DESC")
+        "SELECT usi FROM UndoStackItem usi WHERE usi.target = :target AND usi.user = :user ORDER BY usi.created DESC")
     Page<UndoStackItem> findLastUndoStackItems(User user, Command command, Pageable pageable);
 
     @Query("SELECT usi FROM UndoStackItem usi WHERE usi.user = :user ORDER BY usi.created DESC")
@@ -77,7 +77,7 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
     }
 
     @Query(
-        "SELECT usi FROM RedoStackItem usi WHERE usi.command = :command AND usi.user = :user ORDER BY usi.created DESC")
+        "SELECT usi FROM RedoStackItem usi WHERE usi.target = :target AND usi.user = :user ORDER BY usi.created DESC")
     Page<RedoStackItem> findLastRedoStackItems(User user, Command command, Pageable pageable);
 
     @Query("SELECT usi FROM RedoStackItem usi WHERE usi.user = :user ORDER BY usi.created DESC")

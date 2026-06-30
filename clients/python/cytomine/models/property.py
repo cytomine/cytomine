@@ -23,6 +23,7 @@ from cytomine.models.annotation import Annotation
 from cytomine.models.collection import Collection, DomainCollection
 from cytomine.models.model import DomainModel, Model
 
+
 class Property(DomainModel):
     def __init__(
         self,
@@ -81,6 +82,7 @@ class Property(DomainModel):
             f"- Key: {self.key} - Value {self.value}"
         )
 
+
 class PropertyCollection(DomainCollection):
     _domainClassName: str | None
 
@@ -120,6 +122,7 @@ class PropertyCollection(DomainCollection):
         else:
             self._domainClassName = getattr(value, "class_", None)
         self._domainIdent = value.id
+
 
 class AttachedFile(DomainModel):
     def __init__(
@@ -189,6 +192,7 @@ class AttachedFile(DomainModel):
             override,
         )
 
+
 class AttachedFileCollection(DomainCollection):
     def __init__(
         self,
@@ -201,6 +205,7 @@ class AttachedFileCollection(DomainCollection):
         super().__init__(AttachedFile, object, filters, max, offset)
         self._allowed_filters = [None]
         self.set_parameters(parameters)
+
 
 class Description(DomainModel):
     def __init__(
@@ -223,11 +228,13 @@ class Description(DomainModel):
 
         return Cytomine.get_instance().get_model(self, self.query_parameters)
 
+
 class Tag(Model):
     def __init__(self, name: str | None = None, **attributes: Any) -> None:
         super().__init__()
         self.name: str | None = name
         self.populate(attributes)
+
 
 class TagCollection(Collection):
     def __init__(
@@ -241,9 +248,13 @@ class TagCollection(Collection):
         self._allowed_filters = [None]
         self.set_parameters(parameters)
 
+
 class TagDomainAssociation(DomainModel):
     def __init__(
-        self, object: Model, tag: int | None = None, **attributes: Any
+        self,
+        object: Model,
+        tag: int | None = None,
+        **attributes: Any,
     ) -> None:
         super().__init__(object)
         self.tag = tag
@@ -261,6 +272,7 @@ class TagDomainAssociation(DomainModel):
     @property
     def callback_identifier(self) -> str:
         return "tag_domain_association"
+
 
 class TagDomainAssociationCollection(DomainCollection):
     def __init__(

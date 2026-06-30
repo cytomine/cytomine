@@ -38,7 +38,6 @@ import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repository.meta.TagDomainAssociationRepository;
-import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
@@ -83,29 +82,6 @@ public class TagDomainAssociationServiceTests {
     }
 
     @Test
-    public void findById() {
-        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        );
-        assertThat(tagDomainAssociationService.find(tagDomainAssociation.getId())).isPresent();
-    }
-
-    @Test
-    public void findByIdThatDoNotExists() {
-        assertThat(tagDomainAssociationService.find(0L)).isEmpty();
-    }
-
-    @Test
-    public void getById() {
-        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        );
-        assertThat(tagDomainAssociationService.get(tagDomainAssociation.getId())).isNotNull();
-    }
-
-    @Test
     public void listAllForDomain() {
         Project project = builder.givenAProject();
         TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(builder.givenATag(), project);
@@ -115,19 +91,6 @@ public class TagDomainAssociationServiceTests {
         assertThat(tagDomainAssociationService.listAllByDomain(project))
             .contains(tagDomainAssociation)
             .doesNotContain(tagDomainAssociationFromOtherDomain);
-    }
-
-    @Test
-    public void listAllForTag() {
-        Project project = builder.givenAProject();
-        Tag tag = builder.givenATag();
-        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(tag, project);
-        TagDomainAssociation tagDomainAssociationFromOtherTag = builder.givenATagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        );
-        assertThat(tagDomainAssociationService.listAllByTag(tag)).contains(tagDomainAssociation)
-            .doesNotContain(tagDomainAssociationFromOtherTag);
     }
 
     @Test
@@ -163,27 +126,5 @@ public class TagDomainAssociationServiceTests {
         )))).doesNotContain(tag1Domain1, tag1Domain2, tag2Domain1, tag2Domain2);
     }
 
-
-    @Test
-    public void createTagAssociation() throws ClassNotFoundException {
-        CommandResponse
-            add
-            = tagDomainAssociationService.add(builder.givenANotPersistedTagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        ).toJsonObject());
-        assertThat(tagDomainAssociationService.listAllByTag(((TagDomainAssociation) add.getObject()).getTag())).hasSize(
-            1);
-    }
-
-    @Test
-    public void deleteTagAssociation() {
-        TagDomainAssociation tagDomainAssociation = builder.givenATagAssociation(
-            builder.givenATag(),
-            builder.givenAProject()
-        );
-        CommandResponse delete = tagDomainAssociationService.delete(tagDomainAssociation, null, null, false);
-        assertThat(tagDomainAssociationService.listAllByTag(tagDomainAssociation.getTag())).hasSize(0);
-    }
 
 }

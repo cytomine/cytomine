@@ -17,7 +17,9 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
-import be.cytomine.common.repository.model.command.request.UndoCommandRequest;
+import be.cytomine.common.repository.model.command.request.UndoCreateCommand;
+import be.cytomine.common.repository.model.command.request.UndoDeleteCommand;
+import be.cytomine.common.repository.model.command.request.UndoUpdateCommand;
 import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
 
 public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E extends HasTimestampCUD,
@@ -119,7 +121,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
             return Optional.empty();
         }
 
-        UndoCommandRequest<P> undoCommandRequest = new UndoCommandRequest<>(deleteCommand, commandId);
+        UndoDeleteCommand<P> undoCommandRequest = new UndoDeleteCommand<>(deleteCommand, commandId);
         CommandV2Entity commandV2Entity =
             getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId));
 
@@ -145,7 +147,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
             return Optional.empty();
         }
 
-        UndoCommandRequest<P> undoCommandRequest = new UndoCommandRequest<>(createCommand, commandId);
+        UndoCreateCommand<P> undoCommandRequest = new UndoCreateCommand<>(createCommand, commandId);
         CommandV2Entity commandV2Entity =
             getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId));
 
@@ -164,7 +166,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
             return Optional.empty();
         }
 
-        UndoCommandRequest<P> undoCommandRequest = new UndoCommandRequest<>(updateCommand, commandId);
+        UndoUpdateCommand<P> undoCommandRequest = new UndoUpdateCommand<>(updateCommand, commandId);
         CommandV2Entity commandV2Entity =
             getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId));
 

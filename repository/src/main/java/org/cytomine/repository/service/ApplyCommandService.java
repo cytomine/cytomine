@@ -22,7 +22,9 @@ import be.cytomine.common.repository.model.command.request.DeleteTagDomainAssoci
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.DeleteUploadedFileCommand;
-import be.cytomine.common.repository.model.command.request.UndoCommandRequest;
+import be.cytomine.common.repository.model.command.request.UndoCreateCommand;
+import be.cytomine.common.repository.model.command.request.UndoDeleteCommand;
+import be.cytomine.common.repository.model.command.request.UndoUpdateCommand;
 import be.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.UpdateStorageCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTagDomainAssociationCommand;
@@ -77,16 +79,22 @@ public class ApplyCommandService {
                 tagDomainAssociationCommandService.undoDelete(commandEntity.getId(), dtdac, userId, now);
 
             // Actually we undo an undo target here
-            case UndoCommandRequest<?> v -> switch (v.target()) {
+            case UndoCreateCommand<?> v -> switch (v.target()) {
+                case CreateTermCommand ctc -> termCommandService.delete(userId, ctc.id(), now);
+                case CreateOntologyCommand coc -> ontologyCommandService.undoCreate(v.commandId(), coc, userId, now);
+                default -> null;
+            };
+            case UndoDeleteCommand<?> v -> switch (v.target()) {
                 case DeleteStorageCommand dsc ->
                     storageCommandService.create(userId, new CreateStorage(dsc.before().name()), now);
-                case CreateTermCommand ctc -> termCommandService.delete(userId, ctc.id(), now);
                 case DeleteTermCommand dtc -> termCommandService.undoDelete(v.commandId(), dtc, userId, now);
+                case DeleteOntologyCommand doc -> ontologyCommandService.undoDelete(v.commandId(), doc, userId, now);
+                default -> null;
+            };
+            case UndoUpdateCommand<?> v -> switch (v.target()) {
                 case UpdateTermCommand updateTermCommand ->
                     termCommandService.updateWithExistingCommand(userId, v.commandId(), updateTermCommand.getCommand(),
                         updateTermCommand.after(), now);
-                case CreateOntologyCommand coc -> ontologyCommandService.undoCreate(v.commandId(), coc, userId, now);
-                case DeleteOntologyCommand doc -> ontologyCommandService.undoDelete(v.commandId(), doc, userId, now);
                 case UpdateOntologyCommand uoc ->
                     ontologyCommandService.updateWithExistingCommand(userId, v.commandId(), uoc.getCommand(),
                         uoc.after(), now);

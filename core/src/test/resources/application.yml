@@ -371,3 +371,4 @@ keycloak-client:
 meilisearch:
   host: ${MEILISEARCH_URL:http://localhost:7700}
   api-key: ${MEILISEARCH_KEY:masterKey}
+  index_id: imageMetadataIndex

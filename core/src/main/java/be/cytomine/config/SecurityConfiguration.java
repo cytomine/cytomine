@@ -79,6 +79,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                     .requestMatchers("/api/abstractimage/**").permitAll()
+                    .requestMatchers("/api/meilisearch/**").permitAll()
                     .requestMatchers("/api/imageinstance/**").permitAll()
                     .requestMatchers("/api/uploadedfile/*/download").permitAll()
                     .requestMatchers("/api/userannotation/**").permitAll()

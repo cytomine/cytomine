@@ -303,7 +303,6 @@ public class CollectionType extends Type {
         );
 
         if (!excludedTypes.contains(valueObject.getClass())) {
-
             throw new TypeValidationException(ErrorCode.INTERNAL_WRONG_PROVISION_STRUCTURE);
         }
 
@@ -319,7 +318,6 @@ public class CollectionType extends Type {
             File.class
         );
         if (validTypes.contains(valueObject.getClass())) {
-
             ObjectMapper objectMapper = new ObjectMapper();
             // validate a GeoJSON collection like FeatureCollection or GeometryCollection
             if (valueObject instanceof String stringValueObject) {
@@ -336,7 +334,6 @@ public class CollectionType extends Type {
                         validatePrimitiveCollectionItem(stringValueObject);
                     }
                 } catch (JsonProcessingException e) {
-
                     throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_FEATURE_COLLECTION);
                 }
 

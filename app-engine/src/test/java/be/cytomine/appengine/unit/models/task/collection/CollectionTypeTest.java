@@ -76,9 +76,10 @@ public class CollectionTypeTest {
         item2.setIndex("nuclei/2");
         item2.setValue(3);
 
-        StorageData result0 = ct.mapToStorageFileData(mapper.valueToTree(item0), new Run());
-        StorageData result1 = ct.mapToStorageFileData(mapper.valueToTree(item1), new Run());
-        StorageData result2 = ct.mapToStorageFileData(mapper.valueToTree(item2), new Run());
+        Run run = new Run();
+        StorageData result0 = ct.mapToStorageFileData(mapper.valueToTree(item0), run);
+        StorageData result1 = ct.mapToStorageFileData(mapper.valueToTree(item1), run);
+        StorageData result2 = ct.mapToStorageFileData(mapper.valueToTree(item2), run);
 
         assertThat(readArrayYmlContent(result0)).isEqualTo("size: 1");
         assertThat(readArrayYmlContent(result1)).isEqualTo("size: 2");

@@ -120,7 +120,7 @@ public class TrackResourceTests {
             .andExpect(jsonPath("$.callback.trackID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddTrackCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.track.id").exists())
             .andExpect(jsonPath("$.track.name").value(track.getName()));
     }
@@ -138,7 +138,7 @@ public class TrackResourceTests {
             .andExpect(jsonPath("$.callback.trackID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditTrackCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.track.id").exists())
             .andExpect(jsonPath("$.track.name").value(track.getName()));
 
@@ -157,7 +157,7 @@ public class TrackResourceTests {
             .andExpect(jsonPath("$.callback.trackID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteTrackCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.track.id").exists())
             .andExpect(jsonPath("$.track.name").value(track.getName()));
 

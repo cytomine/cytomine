@@ -80,7 +80,7 @@ public class ImageGroupImageInstanceResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.imagegroupimageinstanceID").exists())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.imagegroupimageinstance.id").exists());
     }
 
@@ -99,7 +99,7 @@ public class ImageGroupImageInstanceResourceTests {
             .andExpect(jsonPath("$.callback.imagegroupimageinstanceID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteImageGroupImageInstanceCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.imagegroupimageinstance.id").exists());
     }
 

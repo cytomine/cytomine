@@ -141,7 +141,7 @@ public abstract class ModelService<T extends CytomineDomain> {
     }
 
     /**
-     * Add target info for the new domain concerned by the target
+     * Add command info for the new domain concerned by the command
      */
     CytomineDomain fillDomainWithData(CytomineDomain object, JsonObject json) {
         CytomineDomain domain = entityManager.find(object.getClass(), retrieveLongId(json));
@@ -177,7 +177,7 @@ public abstract class ModelService<T extends CytomineDomain> {
     }
 
     /**
-     * Execute target with JSON data
+     * Execute command with JSON data
      */
     public CommandResponse executeCommand(Command c, Task task) {
         log.debug("Command " + c.getClass() + " " + getServiceName());
@@ -238,7 +238,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param json         JSON data for the new domain
      * @param printMessage Flag to specify if confirmation message must be show in client Usefull when we create a lot
-     *                     of data, just print the root target message
+     *                     of data, just print the root command message
      *
      * @return Response structure (status, object data,...)
      */

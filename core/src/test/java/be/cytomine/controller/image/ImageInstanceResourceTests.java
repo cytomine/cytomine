@@ -616,7 +616,7 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.imageinstanceID").exists())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.imageinstance.id").exists());
 
     }
@@ -637,7 +637,7 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.callback.imageinstanceID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditImageInstanceCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.imageinstance.id").exists())
             .andExpect(jsonPath("$.imageinstance.project").value(project.getId()));
 
@@ -656,7 +656,7 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.callback.imageinstanceID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteImageInstanceCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.imageinstance.id").exists());
 
 

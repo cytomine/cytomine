@@ -24,9 +24,9 @@ public class ResponseService {
     private final MessageSource messageSource;
 
     /**
-     * Create response message structure for a target result E.g. if we try to add a new annotation "object"
+     * Create response message structure for a command result E.g. if we try to add a new annotation "object"
      *
-     * @param object                   Object updated (add/edit/delete) by target  (e.g. annotation x)
+     * @param object                   Object updated (add/edit/delete) by command  (e.g. annotation x)
      * @param messageParams            Params for i18n message (e.g. annotation id, annotation image id)
      * @param printMessage             Flag for client, indicate if client must print or not a confirmation message
      * @param commandType              Command type: add, edit or delete

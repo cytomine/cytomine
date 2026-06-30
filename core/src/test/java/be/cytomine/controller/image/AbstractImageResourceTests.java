@@ -449,7 +449,7 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.abstractimageID").exists())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.abstractimage.id").exists());
 
     }
@@ -469,7 +469,7 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.callback.abstractimageID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditAbstractImageCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.abstractimage.id").exists())
             .andExpect(jsonPath("$.abstractimage.width").value(999));
 
@@ -488,7 +488,7 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.callback.abstractimageID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteAbstractImageCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.abstractimage.id").exists());
 
 

@@ -183,7 +183,7 @@ public class TermResourceTests {
 
         restTermControllerMockMvc.perform(post("/api/term.json").contentType(APPLICATION_JSON).content(createTermJson))
             .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.target").value("be.cytomine.AddTermCommand"))
+            .andExpect(jsonPath("$.command").value("be.cytomine.AddTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
     }
@@ -221,7 +221,7 @@ public class TermResourceTests {
         restTermControllerMockMvc.perform(
                 put("/api/term/{id}.json", term.getId()).contentType(APPLICATION_JSON).content(updateTermJson))
             .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.target").value("be.cytomine.EditTermCommand"))
+            .andExpect(jsonPath("$.command").value("be.cytomine.EditTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
     }
@@ -253,7 +253,7 @@ public class TermResourceTests {
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.target").value("be.cytomine.DeleteTermCommand"))
+            .andExpect(jsonPath("$.command").value("be.cytomine.DeleteTermCommand"))
             .andExpect(jsonPath("$.data.id").value(term.getId()))
             .andExpect(jsonPath("$.data.name").value(term.getName()));
     }

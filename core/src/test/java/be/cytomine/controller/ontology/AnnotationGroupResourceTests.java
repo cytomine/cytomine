@@ -71,7 +71,7 @@ public class AnnotationGroupResourceTests {
             .andExpect(jsonPath("$.callback.annotationgroupID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddAnnotationGroupCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.annotationgroup.id").exists())
             .andExpect(jsonPath("$.annotationgroup.imageGroup").exists());
     }
@@ -92,7 +92,7 @@ public class AnnotationGroupResourceTests {
             .andExpect(jsonPath("$.callback.annotationgroupID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditAnnotationGroupCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.annotationgroup.id").exists())
             .andExpect(jsonPath("$.annotationgroup.type").value(type));
     }
@@ -108,7 +108,7 @@ public class AnnotationGroupResourceTests {
             .andExpect(jsonPath("$.callback.annotationgroupID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteAnnotationGroupCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.annotationgroup.id").exists());
     }
 
@@ -154,7 +154,7 @@ public class AnnotationGroupResourceTests {
             .andExpect(jsonPath("$.callback.annotationgroupID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditAnnotationGroupCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.annotationgroup.id").exists())
             .andExpect(jsonPath("$.annotationgroup.id").value(annotationGroup.getId()));
     }

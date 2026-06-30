@@ -542,7 +542,7 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.callback.projectID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddProjectCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists())
             .andExpect(jsonPath("$.project.name").value(project.getName()))
             .andExpect(jsonPath("$.project.ontology").value(project.getOntology().getId()));
@@ -568,7 +568,7 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.callback.projectID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddProjectCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists())
             .andExpect(jsonPath("$.project.name").value(project.getName()))
             .andExpect(jsonPath("$.ontology").doesNotExist());
@@ -595,7 +595,7 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.callback.projectID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddProjectCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists())
             .andExpect(jsonPath("$.project.name").value(project.getName()));
 
@@ -648,7 +648,7 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.callback.projectID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditProjectCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists())
             .andExpect(jsonPath("$.project.name").value("new_name"));
     }
@@ -684,7 +684,7 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.callback.projectID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditProjectCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists());
 
         assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), READ)).isFalse();
@@ -709,7 +709,7 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.callback.projectID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditProjectCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists());
 
         assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), ADMINISTRATION)).isFalse();
@@ -749,7 +749,7 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.callback.projectID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteProjectCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists())
             .andExpect(jsonPath("$.project.name").value(project.getName()));
     }

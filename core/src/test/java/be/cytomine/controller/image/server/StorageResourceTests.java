@@ -144,7 +144,7 @@ public class StorageResourceTests {
                 .content(storage.toJSON()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.target").value(Commands.CREATE_STORAGE))
+            .andExpect(jsonPath("$.command").value(Commands.CREATE_STORAGE))
             .andExpect(jsonPath("$.data.name").value(storage.getName()));
     }
 
@@ -167,7 +167,7 @@ public class StorageResourceTests {
                 .content(storage.toJSON()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.target").value(Commands.UPDATE_STORAGE))
+            .andExpect(jsonPath("$.command").value(Commands.UPDATE_STORAGE))
             .andExpect(jsonPath("$.data.id").value(storage.getId().intValue()))
             .andExpect(jsonPath("$.data.name").value(storage.getName()));
     }
@@ -203,7 +203,7 @@ public class StorageResourceTests {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.target").value(Commands.DELETE_STORAGE))
+            .andExpect(jsonPath("$.command").value(Commands.DELETE_STORAGE))
             .andExpect(jsonPath("$.data.id").value(storage.getId().intValue()))
             .andExpect(jsonPath("$.data.name").value(storage.getName()));
     }

@@ -228,8 +228,8 @@ public class ReviewedAnnotationService extends ModelService {
      * Delete this domain
      *
      * @param domain       Domain to delete
-     * @param transaction  Transaction link with this target
-     * @param task         Task for this target
+     * @param transaction  Transaction link with this command
+     * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
      *
      * @return Response structure (code, old domain,..)

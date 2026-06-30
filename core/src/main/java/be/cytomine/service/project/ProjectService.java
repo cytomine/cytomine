@@ -603,7 +603,7 @@ public class ProjectService extends ModelService {
         if (fullData) {
             select += ", c.data as data,c.service_name as serviceName, "
                 + "c.class as className, c.action_message as actionMessage, u.username as username ";
-            from += "LEFT JOIN target c ON ch.command_id = c.id "
+            from += "LEFT JOIN command c ON ch.command_id = c.id "
                 + "LEFT JOIN sec_user u ON u.id = ch.user_id ";
         }
 
@@ -977,8 +977,8 @@ public class ProjectService extends ModelService {
      * Delete this domain
      *
      * @param domain       Domain to delete
-     * @param transaction  Transaction link with this target
-     * @param task         Task for this target
+     * @param transaction  Transaction link with this command
+     * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
      * @return Response structure (code, old domain,..)
      */

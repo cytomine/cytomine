@@ -370,7 +370,7 @@ public class PropertyResourceTests {
             .andExpect(jsonPath("$.callback.propertyID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddPropertyCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.property.id").exists());
     }
 
@@ -404,7 +404,7 @@ public class PropertyResourceTests {
             .andExpect(jsonPath("$.callback.propertyID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddPropertyCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.property.id").exists());
     }
 
@@ -428,7 +428,7 @@ public class PropertyResourceTests {
             .andExpect(jsonPath("$.callback.propertyID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditPropertyCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.property.id").exists())
             .andExpect(jsonPath("$.property.value").value("v2"));
 

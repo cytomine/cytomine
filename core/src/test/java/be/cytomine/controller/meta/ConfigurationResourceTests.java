@@ -91,7 +91,7 @@ public class ConfigurationResourceTests {
             .andExpect(jsonPath("$.callback.configurationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddConfigurationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.configuration.id").exists())
             .andExpect(jsonPath("$.configuration.key").value(configuration.getKey()));
     }
@@ -109,7 +109,7 @@ public class ConfigurationResourceTests {
             .andExpect(jsonPath("$.callback.configurationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditConfigurationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.configuration.id").exists())
             .andExpect(jsonPath("$.configuration.key").value("xxx"));
     }
@@ -127,7 +127,7 @@ public class ConfigurationResourceTests {
             .andExpect(jsonPath("$.callback.configurationID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteConfigurationCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.configuration.id").exists())
             .andExpect(jsonPath("$.configuration.key").value(configuration.getKey()));
     }

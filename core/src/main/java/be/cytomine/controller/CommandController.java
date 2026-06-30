@@ -40,9 +40,9 @@ public class CommandController extends RestCytomineController {
 
     private final CommandService commandService;
 
-    @GetMapping({"/target/undo.json", "/target/{id}/undo.json"})
+    @GetMapping({"/command/undo.json", "/command/{id}/undo.json"})
     public ResponseEntity<String> undo(@PathVariable(required = false) Long id) {
-        log.debug("REST request to undo target {}", id);
+        log.debug("REST request to undo command {}", id);
         User user = currentUserService.getCurrentUser();
         Command command = null;
         if (id != null) {
@@ -50,7 +50,7 @@ public class CommandController extends RestCytomineController {
                 .orElseThrow(() -> new ObjectNotFoundException("Command", id));
         }
 
-        //Get the last target list with max 1 target
+        //Get the last command list with max 1 command
 
         Optional<UndoStackItem> lastCommand;
         if (command != null) {
@@ -59,7 +59,7 @@ public class CommandController extends RestCytomineController {
             lastCommand = commandRepository.findLastUndoStackItem(user);
         }
 
-        //There is no target, so nothing to undo
+        //There is no command, so nothing to undo
         if (lastCommand.isEmpty()) {
             String message = messageSource.getMessage("be.cytomine.UndoCommand", new Object[0], Locale.ENGLISH);
             return responseSuccess(
@@ -74,7 +74,7 @@ public class CommandController extends RestCytomineController {
             );
         }
 
-        //Last target done
+        //Last command done
         UndoStackItem firstUndoStack = lastCommand.get();
         List<CommandResponse> results = commandService.undo(firstUndoStack, user);
 
@@ -86,9 +86,9 @@ public class CommandController extends RestCytomineController {
         return responseSuccess(results.stream().map(CommandResponse::getData).toList());
     }
 
-    @GetMapping({"/target/redo.json", "/target/{id}/redo.json"})
+    @GetMapping({"/command/redo.json", "/command/{id}/redo.json"})
     public ResponseEntity<String> redo(@PathVariable(required = false) Long id) {
-        log.debug("REST request to redo target {}", id);
+        log.debug("REST request to redo command {}", id);
         User user = currentUserService.getCurrentUser();
         Command command = null;
         if (id != null) {
@@ -96,7 +96,7 @@ public class CommandController extends RestCytomineController {
                 .orElseThrow(() -> new ObjectNotFoundException("Command", id));
         }
 
-        //Get the last target list with max 1 target
+        //Get the last command list with max 1 command
 
         Optional<RedoStackItem> lastCommand;
         if (command != null) {
@@ -105,7 +105,7 @@ public class CommandController extends RestCytomineController {
             lastCommand = commandRepository.findLastRedoStackItem(user);
         }
 
-        //There is no target, so nothing to undo
+        //There is no command, so nothing to undo
         if (lastCommand.isEmpty()) {
             String message = messageSource.getMessage("be.cytomine.RedoCommand", new Object[0], Locale.ENGLISH);
             return responseSuccess(
@@ -120,7 +120,7 @@ public class CommandController extends RestCytomineController {
             );
         }
 
-        //Last target done
+        //Last command done
         RedoStackItem firstRedoStack = lastCommand.get();
         List<CommandResponse> results = commandService.redo(firstRedoStack, user);
 

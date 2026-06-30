@@ -7,7 +7,5 @@ public enum DataType {
     TERM,
     TERM_RELATION,
     UPLOADED_FILE,
-
-
     UNDO_COMMAND,
 }

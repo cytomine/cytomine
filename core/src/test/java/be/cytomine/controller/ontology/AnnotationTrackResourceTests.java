@@ -145,7 +145,7 @@ public class AnnotationTrackResourceTests {
             .andExpect(jsonPath("$.callback.annotationtrackID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddAnnotationTrackCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.annotationtrack.id").exists());
     }
 
@@ -166,7 +166,7 @@ public class AnnotationTrackResourceTests {
             .andExpect(jsonPath("$.callback.annotationtrackID").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteAnnotationTrackCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.annotationtrack.id").exists());
     }
 

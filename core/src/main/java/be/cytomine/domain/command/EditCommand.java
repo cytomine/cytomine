@@ -30,7 +30,7 @@ import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
 @Entity
-@DiscriminatorValue("be.cytomine.domain.target.EditCommand")
+@DiscriminatorValue("be.cytomine.domain.command.EditCommand")
 public class EditCommand extends Command {
 
     public EditCommand(User currentUser, Transaction transaction) {
@@ -42,11 +42,11 @@ public class EditCommand extends Command {
     }
 
     /**
-     * Add target info for the new domain concerned by the target
+     * Add command info for the new domain concerned by the command
      *
      * @param newObject domain after update
      * @param oldObject domain before update
-     * @param message   Message build for the target
+     * @param message   Message build for the command
      */
     protected void fillCommandInfo(CytomineDomain newObject, String oldObject, String message) {
         HashMap<String, Object> paramsData = new HashMap<>();
@@ -67,7 +67,7 @@ public class EditCommand extends Command {
     }
 
     /**
-     * Process an Add operation for this target
+     * Process an Add operation for this command
      *
      * @return Message
      */
@@ -76,7 +76,7 @@ public class EditCommand extends Command {
         CytomineDomain updatedDomain = this.domain;
         String oldDomain = updatedDomain.toJSON();
         updatedDomain.buildDomainFromJson(json, service.getEntityManager());
-        //Init target info TODO
+        //Init command info TODO
         CytomineDomain container = updatedDomain.container();
         if (container != null && container instanceof Project) {
             super.setProject((Project) container);

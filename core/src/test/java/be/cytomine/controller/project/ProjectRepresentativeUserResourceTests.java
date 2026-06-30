@@ -129,7 +129,7 @@ public class ProjectRepresentativeUserResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddProjectRepresentativeUserCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists())
+            .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.projectrepresentativeuser.id").exists());
     }
 
@@ -168,7 +168,7 @@ public class ProjectRepresentativeUserResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteProjectRepresentativeUserCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists());
+            .andExpect(jsonPath("$.command").exists());
     }
 
     @Test
@@ -190,7 +190,7 @@ public class ProjectRepresentativeUserResourceTests {
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteProjectRepresentativeUserCommand"))
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists());
+            .andExpect(jsonPath("$.command").exists());
     }
 
     @Test

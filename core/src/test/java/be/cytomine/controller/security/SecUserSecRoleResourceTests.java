@@ -150,7 +150,7 @@ public class SecUserSecRoleResourceTests {
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
             .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.target").exists());
+            .andExpect(jsonPath("$.command").exists());
     }
 
 
@@ -191,7 +191,7 @@ public class SecUserSecRoleResourceTests {
         restSecUserSecRoleControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.target").value(Commands.DELETE_TERM_RELATION))
+            .andExpect(jsonPath("$.command").value(Commands.DELETE_TERM_RELATION))
             .andExpect(jsonPath("$.data.id").value(relationId));
     }
 

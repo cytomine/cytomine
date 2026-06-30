@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * A task provide info about a target. The main info is the progress status THIS CLASS CANNOT BE A DOMAIN! Because it
+ * A task provide info about a command. The main info is the progress status THIS CLASS CANNOT BE A DOMAIN! Because it
  * cannot works with hibernate transaction.
  */
 @Getter
@@ -19,7 +19,7 @@ public class Task {
     private int progress = 0;
 
     /**
-     * Project updated by the target task
+     * Project updated by the command task
      */
     private Long projectIdent = -1L;
 

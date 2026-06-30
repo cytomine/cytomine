@@ -454,7 +454,6 @@ public class CollectionType extends Type {
                     }
                     parentType = (CollectionType) currentType;
                     currentType = ((CollectionType) currentType).getSubType();
-                    continue;
                 } else {
                     if (i == indexes.length - 1) { // this is the last item, yet it is still a collection (nested)
                         while (currentType instanceof CollectionType) {
@@ -1276,8 +1275,8 @@ public class CollectionType extends Type {
             String dirPrefix = "/" + ymlPath + "/";
             long filesInDir = container.getEntryList().stream()
                 .filter(e -> e.getStorageDataType() == StorageDataType.FILE)
-                .filter(e -> e.getName().startsWith(dirPrefix) &&
-                    !e.getName().substring(dirPrefix.length()).contains("/"))
+                .filter(e -> e.getName().startsWith(dirPrefix)
+                    && !e.getName().substring(dirPrefix.length()).contains("/"))
                 .count();
             container.add(itemFileEntry);
             String arraySize = "size: " + (filesInDir + 1);
@@ -1495,7 +1494,7 @@ public class CollectionType extends Type {
                             throw new RuntimeException(e);
                         }
                     });
-            collectionValue.setSubType(items.get(0).getType());
+            collectionValue.setSubType(items.getFirst().getType());
 
             return collectionValue;
         }

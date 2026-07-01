@@ -77,7 +77,7 @@ df -h
    - **Web UI**: <http://127.0.0.1/>
    - **Core API**: <http://127.0.0.1:8080>
    - **PIMS (image server)**: <http://127.0.0.1:5001>
-   - **IAM (identity)**: <http://127.0.0.1:8070>
+   - **IAM (identity)**: <http://127.0.0.1:8100>
    - **App Engine**: <http://127.0.0.1:8082>
 
    Default admin credentials: username `admin`, password `password`.
@@ -88,21 +88,21 @@ If you encounter issues during startup, refer to the [troubleshooting](./trouble
 
 ## Services and Ports
 
-| Service       | Port  | Description                              |
-|---------------|-------|------------------------------------------|
-| `web-ui`      | 80    | Web user interface                       |
-| `core`        | 8080  | Main Cytomine API server                 |
-| `pims`        | 5001  | Image server (PIMS)                      |
-| `iam`         | 8070  | Identity and access management (Keycloak)|
-| `app-engine`  | 8082  | Algorithm / task runner                  |
-| `cbir`        | 6000  | Content-based image retrieval            |
-| `sam`         | 8000  | Segment Anything Model service           |
-| `repository`  | 8081  | Artifact repository                      |
-| `postgis`     | 5432  | Main PostgreSQL database                 |
-| `mongo`       | 27017 | Activity / metadata database             |
-| `app-engine-db` | 5433 | App Engine PostgreSQL database          |
-| `registry`    | 5000  | Docker image registry for tasks          |
-| `k3s`         | 6443  | Kubernetes API (used by App Engine)      |
+| Service         | Port  | Description                              |
+|-----------------|-------|------------------------------------------|
+| `web-ui`        | 80    | Web user interface                       |
+| `core`          | 8080  | Main Cytomine API server                 |
+| `pims`          | 5001  | Image server (PIMS)                      |
+| `iam`           | 8100  | Identity and access management (Keycloak)|
+| `app-engine`    | 8082  | App / task runner                        |
+| `cbir`          | 6000  | Content-based image retrieval            |
+| `sam`           | 8000  | Segment Anything Model service           |
+| `repository`    | 8081  | Artifact repository                      |
+| `postgis`       | 5432  | Main PostgreSQL database                 |
+| `mongo`         | 27017 | Activity / metadata database             |
+| `app-engine-db` | 5433  | App Engine PostgreSQL database           |
+| `registry`      | 5000  | Docker image registry for tasks          |
+| `k3s`           | 6443  | Kubernetes API (used by App Engine)      |
 
 ## Data Persistence
 

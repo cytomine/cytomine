@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.StorageMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -34,6 +35,8 @@ public class StorageCommandService
     private final CommandV2Repository commandV2Repository;
     private final StorageMapper storageMapper;
     private final StorageRepository storageRepository;
+    @Setter
+    private ApplyCommandService applyCommandService;
 
     @Override
     public StorageEntity save(StorageEntity entity) {

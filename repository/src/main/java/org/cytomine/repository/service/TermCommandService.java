@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -41,10 +40,10 @@ public class TermCommandService
     private final TermRelationRepository termRelationRepository;
     private final TermMapper termMapper;
     private final CommandV2Repository commandV2Repository;
-    @Setter
-    private ApplyCommandService applyCommandService;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
+    @Setter
+    private ApplyCommandService applyCommandService;
 
     @Override
     public TermEntity updateEntityWithEntity(TermEntity entity, UpdateTerm payload, Timestamp now) {

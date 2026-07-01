@@ -44,7 +44,7 @@ public class UploadedFileCommandService
     private final UploadedFileMapper uploadedFileMapper;
     private final UploadedFileRepository uploadedFileRepository;
     @Setter
-     private  ApplyCommandService applyCommandService;
+    private ApplyCommandService applyCommandService;
 
     @Override
     public UploadedFileEntity save(UploadedFileEntity entity) {

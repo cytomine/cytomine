@@ -40,7 +40,7 @@ public class OntologyEntity implements HasTimestampCUD {
     @Column
     private Timestamp deleted;
 
-    @OneToMany(mappedBy = "ontologyId",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "ontologyId", fetch = FetchType.EAGER)
     @SQLRestriction("deleted IS NULL")
     private Set<TermEntity> terms;
 }

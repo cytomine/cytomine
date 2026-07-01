@@ -169,7 +169,8 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
                 Optional.of(commandId)));
 
         return get(createCommand.id()).map(entity -> {
-            Set<HttpCommandResponse> subCommands = deleteSubEntities(userId, createCommand.id(), now, commandV2Entity.getId());
+            Set<HttpCommandResponse> subCommands =
+                deleteSubEntities(userId, createCommand.id(), now, commandV2Entity.getId());
             entity.setDeleted(Timestamp.valueOf(now));
             E saved = save(entity);
             R response = mapToResponse(saved);

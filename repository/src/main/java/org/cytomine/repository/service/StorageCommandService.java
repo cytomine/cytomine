@@ -33,11 +33,10 @@ public class StorageCommandService
     private final ACLService aclService;
     private final CommandMapper commandMapper;
     private final CommandV2Repository commandV2Repository;
-    
-    @Setter
-    private ApplyCommandService applyCommandService;
     private final StorageMapper storageMapper;
     private final StorageRepository storageRepository;
+    @Setter
+    private ApplyCommandService applyCommandService;
 
     @Override
     public StorageEntity save(StorageEntity entity) {

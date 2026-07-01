@@ -153,7 +153,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         LocalDateTime deletedTime =
             undoCommandResponse.orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data()
                 .deleted().orElseThrow(() -> new IllegalStateException("Deleted should not be empty."));
-        assertEquals(Optional.of(new UndoCommandResponse(expectedDeletedResponse(getResponseData, deletedTime))),
+        assertEquals(Optional.of(new UndoCommandResponse(
+                getApplyCommandResponseMapper().setDeleteTime(getResponseData, Optional.of(deletedTime)))),
             undoCommandResponse.map(HttpCommandResponse::data));
 
         String emptyResponseString = getMockMvc().perform(
@@ -174,7 +175,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             .orElseThrow(() -> new IllegalStateException("Updated should not be empty."));
 
         R firstCreateData = (R) firstCreate.data();
-        assertEquals(Optional.of(new UndoCommandResponse(expectChangedUpdatedTime(getResponseData, updateTime))),
+        assertEquals(Optional.of(new UndoCommandResponse(
+                getApplyCommandResponseMapper().setUpdateTime(getResponseData, Optional.of(updateTime)))),
             redoCommandResponse.map(HttpCommandResponse::data));
 
         String redoGetResponseString = getMockMvc().perform(
@@ -183,9 +185,9 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         R redoGetResponse = (R) getObjectMapper().readValue(redoGetResponseString, (firstCreateData).getClass());
 
-        assertEquals(getApplyCommandResponseMapper().setUpdateTime(firstCreate.get().data(), Optional.of(
+        assertEquals(getApplyCommandResponseMapper().setUpdateTime(firstCreate.data(), Optional.of(
                 redoGetResponse.updated().orElseThrow(
-                () -> new IllegalStateException("Newly created entity should not have `updated` " + "empty."))),
+                    () -> new IllegalStateException("Newly created entity should not have `updated` " + "empty.")))),
             getObjectMapper().readValue(redoGetResponseString, firstCreate.data().getClass()));
     }
 }

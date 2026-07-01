@@ -10,8 +10,11 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
+import be.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 
 @Mapper(componentModel = "spring")
 public interface ApplyCommandResponseMapper {
@@ -23,6 +26,9 @@ public interface ApplyCommandResponseMapper {
             case TermResponse tr -> setDeleteTimeTR(tr, deleteTime);
             case StorageResponse sr -> setDeleteTimeSR(sr, deleteTime);
             case TermRelationResponse trr -> setDeleteTimeTRR(trr, deleteTime);
+            case TagDomainAssociationResponse tdar -> setDeleteTimeTDAR(tdar, deleteTime);
+            case UndoCommandResponse ucr -> ucr;
+            case UploadedFileResponse ufr -> setDeleteTimeUFR(ufr, deleteTime);
         };
     }
 
@@ -42,6 +48,18 @@ public interface ApplyCommandResponseMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
     TermRelationResponse setDeleteTimeTRR(TermRelationResponse or, Optional<LocalDateTime> deleteTime);
 
+    @Mapping(target = "deleted", source = "deleteTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
+    TagDomainAssociationResponse setDeleteTimeTDAR(TagDomainAssociationResponse or, Optional<LocalDateTime> deleteTime);
+
+//    @Mapping(target = "deleted", source = "deleteTime")
+//    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
+//    UndoCommandResponse setDeleteTimeUCR(UndoCommandResponse or, Optional<LocalDateTime> deleteTime);
+
+    @Mapping(target = "deleted", source = "deleteTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
+    UploadedFileResponse setDeleteTimeUFR(UploadedFileResponse or, Optional<LocalDateTime> deleteTime);
+
     default ApplyCommandResponse setUpdateTime(ApplyCommandResponse applyCommandResponse,
         Optional<LocalDateTime> updateTime) {
         return switch (applyCommandResponse) {
@@ -49,6 +67,9 @@ public interface ApplyCommandResponseMapper {
             case TermResponse tr -> setUpdateTimeTR(tr, updateTime);
             case StorageResponse sr -> setUpdateTimeSR(sr, updateTime);
             case TermRelationResponse trr -> setUpdateTimeTRR(trr, updateTime);
+            case TagDomainAssociationResponse tdar -> setUpdateTimeTDAR(tdar, updateTime);
+            case UndoCommandResponse ucr -> ucr;
+            case UploadedFileResponse ufr -> setUpdateTimeUFR(ufr, updateTime);
         };
     }
 
@@ -67,5 +88,17 @@ public interface ApplyCommandResponseMapper {
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
     StorageResponse setUpdateTimeSR(StorageResponse or, Optional<LocalDateTime> updateTime);
+
+    @Mapping(target = "updated", source = "updateTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
+    TagDomainAssociationResponse setUpdateTimeTDAR(TagDomainAssociationResponse or, Optional<LocalDateTime> updateTime);
+
+//    @Mapping(target = "updated", source = "updateTime")
+//    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
+//    UndoCommandResponse setUpdateTimeUCR(UndoCommandResponse or, Optional<LocalDateTime> updateTime);
+
+    @Mapping(target = "updated", source = "updateTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
+    UploadedFileResponse setUpdateTimeUFR(UploadedFileResponse or, Optional<LocalDateTime> updateTime);
 
 }

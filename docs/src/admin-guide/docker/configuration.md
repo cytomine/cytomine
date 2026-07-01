@@ -135,13 +135,13 @@ This step should be done before the `docker compose up -d` command in the Cytomi
 
 ### Usage
 
-Using the Python client in your locally cloned Cytomine directory, you can import the datasets with the following command:
+Using the Python client in your locally cloned Cytomine directory, you can import the datasets with the following command executed from the root of the repository:
 
 ```bash
-python import_datasets.py --cytomine_core_host <cytomine-core-host> --cytomine_pims_host <cytomine-pims-host> --private_key <private-key> --public_key <public-key>
+python ./clients/python/examples/import_datasets.py --cytomine_core_host <cytomine-core-host> --cytomine_pims_host <cytomine-pims-host> --private_key <private-key> --public_key <public-key>
 ```
 
-where `<cytomine-core-host>` and `<cytomine-pims-host>` is your Cytomine host (if local installation: <http://127.0.0.1/>), `<public-key>` and `<private-key>` are your public and private keys (you can get them in the Cytomine Web-UI in Account).
+where `<cytomine-core-host>` (if local installation: <http://127.0.0.1:8080>) and `<cytomine-pims-host>` (if local installation: <http://127.0.0.1:5001>) is the IP address of `core` and `pims`, `<public-key>` and `<private-key>` are your public and private keys (you can get them in the Cytomine Web-UI in Account).
 
 ::: danger
 Several factors can slow down the importation:

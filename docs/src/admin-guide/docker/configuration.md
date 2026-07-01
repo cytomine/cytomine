@@ -117,6 +117,8 @@ If you’re working with `sdafs`, the directories are already organised in the s
 
 ::: tip
 This configuration is optional if you planned to use the default location `./cytomine/data/dataset` for importing your datasets.
+
+If you are using `sdafs`, set this path to the mounted folder (e.g., `bp-datasets` as configured in the previous step).
 :::
 
 Create `.env` in the cytomine folder and add the path to your dataset folder:

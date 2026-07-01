@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,27 +35,16 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     JdbcTemplate jdbcTemplate;
     @Autowired
     OntologyMapper ontologyController;
-
     String apiURL = OntologyHttpContract.ROOT_PATH;
     CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());
     UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID().toString()));
+    @Autowired
+    private ApplyCommandResponseMapper applyCommandResponseMapper;
 
     @Override
     public OntologyResponse expectedUpdatedResponse(OntologyResponse response, UpdateOntology updatePayload,
         LocalDateTime updated) {
         return new OntologyResponse(updatePayload.name().orElse(response.name()), response.id(), response.terms(),
             response.created(), Optional.of(updated), response.deleted(), response.user());
-    }
-
-    @Override
-    public OntologyResponse expectedDeletedResponse(OntologyResponse response, LocalDateTime deletedTime) {
-        return new OntologyResponse(response.name(), response.id(), response.terms(), response.created(),
-            response.updated(), Optional.of(deletedTime), response.user());
-    }
-
-    @Override
-    public OntologyResponse expectChangedUpdatedTime(OntologyResponse response, LocalDateTime updatedTime) {
-        return new OntologyResponse(response.name(), response.id(), response.terms(), response.created(),
-            Optional.of(updatedTime), response.deleted(), response.user());
     }
 }

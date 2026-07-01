@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -16,7 +17,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.model.HasLocaleDateTimeCUD;
+import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
 @Import(PostGisTestConfiguration.class)
-public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
+public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
     MockMvc getMockMvc();
 
     ObjectMapper getObjectMapper();
@@ -44,11 +45,9 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
 
     R expectedUpdatedResponse(R response, U updatePayload, LocalDateTime updatedTime);
 
-    R expectedDeletedResponse(R response, LocalDateTime deletedTime);
-
-    R expectChangedUpdatedTime(R response, LocalDateTime updatedTime);
-
     JdbcTemplate getJdbcTemplate();
+
+    ApplyCommandResponseMapper getApplyCommandResponseMapper();
 
     default void beforeCreate(long userId) {
     }
@@ -74,8 +73,7 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
     default void baseTest() {
         String userId = createUser();
         String response = getMockMvc().perform(post(getApiURL()).param("userId", userId).contentType(APPLICATION_JSON)
-                .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-            .andReturn()
+                .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk()).andReturn()
             .getResponse().getContentAsString();
 
         HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
@@ -104,7 +102,9 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
                 delete(getApiURL() + "/" + result.data().id()).param("userId", userId).contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
-        assertEquals(expectedDeletedResponse(updateDataResult, deleteResult.data().deleted().orElseThrow()),
+        assertEquals(getApplyCommandResponseMapper().setDeleteTime(updateDataResult,
+                Optional.of(deleteResult.data().deleted().orElseThrow(
+                    () -> new IllegalStateException("Newly created entity should not have `updated` empty.")))),
             deleteResult.data());
     }
 
@@ -145,10 +145,11 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         R redoGetResponse =
-            (R) getObjectMapper().readValue(redoGetResponseString, ((R) firstCreate.get().data()).getClass());
+            (R) getObjectMapper().readValue(redoGetResponseString, firstCreate.get().data().getClass());
 
-        assertEquals(expectChangedUpdatedTime((R) firstCreate.get().data(), redoGetResponse.updated().orElseThrow(
-                () -> new IllegalStateException("Newly created entity should not have `updated` " + "empty."))),
+        assertEquals(getApplyCommandResponseMapper().setUpdateTime(firstCreate.get().data(), Optional.of(
+                redoGetResponse.updated().orElseThrow(
+                    () -> new IllegalStateException("Newly created entity should not have `updated` empty.")))),
             getObjectMapper().readValue(redoGetResponseString, firstCreate.get().data().getClass()));
     }
 }

@@ -74,8 +74,8 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
     default void baseTest() {
         String userId = createUser();
         String response = getMockMvc().perform(post(getApiURL()).param("userId", userId).contentType(APPLICATION_JSON)
-                .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-            .andReturn()
+                .content(getObjectMapper().writeValueAsString(getCreatePayload())))
+            .andExpect(status().isOk()).andReturn()
             .getResponse().getContentAsString();
 
         HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
@@ -118,10 +118,11 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
             .andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
         String commandID = firstCreate.get().commandId().toString();
         long entityID = firstCreate.get().data().id();
+
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", userId)
-                    .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
+                    .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
+            .getContentAsString(), new TypeReference<>() {});
 
         assertTrue(undoCommandResponse.isPresent());
 
@@ -134,9 +135,10 @@ public interface CRUDCommandTests<C, R extends HasLocaleDateTimeCUD, U> {
         assertEquals(emptyResponse, Optional.empty());
 
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
-                post(CommandController.ROOT_PATH + "/redo/" + commandID).param("userId", userId)
-                    .contentType(APPLICATION_JSON).content(getObjectMapper().writeValueAsString(getCreatePayload())))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
+                post(CommandController.ROOT_PATH + "/undo/" + undoCommandResponse.get().commandId()).param("userId",
+                        userId)
+                    .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
+            .getContentAsString(), new TypeReference<>() {});
 
         assertTrue(redoCommandResponse.isPresent());
 

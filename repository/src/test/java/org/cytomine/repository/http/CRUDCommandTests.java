@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.cytomine.repository.RepositoryApp;
-import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -18,7 +17,6 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.model.HasLocaleDateTimeCUD;
 import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
@@ -34,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
 @Import(PostGisTestConfiguration.class)
-public interface CRUDCommandTests<C, R extends  ApplyCommandResponse, U> {
+public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
     MockMvc getMockMvc();
 
     ObjectMapper getObjectMapper();
@@ -56,8 +54,6 @@ public interface CRUDCommandTests<C, R extends  ApplyCommandResponse, U> {
     R expectChangedUpdatedTime(R response, LocalDateTime updatedTime);
 
     JdbcTemplate getJdbcTemplate();
-
-    ApplyCommandResponseMapper getApplyCommandResponseMapper();
 
     default Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
         return Set.of();

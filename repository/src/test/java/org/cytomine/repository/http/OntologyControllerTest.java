@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
-import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.mapper.BaseMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.mapper.TermMapper;
@@ -57,9 +56,6 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     @Autowired
     BaseMapper baseMapper;
 
-    @Autowired
-    ApplyCommandResponseMapper applyCommandResponseMapper;
-
     String apiURL = OntologyHttpContract.ROOT_PATH;
     CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());
     UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID().toString()));
@@ -99,7 +95,7 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     public OntologyResponse expectChangedUpdatedTime(OntologyResponse response, LocalDateTime updatedTime) {
         return new OntologyResponse(response.name(), response.id(),
             response.terms().stream().map(e -> termMapper.updateUpdateTime(e, Optional.of(updatedTime)))
-            .collect(Collectors.toSet()), response.created(),
+                .collect(Collectors.toSet()), response.created(),
             Optional.of(updatedTime), response.deleted(), response.user());
     }
 }

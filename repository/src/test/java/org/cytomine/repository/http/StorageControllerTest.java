@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lombok.Getter;
-import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.RepositoryApp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +31,6 @@ public class StorageControllerTest implements CRUDCommandTests<CreateStorage, St
     ObjectMapper objectMapper;
     @Autowired
     JdbcTemplate jdbcTemplate;
-    @Autowired  ApplyCommandResponseMapper applyCommandResponseMapper;
     String apiURL = StorageHttpContract.ROOT_PATH;
     CreateStorage createPayload = new CreateStorage(UUID.randomUUID().toString());
     UpdateStorage updatePayload = new UpdateStorage(Optional.of(UUID.randomUUID().toString()));

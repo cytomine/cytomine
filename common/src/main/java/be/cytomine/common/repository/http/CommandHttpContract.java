@@ -1,7 +1,6 @@
 package be.cytomine.common.repository.http;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.web.bind.annotation.PathVariable;

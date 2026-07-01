@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.Optional;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +29,13 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.OntologyMapper;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -59,6 +63,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -72,7 +79,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class UserResourceTests {
 
     @Autowired
@@ -117,6 +124,12 @@ public class UserResourceTests {
     @Autowired
     private PermissionService permissionService;
 
+    @MockitoBean
+    private OntologyHttpContract ontologyHttpContract;
+
+    @Autowired
+    private OntologyMapper ontologyMapper;
+
     @BeforeEach
     public void init() {
         persistentConnectionRepository.deleteAll();
@@ -142,7 +155,6 @@ public class UserResourceTests {
     ) {
         return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
     }
-
 
     PersistentUserPosition givenAPersistentUserPosition(
         Date creation, User user,
@@ -212,22 +224,21 @@ public class UserResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void listProjectRepresentatives() throws Exception {
-        User projectPrepresentative = builder.givenAUser();
+        User projectRepresentative = builder.givenAUser();
         User projectUser = builder.givenAUser();
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, projectPrepresentative.getUsername(), ADMINISTRATION);
+        builder.addUserToProject(project, projectRepresentative.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
-        builder.givenAProjectRepresentativeUser(project, projectPrepresentative);
+        builder.givenAProjectRepresentativeUser(project, projectRepresentative);
 
         restUserControllerMockMvc.perform(
                 get("/api/project/{id}/users/representative.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.username=='" + projectPrepresentative.getUsername() + "')]").exists())
+            .andExpect(jsonPath("$.collection[?(@.username=='" + projectRepresentative.getUsername() + "')]").exists())
             .andExpect(jsonPath("$.collection[?(@.username=='" + projectUser.getUsername() + "')]").doesNotExist());
     }
 
@@ -249,7 +260,6 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.collection[?(@.username=='" + projectUser.getUsername() + "')]").doesNotExist());
     }
 
-
     @Test
     @Transactional
     public void listOntologyUser() throws Exception {
@@ -260,31 +270,14 @@ public class UserResourceTests {
         Project project = builder.givenAProjectWithOntology(ontology);
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
+        when(ontologyHttpContract.get(eq(ontology.getId()), anyLong())).thenReturn(
+            Optional.ofNullable(ontologyMapper.map(ontology)));
 
         restUserControllerMockMvc.perform(get("/api/ontology/{id}/user.json", ontology.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.username=='" + projectAdmin.getUsername() + "')]").exists())
             .andExpect(jsonPath("$.collection[?(@.username=='" + projectUser.getUsername() + "')]").exists())
-            .andExpect(jsonPath("$.collection[?(@.username=='" + simpleUser.getUsername() + "')]").doesNotExist());
-    }
-
-
-    @Test
-    @Transactional
-    public void listStorageUser() throws Exception {
-        User storageAdmin = builder.givenAUser();
-        User storageUser = builder.givenAUser();
-        User simpleUser = builder.givenAUser();
-        Storage storage = builder.givenAStorage();
-        builder.addUserToStorage(storage, storageAdmin.getUsername(), ADMINISTRATION);
-        builder.addUserToStorage(storage, storageUser.getUsername(), READ);
-
-        restUserControllerMockMvc.perform(get("/api/storage/{id}/user.json", storage.getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.username=='" + storageAdmin.getUsername() + "')]").exists())
-            .andExpect(jsonPath("$.collection[?(@.username=='" + storageUser.getUsername() + "')]").exists())
             .andExpect(jsonPath("$.collection[?(@.username=='" + simpleUser.getUsername() + "')]").doesNotExist());
     }
 
@@ -472,7 +465,6 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.primaryKey").value(not(oldPrimaryKey)))
             .andExpect(jsonPath("$.secondaryKey").value(not(oldSecondaryKey)));
     }
-
 
     @Test
     @Transactional
@@ -748,7 +740,6 @@ public class UserResourceTests {
         assertThat(permissionService.hasACLPermission(project, user1.getUsername(), ADMINISTRATION)).isFalse();
     }
 
-
     @Test
     @Transactional
     public void deleteUserFromProject() throws Exception {
@@ -831,35 +822,6 @@ public class UserResourceTests {
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
-    }
-
-    @Test
-    @Transactional
-    public void addUserToStorage() throws Exception {
-        Storage storage = builder.givenAStorage();
-        User user = builder.givenAUser();
-        restUserControllerMockMvc.perform(
-                post("/api/storage/{storage}/user/{user}.json", storage.getId(), user.getId())
-                    .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
-    }
-
-    @Test
-    @Transactional
-    public void deleteUserFromStorage() throws Exception {
-        Storage storage = builder.givenAStorage();
-        User user = builder.givenAUser();
-        builder.addUserToStorage(storage, user.getUsername(), READ);
-        restUserControllerMockMvc.perform(
-                delete("/api/storage/{storage}/user/{user}.json", storage.getId(), user.getId())
-                    .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
     }
 
     @Test

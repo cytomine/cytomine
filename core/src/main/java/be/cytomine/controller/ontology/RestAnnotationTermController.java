@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.ontology.AnnotationDomain;
@@ -26,7 +27,6 @@ import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ontology.AnnotationTermService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
-import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
@@ -48,7 +48,7 @@ public class RestAnnotationTermController extends RestCytomineController {
 
     private final UserService userService;
 
-    private final TermService termService;
+    private final TermHttpContract termHttpContract;
 
     private final SecurityACLService securityACLService;
 
@@ -107,7 +107,7 @@ public class RestAnnotationTermController extends RestCytomineController {
         AnnotationDomain annotation = annotationDomainRepository.findById(idAnnotation)
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));
 
-        TermResponse term = termService.find(idTerm)
+        TermResponse term = termHttpContract.findTermByID(idTerm, currentUserService.getCurrentUser().getId())
             .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm));
 
         if (idUser != null) {
@@ -154,7 +154,6 @@ public class RestAnnotationTermController extends RestCytomineController {
         return responseSuccess(annotationTermService.add(json));
     }
 
-
     @DeleteMapping({
         "/annotation/{idAnnotation}/term/{idTerm}.json",
         "/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json"
@@ -170,7 +169,7 @@ public class RestAnnotationTermController extends RestCytomineController {
         AnnotationDomain annotation = userAnnotationService.find(idAnnotation)
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));
 
-        TermResponse term = termService.find(idTerm)
+        TermResponse term = termHttpContract.findTermByID(idTerm, currentUserService.getCurrentUser().getId())
             .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm));
         User user = userService.find(idUser != null ? idUser : -1L)
             .orElseGet(currentUserService::getCurrentUser);

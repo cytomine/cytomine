@@ -194,8 +194,10 @@ public class CytomineSteps {
         );
     }
 
+    @SneakyThrows
     public String addTermToOntology(Wait<WebDriver> wait, WebDriver driver, String ontologyURL, String termName) {
         webDriverUtils.goTo(wait, ontologyURL);
+        Thread.sleep(250);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Add a term')]");
         webDriverUtils.bySendKeys(wait, By.name("name"), termName);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
@@ -218,7 +220,7 @@ public class CytomineSteps {
     }
 
     public void makeTermChildOf(Wait<WebDriver> wait, WebDriver driver, String ontologyURL,
-                                String childTermName, String parentTermName) {
+        String childTermName, String parentTermName) {
         webDriverUtils.goTo(wait, ontologyURL);
         webDriverUtils.waitLoading(wait);
         var source = wait.until(d -> d.findElement(By.xpath(

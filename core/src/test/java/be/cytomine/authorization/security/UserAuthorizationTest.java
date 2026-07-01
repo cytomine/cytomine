@@ -1,6 +1,8 @@
 package be.cytomine.authorization.security;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Disabled;
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.AbstractAuthorizationTest;
+import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
+import be.cytomine.common.repository.utils.SpringPage;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.project.ProjectMemberService;
@@ -25,6 +31,9 @@ import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -33,20 +42,18 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
-    @MockitoBean
-    private AccountService accountService;
-
     @Autowired
     ProjectMemberService projectMemberService;
-
     @Autowired
     UserService userService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     SecUserSecRoleService secSecUserSecRoleService;
+    @MockitoBean
+    private AccountService accountService;
+    @MockitoBean
+    private OntologyHttpContract ontologyHttpContract;
 
     @Test
     @WithMockUser(username = GUEST)
@@ -178,6 +185,13 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void adminCanDeleteAnotherUser() {
+
+        when(ontologyHttpContract.getAllLightForUser(anyLong(), eq(PageRequest.of(0, 50)))).thenReturn(new SpringPage<>(
+            List.of(new OntologyLight(100, "test")), 1, 1, 1));
+        when(ontologyHttpContract.getAllLightForUser(anyLong(), eq(PageRequest.of(1, 50)))).thenReturn(new SpringPage<>(
+            List.of(), 0, 1, 0));
+        when(ontologyHttpContract.delete(eq(100), anyLong())).thenReturn(Optional.empty());
+
         User user = builder.givenAUser();
         expectOK(() -> userService.delete(user, null, null, false));
     }

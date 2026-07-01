@@ -15,6 +15,10 @@ import be.cytomine.domain.ontology.Term;
 @Mapper(componentModel = "spring")
 public interface TermMapper {
 
+    default <T> Optional<T> map(T value) {
+        return Optional.ofNullable(value);
+    }
+
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "ontologyId", source = "ontology.id")
     TermResponse map(Term term);

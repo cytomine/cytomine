@@ -64,7 +64,6 @@ import be.cytomine.service.ModelService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.ontology.AnnotationTermService;
-import be.cytomine.service.ontology.OntologyService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.search.ProjectSearchExtension;
 import be.cytomine.service.search.RetrievalService;
@@ -116,8 +115,6 @@ public class ProjectService extends ModelService {
     private final AnnotationTermService annotationTermService;
 
     private final ReviewedAnnotationService reviewedAnnotationService;
-
-    private final OntologyService ontologyService;
 
     private final PermissionService permissionService;
 
@@ -210,7 +207,6 @@ public class ProjectService extends ModelService {
         List<Document> results = persistentImageConsultation.aggregate(requests)
             .into(new ArrayList<>());
 
-
         List<Map<String, Object>> data = results.stream()
             .map(x -> JsonObject.of("id", x.get("_id"), "date", x.get("date"), "opened", true))
             .collect(Collectors.toList());
@@ -220,8 +216,8 @@ public class ProjectService extends ModelService {
             List<DatedCytomineDomain> unopened = data.isEmpty()
                 ? projectRepository.listLastCreated()
                 : projectRepository.listLastCreated(data.stream()
-                    .map(x -> (Long) x.get("id"))
-                    .collect(Collectors.toList()));
+                .map(x -> (Long) x.get("id"))
+                .collect(Collectors.toList()));
             for (DatedCytomineDomain datedCytomineDomain : unopened) {
                 data.add(JsonObject.of(
                     "id", datedCytomineDomain.getId(),
@@ -749,7 +745,6 @@ public class ProjectService extends ModelService {
         securityACLService.check(project.container(), WRITE);
         Ontology ontology = project.getOntology();
 
-
         if (ontology != null && !Objects.equals(ontology.getId(), jsonNewData.getJSONAttrLong("ontology", 0L))) {
             boolean deleteTerms = jsonNewData.getJSONAttrBoolean("forceOntologyUpdate", false);
             long associatedTermsCount;
@@ -782,7 +777,6 @@ public class ProjectService extends ModelService {
             }
         }
 
-
         CommandResponse commandResponse = executeCommand(
             new EditCommand(currentUser, transaction),
             domain,
@@ -795,7 +789,6 @@ public class ProjectService extends ModelService {
         List<Long> users = jsonNewData.getJSONAttrListLong("users", null);
         List<Long> admins = jsonNewData.getJSONAttrListLong("admins", null);
         List<Long> representatives = jsonNewData.getJSONAttrListLong("representatives", null);
-
 
         if (users != null) {
             List<Long> projectOldUsers = userService.listUsers(project)
@@ -821,7 +814,6 @@ public class ProjectService extends ModelService {
             log.info("projectNewUsers=" + projectNewUsers);
             changeProjectUser(project, projectNewUsers, projectOldUsers, false, task, 20);
         }
-
 
         if (admins != null) {
             List<Long> projectOldAdmins = userService.listAdmins(project)
@@ -881,16 +873,9 @@ public class ProjectService extends ModelService {
                 }
             }
         }
-        if (ontology != null && !Objects.equals(ontology.getId(), jsonNewData.getJSONAttrLong("ontology"))) {
-            ontologyService.determineRightsForUsers(ontology, userService.listUsers(project));
-            if (project.getOntology() != null) {
-                ontologyService.determineRightsForUsers(project.getOntology(), userService.listUsers(project));
-            }
-        }
         return commandResponse;
 
     }
-
 
     private void changeProjectUser(
         Project project,
@@ -988,7 +973,6 @@ public class ProjectService extends ModelService {
         return data;
     }
 
-
     /**
      * Delete this domain
      *
@@ -996,7 +980,6 @@ public class ProjectService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -1037,7 +1020,6 @@ public class ProjectService extends ModelService {
 
     }
 
-
     protected void beforeUpdate(CytomineDomain domain) {
         Project project = (Project) domain;
         project.setCountAnnotations(annotationDomainRepository.countAllUserAnnotationAndProject(domain.getId()));
@@ -1059,7 +1041,6 @@ public class ProjectService extends ModelService {
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
         return List.of(domain.getId(), ((Project) domain).getName());
     }
-
 
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         Project project = (Project) domain;

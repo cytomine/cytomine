@@ -86,7 +86,11 @@ def import_datasets(
     )
 
     background_tasks.add_task(run_import_datasets, cytomine_auth, api_credentials, storage_id)
-    return JobResponse(status="running")
+    return JobResponse(
+        status="running",
+        path=config.dataset_path,
+        content=os.listdir(config.dataset_path),
+    )
 
 
 @router.post('/upload', tags=['Import'])

@@ -28,10 +28,13 @@ import be.cytomine.common.repository.model.command.payload.request.UpdateCommand
     @JsonSubTypes.Type(value = DeleteUploadedFileCommand.class, name = "DELETE_UPLOADED_FILE_COMMAND"),
     @JsonSubTypes.Type(value = CreateTagDomainAssociationCommand.class, name = "INSERT_TAG_DOMAIN_ASSOCIATION_COMMAND"),
     @JsonSubTypes.Type(value = UpdateTagDomainAssociationCommand.class, name = "UPDATE_TAG_DOMAIN_ASSOCIATION_COMMAND"),
-    @JsonSubTypes.Type(value = DeleteTagDomainAssociationCommand.class, name = "DELETE_TAG_DOMAIN_ASSOCIATION_COMMAND")
+    @JsonSubTypes.Type(value = DeleteTagDomainAssociationCommand.class, name = "DELETE_TAG_DOMAIN_ASSOCIATION_COMMAND"),
+    @JsonSubTypes.Type(value = UndoCreateCommand.class, name = "UNDO_CREATE_COMMAND"),
+    @JsonSubTypes.Type(value = UndoDeleteCommand.class, name = "UNDO_DELETE_COMMAND"),
+    @JsonSubTypes.Type(value = UndoUpdateCommand.class, name = "UNDO_UPDATE_COMMAND"),
 })
 public sealed interface CommandV2Request<T extends HasLongId & HasAclId>
-    permits DeleteCommandRequest, CreateCommandRequest, UpdateCommandRequest {
+    permits DeleteCommandRequest, CreateCommandRequest, UpdateCommandRequest, UndoCommandRequest {
 
     UpdateCommandPayload<T> data();
 

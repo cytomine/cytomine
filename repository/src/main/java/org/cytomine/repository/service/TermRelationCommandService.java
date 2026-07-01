@@ -54,7 +54,6 @@ public class TermRelationCommandService implements
         return termRelationMapper.mapToTermRelationCommandPayload(entity, ontologyId);
     }
 
-
     @Override
     public TermRelationEntity updateEntityWithPayload(TermRelationEntity entity,
         TermRelationCommandPayload payload,

@@ -34,7 +34,6 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
         """, nativeQuery = true)
     Set<Long> findAllIdsByProjectId(long projectId);
 
-
     @Query(value = """
         SELECT t.userId AS userId, t.name AS key, count(DISTINCT ua.image_id) AS value, t.color AS color
         FROM user_annotation ua
@@ -59,7 +58,6 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
         LocalDateTime startDate,
         LocalDateTime endDate,
         Pageable pageable);
-
 
     @Query(value = """
         SELECT u.userId AS userId, u.username AS key, t.userId AS termId, t.name AS termName,

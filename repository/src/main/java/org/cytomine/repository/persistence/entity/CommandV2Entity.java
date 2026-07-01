@@ -1,6 +1,5 @@
 package org.cytomine.repository.persistence.entity;
 
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 

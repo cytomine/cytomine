@@ -41,7 +41,6 @@ public interface TermMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     TermResponse mapToTermResponse(TermEntity termEntity);
 
-
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)

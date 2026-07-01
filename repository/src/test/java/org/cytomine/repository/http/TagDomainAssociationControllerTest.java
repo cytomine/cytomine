@@ -41,7 +41,7 @@ class TagDomainAssociationControllerTest
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ObjectMapper objectMapper;
-    
+
     @Override
     public void beforeCreate(long userId) {
         Long tagId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);

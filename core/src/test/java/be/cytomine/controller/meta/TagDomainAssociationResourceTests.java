@@ -141,7 +141,8 @@ public class TagDomainAssociationResourceTests {
             new CreateTagDomainAssociation(tda.getTag().getId(), tda.getDomainClassName(), tda.getDomainIdent()));
         mockMvc.perform(
                 post("/api/domain/{domainClassName}/{domainId}/tag_domain_association.json", tda.getDomainClassName(),
-                    tda.getDomainIdent()).contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isOk())
+                    tda.getDomainIdent()).contentType(MediaType.APPLICATION_JSON)
+                    .content(body)).andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.CREATE_TAG_DOMAIN_ASSOCIATION));
     }

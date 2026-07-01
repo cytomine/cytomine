@@ -112,10 +112,11 @@ public class TermResourceTests {
         Term term = builder.givenATerm();
         Long userId = builder.givenSuperAdmin().getId();
         when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId),
-            any(Pageable.class))).thenReturn(new PageImpl<>(List.of(
-            new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
-                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()))));
+            any(Pageable.class))).thenReturn(new PageImpl<>(
+            List.of(
+                new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
+                    LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                    Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()))));
 
         restTermControllerMockMvc.perform(get("/api/ontology/{id}/term.json", term.getOntology().getId()))
             .andExpect(status().isOk()).andExpect(jsonPath("$.collection", hasSize(greaterThan(0)))).andExpect(

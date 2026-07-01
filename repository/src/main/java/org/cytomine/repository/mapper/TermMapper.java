@@ -57,4 +57,9 @@ public interface TermMapper {
     @Mapping(target = "dataType", ignore = true)
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted","dataType"})
     TermResponse updateDeleteTime(TermResponse value, Optional<LocalDateTime> deletionTime);
+
+    @Mapping(target = "updated", source = "updateTime")
+    @Mapping(target = "dataType", ignore = true)
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated","dataType"})
+    TermResponse updateUpdateTime(TermResponse value, Optional<LocalDateTime> updateTime);
 }

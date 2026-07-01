@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.TermRelationMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -39,6 +40,8 @@ public class TermRelationCommandService implements
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
+    @Setter
+    private ApplyCommandService applyCommandService;
 
     @Override
     public TermRelationEntity save(TermRelationEntity entity) {
@@ -50,7 +53,6 @@ public class TermRelationCommandService implements
         long ontologyId = termRepository.findById(entity.getTerm1Id()).orElseThrow().getOntologyId();
         return termRelationMapper.mapToTermRelationCommandPayload(entity, ontologyId);
     }
-
 
     @Override
     public TermRelationEntity updateEntityWithPayload(TermRelationEntity entity,

@@ -51,93 +51,62 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class UploadedFileResourceTests {
 
+    private final ObjectMapper objectMapper =
+        new ObjectMapper().registerModule(new Jdk8Module()).registerModule(new JavaTimeModule());
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper()
-        .registerModule(new Jdk8Module())
-        .registerModule(new JavaTimeModule());
-
     @Test
     void shouldListUploadedFiles() throws Exception {
-        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(pageJson(anUploadedFileResponse(42L)))
-            )
-        );
+        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all")).willReturn(
+            aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(pageJson(anUploadedFileResponse(42L)))));
 
-        mockMvc.perform(get("/api/uploadedfile.json"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(1)))
-            .andExpect(jsonPath("$.collection[0].id").value(42))
-            .andExpect(jsonPath("$.size").value(1))
-            .andExpect(jsonPath("$.totalPages").value(1));
+        mockMvc.perform(get("/api/uploadedfile.json")).andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(1))).andExpect(jsonPath("$.collection[0].id").value(42))
+            .andExpect(jsonPath("$.size").value(1)).andExpect(jsonPath("$.totalPages").value(1));
     }
 
     @Test
     void shouldListUploadedFilesWithPagination() throws Exception {
-        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(pageJson(1, 3L, anUploadedFileResponse(1L)))
-            )
-        );
+        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all")).willReturn(
+            aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(pageJson(1, 3L, anUploadedFileResponse(1L)))));
 
-        mockMvc.perform(get("/api/uploadedfile.json").param("size", "1").param("page", "0"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(1)))
-            .andExpect(jsonPath("$.perPage").value(1))
-            .andExpect(jsonPath("$.size").value(3))
-            .andExpect(jsonPath("$.totalPages").value(3));
+        mockMvc.perform(get("/api/uploadedfile.json").param("size", "1").param("page", "0")).andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(1))).andExpect(jsonPath("$.perPage").value(1))
+            .andExpect(jsonPath("$.size").value(3)).andExpect(jsonPath("$.totalPages").value(3));
     }
 
     @Test
     void shouldReturnEmptyCollectionWhenNoUploadedFiles() throws Exception {
-        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(emptyPageJson())
-            )
-        );
+        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all")).willReturn(
+            aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(emptyPageJson())));
 
-        mockMvc.perform(get("/api/uploadedfile.json"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(0)))
-            .andExpect(jsonPath("$.size").value(0));
+        mockMvc.perform(get("/api/uploadedfile.json")).andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(0))).andExpect(jsonPath("$.size").value(0));
     }
 
     @Test
     void shouldReturnUploadedFileById() throws Exception {
-        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/42"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(objectMapper.writeValueAsString(anUploadedFileResponse(42L)))
-            )
-        );
+        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/42")).willReturn(
+            aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(objectMapper.writeValueAsString(anUploadedFileResponse(42L)))));
 
-        mockMvc.perform(get("/api/uploadedfile/{id}.json", 42))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(42))
-            .andExpect(jsonPath("$.filename").value("file_42.tif"))
+        mockMvc.perform(get("/api/uploadedfile/{id}.json", 42)).andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(42)).andExpect(jsonPath("$.filename").value("file_42.tif"))
             .andExpect(jsonPath("$.originalFilename").value("original_42.tif"));
     }
 
     @Test
     void shouldReturn404WhenUploadedFileNotFound() throws Exception {
         WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/999"))
-            .willReturn(aResponse().withStatus(HttpStatus.OK.value()))
-        );
+            .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-        mockMvc.perform(get("/api/uploadedfile/{id}.json", 999))
-            .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/uploadedfile/{id}.json", 999)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -145,45 +114,28 @@ class UploadedFileResourceTests {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         long uploadedFileId = abstractImage.getUploadedFile().getId();
 
-        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/" + uploadedFileId))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(objectMapper.writeValueAsString(anUploadedFileResponse(uploadedFileId)))
-            )
-        );
+        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/" + uploadedFileId)).willReturn(
+            aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(objectMapper.writeValueAsString(anUploadedFileResponse(uploadedFileId)))));
 
-        mockMvc.perform(get("/api/uploadedfile/{id}.json", uploadedFileId))
-            .andExpect(status().isOk())
+        mockMvc.perform(get("/api/uploadedfile/{id}.json", uploadedFileId)).andExpect(status().isOk())
             .andExpect(jsonPath("$.thumbnailUrl").isString());
     }
 
     @Test
     void shouldCreateUploadedFile() throws Exception {
         UUID commandId = UUID.randomUUID();
-        WiremockRepository.SERVER.stubFor(WireMock.post(urlPathEqualTo("/uploaded-files"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(objectMapper.writeValueAsString(new HttpCommandResponse(
-                    true,
-                    null,
-                    commandId,
-                    Commands.CREATE_UPLOADED_FILE
-                )))
-            )
-        );
+        WiremockRepository.SERVER.stubFor(WireMock.post(urlPathEqualTo("/uploaded-files")).willReturn(
+            aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(objectMapper.writeValueAsString(
+                    new HttpCommandResponse(true, null, commandId, Commands.CREATE_UPLOADED_FILE, Set.of())))));
 
-        CreateUploadedFile payload = new CreateUploadedFile(
-            1L, 1L, Optional.empty(),
-            "test.tif", "test.tif", "tif", "PYRTIFF",
-            100L, 0, Set.of()
-        );
+        CreateUploadedFile payload =
+            new CreateUploadedFile(1L, 1L, Optional.empty(), "test.tif", "test.tif", "tif", "PYRTIFF", 100L, 0,
+                Set.of());
 
-        mockMvc.perform(post("/api/uploadedfile.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(payload)))
-            .andExpect(status().isOk())
+        mockMvc.perform(post("/api/uploadedfile.json").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload))).andExpect(status().isOk())
             .andExpect(jsonPath("$.commandId").value(commandId.toString()))
             .andExpect(jsonPath("$.printMessage").value(true));
     }
@@ -191,98 +143,57 @@ class UploadedFileResourceTests {
     @Test
     void shouldUpdateUploadedFile() throws Exception {
         UUID commandId = UUID.randomUUID();
-        WiremockRepository.SERVER.stubFor(WireMock.put(urlPathEqualTo("/uploaded-files/42"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(objectMapper.writeValueAsString(new HttpCommandResponse(
-                    true,
-                    null,
-                    commandId,
-                    Commands.UPDATE_UPLOADED_FILE
-                )))
-            )
-        );
+        WiremockRepository.SERVER.stubFor(WireMock.put(urlPathEqualTo("/uploaded-files/42")).willReturn(
+            aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(objectMapper.writeValueAsString(
+                    new HttpCommandResponse(true, null, commandId, Commands.UPDATE_UPLOADED_FILE, Set.of())))));
 
-        UpdateUploadedFile payload = new UpdateUploadedFile(
-            Optional.of("updated.tif"), Optional.empty(), Optional.empty(),
-            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
-        );
+        UpdateUploadedFile payload =
+            new UpdateUploadedFile(Optional.of("updated.tif"), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty());
 
-        mockMvc.perform(put("/api/uploadedfile/{id}.json", 42)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(payload)))
-            .andExpect(status().isOk())
+        mockMvc.perform(put("/api/uploadedfile/{id}.json", 42).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload))).andExpect(status().isOk())
             .andExpect(jsonPath("$.commandId").value(commandId.toString()));
     }
 
     @Test
     void shouldReturn404WhenUpdatingNonexistentUploadedFile() throws Exception {
         WiremockRepository.SERVER.stubFor(WireMock.put(urlPathEqualTo("/uploaded-files/999"))
-            .willReturn(aResponse().withStatus(HttpStatus.OK.value()))
-        );
+            .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-        UpdateUploadedFile payload = new UpdateUploadedFile(
-            Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty()
-        );
+        UpdateUploadedFile payload =
+            new UpdateUploadedFile(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty());
 
-        mockMvc.perform(put("/api/uploadedfile/{id}.json", 999)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(payload)))
-            .andExpect(status().isNotFound());
+        mockMvc.perform(put("/api/uploadedfile/{id}.json", 999).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(payload))).andExpect(status().isNotFound());
     }
 
     @Test
     void shouldDeleteUploadedFile() throws Exception {
         UUID commandId = UUID.randomUUID();
-        WiremockRepository.SERVER.stubFor(WireMock.delete(urlPathEqualTo("/uploaded-files/42"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(objectMapper.writeValueAsString(new HttpCommandResponse(
-                    true,
-                    null,
-                    commandId,
-                    Commands.DELETE_UPLOADED_FILE
-                )))
-            )
-        );
+        WiremockRepository.SERVER.stubFor(WireMock.delete(urlPathEqualTo("/uploaded-files/42")).willReturn(
+            aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(objectMapper.writeValueAsString(
+                    new HttpCommandResponse(true, null, commandId, Commands.DELETE_UPLOADED_FILE, Set.of())))));
 
-        mockMvc.perform(delete("/api/uploadedfile/{id}.json", 42))
-            .andExpect(status().isOk())
+        mockMvc.perform(delete("/api/uploadedfile/{id}.json", 42)).andExpect(status().isOk())
             .andExpect(jsonPath("$.commandId").value(commandId.toString()));
     }
 
     @Test
     void shouldReturn404WhenDeletingNonexistentUploadedFile() throws Exception {
         WiremockRepository.SERVER.stubFor(WireMock.delete(urlPathEqualTo("/uploaded-files/999"))
-            .willReturn(aResponse().withStatus(HttpStatus.OK.value()))
-        );
+            .willReturn(aResponse().withStatus(HttpStatus.OK.value())));
 
-        mockMvc.perform(delete("/api/uploadedfile/{id}.json", 999))
-            .andExpect(status().isNotFound());
+        mockMvc.perform(delete("/api/uploadedfile/{id}.json", 999)).andExpect(status().isNotFound());
     }
 
     private UploadedFileResponse anUploadedFileResponse(long id) {
-        return new UploadedFileResponse(
-            id,
-            Optional.of(1L),
-            Optional.empty(),
-            Optional.of(1L),
-            "file_" + id + ".tif",
-            "original_" + id + ".tif",
-            "tif",
-            "PYRTIFF",
-            100L,
-            "/data/file_" + id + ".tif",
-            0,
-            Set.of(),
-            LocalDateTime.of(2024, 1, 1, 0, 0),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty()
-        );
+        return new UploadedFileResponse(id, Optional.of(1L), Optional.empty(), Optional.of(1L), "file_" + id + ".tif",
+            "original_" + id + ".tif", "tif", "PYRTIFF", 100L, "/data/file_" + id + ".tif", 0, Set.of(),
+            LocalDateTime.of(2024, 1, 1, 0, 0), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     private String pageJson(UploadedFileResponse item) throws Exception {

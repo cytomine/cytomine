@@ -65,7 +65,7 @@ public class UploadedFileControllerTest
             "image/tiff",
             1024L,
             0,
-            Set.<Long>of()
+            Set.of()
         );
     }
 

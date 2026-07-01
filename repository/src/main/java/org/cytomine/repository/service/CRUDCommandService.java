@@ -3,6 +3,7 @@ package org.cytomine.repository.service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.cytomine.repository.mapper.CommandMapper;
@@ -48,17 +49,28 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
 
     Optional<E> get(long id);
 
+    default Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now, UUID parentCommandId) {
+        return Set.of();
+    }
+
     default Optional<HttpCommandResponse> delete(long userId, long id, LocalDateTime now) {
+        return delete(userId, id, now, Optional.empty());
+    }
+
+    default Optional<HttpCommandResponse> delete(long userId, long id, LocalDateTime now,
+        Optional<UUID> parentCommandId) {
         if (canDeleteId(userId, id)) {
             return get(id).map(entity -> {
                 DeleteCommandRequest<P> deleteCommandRequest = mapDeleteCommand(userId, map(entity));
                 CommandV2Entity commandV2Entity =
-                    getCommandV2Repository().save(getCommandMapper().map(deleteCommandRequest, now, now, userId));
+                    getCommandV2Repository().save(
+                        getCommandMapper().map(deleteCommandRequest, now, now, userId, parentCommandId));
+                Set<HttpCommandResponse> subCommands = deleteSubEntities(userId, id, now, commandV2Entity.getId());
                 entity.setDeleted(Timestamp.valueOf(now));
                 E savedEntity = save(entity);
                 R response = mapToResponse(savedEntity);
                 return new HttpCommandResponse(true, response, commandV2Entity.getId(),
-                    deleteCommandRequest.getCommand());
+                    deleteCommandRequest.getCommand(), subCommands);
             });
         } else {
             return Optional.empty();
@@ -75,10 +87,11 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
                 UpdateCommandRequest<?> updateCommandRequest =
                     mapUpdateCommand(userId, beforePayload, map(savedEntity));
                 CommandV2Entity commandV2Entity =
-                    getCommandV2Repository().save(getCommandMapper().map(updateCommandRequest, now, now, userId));
+                    getCommandV2Repository().save(
+                        getCommandMapper().map(updateCommandRequest, now, now, userId, Optional.empty()));
                 R response = mapToResponse(savedEntity);
                 return new HttpCommandResponse(true, response, commandV2Entity.getId(),
-                    updateCommandRequest.getCommand());
+                    updateCommandRequest.getCommand(), Set.of());
             });
         } else {
             return Optional.empty();
@@ -91,19 +104,21 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         P commandPayload = map(savedEntity);
         CreateCommandRequest<?> createCommandRequest = mapCreateCommand(userId, commandPayload);
         CommandV2Entity commandV2Entity =
-            getCommandV2Repository().save(getCommandMapper().map(createCommandRequest, now, null, userId));
+            getCommandV2Repository().save(
+                getCommandMapper().map(createCommandRequest, now, null, userId, Optional.empty()));
         R response = mapToResponse(savedEntity);
         return Optional.of(
-            new HttpCommandResponse(true, response, commandV2Entity.getId(), createCommandRequest.getCommand()));
+            new HttpCommandResponse(true, response, commandV2Entity.getId(), createCommandRequest.getCommand(),
+                Set.of()));
     }
 
-    default Optional<HttpCommandResponse> updateWithExistingCommand(long userId, UUID commandId, String command,
+    default Optional<HttpCommandResponse> updateWithExistingCommand(UUID commandId, String command,
         P payload, LocalDateTime now) {
         return get(payload.id()).map(entity -> {
             E updatedEntity = updateEntityWithPayload(entity, payload, Timestamp.valueOf(now));
             E saved = save(updatedEntity);
             R response = mapToResponse(saved);
-            return new HttpCommandResponse(true, new UndoCommandResponse(response), commandId, command);
+            return new HttpCommandResponse(true, new UndoCommandResponse(response), commandId, command, Set.of());
         });
     }
 
@@ -123,7 +138,8 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
 
         UndoDeleteCommand<P> undoCommandRequest = new UndoDeleteCommand<>(deleteCommand, commandId);
         CommandV2Entity commandV2Entity =
-            getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId));
+            getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId,
+                Optional.of(commandId)));
 
         long aclId = deleteCommand.aclId();
 
@@ -134,7 +150,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
                 E saved = save(entity);
                 R response = mapToResponse(saved);
                 return new HttpCommandResponse(true, new UndoCommandResponse(response), commandV2Entity.getId(),
-                    undoCommandRequest.getCommand());
+                    undoCommandRequest.getCommand(), Set.of());
             });
         } else {
             return Optional.empty();
@@ -149,14 +165,17 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
 
         UndoCreateCommand<P> undoCommandRequest = new UndoCreateCommand<>(createCommand, commandId);
         CommandV2Entity commandV2Entity =
-            getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId));
+            getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId,
+                Optional.of(commandId)));
 
         return get(createCommand.id()).map(entity -> {
+            Set<HttpCommandResponse> subCommands =
+                deleteSubEntities(userId, createCommand.id(), now, commandV2Entity.getId());
             entity.setDeleted(Timestamp.valueOf(now));
             E saved = save(entity);
             R response = mapToResponse(saved);
             return new HttpCommandResponse(true, new UndoCommandResponse(response), commandV2Entity.getId(),
-                undoCommandRequest.getCommand());
+                undoCommandRequest.getCommand(), subCommands);
         });
     }
 
@@ -168,9 +187,10 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
 
         UndoUpdateCommand<P> undoCommandRequest = new UndoUpdateCommand<>(updateCommand, commandId);
         CommandV2Entity commandV2Entity =
-            getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId));
+            getCommandV2Repository().save(getCommandMapper().map(undoCommandRequest, now, now, userId,
+                Optional.of(commandId)));
 
-        return updateWithExistingCommand(userId, commandV2Entity.getId(), undoCommandRequest.getCommand(),
+        return updateWithExistingCommand(commandV2Entity.getId(), undoCommandRequest.getCommand(),
             updateCommand.before(), now);
     }
 }

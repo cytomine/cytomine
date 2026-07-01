@@ -31,7 +31,6 @@ public class StorageControllerTest implements CRUDCommandTests<CreateStorage, St
     ObjectMapper objectMapper;
     @Autowired
     JdbcTemplate jdbcTemplate;
-
     String apiURL = StorageHttpContract.ROOT_PATH;
     CreateStorage createPayload = new CreateStorage(UUID.randomUUID().toString());
     UpdateStorage updatePayload = new UpdateStorage(Optional.of(UUID.randomUUID().toString()));

@@ -2,6 +2,7 @@ package org.cytomine.repository.mapper;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -37,6 +38,7 @@ public interface ApplyCommandResponseMapper {
     TermResponse setDeleteTimeTR(TermResponse or, Optional<LocalDateTime> deleteTime);
 
     @Mapping(target = "deleted", source = "deleteTime")
+    @Mapping(target = "terms", source = "or.terms")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
     OntologyResponse setDeleteTimeOR(OntologyResponse or, Optional<LocalDateTime> deleteTime);
 
@@ -51,10 +53,6 @@ public interface ApplyCommandResponseMapper {
     @Mapping(target = "deleted", source = "deleteTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
     TagDomainAssociationResponse setDeleteTimeTDAR(TagDomainAssociationResponse or, Optional<LocalDateTime> deleteTime);
-
-//    @Mapping(target = "deleted", source = "deleteTime")
-//    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
-//    UndoCommandResponse setDeleteTimeUCR(UndoCommandResponse or, Optional<LocalDateTime> deleteTime);
 
     @Mapping(target = "deleted", source = "deleteTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})

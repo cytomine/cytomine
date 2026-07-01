@@ -73,33 +73,11 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
         subEntities = Set.of(termMapper.mapToTermResponse(subEntity));
         return subEntities;
     }
-
-    @Override
-    public Set<ApplyCommandResponse> expectDeletedSubEntities(LocalDateTime deletionTime) {
-        return subEntities.stream().map(e -> termMapper.updateDeleteTime(e, Optional.of(deletionTime)))
-            .collect(Collectors.toSet());
-    }
-
+    
     @Override
     public OntologyResponse expectedUpdatedResponse(OntologyResponse response, UpdateOntology updatePayload,
         LocalDateTime updated) {
         return new OntologyResponse(updatePayload.name().orElse(response.name()), response.id(), response.terms(),
             response.created(), Optional.of(updated), response.deleted(), response.user());
-    }
-
-    @Override
-    public OntologyResponse expectedDeletedResponse(OntologyResponse response, LocalDateTime deletedTime) {
-        return new OntologyResponse(response.name(), response.id(),
-            response.terms().stream().map(e -> termMapper.updateDeleteTime(e, Optional.of(deletedTime)))
-                .collect(Collectors.toSet()), response.created(), response.updated(), Optional.of(deletedTime),
-            response.user());
-    }
-
-    @Override
-    public OntologyResponse expectChangedUpdatedTime(OntologyResponse response, LocalDateTime updatedTime) {
-        return new OntologyResponse(response.name(), response.id(),
-            response.terms().stream().map(e -> termMapper.updateUpdateTime(e, Optional.of(updatedTime)))
-                .collect(Collectors.toSet()), response.created(),
-            Optional.of(updatedTime), response.deleted(), response.user());
     }
 }

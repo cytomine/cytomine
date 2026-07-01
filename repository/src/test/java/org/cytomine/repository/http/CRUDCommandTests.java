@@ -44,10 +44,6 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
     U getUpdatePayload();
 
-    default Set<ApplyCommandResponse> expectDeletedSubEntities(LocalDateTime deletionTime) {
-        return Set.of();
-    }
-
     R expectedUpdatedResponse(R response, U updatePayload, LocalDateTime updatedTime);
 
     JdbcTemplate getJdbcTemplate();

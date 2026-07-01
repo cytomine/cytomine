@@ -112,7 +112,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             updateDataResult);
 
         String delete = getMockMvc().perform(
-                delete(getApiURL() + "/" + result.data().id()).param("userId", stringUserId).contentType(APPLICATION_JSON))
+                delete(getApiURL() + "/" + result.data().id()).param("userId", stringUserId)
+                    .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
         assertEquals(expectedDeletedResponse(updateDataResult, deleteResult.data().deleted().orElseThrow()),
@@ -128,8 +129,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> maybeFirstCreate = getObjectMapper().readValue(getMockMvc().perform(
                 post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
-        });
+            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
 
         HttpCommandResponse firstCreate =
             maybeFirstCreate.orElseThrow(() -> new IllegalStateException("First creation should not be empty."));
@@ -147,14 +147,12 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", stringUserId)
                     .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
-            .getContentAsString(), new TypeReference<>() {
-        });
+            .getContentAsString(), new TypeReference<>() {});
 
         LocalDateTime deletedTime =
             undoCommandResponse.orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data()
                 .deleted().orElseThrow(() -> new IllegalStateException("Deleted should not be empty."));
-        assertEquals(Optional.of(
-                new UndoCommandResponse(expectedDeletedResponse(getResponseData, deletedTime))),
+        assertEquals(Optional.of(new UndoCommandResponse(expectedDeletedResponse(getResponseData, deletedTime))),
             undoCommandResponse.map(HttpCommandResponse::data));
 
         String emptyResponseString = getMockMvc().perform(
@@ -168,16 +166,14 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + undoCommandResponse.get().commandId()).param("userId",
                     stringUserId).contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
-            .getContentAsString(), new TypeReference<>() {
-        });
+            .getContentAsString(), new TypeReference<>() {});
 
         LocalDateTime updateTime = redoCommandResponse.stream().findFirst()
             .orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data().updated()
             .orElseThrow(() -> new IllegalStateException("Updated should not be empty."));
 
         R firstCreateData = (R) firstCreate.data();
-        assertEquals(Optional.of(
-                new UndoCommandResponse(expectChangedUpdatedTime(getResponseData, updateTime))),
+        assertEquals(Optional.of(new UndoCommandResponse(expectChangedUpdatedTime(getResponseData, updateTime))),
             redoCommandResponse.map(HttpCommandResponse::data));
 
         String redoGetResponseString = getMockMvc().perform(

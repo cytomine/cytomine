@@ -971,12 +971,7 @@ class Cytomine:
 
         return uf
 
-    def import_datasets(
-        self,
-        storage_id: int,
-        pims_url: str,
-        dataset_names: str | None = None,
-    ) -> dict[str, str]:
+    def import_datasets(self, storage_id: int, pims_url: str) -> dict[str, str]:
         """Import datasets from a given path."""
 
         response = self._session.post(

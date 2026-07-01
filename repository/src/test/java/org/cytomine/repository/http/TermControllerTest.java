@@ -1,11 +1,16 @@
 package org.cytomine.repository.http;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.persistence.OntologyRepository;
+import org.cytomine.repository.persistence.entity.OntologyEntity;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +33,7 @@ import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 class TermControllerTest implements CRUDCommandTests<CreateTerm, TermResponse, UpdateTerm> {
 
     String apiURL = TermHttpContract.ROOT_PATH;
+
     CreateTerm createPayload;
     UpdateTerm updatePayload =
         new UpdateTerm(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()));
@@ -39,16 +45,20 @@ class TermControllerTest implements CRUDCommandTests<CreateTerm, TermResponse, U
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private OntologyRepository ontologyRepository;
 
     private long ontologyId;
 
     @Override
     public void beforeCreate(long userId) {
-        ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, ?, ?)", ontologyId,
-            UUID.randomUUID(), userId);
+        ontologyId = ontologyRepository.save(
+            new OntologyEntity(null, 0, UUID.randomUUID().toString(), userId, Timestamp.from(Instant.now()), null, null,
+                Set.of())).getId();
         createPayload = new CreateTerm(UUID.randomUUID().toString(), UUID.randomUUID().toString(), ontologyId,
             Optional.of(UUID.randomUUID().toString()));
     }

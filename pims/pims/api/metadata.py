@@ -13,7 +13,7 @@
 #  * limitations under the License.
 from datetime import datetime
 from enum import Enum
-from typing import Any, Union
+from typing import Any
 
 from fastapi import APIRouter, Depends, Path as PathParam
 from pydantic import BaseModel, Field, RootModel
@@ -73,7 +73,7 @@ class SingleFileInfo(BaseModel):
 
 
 class CollectionFileInfo(SingleFileInfo):
-    children: list[Union['CollectionFileInfo', SingleFileInfo]] = Field(
+    children: list['CollectionFileInfo | SingleFileInfo'] = Field(
         ..., description='Information about children files'
     )
 

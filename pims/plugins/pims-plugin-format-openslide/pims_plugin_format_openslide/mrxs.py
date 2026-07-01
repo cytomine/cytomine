@@ -12,7 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 from pathlib import Path
-from typing import Optional
 
 from pims.cache import cached_property
 from pims.formats import AbstractFormat
@@ -22,7 +21,7 @@ from pims.formats.utils.histogram import DefaultHistogramReader
 from pims_plugin_format_openslide.utils.engine import OpenslideVipsParser, OpenslideVipsReader
 
 
-def get_root_file(path: Path) -> Optional[Path]:
+def get_root_file(path: Path) -> Path | None:
     """Try to get MRXS main file (as it is a multi-file format)."""
     if path.is_dir():
         for child in path.iterdir():

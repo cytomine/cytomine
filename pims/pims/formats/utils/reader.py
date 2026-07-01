@@ -256,12 +256,12 @@ class AbstractReader(ABC):
         self, channels: int | list[int] | None
     ) -> tuple[list, list]:
         if channels is None:
-            channels = np.arange(self.format.main_imd.n_channels)
+            ch = np.arange(self.format.main_imd.n_channels)
         else:
-            channels = np.asarray(ensure_list(channels))
+            ch = np.asarray(ensure_list(channels))
 
         spp = self.format.main_imd.n_samples
 
-        cc_idxs = channels // spp
-        s_idxs = channels % spp
+        cc_idxs = ch // spp
+        s_idxs = ch % spp
         return cc_idxs.tolist(), s_idxs.tolist()

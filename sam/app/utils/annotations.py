@@ -1,4 +1,4 @@
-from typing import List, Union, cast
+from typing import cast
 
 import cv2
 import geojson
@@ -36,7 +36,7 @@ def mask_to_polygon(
     offset_y: int,
     scale_x: float = 1.0,
     scale_y: float = 1.0,
-) -> Union[geojson.Feature, None]:
+) -> geojson.Feature | None:
     """
     Function to convert the mask to a GeoJSON taking into account the offset due
     to the manipulation of WSIs.
@@ -58,7 +58,7 @@ def mask_to_polygon(
     if not contours:
         return None
 
-    polygons: List[List[List[float]]] = []
+    polygons: list[list[list[float]]] = []
     for contour in contours:
         if len(contour) >= 3:  # because the polygon must at least have 3 points
             coords = contour.squeeze().astype(np.float32)
@@ -72,7 +72,7 @@ def mask_to_polygon(
             coords = coords + np.array([offset_x, offset_y])
             coords[:, 1] = image_height - coords[:, 1]
 
-            coords_list = cast(List[List[float]], coords.tolist())
+            coords_list = cast(list[list[float]], coords.tolist())
 
             if coords_list[0] != coords_list[-1]:
                 coords_list.append(coords_list[0])

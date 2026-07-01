@@ -4,13 +4,13 @@ This page provides some features that can be configured on Cytomine.
 
 ## Configure LS-AAI Identity Broker
 
-Cytomine uses keycloak as IAM and also as a broker to negotiate with LS-AAI to authenticate users using `authorization_code` flow and go to <https://127.0.0.1/iam/realms/cytomine/.well-known/openid-configuration> for the metadata, for configuration follow steps below:
+Cytomine uses keycloak as IAM and also as a broker to negotiate with LS-AAI to authenticate users using `authorization_code` flow and go to <http://127.0.0.1:8100/iam/realms/cytomine/.well-known/openid-configuration> for the metadata, for configuration follow steps below:
 
 ### A. Configure the broker
 
-1. Access keycloak admin console <https://127.0.0.1/iam/admin> and authenticate using the default `admin` user and find the password for it in `cytomine.yaml` under `KEYCLOAK_ADMIN_PASSWORD` and notice this is not the cytomine admin.
+1. Access keycloak admin console <http://127.0.0.1:8100/iam/admin> and authenticate using the default `admin` user and find the password for it in `cytomine.yaml` under `KEYCLOAK_ADMIN_PASSWORD` and notice this is not the cytomine admin.
 2. Click `Identity Providers` in the menu.
-3. Select `Cytomine` realm from the upper left corner
+3. Select `Cytomine` realm from the upper left corner dropdown menu
 4. From the `Add provider` list, select `OpenID Connect v1.0` or `keycloak openID connect`.
 5. `Redirect URI` is prefilled
 6. Enter display name as `LS_AAI`
@@ -55,7 +55,7 @@ The complete installation guide is available in the [sdafs repository](https://g
 
 2. Add the following line to your `$HOME/.profile` or `/etc/profile` (for a system-wide installation):
 ```bash
-export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
 ```
 
 3. Install `sdafs`
@@ -117,6 +117,8 @@ If you’re working with `sdafs`, the directories are already organised in the s
 
 ::: tip
 This configuration is optional if you planned to use the default location `./cytomine/data/dataset` for importing your datasets.
+
+If you are using `sdafs`, set this path to the mounted folder (e.g., `bp-datasets` as configured in the previous step).
 :::
 
 Create `.env` in the cytomine folder and add the path to your dataset folder:
@@ -135,13 +137,13 @@ This step should be done before the `docker compose up -d` command in the Cytomi
 
 ### Usage
 
-Using the Python client in your locally cloned Cytomine directory, you can import the datasets with the following command:
+Using the Python client in your locally cloned Cytomine directory, you can import the datasets with the following command executed from the root of the repository:
 
 ```bash
-python import_datasets.py --cytomine_core_host <cytomine-core-host> --cytomine_pims_host <cytomine-pims-host> --private_key <private-key> --public_key <public-key>
+python ./clients/python/examples/import_datasets.py --cytomine_core_host <cytomine-core-host> --cytomine_pims_host <cytomine-pims-host> --private_key <private-key> --public_key <public-key>
 ```
 
-where `<cytomine-core-host>` and `<cytomine-pims-host>` is your Cytomine host (if local installation: <http://127.0.0.1/>), `<public-key>` and `<private-key>` are your public and private keys (you can get them in the Cytomine Web-UI in Account).
+where `<cytomine-core-host>` (if local installation: <http://127.0.0.1:8080>) and `<cytomine-pims-host>` (if local installation: <http://127.0.0.1:5001>) are the host address with port of `core` and `pims`, `<public-key>` and `<private-key>` are your public and private keys (you can get them in the Cytomine Web-UI in Account).
 
 ::: danger
 Several factors can slow down the importation:

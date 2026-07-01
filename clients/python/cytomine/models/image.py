@@ -14,24 +14,22 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=invalid-name,unused-argument
 
 import os
 import re
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
-from cytomine.cytomine import Cytomine, deprecated
+from cytomine.cytomine import Cytomine
 from cytomine.models.collection import Collection
 from cytomine.models.model import Model
 
 from ._utilities import generic_image_dump
 
-
 class AbstractImage(Model):
     def __init__(
         self,
-        filename: Optional[str] = None,
-        id_uploaded_file: Optional[int] = None,
+        filename: str | None = None,
+        id_uploaded_file: int | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__()
@@ -102,35 +100,31 @@ class AbstractImage(Model):
     def __str__(self) -> str:
         return f"[{self.callback_identifier}] {self.id} : {self.originalFilename}"
 
-
 class AbstractImageCollection(Collection):
     def __init__(
         self,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,
     ) -> None:
         super().__init__(AbstractImage, filters, max, offset)
-        self._allowed_filters = [None]  # "project"]
+        self._allowed_filters = [None]
         self.set_parameters(parameters)
-
 
 class AbstractSlice(Model):
     def __init__(
         self,
-        id_image: Optional[int] = None,
-        id_uploaded_file: Optional[int] = None,
-        mime: Optional[str] = None,
-        channel: Optional[int] = None,
-        z_stack: Optional[int] = None,
-        time: Optional[int] = None,
+        id_image: int | None = None,
+        id_uploaded_file: int | None = None,
+        channel: int | None = None,
+        z_stack: int | None = None,
+        time: int | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__()
         self.image = id_image
         self.uploadedFile = id_uploaded_file
-        self.mime = mime
         self.channel = channel
         self.zStack = z_stack
         self.time = time
@@ -138,11 +132,10 @@ class AbstractSlice(Model):
         self.rank = None
         self.populate(attributes)
 
-
 class AbstractSliceCollection(Collection):
     def __init__(
         self,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,
@@ -151,25 +144,24 @@ class AbstractSliceCollection(Collection):
         self._allowed_filters = ["abstractimage", "uploadedfile"]
         self.set_parameters(parameters)
 
-
 class ImageInstance(Model):
     def __init__(
         self,
-        id_abstract_image: Optional[int] = None,
-        id_project: Optional[int] = None,
+        id_abstract_image: int | None = None,
+        id_project: int | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__()
         self.baseImage = id_abstract_image
         self.project = id_project
         self.user = None
-        self.originalFilename: Optional[str] = None
-        self.instanceFilename: Optional[str] = None
-        self.path: Optional[str] = None
-        self.contentType: Optional[str] = None
+        self.originalFilename: str | None = None
+        self.instanceFilename: str | None = None
+        self.path: str | None = None
+        self.contentType: str | None = None
 
-        self.filename: Optional[str] = None
-        self.filenames: Optional[List[str]] = None
+        self.filename: str | None = None
+        self.filenames: list[str] | None = None
 
         self.width = None
         self.height = None
@@ -195,14 +187,14 @@ class ImageInstance(Model):
         self.numberOfReviewedAnnotations = None
         self.reviewed = None
         self.populate(attributes)
-        self._reference_slice: Optional[SliceInstance] = None
+        self._reference_slice: SliceInstance | None = None
 
-        self.x: Optional[int] = None
-        self.y: Optional[int] = None
-        self.w: Optional[int] = None
-        self.h: Optional[int] = None
+        self.x: int | None = None
+        self.y: int | None = None
+        self.w: int | None = None
+        self.h: int | None = None
 
-    def reference_slice(self) -> Optional[Union[bool, "SliceInstance"]]:
+    def reference_slice(self) -> "bool | SliceInstance | None":
         if self.id is None:
             raise ValueError("Cannot get the reference slice of an image with no ID.")
 
@@ -221,12 +213,12 @@ class ImageInstance(Model):
         self,
         dest_pattern: str = "{id}.jpg",
         override: bool = True,
-        max_size: Optional[Union[int, Tuple[int, ...]]] = None,
+        max_size: int | tuple[int, ...] | None = None,
         bits: int = 8,
-        contrast: Optional[float] = None,
-        gamma: Optional[float] = None,
-        colormap: Optional[int] = None,
-        inverse: Optional[bool] = None,
+        contrast: float | None = None,
+        gamma: float | None = None,
+        colormap: int | None = None,
+        inverse: bool | None = None,
     ) -> bool:
         """
         Download the *reference* slice image with optional image modifications.
@@ -263,7 +255,7 @@ class ImageInstance(Model):
         if self.id is None:
             raise ValueError("Cannot dump an image with no ID.")
 
-        parameters: Dict[str, Any] = {
+        parameters: dict[str, Any] = {
             "maxSize": max(max_size) if isinstance(max_size, tuple) else max_size,
             "contrast": contrast,
             "gamma": gamma,
@@ -340,17 +332,17 @@ class ImageInstance(Model):
         h: int,
         dest_pattern: str = "{id}-{x}-{y}-{w}-{h}.jpg",
         override: bool = True,
-        mask: Optional[bool] = None,
-        alpha: Optional[bool] = None,
+        mask: bool | None = None,
+        alpha: bool | None = None,
         bits: int = 8,
-        annotations: Optional[List[int]] = None,
-        terms: Optional[List[int]] = None,
-        users: Optional[List[int]] = None,
-        reviewed: Optional[bool] = None,
+        annotations: list[int] | None = None,
+        terms: list[int] | None = None,
+        users: list[int] | None = None,
+        reviewed: bool | None = None,
         complete: bool = True,
-        projection: Optional[str] = None,
-        max_size: Optional[Union[int, Tuple[int, ...]]] = None,
-        zoom: Optional[int] = None,
+        projection: str | None = None,
+        max_size: int | tuple[int, ...] | None = None,
+        zoom: int | None = None,
     ) -> bool:
         """
         Extract a window (rectangle) from an image and download it.
@@ -471,11 +463,10 @@ class ImageInstance(Model):
             parameters,
         )
 
-
 class ImageInstanceCollection(Collection):
     def __init__(
         self,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,
@@ -484,23 +475,21 @@ class ImageInstanceCollection(Collection):
         self._allowed_filters = ["project", "imagegroup"]  # "user"
         self.set_parameters(parameters)
 
-    def save(self, *args: Any, **kwargs: Any) -> Union[bool, Collection]:
+    def save(self, *args: Any, **kwargs: Any) -> bool | Collection:
         raise NotImplementedError("Cannot save an imageinstance collection by client.")
-
 
 class SliceInstance(Model):
     def __init__(
         self,
-        id_project: Optional[int] = None,
-        id_image: Optional[int] = None,
-        id_base_slice: Optional[int] = None,
+        id_project: int | None = None,
+        id_image: int | None = None,
+        id_base_slice: int | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__()
         self.project = id_project
         self.image = id_image
         self.baseSlice = id_base_slice
-        self.mime = None
         self.channel = None
         self.zStack = None
         self.time = None
@@ -508,13 +497,13 @@ class SliceInstance(Model):
         self.rank = None
 
         # Used to store local filename(s) after dump on disk.
-        self.filename: Optional[str] = None
-        self.filenames: Optional[List[str]] = None
+        self.filename: str | None = None
+        self.filenames: list[str] | None = None
 
-        self.x: Optional[int] = None
-        self.y: Optional[int] = None
-        self.w: Optional[int] = None
-        self.h: Optional[int] = None
+        self.x: int | None = None
+        self.y: int | None = None
+        self.w: int | None = None
+        self.h: int | None = None
 
         self.populate(attributes)
 
@@ -522,12 +511,12 @@ class SliceInstance(Model):
         self,
         dest_pattern: str = "{id}.jpg",
         override: bool = True,
-        max_size: Optional[Union[int, Tuple[int, ...]]] = None,
+        max_size: int | tuple[int, ...] | None = None,
         bits: int = 8,
-        contrast: Optional[float] = None,
-        gamma: Optional[float] = None,
-        colormap: Optional[int] = None,
-        inverse: Optional[bool] = None,
+        contrast: float | None = None,
+        gamma: float | None = None,
+        colormap: int | None = None,
+        inverse: bool | None = None,
     ) -> bool:
         """
         Download the slice image with optional image modifications.
@@ -601,16 +590,16 @@ class SliceInstance(Model):
         h: int,
         dest_pattern: str = "{id}-{x}-{y}-{w}-{h}.jpg",
         override: bool = True,
-        mask: Optional[bool] = None,
-        alpha: Optional[bool] = None,
+        mask: bool | None = None,
+        alpha: bool | None = None,
         bits: int = 8,
-        annotations: Optional[List[int]] = None,
-        terms: Optional[List[int]] = None,
-        users: Optional[List[int]] = None,
-        reviewed: Optional[bool] = None,
+        annotations: list[int] | None = None,
+        terms: list[int] | None = None,
+        users: list[int] | None = None,
+        reviewed: bool | None = None,
         complete: bool = True,
-        max_size: Optional[Union[int, Tuple[int, ...]]] = None,
-        zoom: Optional[int] = None,
+        max_size: int | tuple[int, ...] | None = None,
+        zoom: int | None = None,
     ) -> bool:
         """
         Extract a window (rectangle) from an image and download it.
@@ -726,11 +715,10 @@ class SliceInstance(Model):
             parameters,
         )
 
-
 class SliceInstanceCollection(Collection):
     def __init__(
         self,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,

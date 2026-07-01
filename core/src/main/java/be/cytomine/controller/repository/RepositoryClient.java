@@ -18,8 +18,10 @@ import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.http.StorageHttpContract;
+import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.http.UploadedFileHttpContract;
 import be.cytomine.common.repository.utils.SpringPage;
 
 @Configuration
@@ -78,6 +80,15 @@ public class RepositoryClient {
     @Bean
     ReviewedAnnotationHttpContract reviewedAnnotationClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, ReviewedAnnotationHttpContract.class);
+    }
+
+    @Bean TagDomainAssociationHttpContract tagDomainAssociationClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, TagDomainAssociationHttpContract.class);
+    }
+
+    @Bean
+    UploadedFileHttpContract uploadedFileServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, UploadedFileHttpContract.class);
     }
 
     private <T> T createClient(RestClient repositoryRestClient, Class<T> repoType) {

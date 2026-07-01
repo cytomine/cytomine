@@ -14,17 +14,15 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=invalid-name
 
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 from cytomine.cytomine import Cytomine
 from cytomine.models.collection import Collection
 from cytomine.models.model import Model
 
-
 class Ontology(Model):
-    def __init__(self, name: Optional[str] = None, **attributes: Any) -> None:
+    def __init__(self, name: str | None = None, **attributes: Any) -> None:
         super().__init__()
         self.name = name
         self.user = None
@@ -36,11 +34,10 @@ class Ontology(Model):
         self.children = None
         self.populate(attributes)
 
-
 class OntologyCollection(Collection):
     def __init__(
         self,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,
@@ -49,14 +46,13 @@ class OntologyCollection(Collection):
         self._allowed_filters = [None]
         self.set_parameters(parameters)
 
-
 class Term(Model):
     def __init__(
         self,
-        name: Optional[str] = None,
-        id_ontology: Optional[int] = None,
-        color: Optional[str] = None,
-        id_parent: Optional[int] = None,
+        name: str | None = None,
+        id_ontology: int | None = None,
+        color: str | None = None,
+        id_parent: int | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__()
@@ -66,11 +62,10 @@ class Term(Model):
         self.color = color
         self.populate(attributes)
 
-
 class TermCollection(Collection):
     def __init__(
         self,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         max: int = 0,
         offset: int = 0,
         **parameters: Any,
@@ -79,12 +74,11 @@ class TermCollection(Collection):
         self._allowed_filters = [None, "project", "ontology", "annotation"]
         self.set_parameters(parameters)
 
-
 class RelationTerm(Model):
     def __init__(
         self,
-        id_term1: Optional[int] = None,
-        id_term2: Optional[int] = None,
+        id_term1: int | None = None,
+        id_term2: int | None = None,
         **attributes: Any,
     ) -> None:
         super().__init__()
@@ -100,9 +94,9 @@ class RelationTerm(Model):
 
     def fetch(
         self,
-        id_term1: Optional[int] = None,
-        id_term2: Optional[int] = None,
-    ) -> Union[bool, Model]:
+        id_term1: int | None = None,
+        id_term2: int | None = None,
+    ) -> bool | Model:
         self.id = -1
 
         if self.term1 is None and id_term1 is None:
@@ -119,7 +113,7 @@ class RelationTerm(Model):
 
         return Cytomine.get_instance().get_model(self, self.query_parameters)
 
-    def update(self, *args: Any, **kwargs: Any) -> Union[bool, Model]:
+    def update(self, *args: Any, **kwargs: Any) -> bool | Model:
         raise NotImplementedError("Cannot update a relation-term.")
 
     def __str__(self) -> str:

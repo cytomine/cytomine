@@ -12,7 +12,6 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 from datetime import datetime
-from typing import Optional
 
 from pims.cache import cached_property
 from pims.formats import AbstractFormat
@@ -53,7 +52,7 @@ class PhilipsParser(OpenslideVipsParser):
         return imd
 
     @staticmethod
-    def parse_acquisition_date(date: str) -> Optional[datetime]:
+    def parse_acquisition_date(date: str) -> datetime | None:
         # Have seen: 20181019105847.000000
         try:
             return datetime.strptime(date, "%Y%m%d%H%M%S.%f")

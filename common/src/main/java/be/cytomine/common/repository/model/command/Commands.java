@@ -16,4 +16,16 @@ public interface Commands {
     String CREATE_STORAGE = "be.cytomine.AddStorageCommand";
     String UPDATE_STORAGE = "be.cytomine.EditStorageCommand";
     String DELETE_STORAGE = "be.cytomine.DeleteStorageCommand";
+
+    String CREATE_UPLOADED_FILE = "be.cytomine.AddUploadedFileCommand";
+    String UPDATE_UPLOADED_FILE = "be.cytomine.EditUploadedFileCommand";
+    String DELETE_UPLOADED_FILE = "be.cytomine.DeleteUploadedFileCommand";
+
+    String CREATE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.AddTagDomainAssociationCommand";
+    String UPDATE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.EditTagDomainAssociationCommand";
+    String DELETE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.DeleteTagDomainAssociationCommand";
+
+    String UNDO_CREATE_COMMAND = "be.cytomine.UndoCreateCommand";
+    String UNDO_DELETE_COMMAND = "be.cytomine.UndoDeleteCommand";
+    String UNDO_UPDATE_COMMAND = "be.cytomine.UndoUpdateCommand";
 }

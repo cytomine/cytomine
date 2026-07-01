@@ -1279,10 +1279,16 @@ public class CollectionType extends Type {
             String arrayYmlName = ymlPath + "/array.yml";
 
             container.getEntryList().removeIf(entry -> entry.getName().equals(arrayYmlName));
+            String dirPrefix = "/" + ymlPath + "/";
+            long filesAlreadyInContainer = container.getEntryList().stream()
+                .filter(e -> e.getStorageDataType() == StorageDataType.FILE)
+                .filter(e -> e.getName().startsWith(dirPrefix)
+                    && !e.getName().substring(dirPrefix.length()).contains("/"))
+                .count();
             container.add(itemFileEntry);
 
             int persistedSize = readPersistedArraySize(run, arrayYmlName);
-            String arraySize = "size: " + (persistedSize + 1);
+            String arraySize = "size: " + (persistedSize + filesAlreadyInContainer + 1);
             container.add(new StorageDataEntry(
                 FileHelper.write("array.yml", arraySize.getBytes(StandardCharsets.UTF_8)),
                 arrayYmlName,

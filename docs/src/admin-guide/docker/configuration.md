@@ -4,13 +4,13 @@ This page provides some features that can be configured on Cytomine.
 
 ## Configure LS-AAI Identity Broker
 
-Cytomine uses keycloak as IAM and also as a broker to negotiate with LS-AAI to authenticate users using `authorization_code` flow and go to <https://127.0.0.1/iam/realms/cytomine/.well-known/openid-configuration> for the metadata, for configuration follow steps below:
+Cytomine uses keycloak as IAM and also as a broker to negotiate with LS-AAI to authenticate users using `authorization_code` flow and go to <http://127.0.0.1:8100/iam/realms/cytomine/.well-known/openid-configuration> for the metadata, for configuration follow steps below:
 
 ### A. Configure the broker
 
-1. Access keycloak admin console <https://127.0.0.1/iam/admin> and authenticate using the default `admin` user and find the password for it in `cytomine.yaml` under `KEYCLOAK_ADMIN_PASSWORD` and notice this is not the cytomine admin.
+1. Access keycloak admin console <http://127.0.0.1:8100/iam/admin> and authenticate using the default `admin` user and find the password for it in `cytomine.yaml` under `KEYCLOAK_ADMIN_PASSWORD` and notice this is not the cytomine admin.
 2. Click `Identity Providers` in the menu.
-3. Select `Cytomine` realm from the upper left corner
+3. Select `Cytomine` realm from the upper left corner dropdown menu
 4. From the `Add provider` list, select `OpenID Connect v1.0` or `keycloak openID connect`.
 5. `Redirect URI` is prefilled
 6. Enter display name as `LS_AAI`

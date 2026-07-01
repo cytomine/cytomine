@@ -44,6 +44,7 @@ import be.cytomine.appengine.exceptions.TypeValidationException;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageDataEntry;
 import be.cytomine.appengine.handlers.StorageDataType;
+import be.cytomine.appengine.handlers.StorageHandler;
 import be.cytomine.appengine.models.task.Parameter;
 import be.cytomine.appengine.models.task.ParameterType;
 import be.cytomine.appengine.models.task.Run;
@@ -1223,30 +1224,30 @@ public class CollectionType extends Type {
             name = provision.get("parameterName").asText();
         }
 
-        return mapNode("/" + name, provision.get("value"), new StorageData());
+        return mapNode("/" + name, provision.get("value"), new StorageData(), run);
     }
 
-    private StorageData mapNode(String path, JsonNode value, StorageData container) throws FileStorageException {
-
-        Type currentType = new CollectionType(this);
-        while (currentType instanceof CollectionType) {
-            currentType = ((CollectionType) currentType).getSubType();
-        }
-        String leafType = currentType.getClass().getSimpleName();
+    private StorageData mapNode(
+        String path,
+        JsonNode value,
+        StorageData container,
+        Run run
+    ) throws FileStorageException {
         if (value.isNull()) {
             throw new FileStorageException(ErrorCode.INTERNAL_NULL_PROVISION);
         }
+
         if (value.isArray()) {
             container.add(new StorageDataEntry(path, StorageDataType.DIRECTORY));
-            int size = value.size();
-            String arrayDotYmpData = "size: " + size;
+            String arrayDotYmpData = "size: " + value.size();
             container.add(new StorageDataEntry(FileHelper.write("array.yml", arrayDotYmpData.getBytes(StandardCharsets.UTF_8)),
-                path + "/" + "array.yml",
+                path.substring(1) + "/array.yml",
                 StorageDataType.FILE));
             for (JsonNode item : value) {
-                container = mapNode(path + "/" + item.get("index").asText(), item.get("value"), container);
+                container = mapNode(path + "/" + item.get("index").asText(), item.get("value"), container, run);
             }
         }
+
         if (value.isObject() || value.isValueNode()) {
             if (value.has("type")
                 && (value.get("type").asText().equals("GeometryCollection")
@@ -1254,7 +1255,13 @@ public class CollectionType extends Type {
                 path += ".geojson";
             }
 
-            StorageDataEntry itemFileEntry = null;
+            Type currentType = new CollectionType(this);
+            while (currentType instanceof CollectionType collectionType) {
+                currentType = collectionType.getSubType();
+            }
+            String leafType = currentType.getClass().getSimpleName();
+
+            StorageDataEntry itemFileEntry;
             if (leafType.equalsIgnoreCase("FileType") || leafType.equalsIgnoreCase("ImageType")) {
                 itemFileEntry = new StorageDataEntry(new File(value.asText()), path, StorageDataType.FILE);
             } else {
@@ -1265,28 +1272,43 @@ public class CollectionType extends Type {
                 );
             }
 
-            // add the yml file to the storage data object
             String ymlPath = "";
             if (path.contains("/")) {
                 ymlPath = path.substring(1, path.lastIndexOf("/"));
             }
+            String arrayYmlName = ymlPath + "/array.yml";
 
-            container.getEntryList().removeIf(tempYml -> tempYml.getName().endsWith("array.yml"));
-            String dirPrefix = "/" + ymlPath + "/";
-            long filesInDir = container.getEntryList().stream()
-                .filter(e -> e.getStorageDataType() == StorageDataType.FILE)
-                .filter(e -> e.getName().startsWith(dirPrefix)
-                    && !e.getName().substring(dirPrefix.length()).contains("/"))
-                .count();
+            container.getEntryList().removeIf(entry -> entry.getName().equals(arrayYmlName));
             container.add(itemFileEntry);
-            String arraySize = "size: " + (filesInDir + 1);
+
+            int persistedSize = readPersistedArraySize(run, arrayYmlName);
+            String arraySize = "size: " + (persistedSize + 1);
             container.add(new StorageDataEntry(
                 FileHelper.write("array.yml", arraySize.getBytes(StandardCharsets.UTF_8)),
-                ymlPath + "/array.yml",
+                arrayYmlName,
                 StorageDataType.FILE
             ));
         }
         return container;
+    }
+
+    private int readPersistedArraySize(Run run, String arrayYmlName) {
+        if (run == null || run.getId() == null) {
+            return 0;
+        }
+
+        StorageDataEntry query = new StorageDataEntry(arrayYmlName, StorageDataType.FILE);
+        query.setStorageId("task-run-inputs-" + run.getId());
+
+        try {
+            StorageDataEntry arrayYml = AppEngineApplicationContext.getBean(StorageHandler.class)
+                .readStorageData(new StorageData(query))
+                .peek();
+            String content = FileHelper.read(arrayYml.getData(), StandardCharsets.UTF_8);
+            return Integer.parseInt(content.replace("size:", "").trim());
+        } catch (FileStorageException e) {
+            return 0;
+        }
     }
 
     @Override

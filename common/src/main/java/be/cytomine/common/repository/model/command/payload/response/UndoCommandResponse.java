@@ -1,6 +1,6 @@
 package be.cytomine.common.repository.model.command.payload.response;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import be.cytomine.common.repository.model.command.DataType;
@@ -12,17 +12,17 @@ public record UndoCommandResponse(ApplyCommandResponse subCommand) implements Ap
     }
 
     @Override
-    public Optional<LocalDateTime> updated() {
+    public Optional<Instant> updated() {
         return subCommand.updated();
     }
 
     @Override
-    public Optional<LocalDateTime> deleted() {
+    public Optional<Instant> deleted() {
         return subCommand.deleted();
     }
 
     @Override
-    public LocalDateTime created() {
+    public Instant created() {
         return subCommand.created();
     }
 

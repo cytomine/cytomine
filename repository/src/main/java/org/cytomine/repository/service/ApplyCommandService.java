@@ -44,7 +44,7 @@ public class ApplyCommandService {
     private final UploadedFileCommandService uploadedFileCommandService;
 
     @Transactional
-    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
+    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, Instant now) {
         return commandRepository.findById(undoCommand)
             .flatMap(commandEntity -> switch (commandEntity.getData()) {
                 case DeleteTermCommand dtc -> termCommandService.undoDelete(commandEntity.getId(), dtc, userId, now);

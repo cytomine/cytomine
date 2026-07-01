@@ -55,7 +55,7 @@ The complete installation guide is available in the [sdafs repository](https://g
 
 2. Add the following line to your `$HOME/.profile` or `/etc/profile` (for a system-wide installation):
 ```bash
-export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
 ```
 
 3. Install `sdafs`

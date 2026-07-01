@@ -18,7 +18,6 @@ package be.cytomine.controller.security;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.EntityManager;
@@ -182,12 +181,12 @@ public class SecUserSecRoleResourceTests {
         long relationId = 42L;
         UUID commandId = UUID.randomUUID();
         TermRelationResponse response = new TermRelationResponse(
-            relationId, term1.getId(), term2.getId(), 1L,
+            relationId, term1.getId(), term2.getId(),  1L,
             Optional.empty(), Optional.empty(), LocalDateTime.now(), "parent"
         );
 
         when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(
-            Optional.of(new HttpCommandResponse(true, response, commandId, Commands.DELETE_TERM_RELATION, Set.of())));
+            Optional.of(new HttpCommandResponse(true, response, commandId, Commands.DELETE_TERM_RELATION)));
 
         restSecUserSecRoleControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())

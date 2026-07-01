@@ -93,8 +93,8 @@ services:
     build:
       context: ./pims
       dockerfile: Dockerfile
-      ssh:
-        - default
+      args:
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
     image: cytomine/pims:latest
     restart: unless-stopped
     depends_on:

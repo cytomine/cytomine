@@ -39,7 +39,7 @@ dependencies = [
   "uvicorn[standard]==0.29.0",
   "zarr==2.14.2",
   "meilisearch",
-  "bigpicture-metadata-interface"
+  "lxml" # Added lxml
 ]
 
 [dependency-groups]
@@ -50,4 +50,3 @@ dev = [
 
 [tool.uv.sources]
 cytomine-python-client = { path = "../clients/python" }
-bigpicture-metadata-interface = { git = "ssh://git@github.com/imi-bigpicture/bigpicture_metadata_interface.git" }

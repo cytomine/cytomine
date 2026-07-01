@@ -20,6 +20,7 @@ ARG PIMS_VERSION
 ARG PLUGIN_CSV
 ARG VIPS_URL
 ARG VIPS_VERSION
+ARG GITHUB_TOKEN
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
@@ -29,7 +30,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONPATH="/app:$PYTHONPATH" \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
-    UV_PROJECT_ENVIRONMENT=/usr/local
+    UV_PROJECT_ENVIRONMENT=/usr/local \
+    GITHUB_TOKEN=${GITHUB_TOKEN}
 
 RUN apt-get update && \
     apt-get -y install --no-install-recommends --no-install-suggests \
@@ -45,8 +47,7 @@ RUN apt-get update && \
         libvips-dev \
         libvips42 \
         libwebp-dev \
-        openssh-client \
-        git # Ensure git is installed for cloning
+        git # Keep git for general purposes if needed, but openssh-client is removed
 
 COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.10.12 /uv /uvx /bin/
 
@@ -70,15 +71,18 @@ RUN python plugins.py \
 # Cleaning. Cannot be done before as plugin prerequisites could use apt-get.
 RUN rm -rf /var/lib/apt/lists/*
 
-# Setup SSH known_hosts for GitHub
-RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+# --- START: GITHUB_TOKEN based private repo installation ---
+# Install private dependencies using GITHUB_TOKEN via uv pip install
+RUN uv pip install --no-cache-dir --system \
+    git+https://${GITHUB_TOKEN}@github.com/imi-bigpicture/bigpicture-metadata-interface.git
+# --- END: GITHUB_TOKEN based private repo installation ---
 
 COPY ./clients/python /clients/python
 
+# Remove --mount=type=ssh from uv sync commands
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
     --mount=type=bind,source=./pims/pyproject.toml,target=pyproject.toml \
-    --mount=type=ssh \
     uv sync --frozen --no-install-project
 
 # Add default config
@@ -96,8 +100,8 @@ COPY ./pims/pims /app/pims
 COPY ./pims/resources/ ./resources/
 
 COPY ./pims/pyproject.toml ./pims/uv.lock ./
+# Remove --mount=type=ssh from uv sync commands
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=ssh \
     uv sync
 
 RUN python plugins.py \
@@ -125,8 +129,9 @@ EXPOSE ${PORT}
 ## Stage: Pims (dev server)
 FROM base-pims AS dev-server
 
+# Remove openssh-server rsync from dev-server stage
 RUN apt-get -y update && \
-    apt-get -y install --no-install-recommends --no-install-suggests openssh-server rsync
+    apt-get -y install --no-install-recommends --no-install-suggests rsync
 
 #######################################################################################
 ## Stage: production

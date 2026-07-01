@@ -20,10 +20,7 @@ public interface CommandHttpContract {
     String ROOT_PATH = "/commands";
 
     @PostExchange("/undo/{commandId}")
-    Set<HttpCommandResponse> undo(@PathVariable UUID commandId, @RequestParam long userId);
-
-    @PostExchange("/redo/{commandId}")
-    Set<HttpCommandResponse> redo(@PathVariable UUID commandId, @RequestParam long userId);
+    Optional<HttpCommandResponse> undo(@PathVariable UUID commandId, @RequestParam long userId);
 
     @GetExchange("/{commandId}")
     Optional<CommandV2Response<?>> get(@PathVariable UUID commandId, @RequestParam long userId);

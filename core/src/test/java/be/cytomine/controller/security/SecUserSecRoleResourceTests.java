@@ -16,7 +16,7 @@ package be.cytomine.controller.security;
  * limitations under the License.
  */
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -183,7 +183,7 @@ public class SecUserSecRoleResourceTests {
         UUID commandId = UUID.randomUUID();
         TermRelationResponse response = new TermRelationResponse(
             relationId, term1.getId(), term2.getId(),  1L,
-            Optional.empty(), Optional.empty(), LocalDateTime.now(), "parent"
+            Optional.empty(), Optional.empty(), Instant.now(), "parent"
         );
 
         when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(

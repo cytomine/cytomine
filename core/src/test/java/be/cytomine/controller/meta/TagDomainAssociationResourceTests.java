@@ -1,6 +1,6 @@
 package be.cytomine.controller.meta;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

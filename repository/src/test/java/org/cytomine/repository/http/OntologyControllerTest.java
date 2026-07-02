@@ -74,7 +74,7 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
 
     @Override
     public OntologyResponse expectedUpdatedResponse(OntologyResponse response, UpdateOntology updatePayload,
-        LocalDateTime updated) {
+        Instant updated) {
         return new OntologyResponse(updatePayload.name().orElse(response.name()), response.id(), response.terms(),
             response.created(), Optional.of(updated), response.deleted(), response.user());
     }

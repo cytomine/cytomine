@@ -1,7 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,6 +26,7 @@ import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
+import static java.time.temporal.ChronoUnit.MICROS;
 
 @RequiredArgsConstructor
 @RestController
@@ -46,20 +46,20 @@ public class TermController implements TermHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> create(@RequestParam long userId, @RequestBody CreateTerm createTerm) {
-        return termCommandService.create(userId, createTerm, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
+        return termCommandService.create(userId, createTerm, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> update(@PathVariable long id,
         @RequestParam long userId,
         @RequestBody UpdateTerm updateTerm) {
-        return termCommandService.update(userId, id, updateTerm, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
+        return termCommandService.update(userId, id, updateTerm, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
     @Transactional
     public Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId) {
-        return termCommandService.delete(userId, id, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
+        return termCommandService.delete(userId, id, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
@@ -67,7 +67,7 @@ public class TermController implements TermHttpContract {
     public Set<HttpCommandResponse> deleteAll(Set<Long> ids, long userId) {
         // Later we may implement it in OntologyHttpContract
         return ids.stream()
-            .map(id -> termCommandService.delete(userId, id, LocalDateTime.now()))
+            .map(id -> termCommandService.delete(userId, id, Instant.now().truncatedTo(MICROS)))
             .flatMap(Optional::stream)
             .collect(Collectors.toSet());
     }

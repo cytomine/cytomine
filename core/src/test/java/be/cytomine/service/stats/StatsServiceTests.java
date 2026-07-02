@@ -1,6 +1,7 @@
 package be.cytomine.service.stats;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -364,8 +365,8 @@ public class StatsServiceTests {
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         assertThat(results).hasSize(2);
 
-        Optional<LocalDateTime> startDate = Optional.of(LocalDateTime.now().minusDays(42));
-        Optional<LocalDateTime> endDate = Optional.of(LocalDateTime.now().minusDays(20));
+        Optional<Instant> startDate = Optional.of(Instant.now().minus(42, ChronoUnit.DAYS));
+        Optional<Instant> endDate = Optional.of(Instant.now().minus(20, ChronoUnit.DAYS));
         when(statsHttpContract.findTermsByProject(
             ontologyId,
             userId,

@@ -1,7 +1,7 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -47,10 +47,12 @@ public class TermCommandService
 
     @Override
     public TermEntity updateEntityWithEntity(TermEntity entity, UpdateTerm payload, Timestamp now) {
-        return termMapper.update(entity,
+        return termMapper.update(
+            entity,
             payload.name().orElse(entity.getName()),
             payload.color().orElse(entity.getColor()),
-            now);
+            now
+        );
     }
 
     @Override
@@ -79,9 +81,11 @@ public class TermCommandService
     }
 
     @Override
-    public UpdateCommandRequest<TermCommandPayload> mapUpdateCommand(long userId,
+    public UpdateCommandRequest<TermCommandPayload> mapUpdateCommand(
+        long userId,
         TermCommandPayload before,
-        TermCommandPayload after) {
+        TermCommandPayload after
+    ) {
 
         return new UpdateTermCommand(before, after, userId);
     }
@@ -127,8 +131,10 @@ public class TermCommandService
         return aclService.canDeleteOntology(userId, id);
     }
 
-    public Set<HttpCommandResponse> deleteByOntologyId(long userId, long ontologyId, LocalDateTime now,
-        UUID parentCommandId) {
+    public Set<HttpCommandResponse> deleteByOntologyId(
+        long userId, long ontologyId, Instant now,
+        UUID parentCommandId
+    ) {
         Set<Long> allIdsByOntologyId = termRepository.findAllIdsByOntologyId(ontologyId);
         return allIdsByOntologyId
             .stream().map(termId -> delete(userId, termId, now, Optional.of(parentCommandId)))

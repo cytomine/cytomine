@@ -1,7 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.Instant;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +23,7 @@ import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTa
 import be.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTagDomainAssociation;
 
 import static be.cytomine.common.repository.http.TagDomainAssociationHttpContract.ROOT_PATH;
+import static java.time.temporal.ChronoUnit.MICROS;
 
 @RequiredArgsConstructor
 @RestController
@@ -62,10 +62,7 @@ public class TagDomainAssociationController implements TagDomainAssociationHttpC
         @RequestParam long userId,
         @RequestBody CreateTagDomainAssociation payload
     ) {
-        return service.create(
-            userId, payload,
-            LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
-        );
+        return service.create(userId, payload, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
@@ -81,17 +78,11 @@ public class TagDomainAssociationController implements TagDomainAssociationHttpC
         @RequestParam long userId,
         @RequestBody UpdateTagDomainAssociation payload
     ) {
-        return service.update(
-            userId, id, payload,
-            LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
-        );
+        return service.update(userId, id, payload, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId) {
-        return service.delete(
-            userId, id,
-            LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
-        );
+        return service.delete(userId, id, Instant.now().truncatedTo(MICROS));
     }
 }

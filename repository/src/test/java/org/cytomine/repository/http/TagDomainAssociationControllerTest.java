@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,7 +58,7 @@ class TagDomainAssociationControllerTest
     public TagDomainAssociationResponse expectedUpdatedResponse(
         TagDomainAssociationResponse response,
         UpdateTagDomainAssociation updatePayload,
-        LocalDateTime updatedTime
+        Instant updatedTime
     ) {
         return new TagDomainAssociationResponse(
             response.id(),

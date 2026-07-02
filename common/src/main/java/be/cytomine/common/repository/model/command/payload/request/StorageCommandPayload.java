@@ -1,6 +1,6 @@
 package be.cytomine.common.repository.model.command.payload.request;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import be.cytomine.common.repository.model.HasAclId;
@@ -9,9 +9,9 @@ import be.cytomine.common.repository.model.HasLongId;
 public record StorageCommandPayload(
     long id,
     String name,
-    LocalDateTime created,
-    Optional<LocalDateTime> updated,
-    Optional<LocalDateTime> deleted
+    Instant created,
+    Optional<Instant> updated,
+    Optional<Instant> deleted
 ) implements HasLongId, HasAclId {
     @Override
     public long aclId() {

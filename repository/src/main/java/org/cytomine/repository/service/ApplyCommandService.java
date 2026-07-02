@@ -1,6 +1,6 @@
 package org.cytomine.repository.service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -45,7 +45,7 @@ public class ApplyCommandService {
     private final OntologyCommandService ontologyCommandService;
     private final UploadedFileCommandService uploadedFileCommandService;
 
-    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
+    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, Instant now) {
         Set<HttpCommandResponse> subCommands = commandRepository.findByParentCommandId(undoCommand).stream()
             .map(rc -> undoCommand(userId, rc.getId(), now)).flatMap(Optional::stream).collect(Collectors.toSet());
 

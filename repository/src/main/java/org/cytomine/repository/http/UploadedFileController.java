@@ -1,6 +1,6 @@
 package org.cytomine.repository.http;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -40,17 +40,17 @@ public class UploadedFileController implements UploadedFileHttpContract {
 
     @Override
     public Optional<HttpCommandResponse> create(long userId, CreateUploadedFile payload) {
-        return service.create(userId, payload, LocalDateTime.now().truncatedTo(MICROS));
+        return service.create(userId, payload, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateUploadedFile payload) {
-        return service.update(userId, id, payload, LocalDateTime.now().truncatedTo(MICROS));
+        return service.update(userId, id, payload, Instant.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+        return service.delete(userId, id, Instant.now().truncatedTo(MICROS));
     }
 
     @Override

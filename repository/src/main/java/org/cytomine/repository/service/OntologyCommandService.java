@@ -1,7 +1,7 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -48,9 +48,11 @@ public class OntologyCommandService implements
     }
 
     @Override
-    public UpdateCommandRequest<OntologyCommandPayload> mapUpdateCommand(long userId,
+    public UpdateCommandRequest<OntologyCommandPayload> mapUpdateCommand(
+        long userId,
         OntologyCommandPayload before,
-        OntologyCommandPayload after) {
+        OntologyCommandPayload after
+    ) {
         return new UpdateOntologyCommand(before, after, userId);
     }
 
@@ -75,9 +77,11 @@ public class OntologyCommandService implements
     }
 
     @Override
-    public OntologyEntity updateEntityWithPayload(OntologyEntity entity,
+    public OntologyEntity updateEntityWithPayload(
+        OntologyEntity entity,
         OntologyCommandPayload payload,
-        Timestamp now) {
+        Timestamp now
+    ) {
         return ontologyMapper.updateWithPayload(entity, payload, now);
     }
 
@@ -118,8 +122,7 @@ public class OntologyCommandService implements
     }
 
     @Override
-    public Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now, UUID commandId) {
+    public Set<HttpCommandResponse> deleteSubEntities(long userId, long id, Instant now, UUID commandId) {
         return termCommandService.deleteByOntologyId(userId, id, now, commandId);
     }
-
 }

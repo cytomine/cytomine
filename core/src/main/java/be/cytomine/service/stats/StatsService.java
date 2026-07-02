@@ -1,8 +1,7 @@
 package be.cytomine.service.stats;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -218,8 +217,8 @@ public class StatsService {
 
     public List<StatTerm> statTermSlide(
         Project project,
-        Optional<LocalDateTime> startDate,
-        Optional<LocalDateTime> endDate
+        Optional<Instant> startDate,
+        Optional<Instant> endDate
     ) {
         securityACLService.check(project, READ);
         Long userId = currentUserService.getCurrentUser().getId();
@@ -234,10 +233,8 @@ public class StatsService {
 
     public List<StatPerTermAndImage> statPerTermAndImage(Project project, Date startDate, Date endDate) {
         securityACLService.check(project, READ);
-        Optional<LocalDateTime> start = Optional.ofNullable(startDate)
-            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        Optional<LocalDateTime> end = Optional.ofNullable(endDate)
-            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Optional<Instant> start = Optional.ofNullable(startDate).map(Date::toInstant);
+        Optional<Instant> end = Optional.ofNullable(endDate).map(Date::toInstant);
 
         return statsHttpContract.findPerTermAndImageByProject(project.getId(), start, end, Pageable.unpaged())
             .stream()
@@ -247,10 +244,8 @@ public class StatsService {
     public List<JsonObject> statTerm(Project project, Date startDate, Date endDate, boolean leafsOnly) {
         securityACLService.check(project, READ);
         Long userId = currentUserService.getCurrentUser().getId();
-        Optional<LocalDateTime> start = Optional.ofNullable(startDate)
-            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        Optional<LocalDateTime> end = Optional.ofNullable(endDate)
-            .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        Optional<Instant> start = Optional.ofNullable(startDate).map(Date::toInstant);
+        Optional<Instant> end = Optional.ofNullable(endDate).map(Date::toInstant);
 
         Set<Long> nonLeafTermIds = leafsOnly ? termRelationHttpContract.findAllByOntologyId(
             project.getOntology()

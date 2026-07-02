@@ -19,6 +19,6 @@ import be.cytomine.common.repository.model.command.DataType;
 })
 public sealed interface ApplyCommandResponse extends HasLongId, HasLocaleDateTimeCUD
     permits OntologyResponse, StorageResponse, TagDomainAssociationResponse, TermRelationResponse, TermResponse,
-        UploadedFileResponse, UndoCommandResponse {
+    UploadedFileResponse, UndoCommandResponse, UserResponse {
     DataType getDataType();
 }

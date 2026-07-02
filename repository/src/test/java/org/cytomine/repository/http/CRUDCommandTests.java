@@ -113,7 +113,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
         assertEquals(getApplyCommandResponseMapper().setDeleteTime(updateDataResult,
                 Optional.of(deleteResult.data().deleted().orElseThrow(
-                    () -> new IllegalStateException("Newly created entity should not have `updated` empty.")))),
+                    () -> new IllegalStateException("Newly created entity should not have `deleted` empty.")))),
             deleteResult.data());
     }
 

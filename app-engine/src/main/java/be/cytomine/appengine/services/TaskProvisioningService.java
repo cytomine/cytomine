@@ -1440,18 +1440,10 @@ public class TaskProvisioningService {
         return filePath;
     }
 
-    public Path prepareStreaming(
-        String runId,
-        String parameterName,
-        String[] indexesArray
-    ) throws IOException {
+    public Path prepareStreaming(String runId, String parameterName, String[] indexesArray) throws IOException {
         log.info("provisioning collection item streaming: preparing...");
         Storage runStorage = new Storage("task-run-inputs-" + runId);
-        Path filePath = Paths.get(
-            basePath,
-            runStorage.id(),
-            parameterName + "/" + String.join("/",
-            indexesArray));
+        Path filePath = Paths.get(basePath, runStorage.id(), parameterName + "/" + String.join("/", indexesArray));
         Files.createDirectories(filePath.getParent());
         String[] arrayYmlPosition = Arrays.stream(indexesArray)
             .limit(indexesArray.length - 1)

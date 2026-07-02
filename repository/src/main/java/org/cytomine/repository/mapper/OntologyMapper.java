@@ -27,7 +27,6 @@ public interface OntologyMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     OntologyResponse mapToOntologyResponse(OntologyEntity ontologyEntity);
 
-
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "userId", "created", "updated", "deleted", "terms"})
     OntologyLight mapToOntologyLight(OntologyEntity ontologyEntity);
 

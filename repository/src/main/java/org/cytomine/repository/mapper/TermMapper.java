@@ -1,6 +1,8 @@
 package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.mapstruct.BeanMapping;
@@ -39,7 +41,6 @@ public interface TermMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     TermResponse mapToTermResponse(TermEntity termEntity);
 
-
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -50,4 +51,14 @@ public interface TermMapper {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "updated", ignore = true)
     TermEntity map(CreateTerm createTerm, Timestamp creationDate);
+
+    @Mapping(target = "deleted", source = "deletionTime")
+    @Mapping(target = "dataType", ignore = true)
+    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
+    TermResponse updateDeleteTime(TermResponse value, Optional<LocalDateTime> deletionTime);
+
+    @Mapping(target = "updated", source = "updateTime")
+    @Mapping(target = "dataType", ignore = true)
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
+    TermResponse updateUpdateTime(TermResponse value, Optional<LocalDateTime> updateTime);
 }

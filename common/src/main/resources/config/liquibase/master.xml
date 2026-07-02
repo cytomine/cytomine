@@ -104,4 +104,6 @@
     <include file="/config/liquibase/changelog/2026-06-24-tag-domain-association-id-sequence.sql"
              relativeToChangelogFile="false"/>
 
+    <include file="/config/liquibase/changelog/2026-06-26-command-parent.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

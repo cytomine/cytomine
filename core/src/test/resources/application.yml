@@ -367,3 +367,8 @@ keycloak-client:
     client-id: core
   client-id: admin-cli
   url: ${IAM_URL:http://iam:8100}/iam
+
+meilisearch:
+  host: ${MEILISEARCH_URL:http://localhost:7700}
+  api-key: ${MEILISEARCH_KEY:masterKey}
+  index_id: imageMetadataIndex

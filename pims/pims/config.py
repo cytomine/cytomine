@@ -17,6 +17,7 @@ import os
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from meilisearch import Client
 
 logger = logging.getLogger("pims.app")
 
@@ -65,6 +66,15 @@ class ReadableSettings(BaseSettings):
     auto_delete_multi_file_format_archive: bool = True
     auto_delete_collection_archive: bool = True
     auto_delete_failed_upload: bool = True
+
+    # MeiliSearch Configuration
+    meilisearch_url: str = "http://meilisearch:7700"
+    meilisearch_key: str | None = None
+
+    @property
+    def meilisearch_client(self) -> Client:
+        """Returns a MeiliSearch client instance."""
+        return Client(self.meilisearch_url, self.meilisearch_key)
 
 
 class Settings(ReadableSettings):

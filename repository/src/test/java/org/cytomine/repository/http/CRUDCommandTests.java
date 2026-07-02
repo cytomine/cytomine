@@ -103,7 +103,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         assertEquals(expectedUpdatedResponse(getResponseData, getUpdatePayload(), updateDataResult.updated()
                 .orElseThrow(
-                    () -> new IllegalStateException("Newly created entity should " + "not have `updated` empty."))),
+                    () -> new IllegalStateException("Newly created entity should not have `updated` empty."))),
             updateDataResult);
 
         String delete = getMockMvc().perform(

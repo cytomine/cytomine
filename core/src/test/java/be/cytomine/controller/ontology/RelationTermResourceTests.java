@@ -17,6 +17,7 @@ package be.cytomine.controller.ontology;
  */
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,7 +76,7 @@ public class RelationTermResourceTests {
     private TermRelationResponse buildResponse(RelationTerm relationTerm) {
         return new TermRelationResponse(
             relationTerm.getId(), relationTerm.getTerm1().getId(),
-            relationTerm.getTerm2().getId(),  relationTerm.getRelation().getId(),
+            relationTerm.getTerm2().getId(), relationTerm.getRelation().getId(),
             Optional.empty(),
             Optional.empty(),
             relationTerm.getCreated().toInstant(),
@@ -122,7 +123,7 @@ public class RelationTermResourceTests {
         );
         HttpCommandResponse expected = new HttpCommandResponse(
             true, buildResponse(relationTerm),
-            commandId, Commands.CREATE_TERM_RELATION
+            commandId, Commands.CREATE_TERM_RELATION, Set.of()
         );
         when(termRelationHttpContract.create(eq(userId), eq(createTermRelation))).thenReturn(Optional.of(expected));
 
@@ -173,7 +174,7 @@ public class RelationTermResourceTests {
         );
         HttpCommandResponse expected = new HttpCommandResponse(
             true, buildResponse(relationTerm),
-            commandId, Commands.UPDATE_TERM_RELATION
+            commandId, Commands.UPDATE_TERM_RELATION, Set.of()
         );
         when(termRelationHttpContract.update(eq(relationTerm.getId()), eq(userId), eq(updateTermRelation)))
             .thenReturn(Optional.of(expected));
@@ -219,7 +220,7 @@ public class RelationTermResourceTests {
         UUID commandId = UUID.randomUUID();
         HttpCommandResponse expected = new HttpCommandResponse(
             true, buildResponse(relationTerm),
-            commandId, Commands.DELETE_TERM_RELATION
+            commandId, Commands.DELETE_TERM_RELATION, Set.of()
         );
         when(termRelationHttpContract.delete(eq(relationTerm.getId()), eq(userId))).thenReturn(Optional.of(expected));
 

@@ -3,6 +3,7 @@ package be.cytomine.controller.image.server;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -59,14 +60,8 @@ public class StorageResourceTests {
     private StorageHttpContract storageHttpContract;
 
     private static StorageResponse toResponse(Storage storage) {
-        return new StorageResponse(
-            storage.getId(),
-            storage.getUser().getId(),
-            storage.getName(),
-            Instant.now(),
-            Optional.empty(),
-            Optional.empty()
-        );
+        return new StorageResponse(storage.getId(), storage.getUser().getId(), storage.getName(), LocalDateTime.now(),
+            Optional.empty(), Optional.empty());
     }
 
     @Test
@@ -74,11 +69,10 @@ public class StorageResourceTests {
     public void shouldListReadableStorages() throws Exception {
         Storage storage = builder.givenAStorage(builder.givenDefaultAdmin());
         Long userId = builder.givenDefaultAdmin().getId();
-        when(storageHttpContract.getAll(eq(userId), any(Pageable.class)))
-            .thenReturn(new PageImpl<>(List.of(toResponse(storage))));
+        when(storageHttpContract.getAll(eq(userId), any(Pageable.class))).thenReturn(
+            new PageImpl<>(List.of(toResponse(storage))));
 
-        mockMvc.perform(get("/api/storage.json"))
-            .andExpect(status().isOk())
+        mockMvc.perform(get("/api/storage.json")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.name=='" + storage.getName() + "')]").exists());
     }
@@ -89,8 +83,7 @@ public class StorageResourceTests {
         Long userId = builder.givenDefaultAdmin().getId();
         when(storageHttpContract.getAll(eq(userId), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get("/api/storage.json"))
-            .andExpect(status().isOk())
+        mockMvc.perform(get("/api/storage.json")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
@@ -101,12 +94,10 @@ public class StorageResourceTests {
         Long userId = builder.givenDefaultAdmin().getId();
         when(storageHttpContract.get(eq(storage.getId()), eq(userId))).thenReturn(Optional.of(toResponse(storage)));
 
-        mockMvc.perform(get("/api/storage/{id}.json", storage.getId()))
-            .andExpect(status().isOk())
+        mockMvc.perform(get("/api/storage/{id}.json", storage.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(storage.getId().intValue()))
             .andExpect(jsonPath("$.userId").value(storage.getUser().getId().intValue()))
-            .andExpect(jsonPath("$.name").value(storage.getName()))
-            .andExpect(jsonPath("$.created").exists());
+            .andExpect(jsonPath("$.name").value(storage.getName())).andExpect(jsonPath("$.created").exists());
     }
 
     @Test
@@ -115,8 +106,7 @@ public class StorageResourceTests {
         Long userId = builder.givenDefaultAdmin().getId();
         when(storageHttpContract.get(eq(0L), eq(userId))).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/storage/{id}.json", 0))
-            .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/storage/{id}.json", 0)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -125,25 +115,12 @@ public class StorageResourceTests {
         Storage storage = basicInstanceBuilder.givenANotPersistedStorage(builder.givenDefaultAdmin());
         Long userId = builder.givenDefaultAdmin().getId();
         UUID commandId = UUID.randomUUID();
-        when(storageHttpContract.create(eq(userId), any())).thenReturn(Optional.of(
-            new HttpCommandResponse(
-                true,
-                new StorageResponse(
-                    1L,
-                    userId,
-                    storage.getName(),
-                    Instant.now(),
-                    Optional.empty(),
-                    Optional.empty()
-                ),
-                commandId, Commands.CREATE_STORAGE
-            )));
+        when(storageHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(true,
+            new StorageResponse(1L, userId, storage.getName(), LocalDateTime.now(), Optional.empty(), Optional.empty()),
+            commandId, Commands.CREATE_STORAGE, Set.of())));
 
-        mockMvc.perform(post("/api/storage.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(storage.toJSON()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
+        mockMvc.perform(post("/api/storage.json").contentType(MediaType.APPLICATION_JSON).content(storage.toJSON()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.CREATE_STORAGE))
             .andExpect(jsonPath("$.data.name").value(storage.getName()));
     }
@@ -154,19 +131,11 @@ public class StorageResourceTests {
         Storage storage = builder.givenAStorage(builder.givenDefaultAdmin());
         Long userId = builder.givenDefaultAdmin().getId();
         UUID commandId = UUID.randomUUID();
-        when(storageHttpContract.update(eq(storage.getId()), eq(userId), any()))
-            .thenReturn(Optional.of(new HttpCommandResponse(
-                true,
-                toResponse(storage),
-                commandId,
-                Commands.UPDATE_STORAGE
-            )));
+        when(storageHttpContract.update(eq(storage.getId()), eq(userId), any())).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(storage), commandId, Commands.UPDATE_STORAGE, Set.of())));
 
-        mockMvc.perform(put("/api/storage/{id}.json", storage.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(storage.toJSON()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
+        mockMvc.perform(put("/api/storage/{id}.json", storage.getId()).contentType(MediaType.APPLICATION_JSON)
+                .content(storage.toJSON())).andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.UPDATE_STORAGE))
             .andExpect(jsonPath("$.data.id").value(storage.getId().intValue()))
             .andExpect(jsonPath("$.data.name").value(storage.getName()));
@@ -179,9 +148,8 @@ public class StorageResourceTests {
         Long userId = builder.givenDefaultAdmin().getId();
         when(storageHttpContract.update(eq(0L), eq(userId), any())).thenReturn(Optional.empty());
 
-        mockMvc.perform(put("/api/storage/{id}.json", 0)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(storage.toJSON()))
+        mockMvc.perform(
+                put("/api/storage/{id}.json", 0).contentType(MediaType.APPLICATION_JSON).content(storage.toJSON()))
             .andExpect(status().isNotFound());
     }
 
@@ -191,18 +159,11 @@ public class StorageResourceTests {
         Storage storage = builder.givenAStorage(builder.givenDefaultAdmin());
         Long userId = builder.givenDefaultAdmin().getId();
         UUID commandId = UUID.randomUUID();
-        when(storageHttpContract.delete(eq(storage.getId()), eq(userId)))
-            .thenReturn(Optional.of(new HttpCommandResponse(
-                true,
-                toResponse(storage),
-                commandId,
-                Commands.DELETE_STORAGE
-            )));
+        when(storageHttpContract.delete(eq(storage.getId()), eq(userId))).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(storage), commandId, Commands.DELETE_STORAGE, Set.of())));
 
-        mockMvc.perform(delete("/api/storage/{id}.json", storage.getId())
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
+        mockMvc.perform(delete("/api/storage/{id}.json", storage.getId()).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.DELETE_STORAGE))
             .andExpect(jsonPath("$.data.id").value(storage.getId().intValue()))
             .andExpect(jsonPath("$.data.name").value(storage.getName()));
@@ -214,8 +175,7 @@ public class StorageResourceTests {
         Long userId = builder.givenDefaultAdmin().getId();
         when(storageHttpContract.delete(eq(0L), eq(userId))).thenReturn(Optional.empty());
 
-        mockMvc.perform(delete("/api/storage/{id}.json", 0)
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(delete("/api/storage/{id}.json", 0).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound());
     }
 }

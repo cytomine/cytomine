@@ -14,11 +14,9 @@ import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelati
 @Mapper(componentModel = "spring", uses = BaseMapper.class)
 public interface TermRelationMapper {
 
-
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     @Mapping(target = "name", ignore = true)
     TermRelationResponse mapToTermRelationResponse(TermRelationEntity termRelationEntity);
-
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"name"})
     @Mapping(target = "id", ignore = true)
@@ -29,7 +27,6 @@ public interface TermRelationMapper {
     TermRelationEntity mapToTermRelationEntity(CreateTermRelation createTermRelation,
         Timestamp creationDate,
         long relationId);
-
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     @Mapping(target = "ontologyId", source = "ontologyId")

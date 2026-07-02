@@ -28,7 +28,6 @@ import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
 
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(ROOT_PATH)

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -31,10 +32,11 @@ public class StorageControllerTest implements CRUDCommandTests<CreateStorage, St
     ObjectMapper objectMapper;
     @Autowired
     JdbcTemplate jdbcTemplate;
-
     String apiURL = StorageHttpContract.ROOT_PATH;
     CreateStorage createPayload = new CreateStorage(UUID.randomUUID().toString());
     UpdateStorage updatePayload = new UpdateStorage(Optional.of(UUID.randomUUID().toString()));
+    @Autowired
+    private ApplyCommandResponseMapper applyCommandResponseMapper;
 
     @Override
     public StorageResponse expectedUpdatedResponse(
@@ -46,30 +48,6 @@ public class StorageControllerTest implements CRUDCommandTests<CreateStorage, St
             response.id(),
             response.userId(),
             updatePayload.name().orElse(response.name()),
-            response.created(),
-            Optional.of(updatedTime),
-            response.deleted()
-        );
-    }
-
-    @Override
-    public StorageResponse expectedDeletedResponse(StorageResponse response, Instant deletedTime) {
-        return new StorageResponse(
-            response.id(),
-            response.userId(),
-            response.name(),
-            response.created(),
-            response.updated(),
-            Optional.of(deletedTime)
-        );
-    }
-
-    @Override
-    public StorageResponse expectChangedUpdatedTime(StorageResponse response, Instant updatedTime) {
-        return new StorageResponse(
-            response.id(),
-            response.userId(),
-            response.name(),
             response.created(),
             Optional.of(updatedTime),
             response.deleted()

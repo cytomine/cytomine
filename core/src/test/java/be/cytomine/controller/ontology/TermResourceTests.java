@@ -172,8 +172,9 @@ public class TermResourceTests {
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                term.getCreated().toInstant(), Optional.empty(),
-                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.CREATE_TERM)));
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.CREATE_TERM,
+            Set.of())));
 
         String createTermJson =
             JsonObject.of("name", term.getName(), "color", term.getColor(), "ontology", term.getOntology().getId())
@@ -212,7 +213,7 @@ public class TermResourceTests {
                 new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                     term.getCreated().toInstant(), Optional.empty(),
                     Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId,
-                Commands.UPDATE_TERM)));
+                Commands.UPDATE_TERM, Set.of())));
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
 
@@ -246,8 +247,9 @@ public class TermResourceTests {
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.of(new HttpCommandResponse(true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
-                term.getCreated().toInstant(), Optional.empty(),
-                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.DELETE_TERM)));
+                LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
+                Optional.empty(), Optional.ofNullable(term.getComment()), Set.of()), commandId, Commands.DELETE_TERM,
+            Set.of())));
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))

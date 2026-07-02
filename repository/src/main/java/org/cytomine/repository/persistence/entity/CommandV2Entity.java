@@ -1,7 +1,6 @@
 package org.cytomine.repository.persistence.entity;
 
-
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -27,7 +26,10 @@ public class CommandV2Entity {
     private UUID id;
 
     @Column
-    private Timestamp created;
+    private UUID parentCommandId;
+
+    @Column
+    private LocalDateTime created;
 
     @Column
     private Timestamp updated;

@@ -2,9 +2,11 @@ package org.cytomine.repository.service;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.springframework.stereotype.Component;
@@ -43,8 +45,10 @@ public class ApplyCommandService {
     private final OntologyCommandService ontologyCommandService;
     private final UploadedFileCommandService uploadedFileCommandService;
 
-    @Transactional
-    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, Instant now) {
+    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
+        Set<HttpCommandResponse> subCommands = commandRepository.findByParentCommandId(undoCommand).stream()
+            .map(rc -> undoCommand(userId, rc.getId(), now)).flatMap(Optional::stream).collect(Collectors.toSet());
+
         return commandRepository.findById(undoCommand)
             .flatMap(commandEntity -> switch (commandEntity.getData()) {
                 case DeleteTermCommand dtc -> termCommandService.undoDelete(commandEntity.getId(), dtc, userId, now);
@@ -96,12 +100,10 @@ public class ApplyCommandService {
                     case CreateTagDomainAssociationCommand ctdac ->
                         tagDomainAssociationCommandService.undoDelete(v.commandId(),
                             new DeleteTagDomainAssociationCommand(ctdac.after(), userId), userId, now);
-                    case CreateTermRelationCommand ctrc ->
-                        termRelationCommandService.undoDelete(v.commandId(),
-                            new DeleteTermRelationCommand(ctrc.after(), userId), userId, now);
-                    case CreateUploadedFileCommand cufc ->
-                        uploadedFileCommandService.undoDelete(v.commandId(),
-                            new DeleteUploadedFileCommand(cufc.after(), userId), userId, now);
+                    case CreateTermRelationCommand ctrc -> termRelationCommandService.undoDelete(v.commandId(),
+                        new DeleteTermRelationCommand(ctrc.after(), userId), userId, now);
+                    case CreateUploadedFileCommand cufc -> uploadedFileCommandService.undoDelete(v.commandId(),
+                        new DeleteUploadedFileCommand(cufc.after(), userId), userId, now);
                 };
                 case UndoDeleteCommand<?> v -> switch (v.target()) {
                     case DeleteStorageCommand dsc ->
@@ -109,18 +111,18 @@ public class ApplyCommandService {
                             userId, now);
                     case DeleteTermCommand dtc ->
                         termCommandService.undoCreate(v.commandId(), new CreateTermCommand(dtc.before(), userId),
-                            userId, now);
+                            userId,
+                            now);
                     case DeleteOntologyCommand doc -> ontologyCommandService.undoCreate(v.commandId(),
-                        new CreateOntologyCommand(doc.before(), userId), userId, now);
+                        new CreateOntologyCommand(doc.before(), userId),
+                        userId, now);
                     case DeleteTagDomainAssociationCommand dtdac ->
                         tagDomainAssociationCommandService.undoCreate(v.commandId(),
                             new CreateTagDomainAssociationCommand(dtdac.before(), userId), userId, now);
-                    case DeleteTermRelationCommand dtrc ->
-                        termRelationCommandService.undoCreate(v.commandId(),
-                            new CreateTermRelationCommand(dtrc.before(), userId), userId, now);
-                    case DeleteUploadedFileCommand dufc ->
-                        uploadedFileCommandService.undoCreate(v.commandId(),
-                            new CreateUploadedFileCommand(dufc.before(), userId), userId, now);
+                    case DeleteTermRelationCommand dtrc -> termRelationCommandService.undoCreate(v.commandId(),
+                        new CreateTermRelationCommand(dtrc.before(), userId), userId, now);
+                    case DeleteUploadedFileCommand dufc -> uploadedFileCommandService.undoCreate(v.commandId(),
+                        new CreateUploadedFileCommand(dufc.before(), userId), userId, now);
                 };
                 case UndoUpdateCommand<?> v -> switch (v.target()) {
                     case UpdateTermCommand utc -> termCommandService.undoUpdate(v.commandId(),
@@ -132,13 +134,13 @@ public class ApplyCommandService {
                     case UpdateTagDomainAssociationCommand utdac ->
                         tagDomainAssociationCommandService.undoUpdate(v.commandId(),
                             new UpdateTagDomainAssociationCommand(utdac.after(), utdac.before(), userId), userId, now);
-                    case UpdateTermRelationCommand utrc ->
-                        termRelationCommandService.undoUpdate(v.commandId(),
-                            new UpdateTermRelationCommand(utrc.after(), utrc.before(), userId), userId, now);
-                    case UpdateUploadedFileCommand uufc ->
-                        uploadedFileCommandService.undoUpdate(v.commandId(),
-                            new UpdateUploadedFileCommand(uufc.after(), uufc.before(), userId), userId, now);
+                    case UpdateTermRelationCommand utrc -> termRelationCommandService.undoUpdate(v.commandId(),
+                        new UpdateTermRelationCommand(utrc.after(), utrc.before(), userId), userId, now);
+                    case UpdateUploadedFileCommand uufc -> uploadedFileCommandService.undoUpdate(v.commandId(),
+                        new UpdateUploadedFileCommand(uufc.after(), uufc.before(), userId), userId, now);
                 };
-            });
+            }).map(command -> new HttpCommandResponse(command.printMessage(), command.data(), command.commandId(),
+                command.command(),
+                Stream.concat(command.subCommands().stream(), subCommands.stream()).collect(Collectors.toSet())));
     }
 }

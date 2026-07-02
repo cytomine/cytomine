@@ -3,6 +3,7 @@ package be.cytomine.controller.meta;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,15 +61,8 @@ public class TagDomainAssociationResourceTests {
     private TagDomainAssociationHttpContract httpContract;
 
     private TagDomainAssociationResponse toResponse(TagDomainAssociation tda) {
-        return new TagDomainAssociationResponse(
-            tda.getId(),
-            tda.getTag().getId(),
-            tda.getDomainClassName(),
-            tda.getDomainIdent(),
-            Instant.now(),
-            Optional.empty(),
-            Optional.empty()
-        );
+        return new TagDomainAssociationResponse(tda.getId(), tda.getTag().getId(), tda.getDomainClassName(),
+            tda.getDomainIdent(), LocalDateTime.now(), Optional.empty(), Optional.empty());
     }
 
     @Test
@@ -78,8 +72,7 @@ public class TagDomainAssociationResourceTests {
         long userId = builder.givenDefaultAdmin().getId();
         when(httpContract.read(eq(tda.getId()), eq(userId))).thenReturn(Optional.of(toResponse(tda)));
 
-        mockMvc.perform(get("/api/tag_domain_association/{id}.json", tda.getId()))
-            .andExpect(status().isOk())
+        mockMvc.perform(get("/api/tag_domain_association/{id}.json", tda.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(tda.getId().intValue()));
     }
 
@@ -89,8 +82,7 @@ public class TagDomainAssociationResourceTests {
         long userId = builder.givenDefaultAdmin().getId();
         when(httpContract.read(eq(0L), eq(userId))).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/tag_domain_association/{id}.json", 0L))
-            .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/tag_domain_association/{id}.json", 0L)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -98,11 +90,10 @@ public class TagDomainAssociationResourceTests {
     public void listAllTagDomainAssociation() throws Exception {
         TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
         long userId = builder.givenDefaultAdmin().getId();
-        when(httpContract.readAll(eq(userId), any(Pageable.class)))
-            .thenReturn(new PageImpl<>(List.of(toResponse(tda))));
+        when(httpContract.readAll(eq(userId), any(Pageable.class))).thenReturn(
+            new PageImpl<>(List.of(toResponse(tda))));
 
-        mockMvc.perform(get("/api/tag_domain_association.json"))
-            .andExpect(status().isOk())
+        mockMvc.perform(get("/api/tag_domain_association.json")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[0].domainId").value(tda.getDomainIdent().intValue()));
     }
@@ -112,16 +103,12 @@ public class TagDomainAssociationResourceTests {
     public void listTagDomainAssociationsByDomain() throws Exception {
         TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
         long userId = builder.givenDefaultAdmin().getId();
-        when(httpContract.readAllByDomain(
-            eq(tda.getDomainClassName()), eq(tda.getDomainIdent()), eq(userId), any(Pageable.class)
-        )).thenReturn(new PageImpl<>(List.of(toResponse(tda))));
+        when(httpContract.readAllByDomain(eq(tda.getDomainClassName()), eq(tda.getDomainIdent()), eq(userId),
+            any(Pageable.class))).thenReturn(new PageImpl<>(List.of(toResponse(tda))));
 
-        mockMvc.perform(get(
-                "/api/domain/{domainClassName}/{domainId}/tag_domain_association.json",
-                tda.getDomainClassName(),
-                tda.getDomainIdent()
-            ))
-            .andExpect(status().isOk())
+        mockMvc.perform(
+                get("/api/domain/{domainClassName}/{domainId}/tag_domain_association.json", tda.getDomainClassName(),
+                    tda.getDomainIdent())).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[0].id").value(tda.getId().intValue()));
     }
@@ -131,17 +118,13 @@ public class TagDomainAssociationResourceTests {
     public void listTagDomainAssociationsByDomainReturnsEmptyWhenNotAccessible() throws Exception {
         TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
         long userId = builder.givenDefaultAdmin().getId();
-        when(httpContract.readAllByDomain(
-            eq(tda.getDomainClassName()), eq(0L), eq(userId), any(Pageable.class)
-        )).thenReturn(new PageImpl<>(List.of()));
+        when(httpContract.readAllByDomain(eq(tda.getDomainClassName()), eq(0L), eq(userId),
+            any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get(
-                "/api/domain/{domainClassName}/{domainId}/tag_domain_association.json",
-                tda.getDomainClassName(),
-                0
-            ))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(0)));
+        mockMvc.perform(
+                get("/api/domain/{domainClassName}/{domainId}/tag_domain_association.json", tda.getDomainClassName(),
+                    0))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
     @Test
@@ -151,20 +134,15 @@ public class TagDomainAssociationResourceTests {
         long userId = builder.givenDefaultAdmin().getId();
         UUID commandId = UUID.randomUUID();
         when(httpContract.create(eq(userId), any())).thenReturn(Optional.of(
-            new HttpCommandResponse(true, toResponse(tda), commandId, Commands.CREATE_TAG_DOMAIN_ASSOCIATION)
-        ));
+            new HttpCommandResponse(true, toResponse(tda), commandId, Commands.CREATE_TAG_DOMAIN_ASSOCIATION,
+                Set.of())));
 
         String body = objectMapper.writeValueAsString(
-            new CreateTagDomainAssociation(tda.getTag().getId(), tda.getDomainClassName(), tda.getDomainIdent())
-        );
-        mockMvc.perform(post(
-                "/api/domain/{domainClassName}/{domainId}/tag_domain_association.json",
-                tda.getDomainClassName(),
-                tda.getDomainIdent()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-            .andExpect(status().isOk())
+            new CreateTagDomainAssociation(tda.getTag().getId(), tda.getDomainClassName(), tda.getDomainIdent()));
+        mockMvc.perform(
+                post("/api/domain/{domainClassName}/{domainId}/tag_domain_association.json", tda.getDomainClassName(),
+                    tda.getDomainIdent()).contentType(MediaType.APPLICATION_JSON)
+                    .content(body)).andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.CREATE_TAG_DOMAIN_ASSOCIATION));
     }
@@ -176,17 +154,13 @@ public class TagDomainAssociationResourceTests {
         long userId = builder.givenDefaultAdmin().getId();
         UUID commandId = UUID.randomUUID();
         when(httpContract.create(eq(userId), any())).thenReturn(Optional.of(
-            new HttpCommandResponse(true, toResponse(tda), commandId, Commands.CREATE_TAG_DOMAIN_ASSOCIATION)
-        ));
+            new HttpCommandResponse(true, toResponse(tda), commandId, Commands.CREATE_TAG_DOMAIN_ASSOCIATION,
+                Set.of())));
 
         String body = objectMapper.writeValueAsString(
-            new CreateTagDomainAssociation(tda.getTag().getId(), tda.getDomainClassName(), tda.getDomainIdent())
-        );
-        mockMvc.perform(post("/api/tag_domain_association.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
+            new CreateTagDomainAssociation(tda.getTag().getId(), tda.getDomainClassName(), tda.getDomainIdent()));
+        mockMvc.perform(post("/api/tag_domain_association.json").contentType(MediaType.APPLICATION_JSON).content(body))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.CREATE_TAG_DOMAIN_ASSOCIATION));
     }
 
@@ -197,8 +171,8 @@ public class TagDomainAssociationResourceTests {
         long userId = builder.givenDefaultAdmin().getId();
         UUID commandId = UUID.randomUUID();
         when(httpContract.delete(eq(tda.getId()), eq(userId))).thenReturn(Optional.of(
-            new HttpCommandResponse(true, toResponse(tda), commandId, Commands.DELETE_TAG_DOMAIN_ASSOCIATION)
-        ));
+            new HttpCommandResponse(true, toResponse(tda), commandId, Commands.DELETE_TAG_DOMAIN_ASSOCIATION,
+                Set.of())));
 
         mockMvc.perform(delete("/api/tag_domain_association/{id}.json", tda.getId())).andExpect(status().isOk());
     }

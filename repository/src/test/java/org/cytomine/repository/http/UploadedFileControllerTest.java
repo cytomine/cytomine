@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -34,7 +35,8 @@ public class UploadedFileControllerTest
     ObjectMapper objectMapper;
     @Autowired
     JdbcTemplate jdbcTemplate;
-
+    @Autowired
+    ApplyCommandResponseMapper applyCommandResponseMapper;
     String apiURL = UploadedFileHttpContract.ROOT_PATH;
 
     UpdateUploadedFile updatePayload = new UpdateUploadedFile(
@@ -65,7 +67,7 @@ public class UploadedFileControllerTest
             "image/tiff",
             1024L,
             0,
-            Set.<Long>of()
+            Set.of()
         );
     }
 
@@ -87,50 +89,6 @@ public class UploadedFileControllerTest
             response.contentType(),
             response.size(),
             newFilename,
-            response.status(),
-            response.projects(),
-            response.created(),
-            Optional.of(updatedTime),
-            response.deleted(),
-            response.thumbnailUrl()
-        );
-    }
-
-    @Override
-    public UploadedFileResponse expectedDeletedResponse(UploadedFileResponse response, Instant deletedTime) {
-        return new UploadedFileResponse(
-            response.id(),
-            response.user(),
-            response.parent(),
-            response.storage(),
-            response.filename(),
-            response.originalFilename(),
-            response.ext(),
-            response.contentType(),
-            response.size(),
-            response.path(),
-            response.status(),
-            response.projects(),
-            response.created(),
-            response.updated(),
-            Optional.of(deletedTime),
-            response.thumbnailUrl()
-        );
-    }
-
-    @Override
-    public UploadedFileResponse expectChangedUpdatedTime(UploadedFileResponse response, Instant updatedTime) {
-        return new UploadedFileResponse(
-            response.id(),
-            response.user(),
-            response.parent(),
-            response.storage(),
-            response.filename(),
-            response.originalFilename(),
-            response.ext(),
-            response.contentType(),
-            response.size(),
-            response.path(),
             response.status(),
             response.projects(),
             response.created(),

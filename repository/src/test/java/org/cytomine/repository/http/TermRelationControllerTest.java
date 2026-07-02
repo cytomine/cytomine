@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.TermRepository;
@@ -31,6 +32,8 @@ class TermRelationControllerTest
     implements CRUDCommandTests<CreateTermRelation, TermRelationResponse, UpdateTermRelation> {
 
     String apiURL = TermRelationHttpContract.ROOT_PATH;
+    @Autowired
+    private ApplyCommandResponseMapper applyCommandResponseMapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -76,17 +79,5 @@ class TermRelationControllerTest
             updatePayload.term2Id().orElse(response.term2Id()),
             updatePayload.relationId().orElse(response.relationId()), Optional.of(updatedTime), response.deleted(),
             response.created(), response.name());
-    }
-
-    @Override
-    public TermRelationResponse expectedDeletedResponse(TermRelationResponse response, Instant deletedTime) {
-        return new TermRelationResponse(response.id(), response.term1Id(), response.term2Id(), response.relationId(),
-            response.updated(), Optional.of(deletedTime), response.created(), response.name());
-    }
-
-    @Override
-    public TermRelationResponse expectChangedUpdatedTime(TermRelationResponse response, Instant updatedTime) {
-        return new TermRelationResponse(response.id(), response.term1Id(), response.term2Id(), response.relationId(),
-            Optional.of(updatedTime), response.deleted(), response.created(), response.name());
     }
 }

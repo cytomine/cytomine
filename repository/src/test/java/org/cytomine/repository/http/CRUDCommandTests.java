@@ -181,7 +181,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         R redoGetResponse = (R) getObjectMapper().readValue(redoGetResponseString, (firstCreateData).getClass());
 
-        assertEquals(getApplyCommandResponseMapper().setUpdateTime(firstCreate.data(), Optional.of(
+        assertEquals(getApplyCommandResponseMapper().setUpdateTime(getResponse, Optional.of(
                 redoGetResponse.updated().orElseThrow(
                     () -> new IllegalStateException("Newly created entity should not have `updated` " + "empty.")))),
             getObjectMapper().readValue(redoGetResponseString, firstCreate.data().getClass()));

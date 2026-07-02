@@ -3,6 +3,7 @@ package org.cytomine.repository.mapper;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -38,9 +39,14 @@ public interface ApplyCommandResponseMapper {
     TermResponse setDeleteTimeTR(TermResponse or, Optional<LocalDateTime> deleteTime);
 
     @Mapping(target = "deleted", source = "deleteTime")
-    @Mapping(target = "terms", source = "or.terms")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
+    @Mapping(target = "terms", expression = "java(setDeleteTimes(or.terms(), deleteTime))")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType", "terms"})
     OntologyResponse setDeleteTimeOR(OntologyResponse or, Optional<LocalDateTime> deleteTime);
+
+
+    default Set<TermResponse> setDeleteTimes(Set<TermResponse> terms, Optional<LocalDateTime> deleteTime) {
+        return terms.stream().map(term -> setDeleteTimeTR(term, deleteTime)).collect(Collectors.toSet());
+    }
 
     @Mapping(target = "deleted", source = "deleteTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
@@ -76,8 +82,13 @@ public interface ApplyCommandResponseMapper {
     TermResponse setUpdateTimeTR(TermResponse or, Optional<LocalDateTime> updateTime);
 
     @Mapping(target = "updated", source = "updateTime")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
+    @Mapping(target = "terms", expression = "java(setUpdateTimes(or.terms(), updateTime))")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType", "terms"})
     OntologyResponse setUpdateTimeOR(OntologyResponse or, Optional<LocalDateTime> updateTime);
+
+    default Set<TermResponse> setUpdateTimes(Set<TermResponse> terms, Optional<LocalDateTime> updateTime) {
+        return terms.stream().map(term -> setUpdateTimeTR(term, updateTime)).collect(Collectors.toSet());
+    }
 
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
@@ -90,10 +101,6 @@ public interface ApplyCommandResponseMapper {
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
     TagDomainAssociationResponse setUpdateTimeTDAR(TagDomainAssociationResponse or, Optional<LocalDateTime> updateTime);
-
-//    @Mapping(target = "updated", source = "updateTime")
-//    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
-//    UndoCommandResponse setUpdateTimeUCR(UndoCommandResponse or, Optional<LocalDateTime> updateTime);
 
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})

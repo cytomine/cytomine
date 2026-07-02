@@ -5,7 +5,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
@@ -60,10 +59,9 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     String apiURL = OntologyHttpContract.ROOT_PATH;
     CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());
     UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID().toString()));
+    Set<TermResponse> subEntities;
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;
-
-    Set<TermResponse> subEntities;
 
     @Override
     public Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
@@ -73,7 +71,7 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
         subEntities = Set.of(termMapper.mapToTermResponse(subEntity));
         return subEntities;
     }
-    
+
     @Override
     public OntologyResponse expectedUpdatedResponse(OntologyResponse response, UpdateOntology updatePayload,
         LocalDateTime updated) {

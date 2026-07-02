@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -43,17 +44,11 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
     U getUpdatePayload();
 
-    default Set<ApplyCommandResponse> expectDeletedSubEntities(LocalDateTime deletionTime) {
-        return Set.of();
-    }
-
     R expectedUpdatedResponse(R response, U updatePayload, LocalDateTime updatedTime);
 
-    R expectedDeletedResponse(R response, LocalDateTime deletedTime);
-
-    R expectChangedUpdatedTime(R response, LocalDateTime updatedTime);
-
     JdbcTemplate getJdbcTemplate();
+
+    ApplyCommandResponseMapper getApplyCommandResponseMapper();
 
     default Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
         return Set.of();
@@ -81,6 +76,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
     @Test
     @SneakyThrows
     default void baseTest() {
+        // Create Entity
         long userId = createUser();
         String stringUserId = String.valueOf(userId);
         String response = getMockMvc().perform(
@@ -89,15 +85,18 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             .andReturn().getResponse().getContentAsString();
 
         HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
+
+        // Add SubEntities
         createSubEntities(userId, result.data().id());
 
+        // Get the Entity with Sub Entities
         String get = getMockMvc().perform(
                 get(getApiURL() + "/" + result.data().id()).param("userId", stringUserId).contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-
         ApplyCommandResponse getResponse = getObjectMapper().readValue(get, ApplyCommandResponse.class);
         R getResponseData = (R) getResponse;
 
+        // Update Entity
         String update = getMockMvc().perform(
                 put(getApiURL() + "/" + result.data().id()).param("userId", stringUserId).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getUpdatePayload()))).andExpect(status().isOk())
@@ -108,21 +107,25 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         assertEquals(expectedUpdatedResponse(getResponseData, getUpdatePayload(), updateDataResult.updated()
                 .orElseThrow(
-                    () -> new IllegalStateException("Newly created entity should " + "not have `updated` empty."))),
+                    () -> new IllegalStateException("Newly created entity should not have `updated` empty."))),
             updateDataResult);
 
+        // Delete Entity
         String delete = getMockMvc().perform(
                 delete(getApiURL() + "/" + result.data().id()).param("userId", stringUserId)
                     .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
-        assertEquals(expectedDeletedResponse(updateDataResult, deleteResult.data().deleted().orElseThrow()),
+        assertEquals(getApplyCommandResponseMapper().setDeleteTime(updateDataResult,
+                Optional.of(deleteResult.data().deleted().orElseThrow(
+                    () -> new IllegalStateException("Deleted entity should not have `deleted` empty.")))),
             deleteResult.data());
     }
 
     @Test
     @SneakyThrows
     default void createCommandTest() {
+        // Create Entity
         long userId = createUser();
         String stringUserId = String.valueOf(userId);
 
@@ -134,8 +137,10 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         HttpCommandResponse firstCreate =
             maybeFirstCreate.orElseThrow(() -> new IllegalStateException("First creation should not be empty."));
 
+        // Add SubEntities
         Set<? extends ApplyCommandResponse> ignored = createSubEntities(userId, firstCreate.data().id());
 
+        // Get the Entity with Sub Entities
         String get = getMockMvc().perform(get(getApiURL() + "/" + firstCreate.data().id()).param("userId", stringUserId)
             .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
@@ -144,6 +149,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         String commandID = firstCreate.commandId().toString();
         long entityID = firstCreate.data().id();
+
+        // Undo (Entity Creation)
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", stringUserId)
                     .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
@@ -152,7 +159,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         LocalDateTime deletedTime =
             undoCommandResponse.orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data()
                 .deleted().orElseThrow(() -> new IllegalStateException("Deleted should not be empty."));
-        assertEquals(Optional.of(new UndoCommandResponse(expectedDeletedResponse(getResponseData, deletedTime))),
+        assertEquals(Optional.of(new UndoCommandResponse(
+                getApplyCommandResponseMapper().setDeleteTime(getResponseData, Optional.of(deletedTime)))),
             undoCommandResponse.map(HttpCommandResponse::data));
 
         String emptyResponseString = getMockMvc().perform(
@@ -163,6 +171,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         assertEquals(emptyResponse, Optional.empty());
 
+        // Undo (Undo (Entity Creation)) -> Recreate Entity
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + undoCommandResponse.get().commandId()).param("userId",
                     stringUserId).contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
@@ -173,7 +182,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             .orElseThrow(() -> new IllegalStateException("Updated should not be empty."));
 
         R firstCreateData = (R) firstCreate.data();
-        assertEquals(Optional.of(new UndoCommandResponse(expectChangedUpdatedTime(getResponseData, updateTime))),
+        assertEquals(Optional.of(new UndoCommandResponse(
+                getApplyCommandResponseMapper().setUpdateTime(getResponseData, Optional.of(updateTime)))),
             redoCommandResponse.map(HttpCommandResponse::data));
 
         String redoGetResponseString = getMockMvc().perform(
@@ -182,8 +192,9 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         R redoGetResponse = (R) getObjectMapper().readValue(redoGetResponseString, (firstCreateData).getClass());
 
-        assertEquals(expectChangedUpdatedTime(getResponseData, redoGetResponse.updated().orElseThrow(
-                () -> new IllegalStateException("Newly created entity should not have `updated` " + "empty."))),
+        assertEquals(getApplyCommandResponseMapper().setUpdateTime(getResponse, Optional.of(
+                redoGetResponse.updated().orElseThrow(
+                    () -> new IllegalStateException("Newly re-created entity should not have `updated` empty.")))),
             getObjectMapper().readValue(redoGetResponseString, firstCreate.data().getClass()));
     }
 }

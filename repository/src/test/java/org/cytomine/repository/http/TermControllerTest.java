@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.persistence.OntologyRepository;
 import org.cytomine.repository.persistence.entity.OntologyEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +31,14 @@ import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 @Import(PostGisTestConfiguration.class)
 @Getter
 class TermControllerTest implements CRUDCommandTests<CreateTerm, TermResponse, UpdateTerm> {
+
     String apiURL = TermHttpContract.ROOT_PATH;
 
     CreateTerm createPayload;
     UpdateTerm updatePayload =
         new UpdateTerm(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()));
+    @Autowired
+    private ApplyCommandResponseMapper applyCommandResponseMapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -65,17 +69,5 @@ class TermControllerTest implements CRUDCommandTests<CreateTerm, TermResponse, U
         return new TermResponse(response.id(), updatePayload.name().orElse(response.name()),
             updatePayload.color().orElse(response.color()), response.ontologyId(), response.created(),
             Optional.of(updatedTime), response.deleted(), response.comment(), response.children());
-    }
-
-    @Override
-    public TermResponse expectedDeletedResponse(TermResponse response, LocalDateTime deletedTime) {
-        return new TermResponse(response.id(), response.name(), response.color(), response.ontologyId(),
-            response.created(), response.updated(), Optional.of(deletedTime), response.comment(), response.children());
-    }
-
-    @Override
-    public TermResponse expectChangedUpdatedTime(TermResponse response, LocalDateTime updatedTime) {
-        return new TermResponse(response.id(), response.name(), response.color(), response.ontologyId(),
-            response.created(), Optional.of(updatedTime), response.deleted(), response.comment(), response.children());
     }
 }

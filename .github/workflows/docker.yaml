@@ -95,6 +95,13 @@ jobs:
           network: host
           target: ${{ matrix.image.target || '' }}
 
+      - name: Cache Trivy DB
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/trivy
+          key: trivy-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: trivy-${{ runner.os }}-
+
       - name: Run Trivy vulnerability scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -103,3 +110,4 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+          cache-dir: ${{ github.workspace }}/.cache/trivy

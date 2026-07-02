@@ -45,7 +45,7 @@ public class ApplyCommandService {
     private final OntologyCommandService ontologyCommandService;
     private final UploadedFileCommandService uploadedFileCommandService;
 
-    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
+    public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, Instant now) {
         Set<HttpCommandResponse> subCommands = commandRepository.findByParentCommandId(undoCommand).stream()
             .map(rc -> undoCommand(userId, rc.getId(), now)).flatMap(Optional::stream).collect(Collectors.toSet());
 

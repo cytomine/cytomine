@@ -1,6 +1,6 @@
 package org.cytomine.repository.mapper;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,8 +21,10 @@ import be.cytomine.common.repository.model.command.payload.response.UploadedFile
 @Mapper(componentModel = "spring")
 public interface ApplyCommandResponseMapper {
 
-    default ApplyCommandResponse setDeleteTime(ApplyCommandResponse applyCommandResponse,
-        Optional<LocalDateTime> deleteTime) {
+    default ApplyCommandResponse setDeleteTime(
+        ApplyCommandResponse applyCommandResponse,
+        Optional<Instant> deleteTime
+    ) {
         return switch (applyCommandResponse) {
             case OntologyResponse or -> setDeleteTimeOR(or, deleteTime);
             case TermResponse tr -> setDeleteTimeTR(tr, deleteTime);
@@ -36,36 +38,38 @@ public interface ApplyCommandResponseMapper {
 
     @Mapping(target = "deleted", source = "deleteTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
-    TermResponse setDeleteTimeTR(TermResponse or, Optional<LocalDateTime> deleteTime);
+    TermResponse setDeleteTimeTR(TermResponse or, Optional<Instant> deleteTime);
 
     @Mapping(target = "deleted", source = "deleteTime")
     @Mapping(target = "terms", expression = "java(setDeleteTimes(or.terms(), deleteTime))")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType", "terms"})
-    OntologyResponse setDeleteTimeOR(OntologyResponse or, Optional<LocalDateTime> deleteTime);
+    OntologyResponse setDeleteTimeOR(OntologyResponse or, Optional<Instant> deleteTime);
 
 
-    default Set<TermResponse> setDeleteTimes(Set<TermResponse> terms, Optional<LocalDateTime> deleteTime) {
+    default Set<TermResponse> setDeleteTimes(Set<TermResponse> terms, Optional<Instant> deleteTime) {
         return terms.stream().map(term -> setDeleteTimeTR(term, deleteTime)).collect(Collectors.toSet());
     }
 
     @Mapping(target = "deleted", source = "deleteTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
-    StorageResponse setDeleteTimeSR(StorageResponse or, Optional<LocalDateTime> deleteTime);
+    StorageResponse setDeleteTimeSR(StorageResponse or, Optional<Instant> deleteTime);
 
     @Mapping(target = "deleted", source = "deleteTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
-    TermRelationResponse setDeleteTimeTRR(TermRelationResponse or, Optional<LocalDateTime> deleteTime);
+    TermRelationResponse setDeleteTimeTRR(TermRelationResponse or, Optional<Instant> deleteTime);
 
     @Mapping(target = "deleted", source = "deleteTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
-    TagDomainAssociationResponse setDeleteTimeTDAR(TagDomainAssociationResponse or, Optional<LocalDateTime> deleteTime);
+    TagDomainAssociationResponse setDeleteTimeTDAR(TagDomainAssociationResponse or, Optional<Instant> deleteTime);
 
     @Mapping(target = "deleted", source = "deleteTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
-    UploadedFileResponse setDeleteTimeUFR(UploadedFileResponse or, Optional<LocalDateTime> deleteTime);
+    UploadedFileResponse setDeleteTimeUFR(UploadedFileResponse or, Optional<Instant> deleteTime);
 
-    default ApplyCommandResponse setUpdateTime(ApplyCommandResponse applyCommandResponse,
-        Optional<LocalDateTime> updateTime) {
+    default ApplyCommandResponse setUpdateTime(
+        ApplyCommandResponse applyCommandResponse,
+        Optional<Instant> updateTime
+    ) {
         return switch (applyCommandResponse) {
             case OntologyResponse or -> setUpdateTimeOR(or, updateTime);
             case TermResponse tr -> setUpdateTimeTR(tr, updateTime);
@@ -79,31 +83,31 @@ public interface ApplyCommandResponseMapper {
 
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
-    TermResponse setUpdateTimeTR(TermResponse or, Optional<LocalDateTime> updateTime);
+    TermResponse setUpdateTimeTR(TermResponse or, Optional<Instant> updateTime);
 
     @Mapping(target = "updated", source = "updateTime")
     @Mapping(target = "terms", expression = "java(setUpdateTimes(or.terms(), updateTime))")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType", "terms"})
-    OntologyResponse setUpdateTimeOR(OntologyResponse or, Optional<LocalDateTime> updateTime);
+    OntologyResponse setUpdateTimeOR(OntologyResponse or, Optional<Instant> updateTime);
 
-    default Set<TermResponse> setUpdateTimes(Set<TermResponse> terms, Optional<LocalDateTime> updateTime) {
+    default Set<TermResponse> setUpdateTimes(Set<TermResponse> terms, Optional<Instant> updateTime) {
         return terms.stream().map(term -> setUpdateTimeTR(term, updateTime)).collect(Collectors.toSet());
     }
 
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
-    TermRelationResponse setUpdateTimeTRR(TermRelationResponse or, Optional<LocalDateTime> updateTime);
+    TermRelationResponse setUpdateTimeTRR(TermRelationResponse or, Optional<Instant> updateTime);
 
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
-    StorageResponse setUpdateTimeSR(StorageResponse or, Optional<LocalDateTime> updateTime);
+    StorageResponse setUpdateTimeSR(StorageResponse or, Optional<Instant> updateTime);
 
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
-    TagDomainAssociationResponse setUpdateTimeTDAR(TagDomainAssociationResponse or, Optional<LocalDateTime> updateTime);
+    TagDomainAssociationResponse setUpdateTimeTDAR(TagDomainAssociationResponse or, Optional<Instant> updateTime);
 
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
-    UploadedFileResponse setUpdateTimeUFR(UploadedFileResponse or, Optional<LocalDateTime> updateTime);
+    UploadedFileResponse setUpdateTimeUFR(UploadedFileResponse or, Optional<Instant> updateTime);
 
 }

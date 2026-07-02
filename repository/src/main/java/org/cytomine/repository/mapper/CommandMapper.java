@@ -1,6 +1,6 @@
 package org.cytomine.repository.mapper;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,9 +16,10 @@ public interface CommandMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "data", source = "commandV2Request")
-    CommandV2Entity map(CommandV2Request<?> commandV2Request,
-        LocalDateTime created,
-        LocalDateTime updated,
+    CommandV2Entity map(
+        CommandV2Request<?> commandV2Request,
+        Instant created,
+        Instant updated,
         long userId,
         Optional<UUID> parentCommandId
     );

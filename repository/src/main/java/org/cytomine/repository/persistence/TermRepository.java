@@ -54,10 +54,12 @@ public interface TermRepository extends JpaRepository<TermEntity, Long> {
             GROUP BY at.term_id
         ) AS _count
         """, nativeQuery = true)
-    Page<StatTermProjection> findAllByProjectForStats(long projectId,
-        LocalDateTime startDate,
-        LocalDateTime endDate,
-        Pageable pageable);
+    Page<StatTermProjection> findAllByProjectForStats(
+        long projectId,
+        Instant startDate,
+        Instant endDate,
+        Pageable pageable
+    );
 
     @Query(value = """
         SELECT u.userId AS userId, u.username AS key, t.userId AS termId, t.name AS termName,

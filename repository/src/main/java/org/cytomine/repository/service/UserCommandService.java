@@ -26,8 +26,8 @@ import be.cytomine.common.repository.model.user.payload.UpdateUser;
 @RequiredArgsConstructor
 @Component
 @Getter
-public class UserCommandService implements CRUDCommandService<CreateUser, UpdateUser, UserCommandPayload, UserEntity,
-    UserResponse> {
+public class UserCommandService
+    implements CRUDCommandService<CreateUser, UpdateUser, UserCommandPayload, UserEntity, UserResponse> {
     private final ACLService aclService;
     private final CommandV2Repository commandV2Repository;
     private final UserRepository userRepository;
@@ -36,7 +36,8 @@ public class UserCommandService implements CRUDCommandService<CreateUser, Update
 
     @Override
     public UserEntity updateEntityWithEntity(UserEntity entity, UpdateUser payload, Timestamp now) {
-        return userMapper.update(entity, payload.username().orElse(entity.getUsername()), payload.email().orElse(entity.getEmail()), now);
+        return userMapper.update(entity, payload.username().orElse(entity.getUsername()),
+            payload.email().orElse(entity.getEmail()), now);
     }
 
     @Override

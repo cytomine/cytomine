@@ -5,7 +5,11 @@ import java.util.Optional;
 
 import be.cytomine.common.repository.model.command.DataType;
 
-public record UserResponse(long id, Optional<LocalDateTime> updated, Optional<LocalDateTime> deleted,
+public record UserResponse(long id,
+                           String username,
+                           String email,
+                           Optional<LocalDateTime> updated,
+                           Optional<LocalDateTime> deleted,
                            LocalDateTime created) implements ApplyCommandResponse {
     @Override
     public DataType getDataType() {

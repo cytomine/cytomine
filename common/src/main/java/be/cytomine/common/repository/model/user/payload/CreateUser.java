@@ -1,4 +1,4 @@
 package be.cytomine.common.repository.model.user.payload;
 
-public record CreateUser(String username) {
+public record CreateUser(String username, String email) {
 }

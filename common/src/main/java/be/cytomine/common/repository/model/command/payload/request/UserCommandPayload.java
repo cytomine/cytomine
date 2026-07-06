@@ -4,7 +4,8 @@ import be.cytomine.common.repository.model.HasAclId;
 import be.cytomine.common.repository.model.HasLongId;
 
 public record UserCommandPayload(long id,
-                                 String username) implements HasLongId, HasAclId {
+                                 String username,
+                                 String email) implements HasLongId, HasAclId {
     @Override
     public long aclId() {
         return id;

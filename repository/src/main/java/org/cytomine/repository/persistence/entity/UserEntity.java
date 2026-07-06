@@ -27,34 +27,7 @@ public class UserEntity implements HasTimestampCUD {
     private String username;
 
     @Column
-    private String name;
-
-    @Column
-    private String reference;
-
-    @Column
-    private String firstname;
-
-    @Column
-    private String lastname;
-
-    @Column
     private String email;
-
-    @Column
-    private Integer language;
-
-    @Column
-    private boolean isDeveloper;
-
-    @Column
-    private String password;
-
-    @Column
-    private boolean enabled;
-
-    @Column
-    private String origin;
 
     @Column
     private Timestamp created;

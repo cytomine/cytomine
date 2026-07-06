@@ -33,8 +33,9 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
     @Autowired
     JdbcTemplate jdbcTemplate;
     String apiURL = UserHttpContract.ROOT_PATH;
-    CreateUser createPayload = new CreateUser(UUID.randomUUID().toString());
-    UpdateUser updatePayload = new UpdateUser(Optional.of(UUID.randomUUID().toString()));
+    CreateUser createPayload = new CreateUser(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    UpdateUser updatePayload =
+        new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()));
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;
 
@@ -46,6 +47,8 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
     ) {
         return new UserResponse(
             response.id(),
+            updatePayload.username().orElse(response.username()),
+            updatePayload.email().orElse(response.email()),
             Optional.of(updatedTime),
             response.deleted(),
             response.created()

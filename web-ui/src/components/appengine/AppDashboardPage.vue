@@ -93,6 +93,7 @@ import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
 import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable';
 import {get} from '@/utils/store-helpers';
+import {formatDate} from '@/utils/date';
 
 export default {
   name: 'AppDashboardPage',
@@ -138,16 +139,7 @@ export default {
       }
     },
     formatDate(date) {
-      return new Intl.DateTimeFormat(
-        this.$i18n.locale,
-        {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        }
-      ).format(new Date(date));
+      return formatDate(date, this.$i18n.locale);
     },
     stateClass(state) {
       const map = {

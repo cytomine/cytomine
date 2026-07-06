@@ -12,6 +12,8 @@ on:
         required: true
       REGISTRY_TOKEN:
         required: true
+      PRIVATE_REPO_TOKEN:
+        required: true
 jobs:
   build-push:
     runs-on: self-hosted
@@ -94,6 +96,8 @@ jobs:
           allow: network.host
           network: host
           target: ${{ matrix.image.target || '' }}
+          secrets: |                       
+            github_token=${{ secrets.PRIVATE_REPO_TOKEN }}
 
       - name: Run Trivy vulnerability scan
         uses: aquasecurity/trivy-action@v0.36.0

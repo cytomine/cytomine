@@ -26,6 +26,10 @@ K3S is provided as a mean to deploy on a local docker-compose environment. Run:
 - `make start-k3s-cluster`
 - `make deploy-helm`
 
+## Contributing
+
+Contributions are welcome! See our [Contributing Guide](https://github.com/cytomine/cytomine/blob/main/CONTRIBUTING.md) and [How to contribute](https://doc.uliege.cytomine.org/community/how-to-contribute) page to get started.
+
 ## License
 
 [Apache 2.0](https://github.com/cytomine/cytomine/blob/main/LICENSE).

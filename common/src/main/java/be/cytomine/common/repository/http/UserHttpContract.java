@@ -2,8 +2,6 @@ package be.cytomine.common.repository.http;
 
 import java.util.Optional;
 
-import java.util.Optional;
-
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

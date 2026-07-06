@@ -18,6 +18,7 @@ package be.cytomine.controller.ontology;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -81,7 +82,8 @@ public class RelationTermResourceTests {
             relationTerm.getTerm2().getId(), relationTerm.getRelation().getId(),
             Optional.empty(),
             Optional.empty(),
-            LocalDateTime.ofInstant(relationTerm.getCreated().toInstant(), ZoneId.systemDefault()),
+            LocalDateTime.ofInstant(relationTerm.getCreated().toInstant(), ZoneId.systemDefault())
+                .truncatedTo(ChronoUnit.SECONDS),
             relationTerm.getRelation().getName()
         );
     }

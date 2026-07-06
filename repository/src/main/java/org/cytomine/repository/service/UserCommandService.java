@@ -6,10 +6,8 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.mapper.UserMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.persistence.OntologyRepository;
 import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
@@ -17,8 +15,11 @@ import org.springframework.stereotype.Component;
 import be.cytomine.common.repository.model.command.payload.request.UserCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
+import be.cytomine.common.repository.model.command.request.CreateUserCommand;
 import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
+import be.cytomine.common.repository.model.command.request.DeleteUserCommand;
 import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
+import be.cytomine.common.repository.model.command.request.UpdateUserCommand;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.common.repository.model.user.payload.UpdateUser;
 
@@ -27,9 +28,7 @@ import be.cytomine.common.repository.model.user.payload.UpdateUser;
 @Getter
 public class UserCommandService implements CRUDCommandService<CreateUser, UpdateUser, UserCommandPayload, UserEntity,
     UserResponse> {
-    private final OntologyRepository ontologyRepository;
     private final ACLService aclService;
-    private final OntologyMapper ontologyMapper;
     private final CommandV2Repository commandV2Repository;
     private final UserRepository userRepository;
     private final CommandMapper commandMapper;
@@ -37,72 +36,72 @@ public class UserCommandService implements CRUDCommandService<CreateUser, Update
 
     @Override
     public UserEntity updateEntityWithEntity(UserEntity entity, UpdateUser payload, Timestamp now) {
-        return null;
+        return userMapper.update(entity, payload.name().orElse(entity.getUsername()), now);
     }
 
     @Override
     public UserEntity updateEntityWithPayload(UserEntity entity, UserCommandPayload payload, Timestamp now) {
-        return null;
+        return userMapper.updateWithPayload(entity, payload, now);
     }
 
     @Override
     public UserResponse mapToResponse(UserEntity entity) {
-        return null;
+        return userMapper.mapToUserResponse(entity);
     }
 
     @Override
     public UserEntity mapCreateToEntity(CreateUser createPayload, long userId, Timestamp creationDate) {
-        return null;
+        return userMapper.mapToUserEntity(createPayload, userId, creationDate);
     }
 
     @Override
     public UserCommandPayload map(UserEntity entity) {
-        return null;
+        return userMapper.mapToUserCommandPayload(entity);
     }
 
     @Override
     public UserEntity save(UserEntity entity) {
-        return null;
+        return userRepository.save(entity);
     }
 
     @Override
     public UpdateCommandRequest<UserCommandPayload> mapUpdateCommand(long userId, UserCommandPayload before,
         UserCommandPayload after) {
-        return null;
+        return new UpdateUserCommand(before, after, userId);
     }
 
     @Override
     public CreateCommandRequest<UserCommandPayload> mapCreateCommand(long userId, UserCommandPayload after) {
-        return null;
+        return new CreateUserCommand(after, userId);
     }
 
     @Override
     public DeleteCommandRequest<UserCommandPayload> mapDeleteCommand(long userId, UserCommandPayload before) {
-        return null;
+        return new DeleteUserCommand(before, userId);
     }
 
     @Override
     public Optional<UserEntity> get(long id) {
-        return Optional.empty();
+        return userRepository.findById(id);
     }
 
     @Override
     public boolean canWriteId(long userId, long id) {
-        return false;
+        return aclService.isAdmin(userId);
     }
 
     @Override
     public boolean canDeleteId(long userId, long id) {
-        return false;
+        return aclService.isAdmin(userId);
     }
 
     @Override
     public boolean canWriteAclId(long userId, long id) {
-        return false;
+        return aclService.isAdmin(userId);
     }
 
     @Override
     public boolean canDeleteAclId(long userId, long id) {
-        return false;
+        return aclService.isAdmin(userId);
     }
 }

@@ -8,7 +8,7 @@ import be.cytomine.common.repository.model.command.payload.request.UpdateCommand
 
 public sealed interface CreateCommandRequest<T extends HasLongId & HasAclId> extends CommandV2Request<T>
     permits CreateOntologyCommand, CreateTagDomainAssociationCommand, CreateTermCommand, CreateTermRelationCommand,
-        CreateStorageCommand, CreateUploadedFileCommand {
+        CreateStorageCommand, CreateUploadedFileCommand, CreateUserCommand {
 
     T after();
 

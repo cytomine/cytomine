@@ -17,6 +17,7 @@ import be.cytomine.common.repository.model.command.payload.response.TermRelation
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 
 @Mapper(componentModel = "spring")
 public interface ApplyCommandResponseMapper {
@@ -31,6 +32,7 @@ public interface ApplyCommandResponseMapper {
             case TagDomainAssociationResponse tdar -> setDeleteTimeTDAR(tdar, deleteTime);
             case UndoCommandResponse ucr -> ucr;
             case UploadedFileResponse ufr -> setDeleteTimeUFR(ufr, deleteTime);
+            case UserResponse ur -> setDeleteTimeUR(ur, deleteTime);
         };
     }
 
@@ -64,6 +66,10 @@ public interface ApplyCommandResponseMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
     UploadedFileResponse setDeleteTimeUFR(UploadedFileResponse or, Optional<LocalDateTime> deleteTime);
 
+    @Mapping(target = "deleted", source = "deleteTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
+    UserResponse setDeleteTimeUR(UserResponse or, Optional<LocalDateTime> deleteTime);
+
     default ApplyCommandResponse setUpdateTime(ApplyCommandResponse applyCommandResponse,
         Optional<LocalDateTime> updateTime) {
         return switch (applyCommandResponse) {
@@ -74,6 +80,7 @@ public interface ApplyCommandResponseMapper {
             case TagDomainAssociationResponse tdar -> setUpdateTimeTDAR(tdar, updateTime);
             case UndoCommandResponse ucr -> ucr;
             case UploadedFileResponse ufr -> setUpdateTimeUFR(ufr, updateTime);
+            case UserResponse ur -> setUpdateTimeUR(ur, updateTime);
         };
     }
 
@@ -105,5 +112,9 @@ public interface ApplyCommandResponseMapper {
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
     UploadedFileResponse setUpdateTimeUFR(UploadedFileResponse or, Optional<LocalDateTime> updateTime);
+
+    @Mapping(target = "updated", source = "updateTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
+    UserResponse setUpdateTimeUR(UserResponse or, Optional<LocalDateTime> updateTime);
 
 }

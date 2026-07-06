@@ -1,5 +1,6 @@
 package org.cytomine.repository.http;
 
+import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -13,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -58,10 +61,19 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
     }
 
     default long createUser() {
-        Long userId = getJdbcTemplate().queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        // This is the ugly spring way to "INSERT ... RETURNING ..."
+        // Live with it.
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        getJdbcTemplate().update(
+            connection -> {
+                PreparedStatement ps =
+                    connection.prepareStatement("INSERT INTO sec_user (version, username) VALUES (0, ?)",
+                        new String[] {"id"});
+                ps.setString(1, UUID.randomUUID().toString());
+                return ps;
+            }, keyHolder);
+        long userId = keyHolder.getKeyAs(Long.class);
 
-        getJdbcTemplate().update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)", userId,
-            UUID.randomUUID());
         getJdbcTemplate().update(
             "INSERT INTO sec_role (id, version, authority) SELECT nextval('hibernate_sequence'), 0, 'ROLE_ADMIN' "
                 + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");

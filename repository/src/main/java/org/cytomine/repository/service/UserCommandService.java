@@ -36,7 +36,7 @@ public class UserCommandService implements CRUDCommandService<CreateUser, Update
 
     @Override
     public UserEntity updateEntityWithEntity(UserEntity entity, UpdateUser payload, Timestamp now) {
-        return userMapper.update(entity, payload.username().orElse(entity.getUsername()), now);
+        return userMapper.update(entity, payload.username().orElse(entity.getUsername()), payload.email().orElse(entity.getEmail()), now);
     }
 
     @Override

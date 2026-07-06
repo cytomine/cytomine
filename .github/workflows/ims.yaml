@@ -40,10 +40,10 @@ jobs:
           sudo apt-get install -y gh
 
       - name: Authenticate with GitHub CLI
-        env:
-          GITHUB_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
-        run: |
-          gh auth setup-git   
+        run: echo "${{ secrets.PRIVATE_REPO_TOKEN }}" | gh auth login --with-token
+
+      - name: Configure Git credential helper
+        run: gh auth setup-git
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7

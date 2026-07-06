@@ -39,9 +39,6 @@ jobs:
           sudo apt-get update 
           sudo apt-get install -y gh
 
-      - name: Authenticate with GitHub CLI
-        run: echo "${{ secrets.PRIVATE_REPO_TOKEN }}" | gh auth login --with-token
-
       - name: Configure Git credential helper
         run: gh auth setup-git
 

@@ -56,4 +56,4 @@ Running `npm run translations-csv2json` in the `web-ui` folder regenerates the p
 
 ## Report a bug or request a feature
 
-If you noticed a bug or would like to suggest a new feature, please [open an issue](https://github.com/cytomine/cytomine/issues/new) on GitHub. Providing as much detail as possible (steps to reproduce, expected vs. actual behaviour, screenshots, environment) helps us address it faster.
+If you noticed a bug or would like to suggest a new feature, please [open an issue](https://github.com/cytomine/cytomine/issues/new?template=bug.md) on GitHub. Providing as much detail as possible (steps to reproduce, expected vs. actual behaviour, screenshots, environment) helps us address it faster.

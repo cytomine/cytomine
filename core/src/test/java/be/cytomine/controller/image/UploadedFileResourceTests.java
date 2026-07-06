@@ -98,7 +98,8 @@ class UploadedFileResourceTests {
 
         mockMvc.perform(get("/api/uploadedfile/{id}.json", 42)).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(42)).andExpect(jsonPath("$.filename").value("file_42.tif"))
-            .andExpect(jsonPath("$.originalFilename").value("original_42.tif"));
+            .andExpect(jsonPath("$.originalFilename").value("original_42.tif"))
+            .andExpect(jsonPath("$.created").value("2024-01-01T00:00:00"));
     }
 
     @Test

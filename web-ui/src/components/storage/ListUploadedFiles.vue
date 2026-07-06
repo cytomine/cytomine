@@ -31,7 +31,7 @@
           </b-table-column>
 
           <b-table-column field="created" :label="$t('created')" sortable width="150">
-            {{ Number(uFile.created) | moment('lll') }}
+            {{ formatDate(uFile.created) }}
           </b-table-column>
 
           <b-table-column field="size" :label="$t('size')" sortable width="80">
@@ -72,6 +72,7 @@ import _ from 'lodash';
 import CytomineTable from '@/components/utils/CytomineTable';
 import UploadedFileStatusComponent from './UploadedFileStatus';
 import {appendShortTermToken} from '@/utils/token-utils';
+import {formatDate} from '@/utils/date';
 
 export default {
   name: 'list-uploaded-files',
@@ -108,6 +109,9 @@ export default {
   methods: {
     filesize(size) {
       return (size) ? filesize(size, {base: 10}) : null;
+    },
+    formatDate(date) {
+      return formatDate(date, this.$i18n.locale);
     },
     debounceSearchString: _.debounce(async function (value) {
       this.searchString = value;

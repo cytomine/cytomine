@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Version;
 import lombok.Data;
 
@@ -17,8 +16,7 @@ import be.cytomine.common.repository.model.HasTimestampCUD;
 @Data
 public class UserEntity implements HasTimestampCUD {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hibernate_sequence")
-    @SequenceGenerator(name = "hibernate_sequence", sequenceName = "hibernate_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
@@ -29,10 +27,34 @@ public class UserEntity implements HasTimestampCUD {
     private String username;
 
     @Column
+    private String name;
+
+    @Column
+    private String reference;
+
+    @Column
     private String firstname;
 
     @Column
     private String lastname;
+
+    @Column
+    private String email;
+
+    @Column
+    private Integer language;
+
+    @Column
+    private boolean isDeveloper;
+
+    @Column
+    private String password;
+
+    @Column
+    private boolean enabled;
+
+    @Column
+    private String origin;
 
     @Column
     private Timestamp created;

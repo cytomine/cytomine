@@ -106,4 +106,7 @@
 
     <include file="/config/liquibase/changelog/2026-06-26-command-parent.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-06-user-id-sequence.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

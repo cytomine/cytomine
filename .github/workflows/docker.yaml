@@ -32,26 +32,26 @@ jobs:
             target: production
             context: .
             dockerfile_location: core
-           - name: iam
-             target: production
+          - name: iam
+            target: production
           - name: pims
             context: .
             dockerfile_location: pims
             target: production
-           - name: sam
-             target: production
-           - name: web-ui
-           - name: python-client
-             context: clients/python
-           - name: e2e-tests
-             context: .
-             dockerfile_location: e2e-tests
-           - name: repository
-             context: .
-             dockerfile_location: repository
-           - name: app-engine-tasks-runner
-             context: .
-             dockerfile_location: app-engine/task-runner
+          - name: sam
+            target: production
+          - name: web-ui
+          - name: python-client
+            context: clients/python
+          - name: e2e-tests
+            context: .
+            dockerfile_location: e2e-tests
+          - name: repository
+            context: .
+            dockerfile_location: repository
+          - name: app-engine-tasks-runner
+            context: .
+            dockerfile_location: app-engine/task-runner
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7.0.0

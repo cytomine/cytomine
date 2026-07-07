@@ -70,7 +70,7 @@ RUN python plugins.py \
 RUN rm -rf /var/lib/apt/lists/*
 
 COPY ./clients/python /clients/python
-COPY ./pims/imi-bigpicture ./pims/imi-bigpicture
+COPY ./pims/imi-bigpicture ./imi-bigpicture
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
@@ -90,6 +90,7 @@ RUN chmod +x /start-reload.sh
 
 COPY ./pims/pims /app/pims
 COPY ./pims/resources/ ./resources/
+COPY ./pims/imi-bigpicture /app/pims/imi-bigpicture
 
 COPY ./pims/pyproject.toml ./pims/uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \

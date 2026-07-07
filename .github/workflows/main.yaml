@@ -29,9 +29,9 @@ jobs:
 #  test:
 #    uses: ./.github/workflows/test.yaml
 
-#   docker-images:
-#     uses: ./.github/workflows/docker.yaml
-#     secrets: inherit
+  docker-images:
+    uses: ./.github/workflows/docker.yaml
+    secrets: inherit
 #
 #   helm-tests:
 #     needs:

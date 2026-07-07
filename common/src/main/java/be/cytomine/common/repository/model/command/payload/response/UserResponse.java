@@ -8,6 +8,7 @@ import be.cytomine.common.repository.model.command.DataType;
 public record UserResponse(long id,
                            String username,
                            String email,
+                           Optional<String> name,
                            Optional<String> lastname,
                            Optional<String> firstname,
                            Optional<String> language,

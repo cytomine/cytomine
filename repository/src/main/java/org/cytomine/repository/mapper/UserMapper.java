@@ -34,6 +34,7 @@ public interface UserMapper {
     UserEntity update(UserEntity entity, String newUsername, String newEmail, Timestamp now);
 
     @Mapping(target = "username", source = "replace.username")
+    @Mapping(target = "name", source = "replace.name")
     @Mapping(target = "email", source = "replace.email")
     @Mapping(target = "firstname", source = "replace.firstname")
     @Mapping(target = "lastname", source = "replace.lastname")

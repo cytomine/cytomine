@@ -4,6 +4,8 @@ import java.util.Optional;
 
 public record UpdateUser(Optional<String> username,
                          Optional<String> email,
+                         Optional<String> name,
                          Optional<String> firstname,
                          Optional<String> lastname,
-                         Optional<String> language) {}
+                         Optional<String> language) {
+}

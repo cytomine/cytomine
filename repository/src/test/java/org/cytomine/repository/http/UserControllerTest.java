@@ -40,6 +40,7 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
         new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
             Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
             Optional.of(UUID.randomUUID().toString()));
+
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;
 

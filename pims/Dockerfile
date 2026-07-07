@@ -70,6 +70,7 @@ RUN python plugins.py \
 RUN rm -rf /var/lib/apt/lists/*
 
 COPY ./clients/python /clients/python
+COPY ./imi-bigpicture /imi-bigpicture
 
 # Add default config
 COPY ./pims/pims-config.env /app/pims-config.env

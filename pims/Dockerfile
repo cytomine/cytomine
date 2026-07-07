@@ -71,19 +71,11 @@ RUN python plugins.py \
 RUN rm -rf /var/lib/apt/lists/*
 
 COPY ./clients/python /clients/python
+COPY ./pims/resources/ ./resources/
 
-RUN apt-get update && apt-get install -y curl && \
-    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
-    chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
-    apt-get update && apt-get install -y gh
-
-ARG GITHUB_TOKEN
-ENV GH_TOKEN=$GITHUB_TOKEN
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
     --mount=type=bind,source=./pims/pyproject.toml,target=pyproject.toml \
-    gh auth setup-git && \
     uv sync --frozen --no-install-project
 
 # Add default config
@@ -98,7 +90,6 @@ COPY ./pims/docker/start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
 
 COPY ./pims/pims /app/pims
-COPY ./pims/resources/ ./resources/
 
 COPY ./pims/pyproject.toml ./pims/uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \

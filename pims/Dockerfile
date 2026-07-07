@@ -72,19 +72,14 @@ RUN rm -rf /var/lib/apt/lists/*
 
 COPY ./clients/python /clients/python
 
-RUN apt-get update && apt-get install -y curl && \
-    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
-    chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
-    apt-get update && apt-get install -y gh
-
 ARG GITHUB_TOKEN
 ENV GH_TOKEN=$GITHUB_TOKEN
+# Clone the private repo into a known location
+RUN git clone https://${GITHUB_TOKEN}@github.com/imi-bigpicture/bigpicture-metadata-interface.git /src/bigpicture-metadata-interface
+
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
     --mount=type=bind,source=./pims/pyproject.toml,target=pyproject.toml \
-    printf '%s\n' "$GITHUB_TOKEN" | env -u GITHUB_TOKEN -u GH_TOKEN gh auth login --with-token && \
-    gh auth setup-git && \
     uv sync --frozen --no-install-project
 
 # Add default config

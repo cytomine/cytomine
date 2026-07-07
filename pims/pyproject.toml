@@ -51,4 +51,4 @@ dev = [
 
 [tool.uv.sources]
 cytomine-python-client = { path = "../clients/python" }
-bigpicture-metadata-interface = { git = "https://github.com/imi-bigpicture/bigpicture-metadata-interface.git" }
+bigpicture-metadata-interface = { path = "/src/bigpicture-metadata-interface" }

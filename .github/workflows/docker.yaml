@@ -58,6 +58,14 @@ jobs:
         with:
           submodules: true
 
+      - name: Set up private repository
+        if: ${{ matrix.image.name == 'pims' }}
+        uses: actions/checkout@v7.0.0
+        with:
+          repository: imi-bigpicture/bigpicture-metadata-interface
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: imi-bigpicture
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
         with:

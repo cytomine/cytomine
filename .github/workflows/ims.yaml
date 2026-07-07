@@ -31,6 +31,9 @@ jobs:
             libvips42 \
             libpng-dev
 
+      - name: Clone private repo
+        run: |
+          git clone https://${{ secrets.PRIVATE_REPO_TOKEN }}@github.com/imi-bigpicture/bigpicture-metadata-interface.git /src/bigpicture-metadata-interface
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7

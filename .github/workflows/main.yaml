@@ -18,9 +18,9 @@ jobs:
   #  uses: ./.github/workflows/app-engine.yaml
   #cbir:
   #  uses: ./.github/workflows/cbir.yaml
-  #ims:
-  #  uses: ./.github/workflows/ims.yaml
-  #  secrets: inherit
+  ims:
+    uses: ./.github/workflows/ims.yaml
+    secrets: inherit
   #sam:
   #  uses: ./.github/workflows/sam.yaml
   #web-ui:
@@ -38,7 +38,7 @@ jobs:
     needs:
       #- app-engine
       #- cbir
-      #- ims
+      - ims
       #- sam
       #- web-ui
       #- code-quality

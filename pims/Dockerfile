@@ -72,6 +72,11 @@ RUN rm -rf /var/lib/apt/lists/*
 COPY ./clients/python /clients/python
 COPY ./imi-bigpicture /imi-bigpicture
 
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
+    --mount=type=bind,source=./pims/pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project
+
 # Add default config
 COPY ./pims/pims-config.env /app/pims-config.env
 COPY ./pims/logging-prod.yml /app/logging.yml

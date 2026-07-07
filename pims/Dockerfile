@@ -75,7 +75,7 @@ COPY ./clients/python /clients/python
 ARG GITHUB_TOKEN
 ENV GH_TOKEN=$GITHUB_TOKEN
 # Clone the private repo into a known location
-RUN git clone https://${GITHUB_TOKEN}@github.com/imi-bigpicture/bigpicture-metadata-interface.git /src/bigpicture-metadata-interface
+RUN git clone https://${GITHUB_TOKEN}@github.com/imi-bigpicture/bigpicture-metadata-interface.git /tmp/bigpicture-metadata-interface
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=./pims/uv.lock,target=uv.lock \

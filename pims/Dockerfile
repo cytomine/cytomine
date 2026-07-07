@@ -83,6 +83,7 @@ ENV GH_TOKEN=$GITHUB_TOKEN
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
     --mount=type=bind,source=./pims/pyproject.toml,target=pyproject.toml \
+    printf '%s\n' "$GITHUB_TOKEN" | env -u GITHUB_TOKEN -u GH_TOKEN gh auth login --with-token && \
     gh auth setup-git && \
     uv sync --frozen --no-install-project
 

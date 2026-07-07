@@ -46,7 +46,6 @@ RUN apt-get update && \
         libvips42 \
         libwebp-dev \
         openssh-client \
-        git # Ensure git is installed for cloning
 
 COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.10.12 /uv /uvx /bin/
 
@@ -71,20 +70,6 @@ RUN python plugins.py \
 RUN rm -rf /var/lib/apt/lists/*
 
 COPY ./clients/python /clients/python
-
-RUN apt-get update && apt-get install -y curl && \
-    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && \
-    chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
-    apt-get update && apt-get install -y gh
-
-ARG GITHUB_TOKEN
-ENV GH_TOKEN=$GITHUB_TOKEN
-RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
-    --mount=type=bind,source=./pims/pyproject.toml,target=pyproject.toml \
-    gh auth setup-git && \
-    uv sync --frozen --no-install-project
 
 # Add default config
 COPY ./pims/pims-config.env /app/pims-config.env

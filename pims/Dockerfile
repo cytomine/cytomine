@@ -71,11 +71,7 @@ RUN python plugins.py \
 RUN rm -rf /var/lib/apt/lists/*
 
 COPY ./clients/python /clients/python
-
-ARG GITHUB_TOKEN
-ENV GH_TOKEN=$GITHUB_TOKEN
-# Clone the private repo into a known location
-RUN git clone https://${GITHUB_TOKEN}@github.com/imi-bigpicture/bigpicture-metadata-interface.git /tmp/bigpicture-metadata-interface
+COPY ./pims/resources/ ./resources/
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
@@ -94,7 +90,6 @@ COPY ./pims/docker/start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
 
 COPY ./pims/pims /app/pims
-COPY ./pims/resources/ ./resources/
 
 COPY ./pims/pyproject.toml ./pims/uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \

@@ -22,41 +22,42 @@ jobs:
       fail-fast: true
       matrix:
         image:
-          - name: app-engine
-            context: .
-            dockerfile_location: app-engine
-            target: production
-          - name: cbir
-            target: production
-          - name: core
-            target: production
-            context: .
-            dockerfile_location: core
-          - name: iam
-            target: production
+          #- name: app-engine
+          #  context: .
+          #  dockerfile_location: app-engine
+          #  target: production
+          #- name: cbir
+          #  target: production
+          #- name: core
+          #  target: production
+          #  context: .
+          #  dockerfile_location: core
+          # - name: iam
+          #   target: production
           - name: pims
             context: .
             dockerfile_location: pims
             target: production
-          - name: sam
-            target: production
-          - name: web-ui
-          - name: python-client
-            context: clients/python
-          - name: e2e-tests
-            context: .
-            dockerfile_location: e2e-tests
-          - name: repository
-            context: .
-            dockerfile_location: repository
-          - name: app-engine-tasks-runner
-            context: .
-            dockerfile_location: app-engine/task-runner
+          # - name: sam
+          #   target: production
+          # - name: web-ui
+          # - name: python-client
+          #   context: clients/python
+          # - name: e2e-tests
+          #   context: .
+          #   dockerfile_location: e2e-tests
+          # - name: repository
+          #   context: .
+          #   dockerfile_location: repository
+          # - name: app-engine-tasks-runner
+          #   context: .
+          #   dockerfile_location: app-engine/task-runner
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7.0.0
         with:
           submodules: true
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4

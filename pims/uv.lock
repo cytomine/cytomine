@@ -344,7 +344,7 @@ wheels = [
 [[package]]
 name = "bigpicture-metadata-interface"
 version = "2.2.0"
-source = { git = "https://github.com/imi-bigpicture/bigpicture-metadata-interface.git#53b999d895051c5b0bf758ebfb9a113a28854883" }
+source = { directory = "resources/bigpicture_metadata_interface" }
 dependencies = [
     { name = "crypt4gh" },
     { name = "isodate" },
@@ -355,6 +355,28 @@ dependencies = [
     { name = "s3fs" },
     { name = "tqdm" },
     { name = "xmltodict" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "crypt4gh", specifier = ">=1.6,<1.8" },
+    { name = "isodate", specifier = ">=0.7.2,<0.8.0" },
+    { name = "lxml", specifier = ">=6.1.1,<7.0.0" },
+    { name = "marshmallow", specifier = ">=3.20.2,<4.0.0" },
+    { name = "more-itertools", specifier = ">=11.0.0,<12.0.0" },
+    { name = "peewee", specifier = ">=4.0.0,<5.0.0" },
+    { name = "s3fs", specifier = ">=2024.2.0" },
+    { name = "tqdm", specifier = ">=4.68.2,<5.0.0" },
+    { name = "xmltodict", specifier = ">=1.0.4,<2.0.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "codespell", specifier = ">=2.2.5,<3.0.0" },
+    { name = "coverage", specifier = ">=7.14.1,<8.0.0" },
+    { name = "pyright", specifier = ">=1.1.410" },
+    { name = "pytest", specifier = ">=9.0.3,<10.0.0" },
+    { name = "ruff", specifier = ">=0.15.16" },
 ]
 
 [[package]]
@@ -850,7 +872,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "aiofiles", specifier = "==23.1.0" },
-    { name = "bigpicture-metadata-interface", git = "https://github.com/imi-bigpicture/bigpicture-metadata-interface.git" },
+    { name = "bigpicture-metadata-interface", directory = "resources/bigpicture_metadata_interface" },
     { name = "celery", specifier = "==5.2.7" },
     { name = "cytomine-python-client", directory = "../clients/python" },
     { name = "fastapi", specifier = "==0.110.3" },

@@ -1,3 +1,4 @@
+---
 name: IMS
 
 on:
@@ -17,6 +18,13 @@ jobs:
       - name: Set up the repository
         uses: actions/checkout@v7.0.0
 
+      - name: Set up the repository
+        uses: actions/checkout@v7.0.0
+        with:
+          repository: imi-bigpicture/bigpicture-metadata-interface
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: imi-bigpicture
+
       - name: Load versions
         id: versions
         uses: ./.github/actions/load-versions
@@ -33,10 +41,10 @@ jobs:
 
       - name: Install GitHub CLI (gh)
         run: |
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg 
-          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg 
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null 
-          sudo apt-get update 
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt-get update
           sudo apt-get install -y gh
 
       - name: Authenticate with GitHub CLI

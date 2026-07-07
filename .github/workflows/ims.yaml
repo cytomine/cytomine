@@ -23,7 +23,7 @@ jobs:
         with:
           repository: imi-bigpicture/bigpicture-metadata-interface
           token: ${{ secrets.PRIVATE_REPO_TOKEN }}
-          path: imi-bigpicture
+          path: pims/imi-bigpicture
 
       - name: Load versions
         id: versions

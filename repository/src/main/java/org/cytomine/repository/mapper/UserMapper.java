@@ -35,6 +35,9 @@ public interface UserMapper {
 
     @Mapping(target = "username", source = "replace.username")
     @Mapping(target = "email", source = "replace.email")
+    @Mapping(target = "firstname", source = "replace.firstname")
+    @Mapping(target = "lastname", source = "replace.lastname")
+    @Mapping(target = "language", source = "replace.language")
     @Mapping(target = "updated", source = "now")
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "version", source = "entity.version")

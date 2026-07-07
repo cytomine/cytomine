@@ -33,25 +33,22 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
     @Autowired
     JdbcTemplate jdbcTemplate;
     String apiURL = UserHttpContract.ROOT_PATH;
-    CreateUser createPayload = new CreateUser(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    CreateUser createPayload =
+        new CreateUser(UUID.randomUUID().toString(), Optional.empty(), Optional.empty(), UUID.randomUUID().toString(),
+            Optional.empty());
     UpdateUser updatePayload =
-        new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()));
+        new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
+            Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
+            Optional.of(UUID.randomUUID().toString()));
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;
 
     @Override
-    public UserResponse expectedUpdatedResponse(
-        UserResponse response,
-        UpdateUser updatePayload,
-        LocalDateTime updatedTime
-    ) {
-        return new UserResponse(
-            response.id(),
-            updatePayload.username().orElse(response.username()),
-            updatePayload.email().orElse(response.email()),
-            Optional.of(updatedTime),
-            response.deleted(),
-            response.created()
-        );
+    public UserResponse expectedUpdatedResponse(UserResponse response, UpdateUser updatePayload,
+        LocalDateTime updatedTime) {
+        return new UserResponse(response.id(), updatePayload.username().orElse(response.username()),
+            updatePayload.email().orElse(response.email()), updatePayload.lastname().or(response::lastname),
+            updatePayload.firstname().or(response::firstname), updatePayload.language().or(response::language),
+            Optional.of(updatedTime), response.deleted(), response.created());
     }
 }

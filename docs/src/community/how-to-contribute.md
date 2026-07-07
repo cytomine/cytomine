@@ -10,6 +10,8 @@ If you are ready to dive in, whether testing, fixing a bug, or adding a feature,
 
 ## Documentation
 
+Test Eddy
+
 This documentation website lives in the [`docs`](https://github.com/cytomine/cytomine/tree/main/docs) folder of the [cytomine/cytomine](https://github.com/cytomine/cytomine) repository, and is built with [VuePress v1](https://v1.vuepress.vuejs.org/).
 
 To work on it locally:

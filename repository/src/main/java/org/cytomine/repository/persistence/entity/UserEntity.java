@@ -68,6 +68,7 @@ public class UserEntity implements HasTimestampCUD {
     @Column
     private Timestamp created;
     @Column
+
     private Timestamp updated;
     @Column
     private Timestamp deleted;

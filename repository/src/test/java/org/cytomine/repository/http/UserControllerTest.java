@@ -2,6 +2,7 @@ package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
@@ -35,7 +36,7 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
     String apiURL = UserHttpContract.ROOT_PATH;
     CreateUser createPayload =
         new CreateUser(UUID.randomUUID().toString(), Optional.empty(), Optional.empty(), Optional.empty(),
-            UUID.randomUUID().toString(), "EN");
+            UUID.randomUUID().toString(), Optional.empty(), false, Set.of(), "EN");
     UpdateUser updatePayload =
         new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
             Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),

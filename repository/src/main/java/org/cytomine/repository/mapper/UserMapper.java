@@ -12,7 +12,7 @@ import be.cytomine.common.repository.model.command.payload.response.UserResponse
 import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.common.repository.utils.Language;
 
-@Mapper(componentModel = "spring", uses = {BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {BaseMapper.class, RoleMapper.class})
 public interface UserMapper {
 
     default Language mapToLanguage(String language) {
@@ -28,11 +28,13 @@ public interface UserMapper {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", source = "now")
+    @Mapping(target = "developer", source = "entity.developer")
     UserEntity mapToUserEntity(CreateUser entity, long userId, Timestamp now);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted"})
     UserCommandPayload mapToUserCommandPayload(UserEntity entity);
 
+    @Mapping(target = "isDeveloper", source = "entity.developer")
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted"})
     UserResponse mapToUserResponse(UserEntity entity);
 
@@ -54,6 +56,9 @@ public interface UserMapper {
     @Mapping(target = "firstname", source = "replace.firstname")
     @Mapping(target = "lastname", source = "replace.lastname")
     @Mapping(target = "language", source = "replace.language")
+    @Mapping(target = "developer", source = "replace.developer")
+    @Mapping(target = "origin", source = "replace.origin")
+    @Mapping(target = "roles", source = "replace.roles")
     @Mapping(target = "updated", source = "now")
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "version", source = "entity.version")

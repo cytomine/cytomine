@@ -140,7 +140,7 @@ jobs:
             --set images.pims_cache=registry.cytomine.org/docker/library/redis:7 \
             --set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ env.DEPLOYMENT_NAME }} \
             --set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 \
-            --set meilisearch.image.repository=registry.cytomine.org/docker/getmeili/meilisearch:v1.43.0 \
+            --set images.meilisearch=registry.cytomine.org/docker/getmeili/meilisearch:v1.43.0 \
             --set images.postgresql=registry.cytomine.org/docker/library/postgres:15 \
             --set images.redis=registry.cytomine.org/docker/library/redis:7 \
             --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \

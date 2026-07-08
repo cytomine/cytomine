@@ -67,7 +67,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         getJdbcTemplate().update(
             connection -> {
                 PreparedStatement ps =
-                    connection.prepareStatement("INSERT INTO sec_user (version, username) VALUES (0, ?)",
+                    connection.prepareStatement(
+                        "INSERT INTO sec_user (version, username,language) VALUES (0, ?,'ENGLISH')",
                         new String[] {"id"});
                 ps.setString(1, UUID.randomUUID().toString());
                 return ps;
@@ -144,7 +145,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> maybeFirstCreate = getObjectMapper().readValue(getMockMvc().perform(
                 post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
+            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
+        });
 
         HttpCommandResponse firstCreate =
             maybeFirstCreate.orElseThrow(() -> new IllegalStateException("First creation should not be empty."));
@@ -166,7 +168,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", stringUserId)
                     .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
-            .getContentAsString(), new TypeReference<>() {});
+            .getContentAsString(), new TypeReference<>() {
+        });
 
         LocalDateTime deletedTime =
             undoCommandResponse.orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data()
@@ -187,7 +190,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + undoCommandResponse.get().commandId()).param("userId",
                     stringUserId).contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
-            .getContentAsString(), new TypeReference<>() {});
+            .getContentAsString(), new TypeReference<>() {
+        });
 
         LocalDateTime updateTime = redoCommandResponse.stream().findFirst()
             .orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data().updated()

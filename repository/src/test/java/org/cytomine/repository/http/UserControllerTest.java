@@ -34,13 +34,16 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
     @Autowired
     JdbcTemplate jdbcTemplate;
     String apiURL = UserHttpContract.ROOT_PATH;
+
     CreateUser createPayload =
         new CreateUser(UUID.randomUUID().toString(), Optional.empty(), Optional.empty(), Optional.empty(),
             UUID.randomUUID().toString(), Optional.empty(), false, Set.of(), "EN");
+
     UpdateUser updatePayload =
         new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
             Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
-            Optional.of(UUID.randomUUID().toString()), Optional.of("FRENCH"));
+            Optional.of(UUID.randomUUID().toString()), Optional.of("FRENCH"),
+            Optional.empty(), Optional.empty(), Optional.empty());
 
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;
@@ -51,7 +54,8 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
         return new UserResponse(response.id(), updatePayload.username().orElse(response.username()),
             updatePayload.email().orElse(response.email()), updatePayload.name().or(response::name),
             updatePayload.lastname().or(response::lastname), updatePayload.firstname().or(response::firstname),
-            updatePayload.language().or(response::language), Optional.of(updatedTime), response.deleted(),
-            response.created());
+            updatePayload.language().or(response::language), response.isDeveloper(),
+            updatePayload.origin().or(response::origin), Optional.of(updatedTime), response.deleted(),
+            response.created(), response.roles());
     }
 }

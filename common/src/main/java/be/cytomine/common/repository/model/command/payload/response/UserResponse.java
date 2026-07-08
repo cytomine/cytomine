@@ -1,6 +1,7 @@
 package be.cytomine.common.repository.model.command.payload.response;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Optional;
 
 import be.cytomine.common.repository.model.command.DataType;
@@ -11,7 +12,7 @@ public record UserResponse(long id,
                            Optional<String> name,
                            Optional<String> lastname,
                            Optional<String> firstname,
-                           Optional<String> language,
+                           Optional<Locale> locale,
                            Optional<LocalDateTime> updated,
                            Optional<LocalDateTime> deleted,
                            LocalDateTime created) implements ApplyCommandResponse {

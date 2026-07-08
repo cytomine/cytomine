@@ -1,5 +1,6 @@
 package be.cytomine.common.repository.model.user.payload;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public record UpdateUser(Optional<String> username,
@@ -7,5 +8,5 @@ public record UpdateUser(Optional<String> username,
                          Optional<String> name,
                          Optional<String> firstname,
                          Optional<String> lastname,
-                         Optional<String> language) {
+                         Optional<String> locale) {
 }

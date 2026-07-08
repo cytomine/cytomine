@@ -1,6 +1,7 @@
 package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
+import java.util.Locale;
 
 import org.cytomine.repository.persistence.entity.UserEntity;
 import org.mapstruct.BeanMapping;
@@ -29,16 +30,17 @@ public interface UserMapper {
 
     @Mapping(target = "username", source = "newUsername")
     @Mapping(target = "email", source = "newEmail")
+    @Mapping(target = "locale", source = "newLocale")
     @Mapping(target = "updated", source = "now")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"username", "email", "updated"})
-    UserEntity update(UserEntity entity, String newUsername, String newEmail, Timestamp now);
+    @BeanMapping(ignoreUnmappedSourceProperties = {"username", "email", "updated", "locale"})
+    UserEntity update(UserEntity entity, String newUsername, String newEmail, Locale newLocale, Timestamp now);
 
     @Mapping(target = "username", source = "replace.username")
     @Mapping(target = "name", source = "replace.name")
     @Mapping(target = "email", source = "replace.email")
     @Mapping(target = "firstname", source = "replace.firstname")
     @Mapping(target = "lastname", source = "replace.lastname")
-    @Mapping(target = "language", source = "replace.language")
+    @Mapping(target = "locale", source = "replace.locale")
     @Mapping(target = "updated", source = "now")
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "version", source = "entity.version")

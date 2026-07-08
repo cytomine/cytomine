@@ -1,6 +1,7 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
+import java.util.Locale;
 import java.util.Optional;
 
 import lombok.Getter;
@@ -37,7 +38,7 @@ public class UserCommandService
     @Override
     public UserEntity updateEntityWithEntity(UserEntity entity, UpdateUser payload, Timestamp now) {
         return userMapper.update(entity, payload.username().orElse(entity.getUsername()),
-            payload.email().orElse(entity.getEmail()), now);
+            payload.email().orElse(entity.getEmail()), Locale.of(payload.locale()).orElse(entity.getLocale()), now);
     }
 
     @Override

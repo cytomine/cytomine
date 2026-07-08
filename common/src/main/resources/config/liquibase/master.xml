@@ -109,4 +109,6 @@
 
     <include file="/config/liquibase/changelog/2026-07-06-user-id-sequence.sql"
              relativeToChangelogFile="false"/>
+    <include file="/config/liquibase/changelog/2026-07-08-locale-user.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -1,6 +1,7 @@
 package org.cytomine.repository.persistence.entity;
 
 import java.sql.Timestamp;
+import java.util.Locale;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,7 +37,7 @@ public class UserEntity implements HasTimestampCUD {
     private String name;
 
     @Column
-    private String language;
+    private Locale locale;
 
     @Column
     private String email;

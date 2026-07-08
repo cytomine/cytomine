@@ -1,6 +1,7 @@
 package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
     UpdateUser updatePayload =
         new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
             Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
-            Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()));
+            Optional.of(UUID.randomUUID().toString()), Optional.of(Locale.of("fr_be")));
 
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;
@@ -50,7 +51,7 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
         return new UserResponse(response.id(), updatePayload.username().orElse(response.username()),
             updatePayload.email().orElse(response.email()), updatePayload.name().or(response::name),
             updatePayload.lastname().or(response::lastname), updatePayload.firstname().or(response::firstname),
-            updatePayload.language().or(response::language), Optional.of(updatedTime), response.deleted(),
+            updatePayload.locale().or(response::locale), Optional.of(updatedTime), response.deleted(),
             response.created());
     }
 }

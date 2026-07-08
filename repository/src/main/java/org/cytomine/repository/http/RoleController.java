@@ -32,7 +32,7 @@ public class RoleController implements RoleHttpContract {
 
     @Override
     public Page<RoleResponse> list(Pageable pageable) {
-        return repository.findAllRoles(pageable).map(mapper::mapToRoleResponse);
+        return repository.findAll(pageable).map(mapper::mapToRoleResponse);
     }
 
     @Override

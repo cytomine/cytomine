@@ -11,6 +11,7 @@ import jakarta.persistence.Version;
 import lombok.Data;
 
 import be.cytomine.common.repository.model.HasTimestampCUD;
+import be.cytomine.common.repository.utils.Language;
 
 @Entity(name = "sec_user")
 @Data
@@ -36,7 +37,7 @@ public class UserEntity implements HasTimestampCUD {
     private String name;
 
     @Column
-    private String language;
+    private Language language;
 
     @Column
     private String email;

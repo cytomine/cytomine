@@ -35,7 +35,7 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
     String apiURL = UserHttpContract.ROOT_PATH;
     CreateUser createPayload =
         new CreateUser(UUID.randomUUID().toString(), Optional.empty(), Optional.empty(), Optional.empty(),
-            UUID.randomUUID().toString(), Optional.empty());
+            UUID.randomUUID().toString(), "ENGLISH");
     UpdateUser updatePayload =
         new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
             Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),

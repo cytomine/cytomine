@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
+import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -34,7 +35,8 @@ class TagDomainAssociationControllerTest
         Optional.of("be.cytomine.domain.project.Project"),
         Optional.empty()
     );
-
+    @Autowired
+    ApplyCommandResponseMapper applyCommandResponseMapper;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -63,38 +65,6 @@ class TagDomainAssociationControllerTest
             updatePayload.tagId().orElse(response.tagId()),
             updatePayload.domainClassName().orElse(response.domainClassName()),
             updatePayload.domainId().orElse(response.domainId()),
-            response.created(),
-            Optional.of(updatedTime),
-            response.deleted()
-        );
-    }
-
-    @Override
-    public TagDomainAssociationResponse expectedDeletedResponse(
-        TagDomainAssociationResponse response,
-        LocalDateTime deletedTime
-    ) {
-        return new TagDomainAssociationResponse(
-            response.id(),
-            response.tagId(),
-            response.domainClassName(),
-            response.domainId(),
-            response.created(),
-            response.updated(),
-            Optional.of(deletedTime)
-        );
-    }
-
-    @Override
-    public TagDomainAssociationResponse expectChangedUpdatedTime(
-        TagDomainAssociationResponse response,
-        LocalDateTime updatedTime
-    ) {
-        return new TagDomainAssociationResponse(
-            response.id(),
-            response.tagId(),
-            response.domainClassName(),
-            response.domainId(),
             response.created(),
             Optional.of(updatedTime),
             response.deleted()

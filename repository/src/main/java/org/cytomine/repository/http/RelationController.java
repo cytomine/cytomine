@@ -12,7 +12,6 @@ import be.cytomine.common.repository.model.command.payload.response.RelationResp
 
 import static be.cytomine.common.repository.http.RelationHttpContract.ROOT_PATH;
 
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(ROOT_PATH)

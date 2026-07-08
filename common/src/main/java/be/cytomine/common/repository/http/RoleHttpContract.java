@@ -1,6 +1,5 @@
 package be.cytomine.common.repository.http;
 
-import java.util.List;
 import java.util.Optional;
 
 import jakarta.validation.Valid;

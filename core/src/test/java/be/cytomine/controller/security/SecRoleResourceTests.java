@@ -26,8 +26,8 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import be.cytomine.config.MongoTestConfiguration;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -50,7 +50,7 @@ public class SecRoleResourceTests {
     @MockitoBean
     private RoleHttpContract roleHttpContract;
 
-    private static RoleResponse aRoleResponse(long id, String authority) {
+    private static RoleResponse roleResponse(long id, String authority) {
         return new RoleResponse(id, authority, LocalDateTime.now(), Optional.empty(), Optional.empty());
     }
 
@@ -58,7 +58,7 @@ public class SecRoleResourceTests {
     @Transactional
     public void listAllRoles() throws Exception {
         when(roleHttpContract.list(any())).thenReturn(
-            new PageImpl<>(List.of(aRoleResponse(1L, "ROLE_GUEST"), aRoleResponse(2L, "ROLE_USER"))));
+            new PageImpl<>(List.of(roleResponse(1L, "ROLE_GUEST"), roleResponse(2L, "ROLE_USER"))));
 
         mockMvc.perform(get("/api/role.json"))
             .andExpect(status().isOk())
@@ -68,7 +68,7 @@ public class SecRoleResourceTests {
     @Test
     @Transactional
     public void shouldSuccessfullyGetRole() throws Exception {
-        RoleResponse role = aRoleResponse(1L, "ROLE_GUEST");
+        RoleResponse role = roleResponse(1L, "ROLE_GUEST");
         when(roleHttpContract.get(1L)).thenReturn(Optional.of(role));
 
         mockMvc.perform(get("/api/role/{id}.json", 1L))
@@ -90,7 +90,7 @@ public class SecRoleResourceTests {
     @Transactional
     public void shouldCreateRoleAndReturnCommandResponse() throws Exception {
         UUID commandId = UUID.randomUUID();
-        RoleResponse role = aRoleResponse(1L, "ROLE_NEW");
+        RoleResponse role = roleResponse(1L, "ROLE_NEW");
         when(roleHttpContract.create(any(Long.class), any())).thenReturn(
             Optional.of(new HttpCommandResponse(true, role, commandId, Commands.CREATE_ROLE, Set.of())));
 
@@ -107,7 +107,7 @@ public class SecRoleResourceTests {
     @Transactional
     public void shouldUpdateRoleAndReturnCommandResponse() throws Exception {
         UUID commandId = UUID.randomUUID();
-        RoleResponse role = aRoleResponse(1L, "ROLE_UPDATED");
+        RoleResponse role = roleResponse(1L, "ROLE_UPDATED");
         when(roleHttpContract.update(eq(1L), any(Long.class), any())).thenReturn(
             Optional.of(new HttpCommandResponse(true, role, commandId, Commands.UPDATE_ROLE, Set.of())));
 
@@ -134,7 +134,7 @@ public class SecRoleResourceTests {
     @Transactional
     public void shouldDeleteRoleAndReturnCommandResponse() throws Exception {
         UUID commandId = UUID.randomUUID();
-        RoleResponse role = aRoleResponse(1L, "ROLE_GUEST");
+        RoleResponse role = roleResponse(1L, "ROLE_GUEST");
         when(roleHttpContract.delete(eq(1L), any(Long.class))).thenReturn(
             Optional.of(new HttpCommandResponse(true, role, commandId, Commands.DELETE_ROLE, Set.of())));
 

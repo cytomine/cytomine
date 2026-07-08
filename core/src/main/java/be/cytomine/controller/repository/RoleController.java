@@ -1,10 +1,10 @@
 package be.cytomine.controller.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +20,8 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import be.cytomine.common.repository.model.role.payload.CreateRole;
 import be.cytomine.common.repository.model.role.payload.UpdateRole;
+import be.cytomine.controller.utils.CollectionResponse;
+import be.cytomine.controller.utils.PageMapper;
 import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
@@ -35,11 +37,12 @@ public class RoleController {
 
     private final CurrentUserService currentUserService;
     private final RoleHttpContract roleHttpContract;
+    private final PageMapper pageMapper;
 
     @GetMapping("/role.json")
-    public List<RoleResponse> list() {
+    public CollectionResponse<RoleResponse> list(Pageable pageable) {
         log.debug("GET /role.json");
-        return roleHttpContract.list();
+        return pageMapper.toCollectionResponse(roleHttpContract.list(pageable));
     }
 
     @GetMapping("/role/{id}.json")

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +27,7 @@ public interface RoleHttpContract {
     String ROOT_PATH = "/roles";
 
     @GetExchange
-    List<RoleResponse> list();
+    Page<RoleResponse> list(Pageable pageable);
 
     @GetExchange("/{id}")
     Optional<RoleResponse> get(@PathVariable long id);

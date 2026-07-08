@@ -1,13 +1,15 @@
 package org.cytomine.repository.http;
 
+
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.RoleMapper;
 import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.service.RoleCommandService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,8 +31,8 @@ public class RoleController implements RoleHttpContract {
     private final RoleMapper mapper;
 
     @Override
-    public List<RoleResponse> list() {
-        return repository.findAll().stream().map(mapper::mapToRoleResponse).toList();
+    public Page<RoleResponse> list(Pageable pageable) {
+        return repository.findAllRoles(pageable).stream().map(mapper::mapToRoleResponse);
     }
 
     @Override

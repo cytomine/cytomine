@@ -70,7 +70,7 @@ jobs:
           severity: CRITICAL,HIGH
 
       - name: Add preview label
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
         uses: actions/github-script@v8
         with:
           script: |
@@ -82,7 +82,7 @@ jobs:
             });
 
       - name: Add preview link
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.event.action == 'opened'
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.pull_request.number }}

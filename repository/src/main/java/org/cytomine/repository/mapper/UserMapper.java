@@ -10,9 +10,18 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.request.UserCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
+import be.cytomine.common.repository.utils.Language;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface UserMapper {
+
+    default Language mapToLanguage(String language) {
+        if (language.length() > 2) {
+            return Language.valueOf(language);
+        } else {
+            return Language.findByCode(language);
+        }
+    }
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "updated", ignore = true)
@@ -34,7 +43,8 @@ public interface UserMapper {
     @Mapping(target = "lastname", source = "newLastname")
     @Mapping(target = "language", source = "newLanguage")
     @Mapping(target = "updated", source = "now")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"username", "email", "name", "firstname", "lastname", "language", "updated"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"username", "email", "name", "firstname", "lastname", "language",
+        "updated"})
     UserEntity update(UserEntity entity, String newUsername, String newEmail, String newName, String newFirstname,
         String newLastname, String newLanguage, Timestamp now);
 

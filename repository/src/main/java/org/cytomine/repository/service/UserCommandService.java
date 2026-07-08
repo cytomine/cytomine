@@ -65,8 +65,7 @@ public class UserCommandService
 
     @Override
     public UserEntity save(UserEntity entity) {
-        UserEntity save = userRepository.save(entity);
-        return save;
+        return userRepository.save(entity);
     }
 
     @Override

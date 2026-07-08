@@ -25,6 +25,10 @@ public interface Commands {
     String UPDATE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.EditTagDomainAssociationCommand";
     String DELETE_TAG_DOMAIN_ASSOCIATION = "be.cytomine.DeleteTagDomainAssociationCommand";
 
+    String CREATE_ROLE = "be.cytomine.AddSecRoleCommand";
+    String UPDATE_ROLE = "be.cytomine.EditSecRoleCommand";
+    String DELETE_ROLE = "be.cytomine.DeleteSecRoleCommand";
+
     String UNDO_CREATE_COMMAND = "be.cytomine.UndoCreateCommand";
     String UNDO_DELETE_COMMAND = "be.cytomine.UndoDeleteCommand";
     String UNDO_UPDATE_COMMAND = "be.cytomine.UndoUpdateCommand";

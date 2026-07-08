@@ -49,11 +49,6 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_TOKEN }}
 
-      - name: Compute production image tag
-        if: github.event_name == 'push'
-        id: prod
-        run: echo "tag=main-${GITHUB_SHA::7}-$(date +%s)" >> "$GITHUB_OUTPUT"
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
         with:
@@ -63,7 +58,6 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:${{ env.IMAGE_SHA }}
             ${{ github.event_name == 'push' && format('{0}:latest', env.IMAGE) || '' }}
-            ${{ github.event_name == 'push' && format('{0}:{1}', env.IMAGE, steps.prod.outputs.tag) || '' }}
           cache-from: type=registry,ref=${{ env.IMAGE }}-build-cache
           cache-to: type=registry,ref=${{ env.IMAGE }}-build-cache,mode=min
 

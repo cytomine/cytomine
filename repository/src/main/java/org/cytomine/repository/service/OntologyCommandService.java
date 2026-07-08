@@ -14,7 +14,6 @@ import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.OntologyRepository;
 import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.persistence.entity.OntologyEntity;
-import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.OntologyCommandPayload;

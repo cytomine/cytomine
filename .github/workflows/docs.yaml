@@ -20,12 +20,16 @@ jobs:
   build-push:
     runs-on: self-hosted
 
+    permissions:
+      contents: read
+      pull-requests: write
+
     env:
       IMAGE: registry.cytomine.org/cytomine/documentation
       IMAGE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout the repository
         uses: actions/checkout@v7.0.0
         with:
           ref: ${{ env.IMAGE_SHA }}
@@ -45,6 +49,11 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_TOKEN }}
 
+      - name: Compute production image tag
+        if: github.event_name == 'push'
+        id: prod
+        run: echo "tag=main-${GITHUB_SHA::7}-$(date +%s)" >> "$GITHUB_OUTPUT"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
         with:
@@ -54,6 +63,7 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:${{ env.IMAGE_SHA }}
             ${{ github.event_name == 'push' && format('{0}:latest', env.IMAGE) || '' }}
+            ${{ github.event_name == 'push' && format('{0}:{1}', env.IMAGE, steps.prod.outputs.tag) || '' }}
           cache-from: type=registry,ref=${{ env.IMAGE }}-build-cache
           cache-to: type=registry,ref=${{ env.IMAGE }}-build-cache,mode=min
 
@@ -65,6 +75,18 @@ jobs:
           exit-code: '0'
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+
+      - name: Add preview label
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ["docs-preview"],
+            });
 
       - name: Add preview link
         if: github.event_name == 'pull_request'

@@ -25,6 +25,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -80,6 +82,7 @@ public class User extends CytomineDomain {
     protected String email;
 
     @Deprecated
+    @Enumerated(EnumType.STRING)
     protected Language language;
 
     @Deprecated

@@ -1,7 +1,9 @@
 package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
+import java.util.Set;
 
+import org.cytomine.repository.persistence.entity.RoleEntity;
 import org.cytomine.repository.persistence.entity.UserEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -29,7 +31,8 @@ public interface UserMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", source = "now")
     @Mapping(target = "developer", source = "entity.developer")
-    UserEntity mapToUserEntity(CreateUser entity, long userId, Timestamp now);
+    @BeanMapping(ignoreUnmappedSourceProperties = {"role"})
+    UserEntity mapToUserEntity(CreateUser entity, long userId, Timestamp now, Set<RoleEntity> roles);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted"})
     UserCommandPayload mapToUserCommandPayload(UserEntity entity);

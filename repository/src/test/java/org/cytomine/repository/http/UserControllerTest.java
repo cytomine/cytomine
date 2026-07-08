@@ -37,7 +37,7 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
 
     CreateUser createPayload =
         new CreateUser(UUID.randomUUID().toString(), Optional.empty(), Optional.empty(), Optional.empty(),
-            UUID.randomUUID().toString(), Optional.empty(), false, Set.of(), "EN");
+            UUID.randomUUID().toString(), Optional.empty(), false, "ROLE_ADMIN", "EN");
 
     UpdateUser updatePayload =
         new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),

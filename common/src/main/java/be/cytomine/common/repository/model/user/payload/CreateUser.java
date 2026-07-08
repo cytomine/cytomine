@@ -12,6 +12,6 @@ public record CreateUser(String username,
                          String email,
                          Optional<String> origin,
                          boolean developer,
-                         Set<RoleResponse> roles,
+                         String role,
                          String language) {
 }

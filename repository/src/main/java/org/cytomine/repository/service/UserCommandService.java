@@ -2,13 +2,16 @@ package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.UserMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.persistence.UserRepository;
+import org.cytomine.repository.persistence.entity.RoleEntity;
 import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +26,8 @@ import be.cytomine.common.repository.model.command.request.UpdateUserCommand;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.common.repository.model.user.payload.UpdateUser;
 
+import static java.lang.String.format;
+
 @RequiredArgsConstructor
 @Component
 @Getter
@@ -33,6 +38,7 @@ public class UserCommandService
     private final UserRepository userRepository;
     private final CommandMapper commandMapper;
     private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
 
     @Override
     public UserEntity updateEntityWithEntity(UserEntity entity, UpdateUser payload, Timestamp now) {
@@ -55,7 +61,10 @@ public class UserCommandService
 
     @Override
     public UserEntity mapCreateToEntity(CreateUser createPayload, long userId, Timestamp creationDate) {
-        return userMapper.mapToUserEntity(createPayload, userId, creationDate);
+        Optional<RoleEntity> maybeRole = roleRepository.findByAuthority(createPayload.role());
+        RoleEntity roleEntity = maybeRole.orElseThrow(
+            () -> new IllegalArgumentException(format("Role not found %s", createPayload.role())));
+        return userMapper.mapToUserEntity(createPayload, userId, creationDate, Set.of(roleEntity));
     }
 
     @Override

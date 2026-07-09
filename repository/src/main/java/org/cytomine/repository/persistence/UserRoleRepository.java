@@ -11,10 +11,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface UserRoleRepository extends JpaRepository<UserRoleEntity, Long> {
+
     Optional<UserRoleEntity> findByIdAndDeletedNull(long id);
+
     Page<UserRoleEntity> findAllBySecUserIdAndDeletedNull(long secUserId, Pageable pageable);
-    Optional<UserRoleEntity> findBySecUserIdAndSecRoleIdAndDeletedNull(long secUserId, long secRoleId);
+
     List<UserRoleEntity> findAllBySecUserIdAndDeletedNull(long secUserId);
+
+    Optional<UserRoleEntity> findBySecUserIdAndSecRoleIdAndDeletedNull(long secUserId, long secRoleId);
 
     @Query(value = """
         SELECT ur.* FROM sec_user_sec_role ur

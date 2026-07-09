@@ -69,7 +69,8 @@ public class UserRoleCommandService implements
     }
 
     @Override
-    public UserRoleEntity updateEntityWithPayload(UserRoleEntity entity, UserRoleCommandPayload payload, Timestamp now) {
+    public UserRoleEntity updateEntityWithPayload(
+            UserRoleEntity entity, UserRoleCommandPayload payload, Timestamp now) {
         return userRoleMapper.updateWithPayload(entity, payload, now);
     }
 

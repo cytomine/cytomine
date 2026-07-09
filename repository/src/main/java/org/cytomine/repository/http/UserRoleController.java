@@ -32,9 +32,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequestMapping(ROOT_PATH)
 public class UserRoleController implements UserRoleHttpContract {
 
-    private static final List<String> ROLE_ORDER = List.of(
-        "ROLE_GUEST", "ROLE_USER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN"
-    );
+    private static final List<String> ROLE_ORDER = List.of("ROLE_GUEST", "ROLE_USER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN");
 
     private final UserRoleCommandService service;
     private final UserRoleRepository repository;
@@ -78,8 +76,7 @@ public class UserRoleController implements UserRoleHttpContract {
 
     @Override
     public Optional<UserRoleResponse> getByUserIdAndRoleId(long userId, long roleId) {
-        return repository.findBySecUserIdAndSecRoleIdAndDeletedNull(userId, roleId)
-            .map(mapper::mapToUserRoleResponse);
+        return repository.findBySecUserIdAndSecRoleIdAndDeletedNull(userId, roleId).map(mapper::mapToUserRoleResponse);
     }
 
     @Override
@@ -92,15 +89,14 @@ public class UserRoleController implements UserRoleHttpContract {
 
         for (int i = 0; i < ROLE_ORDER.size(); i++) {
             String authority = ROLE_ORDER.get(i);
-            RoleEntity role = roleRepository.findByAuthorityAndDeletedNull(authority)
-                .orElse(null);
-            if (role == null) continue;
+            Optional<RoleEntity> maybeRole = roleRepository.findByAuthorityAndDeletedNull(authority);
 
-            Optional<UserRoleEntity> existing = repository.findBySecUserIdAndSecRoleIdAndDeletedNull(
-                userId, role.getId());
+            Optional<UserRoleEntity> existing = maybeRole.flatMap(
+                existingUserRole -> repository.findBySecUserIdAndSecRoleIdAndDeletedNull(userId,
+                    existingUserRole.getId()));
 
             if (i <= targetLevel && existing.isEmpty()) {
-                service.create(requestingUserId, new CreateUserRole(userId, role.getId()), now);
+                maybeRole.map(role -> service.create(requestingUserId, new CreateUserRole(userId, role.getId()), now));
             } else if (i > targetLevel && existing.isPresent()) {
                 service.delete(requestingUserId, existing.get().getId(), now);
             }

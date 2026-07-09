@@ -16,6 +16,7 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import be.cytomine.common.repository.http.RoleHttpContract;
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
@@ -75,6 +76,11 @@ public class RepositoryClient {
     @Bean
     StorageHttpContract storageServiceClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, StorageHttpContract.class);
+    }
+
+    @Bean
+    RoleHttpContract roleServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, RoleHttpContract.class);
     }
 
     @Bean

@@ -63,7 +63,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         getJdbcTemplate().update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)", userId,
             UUID.randomUUID());
         getJdbcTemplate().update(
-            "INSERT INTO sec_role (id, version, authority) SELECT nextval('hibernate_sequence'), 0, 'ROLE_ADMIN' "
+            "INSERT INTO sec_role (version, authority) SELECT 0, 'ROLE_ADMIN' "
                 + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
         Long userRoleId = getJdbcTemplate().queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         getJdbcTemplate().update(

@@ -94,6 +94,12 @@ jobs:
 
           kubectl -n $NS apply -f .github/workflows/tests/test-dataset-pvc.yaml
           kubectl -n $NS create configmap test-dataset-metadata --from-file=dataset.xml=e2e-tests/src/test/resources/dataset.xml
+          kubectl -n $NS create configmap test-dataset-metadata-image --from-file=image.xml=e2e-tests/src/test/resources/image.xml
+          kubectl -n $NS create configmap test-dataset-metadata-observation --from-file=observation.xml=e2e-tests/src/test/resources/observation.xml
+          kubectl -n $NS create configmap test-dataset-metadata-observer --from-file=observer.xml=e2e-tests/src/test/resources/observer.xml
+          kubectl -n $NS create configmap test-dataset-metadata-policy --from-file=policy.xml=e2e-tests/src/test/resources/policy.xml
+          kubectl -n $NS create configmap test-dataset-metadata-sample --from-file=sample.xml=e2e-tests/src/test/resources/sample.xml
+          kubectl -n $NS create configmap test-dataset-metadata-staining --from-file=staining.xml=e2e-tests/src/test/resources/staining.xml
 
       - name: Populate test dataset PVC with real image
         run: |

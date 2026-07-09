@@ -48,6 +48,12 @@ spec:
               mkdir -p /data/dataset-id/test-project/IMAGES
               mkdir -p /data/dataset-id/test-project/METADATA
               cp /tmp/metadata/dataset.xml /data/dataset-id/test-project/METADATA/dataset.xml
+              cp /tmp/metadata/image.xml /data/dataset-id/test-project/METADATA/image.xml
+              cp /tmp/metadata/observation.xml /data/dataset-id/test-project/METADATA/observation.xml
+              cp /tmp/metadata/observer.xml /data/dataset-id/test-project/METADATA/observer.xml
+              cp /tmp/metadata/sample.xml /data/dataset-id/test-project/METADATA/sample.xml
+              cp /tmp/metadata/staining.xml /data/dataset-id/test-project/METADATA/staining.xml
+              cp /tmp/metadata/policy.xml /data/dataset-id/test-project/METADATA/policy.xml
               cp /tmp/images/cat.png /data/dataset-id/test-project/IMAGES/cat.png
           volumeMounts:
             - mountPath: /data
@@ -61,7 +67,21 @@ spec:
           persistentVolumeClaim:
             claimName: test-dataset-pvc
         - name: dataset-metadata
-          configMap:
-            name: test-dataset-metadata
+          projected:
+            sources:
+              - configMap:
+                  name: test-dataset-metadata
+              - configMap:
+                  name: test-dataset-metadata-image
+              - configMap:
+                  name: test-dataset-metadata-observation
+              - configMap:
+                  name: test-dataset-metadata-observer
+              - configMap:
+                  name: test-dataset-metadata-policy
+              - configMap:
+                  name: test-dataset-metadata-sample
+              - configMap:
+                  name: test-dataset-metadata-staining
         - name: image-staging
           emptyDir: {}

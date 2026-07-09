@@ -1,0 +1,2973 @@
+<?xml version="1.0" encoding="utf-8"?>
+<STAINING_SET>
+	<STAINING alias="STAINING_LIST_SVJRDtSiGX">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_cvSsmIXQbn">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_ICpWklpSUX">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_GPwnYGaPPN">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_RUmBKOqugQ">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_AeMznmYUbo">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_xgxJzaOEeW">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_XlVapiaZRV">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_mBlTHwfDYk">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_RojBafKXFn">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_UAQnwjPxVO">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_tmPVkiVcjh">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_SVGYxlWLUK">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_GzVuakNuZd">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_IFsSTuqsQb">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_vDGYAXTNFc">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_BTsjsfBMEE">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_sXllIdZnCK">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_hlJfABVzge">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_JQxckcDrgu">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_mslEvjhsFh">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_yDhcwzeJHZ">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_olIHyVqAAq">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_yoDECOZjKl">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_CgLklaiDaH">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_eWYltpvFpD">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_ZBRgbVaWlD">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_savPYelXRG">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_FZNdRdUuZn">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_GtGGtnMKpG">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_bolCKcBPXB">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_ZewnZWZCiD">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_XBfrtgDUnw">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_XMlFoSbrjo">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_RiSHWvXQkQ">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_MROhSAfLbC">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_CqPXAZKrdB">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_dMiDPauwuz">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_XAUWRrQTLV">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_lFygXaTHty">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_iWfUAvtEsS">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_CjyQfQApZO">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_dfjSnBShFN">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_ZvXxDlsiMW">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_JfDBDiswPv">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_toYjHZwSAL">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_JdodKfBQpH">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_zJVKEbagDj">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_keVEtWboIY">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_cXDQINVKPP">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_PIBRcUfGbI">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_CefaDxruQb">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_QszCaUTaJx">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_cKoMZKMlFO">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_OZkGaoFZfG">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_NBonoQXKaK">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_qZIxOVUtbB">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_PnYCwuvxsr">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_lKPCzNunOv">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_GkzRfcFQZF">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_uCGcFPYUVE">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_qmmDVVxiPu">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_MlodyxNYkj">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_jrlMVQjKLL">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_IvPwfVgbaF">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_EsyPyswOle">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_uHxQbbWwon">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_XEBgdjtgjm">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_ccSQelmolS">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_AicgbnWtSa">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_SQjYWgwfAR">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_KeBDYbGUrQ">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_zkUsJiVAwK">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_XSjsEydwvf">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_izNpywxcwu">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_BaMUkwenxp">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_jBLQUTnYAF">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_mnLaeWeDNK">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_MMZQbvaQMw">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_SYEpZYYZRG">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_YBIsCjyhjQ">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_SxLvgZhFvD">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_ojQaOUexiu">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_EedWgGpXFN">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_wOKoPhxYDc">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_IXVtOVavNQ">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_TrnbJfcRBk">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_cagbbRNeoU">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_JacACmMIcX">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+	<STAINING alias="STAINING_LIST_MABPphjfcO">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710003</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879007</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
+</STAINING_SET>

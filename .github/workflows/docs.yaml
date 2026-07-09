@@ -50,13 +50,22 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_TOKEN }}
 
+      - name: Log in to Docker registry
+        uses: docker/login-action@v4
+        if: github.ref_name == 'main'
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
         with:
           context: ./docs/
           file: ./docs/Dockerfile
           push: true
-          tags: ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+          tags: |
+            ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ github.ref_name == 'main' && 'cytomine/documentation:latest' || '' }}
           cache-from: type=registry,ref=${{ env.IMAGE }}-build-cache
           cache-to: type=registry,ref=${{ env.IMAGE }}-build-cache,mode=min
 

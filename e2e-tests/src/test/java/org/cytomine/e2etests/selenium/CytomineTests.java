@@ -214,6 +214,23 @@ public class CytomineTests {
     }
 
     @Test
+    void addImageToStorageAndSort() {
+        Set<String> imageNames = Set.of(
+            "selenium-" + randomUUID() + ".png",
+            "selenium-" + randomUUID() + ".png",
+            "selenium-" + randomUUID() + ".png"
+        );
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        imageNames.forEach(name -> cytomineSteps.addImage(wait, cytomineUrl, name, Optional.empty()));
+
+        cytomineSteps.sortImagesInStorage(wait, cytomineUrl, imageNames);
+
+        imageNames.forEach(name -> cytomineSteps.deleteImage(wait, cytomineUrl, name));
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
     void addTermToOntology() {
         String ontologyName = "selenium-ontology-" + randomUUID();
         String termName = "selenium-term-" + randomUUID();

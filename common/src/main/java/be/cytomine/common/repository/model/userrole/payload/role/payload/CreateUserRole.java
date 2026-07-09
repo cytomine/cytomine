@@ -1,3 +1,3 @@
 package be.cytomine.common.repository.model.userrole.payload.role.payload;
 
-public record CreateUserRole() {}
+public record CreateUserRole(long userId, long roleId) {}

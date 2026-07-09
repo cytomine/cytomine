@@ -1,6 +1,7 @@
 package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,7 +72,9 @@ public class UserRoleController implements UserRoleHttpContract {
 
     @Override
     public Optional<UserRoleResponse> getHighestByUserId(long userId) {
-        return repository.findHighestBySecUserId(userId).map(mapper::mapToUserRoleResponse);
+        return repository.findAllBySecUserIdAndDeletedNull(userId).stream().max(
+            Comparator.comparingLong(UserRoleEntity::getSecRoleId)
+        ).map(mapper::mapToUserRoleResponse);
     }
 
     @Override

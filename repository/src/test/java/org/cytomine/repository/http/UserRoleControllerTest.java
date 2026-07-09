@@ -41,18 +41,6 @@ class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRol
     ApplyCommandResponseMapper applyCommandResponseMapper;
 
     @Override
-    public void beforeCreate(long userId) {
-        Long targetUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)",
-            targetUserId, UUID.randomUUID());
-
-        Long roleId = jdbcTemplate.queryForObject(
-            "SELECT id FROM sec_role WHERE authority = 'ROLE_ADMIN'", Long.class);
-
-        createPayload = new CreateUserRole(targetUserId, roleId);
-    }
-
-    @Override
     public UserRoleResponse expectedUpdatedResponse(UserRoleResponse response, UpdateUserRole updatePayload,
         LocalDateTime updatedTime) {
         return new UserRoleResponse(

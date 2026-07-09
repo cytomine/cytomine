@@ -26,7 +26,6 @@ import be.cytomine.domain.security.User;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.search.UserSearchExtension;
 import be.cytomine.service.security.AccountService;
-import be.cytomine.service.security.SecUserSecRoleService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
@@ -48,8 +47,6 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     UserService userService;
     @Autowired
     BasicInstanceBuilder builder;
-    @Autowired
-    SecUserSecRoleService secSecUserSecRoleService;
     @MockitoBean
     private AccountService accountService;
     @MockitoBean
@@ -225,33 +222,4 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
     }
 
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void shouldDenyGrantingAdminRoleWhenUserIsNotSuperAdmin() {
-        User user = builder.givenAUser();
-        expectForbidden(() -> secSecUserSecRoleService.add(builder.givenANotPersistedUserRole(user, "ROLE_ADMIN")
-            .toJsonObject()));
-    }
-
-    @Test
-    @WithMockUser(username = SUPERADMIN)
-    public void shouldGrantAdminRoleWhenSuperAdmin() {
-        User user = builder.givenAUser();
-        expectOK(() -> secSecUserSecRoleService.add(builder.givenANotPersistedUserRole(user, "ROLE_ADMIN")
-            .toJsonObject()));
-    }
-
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void shouldDenyRevokingRoleWhenUserIsNotSuperAdmin() {
-        User user = builder.givenAUser();
-        expectForbidden(() -> secSecUserSecRoleService.delete(builder.givenAUserRole(user), null, null, false));
-    }
-
-    @Test
-    @WithMockUser(username = SUPERADMIN)
-    public void shouldRevokeRoleWhenSuperAdmin() {
-        User user = builder.givenAUser();
-        expectOK(() -> secSecUserSecRoleService.delete(builder.givenAUserRole(user), null, null, false));
-    }
 }

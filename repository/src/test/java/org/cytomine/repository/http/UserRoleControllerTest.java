@@ -1,5 +1,7 @@
 package org.cytomine.repository.http;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -7,6 +9,9 @@ import java.util.UUID;
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.persistence.RoleRepository;
+import org.cytomine.repository.persistence.UserRepository;
+import org.cytomine.repository.persistence.entity.RoleEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -30,7 +35,8 @@ class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRol
     String apiURL = UserRoleHttpContract.ROOT_PATH;
     CreateUserRole createPayload;
     UpdateUserRole updatePayload = new UpdateUserRole(Optional.empty());
-
+    @Autowired
+    RoleRepository roleRepository;
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -41,15 +47,16 @@ class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRol
     ApplyCommandResponseMapper applyCommandResponseMapper;
 
     @Override
+    public void beforeCreate(long userId) {
+        RoleEntity roleGuest = roleRepository.save(
+            new RoleEntity(null, 0, UUID.randomUUID().toString(), Timestamp.from(Instant.now()), null, null));
+        createPayload = new CreateUserRole(userId, roleGuest.getId());
+    }
+
+    @Override
     public UserRoleResponse expectedUpdatedResponse(UserRoleResponse response, UpdateUserRole updatePayload,
         LocalDateTime updatedTime) {
-        return new UserRoleResponse(
-            response.id(),
-            response.userId(),
-            updatePayload.roleId().orElse(response.roleId()),
-            response.created(),
-            Optional.of(updatedTime),
-            response.deleted()
-        );
+        return new UserRoleResponse(response.id(), response.userId(), updatePayload.roleId().orElse(response.roleId()),
+            response.created(), Optional.of(updatedTime), response.deleted());
     }
 }

@@ -25,8 +25,7 @@ jobs:
       pull-requests: write
 
     env:
-      IMAGE: ${{ github.event_name == 'pull_request' && 'registry.cytomine.org/docker/cytomine/documentation' || 'cytomine/documentation' }}
-      IMAGE_CACHE: registry.cytomine.org/cytomine/documentation-build-cache
+      IMAGE: registry.cytomine.org/cytomine/documentation
       IMAGE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       IMAGE_TAG: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'latest' }}
 
@@ -64,9 +63,11 @@ jobs:
           context: ./docs/
           file: ./docs/Dockerfile
           push: true
-          tags: ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
-          cache-from: type=registry,ref=${{ env.IMAGE_CACHE }}
-          cache-to: type=registry,ref=${{ env.IMAGE_CACHE }},mode=min
+          tags: |
+            ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ github.ref_name == 'main' && 'cytomine/documentation:latest' || '' }}
+          cache-from: type=registry,ref=${{ env.IMAGE }}-build-cache
+          cache-to: type=registry,ref=${{ env.IMAGE }}-build-cache,mode=min
 
       - name: Run Trivy vulnerability scan
         uses: aquasecurity/trivy-action@v0.36.0

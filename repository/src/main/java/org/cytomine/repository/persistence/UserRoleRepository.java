@@ -18,4 +18,5 @@ public interface UserRoleRepository extends JpaRepository<UserRoleEntity, Long> 
 
     Optional<UserRoleEntity> findBySecUserIdAndSecRoleIdAndDeletedNull(long secUserId, long secRoleId);
 
+    Set<UserRoleEntity> findAllBySecUserId(long userId);
 }

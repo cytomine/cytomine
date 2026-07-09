@@ -2,6 +2,7 @@ package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
 
+import org.cytomine.repository.persistence.entity.UserEntity;
 import org.cytomine.repository.persistence.entity.UserRoleEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -13,6 +14,8 @@ import be.cytomine.common.repository.model.userrole.payload.role.payload.CreateU
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface UserRoleMapper {
+
+    UserRoleEntity delete(UserRoleEntity userRoleEntity, Timestamp now);
 
     @Mapping(target = "userId", source = "secUserId")
     @Mapping(target = "roleId", source = "secRoleId")

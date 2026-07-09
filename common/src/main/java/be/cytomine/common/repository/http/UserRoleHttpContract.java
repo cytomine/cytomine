@@ -48,12 +48,9 @@ public interface UserRoleHttpContract {
     @GetExchange("/by-user/{userId}")
     Page<UserRoleResponse> listByUserId(@PathVariable long userId, Pageable pageable);
 
-    @GetExchange("/by-user/{userId}/highest")
-    Optional<UserRoleResponse> getHighestByUserId(@PathVariable long userId);
-
     @GetExchange("/by-user/{userId}/by-role/{roleId}")
     Optional<UserRoleResponse> getByUserIdAndRoleId(@PathVariable long userId, @PathVariable long roleId);
 
     @PutExchange("/define")
-    void define(@RequestParam long userId, @RequestParam long roleId, @RequestParam long requestingUserId);
+    void define(@RequestParam long userId, @RequestParam String targetRole, @RequestParam long requestingUserId);
 }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -43,15 +42,9 @@ public class UserRoleController {
     @GetMapping("/user/{userId}/role.json")
     public CollectionResponse<UserRoleResponse> list(
         @PathVariable long userId,
-        @RequestParam(defaultValue = "false") boolean highest,
         Pageable pageable
     ) {
-        log.debug("GET /user/{}/role.json?highest={}", userId, highest);
-        if (highest) {
-            return userRoleHttpContract.getHighestByUserId(userId)
-                .map(r -> new CollectionResponse<>(java.util.List.of(r), 0, 1, 1, 1))
-                .orElse(new CollectionResponse<>(java.util.List.of(), 0, 1, 0, 0));
-        }
+        log.debug("GET /user/{}/role.json", userId);
         return pageMapper.toCollectionResponse(userRoleHttpContract.listByUserId(userId, pageable));
     }
 

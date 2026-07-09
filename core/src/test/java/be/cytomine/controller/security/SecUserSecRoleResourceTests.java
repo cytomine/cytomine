@@ -72,17 +72,6 @@ public class SecUserSecRoleResourceTests {
 
     @Test
     @Transactional
-    public void listHighestRoles() throws Exception {
-        when(userRoleHttpContract.getHighestByUserId(1L)).thenReturn(
-            Optional.of(userRoleResponse(1L, 1L, 10L)));
-
-        mockMvc.perform(get("/api/user/{user}/role.json", 1L).param("highest", "true"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(1)));
-    }
-
-    @Test
-    @Transactional
     public void getRoles() throws Exception {
         when(userRoleHttpContract.getByUserIdAndRoleId(1L, 10L)).thenReturn(
             Optional.of(userRoleResponse(1L, 1L, 10L)));

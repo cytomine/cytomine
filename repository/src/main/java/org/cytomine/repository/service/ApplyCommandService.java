@@ -13,12 +13,14 @@ import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.request.CreateOntologyCommand;
+import be.cytomine.common.repository.model.command.request.CreateRoleCommand;
 import be.cytomine.common.repository.model.command.request.CreateStorageCommand;
 import be.cytomine.common.repository.model.command.request.CreateTagDomainAssociationCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.CreateUploadedFileCommand;
 import be.cytomine.common.repository.model.command.request.DeleteOntologyCommand;
+import be.cytomine.common.repository.model.command.request.DeleteRoleCommand;
 import be.cytomine.common.repository.model.command.request.DeleteStorageCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTagDomainAssociationCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
@@ -28,6 +30,7 @@ import be.cytomine.common.repository.model.command.request.UndoCreateCommand;
 import be.cytomine.common.repository.model.command.request.UndoDeleteCommand;
 import be.cytomine.common.repository.model.command.request.UndoUpdateCommand;
 import be.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
+import be.cytomine.common.repository.model.command.request.UpdateRoleCommand;
 import be.cytomine.common.repository.model.command.request.UpdateStorageCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTagDomainAssociationCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
@@ -38,6 +41,7 @@ import be.cytomine.common.repository.model.command.request.UpdateUploadedFileCom
 @AllArgsConstructor
 public class ApplyCommandService {
     private final CommandV2Repository commandRepository;
+    private final RoleCommandService roleCommandService;
     private final StorageCommandService storageCommandService;
     private final TagDomainAssociationCommandService tagDomainAssociationCommandService;
     private final TermCommandService termCommandService;
@@ -67,6 +71,12 @@ public class ApplyCommandService {
                     ontologyCommandService.undoDelete(commandEntity.getId(), deleteOntologyCommand, userId, now);
                 case UpdateOntologyCommand updateOntologyCommand ->
                     ontologyCommandService.undoUpdate(commandEntity.getId(), updateOntologyCommand, userId, now);
+                case CreateRoleCommand crc ->
+                    roleCommandService.undoCreate(commandEntity.getId(), crc, userId, now);
+                case UpdateRoleCommand urc ->
+                    roleCommandService.undoUpdate(commandEntity.getId(), urc, userId, now);
+                case DeleteRoleCommand drc ->
+                    roleCommandService.undoDelete(commandEntity.getId(), drc, userId, now);
                 case CreateStorageCommand csc ->
                     storageCommandService.undoCreate(commandEntity.getId(), csc, userId, now);
                 case UpdateStorageCommand usc ->
@@ -94,6 +104,9 @@ public class ApplyCommandService {
                     case CreateOntologyCommand coc ->
                         ontologyCommandService.undoDelete(v.commandId(), new DeleteOntologyCommand(coc.after(), userId),
                             userId, now);
+                    case CreateRoleCommand crc ->
+                        roleCommandService.undoDelete(v.commandId(), new DeleteRoleCommand(crc.after(), userId), userId,
+                            now);
                     case CreateStorageCommand csc ->
                         storageCommandService.undoDelete(v.commandId(), new DeleteStorageCommand(csc.after(), userId),
                             userId, now);
@@ -116,6 +129,9 @@ public class ApplyCommandService {
                     case DeleteOntologyCommand doc -> ontologyCommandService.undoCreate(v.commandId(),
                         new CreateOntologyCommand(doc.before(), userId),
                         userId, now);
+                    case DeleteRoleCommand drc ->
+                        roleCommandService.undoCreate(v.commandId(), new CreateRoleCommand(drc.before(), userId),
+                            userId, now);
                     case DeleteTagDomainAssociationCommand dtdac ->
                         tagDomainAssociationCommandService.undoCreate(v.commandId(),
                             new CreateTagDomainAssociationCommand(dtdac.before(), userId), userId, now);
@@ -129,6 +145,8 @@ public class ApplyCommandService {
                         new UpdateTermCommand(utc.after(), utc.before(), userId), userId, now);
                     case UpdateOntologyCommand uoc -> ontologyCommandService.undoUpdate(v.commandId(),
                         new UpdateOntologyCommand(uoc.after(), uoc.before(), userId), userId, now);
+                    case UpdateRoleCommand urc -> roleCommandService.undoUpdate(v.commandId(),
+                        new UpdateRoleCommand(urc.after(), urc.before(), userId), userId, now);
                     case UpdateStorageCommand usc -> storageCommandService.undoUpdate(v.commandId(),
                         new UpdateStorageCommand(usc.after(), usc.before(), userId), userId, now);
                     case UpdateTagDomainAssociationCommand utdac ->

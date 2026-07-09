@@ -25,7 +25,7 @@ jobs:
       pull-requests: write
 
     env:
-      IMAGE: cytomine/documentation
+      IMAGE: registry.cytomine.org/cytomine/documentation
       IMAGE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       IMAGE_TAG: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'latest' }}
 
@@ -52,6 +52,7 @@ jobs:
 
       - name: Log in to Docker registry
         uses: docker/login-action@v4
+        if: github.ref_name == 'main'
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -62,7 +63,9 @@ jobs:
           context: ./docs/
           file: ./docs/Dockerfile
           push: true
-          tags: ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+          tags: |
+            ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ github.ref_name == 'main' && 'cytomine/documentation:latest' || '' }}
           cache-from: type=registry,ref=${{ env.IMAGE }}-build-cache
           cache-to: type=registry,ref=${{ env.IMAGE }}-build-cache,mode=min
 

@@ -101,7 +101,6 @@ export default {
       openedTopMenu: false,
       hotkeysModal: null,
       appEngineEnabled: constants.APPENGINE_ENABLED,
-      aboutModal: null
     };
   },
   computed: {

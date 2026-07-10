@@ -7,6 +7,7 @@ public enum DataType {
     TAG_DOMAIN_ASSOCIATION,
     TERM,
     TERM_RELATION,
-    UPLOADED_FILE,
     UNDO_COMMAND,
+    UPLOADED_FILE,
+    USER_ROLE,
 }

@@ -13,18 +13,20 @@ import lombok.NoArgsConstructor;
 
 import be.cytomine.common.repository.model.HasTimestampCUD;
 
-@Entity(name = "sec_role")
+@Entity(name = "sec_user_sec_role")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleEntity implements HasTimestampCUD {
+public class UserRoleEntity implements HasTimestampCUD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column
     private long version;
-    @Column
-    private String authority;
+    @Column(name = "sec_role_id")
+    private long secRoleId;
+    @Column(name = "sec_user_id")
+    private long secUserId;
     @Column
     private Timestamp created;
     @Column

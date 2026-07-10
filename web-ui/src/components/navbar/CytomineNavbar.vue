@@ -87,6 +87,7 @@ import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
+import {KeycloakRole} from '@/constants/UserRole.js';
 
 export default {
   name: 'cytomine-navbar',
@@ -106,7 +107,7 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     isAdmin() {
-      return this.$keycloak.hasResourceRole('ADMIN');
+      return this.$keycloak.hasResourceRole(KeycloakRole.ADMIN);
     },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;

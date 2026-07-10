@@ -96,10 +96,11 @@
 <script>
 import {User} from '@/api';
 import {rolesMapping} from '@/utils/role-utils';
-const defaultRole = 'ROLE_GUEST';
-const defaultLanguage = {value: 'EN', name:'English'};
-
+import {UserRole} from '@/constants/UserRole.js';
 import CytomineModal from '@/components/utils/CytomineModal';
+
+const defaultRole = UserRole.GUEST;
+const defaultLanguage = {value: 'EN', name:'English'};
 
 export default {
   name: 'user-modal',
@@ -137,7 +138,6 @@ export default {
       return [
         {field: 'firstname', validationRules: 'required'},
         {field: 'lastname', validationRules: 'required'},
-        //{field: 'username', validationRules: 'required'},
         {field: 'email', validationRules: 'required|email'},
         {field: 'password', validationRules: this.editionMode ? 'min:8' : 'required|min:8'}
       ];
@@ -163,7 +163,7 @@ export default {
       return this.isNotAdmin(currentRole) && !this.isNotAdmin(this.selectedRole);
     },
     isNotAdmin(role) {
-      return role !== 'ROLE_ADMIN' && role !== 'ROLE_SUPER_ADMIN';
+      return role !== UserRole.ADMIN && role !== UserRole.SUPER_ADMIN;
     },
     isAdminConfirmed() {
       return this.adminConfirm || !this.isChangingRoleToAdmin();

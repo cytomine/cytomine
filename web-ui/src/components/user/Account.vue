@@ -167,6 +167,7 @@ import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
 import {MyAccount, User} from '@/api';
 import {rolesMapping} from '@/utils/role-utils';
+import {KeycloakRole, UserRole} from '@/constants/UserRole.js';
 import copyToClipboard from 'copy-to-clipboard';
 
 export default {
@@ -195,7 +196,8 @@ export default {
     currentAccount: get('currentUser/account'),
     role() {
       // Guest > User > Admin
-      let key = this.$keycloak.hasResourceRole('ADMIN') ? 'ROLE_ADMIN' : this.$keycloak.hasResourceRole('USER') ? 'ROLE_USER' : 'ROLE_GUEST';
+      let key = this.$keycloak.hasResourceRole(KeycloakRole.ADMIN) ? UserRole.ADMIN
+        : this.$keycloak.hasResourceRole(KeycloakRole.USER) ? UserRole.USER : UserRole.GUEST;
       return rolesMapping[key];
     },
 

@@ -42,6 +42,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
+import {KeycloakRole} from '@/constants/UserRole.js';
 
 import AdminDashboard from './AdminDashboard';
 import AdminUsers from './AdminUsers';
@@ -67,7 +68,7 @@ export default {
       return this.$route.query.tab;
     },
     isAdmin() {
-      return this.$keycloak.hasResourceRole('ADMIN');
+      return this.$keycloak.hasResourceRole(KeycloakRole.ADMIN);
     },
     // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {

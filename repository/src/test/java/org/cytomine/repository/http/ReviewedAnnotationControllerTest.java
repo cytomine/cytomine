@@ -171,7 +171,8 @@ class ReviewedAnnotationControllerTest {
             new ReviewedAnnotationLinkEntity(termId1, reviewedAnnotationTermsId));
 
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
+        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)", nonAdminUserId,
+            UUID.randomUUID().toString());
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId",

@@ -53,8 +53,8 @@
         <router-link to="/activity" class="navbar-item">
           <span class="icon"><i class="fas fa-history fa-xs"></i></span> {{$t('activity-history')}}
         </router-link>
-        <router-link to="/activity" class="navbar-item">
-          <span class="icon"><i class="fas fa-history fa-xs"></i></span> {{$t('activity-history')}}
+        <router-link to="/history" class="navbar-item">
+          <span class="icon"><i class="fas fa-history fa-xs"></i></span> {{$t('user-history')}}
         </router-link>
         <a class="navbar-item" @click="logout()">
           <span class="icon"><i class="fas fa-power-off fa-xs"></i></span> {{ $t('logout') }}

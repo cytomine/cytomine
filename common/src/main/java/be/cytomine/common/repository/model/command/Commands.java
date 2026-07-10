@@ -29,6 +29,10 @@ public interface Commands {
     String UPDATE_ROLE = "be.cytomine.EditSecRoleCommand";
     String DELETE_ROLE = "be.cytomine.DeleteSecRoleCommand";
 
+    String CREATE_USER_ROLE = "be.cytomine.AddSecUserSecRoleCommand";
+    String UPDATE_USER_ROLE = "be.cytomine.EditSecUserSecRoleCommand";
+    String DELETE_USER_ROLE = "be.cytomine.DeleteSecUserSecRoleCommand";
+
     String UNDO_CREATE_COMMAND = "be.cytomine.UndoCreateCommand";
     String UNDO_DELETE_COMMAND = "be.cytomine.UndoDeleteCommand";
     String UNDO_UPDATE_COMMAND = "be.cytomine.UndoUpdateCommand";

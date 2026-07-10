@@ -56,6 +56,14 @@ public class ACLService {
         return isAdmin(userId);
     }
 
+    public boolean canWriteUserRole(long userId) {
+        return isAdmin(userId);
+    }
+
+    public boolean canDeleteUserRole(long userId) {
+        return isAdmin(userId);
+    }
+
     public List<Long> getAccessibleStorageIds(long userId) {
         if (isAdmin(userId)) {
             return null;

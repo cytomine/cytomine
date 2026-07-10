@@ -57,7 +57,7 @@ class ReviewedAnnotationControllerTest {
         jdbcTemplate.update("INSERT INTO sec_role (id, version, authority) VALUES (?, 0, 'ROLE_ADMIN')", adminRoleId);
         Long userRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update(
-            "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) " + "VALUES (?, 0, ?, ?)",
+            "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) VALUES (?, 0, ?, ?)",
             userRoleId, userId, adminRoleId);
 
         Long ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
@@ -80,15 +80,13 @@ class ReviewedAnnotationControllerTest {
                 + "VALUES (?, 0, ?, 0, 0, ?, ?, 'be.cytomine.domain.image.ImageInstance')", imageInstanceId,
             abstractImageId, projectId, userId);
 
-        termId1 = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update(
-            "INSERT INTO term (id, version, name, color, ontology_id) VALUES (?, 0, 'term1', '#FF0000', ?)", termId1,
-            ontologyId);
+        termId1 = jdbcTemplate.queryForObject(
+            "INSERT INTO term (version, name, color, ontology_id) VALUES (0, 'term1', '#FF0000', ?) RETURNING id",
+            Long.class, ontologyId);
 
-        termId2 = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update(
-            "INSERT INTO term (id, version, name, color, ontology_id) VALUES (?, 0, 'term2', '#00FF00', ?)", termId2,
-            ontologyId);
+        termId2 = jdbcTemplate.queryForObject(
+            "INSERT INTO term (version, name, color, ontology_id) VALUES (0, 'term2', '#00FF00', ?) RETURNING id",
+            Long.class, ontologyId);
 
         reviewedAnnotationTermsId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update(

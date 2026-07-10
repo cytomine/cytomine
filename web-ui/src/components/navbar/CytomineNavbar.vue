@@ -11,10 +11,11 @@
   <div id="topMenu" class="navbar-menu" :class="{'is-active':openedTopMenu}">
     <div class="navbar-start">
       <navbar-dropdown
-      icon="fa-folder-open"
-      v-if="this.nbActiveProjects > 0"
-      :title="$t('workspace')"
-      :listPathes="['/project/']">
+        v-if="this.nbActiveProjects > 0"
+        icon="fa-folder-open"
+        :title="$t('workspace')"
+        :listPathes="['/project/']"
+      >
         <navigation-tree />
       </navbar-dropdown>
       <router-link to="/projects" class="navbar-item">

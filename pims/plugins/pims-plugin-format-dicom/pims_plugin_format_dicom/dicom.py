@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 from functools import cached_property
 from pathlib import Path
-from typing import List, Optional
 
 import shapely
 from pydicom.multival import MultiValue
@@ -68,7 +67,7 @@ def cached_wsi_dicom_file(format: AbstractFormat) -> WsiDicom:
     return format.get_cached('_wsi_dicom', WsiDicom.open, str(format.path))
 
 
-def get_root_file(path: Path) -> Optional[Path]:
+def get_root_file(path: Path) -> Path | None:
     """Try to get WSI DICOM directory (as it is a multi-file format)."""
     if path.is_dir():
         if sum(1 for _ in Path(path).glob('*')):
@@ -206,7 +205,7 @@ class WSIDicomParser(AbstractParser):
 
         return pyramid
 
-    def parse_annotations(self) -> List[ParsedMetadataAnnotation]:
+    def parse_annotations(self) -> list[ParsedMetadataAnnotation]:
         wsidicom_object = cached_wsi_dicom_file(self.format)
         channels = list(range(self.format.main_imd.n_channels))
         parsed_annots = []

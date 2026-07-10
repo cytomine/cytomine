@@ -2,6 +2,8 @@
 
 The documentation site is built using VuePress v1.
 
+The live website is available at <https://doc.uliege.cytomine.org>.
+
 ## Requirements
 
 - [Node](https://nodejs.org/) (v22.22.3+ recommended)

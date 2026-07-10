@@ -436,6 +436,7 @@ public class CytomineTests {
     }
 
     @Test
+    @SneakyThrows
     void filterAnnotationsByTermInProject() {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String imageName = "selenium-" + randomUUID() + ".png";
@@ -452,7 +453,7 @@ public class CytomineTests {
         cytomineSteps.selectTermForAnnotation(wait, termName);
         annotationTools.drawRectangleAnnotation(wait, driver);
         cytomineSteps.verifyAnnotationCreated(wait);
-
+        Thread.sleep(1000);
         cytomineSteps.filterAnnotationsByTerm(wait, projectUrl, termName);
 
         cytomineSteps.deleteProject(wait, projectUrl);
@@ -517,6 +518,7 @@ public class CytomineTests {
     }
 
     @Test
+    @SneakyThrows
     void seeRecentlyViewedProjectsInDashboard() {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String projectName = "selenium-" + randomUUID();
@@ -525,7 +527,7 @@ public class CytomineTests {
         String imageName = "selenium-" + randomUUID() + ".png";
         cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
         cytomineSteps.openImageInViewer(wait, projectUrl);
-
+        Thread.sleep(1000);
         cytomineSteps.checkRecentlyViewedProjects(wait, cytomineUrl, projectName, imageName);
 
         cytomineSteps.deleteProject(wait, projectUrl);

@@ -1,6 +1,6 @@
 package org.cytomine.repository.persistence.entity;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -16,11 +16,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import be.cytomine.common.repository.model.HasTimestampCUD;
+
 @Entity(name = "term")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TermEntity {
+public class TermEntity implements HasTimestampCUD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,11 +36,11 @@ public class TermEntity {
     @Column
     private String color;
     @Column
-    private LocalDateTime created;
+    private Timestamp created;
     @Column
-    private LocalDateTime updated;
+    private Timestamp updated;
     @Column
-    private LocalDateTime deleted;
+    private Timestamp deleted;
     @Column
     private String comment;
 

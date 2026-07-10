@@ -8,13 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.cytomine.domain.image.Mime;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.domain.meta.ConfigurationReadingRole;
 import be.cytomine.domain.processing.ImageFilter;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
-import be.cytomine.repository.image.MimeRepository;
 import be.cytomine.repository.meta.ConfigurationRepository;
 import be.cytomine.repository.processing.ImageFilterRepository;
 import be.cytomine.repository.security.SecRoleRepository;
@@ -37,8 +35,6 @@ public class BootstrapUtilsService {
     private final StorageService storageService;
 
     private final ImageFilterRepository imageFilterRepository;
-
-    private final MimeRepository mimeRepository;
 
     private final ConfigurationRepository configurationRepository;
 
@@ -76,15 +72,6 @@ public class BootstrapUtilsService {
         filter.setMethod(method);
         filter.setAvailable(available);
         imageFilterRepository.save(filter);
-    }
-
-    public void createMime(String extension, String mimeType) {
-        if (mimeRepository.findByMimeType(mimeType).isEmpty()) {
-            Mime mime = new Mime();
-            mime.setMimeType(mimeType);
-            mime.setExtension(extension);
-            mimeRepository.save(mime);
-        }
     }
 
     public void createConfigurations(String key, String value, ConfigurationReadingRole readingRole) {

@@ -14,7 +14,6 @@ export default class SliceInstance extends Model {
     this.uploadedFile = null;
     this.path = null;
     this.image = null;
-    this.mime = null;
 
     this.channel = null;
     this.zStack = null;

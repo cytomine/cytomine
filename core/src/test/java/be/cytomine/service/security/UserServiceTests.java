@@ -803,22 +803,6 @@ public class UserServiceTests {
     }
 
     @Test
-    void listOntologyUsers() {
-        User user = builder.givenSuperAdmin();
-
-        Project projectWhereUserIsManager = builder.givenAProject();
-        Project projectWhereUserIsContributor = builder.givenAProject();
-
-        builder.addUserToProject(projectWhereUserIsManager, "superadmin", ADMINISTRATION);
-        builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
-
-        assertThat(userService.listUsers(projectWhereUserIsManager.getOntology()))
-            .contains(user);
-        assertThat(userService.listUsers(projectWhereUserIsContributor.getOntology()))
-            .contains(user);
-    }
-
-    @Test
     void listStorageUsers() {
         Storage storage = builder.givenAStorage(builder.givenSuperAdmin());
 
@@ -1205,24 +1189,5 @@ public class UserServiceTests {
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
-    }
-
-    @Test
-    void addAndDeleteUserToStorage() {
-        User user = builder.givenAUser();
-        Storage storage = builder.givenAStorage();
-
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isFalse();
-
-        userService.addUserToStorage(user, storage);
-
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isTrue();
-
-        userService.deleteUserFromStorage(user, storage);
-
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(storage, user.getUsername(), READ)).isFalse();
     }
 }

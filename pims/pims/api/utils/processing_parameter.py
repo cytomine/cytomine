@@ -12,7 +12,7 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from pims.api.exceptions import ColormapNotFoundProblem, FilterNotFoundProblem
 from pims.api.utils.models import BitDepthEnum, ColormapEnum, ColormapId, IntensitySelectionEnum

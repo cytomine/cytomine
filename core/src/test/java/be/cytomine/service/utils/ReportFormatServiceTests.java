@@ -22,7 +22,6 @@ import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.Point;
-import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.utils.JsonObject;
 
@@ -39,8 +38,6 @@ public class ReportFormatServiceTests {
     ReportFormatService reportFormatService;
     @Autowired
     BasicInstanceBuilder builder;
-    @Autowired
-    TermService termService;
     @Autowired
     WiremockRepository wiremockRepository;
     private Object[][] expectedDataObject;
@@ -85,7 +82,7 @@ public class ReportFormatServiceTests {
     public void annotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
-            buildAnnotations(true)
+            buildAnnotations(true), 1
         );
         assertArrayEquals(expectedDataObject, dataObject);
     }
@@ -94,7 +91,7 @@ public class ReportFormatServiceTests {
     public void incompleteAnnotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
-            buildAnnotations(false)
+            buildAnnotations(false), 1
         );
         assertArrayEquals(expectedDataObject, dataObject);
     }
@@ -103,7 +100,7 @@ public class ReportFormatServiceTests {
     public void reviewedAnnotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
-            buildAnnotations(true)
+            buildAnnotations(true), 1
         );
         assertArrayEquals(expectedDataObject, dataObject);
     }
@@ -112,7 +109,7 @@ public class ReportFormatServiceTests {
     public void incompleteReviewedAnnotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
-            buildAnnotations(false)
+            buildAnnotations(false), 1
         );
         assertArrayEquals(expectedDataObject, dataObject);
     }
@@ -234,9 +231,7 @@ public class ReportFormatServiceTests {
                 "1234567",
                 "Beautiful image",
                 "Paul",
-                termService.find(term1.getId()).get().name() + "- " + termService.find(term2.getId())
-                    .get()
-                    .name(),
+                term1.getName() + "- " + term2.getName(),
                 "http://cropURL",
                 "http://imageURL"
             },

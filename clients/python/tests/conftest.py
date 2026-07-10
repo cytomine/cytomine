@@ -17,7 +17,7 @@
 import logging
 import random
 import string
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
@@ -37,16 +37,13 @@ from cytomine.models import (
     User,
 )
 
-
 def random_string(length: int = 10) -> str:
     return "".join(random.choice(string.ascii_letters) for _ in range(length))
-
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--host", action="store")
     parser.addoption("--public_key", action="store")
     parser.addoption("--private_key", action="store")
-
 
 @pytest.fixture(scope="session")
 def connect(request: pytest.FixtureRequest) -> Cytomine:
@@ -60,10 +57,9 @@ def connect(request: pytest.FixtureRequest) -> Cytomine:
     c.open_admin_session()
     return c
 
-
 @pytest.fixture(scope="session")
-def dataset(request: pytest.FixtureRequest) -> Dict[str, Any]:
-    data: Dict[str, Any] = {}
+def dataset(request: pytest.FixtureRequest) -> dict[str, Any]:
+    data: dict[str, Any] = {}
     data["user"] = User(
         random_string(),
         random_string(),
@@ -134,7 +130,6 @@ def dataset(request: pytest.FixtureRequest) -> Dict[str, Any]:
         z_stack=0,
         time=0,
         id_uploaded_file=data["uploaded_file"].id,
-        mime="image/pyrtiff",
     ).save()
 
     data["image_instance"] = ImageInstance(

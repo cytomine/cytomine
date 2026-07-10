@@ -51,6 +51,7 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.AnnotationListingService;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.annotation.AnnotationReportService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.middleware.ImageServerService;
@@ -83,6 +84,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final ReportService reportService;
 
     private final UserService userService;
+
+    private final CurrentUserService currentUserService;
 
     private final EntityManager entityManager;
 
@@ -167,7 +170,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
         bodyMap.put("afterThan", afterThan);
 
         JsonObject parameters = new JsonObject(bodyMap);
-        byte[] report = annotationReportService.downloadDocumentByProject(parameters, project);
+        byte[] report = annotationReportService.downloadDocumentByProject(parameters, project,
+            currentUserService.getCurrentUser().getId());
         String filename = reportService.getAnnotationReportFileName(reportType.getLabel(), project.getName());
 
         return buildReportResponse(filename, report, reportType);
@@ -273,7 +277,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
         }
 
         //get term
-        List<Long> terms = paramsService.getParamsTermList(params.getJSONAttrStr("terms"), image.getProject());
+        List<Long> terms = paramsService.getParamsTermList(params.getJSONAttrStr("terms"), image.getProject(),
+            currentUserService.getCurrentUser().getId());
 
         List response;
         if (user == null) {

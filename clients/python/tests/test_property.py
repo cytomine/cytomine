@@ -14,10 +14,9 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-# pylint: disable=unused-argument
 
 import os
-from typing import Any, Dict
+from typing import Any
 
 from cytomine.cytomine import Cytomine
 from cytomine.models import (
@@ -33,11 +32,10 @@ from cytomine.models import (
 )
 from tests.conftest import random_string
 
-
 class TestProperty:
-    def test_property(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_property(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         value = random_string()
-        property = Property(  # pylint: disable=redefined-builtin
+        property = Property(
             dataset["project"],
             "key",
             value,
@@ -62,13 +60,12 @@ class TestProperty:
         property.delete()
         assert not Property(dataset["project"]).fetch(property.id)
 
-    def test_properties(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_properties(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         properties = PropertyCollection(dataset["project"]).fetch()
         assert isinstance(properties, PropertyCollection)
 
-
 class TestAttachedFile:
-    def test_attached_file(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_attached_file(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         filename = os.path.dirname(__file__) + "/data/attached_file.txt"
         filename_base = os.path.basename(filename)
         attached_file = AttachedFile(dataset["project"], filename).save()
@@ -92,13 +89,12 @@ class TestAttachedFile:
         # attached_file.delete()
         # assert (not AttachedFile(dataset["project"]).fetch(attached_file.id))
 
-    def test_attached_files(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_attached_files(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         attached_files = AttachedFileCollection(dataset["project"]).fetch()
         assert isinstance(attached_files, AttachedFileCollection)
 
-
 class TestDescription:
-    def test_description(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_description(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         data = random_string()
         description = Description(dataset["project"], data).save()
         assert isinstance(description, Description)
@@ -117,9 +113,8 @@ class TestDescription:
         description.delete()
         assert not Description(dataset["project"]).fetch(description.id)
 
-
 class TestTag:
-    def test_tag(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_tag(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         name = random_string()
         tag = Tag(name).save()
         assert isinstance(tag, Tag)
@@ -141,16 +136,15 @@ class TestTag:
         tag = Tag().save()
         assert tag is False
 
-    def test_tags(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_tags(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         tags = TagCollection().fetch()
         assert isinstance(tags, TagCollection)
-
 
 class TestTagDomainAssociation:
     def test_tag_domain_association(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         tda = TagDomainAssociation(dataset["project"], dataset["tag"].id).save()
         assert isinstance(tda, TagDomainAssociation)
@@ -167,7 +161,7 @@ class TestTagDomainAssociation:
     def test_tag_domain_association_by_projects(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         tags = TagDomainAssociationCollection(dataset["project"]).fetch()
         assert isinstance(tags, TagDomainAssociationCollection)

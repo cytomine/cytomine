@@ -18,6 +18,7 @@ package be.cytomine.controller.security;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.EntityManager;
@@ -41,6 +42,7 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Term;
+import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.security.SecRoleRepository;
@@ -180,12 +182,12 @@ public class SecUserSecRoleResourceTests {
         long relationId = 42L;
         UUID commandId = UUID.randomUUID();
         TermRelationResponse response = new TermRelationResponse(
-            relationId, term1.getId(), term2.getId(), term1.getOntology().getId(), 1L,
-            LocalDateTime.now(), Optional.empty(), LocalDateTime.now(), "parent"
+            relationId, term1.getId(), term2.getId(),  1L,
+            Optional.empty(), Optional.empty(), LocalDateTime.now(), "parent"
         );
 
         when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(
-            Optional.of(new HttpCommandResponse(true, response, commandId, Commands.DELETE_TERM_RELATION)));
+            Optional.of(new HttpCommandResponse(true, response, commandId, Commands.DELETE_TERM_RELATION, Set.of())));
 
         restSecUserSecRoleControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationId))
             .andExpect(status().isOk())
@@ -208,7 +210,7 @@ public class SecUserSecRoleResourceTests {
             .andExpect(status().isOk());
 
         em.refresh(user);
-        assertThat(user.getRoles().stream().map(x -> x.getAuthority()))
+        assertThat(user.getRoles().stream().map(SecRole::getAuthority))
             .containsExactlyInAnyOrder("ROLE_ADMIN", "ROLE_USER", "ROLE_GUEST");
     }
 

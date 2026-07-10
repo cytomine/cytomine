@@ -227,9 +227,8 @@ public class StatsResourceTests {
     void statsTermSlide() throws Exception {
         Project project = builder.givenAProject();
         long userId = builder.givenSuperAdmin().getId();
-        long ontologyId = project.getOntology().getId();
 
-        when(statsHttpContract.findTermsByProject(eq(ontologyId), eq(userId), any(), any(), any(Pageable.class)))
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(new StatTerm(0L, "No term", "#fff", 0))));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termslide.json", project.getId()))
@@ -238,7 +237,7 @@ public class StatsResourceTests {
 
         Term term = builder.givenATerm(project.getOntology());
 
-        when(statsHttpContract.findTermsByProject(eq(ontologyId), eq(userId), any(), any(), any(Pageable.class)))
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(
                 new StatTerm(0L, "No term", "#fff", 0),
                 new StatTerm(term.getId(), term.getName(), term.getColor(), 0)

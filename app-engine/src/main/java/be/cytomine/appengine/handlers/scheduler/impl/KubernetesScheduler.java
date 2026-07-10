@@ -117,35 +117,32 @@ public class KubernetesScheduler implements SchedulerHandler {
 
         Run run = schedule.getRun();
         String runId = run.getId().toString();
-
-
         Task task = run.getTask();
         String runSecret = String.valueOf(run.getSecret());
 
         log.info("Schedule: create task pod...");
 
         // Define helper container resources
-        ResourceRequirementsBuilder helperContainersResourcesBuilder =
-            new ResourceRequirements().toBuilder().addToRequests("cpu", new Quantity(helperContainerCpu))
-                .addToRequests("memory", new Quantity(helperContainerRam))
-                .addToLimits("cpu", new Quantity(helperContainerCpu))
-                .addToLimits("memory", new Quantity(helperContainerRam));
+        ResourceRequirementsBuilder helperContainersResourcesBuilder = new ResourceRequirements().toBuilder()
+            .addToRequests("cpu", new Quantity(helperContainerCpu))
+            .addToRequests("memory", new Quantity(helperContainerRam))
+            .addToLimits("cpu", new Quantity(helperContainerCpu))
+            .addToLimits("memory", new Quantity(helperContainerRam));
 
         ResourceRequirements helperContainersResources = helperContainersResourcesBuilder.build();
 
         // Define task resources for the task
-        ResourceRequirementsBuilder taskResourcesBuilder =
-            new ResourceRequirements().toBuilder().addToRequests("cpu", new Quantity(Integer.toString(task.getCpus())))
-                .addToRequests("memory", new Quantity(task.getRam()))
-                .addToLimits("cpu", new Quantity(Integer.toString(task.getCpus())))
-                .addToLimits("memory", new Quantity(task.getRam()));
+        ResourceRequirementsBuilder taskResourcesBuilder = new ResourceRequirements().toBuilder()
+            .addToRequests("cpu", new Quantity(Integer.toString(task.getCpus())))
+            .addToRequests("memory", new Quantity(task.getRam()))
+            .addToLimits("cpu", new Quantity(Integer.toString(task.getCpus())))
+            .addToLimits("memory", new Quantity(task.getRam()));
 
         if (task.getGpus() > 0) {
-            taskResourcesBuilder =
-                taskResourcesBuilder.addToRequests("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())))
-                    .addToLimits("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())));
+            taskResourcesBuilder = taskResourcesBuilder
+                .addToRequests("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())))
+                .addToLimits("nvidia.com/gpu", new Quantity(Integer.toString(task.getGpus())));
         }
-
 
         String url = baseUrl + runId;
         String and = " && ";
@@ -176,17 +173,16 @@ public class KubernetesScheduler implements SchedulerHandler {
         String fetchInputs = "curl -L -o inputs.zip " + url + "/inputs.zip";
         String unzipInputs = "time unzip -o inputs.zip -d " + task.getInputFolder();
 
-        Container inputContainer = new ContainerBuilder().withName("inputs-provisioning").withImage(taskRunnerImage)
-            .withImagePullPolicy("IfNotPresent").withCommand("/bin/sh", "-c", fetchInputs + and + unzipInputs)
-
-            // request and limit helper container resources
+        Container inputContainer = new ContainerBuilder().withName("inputs-provisioning")
+            .withImage(taskRunnerImage)
+            .withImagePullPolicy("IfNotPresent")
+            .withCommand("/bin/sh", "-c", fetchInputs + and + unzipInputs)
             .withResources(helperContainersResources)
-
-            // Mount volume for inputs provisioning
-            .addNewVolumeMount().withName("inputs").withMountPath(task.getInputFolder()).endVolumeMount()
-
+            .addNewVolumeMount()
+            .withName("inputs")
+            .withMountPath(task.getInputFolder())
+            .endVolumeMount()
             .build();
-
 
         String sendOutputs = "curl -X POST -F 'outputs=@outputs.zip' ";
         sendOutputs += url + "/" + runSecret + "/outputs.zip";
@@ -214,28 +210,22 @@ public class KubernetesScheduler implements SchedulerHandler {
             command = clusterOutputCommand;
         }
 
-        Container outputContainer = new ContainerBuilder().withName("outputs-sending").withImage(taskRunnerImage)
-            .withImagePullPolicy("IfNotPresent").withCommand("/bin/sh", "-c", command)
-
-            // request and limit helper container resources
+        Container outputContainer = new ContainerBuilder().withName("outputs-sending")
+            .withImage(taskRunnerImage)
+            .withImagePullPolicy("IfNotPresent")
+            .withCommand("/bin/sh", "-c", command)
             .withResources(helperContainersResources)
-
             .addNewVolumeMount().withName("outputs").withMountPath(task.getOutputFolder()).endVolumeMount()
-
             .withEnv(new EnvVarBuilder().withName("POD_NAME").withNewValueFrom().withNewFieldRef()
                 .withFieldPath("metadata.name").endFieldRef().endValueFrom().build())
-
             .build();
 
         String permissions = "chmod -R 777 " + task.getInputFolder() + " " + task.getOutputFolder();
         Container permissionContainer = new ContainerBuilder().withName("permissions").withImage(taskRunnerImage)
             .withImagePullPolicy("IfNotPresent").withCommand("/bin/sh", "-c", permissions)
-
             .withResources(helperContainersResources)
-
             .addNewVolumeMount().withName("inputs").withMountPath(task.getInputFolder()).endVolumeMount()
             .addNewVolumeMount().withName("outputs").withMountPath(task.getOutputFolder()).endVolumeMount()
-
             .build();
 
         boolean isClusterMode = this.runMode.equalsIgnoreCase("cluster");
@@ -245,9 +235,7 @@ public class KubernetesScheduler implements SchedulerHandler {
 
         PodBuilder podBuilder = new PodBuilder().withNewMetadata().withName(podName).withNamespace(tasksNamespace)
             .withLabels(Map.of("runId", runId, "app", "task")).endMetadata().withNewSpec()
-
             .withHostNetwork(useHostNetwork).withServiceAccountName("app-engine")
-
             .addNewInitContainerLike(permissionContainer).and().withRestartPolicy("Never").endSpec();
 
         Pod pod = podBuilder.build();
@@ -282,7 +270,6 @@ public class KubernetesScheduler implements SchedulerHandler {
                 // Mount volumes for inputs and outputs
                 .addNewVolumeMount().withName("inputs").withMountPath(task.getInputFolder()).endVolumeMount()
                 .addNewVolumeMount().withName("outputs").withMountPath(task.getOutputFolder()).endVolumeMount()
-
                 .build();
 
         // Add taskContainer unconditionally

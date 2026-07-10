@@ -22,13 +22,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import org.locationtech.jts.io.ParseException;
 import org.springframework.stereotype.Component;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.dto.annotation.AnnotationResult;
@@ -37,7 +37,6 @@ import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.ReviewedAnnotationListing;
 import be.cytomine.repository.UserAnnotationListing;
 import be.cytomine.service.AnnotationListingService;
-import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.security.UserService;
@@ -55,7 +54,7 @@ public class AnnotationListingBuilder {
 
     private final ParamsService paramsService;
 
-    private final TermService termService;
+    private final TermHttpContract termHttpContract;
 
     private final AnnotationListingService annotationListingService;
 
@@ -63,18 +62,13 @@ public class AnnotationListingBuilder {
 
     private final ProjectService projectService;
 
-
-    public byte[] buildAnnotationReport(Long project, String users, JsonObject params, String terms, String format) {
+    public byte[] buildAnnotationReport(Long project, String users, JsonObject params, String terms, String format,
+        long requesterId) {
         List<Map<String, Object>> annotations = buildAnnotationList(params, users);
-        Set<String> termNames = getTermNames(terms);
+        Set<String> termNames = getTermNames(terms, requesterId);
         Set<String> userNames = getUserNames(users);
-        return reportService.generateAnnotationsReport(
-            projectService.get(project).getName(),
-            termNames,
-            userNames,
-            annotations,
-            format
-        );
+        return reportService.generateAnnotationsReport(projectService.get(project).getName(), termNames, userNames,
+            annotations, format, requesterId);
     }
 
     public List<Map<String, Object>> buildAnnotationList(JsonObject params, String users) {
@@ -87,11 +81,8 @@ public class AnnotationListingBuilder {
 
     private List<Map<String, Object>> filterAnnotationByUsers(List<AnnotationResult> annotations, String users) {
         List<Map<String, Object>> filteredAnnotations = new ArrayList<>();
-        List<Long> userIds = Arrays.stream(users.split(","))
-            .sequential()
-            .filter(id -> !id.isEmpty())
-            .map(Long::parseLong)
-            .collect(Collectors.toList());
+        List<Long> userIds =
+            Arrays.stream(users.split(",")).sequential().filter(id -> !id.isEmpty()).map(Long::parseLong).toList();
 
         for (AnnotationResult annotation : annotations) {
             if (userIds.contains((long) annotation.get("user"))) {
@@ -101,7 +92,6 @@ public class AnnotationListingBuilder {
 
         return filteredAnnotations;
     }
-
 
     public AnnotationListing buildAnnotationListing(JsonObject params) {
         AnnotationListing al;
@@ -179,16 +169,14 @@ public class AnnotationListingBuilder {
             }
         }
         if (params.get("bboxAnnotation") != null) {
-            AnnotationDomain annotationDomain = AnnotationDomain.getAnnotationDomain(
-                entityManager,
-                params.getJSONAttrLong("bboxAnnotation")
-            );
+            AnnotationDomain annotationDomain =
+                AnnotationDomain.getAnnotationDomain(entityManager, params.getJSONAttrLong("bboxAnnotation"));
             al.setBboxAnnotation(annotationDomain.getWktLocation());
         }
 
         // Base annotation
-        al.setBaseAnnotation(params.getJSONAttrLong("baseAnnotation") != null
-            ? params.getJSONAttrLong("baseAnnotation") // can be an annotation id
+        al.setBaseAnnotation(params.getJSONAttrLong("baseAnnotation") != null ? params.getJSONAttrLong("baseAnnotation")
+            // can be an annotation id
             : params.getJSONAttrStr("baseAnnotation")); // can be a string (wkt) too
         al.setMaxDistanceBaseAnnotation(params.getJSONAttrLong("maxDistanceBaseAnnotation"));
 
@@ -211,14 +199,11 @@ public class AnnotationListingBuilder {
     /**
      * From a string representing the list of terms ids, get a set of terms name.
      */
-    public Set<String> getTermNames(String terms) {
-        return Arrays.stream(terms.split(","))
-            .filter(termId -> !termId.equals("0"))
-            .filter(termId -> !termId.equals("-1"))
-            .filter(termId -> !termId.isBlank())
-            .flatMap(termId -> termService.find(Long.parseLong(termId)).stream())
-            .map(TermResponse::name)
-            .collect(toSet());
+    public Set<String> getTermNames(String terms, long userId) {
+        return Arrays.stream(terms.split(",")).filter(termId -> !termId.equals("0"))
+            .filter(termId -> !termId.equals("-1")).filter(termId -> !termId.isBlank())
+            .flatMap(termId -> termHttpContract.findTermByID(Long.parseLong(termId), userId).stream())
+            .map(TermResponse::name).collect(toSet());
     }
 
     /**

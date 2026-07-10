@@ -8,17 +8,18 @@ import org.cytomine.repository.mapper.StatsMapper;
 import org.cytomine.repository.persistence.TermRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
 import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 
-@Component
+import static be.cytomine.common.repository.http.StatsHttpContract.ROOT_PATH;
+
+@RestController
+@RequestMapping(ROOT_PATH)
 @RequiredArgsConstructor
 public class StatsController implements StatsHttpContract {
 
@@ -27,12 +28,11 @@ public class StatsController implements StatsHttpContract {
     private final TermRepository termRepository;
 
     @Override
-    @GetMapping("/project/{projectId}")
     public Page<StatTerm> findTermsByProject(
-        @PathVariable long projectId,
-        @RequestParam long userId,
-        @RequestParam(required = false) Optional<LocalDateTime> startDate,
-        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        long projectId,
+        long userId,
+        Optional<LocalDateTime> startDate,
+        Optional<LocalDateTime> endDate,
         Pageable pageable
     ) {
         return termRepository.findAllByProjectForStats(
@@ -44,21 +44,15 @@ public class StatsController implements StatsHttpContract {
     }
 
     @Override
-    @GetMapping("/per-user/project/{projectId}")
-    public Page<FlatStatUserTerm> findUserTermsByProject(
-        @PathVariable long projectId,
-        @RequestParam long userId,
-        Pageable pageable
-    ) {
+    public Page<FlatStatUserTerm> findUserTermsByProject(long projectId, long userId, Pageable pageable) {
         return termRepository.findAllByUsersByProjectForStats(projectId, pageable).map(statsMapper::map);
     }
 
     @Override
-    @GetMapping("/per-term-and-image/project/{projectId}")
     public Page<StatPerTermAndImage> findPerTermAndImageByProject(
-        @PathVariable long projectId,
-        @RequestParam(required = false) Optional<LocalDateTime> startDate,
-        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        long projectId,
+        Optional<LocalDateTime> startDate,
+        Optional<LocalDateTime> endDate,
         Pageable pageable
     ) {
         return termRepository.findAllPerTermAndImageByProjectForStats(

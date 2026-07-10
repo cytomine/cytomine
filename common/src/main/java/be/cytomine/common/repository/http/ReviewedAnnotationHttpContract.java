@@ -15,8 +15,9 @@ public interface ReviewedAnnotationHttpContract {
     String ROOT_PATH = "/reviewed-annotations";
 
     @PutExchange("/terms/{reviewedAnnotationTermsId}")
-    Set<Long> replaceAllTermIds(@PathVariable long reviewedAnnotationTermsId, @RequestParam long userId,
-                                @RequestBody Set<Long> newLinks);
+    Set<Long> replaceAllTermIds(@PathVariable long reviewedAnnotationTermsId,
+        @RequestParam long userId,
+        @RequestBody Set<Long> newLinks);
 
 
 }

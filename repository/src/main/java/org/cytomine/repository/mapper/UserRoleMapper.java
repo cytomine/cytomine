@@ -14,7 +14,8 @@ import be.cytomine.common.repository.model.userrole.payload.role.payload.CreateU
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface UserRoleMapper {
-
+    @Mapping(target = "deleted", source = "now")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted"})
     UserRoleEntity delete(UserRoleEntity userRoleEntity, Timestamp now);
 
     @Mapping(target = "userId", source = "secUserId")

@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.common.repository.http.UserRoleHttpContract;
+import be.cytomine.common.repository.model.Role;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
 import be.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
@@ -79,15 +81,15 @@ public class UserRoleController {
                 NOT_FOUND, format(UNABLE_TO_FIND_USER_ROLE, userId, roleId)));
     }
 
-    @PutMapping("/user/{userId}/role/{roleId}/define.json")
+    @PutMapping("/user/{targetUserId}/role/{role}/define.json")
     public CollectionResponse<UserRoleResponse> define(
-        @PathVariable long userId,
-        @PathVariable long roleId,
+        @PathVariable long targetUserId,
+        @PathVariable Role role,
         Pageable pageable
     ) {
-        log.debug("PUT /user/{}/role/{}/define.json", userId, roleId);
-        long requestingUserId = currentUserService.getCurrentUser().getId();
-        userRoleHttpContract.define(userId, roleId, requestingUserId);
+        log.debug("PUT /user/{}/role/{}/define.json", targetUserId, role);
+        long userId = currentUserService.getCurrentUser().getId();
+        userRoleHttpContract.define(userId, targetUserId, role);
         return pageMapper.toCollectionResponse(userRoleHttpContract.listByUserId(userId, pageable));
     }
 }

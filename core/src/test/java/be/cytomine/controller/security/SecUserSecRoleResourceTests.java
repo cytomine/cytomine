@@ -133,7 +133,7 @@ public class SecUserSecRoleResourceTests {
     @Test
     @Transactional
     public void define() throws Exception {
-        doNothing().when(userRoleHttpContract).define(eq(2L), eq(10L), anyLong());
+        doNothing().when(userRoleHttpContract).define(eq(2L), eq(10L), any());
         when(userRoleHttpContract.listByUserId(eq(2L), any())).thenReturn(
             new PageImpl<>(List.of(
                 userRoleResponse(1L, 2L, 10L),

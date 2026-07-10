@@ -1,7 +1,11 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +13,13 @@ import lombok.Setter;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.UserRoleMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.persistence.UserRoleRepository;
+import org.cytomine.repository.persistence.entity.RoleEntity;
 import org.cytomine.repository.persistence.entity.UserRoleEntity;
 import org.springframework.stereotype.Component;
 
+import be.cytomine.common.repository.model.Role;
 import be.cytomine.common.repository.model.command.payload.request.UserRoleCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
@@ -35,6 +42,10 @@ public class UserRoleCommandService implements
     private final CommandMapper commandMapper;
     private final UserRoleMapper userRoleMapper;
     private final UserRoleRepository userRoleRepository;
+    private final RoleRepository roleRepository;
+    private final UserRoleMapper mapper;
+    private final RoleHierarchy roleHierarchy;
+
     @Setter
     private ApplyCommandService applyCommandService;
 
@@ -69,8 +80,8 @@ public class UserRoleCommandService implements
     }
 
     @Override
-    public UserRoleEntity updateEntityWithPayload(
-            UserRoleEntity entity, UserRoleCommandPayload payload, Timestamp now) {
+    public UserRoleEntity updateEntityWithPayload(UserRoleEntity entity, UserRoleCommandPayload payload,
+        Timestamp now) {
         return userRoleMapper.updateWithPayload(entity, payload, now);
     }
 
@@ -108,5 +119,38 @@ public class UserRoleCommandService implements
     @Override
     public boolean canDeleteAclId(long userId, long id) {
         return aclService.canDeleteUserRole(userId);
+    }
+
+    public Set<UserRoleResponse> define(long userId, long targetUserId, Role role) {
+
+        if (!aclService.isAdmin(userId)) {
+            return Set.of();
+        }
+
+        Timestamp now = Timestamp.from(Instant.now());
+
+        Set<String> targetRoles = roleHierarchy.getRolesUpTo(role).stream().map(Role::name).collect(Collectors.toSet());
+        Set<Long> targetRoleEntities =
+            roleRepository.findAllByAuthorityAndDeletedNull(targetUserId, targetRoles).stream().map(RoleEntity::getId)
+                .collect(Collectors.toSet());
+
+        Set<UserRoleEntity> userRoleEntities = userRoleRepository.findAllBySecUserId(targetUserId);
+
+        Set<UserRoleEntity> rolesToRemove = userRoleEntities.stream().filter(r -> r.getDeleted() == null)
+            .filter(r -> !targetRoleEntities.contains(r.getSecRoleId()))
+            .map(userRoleEntity -> mapper.delete(userRoleEntity, now)).collect(Collectors.toSet());
+
+        Set<UserRoleEntity> rolesToReSet =
+            userRoleEntities.stream().filter(ure -> targetRoleEntities.contains(ure.getSecRoleId()))
+                .map(ure -> mapper.delete(ure, null)).collect(Collectors.toSet());
+
+        Set<UserRoleEntity> rolesToAdd = targetRoleEntities.stream().filter(
+                targetRoleEntity -> userRoleEntities.stream().anyMatch(ure -> ure.getSecRoleId() == targetRoleEntity))
+            .map(targetRoleEntity -> new UserRoleEntity(null, 0, targetRoleEntity, targetUserId, now, null, null))
+            .collect(Collectors.toSet());
+
+        return userRoleRepository.saveAll(
+                Stream.concat(rolesToRemove.stream(), Stream.concat(rolesToReSet.stream(), rolesToAdd.stream())).toList())
+            .stream().map(userRoleMapper::mapToUserRoleResponse).collect(Collectors.toSet());
     }
 }

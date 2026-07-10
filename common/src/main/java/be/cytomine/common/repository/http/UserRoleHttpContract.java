@@ -1,6 +1,7 @@
 package be.cytomine.common.repository.http;
 
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
 
+import be.cytomine.common.repository.model.Role;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
 import be.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
@@ -52,5 +54,5 @@ public interface UserRoleHttpContract {
     Optional<UserRoleResponse> getByUserIdAndRoleId(@PathVariable long userId, @PathVariable long roleId);
 
     @PutExchange("/define")
-    void define(@RequestParam long userId, @RequestParam String targetRole, @RequestParam long requestingUserId);
+    Set<UserRoleResponse> define(@RequestParam long userId, @RequestParam long targetUserId, @RequestParam Role targetRole);
 }

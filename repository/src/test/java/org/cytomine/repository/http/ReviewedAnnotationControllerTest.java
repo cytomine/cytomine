@@ -56,16 +56,16 @@ class ReviewedAnnotationControllerTest {
         jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)", userId,
             UUID.randomUUID().toString());
         jdbcTemplate.update(
-            "INSERT INTO sec_role (id, version, authority) SELECT nextval('hibernate_sequence'), 0, 'ROLE_ADMIN' "
+            "INSERT INTO sec_role (version, authority) SELECT 0, 'ROLE_ADMIN' "
                 + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
         Long userRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update(
             "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) SELECT ?, 0, ?, (SELECT id FROM "
                 + "sec_role WHERE authority = 'ROLE_ADMIN')", userRoleId, userId);
 
-        Long ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'ontology', ?)",
-            ontologyId, userId);
+        Long ontologyId = jdbcTemplate.queryForObject(
+            "INSERT INTO ontology (version, name, user_id) VALUES (0, 'ontology', ?) RETURNING id", Long.class,
+            userId);
 
         Long abstractImageId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO abstract_image (id, version) VALUES (?, 0)", abstractImageId);
@@ -169,7 +169,8 @@ class ReviewedAnnotationControllerTest {
             new ReviewedAnnotationLinkEntity(termId1, reviewedAnnotationTermsId));
 
         Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
+        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)", nonAdminUserId,
+            UUID.randomUUID().toString());
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId",

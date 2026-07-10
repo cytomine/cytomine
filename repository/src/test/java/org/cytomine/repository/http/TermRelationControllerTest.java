@@ -58,15 +58,14 @@ class TermRelationControllerTest
 
     @Override
     public void beforeCreate(long userId) {
-        long ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, ?, ?)", ontologyId,
+        long ontologyId = jdbcTemplate.queryForObject(
+            "INSERT INTO ontology (version, name, user_id) VALUES (0, ?, ?) RETURNING id", Long.class,
             UUID.randomUUID().toString(), userId);
-        long termId1 = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        long termId2 = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-
-        jdbcTemplate.update("INSERT INTO term (id, name, color,version,ontology_id) VALUES (?, ?, ?,0,?);", termId1,
+        long termId1 = jdbcTemplate.queryForObject(
+            "INSERT INTO term (name, color, version, ontology_id) VALUES (?, ?, 0, ?) RETURNING id", Long.class,
             UUID.randomUUID().toString(), UUID.randomUUID().toString(), ontologyId);
-        jdbcTemplate.update("INSERT INTO term (id, name, color,version,ontology_id) VALUES (?, ?, ?,0,?);", termId2,
+        long termId2 = jdbcTemplate.queryForObject(
+            "INSERT INTO term (name, color, version, ontology_id) VALUES (?, ?, 0, ?) RETURNING id", Long.class,
             UUID.randomUUID().toString(), UUID.randomUUID().toString(), ontologyId);
         createPayload = new CreateTermRelation(termId1, termId2, "parent");
         updatePayload = new UpdateTermRelation(Optional.of(termId1), Optional.of(termId2), Optional.of(1L));

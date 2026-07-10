@@ -73,7 +73,7 @@ public class UserRoleController implements UserRoleHttpContract {
     }
 
     @Override
-    public Set<UserRoleResponse> define(long userId, long targetUserId, Role role) {
-        return service.define(userId, targetUserId, role);
+    public Set<UserRoleResponse> define(long userId, long targetUserId, Role targetRole) {
+        return service.define(userId, targetUserId, targetRole);
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
 
     Optional<RoleEntity> findByIdAndDeletedNull(long id);
-    Set<RoleEntity> findAllByAuthorityAndDeletedNull(long id, Set<String> authorities);
+    Set<RoleEntity> findAllByAuthorityInAndDeletedNull( Set<String> authorities);
 
     Optional<RoleEntity> findByAuthorityAndDeletedNull(String authority);
 

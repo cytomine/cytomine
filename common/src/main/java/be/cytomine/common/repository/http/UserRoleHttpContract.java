@@ -38,11 +38,8 @@ public interface UserRoleHttpContract {
     Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateUserRole payload);
 
     @PutExchange("/{id}")
-    Optional<HttpCommandResponse> update(
-        @PathVariable long id,
-        @RequestParam long userId,
-        @RequestBody UpdateUserRole payload
-    );
+    Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
+        @RequestBody UpdateUserRole payload);
 
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
@@ -53,6 +50,7 @@ public interface UserRoleHttpContract {
     @GetExchange("/by-user/{userId}/by-role/{roleId}")
     Optional<UserRoleResponse> getByUserIdAndRoleId(@PathVariable long userId, @PathVariable long roleId);
 
-    @PutExchange("/define")
-    Set<UserRoleResponse> define(@RequestParam long userId, @RequestParam long targetUserId, @RequestParam Role targetRole);
+    @PutExchange("/define/{targetUserId}/role/{targetRole}")
+    Set<UserRoleResponse> define(@RequestParam long userId, @PathVariable long targetUserId,
+        @PathVariable Role targetRole);
 }

@@ -131,7 +131,7 @@ public class UserRoleCommandService implements
 
         Set<String> targetRoles = roleHierarchy.getRolesUpTo(role).stream().map(Role::name).collect(Collectors.toSet());
         Set<Long> targetRoleEntities =
-            roleRepository.findAllByAuthorityAndDeletedNull(targetUserId, targetRoles).stream().map(RoleEntity::getId)
+            roleRepository.findAllByAuthorityInAndDeletedNull(targetRoles).stream().map(RoleEntity::getId)
                 .collect(Collectors.toSet());
 
         Set<UserRoleEntity> userRoleEntities = userRoleRepository.findAllBySecUserId(targetUserId);
@@ -145,7 +145,7 @@ public class UserRoleCommandService implements
                 .map(ure -> mapper.delete(ure, null)).collect(Collectors.toSet());
 
         Set<UserRoleEntity> rolesToAdd = targetRoleEntities.stream().filter(
-                targetRoleEntity -> userRoleEntities.stream().anyMatch(ure -> ure.getSecRoleId() == targetRoleEntity))
+                targetRoleEntity -> userRoleEntities.stream().noneMatch(ure -> ure.getSecRoleId() == targetRoleEntity))
             .map(targetRoleEntity -> new UserRoleEntity(null, 0, targetRoleEntity, targetUserId, now, null, null))
             .collect(Collectors.toSet());
 

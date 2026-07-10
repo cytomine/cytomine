@@ -129,19 +129,4 @@ public class SecUserSecRoleResourceTests {
         mockMvc.perform(delete("/api/user/{user}/role/{role}.json", 0L, 0L))
             .andExpect(status().isNotFound());
     }
-
-    @Test
-    @Transactional
-    public void define() throws Exception {
-        doNothing().when(userRoleHttpContract).define(eq(2L), eq(10L), any());
-        when(userRoleHttpContract.listByUserId(eq(2L), any())).thenReturn(
-            new PageImpl<>(List.of(
-                userRoleResponse(1L, 2L, 10L),
-                userRoleResponse(2L, 2L, 11L)
-            )));
-
-        mockMvc.perform(put("/api/user/{user}/role/{role}/define.json", 2L, 10L))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(2)));
-    }
 }

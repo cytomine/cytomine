@@ -224,7 +224,7 @@ public class StatsService {
         securityACLService.check(project, READ);
         Long userId = currentUserService.getCurrentUser().getId();
         return statsHttpContract.findTermsByProject(
-            project.getOntology().getId(),
+            project.getId(),
             userId,
             startDate,
             endDate,

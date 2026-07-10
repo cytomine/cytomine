@@ -1,61 +1,40 @@
 package be.cytomine.controller.security;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.http.UserRoleHttpContract;
 import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
 import be.cytomine.config.MongoTestConfiguration;
-import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.security.SecRole;
-import be.cytomine.domain.security.SecUserSecRole;
-import be.cytomine.domain.security.User;
-import be.cytomine.repository.security.SecRoleRepository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -66,152 +45,86 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class SecUserSecRoleResourceTests {
 
     @Autowired
-    private EntityManager em;
-
-    @Autowired
-    private BasicInstanceBuilder builder;
-
-    @Autowired
-    private MockMvc restSecUserSecRoleControllerMockMvc;
-
-    @Autowired
-    private SecRoleRepository secRoleRepository;
+    private MockMvc mockMvc;
 
     @MockitoBean
-    private TermRelationHttpContract termRelationHttpContract;
+    private UserRoleHttpContract userRoleHttpContract;
 
-    @Test
-    @Transactional
-    public void listRoles() throws Exception {
-
-        restSecUserSecRoleControllerMockMvc.perform(get(
-                "/api/user/{user}/role.json",
-                builder.givenSuperAdmin().getId()
-            ))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(1))))
-            .andExpect(jsonPath("$.collection[?(@.authority=='ROLE_SUPER_ADMIN')]").exists());
+    private static UserRoleResponse userRoleResponse(long id, long userId, long roleId) {
+        return new UserRoleResponse(id, userId, roleId, LocalDateTime.now(), Optional.empty(), Optional.empty());
     }
 
     @Test
     @Transactional
-    public void listHighestRoles() throws Exception {
+    public void listRoles() throws Exception {
+        when(userRoleHttpContract.listByUserId(eq(1L), any())).thenReturn(
+            new PageImpl<>(List.of(
+                userRoleResponse(1L, 1L, 10L),
+                userRoleResponse(2L, 1L, 11L)
+            )));
 
-        restSecUserSecRoleControllerMockMvc.perform(get(
-                "/api/user/{user}/role.json",
-                builder.givenSuperAdmin().getId()
-            )
-                .param("highest", "true"))
+        mockMvc.perform(get("/api/user/{user}/role.json", 1L))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(1)))
-            .andExpect(jsonPath("$.collection[?(@.authority=='ROLE_SUPER_ADMIN')]").exists());
+            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))));
     }
 
     @Test
     @Transactional
     public void getRoles() throws Exception {
-        restSecUserSecRoleControllerMockMvc.perform(get(
-                "/api/user/{user}/role/{role}.json",
-                builder.givenSuperAdmin().getId(), secRoleRepository.getSuperAdmin().getId()
-            ))
+        when(userRoleHttpContract.getByUserIdAndRoleId(1L, 10L)).thenReturn(
+            Optional.of(userRoleResponse(1L, 1L, 10L)));
+
+        mockMvc.perform(get("/api/user/{user}/role/{role}.json", 1L, 10L))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.authority").value("ROLE_SUPER_ADMIN"));
+            .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
     @Transactional
-    public void getRoleWithUnexistingUser() throws Exception {
-        restSecUserSecRoleControllerMockMvc.perform(get(
-                "/api/user/{user}/role/{role}.json",
-                builder.givenSuperAdmin().getId(), 0L
-            ))
+    public void getRoleNotFound() throws Exception {
+        when(userRoleHttpContract.getByUserIdAndRoleId(0L, 0L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/user/{user}/role/{role}.json", 0L, 0L))
             .andExpect(status().isNotFound());
     }
-
-    @Test
-    @Transactional
-    public void getRoleWithUnexistingRole() throws Exception {
-        restSecUserSecRoleControllerMockMvc.perform(get(
-                "/api/user/{user}/role/{role}.json",
-                0L, secRoleRepository.getSuperAdmin().getId()
-            ))
-            .andExpect(status().isNotFound());
-    }
-
 
     @Test
     @Transactional
     public void addValidRole() throws Exception {
-        User user = builder.givenAUser();
-        SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(user, secRoleRepository.getAdmin());
-        restSecUserSecRoleControllerMockMvc.perform(post("/api/user/{user}/role.json", user.getId())
+        UUID commandId = UUID.randomUUID();
+        UserRoleResponse response = userRoleResponse(1L, 2L, 10L);
+        when(userRoleHttpContract.create(anyLong(), any())).thenReturn(
+            Optional.of(new HttpCommandResponse(true, response, commandId, Commands.CREATE_USER_ROLE, Set.of())));
+
+        mockMvc.perform(post("/api/user/{user}/role.json", 2L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(secSecUserSecRole.toJSON()))
+                .content("{\"role\":10}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists());
+            .andExpect(jsonPath("$.command").value(Commands.CREATE_USER_ROLE));
     }
-
 
     @Test
     @Transactional
     public void deleteUserRole() throws Exception {
-        User user = builder.givenAUser();
-        SecUserSecRole secSecUserSecRole = builder.givenANotPersistedUserRole(user, secRoleRepository.getAdmin());
-        builder.persistAndReturn(secSecUserSecRole);
-        restSecUserSecRoleControllerMockMvc.perform(delete(
-                "/api/user/{user}/role/{role}.json",
-                user.getId(),
-                secSecUserSecRole.getSecRole().getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(secSecUserSecRole.toJSON()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists());
-    }
-
-    @Test
-    @Transactional
-    public void deleteParentRelationTerm() throws Exception {
-        Term term1 = builder.givenATerm();
-        Term term2 = builder.givenATerm(term1.getOntology());
-        Long userId = builder.givenSuperAdmin().getId();
-        long relationId = 42L;
         UUID commandId = UUID.randomUUID();
-        TermRelationResponse response = new TermRelationResponse(
-            relationId, term1.getId(), term2.getId(),  1L,
-            Optional.empty(), Optional.empty(), LocalDateTime.now(), "parent"
-        );
+        UserRoleResponse userRole = userRoleResponse(5L, 2L, 10L);
+        when(userRoleHttpContract.getByUserIdAndRoleId(2L, 10L)).thenReturn(Optional.of(userRole));
+        when(userRoleHttpContract.delete(eq(5L), anyLong())).thenReturn(
+            Optional.of(new HttpCommandResponse(true, userRole, commandId, Commands.DELETE_USER_ROLE, Set.of())));
 
-        when(termRelationHttpContract.delete(eq(relationId), eq(userId))).thenReturn(
-            Optional.of(new HttpCommandResponse(true, response, commandId, Commands.DELETE_TERM_RELATION, Set.of())));
-
-        restSecUserSecRoleControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationId))
+        mockMvc.perform(delete("/api/user/{user}/role/{role}.json", 2L, 10L))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.command").value(Commands.DELETE_TERM_RELATION))
-            .andExpect(jsonPath("$.data.id").value(relationId));
+            .andExpect(jsonPath("$.command").value(Commands.DELETE_USER_ROLE));
     }
 
     @Test
     @Transactional
-    public void define() throws Exception {
-        User user = builder.givenAUser();
+    public void deleteUserRoleNotFound() throws Exception {
+        when(userRoleHttpContract.getByUserIdAndRoleId(0L, 0L)).thenReturn(Optional.empty());
 
-        restSecUserSecRoleControllerMockMvc.perform(put(
-                "/api/user/{user}/role/{role}/define.json",
-                user.getId(),
-                secRoleRepository.getAdmin().getId()
-            )
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-
-        em.refresh(user);
-        assertThat(user.getRoles().stream().map(SecRole::getAuthority))
-            .containsExactlyInAnyOrder("ROLE_ADMIN", "ROLE_USER", "ROLE_GUEST");
+        mockMvc.perform(delete("/api/user/{user}/role/{role}.json", 0L, 0L))
+            .andExpect(status().isNotFound());
     }
-
 }

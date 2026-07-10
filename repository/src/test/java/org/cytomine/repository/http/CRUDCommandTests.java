@@ -175,7 +175,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             undoCommandResponse.map(HttpCommandResponse::data));
 
         String emptyResponseString = getMockMvc().perform(
-                get(getApiURL() + "/" + entityID).param("userId", stringUserId).contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + entityID).param("userId", stringUserId)
+                    .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString,
             getObjectMapper().constructType(Optional.of(firstCreate.data()).getClass()));
@@ -187,7 +188,6 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
                 post(CommandController.ROOT_PATH + "/undo/" + undoCommandResponse.get().commandId()).param("userId",
                     stringUserId).contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
             .getContentAsString(), new TypeReference<>() {});
-
         LocalDateTime updateTime = redoCommandResponse.stream().findFirst()
             .orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data().updated()
             .orElseThrow(() -> new IllegalStateException("Updated should not be empty."));
@@ -198,7 +198,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             redoCommandResponse.map(HttpCommandResponse::data));
 
         String redoGetResponseString = getMockMvc().perform(
-                get(getApiURL() + "/" + entityID).param("userId", stringUserId).contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + entityID).param("userId", stringUserId)
+                    .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         R redoGetResponse = (R) getObjectMapper().readValue(redoGetResponseString, (firstCreateData).getClass());

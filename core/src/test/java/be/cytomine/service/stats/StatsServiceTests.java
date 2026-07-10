@@ -305,11 +305,10 @@ public class StatsServiceTests {
     @Test
     void statsTermSlide() {
         Project project = builder.givenAProject();
-        long ontologyId = project.getOntology().getId();
         long userId = builder.givenSuperAdmin().getId();
 
         when(statsHttpContract.findTermsByProject(
-            ontologyId,
+            project.getId(),
             userId,
             Optional.empty(),
             Optional.empty(),
@@ -321,7 +320,7 @@ public class StatsServiceTests {
         Term term = builder.givenATerm(project.getOntology());
 
         when(statsHttpContract.findTermsByProject(
-            ontologyId,
+            project.getId(),
             userId,
             Optional.empty(),
             Optional.empty(),
@@ -338,7 +337,7 @@ public class StatsServiceTests {
         builder.persistAndReturn(annotation1);
 
         when(statsHttpContract.findTermsByProject(
-            ontologyId,
+            project.getId(),
             userId,
             Optional.empty(),
             Optional.empty(),
@@ -352,7 +351,7 @@ public class StatsServiceTests {
         Term term2 = builder.givenATerm(project.getOntology());
 
         when(statsHttpContract.findTermsByProject(
-            ontologyId,
+            project.getId(),
             userId,
             Optional.empty(),
             Optional.empty(),
@@ -367,7 +366,7 @@ public class StatsServiceTests {
         Optional<LocalDateTime> startDate = Optional.of(LocalDateTime.now().minusDays(42));
         Optional<LocalDateTime> endDate = Optional.of(LocalDateTime.now().minusDays(20));
         when(statsHttpContract.findTermsByProject(
-            ontologyId,
+            project.getId(),
             userId,
             startDate,
             endDate,

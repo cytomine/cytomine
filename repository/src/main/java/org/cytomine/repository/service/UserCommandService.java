@@ -61,7 +61,7 @@ public class UserCommandService
 
     @Override
     public UserEntity mapCreateToEntity(CreateUser createPayload, long userId, Timestamp creationDate) {
-        Optional<RoleEntity> maybeRole = roleRepository.findByAuthority(createPayload.role());
+        Optional<RoleEntity> maybeRole = roleRepository.findByAuthorityAndDeletedNull(createPayload.role());
         RoleEntity roleEntity = maybeRole.orElseThrow(
             () -> new IllegalArgumentException(format("Role not found %s", createPayload.role())));
         return userMapper.mapToUserEntity(createPayload, userId, creationDate, Set.of(roleEntity));

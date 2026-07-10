@@ -1,6 +1,5 @@
 package org.cytomine.repository.http;
 
-import java.sql.PreparedStatement;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -14,8 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -61,25 +58,32 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
     }
 
     default long createUser() {
-        // This is the ugly spring way to "INSERT ... RETURNING ..."
-        // Live with it.
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        getJdbcTemplate().update(connection -> {
-            PreparedStatement ps =
-                connection.prepareStatement("INSERT INTO sec_user (version, username) VALUES (0, ?)",
-                    new String[] {"id"});
-            ps.setString(1, UUID.randomUUID().toString());
-            return ps;
-        }, keyHolder);
-        long userId = keyHolder.getKeyAs(Long.class);
+        long userId = getJdbcTemplate().queryForObject(
+            "INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING ID", Long.class,
+            UUID.randomUUID().toString());
+
+        getJdbcTemplate().update("INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_ADMIN', NOW() "
+            + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
+        getJdbcTemplate().update("INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_GUEST', NOW() "
+            + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_GUEST')");
+        getJdbcTemplate().update(
+            "INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_SUPER_ADMIN', NOW() "
+                + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_SUPER_ADMIN')");
+        getJdbcTemplate().update("INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_USER', NOW() "
+            + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_USER')");
 
         getJdbcTemplate().update(
-            "INSERT INTO sec_role (version, authority) SELECT 0, 'ROLE_ADMIN' "
-                + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
-
+            "INSERT INTO sec_user_sec_role (version, sec_user_id, created, sec_role_id) SELECT 0, ?, NOW(), (SELECT "
+                + "id FROM sec_role WHERE authority = 'ROLE_ADMIN')", userId);
         getJdbcTemplate().update(
-            "INSERT INTO sec_user_sec_role (version, sec_user_id, sec_role_id) SELECT 0, ?, (SELECT id FROM "
-                + "sec_role WHERE authority = 'ROLE_ADMIN')",  userId);
+            "INSERT INTO sec_user_sec_role (version, sec_user_id, created, sec_role_id) SELECT 0, ?, NOW(), (SELECT "
+                + "id FROM sec_role WHERE authority = 'ROLE_GUEST')", userId);
+        getJdbcTemplate().update(
+            "INSERT INTO sec_user_sec_role (version, sec_user_id, created, sec_role_id) SELECT 0, ?, NOW(), (SELECT "
+                + "id FROM sec_role WHERE authority = 'ROLE_SUPER_ADMIN')", userId);
+        getJdbcTemplate().update(
+            "INSERT INTO sec_user_sec_role (version, sec_user_id, created, sec_role_id) SELECT 0, ?, NOW(), (SELECT "
+                + "id FROM sec_role WHERE authority = 'ROLE_USER')", userId);
         beforeCreate(userId);
         return userId;
     }
@@ -140,9 +144,9 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         String stringUserId = String.valueOf(userId);
 
         Optional<HttpCommandResponse> maybeFirstCreate = getObjectMapper().readValue(getMockMvc().perform(
-                    post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
-                        .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString(), new TypeReference<>() {}
+                post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
+                    .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {}
         );
 
         HttpCommandResponse firstCreate =

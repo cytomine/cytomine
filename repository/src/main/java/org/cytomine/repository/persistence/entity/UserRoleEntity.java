@@ -7,16 +7,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.cytomine.repository.persistence.entity.key.UserRoleEntityKey;
 
 import be.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "sec_user_sec_role")
-@IdClass(UserRoleEntityKey.class)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

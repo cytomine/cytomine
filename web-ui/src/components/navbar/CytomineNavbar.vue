@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <nav class="navbar is-light" role="navigation">
   <div class="navbar-brand">
@@ -57,13 +43,15 @@
       <cytomine-searcher />
       <!-- TODO IAM -->
       <navbar-dropdown
-        :icon="currentUser.adminByNow ? 'fa-star' : 'fa-user'"
+        icon="fa-user"
         :title="currentUser.fullName"
-        :tag="currentUser.adminByNow ? {type: 'is-danger', text: $t('admin')} : null"
         :listPathes="['/account', '/activity']"
       >
         <router-link to="/account" class="navbar-item">
           <span class="icon"><i class="fas fa-user fa-xs"></i></span> {{$t('account')}}
+        </router-link>
+        <router-link to="/activity" class="navbar-item">
+          <span class="icon"><i class="fas fa-history fa-xs"></i></span> {{$t('activity-history')}}
         </router-link>
         <router-link to="/activity" class="navbar-item">
           <span class="icon"><i class="fas fa-history fa-xs"></i></span> {{$t('activity-history')}}
@@ -151,29 +139,6 @@ export default {
         hasModalCard: true
       });
     },
-    // ---
-
-    async openAdminSession() {
-      try {
-        await this.$store.dispatch('currentUser/openAdminSession');
-        this.$router.push('/admin');
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    async closeAdminSession() {
-      try {
-        await this.$store.dispatch('currentUser/closeAdminSession');
-        if (this.$router.currentRoute.path === '/') {
-          this.$router.push('/projects');
-        } else {
-          this.$router.push('/');
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-
     async logout() {
       try {
         this.$store.dispatch('logout');

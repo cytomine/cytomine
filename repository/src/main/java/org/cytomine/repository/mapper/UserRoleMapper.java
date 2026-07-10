@@ -2,7 +2,6 @@ package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
 
-import org.cytomine.repository.persistence.entity.UserEntity;
 import org.cytomine.repository.persistence.entity.UserRoleEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

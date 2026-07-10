@@ -150,7 +150,8 @@ public class UserRoleCommandService implements
             .collect(Collectors.toSet());
 
         return userRoleRepository.saveAll(
-                Stream.concat(rolesToRemove.stream(), Stream.concat(rolesToReSet.stream(), rolesToAdd.stream())).toList())
+                Stream.concat(rolesToRemove.stream(),
+                    Stream.concat(rolesToReSet.stream(), rolesToAdd.stream())).toList())
             .stream().map(userRoleMapper::mapToUserRoleResponse).collect(Collectors.toSet());
     }
 }

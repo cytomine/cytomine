@@ -62,35 +62,28 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         getJdbcTemplate().update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)", userId,
             UUID.randomUUID());
-        getJdbcTemplate().update(
-            "INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_ADMIN', NOW() "
-                + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
-        getJdbcTemplate().update(
-            "INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_GUEST', NOW() "
-                + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_GUEST')");
+        getJdbcTemplate().update("INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_ADMIN', NOW() "
+            + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
+        getJdbcTemplate().update("INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_GUEST', NOW() "
+            + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_GUEST')");
         getJdbcTemplate().update(
             "INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_SUPER_ADMIN', NOW() "
                 + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_SUPER_ADMIN')");
-        getJdbcTemplate().update(
-            "INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_USER', NOW() "
-                + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_USER')");
+        getJdbcTemplate().update("INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_USER', NOW() "
+            + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_USER')");
 
         getJdbcTemplate().update(
             "INSERT INTO sec_user_sec_role (version, sec_user_id, created, sec_role_id) SELECT 0, ?, NOW(), (SELECT "
-                + "id FROM sec_role WHERE authority = 'ROLE_ADMIN')",
-            userId);
+                + "id FROM sec_role WHERE authority = 'ROLE_ADMIN')", userId);
         getJdbcTemplate().update(
             "INSERT INTO sec_user_sec_role (version, sec_user_id, created, sec_role_id) SELECT 0, ?, NOW(), (SELECT "
-                + "id FROM sec_role WHERE authority = 'ROLE_GUEST')",
-            userId);
+                + "id FROM sec_role WHERE authority = 'ROLE_GUEST')", userId);
         getJdbcTemplate().update(
             "INSERT INTO sec_user_sec_role (version, sec_user_id, created, sec_role_id) SELECT 0, ?, NOW(), (SELECT "
-                + "id FROM sec_role WHERE authority = 'ROLE_SUPER_ADMIN')",
-            userId);
+                + "id FROM sec_role WHERE authority = 'ROLE_SUPER_ADMIN')", userId);
         getJdbcTemplate().update(
             "INSERT INTO sec_user_sec_role (version, sec_user_id, created, sec_role_id) SELECT 0, ?, NOW(), (SELECT "
-                + "id FROM sec_role WHERE authority = 'ROLE_USER')",
-            userId);
+                + "id FROM sec_role WHERE authority = 'ROLE_USER')", userId);
         beforeCreate(userId);
         return userId;
     }
@@ -128,8 +121,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         R updateDataResult = (R) updateResult.data();
 
         assertEquals(expectedUpdatedResponse(getResponseData, getUpdatePayload(), updateDataResult.updated()
-                .orElseThrow(
-                    () -> new IllegalStateException("Newly created entity should not have `updated` empty."))),
+                .orElseThrow(() -> new IllegalStateException("Newly created entity should not have `updated` empty."))),
             updateDataResult);
 
         // Delete Entity
@@ -138,9 +130,9 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
                     .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
-        assertEquals(getApplyCommandResponseMapper().setDeleteTime(updateDataResult,
-                Optional.of(deleteResult.data().deleted().orElseThrow(
-                    () -> new IllegalStateException("Deleted entity should not have `deleted` empty.")))),
+        assertEquals(getApplyCommandResponseMapper().setDeleteTime(updateDataResult, Optional.of(
+                deleteResult.data().deleted()
+                    .orElseThrow(() -> new IllegalStateException("Deleted entity should not have `deleted` empty.")))),
             deleteResult.data());
     }
 
@@ -154,8 +146,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> maybeFirstCreate = getObjectMapper().readValue(getMockMvc().perform(
                 post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {
-        });
+            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
 
         HttpCommandResponse firstCreate =
             maybeFirstCreate.orElseThrow(() -> new IllegalStateException("First creation should not be empty."));
@@ -177,8 +168,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", stringUserId)
                     .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
-            .getContentAsString(), new TypeReference<>() {
-        });
+            .getContentAsString(), new TypeReference<>() {});
 
         LocalDateTime deletedTime =
             undoCommandResponse.orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data()
@@ -188,7 +178,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             undoCommandResponse.map(HttpCommandResponse::data));
 
         String emptyResponseString = getMockMvc().perform(
-                get(getApiURL() + "/" + entityID).param("userId", stringUserId).contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + entityID).param("userId", stringUserId)
+                    .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString,
             getObjectMapper().constructType(Optional.of(firstCreate.data()).getClass()));
@@ -199,9 +190,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
                 post(CommandController.ROOT_PATH + "/undo/" + undoCommandResponse.get().commandId()).param("userId",
                     stringUserId).contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
-            .getContentAsString(), new TypeReference<>() {
-        });
-
+            .getContentAsString(), new TypeReference<>() {});
         LocalDateTime updateTime = redoCommandResponse.stream().findFirst()
             .orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data().updated()
             .orElseThrow(() -> new IllegalStateException("Updated should not be empty."));
@@ -212,14 +201,15 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             redoCommandResponse.map(HttpCommandResponse::data));
 
         String redoGetResponseString = getMockMvc().perform(
-                get(getApiURL() + "/" + entityID).param("userId", stringUserId).contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + entityID).param("userId", stringUserId)
+                    .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         R redoGetResponse = (R) getObjectMapper().readValue(redoGetResponseString, (firstCreateData).getClass());
 
-        assertEquals(getApplyCommandResponseMapper().setUpdateTime(getResponse, Optional.of(
-                redoGetResponse.updated().orElseThrow(
-                    () -> new IllegalStateException("Newly re-created entity should not have `updated` empty.")))),
+        assertEquals(getApplyCommandResponseMapper().setUpdateTime(getResponse, Optional.of(redoGetResponse.updated()
+                .orElseThrow(
+                    () -> new IllegalStateException("Newly re-created entity should not have `updated` empty" + ".")))),
             getObjectMapper().readValue(redoGetResponseString, firstCreate.data().getClass()));
     }
 }

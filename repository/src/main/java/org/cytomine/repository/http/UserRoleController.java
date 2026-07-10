@@ -1,13 +1,11 @@
 package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.UserRoleMapper;
-import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.persistence.UserRoleRepository;
 import org.cytomine.repository.service.UserRoleCommandService;
 import org.springframework.data.domain.Page;
@@ -30,10 +28,8 @@ import static java.time.temporal.ChronoUnit.MICROS;
 @RequestMapping(ROOT_PATH)
 public class UserRoleController implements UserRoleHttpContract {
 
-    private final List<String> ROLE_ORDER = List.of("ROLE_GUEST", "ROLE_USER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN");
     private final UserRoleCommandService service;
     private final UserRoleRepository repository;
-    private final RoleRepository roleRepository;
     private final UserRoleMapper mapper;
 
 

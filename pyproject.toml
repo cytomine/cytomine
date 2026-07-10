@@ -15,8 +15,13 @@ dev = [
   "ruff==0.15.15",
 ]
 
+[tool.ruff]
+extend-exclude = [
+  "pims/resources"
+]
+
 [tool.ruff.lint]
-select = ["FAST001", "FAST003"]
+select = ["F401", "FAST001", "FAST003"]
 ignore = ["E402"]
 
 [tool.pyrefly]

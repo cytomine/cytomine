@@ -5,10 +5,9 @@ from argparse import ArgumentParser
 import os
 
 from shapely import wkt
-from shapely.affinity import affine_transform
 
 from cytomine import Cytomine
-from cytomine.models import AnnotationCollection, ImageInstanceCollection
+from cytomine.models import AnnotationCollection
 
 def get_by_id(haystack, needle):
     return next((item for item in haystack if item.id == needle), None)

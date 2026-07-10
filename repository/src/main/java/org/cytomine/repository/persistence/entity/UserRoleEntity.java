@@ -22,7 +22,7 @@ public class UserRoleEntity implements HasTimestampCUD {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column
-    private long version;
+    private long version = 0;
     @Column(name = "sec_role_id")
     private long secRoleId;
     @Column(name = "sec_user_id")

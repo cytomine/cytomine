@@ -143,9 +143,6 @@ export default {
         {field: 'password', validationRules: this.editionMode ? 'min:8' : 'required|min:8'}
       ];
     },
-    idRole() {
-      return this.rolesWithIds.find(role => role.authority === this.selectedRole).id;
-    }
   },
   watch: {
     selectedRole() {
@@ -191,7 +188,7 @@ export default {
       try {
         await this.internalUser.save();
         if (!this.editionMode || this.selectedRole !== this.user.role) {
-          await this.internalUser.defineRole(this.idRole);
+          await this.internalUser.defineRole(this.selectedRole);
           this.internalUser.role = this.selectedRole; // for correct rendering in list
         }
 

@@ -151,14 +151,14 @@ export default class User extends Model {
   /**
    * Define the role of the user
    *
-   * @param {number} idRole       The identifier of the role to assign
+   * @param {string} role         The authority name of the role to assign (e.g. "ROLE_ADMIN")
    * @returns {RoleCollection}    The list of roles associated to the user
    */
-  async defineRole(idRole) {
+  async defineRole(role) {
     if (this.isNew()) {
       throw new Error('Cannot define the role of a user with no ID.');
     }
-    let {data} = await Cytomine.instance.api.put(`user/${this.id}/role/${idRole}/define.json`);
+    let {data} = await Cytomine.instance.api.put(`user/${this.id}/role/${role}/define.json`);
     let collection = new RoleCollection();
     data.collection.forEach(item => collection.push(new Role(item)));
     return collection;

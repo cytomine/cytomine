@@ -14,8 +14,6 @@ public interface UserRoleRepository extends JpaRepository<UserRoleEntity, Long> 
 
     Page<UserRoleEntity> findAllBySecUserIdAndDeletedNull(long secUserId, Pageable pageable);
 
-    Set<UserRoleEntity> findAllBySecUserIdAndDeletedNull(long secUserId);
-
     Optional<UserRoleEntity> findBySecUserIdAndSecRoleIdAndDeletedNull(long secUserId, long secRoleId);
 
     Set<UserRoleEntity> findAllBySecUserId(long userId);

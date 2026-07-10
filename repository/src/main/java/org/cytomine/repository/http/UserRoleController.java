@@ -32,7 +32,6 @@ public class UserRoleController implements UserRoleHttpContract {
     private final UserRoleRepository repository;
     private final UserRoleMapper mapper;
 
-
     @Override
     public Page<UserRoleResponse> list(Pageable pageable) {
         return repository.findAll(pageable).map(mapper::mapToUserRoleResponse);

@@ -1,6 +1,5 @@
 package be.cytomine.controller.repository;
 
-import java.util.Map;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -60,12 +59,11 @@ public class UserRoleController {
     @PostMapping("/user/{userId}/role.json")
     public Optional<HttpCommandResponse> create(
         @PathVariable long userId,
-        @RequestBody Map<String, Object> json
+        @RequestBody CreateUserRole createUserRole
     ) {
         log.debug("POST /user/{}/role.json", userId);
-        long roleId = ((Number) json.get("role")).longValue();
         long requestingUserId = currentUserService.getCurrentUser().getId();
-        return userRoleHttpContract.create(requestingUserId, new CreateUserRole(userId, roleId));
+        return userRoleHttpContract.create(requestingUserId, createUserRole);
     }
 
     @DeleteMapping("/user/{userId}/role/{roleId}.json")

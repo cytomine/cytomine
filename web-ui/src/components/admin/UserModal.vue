@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import {User, RoleCollection} from '@/api';
+import {User} from '@/api';
 import {rolesMapping} from '@/utils/role-utils';
 const defaultRole = 'ROLE_GUEST';
 const defaultLanguage = {value: 'EN', name:'English'};
@@ -112,7 +112,6 @@ export default {
   data() {
     return {
       internalUser: {},
-      rolesWithIds: null,
       selectedRole: defaultRole,
       displayErrors: false,
       adminConfirm: false,
@@ -150,11 +149,6 @@ export default {
     },
     active(val) {
       if (val) {
-        if (!this.rolesWithIds) {
-          this.$notify({type: 'error', text: this.$t('notif-unexpected-error')});
-          this.$emit('update:active', false);
-          return;
-        }
         this.internalUser = this.user ? this.user.clone() : new User();
         this.selectedRole = this.user ? this.user.role : defaultRole;
         this.internalUser.language = this.user ? this.user.language : defaultLanguage.value;
@@ -202,13 +196,6 @@ export default {
       }
     },
   },
-  async created() {
-    try {
-      this.rolesWithIds = (await RoleCollection.fetchAll()).array;
-    } catch (error) {
-      console.log(error);
-    }
-  }
 };
 </script>
 

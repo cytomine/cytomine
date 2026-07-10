@@ -1,8 +1,6 @@
 import Cytomine from '../cytomine.js';
 import Model from './model.js';
 import UserCollection from '../collections/user-collection.js';
-import RoleCollection from '../collections/role-collection.js';
-import Role from './role.js';
 
 export default class User extends Model {
   /** @inheritdoc */
@@ -151,16 +149,12 @@ export default class User extends Model {
   /**
    * Define the role of the user
    *
-   * @param {string} role         The authority name of the role to assign (e.g. "ROLE_ADMIN")
-   * @returns {RoleCollection}    The list of roles associated to the user
+   * @param {string} role  The authority name of the role to assign (e.g. "ROLE_ADMIN")
    */
   async defineRole(role) {
     if (this.isNew()) {
       throw new Error('Cannot define the role of a user with no ID.');
     }
-    let {data} = await Cytomine.instance.api.put(`user/${this.id}/role/${role}/define.json`);
-    let collection = new RoleCollection();
-    data.collection.forEach(item => collection.push(new Role(item)));
-    return collection;
+    await Cytomine.instance.api.put(`user/${this.id}/role/${role}/define.json`);
   }
 }

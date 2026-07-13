@@ -32,7 +32,7 @@ public class UserEntity implements HasTimestampCUD {
     @Version
     private long version = 0;
 
-    @Column
+    @Column(unique = true)
     private String username;
 
     @Column

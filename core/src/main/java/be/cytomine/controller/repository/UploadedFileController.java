@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +62,9 @@ public class UploadedFileController {
     private final UploadedFileMapper uploadedFileMapper;
 
     @GetMapping("/uploadedfile.json")
-    public CollectionResponse<UploadedFileResponse> getAll(Pageable pageable) {
+    public CollectionResponse<UploadedFileResponse> getAll(
+        @SortDefault(sort = "created", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         log.debug("GET /uploadedfile.json");
         long userId = currentUserService.getCurrentUser().getId();
         Page<UploadedFileResponse> page = uploadedFileHttpContract.getAll(userId, pageable);

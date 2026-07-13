@@ -24,31 +24,31 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.security.SecRole;
 
+import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static be.cytomine.common.repository.model.Role.ROLE_SUPER_ADMIN;
+import static be.cytomine.common.repository.model.Role.ROLE_USER;
+
 /**
  * Spring Data JPA repository for the user entity.
  */
 @Repository
 public interface SecRoleRepository extends JpaRepository<SecRole, Long>, JpaSpecificationExecutor<SecRole> {
 
-    String ROLE_GUEST = "ROLE_GUEST";
-    String ROLE_USER = "ROLE_USER";
-    String ROLE_ADMIN = "ROLE_ADMIN";
-    String ROLE_SUPER_ADMIN = "ROLE_SUPER_ADMIN";
-
     default SecRole getGuest() {
-        return getByAuthority(ROLE_GUEST);
+        return getByAuthority(ROLE_GUEST.toString());
     }
 
     default SecRole getUser() {
-        return getByAuthority(ROLE_USER);
+        return getByAuthority(ROLE_USER.toString());
     }
 
     default SecRole getAdmin() {
-        return getByAuthority(ROLE_ADMIN);
+        return getByAuthority(ROLE_ADMIN.toString());
     }
 
     default SecRole getSuperAdmin() {
-        return getByAuthority(ROLE_SUPER_ADMIN);
+        return getByAuthority(ROLE_SUPER_ADMIN.toString());
     }
 
     SecRole getByAuthority(String authority);

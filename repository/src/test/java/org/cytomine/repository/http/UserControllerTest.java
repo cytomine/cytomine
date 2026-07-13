@@ -24,6 +24,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.Role;
 import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
@@ -44,7 +45,7 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
 
     CreateUser createPayload =
         new CreateUser(UUID.randomUUID().toString(), Optional.empty(), Optional.empty(), Optional.empty(),
-            UUID.randomUUID().toString(), Optional.empty(), false, "ROLE_ADMIN", "EN");
+            UUID.randomUUID().toString(), Optional.empty(), false, Role.ROLE_ADMIN.toString(), "EN");
 
     UpdateUser updatePayload =
         new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),

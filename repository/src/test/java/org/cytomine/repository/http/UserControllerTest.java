@@ -1,12 +1,19 @@
 package org.cytomine.repository.http;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.mapper.UserRoleMapper;
+import org.cytomine.repository.persistence.RoleRepository;
+import org.cytomine.repository.persistence.UserRoleRepository;
+import org.cytomine.repository.persistence.entity.UserRoleEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -17,6 +24,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.common.repository.model.user.payload.UpdateUser;
@@ -45,6 +53,21 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
 
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private UserRoleRepository userRoleRepository;
+    @Autowired
+    private UserRoleMapper userRoleMapper;
+
+    @Override
+    public Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
+        var role = roleRepository.findByAuthorityAndDeletedNull("ROLE_GUEST")
+            .orElseThrow(() -> new IllegalStateException("ROLE_GUEST should exist"));
+        var userRoleEntity = userRoleRepository.save(
+            new UserRoleEntity(null, 0, role.getId(), currentId, Timestamp.from(Instant.now()), null, null));
+        return Set.of(userRoleMapper.mapToUserRoleResponse(userRoleEntity));
+    }
 
     @Override
     public UserResponse expectedUpdatedResponse(UserResponse response, UpdateUser updatePayload,

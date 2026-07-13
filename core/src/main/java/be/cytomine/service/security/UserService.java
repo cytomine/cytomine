@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.UserRoleHttpContract;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.utils.SpringPageCrawler;
 import be.cytomine.domain.CytomineDomain;
@@ -171,9 +172,9 @@ public class UserService extends ModelService {
 
     private final SecUserSecRoleRepository secSecUserSecRoleRepository;
 
-    private final SecUserSecRoleService secSecUserSecRoleService;
-
     private final SecurityACLService securityACLService;
+
+    private final UserRoleHttpContract userRoleHttpContract;
 
     private final StorageRepository storageRepository;
 
@@ -1107,8 +1108,9 @@ public class UserService extends ModelService {
     }
 
     public void deleteDependentSecUserSecRole(User user, Transaction transaction, Task task) {
+        long requestingUserId = currentUserService.getCurrentUser().getId();
         for (SecUserSecRole secSecUserSecRole : secSecUserSecRoleRepository.findAllBySecUser(user)) {
-            secSecUserSecRoleService.delete(secSecUserSecRole, transaction, null, false);
+            userRoleHttpContract.delete(secSecUserSecRole.getId(), requestingUserId);
         }
     }
 

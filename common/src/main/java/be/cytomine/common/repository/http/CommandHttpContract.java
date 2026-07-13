@@ -14,9 +14,7 @@ import org.springframework.web.service.annotation.PostExchange;
 import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
-import static be.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(CommandHttpContract.ROOT_PATH)
 public interface CommandHttpContract {
     String ROOT_PATH = "/commands";
 

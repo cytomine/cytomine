@@ -1,19 +1,12 @@
 package org.cytomine.repository.http;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
-import org.cytomine.repository.mapper.UserRoleMapper;
-import org.cytomine.repository.persistence.RoleRepository;
-import org.cytomine.repository.persistence.UserRoleRepository;
-import org.cytomine.repository.persistence.entity.UserRoleEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -25,7 +18,6 @@ import tools.jackson.databind.ObjectMapper;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.Role;
-import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.common.repository.model.user.payload.UpdateUser;

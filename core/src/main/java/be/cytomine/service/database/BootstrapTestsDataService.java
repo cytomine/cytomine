@@ -18,10 +18,10 @@ import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 
-import static be.cytomine.repository.security.SecRoleRepository.ROLE_ADMIN;
-import static be.cytomine.repository.security.SecRoleRepository.ROLE_GUEST;
-import static be.cytomine.repository.security.SecRoleRepository.ROLE_SUPER_ADMIN;
-import static be.cytomine.repository.security.SecRoleRepository.ROLE_USER;
+import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static be.cytomine.common.repository.model.Role.ROLE_SUPER_ADMIN;
+import static be.cytomine.common.repository.model.Role.ROLE_USER;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,27 +47,24 @@ public class BootstrapTestsDataService {
     public static final String USER_NO_ACL = "ACL_USER_NO_ACL";
 
     public static final String CREATOR = "CREATOR";
-
-    private final UserRepository userRepository;
-
-    private final SecRoleRepository secRoleRepository;
-
-    private final SecUserSecRoleRepository secSecUserSecRoleRepository;
-
     public static final Map<String, List<String>> ROLES = new HashMap<>();
 
     static {
-        ROLES.put(SUPERADMIN, List.of(ROLE_SUPER_ADMIN));
-        ROLES.put(ADMIN, List.of(ROLE_ADMIN));
-        ROLES.put(USER_NO_ACL, List.of(ROLE_USER));
-        ROLES.put(USER_ACL_READ, List.of(ROLE_USER));
-        ROLES.put(USER_ACL_WRITE, List.of(ROLE_USER));
-        ROLES.put(USER_ACL_CREATE, List.of(ROLE_USER));
-        ROLES.put(USER_ACL_DELETE, List.of(ROLE_USER));
-        ROLES.put(USER_ACL_ADMIN, List.of(ROLE_USER));
-        ROLES.put(CREATOR, List.of(ROLE_USER));
-        ROLES.put(GUEST, List.of(ROLE_GUEST));
+        ROLES.put(SUPERADMIN, List.of(ROLE_SUPER_ADMIN.toString()));
+        ROLES.put(ADMIN, List.of(ROLE_ADMIN.toString()));
+        ROLES.put(USER_NO_ACL, List.of(ROLE_USER.toString()));
+        ROLES.put(USER_ACL_READ, List.of(ROLE_USER.toString()));
+        ROLES.put(USER_ACL_WRITE, List.of(ROLE_USER.toString()));
+        ROLES.put(USER_ACL_CREATE, List.of(ROLE_USER.toString()));
+        ROLES.put(USER_ACL_DELETE, List.of(ROLE_USER.toString()));
+        ROLES.put(USER_ACL_ADMIN, List.of(ROLE_USER.toString()));
+        ROLES.put(CREATOR, List.of(ROLE_USER.toString()));
+        ROLES.put(GUEST, List.of(ROLE_GUEST.toString()));
     }
+
+    private final UserRepository userRepository;
+    private final SecRoleRepository secRoleRepository;
+    private final SecUserSecRoleRepository secSecUserSecRoleRepository;
 
     public User createUserForTests(String login) {
         Optional<User> alreadyExistingUser = userRepository.findByUsernameLikeIgnoreCase(login.toLowerCase());

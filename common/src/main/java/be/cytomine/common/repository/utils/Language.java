@@ -1,4 +1,4 @@
-package be.cytomine.domain.security;
+package be.cytomine.common.repository.utils;
 
 /*
  * Copyright (c) 2009-2022. Authors: see NOTICE file.

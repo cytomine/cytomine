@@ -19,6 +19,7 @@ import be.cytomine.common.repository.model.command.request.CreateTagDomainAssoci
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.CreateUploadedFileCommand;
+import be.cytomine.common.repository.model.command.request.CreateUserCommand;
 import be.cytomine.common.repository.model.command.request.CreateUserRoleCommand;
 import be.cytomine.common.repository.model.command.request.DeleteOntologyCommand;
 import be.cytomine.common.repository.model.command.request.DeleteRoleCommand;
@@ -27,6 +28,7 @@ import be.cytomine.common.repository.model.command.request.DeleteTagDomainAssoci
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.DeleteUploadedFileCommand;
+import be.cytomine.common.repository.model.command.request.DeleteUserCommand;
 import be.cytomine.common.repository.model.command.request.DeleteUserRoleCommand;
 import be.cytomine.common.repository.model.command.request.UndoCreateCommand;
 import be.cytomine.common.repository.model.command.request.UndoDeleteCommand;
@@ -38,6 +40,7 @@ import be.cytomine.common.repository.model.command.request.UpdateTagDomainAssoci
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
 import be.cytomine.common.repository.model.command.request.UpdateUploadedFileCommand;
+import be.cytomine.common.repository.model.command.request.UpdateUserCommand;
 import be.cytomine.common.repository.model.command.request.UpdateUserRoleCommand;
 
 @Component
@@ -52,6 +55,7 @@ public class ApplyCommandService {
     private final OntologyCommandService ontologyCommandService;
     private final UploadedFileCommandService uploadedFileCommandService;
     private final UserRoleCommandService userRoleCommandService;
+    private final UserCommandService userCommandService;
 
     public Optional<HttpCommandResponse> undoCommand(long userId, UUID undoCommand, LocalDateTime now) {
         Set<HttpCommandResponse> subCommands = commandRepository.findByParentCommandId(undoCommand).stream()
@@ -105,6 +109,12 @@ public class ApplyCommandService {
                     userRoleCommandService.undoUpdate(commandEntity.getId(), uurc, userId, now);
                 case DeleteUserRoleCommand durc ->
                     userRoleCommandService.undoDelete(commandEntity.getId(), durc, userId, now);
+                case CreateUserCommand cuc ->
+                    userCommandService.undoCreate(commandEntity.getId(), cuc, userId, now);
+                case UpdateUserCommand uuc ->
+                    userCommandService.undoUpdate(commandEntity.getId(), uuc, userId, now);
+                case DeleteUserCommand duc ->
+                    userCommandService.undoDelete(commandEntity.getId(), duc, userId, now);
 
                 // Actually we undo an undo target here
                 case UndoCreateCommand<?> v -> switch (v.target()) {
@@ -129,6 +139,8 @@ public class ApplyCommandService {
                         new DeleteUploadedFileCommand(cufc.after(), userId), userId, now);
                     case CreateUserRoleCommand curc -> userRoleCommandService.undoDelete(v.commandId(),
                         new DeleteUserRoleCommand(curc.after(), userId), userId, now);
+                    case CreateUserCommand cuc -> userCommandService.undoDelete(v.commandId(),
+                        new DeleteUserCommand(cuc.after(), userId), userId, now);
                 };
                 case UndoDeleteCommand<?> v -> switch (v.target()) {
                     case DeleteStorageCommand dsc ->
@@ -153,6 +165,8 @@ public class ApplyCommandService {
                         new CreateUploadedFileCommand(dufc.before(), userId), userId, now);
                     case DeleteUserRoleCommand durc -> userRoleCommandService.undoCreate(v.commandId(),
                         new CreateUserRoleCommand(durc.before(), userId), userId, now);
+                    case DeleteUserCommand duc -> userCommandService.undoCreate(v.commandId(),
+                        new CreateUserCommand(duc.before(), userId), userId, now);
                 };
                 case UndoUpdateCommand<?> v -> switch (v.target()) {
                     case UpdateTermCommand utc -> termCommandService.undoUpdate(v.commandId(),
@@ -172,6 +186,8 @@ public class ApplyCommandService {
                         new UpdateUploadedFileCommand(uufc.after(), uufc.before(), userId), userId, now);
                     case UpdateUserRoleCommand uurc -> userRoleCommandService.undoUpdate(v.commandId(),
                         new UpdateUserRoleCommand(uurc.after(), uurc.before(), userId), userId, now);
+                    case UpdateUserCommand uuc -> userCommandService.undoUpdate(v.commandId(),
+                        new UpdateUserCommand(uuc.after(), uuc.before(), userId), userId, now);
                 };
             }).map(command -> new HttpCommandResponse(command.printMessage(), command.data(), command.commandId(),
                 command.command(),

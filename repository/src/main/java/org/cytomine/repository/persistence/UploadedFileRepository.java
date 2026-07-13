@@ -14,17 +14,11 @@ public interface UploadedFileRepository extends JpaRepository<UploadedFileEntity
     Optional<UploadedFileEntity> findByIdAndDeletedNull(long id);
 
     @Query(
-        value = """
-            SELECT uf.* FROM uploaded_file uf
+        """
+            SELECT uf FROM uploaded_file uf
             WHERE uf.deleted IS NULL
-            AND (:ignoreStorageFilter = TRUE OR uf.storage_id IN (:storageIds))
-            """,
-        countQuery = """
-            SELECT COUNT(*) FROM uploaded_file uf
-            WHERE uf.deleted IS NULL
-            AND (:ignoreStorageFilter = TRUE OR uf.storage_id IN (:storageIds))
-            """,
-        nativeQuery = true
+            AND (:ignoreStorageFilter = TRUE OR uf.storageId IN (:storageIds))
+            """
     )
     Page<UploadedFileEntity> search(boolean ignoreStorageFilter, List<Long> storageIds, Pageable pageable);
 

@@ -41,7 +41,6 @@ public interface UserMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted"})
     UserResponse mapToUserResponse(UserEntity entity);
 
-    @Mapping(target = "username", source = "newUsername")
     @Mapping(target = "email", source = "newEmail")
     @Mapping(target = "name", source = "newName")
     @Mapping(target = "firstname", source = "newFirstname")
@@ -50,7 +49,7 @@ public interface UserMapper {
     @Mapping(target = "updated", source = "now")
     @BeanMapping(ignoreUnmappedSourceProperties = {"username", "email", "name", "firstname", "lastname", "language",
         "updated"})
-    UserEntity update(UserEntity entity, String newUsername, String newEmail, String newName, String newFirstname,
+    UserEntity update(UserEntity entity, String newEmail, String newName, String newFirstname,
         String newLastname, String newLanguage, Timestamp now);
 
     @Mapping(target = "username", source = "replace.username")

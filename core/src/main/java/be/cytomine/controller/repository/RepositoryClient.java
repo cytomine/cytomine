@@ -13,6 +13,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
@@ -47,6 +48,11 @@ public class RepositoryClient {
             .baseUrl(repositoryURL)
             .messageConverters(converters -> converters.addFirst(new MappingJackson2HttpMessageConverter(objectMapper)))
             .build();
+    }
+
+    @Bean
+    CommandHttpContract  commandHttpContract(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, CommandHttpContract.class);
     }
 
     @Bean

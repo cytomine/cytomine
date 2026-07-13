@@ -1,6 +1,8 @@
 <template>
-  <div>
-    <h1>User History Page</h1>
+  <div class="content-wrapper">
+    <div class="box">
+      <h1>{{ $t('user-history') }}</h1>
+    </div>
   </div>
 </template>
 

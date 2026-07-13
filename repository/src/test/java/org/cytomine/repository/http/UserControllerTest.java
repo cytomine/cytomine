@@ -63,8 +63,8 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
 
     @Override
     public Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
-        var role = roleRepository.findByAuthorityAndDeletedNull("ROLE_GUEST")
-            .orElseThrow(() -> new IllegalStateException("ROLE_GUEST should exist"));
+        var role = roleRepository.findByAuthorityAndDeletedNull(Role.ROLE_GUEST.toString())
+            .orElseThrow(() -> new IllegalStateException(Role.ROLE_GUEST + " should exist"));
         var userRoleEntity = userRoleRepository.save(
             new UserRoleEntity(null, 0, role.getId(), currentId, Timestamp.from(Instant.now()), null, null));
         return Set.of(userRoleMapper.mapToUserRoleResponse(userRoleEntity));

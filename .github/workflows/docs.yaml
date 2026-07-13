@@ -77,7 +77,7 @@ jobs:
 
       - name: Add preview label
         if: github.event_name == 'pull_request' && github.event.action == 'opened'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             await github.rest.issues.addLabels({

@@ -542,7 +542,7 @@ public class CytomineTests {
         String imageName = "cat.png";
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
 
-        cytomineSteps.checkPimsImportProject(wait, cytomineUrl, projectName, imageName);
+        cytomineSteps.checkPimsImportProject(new WebDriverWait(driver, Duration.ofMinutes(5)), cytomineUrl, projectName, imageName);
 
         cytomineSteps.logout(wait, cytomineUrl);
     }

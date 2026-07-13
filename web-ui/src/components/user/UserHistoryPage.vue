@@ -14,6 +14,10 @@
         pagination-size="is-small"
       >
         <template #default="{row}">
+          <b-table-column :label="$t('date')">
+            {{ formatDate(row.created) }}
+          </b-table-column>
+
           <b-table-column :label="$t('action')">
             <b-tag :type="actionTag(row)">{{ actionLabel(row) }}</b-tag>
           </b-table-column>
@@ -58,6 +62,7 @@
 
 <script>
 import {Cytomine} from '@/api';
+import {formatDate} from '@/utils/date';
 
 const ACTION_TAGS = {
   INSERT: 'is-success',
@@ -146,6 +151,9 @@ export default {
         || {};
       return payload.name || payload.originalFilename || payload.filename
         || (payload.id ? `#${payload.id}` : '');
+    },
+    formatDate(date) {
+      return formatDate(date, this.$i18n.locale);
     },
     humanize(tokens) {
       const sentence = tokens.join(' ').toLowerCase();

@@ -17,6 +17,16 @@ export default class User extends Model {
     this.username = null;
   }
 
+  /** @inheritdoc */
+  populate(props) {
+    super.populate(props);
+    if (this.name || this.username) {
+      this.fullName = (this.name && this.name !== this.username)
+        ? `${this.name} (${this.username})`
+        : this.username;
+    }
+  }
+
   /**
    * @static Fetch the current user
    *

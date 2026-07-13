@@ -58,10 +58,10 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
     }
 
     default long createUser() {
-        Long userId = getJdbcTemplate().queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        long userId = getJdbcTemplate().queryForObject(
+            "INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING ID", Long.class,
+            UUID.randomUUID().toString());
 
-        getJdbcTemplate().update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)", userId,
-            UUID.randomUUID());
         getJdbcTemplate().update("INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_ADMIN', NOW() "
             + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
         getJdbcTemplate().update("INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_GUEST', NOW() "
@@ -126,8 +126,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         // Delete Entity
         String delete = getMockMvc().perform(
-                delete(getApiURL() + "/" + result.data().id()).param("userId", stringUserId)
-                    .contentType(APPLICATION_JSON))
+                delete(getApiURL() + "/" + result.data().id())
+                    .param("userId", stringUserId).contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
         assertEquals(getApplyCommandResponseMapper().setDeleteTime(updateDataResult, Optional.of(
@@ -146,7 +146,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> maybeFirstCreate = getObjectMapper().readValue(getMockMvc().perform(
                 post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
+            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {}
+        );
 
         HttpCommandResponse firstCreate =
             maybeFirstCreate.orElseThrow(() -> new IllegalStateException("First creation should not be empty."));
@@ -209,7 +210,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         assertEquals(getApplyCommandResponseMapper().setUpdateTime(getResponse, Optional.of(redoGetResponse.updated()
                 .orElseThrow(
-                    () -> new IllegalStateException("Newly re-created entity should not have `updated` empty" + ".")))),
+                    () -> new IllegalStateException("Newly re-created entity should not have `updated` empty.")))),
             getObjectMapper().readValue(redoGetResponseString, firstCreate.data().getClass()));
     }
 }

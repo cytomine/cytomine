@@ -52,9 +52,8 @@ class ReviewedAnnotationControllerTest {
 
     @BeforeEach
     void setUp() {
-        userId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)", userId,
-            UUID.randomUUID().toString());
+        userId = jdbcTemplate.queryForObject("INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING id",
+            Long.class, UUID.randomUUID().toString());
         jdbcTemplate.update(
             "INSERT INTO sec_role (version, authority) SELECT 0, 'ROLE_ADMIN' "
                 + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
@@ -167,8 +166,8 @@ class ReviewedAnnotationControllerTest {
         reviewedAnnotationLinkRepository.saveAndFlush(
             new ReviewedAnnotationLinkEntity(termId1, reviewedAnnotationTermsId));
 
-        Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, ?)", nonAdminUserId,
+        Long nonAdminUserId = jdbcTemplate.queryForObject(
+            "INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING id", Long.class,
             UUID.randomUUID().toString());
 
         String response = mockMvc.perform(

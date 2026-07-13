@@ -10,6 +10,8 @@ public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
 
     Optional<RoleEntity> findByIdAndDeletedNull(long id);
 
+    Optional<RoleEntity> findByAuthorityAndDeletedNull(String authority);
+
     Set<RoleEntity> findAllByAuthorityInAndDeletedNull(Set<String> authorities);
 
 }

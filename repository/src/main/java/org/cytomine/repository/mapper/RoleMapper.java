@@ -17,8 +17,9 @@ public interface RoleMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     RoleResponse mapToRoleResponse(RoleEntity entity);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
-    RoleCommandPayload mapToRoleCommandPayload(RoleEntity entity);
+    @Mapping(target = "version", ignore = true)
+    @BeanMapping(ignoreUnmappedSourceProperties = {"dataType"})
+    RoleEntity mapToRoleEntity(RoleResponse roleResponse);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -26,6 +27,9 @@ public interface RoleMapper {
     @Mapping(target = "updated", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     RoleEntity mapToRoleEntity(CreateRole createRole, Timestamp creationDate);
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    RoleCommandPayload mapToRoleCommandPayload(RoleEntity entity);
 
     @Mapping(target = "authority", source = "newAuthority")
     @Mapping(target = "updated", source = "now")

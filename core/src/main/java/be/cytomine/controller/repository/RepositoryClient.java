@@ -23,6 +23,7 @@ import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.http.UploadedFileHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.http.UserRoleHttpContract;
 import be.cytomine.common.repository.utils.SpringPage;
 
@@ -101,6 +102,11 @@ public class RepositoryClient {
     @Bean
     UserRoleHttpContract userRoleServiceClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, UserRoleHttpContract.class);
+    }
+
+    @Bean
+    UserHttpContract userServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, UserHttpContract.class);
     }
 
     private <T> T createClient(RestClient repositoryRestClient, Class<T> repoType) {

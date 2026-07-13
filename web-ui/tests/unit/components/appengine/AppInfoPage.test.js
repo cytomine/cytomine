@@ -1,5 +1,5 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
-import VueRouter from 'vue-router';
+import {createRouter, createMemoryHistory} from 'vue-router';
 
 import AppInfoPage from '@/components/appengine/AppInfoPage.vue';
 import Task from '@/utils/appengine/task';
@@ -20,8 +20,8 @@ jest.mock('@/utils/appengine/task', () => ({
 }));
 
 const localVue = createLocalVue();
-localVue.use(VueRouter);
-const router = new VueRouter();
+const router = createRouter({history: createMemoryHistory(), routes: [{path: '/:pathMatch(.*)*', component: {template: '<div/>'}}]});
+localVue.use(router);
 
 describe('AppInfoPage.vue', () => {
   const mockTask = {
@@ -72,7 +72,7 @@ describe('AppInfoPage.vue', () => {
     await flushPromises();
 
     expect(wrapper.vm.loading).toBe(false);
-    expect(wrapper.vm.task).toBe(mockTask);
+    expect(wrapper.vm.task).toEqual(mockTask);
 
     const expectedAuthors = mockTask.authors
       .map(author => `- ${author.firstName} ${author.lastName}`)

@@ -1,11 +1,11 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
-import VueRouter from 'vue-router';
+import {createRouter, createMemoryHistory} from 'vue-router';
 
 import OpenImageGroupButton from '@/components/image-group/OpenImageGroupButton';
 
 const localVue = createLocalVue();
-localVue.use(VueRouter);
-const router = new VueRouter();
+const router = createRouter({history: createMemoryHistory(), routes: [{path: '/:pathMatch(.*)*', component: {template: '<div/>'}}]});
+localVue.use(router);
 
 const mockImages = (count) => Array.from({length: count}, (_, i) => ({id: i + 1, name: `image-${i + 1}.tif`}));
 

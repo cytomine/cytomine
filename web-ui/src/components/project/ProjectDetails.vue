@@ -18,7 +18,7 @@
   <p> {{ $t('unexpected-error-info-message') }} </p>
 </b-message>
 <table v-else class="table">
-  <b-loading :is-full-page="false" :active="loading" class="small" />
+  <b-loading :is-full-page="false" :model-value="loading" class="small" />
   <tbody v-if="!loading">
     <tr v-if="isPropDisplayed('id') && currentAccount.isDeveloper">
       <td class="prop-label">{{$t('id')}}</td>
@@ -94,7 +94,7 @@
     <tr v-if="isPropDisplayed('created')">
       <td class="prop-label">{{$t('created-on')}}</td>
       <td class="prop-content">
-        {{ Number(project.created) | moment('ll') }}
+        {{ $moment(Number(project.created)).format('ll') }}
       </td>
     </tr>
     <tr v-if="isPropDisplayed('creator')">

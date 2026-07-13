@@ -14,7 +14,7 @@
 
 <template>
 <li :key="action.id">
-  <strong>{{Number(action.created) | moment('l LTS')}}:</strong>
+  <strong>{{ $moment(Number(action.created)).format('l LTS') }}:</strong>
   <span class="content" @mouseenter="enter" @mouseleave="leave">
     <router-link v-if="route" :to="route">
       {{action.message}}

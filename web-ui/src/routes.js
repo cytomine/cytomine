@@ -1,4 +1,4 @@
-import VueRouter from 'vue-router';
+import {createRouter, createWebHashHistory} from 'vue-router';
 
 import AppConfigurationPage from '@/components/appengine/AppConfigurationPage.vue';
 import AppDashboardPage from '@/components/appengine/AppDashboardPage.vue';
@@ -114,7 +114,7 @@ const routes = [
         component: ProjectConfiguration
       },
       {
-        path: '*',
+        path: ':pathMatch(.*)*',
         component: PageNotFound
       }
     ]
@@ -132,7 +132,7 @@ const routes = [
     component: AppLayout,
     children: [
       {
-        path: '/',
+        path: '',
         component: AppLocalPage,
       },
       {
@@ -156,9 +156,8 @@ const routes = [
   {path: '/explorer', redirect: '/'},
   {path: '/upload', redirect: '/storage'},
 
-  {path: '/activity', redirect: '/'},
-  {path: '/activity-:idProject-', redirect: '/project/:idProject/activity'},
-  {path: '/activity-:idProject-:idUser', redirect: '/project/:idProject/activity/user/:idUser'},
+  {path: '/activity-:idProject-', redirect: to => `/project/${to.params.idProject}/activity`},
+  {path: '/activity-:idProject-:idUser', redirect: to => `/project/${to.params.idProject}/activity/user/${to.params.idUser}`},
 
   {path: '/search-', redirect: '/advanced-search'},
 
@@ -168,27 +167,27 @@ const routes = [
   {path: '/admin-tabs-permissions', redirect: '/'}, // TODO
   {path: '/admin-tabs-configuration', redirect: '/admin?tab=configuration'},
 
-  {path: '/tabs-dashboard-:idProject', redirect: '/project/:idProject/information'},
-  {path: '/tabs-images-:idProject', redirect: '/project/:idProject/images'},
-  {path: '/tabs-annotations-:idProject', redirect: '/project/:idProject/annotations'},
-  {path: '/tabs-annotationproperties-:idProject-:idAnnot', redirect: '/project/:idProject'},
-  {path: '/tabs-imageproperties-:idProject-:idImage', redirect: '/project/:idProject'},
-  {path: '/tabs-imageproperties-:idProject-:idImage', redirect: '/project/:idProject'},
-  {path: '/tabs-config-:idProject', redirect: '/project/:idProject/configuration'},
-  {path: '/tabs-usersconfig-:idProject', redirect: '/project/:idProject/configuration?tab=members'},
-  {path: '/tabs-#tabs-useractivity-:idProject-:idUser', redirect: '/project/:idProject/activity/user/:idUser'},
-  {path: '/tabs-image-:idProject-:idImage-0', redirect: '/project/:idProject/image/:idImage'},
-  {path: '/tabs-image-:idProject-:idImage-:idAnnotation', redirect: '/project/:idProject/image/:idImage/annotation/:idAnnotation'},
-  {path: '/tabs-image-:idProject-:idImage-', redirect: '/project/:idProject/image/:idImage'},
+  {path: '/tabs-dashboard-:idProject', redirect: to => `/project/${to.params.idProject}/information`},
+  {path: '/tabs-images-:idProject', redirect: to => `/project/${to.params.idProject}/images`},
+  {path: '/tabs-annotations-:idProject', redirect: to => `/project/${to.params.idProject}/annotations`},
+  {path: '/tabs-annotationproperties-:idProject-:idAnnot', redirect: to => `/project/${to.params.idProject}`},
+  {path: '/tabs-imageproperties-:idProject-:idImage', redirect: to => `/project/${to.params.idProject}`},
+  {path: '/tabs-config-:idProject', redirect: to => `/project/${to.params.idProject}/configuration`},
+  {path: '/tabs-usersconfig-:idProject', redirect: to => `/project/${to.params.idProject}/configuration?tab=members`},
+  {path: '/tabs-#tabs-useractivity-:idProject-:idUser', redirect: to => `/project/${to.params.idProject}/activity/user/${to.params.idUser}`},
+  {path: '/tabs-image-:idProject-:idImage-0', redirect: to => `/project/${to.params.idProject}/image/${to.params.idImage}`},
+  {path: '/tabs-image-:idProject-:idImage-:idAnnotation', redirect: to => `/project/${to.params.idProject}/image/${to.params.idImage}/annotation/${to.params.idAnnotation}`},
+  {path: '/tabs-image-:idProject-:idImage-', redirect: to => `/project/${to.params.idProject}/image/${to.params.idImage}`},
   // -----
 
   {
-    path: '*',
+    path: '/:pathMatch(.*)*',
     component: PageNotFound
   }
 ];
 
-const router = new VueRouter({
+const router = createRouter({
+  history: createWebHashHistory(),
   routes: routes,
   linkActiveClass: 'is-active'
 });

@@ -43,7 +43,6 @@ export default {
     tag: Object
   },
   components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
   data() {
     return {
       internalTag: {},

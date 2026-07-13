@@ -13,42 +13,42 @@
  limitations under the License.-->
 
 <script>
-/**
- * @module raster-source/source
- */
 import RasterSource from 'ol/source/Raster';
-import tileSource from 'vuelayers/lib/mixin/image-source';
-
-const props = {
-  sources: {type: Array},
-  operation: {type: Function},
-  lib: {type: Object},
-};
-
-const methods = {
-  createSource() {
-    return new RasterSource({
-      sources: this.sources,
-      operation: this.operation,
-      lib: this.lib,
-    });
-  }
-};
-
-const watch = {
-  operation() {
-    this.$source.setOperation(this.operation, this.lib);
-  },
-  lib() {
-    this.$source.setOperation(this.operation, this.lib);
-  }
-};
 
 export default {
   name: 'vl-source-raster',
-  mixins: [tileSource],
-  props,
-  methods,
-  watch
+  inject: ['vlLayerCtx'],
+  props: {
+    sources: {type: Array},
+    operation: {type: Function},
+    lib: {type: Object}
+  },
+  emits: ['mounted'],
+  created() {
+    this.$source = new RasterSource({
+      sources: this.sources,
+      operation: this.operation,
+      lib: this.lib
+    });
+    this.vlLayerCtx.setSource(this.$source);
+    this.$createPromise = Promise.resolve(this.$source);
+  },
+  watch: {
+    operation() {
+      this.$source.setOperation(this.operation, this.lib);
+    },
+    lib() {
+      this.$source.setOperation(this.operation, this.lib);
+    }
+  },
+  mounted() {
+    this.$emit('mounted');
+  },
+  beforeUnmount() {
+    this.vlLayerCtx.setSource(null);
+  },
+  render() {
+    return null;
+  }
 };
 </script>

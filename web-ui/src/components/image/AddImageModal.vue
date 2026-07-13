@@ -14,7 +14,7 @@
 
 <template>
 <cytomine-modal :active="active" :title="$t('add-images')" @close="$emit('update:active', false)">
-  <b-loading :is-full-page="false" :active="loading" class="small" />
+  <b-loading :is-full-page="false" :model-value="loading" class="small" />
   <template v-if="!loading">
     <template>
       <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
@@ -22,10 +22,10 @@
 
       <cytomine-table
         :collection="imageCollection"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
+        v-model:currentPage="currentPage"
+        v-model:perPage="perPage"
+        v-model:sort="sortField"
+        v-model:order="sortOrder"
         :detailed="false"
       >
         <template #default="{row: image}">
@@ -38,7 +38,7 @@
           </b-table-column>
 
           <b-table-column field="created" :label="$t('created-on')" sortable>
-            {{ Number(image.created) | moment('ll LT') }}
+            {{ $moment(Number(image.created)).format('ll LT') }}
           </b-table-column>
 
           <b-table-column label=" " centered>
@@ -153,17 +153,17 @@ export default {
 </script>
 
 <style scoped>
->>> .animation-content {
+:deep(.animation-content) {
   max-width: 60% !important;
   width: 60%;
 }
 
->>> .modal-card {
+:deep(.modal-card) {
   width: 100%;
   height: 80vh;
 }
 
->>> .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }

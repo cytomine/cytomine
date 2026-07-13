@@ -18,7 +18,7 @@
   <p> {{ $t(permissionError ? 'insufficient-permission' : 'not-found-error') }} </p>
 </div>
 <div class="content-wrapper" v-else>
-  <b-loading :is-full-page="false" :active.sync="loading" />
+  <b-loading :is-full-page="false" v-model="loading" />
   <div class="box" v-if="!loading">
     <div class="box-title">
       <i18n path="detailed-image-information" tag="h1">

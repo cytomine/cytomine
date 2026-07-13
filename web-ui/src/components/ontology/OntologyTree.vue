@@ -19,7 +19,7 @@
       <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
         <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
       </template>
-      <div class="sl-vue-tree-gap"></div>
+      <div class="sl-vue-tree-next-gap"></div>
     </template>
 
     <template #title="{node}">
@@ -63,7 +63,8 @@
 </template>
 
 <script>
-import SlVueTree from 'sl-vue-tree';
+import {SlVueTreeNext as SlVueTree} from 'sl-vue-tree-next';
+import 'sl-vue-tree-next/sl-vue-tree-next-minimal.css';
 import CytomineTerm from './CytomineTerm';
 import TermModal from './TermModal';
 import {Term} from '@/api';
@@ -333,20 +334,20 @@ export default {
   font-size: 1rem;
 }
 
-.ontology-tree.selector .sl-vue-tree-node-item:hover {
+.ontology-tree.selector .sl-vue-tree-next-node-item:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
-.ontology-tree.selector .sl-vue-tree-selected > .sl-vue-tree-node-item {
+.ontology-tree.selector .sl-vue-tree-next-selected > .sl-vue-tree-next-node-item {
   background: rgba(0, 0, 0, 0.05);
   font-weight: 600;
 }
 
-.ontology-tree .sl-vue-tree-selected > .sl-vue-tree-node-item .tree-checkbox {
+.ontology-tree .sl-vue-tree-next-selected > .sl-vue-tree-next-node-item .tree-checkbox {
   color: #61b2e8;
 }
 
-.ontology-tree.selector .sl-vue-tree-gap {
+.ontology-tree.selector .sl-vue-tree-next-gap {
   width: 24px;
 }
 
@@ -373,13 +374,13 @@ export default {
   margin-bottom: 0 !important;
 }
 
-.ontology-tree.editable .sl-vue-tree-sidebar {
+.ontology-tree.editable .sl-vue-tree-next-sidebar {
   width: 100px;
   padding-left: 20px;
   flex-shrink: 0;
 }
 
-.ontology-tree.editable .sl-vue-tree-sidebar {
+.ontology-tree.editable .sl-vue-tree-next-sidebar {
   display: flex;
   align-items: top;
 }

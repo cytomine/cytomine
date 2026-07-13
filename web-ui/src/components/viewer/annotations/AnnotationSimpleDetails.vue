@@ -11,7 +11,7 @@
         </tr>
         <tr>
           <td><strong>{{ $t('created-on') }}</strong></td>
-          <td> {{ Number(annotation.created) | moment('ll') }}</td>
+          <td> {{ $moment(Number(annotation.created)).format('ll') }}</td>
         </tr>
       </template>
 

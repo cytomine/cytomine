@@ -160,7 +160,7 @@ export default {
       this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.index !== null) {
       this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
     }
@@ -169,7 +169,7 @@ export default {
 </script>
 
 <style scoped>
->>> .annot-preview {
+:deep(.annot-preview) {
   margin: 3px;
 }
 

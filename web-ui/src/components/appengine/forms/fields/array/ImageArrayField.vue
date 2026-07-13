@@ -1,11 +1,11 @@
 <template>
   <b-tabs v-model="activeTab" expanded>
     <b-tab-item :label="$t('image')" icon="image">
-      <ImageMultiSelect :key="'image-' + activeTab" @input="onMultiSelect($event, 'image')" />
+      <ImageMultiSelect :key="'image-' + activeTab" @update:model-value="onMultiSelect($event, 'image')" />
     </b-tab-item>
 
     <b-tab-item :label="$t('geometry')" icon="draw-polygon">
-      <AnnotationMultiSelect :key="'annotation-' + activeTab" @input="onMultiSelect($event, 'annotation')"/>
+      <AnnotationMultiSelect :key="'annotation-' + activeTab" @update:model-value="onMultiSelect($event, 'annotation')"/>
     </b-tab-item>
   </b-tabs>
 </template>
@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     onMultiSelect(ids, type) {
-      this.$emit('input', {ids, type});
+      this.$emit('update:modelValue', {ids, type});
     }
   },
 };

@@ -65,7 +65,7 @@ describe('ImageMultiSelect.vue', () => {
 
     await wrapper.setData({selectedImages: newImageIds});
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input[0]).toEqual([newImageIds]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'][0]).toEqual([newImageIds]);
   });
 });

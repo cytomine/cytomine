@@ -24,27 +24,27 @@ describe('FileField.vue', () => {
       },
       propsData: {
         parameter: mockParameter,
-        value: null,
+        modelValue: null,
       },
     });
   });
 
   it('The component should be rendered correctly', () => {
-    expect(wrapper.find('.field label').text()).toBe(mockParameter.display_name);
+    expect(wrapper.find('.field label').text()).toEqual(mockParameter.display_name);
     expect(wrapper.find('input[type="file"]').exists()).toBe(true);
     expect(wrapper.find('button').exists()).toBe(false);
 
     const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
-    expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
+    expect(tooltips.at(0).props('label')).toEqual(mockParameter.description);
   });
 
   it('The component should render clear button when there is a file', async () => {
     const file = {name: 'filename'};
-    await wrapper.setProps({value: file});
+    await wrapper.setProps({modelValue: file});
 
-    expect(wrapper.find('.field label').text()).toBe(mockParameter.display_name);
+    expect(wrapper.find('.field label').text()).toEqual(mockParameter.display_name);
     expect(wrapper.find('input[type="file"]').exists()).toBe(true);
     expect(wrapper.find('button').exists()).toBe(true);
   });
@@ -55,16 +55,16 @@ describe('FileField.vue', () => {
 
   it('The id should be rendered when selected', async () => {
     const file = {name: 'filename'};
-    await wrapper.setProps({value: file});
+    await wrapper.setProps({modelValue: file});
 
-    expect(wrapper.vm.value).toStrictEqual(file);
+    expect(wrapper.vm.modelValue).toStrictEqual(file);
     expect(wrapper.find('.file-name').text()).toBe(file.name);
   });
 
   it('Changing the value should emit an event', async () => {
     await wrapper.setData({input: {id: 42}});
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input.at(0)).toEqual([{id: 42}]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'].at(0)).toEqual([{id: 42}]);
   });
 });

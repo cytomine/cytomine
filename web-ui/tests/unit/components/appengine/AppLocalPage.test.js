@@ -8,8 +8,8 @@ jest.mock('@/utils/appengine/task');
 
 const BLoading = {
   name: 'BLoading',
-  template: '<div class="loading" v-if="active"><slot></slot></div>',
-  props: ['active', 'isFullPage']
+  template: '<div class="loading" v-if="modelValue"><slot></slot></div>',
+  props: ['modelValue', 'isFullPage']
 };
 
 describe('AppLocalPage.vue', () => {
@@ -40,7 +40,7 @@ describe('AppLocalPage.vue', () => {
     const wrapper = createWrapper();
 
     expect(wrapper.findComponent(BLoading).exists()).toBe(true);
-    expect(wrapper.findComponent(BLoading).props('active')).toBe(true);
+    expect(wrapper.findComponent(BLoading).props('modelValue')).toBe(true);
     expect(wrapper.findComponent(BLoading).props('isFullPage')).toBe(false);
   });
 
@@ -59,7 +59,7 @@ describe('AppLocalPage.vue', () => {
 
     expect(wrapper.vm.loading).toBe(false);
     expect(wrapper.findComponent(BLoading).exists()).toBe(true);
-    expect(wrapper.findComponent(BLoading).props('active')).toBe(false);
+    expect(wrapper.findComponent(BLoading).props('modelValue')).toBe(false);
   });
 
   it('should fetch apps on created and updates loading state', async () => {

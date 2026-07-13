@@ -35,6 +35,7 @@ describe('AppCard.vue', () => {
       propsData: {
         app: mockApp,
       },
+      stubs: {RouterLink: {name: 'RouterLink', props: ['to'], template: '<a><slot /></a>'}},
       mocks: {
         $t: (key) => key,
       },
@@ -54,7 +55,7 @@ describe('AppCard.vue', () => {
   it('should render the correct image URL', () => {
     const wrapper = createWrapper();
 
-    expect(wrapper.find('img').attributes('src')).toBe(mockApp.imageUrl);
+    expect(wrapper.find('img').attributes('src')).toEqual(mockApp.imageUrl);
   });
 
   it('should use the correct router link', () => {

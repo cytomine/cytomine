@@ -16,8 +16,8 @@
         </b-button>
       </div>
 
-      <div class="value-container" v-if="value">
-        {{ $t(type) }} {{ value.id }}
+      <div class="value-container" v-if="modelValue">
+        {{ $t(type) }} {{ modelValue.id }}
       </div>
     </b-field>
 
@@ -27,9 +27,9 @@
       </b-tooltip>
     </div>
 
-    <annotation-selection :active.sync="selectAnnotation" @select-annotation="selectInput($event, 'annotation')" />
+    <annotation-selection v-model:active="selectAnnotation" @select-annotation="selectInput($event, 'annotation')" />
 
-    <image-selection :active.sync="selectImage" @select-image="selectInput($event, 'image')" />
+    <image-selection v-model:active="selectImage" @select-image="selectInput($event, 'image')" />
   </div>
 </template>
 
@@ -45,7 +45,7 @@ export default {
   },
   props: {
     parameter: {type: Object, required: true},
-    value: {},
+    modelValue: {},
   },
   data() {
     return {
@@ -57,10 +57,10 @@ export default {
   computed: {
     input: {
       get() {
-        return this.value;
+        return this.modelValue;
       },
       set(value) {
-        this.$emit('input', value);
+        this.$emit('update:modelValue', value);
       }
     },
   },

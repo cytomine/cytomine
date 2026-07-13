@@ -19,7 +19,7 @@
         <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
           <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
         </template>
-        <div class="sl-vue-tree-gap"></div>
+        <div class="sl-vue-tree-next-gap"></div>
       </template>
 
       <template #title="{node}">
@@ -63,7 +63,8 @@
 </template>
 
 <script>
-import SlVueTree from 'sl-vue-tree';
+import {SlVueTreeNext as SlVueTree} from 'sl-vue-tree-next';
+import 'sl-vue-tree-next/sl-vue-tree-next-minimal.css';
 import CytomineTrack from './CytomineTrack';
 import TrackModal from './TrackModal';
 import {Track} from '@/api';
@@ -332,20 +333,20 @@ export default {
     font-size: 1rem;
   }
 
-  .track-tree.selector .sl-vue-tree-node-item:hover {
+  .track-tree.selector .sl-vue-tree-next-node-item:hover {
     background: rgba(0, 0, 0, 0.05);
   }
 
-  .track-tree.selector .sl-vue-tree-selected > .sl-vue-tree-node-item {
+  .track-tree.selector .sl-vue-tree-next-selected > .sl-vue-tree-next-node-item {
     background: rgba(0, 0, 0, 0.05);
     font-weight: 600;
   }
 
-  .track-tree .sl-vue-tree-selected > .sl-vue-tree-node-item .tree-checkbox {
+  .track-tree .sl-vue-tree-next-selected > .sl-vue-tree-next-node-item .tree-checkbox {
     color: #61b2e8;
   }
 
-  .track-tree.selector .sl-vue-tree-gap {
+  .track-tree.selector .sl-vue-tree-next-gap {
     width: 24px;
   }
 
@@ -372,7 +373,7 @@ export default {
     margin-bottom: 0 !important;
   }
 
-  .track-tree.editable .sl-vue-tree-sidebar {
+  .track-tree.editable .sl-vue-tree-next-sidebar {
     padding-left: 20px;
     flex-shrink: 0;
     display: flex;

@@ -362,7 +362,7 @@ export default {
     this.$eventBus.$on('editAnnotation', this.editAnnotationHandler);
     this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // unsubscribe from all events
     this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
     this.$eventBus.$off('selectAnnotationInLayer', this.selectAnnotationHandler);

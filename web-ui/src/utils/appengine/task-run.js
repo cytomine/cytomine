@@ -1,4 +1,4 @@
-import Vue from 'vue';
+
 import Model from './model';
 import Task from './task';
 import {Cytomine} from '@/api';
@@ -92,7 +92,7 @@ export default class TaskRun extends Model {
     }
 
     const inputs = (await Cytomine.instance.api.get(`${this.uri}/inputs`)).data;
-    Vue.set(this, 'inputs', inputs);
+    this['inputs'] = inputs;
 
     return inputs;
   }
@@ -103,7 +103,7 @@ export default class TaskRun extends Model {
     }
 
     const outputs = (await Cytomine.instance.api.get(`${this.uri}/outputs`)).data;
-    Vue.set(this, 'outputs', outputs);
+    this['outputs'] = outputs;
 
     return outputs;
   }
@@ -119,7 +119,7 @@ export default class TaskRun extends Model {
     }
 
     const logs = (await Cytomine.instance.api.get(`${this.uri}/logs`)).data;
-    Vue.set(this, 'logs', logs);
+    this['logs'] = logs;
 
     return logs;
   }

@@ -126,7 +126,7 @@
 
   <calibration-modal
     :image="image"
-    :active.sync="calibrationModal"
+    v-model:active="calibrationModal"
     @setResolution="setResolution"
   />
 </div>
@@ -287,7 +287,7 @@ export default {
   mounted() {
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }
 };

@@ -34,7 +34,7 @@ describe('GeometryField.vue', () => {
       },
       propsData: {
         parameter: mockParameter,
-        value: null,
+        modelValue: null,
       },
       stubs: {
         AnnotationSelection: true,
@@ -43,14 +43,14 @@ describe('GeometryField.vue', () => {
   });
 
   it('The component should be rendered correctly', () => {
-    expect(wrapper.find('.field label').text()).toBe(mockParameter.display_name);
+    expect(wrapper.find('.field label').text()).toEqual(mockParameter.display_name);
     expect(wrapper.find('button').text()).toBe('select');
     expect(wrapper.find('.annotation-container').exists()).toBe(false);
 
     const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
-    expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
+    expect(tooltips.at(0).props('label')).toEqual(mockParameter.description);
   });
 
   it('The input should not have a default value', () => {
@@ -58,9 +58,9 @@ describe('GeometryField.vue', () => {
   });
 
   it('The id should be rendered when selected', async  () => {
-    await wrapper.setProps({value: 42});
+    await wrapper.setProps({modelValue: 42});
 
-    expect(wrapper.vm.value).toBe(42);
+    expect(wrapper.vm.modelValue).toBe(42);
     expect(wrapper.find('.annotation-container').exists()).toBe(true);
     expect(wrapper.find('.annotation-container').text()).toBe('annotation 42');
   });
@@ -68,7 +68,7 @@ describe('GeometryField.vue', () => {
   it('should emit an event when the value is changed', async () => {
     await wrapper.setData({input: 42});
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input.at(0)).toEqual([42]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'].at(0)).toEqual([42]);
   });
 });

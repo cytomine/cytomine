@@ -21,12 +21,12 @@
       :placeholder="$t('search-placeholder')"
       type="search"
       icon="search"
-      @click.native="activate()"
+      @click="activate()"
       :loading="loading"
       :disabled="error"
     />
     <p class="control">
-      <router-link class="button" to="/advanced-search" active-class="router-link-active" @click.native="deactivate">+</router-link>
+      <router-link class="button" to="/advanced-search" active-class="router-link-active" @click="deactivate">+</router-link>
     </p>
   </b-field>
 
@@ -39,7 +39,7 @@
         :to="`/project/${project.id}`"
         class="navbar-item"
         v-html="highlightedName(project.name)"
-        @click.native="deactivate"
+        @click="deactivate"
       />
       <a v-if="moreProjects" class="navbar-item">...</a>
     </p>
@@ -52,7 +52,7 @@
         :key="img.id"
         :to="`/project/${img.project}/image/${img.id}`"
         class="navbar-item"
-        @click.native="deactivate"
+        @click="deactivate"
         v-html="htmlImageName(img)"
       />
       <a v-if="moreImages" class="navbar-item">...</a>
@@ -60,7 +60,7 @@
     <span v-else class="navbar-item no-result">{{$t('no-image')}}</span>
 
     <div v-if="moreImages || moreProjects" class="search-view-all">
-      <router-link class="button is-small" :to="`/advanced-search/${searchString}`" @click.native="deactivate">
+      <router-link class="button is-small" :to="`/advanced-search/${searchString}`" @click="deactivate">
         {{$t('button-view-all')}} ({{totalNbResults}})
       </router-link>
     </div>
@@ -208,7 +208,7 @@ export default {
   color: grey;
 }
 
->>> .blind {
+:deep(.blind) {
   font-size: 0.9em;
   text-transform: uppercase;
 }
@@ -221,7 +221,7 @@ export default {
   margin: 0 !important;
 }
 
->>> .global-search .fas {
+:deep(.global-search .fas) {
   padding-right: 0px !important;
 }
 </style>

@@ -44,7 +44,7 @@
         </button>
       </div>
 
-      <b-collapse :open="filtersOpened">
+      <b-collapse :model-value="filtersOpened">
         <div class="filters">
           <div class="columns">
             <div class="column filter is-one-third">
@@ -69,7 +69,7 @@
       </a>
     </p>
     <div class="panel-block">
-      <b-loading :is-full-page="false" :active="loading" />
+      <b-loading :is-full-page="false" :model-value="loading" />
 
       <div
         v-show="activeTab === 'projects'"
@@ -79,11 +79,11 @@
           :collection="projectCollection"
           :is-empty="nbEmptyFilters > 0"
           class="table-projects"
-          :currentPage.sync="currentPage"
-          :perPage.sync="perPage"
-          :openedDetailed.sync="openedDetails"
-          :sort.sync="sortField"
-          :order.sync="sortOrder"
+          v-model:currentPage="currentPage"
+          v-model:perPage="perPage"
+          v-model:openedDetailed="openedDetails"
+          v-model:sort="sortField"
+          v-model:order="sortOrder"
           :revision="revision"
           @setCollectionSize="nbProjects = $event"
         >
@@ -126,7 +126,7 @@
             </b-table-column>
 
             <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-              {{ Number(project.lastActivity) | moment('ll') }}
+              {{ $moment(Number(project.lastActivity)).format('ll') }}
             </b-table-column>
 
             <b-table-column label=" " centered width="150">
@@ -168,11 +168,11 @@
         <cytomine-table
           :collection="imageCollection"
           :is-empty="nbEmptyFilters > 0"
-          :currentPage.sync="currentPage"
-          :perPage.sync="perPage"
-          :openedDetailed.sync="openedDetails"
-          :sort.sync="sortField"
-          :order.sync="sortOrder"
+          v-model:currentPage="currentPage"
+          v-model:perPage="perPage"
+          v-model:openedDetailed="openedDetails"
+          v-model:sort="sortField"
+          v-model:order="sortOrder"
           :revision="revision"
           @setCollectionSize="nbImages = $event"
         >
@@ -435,7 +435,7 @@ export default {
   margin-bottom: 0.4em;
 }
 
->>> .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }

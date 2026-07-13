@@ -6,7 +6,7 @@ module.exports = {
   'extends': [
     'eslint:recommended',
     'plugin:jest/recommended',
-    'plugin:vue/essential'
+    'plugin:vue/vue3-essential'
   ],
   rules: {
     'array-bracket-spacing': ['error', 'never'],
@@ -31,6 +31,7 @@ module.exports = {
       asyncArrow: 'always',
     }],
     'space-infix-ops': ['error'],
+    'vue/no-v-text-v-html-on-component': 'off',
     'space-in-parens': ['error'],
     'jest/expect-expect': 'off',
     'jest/no-commented-out-tests': 'off',

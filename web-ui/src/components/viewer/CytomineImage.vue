@@ -26,9 +26,9 @@
     >
 
       <vl-view
-        :center.sync="center"
-        :zoom.sync="zoom"
-        :rotation.sync="rotation"
+        v-model:center="center"
+        v-model:zoom="zoom"
+        v-model:rotation="rotation"
         :max-zoom="maxZoom"
         :max-resolution="Math.pow(2, image.zoom)"
         :extent="extent"
@@ -216,7 +216,7 @@ import DrawInteraction from './interactions/DrawInteraction';
 import ModifyInteraction from './interactions/ModifyInteraction';
 import ToggleScaleLine from './interactions/ToggleScaleLine';
 
-import {addProj, createProj, getProj} from 'vuelayers/lib/ol-ext';
+import {addProj, createProj, getProj} from '@/utils/ol-proj';
 
 import View from 'ol/View';
 import OverviewMap from 'ol/control/OverviewMap';
@@ -821,7 +821,7 @@ export default {
     this.$eventBus.$on('close-metadata', () => this.$store.commit(this.imageModule + 'togglePanel', 'info'));
     this.setInitialZoom();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$eventBus.$off('updateMapSize', this.updateMapSize);
     this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
     this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
@@ -832,7 +832,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~vuelayers/lib/style.css';
+
 
 $backgroundPanelBar: #555;
 $widthPanelBar: 2.8rem;

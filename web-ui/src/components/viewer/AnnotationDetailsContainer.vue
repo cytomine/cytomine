@@ -84,6 +84,7 @@
 
 <script>
 import VueDraggableResizable from 'vue-draggable-resizable';
+import 'vue-draggable-resizable/style.css';
 import {Cytomine, UserCollection} from '@/api';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
@@ -236,7 +237,7 @@ export default {
     window.addEventListener('resize', this.handleResize);
     this.$eventBus.$on('updateMapSize', this.handleResize);
   },
-  destroyed() {
+  unmounted() {
     window.removeEventListener('resize', this.handleResize);
     this.$eventBus.$off('updateMapSize', this.handleResize);
   }

@@ -22,7 +22,7 @@ limitations under the License.-->
   <p>{{ $t('unexpected-error-info-message') }}</p>
 </div>
 <div v-else class="content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('image-groups')}}
@@ -51,7 +51,7 @@ limitations under the License.-->
         </button>
       </div>
 
-      <b-collapse :open="filtersOpened">
+      <b-collapse :model-value="filtersOpened">
         <div class="filters">
           <div class="columns">
             <div class="column filter is-half">
@@ -79,12 +79,12 @@ limitations under the License.-->
       <b-table
           :data="filteredImageGroups"
           :paginated="true"
-          :current-page.sync="currentPage"
+          v-model:current-page="currentPage"
           :per-page="perPage"
           pagination-size="is-small"
           detailed
           detail-key="id"
-          :opened-detailed.sync="openedDetails"
+          v-model:opened-detailed="openedDetails"
           :default-sort="sort.field"
           :default-sort-direction="sort.order"
           @sort="updateSort"
@@ -160,7 +160,7 @@ limitations under the License.-->
       </b-table>
     </div>
 
-    <add-image-group-modal :active.sync="addImageGroupModal" @newImageGroup="newImageGroup" />
+    <add-image-group-modal v-model:active="addImageGroupModal" @newImageGroup="newImageGroup" />
   </div>
 </div>
 </template>
@@ -350,12 +350,12 @@ export default {
   display: flex;
 }
 
->>> .search-images {
+:deep(.search-images) {
   max-width: 30rem;
   margin-right: 1rem;
 }
 
->>> td, >>> th {
+:deep(td), :deep(th) {
   vertical-align: middle !important;
 }
 </style>

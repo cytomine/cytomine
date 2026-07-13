@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {createGeoJsonFmt} from 'vuelayers/lib/ol-ext/format';
+import GeoJSON from 'ol/format/GeoJSON';
 import {annotBelongsToLayer} from '@/utils/annotation-utils';
 
 export default {
@@ -57,7 +57,7 @@ export default {
     },
 
     selectFeature(state, feature) {
-      state.selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature));
+      state.selectedFeatures.push(new GeoJSON().writeFeatureObject(feature));
     },
 
     changeAnnotSelectedFeature(state, {indexFeature, annot}) {

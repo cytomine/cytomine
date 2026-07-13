@@ -10,13 +10,13 @@
           <span class="file-cta">
             <span class="file-label">{{ $t("add-attached-file") }}</span>
           </span>
-          <span class="file-name">{{ value ? value.name : $t("no-attached-file") }}</span>
+          <span class="file-name">{{ modelValue ? modelValue.name : $t("no-attached-file") }}</span>
         </label>
       </div>
     </b-field>
 
     <b-button
-      v-if="value"
+      v-if="modelValue"
       @click="input = null"
       class="clear-button"
     >
@@ -36,15 +36,15 @@ export default {
   name: 'FileField',
   props: {
     parameter: {type: Object, required: true},
-    value: {},
+    modelValue: {},
   },
   computed: {
     input: {
       get() {
-        return this.value;
+        return this.modelValue;
       },
       set(value) {
-        this.$emit('input', value);
+        this.$emit('update:modelValue', value);
       }
     },
   },

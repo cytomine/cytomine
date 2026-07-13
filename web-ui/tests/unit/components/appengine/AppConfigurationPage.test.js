@@ -39,6 +39,8 @@ describe('AppConfigurationPage.vue', () => {
       },
       stubs: {
         AppStoreAddModal,
+        // inert stub: the scoped row slot cannot render without b-table internals
+        'b-table': {template: '<div class="b-table-stub" />'},
       },
     });
   };

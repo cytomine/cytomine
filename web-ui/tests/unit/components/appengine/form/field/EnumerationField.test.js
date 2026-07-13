@@ -23,16 +23,16 @@ describe('EnumerationField.vue', () => {
       localVue,
       propsData: {
         parameter: mockParameter,
-        value: mockParameter.default,
+        modelValue: mockParameter.default,
       },
     });
   });
 
   it('The component should be rendered correctly', () => {
-    expect(wrapper.find('.field label').text()).toBe(mockParameter.display_name);
+    expect(wrapper.find('.field label').text()).toEqual(mockParameter.display_name);
 
     const options = wrapper.findAll('option');
-    expect(options.length).toBe(mockParameter.type.values.length);
+    expect(options.length).toEqual(mockParameter.type.values.length);
     expect(options.at(0).text()).toBe('A');
     expect(options.at(1).text()).toBe('B');
     expect(options.at(2).text()).toBe('C');
@@ -40,11 +40,11 @@ describe('EnumerationField.vue', () => {
     const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
-    expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
+    expect(tooltips.at(0).props('label')).toEqual(mockParameter.description);
   });
 
   it('The input should have a default value', () => {
-    expect(wrapper.vm.input).toBe(mockParameter.default);
+    expect(wrapper.vm.input).toEqual(mockParameter.default);
   });
 
   it('The input not show the tooltip if description is empty', async () => {
@@ -63,7 +63,7 @@ describe('EnumerationField.vue', () => {
   it('Changing the value should emit an event', async () => {
     await wrapper.find('select').setValue('B');
 
-    const emitted = wrapper.emitted().input;
+    const emitted = wrapper.emitted()['update:modelValue'];
     expect(emitted).toBeTruthy();
     expect(emitted.at(0)).toEqual(['B']);
     expect(mockParameter.type.values).toContain(emitted.at(0).at(0));
@@ -72,7 +72,7 @@ describe('EnumerationField.vue', () => {
   it('Changing to an unknown value should fail', async () => {
     await wrapper.find('select').setValue('Unknown');
 
-    const emitted = wrapper.emitted().input;
+    const emitted = wrapper.emitted()['update:modelValue'];
     expect(emitted).toBeTruthy();
     expect(emitted.at(0)).toEqual([undefined]);
     expect(mockParameter.type.values).not.toContain(emitted.at(0).at(0));

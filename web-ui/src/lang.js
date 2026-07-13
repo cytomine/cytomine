@@ -14,14 +14,13 @@
 * limitations under the License.
 */
 
-import Vue from 'vue';
-import VueI18n from 'vue-i18n';
+import {createI18n} from 'vue-i18n';
 
-Vue.use(VueI18n);
-
-export default new VueI18n({
+export default createI18n({
+  legacy: true,
   locale: 'en',
   fallbackLocale: 'en',
+  silentTranslationWarn: true,
   messages: {
     'en': require('./locales/json/en.i18n.json'),
     'es': require('./locales/json/es.i18n.json'),

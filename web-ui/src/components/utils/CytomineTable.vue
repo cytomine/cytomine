@@ -21,7 +21,7 @@
   </slot>
 </b-message>
 <div v-else class="cytomine-table-wrapper">
-  <b-loading :is-full-page="false" :active="!data" />
+  <b-loading :is-full-page="false" :model-value="!data" />
   <b-table
     v-if="data"
     :data="data"
@@ -30,7 +30,7 @@
     backend-pagination
     :total="total"
     :per-page="internalPerPage"
-    :current-page.sync="internalCurrentPage"
+    v-model:current-page="internalCurrentPage"
     pagination-size="is-small"
     :detailed="detailed"
     :detail-key="detailKey"
@@ -39,7 +39,7 @@
     :default-sort="sort"
     :default-sort-direction="order"
     :checkable="checkable"
-    :checked-rows.sync="internalCheckedRows"
+    v-model:checked-rows="internalCheckedRows"
     :is-row-checkable="isRowCheckable"
     @sort="updateSort"
   >

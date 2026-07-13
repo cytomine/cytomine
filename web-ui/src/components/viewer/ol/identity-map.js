@@ -14,24 +14,24 @@
 * limitations under the License.
 */
 
-import {pick} from 'vuelayers/lib/util/minilo';
-import Interaction from './interaction.vue';
+/**
+ * Registry mapping string identifiers to OpenLayers objects (sources, feature
+ * collections), so interactions can reference them by name across component
+ * subtrees (replaces the VueLayers IdentityMap).
+ */
 
-function plugin(Vue, options = {}) {
-  if (plugin.installed) {
-    return;
-  }
-  plugin.installed = true;
+const registry = new Map();
 
-  options = pick(options, 'dataProjection');
-  Object.assign(Interaction, options);
-
-  Vue.component(Interaction.name, Interaction);
+export function register(ident, value) {
+  registry.set(ident, value);
 }
 
-export default plugin;
+export function unregister(ident, value) {
+  if (registry.get(ident) === value) {
+    registry.delete(ident);
+  }
+}
 
-export {
-  Interaction,
-  plugin as install,
-};
+export function getIdent(ident) {
+  return registry.get(ident);
+}

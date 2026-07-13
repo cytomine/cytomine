@@ -39,10 +39,10 @@
       <tbody>
         <tr v-for="(layer, idx) in selectedLayers" :key="layer.id">
           <td class="checkbox-column">
-            <b-checkbox size="is-small" :value="layer.visible" @input="toggleLayerVisibility(idx)" />
+            <b-checkbox size="is-small" :model-value="layer.visible" @update:model-value="toggleLayerVisibility(idx)" />
           </td>
           <td v-if="!reviewMode" class="checkbox-column">
-            <b-checkbox size="is-small" :value="layer.drawOn" :disabled="!canDraw(layer)" @input="toggleLayerDrawOn(idx)" />
+            <b-checkbox size="is-small" :model-value="layer.drawOn" :disabled="!canDraw(layer)" @update:model-value="toggleLayerDrawOn(idx)" />
           </td>
 
           <td class="name-column">
@@ -362,7 +362,7 @@ export default {
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
     this.$eventBus.$on('annotation-layers:refresh', this.fetchLayers);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$eventBus.$off('addAnnotation', this.addAnnotationEventHandler);
     this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationEventHandler);
     this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
@@ -373,7 +373,7 @@ export default {
 </script>
 
 <style scoped>
->>> select {
+:deep(select) {
   width: 21em;
 }
 
@@ -413,11 +413,11 @@ td .button {
   width: 100%;
 }
 
->>> .checkbox .control-label {
+:deep(.checkbox .control-label) {
   padding: 0 !important;
 }
 
->>> input[type="range"].slider {
+:deep(input[type="range"].slider) {
   margin: 0;
   padding: 0;
 }

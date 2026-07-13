@@ -5,7 +5,7 @@
       :title="$t('select-image-to-add')"
       @close="$emit('update:active', false)"
     >
-      <b-loading class="small" :active="loading" :is-full-page="false"/>
+      <b-loading class="small" :model-value="loading" :is-full-page="false"/>
 
       <template v-if="!loading">
         <div class="image-content">

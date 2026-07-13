@@ -23,13 +23,13 @@ describe('NumberField.vue', () => {
       localVue,
       propsData: {
         parameter: mockParameter,
-        value: mockParameter.default,
+        modelValue: mockParameter.default,
       },
     });
   });
 
   it('The component should be rendered correctly', () => {
-    expect(wrapper.find('.field label').text()).toBe(mockParameter.display_name);
+    expect(wrapper.find('.field label').text()).toEqual(mockParameter.display_name);
 
     expect(wrapper.findAll('input[type="number"]').length).toBe(1);
 
@@ -41,7 +41,7 @@ describe('NumberField.vue', () => {
   });
 
   it('The input should have a default value', () => {
-    expect(wrapper.vm.input).toBe(mockParameter.default);
+    expect(wrapper.vm.input).toEqual(mockParameter.default);
   });
 
   it('The input should show the correct constraints summary',  () => {
@@ -66,7 +66,7 @@ describe('NumberField.vue', () => {
   it('Changing the value should emit an event', async () => {
     await wrapper.setData({input: 12});
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input.at(0)).toEqual([12]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'].at(0)).toEqual([12]);
   });
 });

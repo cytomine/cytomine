@@ -14,24 +14,29 @@
 * limitations under the License.
 */
 
-import {pick} from 'vuelayers/lib/util/minilo';
-import Interaction from './interaction.vue';
+import mitt from 'mitt';
 
-function plugin(Vue, options = {}) {
-  if (plugin.installed) {
-    return;
+/**
+ * Event bus exposing the Vue 2 instance event API ($on/$off/$emit) used
+ * throughout the codebase, backed by mitt (Vue 3 removed $on/$off/$emit).
+ * Handlers receive a single payload argument, as was already the convention.
+ */
+class EventBus {
+  constructor() {
+    this.emitter = mitt();
   }
-  plugin.installed = true;
 
-  options = pick(options, 'dataProjection');
-  Object.assign(Interaction, options);
+  $on(event, handler) {
+    this.emitter.on(event, handler);
+  }
 
-  Vue.component(Interaction.name, Interaction);
+  $off(event, handler) {
+    this.emitter.off(event, handler);
+  }
+
+  $emit(event, payload) {
+    this.emitter.emit(event, payload);
+  }
 }
 
-export default plugin;
-
-export {
-  Interaction,
-  plugin as install,
-};
+export default new EventBus();

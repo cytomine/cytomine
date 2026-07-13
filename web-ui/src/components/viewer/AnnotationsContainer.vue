@@ -172,7 +172,7 @@ export default {
       }
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$store.commit(this.imageModule + 'setShowSimilarAnnotations', false);
   },
 };

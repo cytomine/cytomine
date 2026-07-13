@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {Line} from 'vue-chartjs';
+import {Line} from './base-charts';
 import _ from 'lodash';
 
 export default {

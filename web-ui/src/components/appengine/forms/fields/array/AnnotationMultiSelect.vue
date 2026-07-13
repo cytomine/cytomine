@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-loading class="small" :active="loading" :is-full-page="false" />
+    <b-loading class="small" :model-value="loading" :is-full-page="false" />
 
     <div v-if="!loading" class="annotation-content">
       <selectable-annotation
@@ -64,7 +64,7 @@ export default {
   },
   watch: {
     selectedAnnotationIds(annotationIds) {
-      this.$emit('input', annotationIds);
+      this.$emit('update:modelValue', annotationIds);
     }
   },
   async created() {

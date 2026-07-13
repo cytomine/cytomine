@@ -1,7 +1,7 @@
 <template>
 <b-taginput
-  :value="value"
-  @input="$emit('input', $event)"
+  :model-value="modelValue"
+  @update:model-value="$emit('update:modelValue', $event)"
   :data="filteredUsers"
   autocomplete
   :open-on-focus="true"
@@ -19,7 +19,7 @@ import {getWildcardRegexp} from '@/utils/string-utils';
 export default {
   name: 'user-taginput',
   props: {
-    value: Array,
+    modelValue: Array,
     users: Array
   },
   data() {
@@ -29,7 +29,7 @@ export default {
   },
   computed: {
     filteredUsers() {
-      let selectedIds = this.value.map(v => v.id);
+      let selectedIds = this.modelValue.map(v => v.id);
       let filtered = this.users.filter(user => !selectedIds.includes(user.id));
       if (this.searchString === '') {
         return filtered;

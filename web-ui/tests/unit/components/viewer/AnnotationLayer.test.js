@@ -65,7 +65,7 @@ describe('AnnotationLayer.vue', () => {
     it('should add feature when annotation belongs to layer', () => {
       const wrapper = createWrapper();
       const feature = {id: 1};
-      wrapper.vm.$refs.olSource = {addFeature: jest.fn()};
+      wrapper.vm.$.refs.olSource = {addFeature: jest.fn()};
       wrapper.vm.annotBelongsToLayer = jest.fn().mockReturnValue(true);
       wrapper.vm.createFeature = jest.fn().mockReturnValue(feature);
 
@@ -79,7 +79,7 @@ describe('AnnotationLayer.vue', () => {
 
     it('should not add feature when annotation does not belong to layer', () => {
       const wrapper = createWrapper();
-      wrapper.vm.$refs.olSource = {addFeature: jest.fn()};
+      wrapper.vm.$.refs.olSource = {addFeature: jest.fn()};
 
       wrapper.vm.annotBelongsToLayer = jest.fn().mockReturnValue(false);
       wrapper.vm.addAnnotationHandler({id: 1});

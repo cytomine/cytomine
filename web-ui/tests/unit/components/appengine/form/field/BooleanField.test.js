@@ -22,13 +22,13 @@ describe('BooleanField.vue', () => {
       localVue,
       propsData: {
         parameter: mockParameter,
-        value: mockParameter.default,
+        modelValue: mockParameter.default,
       },
     });
   });
 
   it('The component should be rendered correctly', () => {
-    expect(wrapper.find('.display-name').text()).toBe(mockParameter.display_name);
+    expect(wrapper.find('.display-name').text()).toEqual(mockParameter.display_name);
 
     expect(wrapper.findAll('input[type="radio"]').length).toBe(2);
     expect(wrapper.findAll('input[type="radio"][value="true"]').length).toBe(1);
@@ -37,15 +37,15 @@ describe('BooleanField.vue', () => {
     const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
-    expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
+    expect(tooltips.at(0).props('label')).toEqual(mockParameter.description);
   });
 
   it('The input should have a default value', () => {
-    expect(wrapper.vm.input).toBe(mockParameter.default);
+    expect(wrapper.vm.input).toEqual(mockParameter.default);
   });
 
   it('The "False" radio button should be checked when the input is false', async () => {
-    await wrapper.setProps({value: null});
+    await wrapper.setProps({modelValue: null});
 
     const radioTrue = wrapper.find('input[type="radio"][value="true"]');
     expect(radioTrue.element.checked).toBe(false);
@@ -53,14 +53,14 @@ describe('BooleanField.vue', () => {
     const radioFalse = wrapper.find('input[type="radio"][value="false"]');
     expect(radioFalse.element.checked).toBe(false);
 
-    await wrapper.setProps({value: false});
+    await wrapper.setProps({modelValue: false});
 
     expect(radioTrue.element.checked).toBe(false);
     expect(radioFalse.element.checked).toBe(true);
   });
 
   it('The "True" radio button should be checked when the input is true', async () => {
-    await wrapper.setProps({value: null});
+    await wrapper.setProps({modelValue: null});
 
     const radioTrue = wrapper.find('input[type="radio"][value="true"]');
     expect(radioTrue.element.checked).toBe(false);
@@ -68,14 +68,14 @@ describe('BooleanField.vue', () => {
     const radioFalse = wrapper.find('input[type="radio"][value="false"]');
     expect(radioFalse.element.checked).toBe(false);
 
-    await wrapper.setProps({value: true});
+    await wrapper.setProps({modelValue: true});
 
     expect(radioTrue.element.checked).toBe(true);
     expect(radioFalse.element.checked).toBe(false);
   });
 
   it('Selecting the radio button should emit an event', async () => {
-    await wrapper.setProps({value: null});
+    await wrapper.setProps({modelValue: null});
     expect(wrapper.vm.input).toBe(null);
 
     const radioFalse = wrapper.find('input[type="radio"][value="false"]');
@@ -84,7 +84,7 @@ describe('BooleanField.vue', () => {
     await radioFalse.setChecked();
 
     expect(radioFalse.element.checked).toBe(true);
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input[0]).toEqual([false]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'][0]).toEqual([false]);
   });
 });

@@ -80,7 +80,7 @@ describe('ImageSelection.vue', () => {
   it('Clicking on cancel should reset selectedImage', async () => {
     wrapper.setData({selectedImage: mockImages[1]});
 
-    expect(wrapper.vm.selectedImage).toBe(mockImages[1]);
+    expect(wrapper.vm.selectedImage).toEqual(mockImages[1]);
 
     wrapper.vm.cancel();
     await wrapper.vm.$nextTick();

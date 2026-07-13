@@ -6,7 +6,7 @@
       <section class="panel-block">
         <b-table
           ref="table"
-          :current.sync="currentPage"
+          v-model:current="currentPage"
           :data="taskRuns"
           :paginated="true"
           :per-page="perPage"
@@ -54,7 +54,7 @@
                 <div class="columns">
                   <div class="column">
                     <h2>{{ $t('app-engine.inputs.title') }}</h2>
-                    <b-loading :is-full-page="false" :active="run.inputs === null" />
+                    <b-loading :is-full-page="false" :model-value="run.inputs === null" />
                     <task-run-parameters-table
                       v-if="run.inputs !== null"
                       :parameters="run.inputs"
@@ -64,7 +64,7 @@
                   </div>
                   <div class="column">
                     <h2>{{ $t('app-engine.outputs.title') }}</h2>
-                    <b-loading :is-full-page="false" :active="run.outputs === null" />
+                    <b-loading :is-full-page="false" :model-value="run.outputs === null" />
                     <task-run-parameters-table
                       v-if="run.outputs !== null"
                       :parameters="run.outputs"
@@ -76,7 +76,7 @@
               </b-tab-item>
 
               <b-tab-item :label="$t('logs')">
-                <b-loading :is-full-page="false" :active="run.logs === null" />
+                <b-loading :is-full-page="false" :model-value="run.logs === null" />
                 <pre v-if="run.logs !== null" class="logs">{{ run.logs }}</pre>
                 <p v-else>{{ $t('no-log-to-display') }}</p>
               </b-tab-item>
@@ -123,7 +123,7 @@ export default {
       );
     },
     async onDetailsOpen(taskRun) {
-      this.$set(taskRun, '_activeTab', taskRun._activeTab ?? 0);
+      taskRun['_activeTab'] = taskRun._activeTab ?? 0;
 
       if (!taskRun.inputs) {
         await taskRun.fetchInputs();
@@ -163,7 +163,7 @@ export default {
       return map[state.toLowerCase()] ?? 'is-light';
     },
     async handleViewLogs(run) {
-      this.$set(run, '_activeTab', 1);
+      run['_activeTab'] = 1;
       await this.onDetailsOpen(run);
       this.$refs.table.openDetailRow(run);
     },

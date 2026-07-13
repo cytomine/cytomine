@@ -1,4 +1,4 @@
-.sl-vue-tree {
+.sl-vue-tree-next {
   position: relative;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -8,15 +8,15 @@
   user-select: none;
 }
 
-.sl-vue-tree-root > .sl-vue-tree-nodes-list {
+.sl-vue-tree-next-root > .sl-vue-tree-next-nodes-list {
   position: relative;
 }
 
-.sl-vue-tree-node-list {
+.sl-vue-tree-next-node-list {
   position: relative;
 }
 
-.sl-vue-tree-node-item {
+.sl-vue-tree-next-node-item {
   position: relative;
   padding-left: 1.5em;
   width: 100%;
@@ -26,7 +26,7 @@
   flex-direction: row;
 }
 
-.sl-vue-tree-title {
+.sl-vue-tree-next-title {
   flex-grow: 1;
   display: flex;
   align-items: top;
@@ -34,44 +34,44 @@
   min-width: 0; /* to allow correct handling of overflow-wrap */
 }
 
-.sl-vue-tree .tree-toggle.fas {
+.sl-vue-tree-next .tree-toggle.fas {
   width: 1.5em;
   padding-left: 0.25em;
   cursor: pointer;
 }
 
-.sl-vue-tree-node-is-folder > .sl-vue-tree-title {
+.sl-vue-tree-next-node-is-folder > .sl-vue-tree-next-title {
   position: relative;
   right: 1.5em;
 }
 
-.sl-vue-tree-node-item {
+.sl-vue-tree-next-node-item {
   position: relative;
   display: flex;
   flex-direction: row;
 }
 
-.sl-vue-tree-gap {
+.sl-vue-tree-next-gap {
   width: 1.5em;
   min-height: 1px;
   flex-shrink: 0;
 }
 
-.sl-vue-tree-cursor {
+.sl-vue-tree-next-cursor {
   position: absolute;
   border: 1px dashed #61b2e8;
   height: 1px;
   width: 100%;
 }
 
-.sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
+.sl-vue-tree-next-node-item.sl-vue-tree-next-cursor-inside {
   outline: 1px dashed #61b2e8;
 }
 
-.sl-vue-tree-drag-info {
+.sl-vue-tree-next-drag-info {
   display: none;
 }
 
-.draggable .sl-vue-tree-selected > .sl-vue-tree-node-item {
+.draggable .sl-vue-tree-next-selected > .sl-vue-tree-next-node-item {
   background-color: rgba(100, 100, 100, 0.1);
 }

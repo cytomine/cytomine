@@ -11,7 +11,7 @@
         {{ $t('select') }}
       </b-button>
 
-      <div class="state-container" v-if="value">
+      <div class="state-container" v-if="modelValue">
         {{ $t('provisioned') }}
       </div>
     </b-field>
@@ -23,7 +23,7 @@
     </div>
 
     <array-modal
-      :active.sync="selectParameters"
+      v-model:active="selectParameters"
       :max-size="maxSize"
       :min-size="minSize"
       :type="subType"
@@ -42,7 +42,7 @@ export default {
   },
   props: {
     parameter: {type: Object, required: true},
-    value: {},
+    modelValue: {},
   },
   data() {
     return {
@@ -52,10 +52,10 @@ export default {
   computed: {
     input: {
       get() {
-        return this.value;
+        return this.modelValue;
       },
       set(value) {
-        this.$emit('input', value);
+        this.$emit('update:modelValue', value);
       }
     },
     type() {

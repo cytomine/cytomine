@@ -19,8 +19,8 @@
     </p>
     <div class="panel-block storage">
       <b-input
-        :value="searchString"
-        @input="debounceSearchString"
+        :model-value="searchString"
+        @update:model-value="debounceSearchString"
         class="search-uploaded-file"
         :placeholder="$t('search-placeholder')"
         icon="search"
@@ -31,7 +31,7 @@
         sort="created" order="desc"
         :revision="revision"
         :refreshInterval="tableRefreshInterval"
-        :openedDetailed.sync="openedDetails"
+        v-model:openedDetailed="openedDetails"
         :detailed="false"
       >
         <template #default="{row: uFile}">
@@ -45,7 +45,7 @@
           </b-table-column>
 
           <b-table-column field="created" :label="$t('created')" sortable width="150">
-            {{ Number(uFile.created) | moment('lll') }}
+            {{ $moment(Number(uFile.created)).format('lll') }}
           </b-table-column>
 
           <b-table-column field="size" :label="$t('size')" sortable width="80">

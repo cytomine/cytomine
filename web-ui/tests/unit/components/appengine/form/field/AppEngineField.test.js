@@ -25,7 +25,7 @@ describe('AppEngineField.vue', () => {
       localVue,
       propsData: {
         parameter: {type: {id: 'array'}},
-        value: null,
+        modelValue: null,
       },
       data() {
         return {
@@ -42,8 +42,8 @@ describe('AppEngineField.vue', () => {
       stubs: {
         ArrayField: {
           name: 'ArrayField',
-          props: ['value', 'parameter'],
-          template: '<input class="array-field" @input="$emit(\'input\', $event.target.value)" />'
+          props: ['modelValue', 'parameter'],
+          template: '<input class="array-field" @input="$emit(\'update:modelValue\', $event.target.value)" />'
         },
         BooleanField: true,
         EnumerationField: true,
@@ -68,12 +68,12 @@ describe('AppEngineField.vue', () => {
     input.element.value = 'new value';
     await input.trigger('input');
 
-    expect(wrapper.emitted('input')).toBeTruthy();
-    expect(wrapper.emitted('input')[0]).toEqual(['new value']);
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+    expect(wrapper.emitted('update:modelValue')[0]).toEqual(['new value']);
   });
 
   it('The component should return correct value via computed input', async () => {
-    await wrapper.setProps({value: 'hello world'});
+    await wrapper.setProps({modelValue: 'hello world'});
 
     expect(wrapper.vm.input).toBe('hello world');
   });
@@ -81,7 +81,7 @@ describe('AppEngineField.vue', () => {
   it('The component should set value via computed setter and emits input', () => {
     wrapper.vm.input = 'updated';
 
-    expect(wrapper.emitted('input')).toBeTruthy();
-    expect(wrapper.emitted('input')[0]).toEqual(['updated']);
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+    expect(wrapper.emitted('update:modelValue')[0]).toEqual(['updated']);
   });
 });

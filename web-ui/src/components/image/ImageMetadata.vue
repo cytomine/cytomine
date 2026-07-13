@@ -14,7 +14,7 @@
 
 <template>
   <div>
-    <b-loading :is-full-page="false" :active="loading" />
+    <b-loading :is-full-page="false" :model-value="loading" />
     <template v-if="!loading">
       <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
         <h2> {{ $t('error') }} </h2>
@@ -123,7 +123,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
->>> .modal-card, >>> .modal-card-body {
+:deep(.modal-card), :deep(.modal-card-body) {
   width: 800px;
   max-width: 100%;
 }

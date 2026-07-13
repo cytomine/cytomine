@@ -48,10 +48,10 @@
 </template>
 
 <script>
-import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect';
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 import CytomineModal from '@/components/utils/CytomineModal';
 import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
+import GeometryArrayField from '@/components/appengine/forms/fields/array/GeometryArrayField';
 import ImageArrayField from '@/components/appengine/forms/fields/array/ImageArrayField';
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 import NumberField from '@/components/appengine/forms/fields/NumberField';
@@ -100,7 +100,7 @@ export default {
     selectedComplexField() {
       switch (this.type.id) {
         case 'geometry':
-          return AnnotationMultiSelect;
+          return GeometryArrayField;
         case 'image':
           return ImageArrayField;
         default:

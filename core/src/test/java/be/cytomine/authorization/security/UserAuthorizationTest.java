@@ -15,12 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.AbstractAuthorizationTest;
+import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.search.UserSearchExtension;
 import be.cytomine.service.security.AccountService;
-import be.cytomine.service.security.SecUserSecRoleService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
@@ -33,20 +33,16 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
-    @MockitoBean
-    private AccountService accountService;
-
     @Autowired
     ProjectMemberService projectMemberService;
-
     @Autowired
     UserService userService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
-    @Autowired
-    SecUserSecRoleService secSecUserSecRoleService;
+    @MockitoBean
+    private AccountService accountService;
+    @MockitoBean
+    private OntologyHttpContract ontologyHttpContract;
 
     @Test
     @WithMockUser(username = GUEST)
@@ -177,13 +173,6 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void adminCanDeleteAnotherUser() {
-        User user = builder.givenAUser();
-        expectOK(() -> userService.delete(user, null, null, false));
-    }
-
-    @Test
-    @WithMockUser(username = SUPERADMIN)
     public void shouldAddAndRemoveUserFromProjectWhenAdmin() {
         User user = builder.givenAUser();
         Project project = builder.givenAProject();
@@ -211,33 +200,4 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
     }
 
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void shouldDenyGrantingAdminRoleWhenUserIsNotSuperAdmin() {
-        User user = builder.givenAUser();
-        expectForbidden(() -> secSecUserSecRoleService.add(builder.givenANotPersistedUserRole(user, "ROLE_ADMIN")
-            .toJsonObject()));
-    }
-
-    @Test
-    @WithMockUser(username = SUPERADMIN)
-    public void shouldGrantAdminRoleWhenSuperAdmin() {
-        User user = builder.givenAUser();
-        expectOK(() -> secSecUserSecRoleService.add(builder.givenANotPersistedUserRole(user, "ROLE_ADMIN")
-            .toJsonObject()));
-    }
-
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void shouldDenyRevokingRoleWhenUserIsNotSuperAdmin() {
-        User user = builder.givenAUser();
-        expectForbidden(() -> secSecUserSecRoleService.delete(builder.givenAUserRole(user), null, null, false));
-    }
-
-    @Test
-    @WithMockUser(username = SUPERADMIN)
-    public void shouldRevokeRoleWhenSuperAdmin() {
-        User user = builder.givenAUser();
-        expectOK(() -> secSecUserSecRoleService.delete(builder.givenAUserRole(user), null, null, false));
-    }
 }

@@ -3,6 +3,7 @@ package be.cytomine.service.annotation;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
@@ -13,11 +14,11 @@ import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.service.AnnotationListingService;
-import be.cytomine.service.ontology.TermService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.JsonObject;
@@ -37,9 +38,9 @@ public class AnnotationReportService {
 
     private final ProjectService projectService;
 
-    private final TermService termService;
+    private final TermHttpContract termHttpContract;
 
-    public byte[] downloadDocumentByProject(JsonObject params, Project project) {
+    public byte[] downloadDocumentByProject(JsonObject params, Project project, long userId) {
 
         Long idProject = params.getJSONAttrLong("project");
         boolean reviewed = params.getJSONAttrBoolean("reviewed", false);
@@ -47,14 +48,18 @@ public class AnnotationReportService {
         String usersParamName = reviewed ? "reviewUsers" : "users";
         Optional<String> requestedUsers = Optional.ofNullable(params.getJSONAttrStr(usersParamName));
 
-        String terms = params.getJSONAttrStr("terms");
+        String termsParam = params.getJSONAttrStr("terms");
         String format = params.getJSONAttrStr("format");
 
         String userIds = requestedUsers
             .filter(s -> !s.isBlank())
             .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
 
-        terms = termService.fillEmptyTermIds(terms, project);
+        String terms =
+            termsParam == null || termsParam.isBlank() ? termHttpContract.findAllTermIdsByProject(idProject, userId)
+                .stream().map(String::valueOf).collect(
+                    Collectors.joining(",")) :
+                termsParam;
 
         if (reviewed) {
             params.put("reviewed", true);
@@ -62,7 +67,7 @@ public class AnnotationReportService {
 
         log.info("Download report for project {} with users {} and terms {}", idProject, userIds, terms);
 
-        return annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format);
+        return annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format, userId);
     }
 
     public Map<String, Object> exportAnnotations(Long projectId) {

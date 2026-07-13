@@ -14,10 +14,17 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import be.cytomine.common.repository.http.HealthService;
+import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import be.cytomine.common.repository.http.RoleHttpContract;
 import be.cytomine.common.repository.http.StatsHttpContract;
+import be.cytomine.common.repository.http.StorageHttpContract;
+import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.http.UploadedFileHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.http.UserRoleHttpContract;
 import be.cytomine.common.repository.utils.SpringPage;
 
 @Configuration
@@ -49,6 +56,11 @@ public class RepositoryClient {
     }
 
     @Bean
+    OntologyHttpContract ontologyServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, OntologyHttpContract.class);
+    }
+
+    @Bean
     TermHttpContract termServiceClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, TermHttpContract.class);
     }
@@ -64,8 +76,37 @@ public class RepositoryClient {
     }
 
     @Bean
+    StorageHttpContract storageServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, StorageHttpContract.class);
+    }
+
+    @Bean
+    RoleHttpContract roleServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, RoleHttpContract.class);
+    }
+
+    @Bean
     ReviewedAnnotationHttpContract reviewedAnnotationClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, ReviewedAnnotationHttpContract.class);
+    }
+
+    @Bean TagDomainAssociationHttpContract tagDomainAssociationClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, TagDomainAssociationHttpContract.class);
+    }
+
+    @Bean
+    UploadedFileHttpContract uploadedFileServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, UploadedFileHttpContract.class);
+    }
+
+    @Bean
+    UserRoleHttpContract userRoleServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, UserRoleHttpContract.class);
+    }
+
+    @Bean
+    UserHttpContract userServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, UserHttpContract.class);
     }
 
     private <T> T createClient(RestClient repositoryRestClient, Class<T> repoType) {

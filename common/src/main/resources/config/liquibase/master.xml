@@ -89,4 +89,33 @@
     <include file="/config/liquibase/changelog/2026-04-22-reviewed-annotation-term-constraints.sql"
              relativeToChangelogFile="false"/>
 
+    <include file="/config/liquibase/changelog/2026-06-01-ontology-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-06-15-storage-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-06-18-uploaded-file-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-06-23-drop-mime.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-06-24-tag-domain-association-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-06-26-command-parent.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-08-sec-role-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-09-sec-user-sec-role-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-10-user-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-13-version-created-defaults.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -87,7 +87,7 @@ module.exports = {
                 title: "Examples",
                 collapsable: false,
                 children: [
-                    ["/dev-guide/algorithms/task/examples/complete-walkthrough-example", "Complete Walkthrough Example"],
+                    ["/dev-guide/algorithms/task/examples/example", "Complete Walkthrough Example"],
                     ["/dev-guide/algorithms/task/examples/others", "Others"],
                 ],
             },

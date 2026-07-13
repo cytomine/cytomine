@@ -88,7 +88,7 @@ app-engine.task.upload,Upload tasks,Téléverser des tâches,Cargar tareas,Taken
 app-engine.task.no-description,No description,Pas de description,Sin descripción,Geen beschrijving
 app-engine.tasks.installed,Installed Tasks,Tâches installées,Tareas instaladas,Geïnstalleerde taken
 app-engine.tasks.name,Tasks,Tâches,Tareas,Taken
-app-name,App Name,app-name,App Name,Nom de l'application,Nombre de la aplicación,App-naam
+app-name,App Name,Nom de l'application,Nombre de la aplicación,App-naam
 app-store,App Store,App Store,App Store,App Store
 appengine-not-enabled-title,App Engine is not enabled,App Engine n'est pas activé,App Engine no está habilitado,App Engine is niet ingeschakeld
 appengine-not-enabled-description,"App Engine is not enabled on your Cytomine instance. Either contact an administrator, or contact sales@cytomine.com for requesting an upgrade of your instance.",App Engine n'est pas activé sur votre instance Cytomine. Contactez un administrateur ou envoyez un e-mail à sales@cytomine.com pour demander une mise à niveau de votre instance.,App Engine no está habilitado en su instancia de Cytomine. Póngase en contacto con un administrador o envíe un correo a sales@cytomine.com para solicitar una actualización de su instancia.,App Engine is niet ingeschakeld op uw Cytomine-instantie. Neem contact op met een beheerder of stuur een e-mail naar sales@cytomine.com om een upgrade van uw instantie aan te vragen.
@@ -528,7 +528,6 @@ manual-annotations-info-message,Annotations created by a user,Annotations créé
 manual,Manual,Manuelle,Manual,Manueel
 manual-annotations-vs-contributor,Manual annotations VS. contributor,Annotations manuelles VS. contributeur,Anotaciones manuales por colaborador,Manuele annotaties VS. bijdrager
 manual-annotations-vs-term,Manual annotations VS. term,Annotations manuelles VS. terme,Anotaciones manuales por término,Manuele annotaties VS. term
-max-size-upload-info,The maximum file size (per file) for uploads is 100 GB,La taille maximale par fichier est de 100 GB,,De maximale grootte per bestand is 100 GB
 maximum,Maximum,Maximum,Máximo,Maximaal
 medium,Medium,Moyen,Mediana,Medium
 members-activity,Members activity,Activité des membres,Actividad de miembros,Leden activiteit

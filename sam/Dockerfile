@@ -1,10 +1,8 @@
 ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG PYTHON_VERSION=3.10
+ARG SAM_WEIGHTS_IMAGE=registry.cytomine.org/cytomine/sam-weights:latest
 
-FROM ${PROXY_CACHE}/alpine AS weights
-RUN mkdir -p /app/weights && \
-    wget -q -O /app/weights/weights.pt \
-    "https://huggingface.co/TVM13/Cytomine-sam/resolve/main/weights.pt"
+FROM ${SAM_WEIGHTS_IMAGE} AS weights
 
 FROM ${PROXY_CACHE}/python:${PYTHON_VERSION}-slim-bullseye AS base
 

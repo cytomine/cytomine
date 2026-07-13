@@ -9,8 +9,6 @@ spring:
     password: ${POSTGIS_PASS:password}
     hikari:
       poolName: Hikari
-      auto-commit: false
-
   jpa:
     show-sql: false
     properties:

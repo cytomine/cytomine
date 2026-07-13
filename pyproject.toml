@@ -11,12 +11,17 @@ license = "Apache-2.0"
 
 [dependency-groups]
 dev = [
-  "pyrefly==1.0.0",
+  "pyrefly==1.1.1",
   "ruff==0.15.15",
 ]
 
+[tool.ruff]
+extend-exclude = [
+  "pims/resources"
+]
+
 [tool.ruff.lint]
-select = ["FAST001", "FAST003"]
+select = ["F401", "FAST001", "FAST003"]
 ignore = ["E402"]
 
 [tool.pyrefly]

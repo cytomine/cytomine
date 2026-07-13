@@ -1,11 +1,12 @@
 package be.cytomine.common.repository.model.command.request;
 
 import be.cytomine.common.repository.model.command.CommandType;
+import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 
 import static java.lang.String.format;
 
-public record DeleteTermCommand(Long id, TermCommandPayload before, long userId, long ontologyId)
+public record DeleteTermCommand(TermCommandPayload before, long userId)
     implements DeleteCommandRequest<TermCommandPayload> {
 
     @Override
@@ -15,6 +16,11 @@ public record DeleteTermCommand(Long id, TermCommandPayload before, long userId,
 
     @Override
     public String getActionMessage() {
-        return format("Term %s (%s) deleted in ontology %s", before.id(), before.name(), ontologyId);
+        return format("Term %s (%s) deleted in ontology %s", before.id(), before.name(), before.ontology());
+    }
+
+    @Override
+    public String getCommand() {
+        return Commands.DELETE_TERM;
     }
 }

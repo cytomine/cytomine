@@ -18,7 +18,8 @@ import logging
 import pickle
 from enum import Enum
 from functools import partial, wraps
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from fastapi_utils.tasks import repeat_every
 from redis import asyncio as aioredis

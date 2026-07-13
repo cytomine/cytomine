@@ -4,15 +4,12 @@ import {Storage, StorageCollection} from '@/index.js';
 describe('Storage', () => {
 
   let name = utils.randomString();
-  let user;
 
-  let storageUser = null;
   let storage = null;
   let id = 0;
 
   beforeAll(async () => {
     await utils.connect(true);
-    ({id: user} = await utils.getUser());
   });
 
   afterAll(async () => {
@@ -20,15 +17,8 @@ describe('Storage', () => {
   });
 
   describe('Create', () => {
-    // skipped because a storage for the user seems to be created automatically and this method throws error if the user already possesses a storage
-    it.skip('Create for user', async () => {
-      storageUser = await Storage.create(user);
-      expect(storageUser).toBeInstanceOf(Storage);
-      expect(storageUser.user).toEqual(user);
-    });
-
     it('Create', async () => {
-      storage = new Storage({name, user});
+      storage = new Storage({name});
       storage = await storage.save();
       id = storage.id;
       expect(storage).toBeInstanceOf(Storage);
@@ -41,13 +31,17 @@ describe('Storage', () => {
     it('Fetch with static method', async () => {
       let fetchedStorage = await Storage.fetch(id);
       expect(fetchedStorage).toBeInstanceOf(Storage);
-      expect(fetchedStorage).toEqual(storage);
+      expect(fetchedStorage.id).toEqual(storage.id);
+      expect(fetchedStorage.name).toEqual(storage.name);
+      expect(fetchedStorage.userId).toEqual(storage.userId);
     });
 
     it('Fetch with instance method', async () => {
       let fetchedStorage = await new Storage({id}).fetch();
       expect(fetchedStorage).toBeInstanceOf(Storage);
-      expect(fetchedStorage).toEqual(storage);
+      expect(fetchedStorage.id).toEqual(storage.id);
+      expect(fetchedStorage.name).toEqual(storage.name);
+      expect(fetchedStorage.userId).toEqual(storage.userId);
     });
 
     it('Fetch with wrong ID', async () => {
@@ -86,7 +80,7 @@ describe('Storage', () => {
       let storagePromises = [];
       for (let i = 0; i < nbStorages - 1; i++) {
         let str = utils.randomString();
-        storagePromises.push(new Storage({name: str, user}).save());
+        storagePromises.push(new Storage({name: str}).save());
       }
       await Promise.all(storagePromises);
     });

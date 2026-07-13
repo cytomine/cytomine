@@ -21,25 +21,20 @@ public interface StatsHttpContract {
     String ROOT_PATH = "/stats";
 
     @GetExchange("/project/{projectId}")
-    Page<StatTerm> findTermsByProject(
-        @PathVariable long projectId, @RequestParam long userId,
+    Page<StatTerm> findTermsByProject(@PathVariable long projectId,
+        @RequestParam long userId,
         @RequestParam(required = false) Optional<LocalDateTime> startDate,
         @RequestParam(required = false) Optional<LocalDateTime> endDate,
-        Pageable pageable
-    );
+        Pageable pageable);
 
     @GetExchange("/per-user/project/{projectId}")
-    Page<FlatStatUserTerm> findUserTermsByProject(
-        @PathVariable long projectId,
+    Page<FlatStatUserTerm> findUserTermsByProject(@PathVariable long projectId,
         @RequestParam long userId,
-        Pageable pageable
-    );
+        Pageable pageable);
 
     @GetExchange("/per-term-and-image/project/{projectId}")
-    Page<StatPerTermAndImage> findPerTermAndImageByProject(
-        @PathVariable long projectId,
+    Page<StatPerTermAndImage> findPerTermAndImageByProject(@PathVariable long projectId,
         @RequestParam(required = false) Optional<LocalDateTime> startDate,
         @RequestParam(required = false) Optional<LocalDateTime> endDate,
-        Pageable pageable
-    );
+        Pageable pageable);
 }

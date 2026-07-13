@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.service.ApplyCommandService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,5 +37,10 @@ public class CommandController implements CommandHttpContract {
     @Override
     public Optional<CommandV2Response<?>> get(UUID commandId, long userId) {
         return commandV2Repository.findById(commandId).map(commandMapper::map);
+    }
+
+    @Override
+    public Page<CommandV2Response<?>> getAllForUser(long userId, Pageable pageable) {
+        return commandV2Repository.findAllByUserId(userId, pageable).map(commandMapper::map);
     }
 }

@@ -10,4 +10,5 @@ public enum DataType {
     UNDO_COMMAND,
     UPLOADED_FILE,
     USER_ROLE,
+    USER,
 }

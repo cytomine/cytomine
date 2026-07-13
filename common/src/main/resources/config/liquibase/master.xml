@@ -112,4 +112,10 @@
 
     <include file="/config/liquibase/changelog/2026-07-09-sec-user-sec-role-id-sequence.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-10-user-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-13-version-created-defaults.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

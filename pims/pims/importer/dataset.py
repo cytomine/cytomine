@@ -1,11 +1,10 @@
 import logging
-import json
 import os
 from collections import defaultdict
 from collections.abc import Mapping
 from lxml import etree
-from typing import List, Any
-from dataclasses import dataclass, fields, is_dataclass
+from typing import Any
+from dataclasses import fields, is_dataclass
 from datetime import datetime
 from enum import Enum
 import uuid
@@ -35,13 +34,10 @@ from bigpicture_metadata_interface import BPInterface
 from bigpicture_metadata_interface.model.dataset import Dataset
 from bigpicture_metadata_interface.model.image import Image
 from bigpicture_metadata_interface.model.sample import (
-    BiologicalBeing,
     Block,
     Slide,
     Specimen,
 )
-from bigpicture_metadata_interface.model.observation import Observation
-from bigpicture_metadata_interface.model.stain import StainingList, Stain
 from bigpicture_metadata_interface.model.common import Code, CodeAttributes, Attributes
 
 logger = logging.getLogger("pims.app")

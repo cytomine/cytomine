@@ -163,8 +163,7 @@ export default {
       const payload = request.after || request.before
         || (request.target && (request.target.after || request.target.before))
         || {};
-      return payload.name || payload.originalFilename || payload.filename
-        || (payload.id ? `#${payload.id}` : '');
+      return payload.name || payload.originalFilename || payload.filename || (payload.id ? `#${payload.id}` : '');
     },
     formatDate(date) {
       return formatDate(date, this.$i18n.locale);

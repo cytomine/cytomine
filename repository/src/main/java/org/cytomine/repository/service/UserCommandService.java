@@ -1,8 +1,10 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.UserCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.CreateUserCommand;
@@ -39,6 +42,7 @@ public class UserCommandService
     private final CommandMapper commandMapper;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+    private final UserRoleCommandService userRoleCommandService;
 
     @Override
     public UserEntity updateEntityWithEntity(UserEntity entity, UpdateUser payload, Timestamp now) {
@@ -116,5 +120,10 @@ public class UserCommandService
     @Override
     public boolean canDeleteAclId(long userId, long id) {
         return aclService.isAdmin(userId);
+    }
+
+    @Override
+    public Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now, UUID parentCommandId) {
+        return userRoleCommandService.deleteByUserId(userId, id, now, parentCommandId);
     }
 }

@@ -2,8 +2,10 @@ package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.Role;
 import be.cytomine.common.repository.model.command.payload.request.UserRoleCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.CreateUserRoleCommand;
@@ -121,6 +124,8 @@ public class UserRoleCommandService implements
         return aclService.canDeleteUserRole(userId);
     }
 
+
+
     public Set<UserRoleResponse> define(long userId, long targetUserId, Role role) {
 
         if (!aclService.isAdmin(userId)) {
@@ -153,5 +158,14 @@ public class UserRoleCommandService implements
                 Stream.concat(rolesToRemove.stream(),
                     Stream.concat(rolesToReSet.stream(), rolesToAdd.stream())).toList())
             .stream().map(userRoleMapper::mapToUserRoleResponse).collect(Collectors.toSet());
+    }
+
+    public Set<HttpCommandResponse> deleteByUserId(long userId, long targetUserId, LocalDateTime now,
+        UUID parentCommandId) {
+        Set<Long> allIdsByOntologyId = userRoleRepository.findAllIdsSecBySecUserId(targetUserId);
+        return allIdsByOntologyId
+            .stream().map(userRoleId -> delete(userId, userRoleId, now, Optional.of(parentCommandId)))
+            .flatMap(Optional::stream)
+            .collect(Collectors.toSet());
     }
 }

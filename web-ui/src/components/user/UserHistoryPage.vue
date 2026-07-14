@@ -21,7 +21,7 @@
             {{ formatDate(row.created) }}
           </b-table-column>
 
-          <b-table-column :label="$t('action')">
+          <b-table-column :label="$t('operation')">
             <b-tag :type="actionTag(row)">{{ actionLabel(row) }}</b-tag>
           </b-table-column>
 

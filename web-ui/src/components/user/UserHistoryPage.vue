@@ -8,13 +8,16 @@
         :loading="loading"
         paginated
         backend-pagination
+        backend-sorting
         :total="total"
         :per-page="perPage"
         :current-page.sync="currentPage"
+        :default-sort="[sortField, sortOrder]"
         pagination-size="is-small"
+        @sort="onSort"
       >
         <template #default="{row}">
-          <b-table-column :label="$t('date')">
+          <b-table-column field="created" :label="$t('date')" sortable>
             {{ formatDate(row.created) }}
           </b-table-column>
 
@@ -80,6 +83,8 @@ export default {
       currentPage: 1,
       perPage: 20,
       perPageOptions: [10, 20, 50, 100],
+      sortField: 'created',
+      sortOrder: 'desc',
       loading: false,
       undoing: null,
     };
@@ -102,7 +107,7 @@ export default {
       try {
         const {data} = await Cytomine.instance.api.get(
           '/commands',
-          {params: {page: this.currentPage - 1, size: this.perPage, sort: 'created,desc'}},
+          {params: {page: this.currentPage - 1, size: this.perPage, sort: `${this.sortField},${this.sortOrder}`}},
         );
         this.commands = data.collection;
         this.total = data.size;
@@ -111,6 +116,15 @@ export default {
         this.$notify({type: 'error', text: this.$t('unexpected-error-info-message')});
       }
       this.loading = false;
+    },
+    onSort(field, order) {
+      this.sortField = field;
+      this.sortOrder = order;
+      if (this.currentPage === 1) {
+        this.fetchCommands();
+      } else {
+        this.currentPage = 1;
+      }
     },
     async undo(command) {
       this.undoing = command.id;

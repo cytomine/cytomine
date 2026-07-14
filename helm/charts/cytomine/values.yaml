@@ -102,6 +102,7 @@ images:
   mongodb: mongo:5.0-focal
   pims_cache: redis:7
   redis: redis:7
+  meilisearch: getmeili/meilisearch:v1.43.0
   iam: keycloak/keycloak:26.3
   e2e_tests: cytomine/e2e-tests:latest
   selenium: selenium/standalone-firefox
@@ -261,6 +262,22 @@ app_engine:
 
 sam:
   port: 8000
+
+# MeiliSearch - Full-text search engine
+meilisearch:
+  deploy: true
+  port: 7700
+  storage: 1Gi
+  storageClassName:
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 1000m
+      ephemeral-storage: 320Mi
+    limits:
+      memory: 1Gi
+      cpu: 1000m
+      ephemeral-storage: 1Gi
 
 # Repository - Storage and artifact repository microservice
 repository:

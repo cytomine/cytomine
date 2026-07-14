@@ -8,7 +8,6 @@ on:
         required: true
       REGISTRY_TOKEN:
         required: true
-
 permissions: {}
 
 jobs:
@@ -94,6 +93,12 @@ jobs:
 
           kubectl -n $NS apply -f .github/workflows/tests/test-dataset-pvc.yaml
           kubectl -n $NS create configmap test-dataset-metadata --from-file=dataset.xml=e2e-tests/src/test/resources/dataset.xml
+          kubectl -n $NS create configmap test-dataset-metadata-image --from-file=image.xml=e2e-tests/src/test/resources/image.xml
+          kubectl -n $NS create configmap test-dataset-metadata-observation --from-file=observation.xml=e2e-tests/src/test/resources/observation.xml
+          kubectl -n $NS create configmap test-dataset-metadata-observer --from-file=observer.xml=e2e-tests/src/test/resources/observer.xml
+          kubectl -n $NS create configmap test-dataset-metadata-policy --from-file=policy.xml=e2e-tests/src/test/resources/policy.xml
+          kubectl -n $NS create configmap test-dataset-metadata-sample --from-file=sample.xml=e2e-tests/src/test/resources/sample.xml
+          kubectl -n $NS create configmap test-dataset-metadata-staining --from-file=staining.xml=e2e-tests/src/test/resources/staining.xml
 
       - name: Populate test dataset PVC with real image
         run: |
@@ -140,6 +145,7 @@ jobs:
             --set images.pims_cache=registry.cytomine.org/docker/library/redis:7 \
             --set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ env.DEPLOYMENT_NAME }} \
             --set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 \
+            --set images.meilisearch=registry.cytomine.org/docker/getmeili/meilisearch:v1.43.0 \
             --set images.postgresql=registry.cytomine.org/docker/library/postgres:15 \
             --set images.redis=registry.cytomine.org/docker/library/redis:7 \
             --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \
@@ -192,11 +198,21 @@ jobs:
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c e2e-tests
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c e2e-tests
 
       - name: Logs e2e tests results - selenium pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c selenium
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c selenium
+
+      - name: Logs pims
+        if: always()
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs pims-0
+
+      - name: Logs pims-cache
+        if: always()
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs deployment/pims-cache
 
       - name: Export test results
         if: always()

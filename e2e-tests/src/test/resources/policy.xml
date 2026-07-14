@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<POLICY_SET>
+	<POLICY alias="POLICY_uwnxUKIsKp">
+		<DATASET_REF alias="test-project"></DATASET_REF>
+		<ATTRIBUTES>
+			<STRING_ATTRIBUTE>
+				<TAG>title</TAG>
+				<VALUE>N/A</VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>policy_text</TAG>
+				<VALUE>N/A</VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>type_of_dataset</TAG>
+				<VALUE>Non-Clinical / Cryptonimized</VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>terms_of_use_version</TAG>
+				<VALUE>2025-04-16T22:32:34.054613</VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>allowed_geographical_distribution</TAG>
+				<VALUE>European Union and EEA countries</VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>duration_of_use</TAG>
+				<VALUE>Limited to the duration of the purpose of the data access request</VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>defined_research_question_required</TAG>
+				<VALUE>True</VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>type_of_access</TAG>
+				<VALUE>Direct access</VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>required_bigpicture_acknowledgements</TAG>
+				<VALUE>”This project has received funding from the Innovative Medicines Initiative 2 Joint Undertaking under grant agreement No 945358. This Joint Undertaking receives support from the European Union’s Horizon 2020 research and innovation program and EFPIA”</VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>legal_basis_for_sharing_the_data</TAG>
+				<VALUE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>informed_consent_form_defined_use_restrictions</TAG>
+				<VALUE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></VALUE>
+			</STRING_ATTRIBUTE>
+			<STRING_ATTRIBUTE>
+				<TAG>custom_use_restrictions</TAG>
+				<VALUE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></VALUE>
+			</STRING_ATTRIBUTE>
+			<SET_ATTRIBUTE>
+				<TAG>allowed_uses</TAG>
+				<VALUE>
+					<STRING_ATTRIBUTE>
+						<TAG>allowed_use</TAG>
+						<VALUE>Implementation of Bigpicture Project (IMI2-945358)</VALUE>
+					</STRING_ATTRIBUTE>
+				</VALUE>
+			</SET_ATTRIBUTE>
+			<SET_ATTRIBUTE>
+				<TAG>required_custom_acknowledgements</TAG>
+				<VALUE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></VALUE>
+			</SET_ATTRIBUTE>
+			<SET_ATTRIBUTE>
+				<TAG>required_citations</TAG>
+				<VALUE>
+					<STRING_ATTRIBUTE>
+						<TAG>citation</TAG>
+						<VALUE>N</VALUE>
+					</STRING_ATTRIBUTE>
+					<STRING_ATTRIBUTE>
+						<TAG>citation</TAG>
+						<VALUE>/</VALUE>
+					</STRING_ATTRIBUTE>
+					<STRING_ATTRIBUTE>
+						<TAG>citation</TAG>
+						<VALUE>A</VALUE>
+					</STRING_ATTRIBUTE>
+				</VALUE>
+			</SET_ATTRIBUTE>
+			<SET_ATTRIBUTE>
+				<TAG>licenses</TAG>
+				<VALUE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></VALUE>
+			</SET_ATTRIBUTE>
+		</ATTRIBUTES>
+	</POLICY>
+</POLICY_SET>

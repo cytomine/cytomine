@@ -1,0 +1,5268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OBSERVATION_SET>
+	<OBSERVATION alias="OBSERVATION_CdLNJArYbf">
+		<SPECIMEN_REF alias="SPECIMEN_ZiHGKOrhBK"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_hzywCyMsPI"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_YrfgzjHECc">
+		<SPECIMEN_REF alias="SPECIMEN_sLbvdJStSU"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_GIbTskmMKs"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_rRlSexkjLR">
+		<SPECIMEN_REF alias="SPECIMEN_vfWXyGsvSe"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_MWHzAqfMum"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_TlShXWMflx">
+		<SPECIMEN_REF alias="SPECIMEN_ahZFzprQat"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_FLVQfbIwLf"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_hqFKwkIpqQ">
+		<SPECIMEN_REF alias="SPECIMEN_pAAownVJNV"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_gYjVBnImaR"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_wnKGBjQVdd">
+		<SPECIMEN_REF alias="SPECIMEN_tgboFXjVVD"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_EdQoCuTdMO"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_wMxYcVcybt">
+		<SPECIMEN_REF alias="SPECIMEN_ruiQFSNdff"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_DHTAZNCQIu"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_BqhveBKtBz">
+		<SPECIMEN_REF alias="SPECIMEN_uTvfBmadEs"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_TZAwdMfzNa"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_sOIUBhkHaL">
+		<SPECIMEN_REF alias="SPECIMEN_BTizVYRMxs"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_iKVqIEMNAA"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_WAxQLfunQn">
+		<SPECIMEN_REF alias="SPECIMEN_VkrDHhXPFI"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_sxTdQzdwVa"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_RcbErmQELi">
+		<SPECIMEN_REF alias="SPECIMEN_iZRyBsUaEW"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_EKFjlSrdra"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_dBcrTBZDaN">
+		<SPECIMEN_REF alias="SPECIMEN_wmKdJQWQEx"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_GKrRGbbulX"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_rleiNlmgtW">
+		<SPECIMEN_REF alias="SPECIMEN_DPAXLWfjYR"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_POEZBQBlnr"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_tLmoyOXnRU">
+		<SPECIMEN_REF alias="SPECIMEN_LXPnuoAcmk"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_xCwOkEhhYI"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_xVmqSTtLvm">
+		<SPECIMEN_REF alias="SPECIMEN_awHereATLr"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_LbmfmtBAzw"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_ygbwDJquOW">
+		<SPECIMEN_REF alias="SPECIMEN_MWkBjarHuC"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_dhcmnQQTZL"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C60880</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>SINGLE CELL NECROSIS</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Single cell necrosis increased</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_rVIDwQcjMN">
+		<SPECIMEN_REF alias="SPECIMEN_tmYBQWqewh"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_NLPpJLhlic"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C34414</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>BASOPHILIA</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Basophilia bilateral   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_VHLnzvOUkc">
+		<SPECIMEN_REF alias="SPECIMEN_rxkhGPXTEN"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_nEhotolVyB"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_OuFwrOWoiV">
+		<SPECIMEN_REF alias="SPECIMEN_MrYHeasZlr"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_BREikxHCoq"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C42077</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFILTRATE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Infiltration unilateral   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_WoESZlVubh">
+		<SPECIMEN_REF alias="SPECIMEN_pfYfTbWDZX"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_qUvTMSRUqK"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_lTgGOdkSeJ">
+		<SPECIMEN_REF alias="SPECIMEN_cgvquOgSKo"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_PaXattkyOS"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_qsXhbRCvJT">
+		<SPECIMEN_REF alias="SPECIMEN_UJGHbxuNEf"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_jcIuxitoUP"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_yqNvgRoLhW">
+		<SPECIMEN_REF alias="SPECIMEN_flmXltchCQ"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_DzAaRrjLtV"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_RLQQzSHMqM">
+		<SPECIMEN_REF alias="SPECIMEN_UUGAflbBqR"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_hcGkFawDnh"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_QrBwliJCtp">
+		<SPECIMEN_REF alias="SPECIMEN_GYLJqvPiSP"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_TKwPfxwHth"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_fENrpNKbGT">
+		<SPECIMEN_REF alias="SPECIMEN_qjKEQHGekq"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_EGaLVFWJGQ"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_YhQvrySHxr">
+		<SPECIMEN_REF alias="SPECIMEN_MSrtgbKhmj"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_FxUXXHEvDZ"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C3137</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFLAMMATION</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MIDISTR</TAG>
+					<VALUE>
+						<CODE>C28224</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>FOCAL</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Inflammation    focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_pFMoPiuDIw">
+		<SPECIMEN_REF alias="SPECIMEN_NdjIOZMUbs"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_kunddFQpON"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_PbjpDnhHGd">
+		<SPECIMEN_REF alias="SPECIMEN_WjUwAvjFWb"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_odmrQEQVgJ"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_QpVXJMyVbA">
+		<SPECIMEN_REF alias="SPECIMEN_RHLBgKUFoZ"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_RhWCflPWJT"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_ksxIirQJUC">
+		<SPECIMEN_REF alias="SPECIMEN_jeWOgXtsKd"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_TqsZLnjfOz"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_cgnMoxsXOu">
+		<SPECIMEN_REF alias="SPECIMEN_KrKnwJRspX"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_KOWxuLdxnU"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_rTZIGbrLjE">
+		<SPECIMEN_REF alias="SPECIMEN_NBuUnKxLAC"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_TvKWmayGaq"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_PrxVjtUYXp">
+		<SPECIMEN_REF alias="SPECIMEN_SELaaytQRw"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_PpytzYgCUi"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_vpLpJBQHZK">
+		<SPECIMEN_REF alias="SPECIMEN_qVzCBSWEKQ"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_NTNvAODykE"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_SkVfSYVBtU">
+		<SPECIMEN_REF alias="SPECIMEN_LenDuVMTOq"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_swNCyGyDod"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_KiRuriPcJY">
+		<SPECIMEN_REF alias="SPECIMEN_uPZNZxezBZ"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_QcXIFQhfoM"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C60880</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>SINGLE CELL NECROSIS</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Single cell necrosis</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_hXFhdqdIjB">
+		<SPECIMEN_REF alias="SPECIMEN_OBIwrhImvn"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_Oxodoyjzdv"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_euDyCPBOgt">
+		<SPECIMEN_REF alias="SPECIMEN_OJtnsqstZa"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_koLqsYHzYH"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_XFgQgGHMGF">
+		<SPECIMEN_REF alias="SPECIMEN_tmYBQWqewh"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_ktruBFroKG"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C42077</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFILTRATE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Infiltration unilateral   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_fVhIlkmWQI">
+		<SPECIMEN_REF alias="SPECIMEN_eVrUwgcrRG"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_hPBCFDeAuv"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_EXzeGEThDQ">
+		<SPECIMEN_REF alias="SPECIMEN_rJJkbDwsDU"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_ZhYxqWyFml"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_ldusEAUfGB">
+		<SPECIMEN_REF alias="SPECIMEN_FnxQLcvavG"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_jWNHHfjuCu"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_TAOPSNpNiz">
+		<SPECIMEN_REF alias="SPECIMEN_YQwcFoaPuE"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_nrwrYuBPJG"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_iOyfpIYfYK">
+		<SPECIMEN_REF alias="SPECIMEN_RNIQGdHuty"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_NCayjmZwVH"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_FgtBuHrSBS">
+		<SPECIMEN_REF alias="SPECIMEN_PvvHghuqPP"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_pLCrfWKGUQ"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_DpUdoEZglK">
+		<SPECIMEN_REF alias="SPECIMEN_fIyKxFpLpz"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_ZMrFHNGJcY"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_jPnaMNChpv">
+		<SPECIMEN_REF alias="SPECIMEN_vypAhbqQmu"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_heWBoiTGif"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_oDDIwUMeDw">
+		<SPECIMEN_REF alias="SPECIMEN_wJFIPkGkDo"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_aRPdfskuvy"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_zvaXNUTuQH">
+		<SPECIMEN_REF alias="SPECIMEN_AeTzhhBWjB"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_hFORrlhyMh"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_czSTiDToZL">
+		<SPECIMEN_REF alias="SPECIMEN_LqxPlDXXXq"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_zrgCedFQPW"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_dPAOsjCHxP">
+		<SPECIMEN_REF alias="SPECIMEN_auJpQYilpn"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_cxcOJfyRTt"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C16897</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>NECROSIS</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Necrosis with inflammation   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_UkzslYNAFM">
+		<SPECIMEN_REF alias="SPECIMEN_YbuxYvqbge"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_TtDKpvONhy"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_mlQQWzrHXN">
+		<SPECIMEN_REF alias="SPECIMEN_krkcVTSdfn"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_CqIYlaqcBQ"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_FibpqxVRaI">
+		<SPECIMEN_REF alias="SPECIMEN_EMedTVUmIw"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_wRlARPsaXl"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_MlWcAtvHXt">
+		<SPECIMEN_REF alias="SPECIMEN_dhvsiNdLwM"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_CAbLhseVAt"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C34414</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>BASOPHILIA</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Basophilia unilateral   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_tfWrZqcygD">
+		<SPECIMEN_REF alias="SPECIMEN_OJWfrlefbf"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_hZTZTQSdUE"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C42077</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFILTRATE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MIDISTR</TAG>
+					<VALUE>
+						<CODE>C28224</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>FOCAL</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Infiltration    focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_beRwBTUuqH">
+		<SPECIMEN_REF alias="SPECIMEN_cFSkejjKBo"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_EmaUeQmCjw"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_MnYcnhAllI">
+		<SPECIMEN_REF alias="SPECIMEN_RaHJNAGcht"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_PLGrRHPPrq"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_lZHjnYGDGB">
+		<SPECIMEN_REF alias="SPECIMEN_UusYNHkMmN"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_tdaKhIxkYn"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_wRJjPzJqAG">
+		<SPECIMEN_REF alias="SPECIMEN_FDUKsffqMA"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_ntkyYTPIKX"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_jXIzfpggHl">
+		<SPECIMEN_REF alias="SPECIMEN_uXSuaUkSqO"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_KSLkPtpVrB"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_RKNsXyzwzm">
+		<SPECIMEN_REF alias="SPECIMEN_qOcpgLqnFP"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_OSYzgdoxet"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_waZHQSXkIo">
+		<SPECIMEN_REF alias="SPECIMEN_UXmoOPzeik"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_cDkimTihob"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_bfWBWGYOpc">
+		<SPECIMEN_REF alias="SPECIMEN_HPinkmgWZw"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_kbcxMKDPYK"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_BUvnuyQVYO">
+		<SPECIMEN_REF alias="SPECIMEN_GtioSVZSvz"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_CwVAeTrUnS"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_nHcwgvKcLL">
+		<SPECIMEN_REF alias="SPECIMEN_NXyRCKZqUz"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_dGpaguNjFa"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_tQupqyYwDD">
+		<SPECIMEN_REF alias="SPECIMEN_rgNacMZNgO"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_uvVlzGelzF"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_rAWrQWqkfn">
+		<SPECIMEN_REF alias="SPECIMEN_WjgXKiEHmE"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_mBgmAjINYj"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C42077</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFILTRATE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MIDISTR</TAG>
+					<VALUE>
+						<CODE>C28224</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>FOCAL</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Infiltration    focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_LgWFwbkPnU">
+		<SPECIMEN_REF alias="SPECIMEN_wRTiCoHUEL"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_NTuhWDKeLa"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C16897</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>NECROSIS</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Necrosis with inflammation   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_FZDZgHvNbc">
+		<SPECIMEN_REF alias="SPECIMEN_GEiFyFnSOV"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_zKRXMjesCL"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C3137</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFLAMMATION</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MIDISTR</TAG>
+					<VALUE>
+						<CODE>C28224</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>FOCAL</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Inflammation    focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_JsoXMTbHcM">
+		<SPECIMEN_REF alias="SPECIMEN_MrYHeasZlr"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_JJRzRzSSOK"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C34414</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>BASOPHILIA</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Basophilia unilateral   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_pldMfDwiHd">
+		<SPECIMEN_REF alias="SPECIMEN_XYvuLMJqGS"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_jYDkkSuNjN"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C34414</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>BASOPHILIA</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Basophilia unilateral   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_YbhSQYRDgP">
+		<SPECIMEN_REF alias="SPECIMEN_timNRfvzeU"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_IPrcdzOAKE"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_IOCMgrsBze">
+		<SPECIMEN_REF alias="SPECIMEN_DLUCbBOvHp"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_kHHsHbfsGT"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_KoloTLtJxA">
+		<SPECIMEN_REF alias="SPECIMEN_qDyNacxGRa"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_bpcMWUPchX"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_AijVYrWGkw">
+		<SPECIMEN_REF alias="SPECIMEN_lXzPQgLEcY"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_ipjAeXHzKx"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_giXMiuOsfv">
+		<SPECIMEN_REF alias="SPECIMEN_lopTmNolXX"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_FDKKvOLrRV"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_KlCMOXnNIM">
+		<SPECIMEN_REF alias="SPECIMEN_NwBIllOhNh"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_zwoGZrlGQb"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_AHZvuBuqMc">
+		<SPECIMEN_REF alias="SPECIMEN_zPFczHTSts"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_BizFWBShVd"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_CgELuLfDEf">
+		<SPECIMEN_REF alias="SPECIMEN_XCMEssJkGm"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_tDtkQKnuOj"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_khHHmIKuia">
+		<SPECIMEN_REF alias="SPECIMEN_ANolNgePQN"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_mmVfKgSjSw"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C34414</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>BASOPHILIA</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Basophilia bilateral   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_jNobVxRYPt">
+		<SPECIMEN_REF alias="SPECIMEN_fSpclTUxNv"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_TVsznjuZMY"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_NqtwSvcFtW">
+		<SPECIMEN_REF alias="SPECIMEN_DGgDJJPoCP"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_NbBzPFJsPB"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_PujYWGFRHm">
+		<SPECIMEN_REF alias="SPECIMEN_NIubxmgxhk"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_VafHmJToXy"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_WAWUrHzlDX">
+		<SPECIMEN_REF alias="SPECIMEN_MTcQaLOVgE"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_dfrWHroLMa"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_jwLFxbnnMH">
+		<SPECIMEN_REF alias="SPECIMEN_erfFxjpndn"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_IrTRMwuFIC"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_ncfCmbkJzu">
+		<SPECIMEN_REF alias="SPECIMEN_ueJzxFSOtj"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_rhylztFNzx"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_YBDXZfNrvi">
+		<SPECIMEN_REF alias="SPECIMEN_WjALPjVhUM"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_KymxvHIrBK"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_JMZJANIPqn">
+		<SPECIMEN_REF alias="SPECIMEN_kdZYCVyAmR"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_mfUtAiqJtx"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_TMtFMQDWbY">
+		<SPECIMEN_REF alias="SPECIMEN_bYBWUgchqV"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_CizxCmPGrh"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_bLwghRMFBy">
+		<SPECIMEN_REF alias="SPECIMEN_VkGtZcbFCt"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_jQIoazihiW"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_dDRywMQLxf">
+		<SPECIMEN_REF alias="SPECIMEN_rLjPNIHIlJ"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_QDCkNufVXA"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_YUxmhqcCHF">
+		<SPECIMEN_REF alias="SPECIMEN_gMPAfDwMFH"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_joWMaTFIJH"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C42077</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFILTRATE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Infiltration bilateral   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_nbFhjEUskI">
+		<SPECIMEN_REF alias="SPECIMEN_HNialliyCQ"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_XkmUiwFXRT"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_PbAbjNCLVQ">
+		<SPECIMEN_REF alias="SPECIMEN_wsFvUJgOQI"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_PRPdJJusfp"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_qCGQVGBftF">
+		<SPECIMEN_REF alias="SPECIMEN_moXEDkEPaa"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_FVlwUDhwpF"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_wZcWaDNNsB">
+		<SPECIMEN_REF alias="SPECIMEN_ULXhydvlYj"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_ONMZbmrneb"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C60880</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>SINGLE CELL NECROSIS</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Single cell necrosis</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_ZdHKpDVhgy">
+		<SPECIMEN_REF alias="SPECIMEN_ODQUlAxyxO"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_dfYJcNdrQw"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_qNSyoBsvxe">
+		<SPECIMEN_REF alias="SPECIMEN_QjKrtfuxmn"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_jviwMkCNuw"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_mRfBAuxMPN">
+		<SPECIMEN_REF alias="SPECIMEN_bfEokIPZrH"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_aZoDMoxlqI"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_FTpmZiScGD">
+		<SPECIMEN_REF alias="SPECIMEN_sQlcbHddnN"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_MdaSmBiocA"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C16897</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>NECROSIS</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Necrosis with inflammation   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_KrCpFbSTRg">
+		<SPECIMEN_REF alias="SPECIMEN_xXIoSwORCO"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_LiyCOHSjMz"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_ucyNdxiXEC">
+		<SPECIMEN_REF alias="SPECIMEN_uPZNZxezBZ"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_lLwPESGlJh"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C16897</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>NECROSIS</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MIDISTR</TAG>
+					<VALUE>
+						<CODE>C28224</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>FOCAL</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Necrosis    focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_tmnntMTazO">
+		<SPECIMEN_REF alias="SPECIMEN_bSYktlntFu"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_JuBEZakEdX"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_vQqgBFNjtL">
+		<SPECIMEN_REF alias="SPECIMEN_uPZNZxezBZ"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_gokddFFnOQ"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C120876</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>DEGENERATION/REGENERATION</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Degeneration/regeneration peritoneal fat segmental  focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_EpvBnpedSQ">
+		<SPECIMEN_REF alias="SPECIMEN_XYvuLMJqGS"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_YKZAEqwKLO"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C42077</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFILTRATE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Infiltration unilateral   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_NfnSAYJxRS">
+		<SPECIMEN_REF alias="SPECIMEN_aimDvJfRpE"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_HSBdBOGerq"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_IVHltkzNUg">
+		<SPECIMEN_REF alias="SPECIMEN_IVqGgQUVVs"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_yqwTvVigfV"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_MGTnLbgoQt">
+		<SPECIMEN_REF alias="SPECIMEN_SysHiGdqIo"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_BumkLKeYLw"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_HPSvPmepBh">
+		<SPECIMEN_REF alias="SPECIMEN_LlcKCAXlRV"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_vqHcTeyuuJ"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C42077</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFILTRATE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MIDISTR</TAG>
+					<VALUE>
+						<CODE>C28224</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>FOCAL</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Infiltration    focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_SsMpDTkXpo">
+		<SPECIMEN_REF alias="SPECIMEN_IagOlSKQoA"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_RXWAGsssYM"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_TeWCTbtsbQ">
+		<SPECIMEN_REF alias="SPECIMEN_RndTtihlth"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_STgLWBnSGi"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_corsayXRXn">
+		<SPECIMEN_REF alias="SPECIMEN_NRukYWWRyP"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_rwrdphWjlD"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_sJtqustpmR">
+		<SPECIMEN_REF alias="SPECIMEN_auXapbnGfX"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_YNpVZzFNBy"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_fsdblLOoLg">
+		<SPECIMEN_REF alias="SPECIMEN_HahNzIHWtc"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_AVxCBpgyaK"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_iOFHjxQJdB">
+		<SPECIMEN_REF alias="SPECIMEN_kkzZgrRByj"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_vetIunLSDU"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_CbXFMeQNgT">
+		<SPECIMEN_REF alias="SPECIMEN_RmNAPNqHri"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_OWMPeHtnMj"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_wqGenfoqik">
+		<SPECIMEN_REF alias="SPECIMEN_EKdcvvfXIU"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_yDofyLxoeC"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_EiAmvkXpTL">
+		<SPECIMEN_REF alias="SPECIMEN_fbfImZIcKO"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_RpknMLZEqK"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_aHmvXfclPO">
+		<SPECIMEN_REF alias="SPECIMEN_yyWenQpeOf"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_AmiccajHbE"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_uGxIoTOdEF">
+		<SPECIMEN_REF alias="SPECIMEN_doaYHcvhPo"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_aOeTeVriAX"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_hzulfWVjtO">
+		<SPECIMEN_REF alias="SPECIMEN_bBheDaOgFk"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_gPaqGLbeIx"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_JhVLVfyYae">
+		<SPECIMEN_REF alias="SPECIMEN_izjbszTrld"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_zKGhdlvuMB"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_gHqxUKuBgq">
+		<SPECIMEN_REF alias="SPECIMEN_EMEVaMfkjV"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_cURmhKvTzN"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_lorgQWDbTY">
+		<SPECIMEN_REF alias="SPECIMEN_jVrYhMohvW"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_yBMsRvikCY"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_MNgsphYhKu">
+		<SPECIMEN_REF alias="SPECIMEN_zofDDAJske"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_JoAGqKCqly"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C3137</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFLAMMATION</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Inflammation with eosinophilic crystals   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_TIQTpWtNjb">
+		<SPECIMEN_REF alias="SPECIMEN_SWlSyCcfJm"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_PpcXzeAYkK"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_kQHGqbovHC">
+		<SPECIMEN_REF alias="SPECIMEN_ZHpzRiIdJO"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_CcKqBvnytR"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_aMuwWAHCMh">
+		<SPECIMEN_REF alias="SPECIMEN_xQVBnwzAPT"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_jGYJLqGOPf"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_RBKJdffKTk">
+		<SPECIMEN_REF alias="SPECIMEN_MvWnWpQink"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_vjuznwHJEr"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_oFgZejAfij">
+		<SPECIMEN_REF alias="SPECIMEN_yCAOlMUMMh"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_FKaXJneTuq"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C42077</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>INFILTRATE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MISEV</TAG>
+					<VALUE>
+						<CODE>C147501</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>1 OF 5</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>Infiltration unilateral   focal</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_ZDYcwwCoDh">
+		<SPECIMEN_REF alias="SPECIMEN_SOWOEltCUj"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_DzagCDnUXL"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_jMHyTXlIui">
+		<SPECIMEN_REF alias="SPECIMEN_TRdRhzdFJM"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_mBNYJaxUCC"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+	<OBSERVATION alias="OBSERVATION_QSHMCDpVxz">
+		<SPECIMEN_REF alias="SPECIMEN_QcedUrMXqX"></SPECIMEN_REF>
+		<OBSERVER_REF alias="OBSERVER_WeBnwAouot"></OBSERVER_REF>
+		<STATEMENT>
+			<STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+			<STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+			<CODE_ATTRIBUTES>
+				<CODE_ATTRIBUTE>
+					<TAG>MISTRESC</TAG>
+					<VALUE>
+						<CODE>C96301</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>UNREMARKABLE</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+				<CODE_ATTRIBUTE>
+					<TAG>MITEST</TAG>
+					<VALUE>
+						<CODE>C147493</CODE>
+						<SCHEME>SEND</SCHEME>
+						<MEANING>General Histopathologic Exam, Qual</MEANING>
+						<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+					</VALUE>
+				</CODE_ATTRIBUTE>
+			</CODE_ATTRIBUTES>
+			<CUSTOM_ATTRIBUTES>
+				<STRING_ATTRIBUTE>
+					<TAG>MIORRES</TAG>
+					<VALUE>No Abnormalities Detected</VALUE>
+				</STRING_ATTRIBUTE>
+			</CUSTOM_ATTRIBUTES>
+			<FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+			<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+		</STATEMENT>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVATION>
+</OBSERVATION_SET>

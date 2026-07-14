@@ -119,7 +119,7 @@ jobs:
             sleep 2
           done
 
-          kubectl cp -r e2e-tests/src/test/resources/wsi $NS/$POD:/tmp/images/wsi -c wait-for-image
+          kubectl cp --recursive e2e-tests/src/test/resources/wsi $NS/$POD:/tmp/images/wsi -c wait-for-image
           kubectl -n $NS wait --for=condition=complete job/test-dataset-loader --timeout=120s
 
       - name: Install chart

@@ -194,6 +194,40 @@ public class CytomineSteps {
         );
     }
 
+    public void sortImagesInStorage(Wait<WebDriver> wait, URL cytomineUrl, Set<String> imageNames) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        webDriverUtils.waitLoading(wait);
+
+        for (String column : List.of("Filename", "Created", "Size", "Status")) {
+            sortImagesByColumn(wait, column, true, imageNames);
+            sortImagesByColumn(wait, column, false, imageNames);
+        }
+    }
+
+    private void sortImagesByColumn(
+        Wait<WebDriver> wait,
+        String columnLabel,
+        boolean descending,
+        Set<String> imageNames
+    ) {
+        String header = "//div[contains(@class,'uploaded-files-list')]"
+            + "//th[contains(@class,'is-sortable') and contains(normalize-space(.), '"
+            + columnLabel
+            + "')]";
+        webDriverUtils.xpathClick(wait, header);
+        String icon = descending
+            ? "//span[contains(@class,'icon') and contains(@class,'is-desc')]"
+            : "//span[contains(@class,'icon') and not(contains(@class,'is-desc'))"
+              + " and not(contains(@class,'is-invisible'))]";
+        webDriverUtils.byIsDisplayed(wait, By.xpath(header + "[contains(@class,'is-current-sort')]" + icon));
+
+        webDriverUtils.waitUntilByEmpty(wait, By.cssSelector(".uploaded-files-list .message.is-danger"));
+        imageNames.forEach(name -> webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + name + "']")
+        ));
+    }
+
     @SneakyThrows
     public String addTermToOntology(Wait<WebDriver> wait, WebDriver driver, String ontologyURL, String termName) {
         webDriverUtils.goTo(wait, ontologyURL);

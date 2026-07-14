@@ -102,7 +102,7 @@ export default {
       try {
         const {data} = await Cytomine.instance.api.get(
           '/commands',
-          {params: {page: this.currentPage - 1, size: this.perPage}},
+          {params: {page: this.currentPage - 1, size: this.perPage, sort: 'created,desc'}},
         );
         this.commands = data.collection;
         this.total = data.size;

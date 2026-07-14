@@ -206,13 +206,13 @@ jobs:
         run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
           -c selenium
 
-      - name: Logs pims-cache
-        if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs pims
-
       - name: Logs pims
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs pims-cache
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs pims-0
+
+      - name: Logs pims-cache
+        if: always()
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs deployment/pims-cache
 
       - name: Export test results
         if: always()

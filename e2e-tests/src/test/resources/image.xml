@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?><IMAGE_SET>
-	<IMAGE alias="cat.png">
+	<IMAGE alias="cat_png">
 		<IMAGE_OF alias="SLIDE_rSAAqjQQzp"/>
 		<IMAGE_TYPE>
-			<WSI_IMAGE>WSI_IMAGE</WSI_IMAGE>
+			<PNG_IMAGE>PNG_IMAGE</PNG_IMAGE>
 		</IMAGE_TYPE>
 		<FILES>
-			<FILE checksum="853cdcc6f9334b1a0b1dcbce59b112fb40d3f237be1ef9420d8ececa76e75e43" checksum_method="SHA256" filename="IMAGES/IMAGE_oCbGhYajfF/image-level-0.dcm" filetype="dcm" unencrypted_checksum="7a087dd8eea083fb17e5c19d0176c9c20faa84e953e3604d7877f7b1fd8089e7"/>
-			<FILE checksum="8579b6ea65c914ef9d7d4d5061a0cbcd9caa8a5b7ccf26fb1a17d00f1d0691f1" checksum_method="SHA256" filename="IMAGES/IMAGE_oCbGhYajfF/image-level-1.dcm" filetype="dcm" unencrypted_checksum="cb06d31b1288f12bb7f68e4f923833b2d3c1d131b76160d139d8e4b0d8101dc2"/>
-			<FILE checksum="efded068bda60658c357727d1288f0a5fe6ec96875917c87f32a6a0e9a7011b2" checksum_method="SHA256" filename="IMAGES/IMAGE_oCbGhYajfF/image-level-2.dcm" filetype="dcm" unencrypted_checksum="c7caf4f92b18f1d645ceff255f84882756db73839b9e136b789f5d2bd0db95d8"/>
-			<FILE checksum="25d2a9042826db3b06ca0d9b9e99fa0b8104e206750dba55dd49b356fbfde81f" checksum_method="SHA256" filename="IMAGES/IMAGE_oCbGhYajfF/image-level-3.dcm" filetype="dcm" unencrypted_checksum="888f17fccb9454f4fed8bbce08b3fa26fd04e060660cff17b59aa7046f08f217"/>
-			<FILE checksum="39ffa3244cabd334918fde3e7335c8fdf5d2ad93a3eae43fd97261065cfac895" checksum_method="SHA256" filename="IMAGES/IMAGE_oCbGhYajfF/image-level-4.dcm" filetype="dcm" unencrypted_checksum="63b4ee3d6e1ccb2bc07495cb7418a73ba86ba07719fa59ccdc8dbdecf5dc3f51"/>
-			<FILE checksum="3caf1e70e4e4576bf0187061be3eb3881a658887efe98b358784152aa9f10e7b" checksum_method="SHA256" filename="IMAGES/IMAGE_oCbGhYajfF/image-level-5.dcm" filetype="dcm" unencrypted_checksum="68feff8e78b8910db39daeaa621a84a166e6b1c5b4f64eb373bedeb77cd2a55d"/>
-			<FILE checksum="472d657d11e82fb60d8a4da5aca732f4d084c034254b384302858e0736676fbb" checksum_method="SHA256" filename="IMAGES/IMAGE_oCbGhYajfF/image-level-6.dcm" filetype="dcm" unencrypted_checksum="02aac3bb5c653df445f03445abe6a3afa819786fa2acd291d6ef52f4d59e9764"/>
+			<FILE checksum="853cdcc6f9334b1a0b1dcbce59b112fb40d3f237be1ef9420d8ececa76e75e43" checksum_method="SHA256" filename="test-project/IMAGES/cat.png" filetype="png" unencrypted_checksum="7a087dd8eea083fb17e5c19d0176c9c20faa84e953e3604d7877f7b1fd8089e7"/>
 		</FILES>
 		<ATTRIBUTES>
 			<STRING_ATTRIBUTE>

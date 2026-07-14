@@ -50,7 +50,7 @@ public class Ontology extends CytomineDomain {
 
     @NotNull
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     protected String name;
 
     @ManyToOne(fetch = FetchType.LAZY)

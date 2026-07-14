@@ -26,9 +26,9 @@ spec:
             - sh
             - -c
             - |
-              echo "Waiting for cat.png..."
-              until [ -f /tmp/images/cat.png ]; do sleep 2; done
-              echo "cat.png found!"
+              echo "Waiting for wsi..."
+              until [ -f /tmp/images/wsi ]; do sleep 2; done
+              echo "wsi found!"
           volumeMounts:
             - mountPath: /tmp/images
               name: image-staging
@@ -54,7 +54,7 @@ spec:
               cp /tmp/metadata/sample.xml /data/dataset/test-project/METADATA/sample.xml
               cp /tmp/metadata/staining.xml /data/dataset/test-project/METADATA/staining.xml
               cp /tmp/metadata/policy.xml /data/dataset/test-project/METADATA/policy.xml
-              cp /tmp/images/cat.png /data/dataset/test-project/IMAGES/cat.png
+              cp -r /tmp/images/wsi /data/dataset/test-project/IMAGES/wsi
           volumeMounts:
             - mountPath: /data
               name: dataset-pvc

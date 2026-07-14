@@ -7,7 +7,7 @@
         <VERSION>1.0.0</VERSION>
         <METADATA_STANDARD>2.0.0</METADATA_STANDARD>
         <DATASET_TYPE>Whole slide imaging</DATASET_TYPE>
-        <IMAGE_REF alias="cat_png"></IMAGE_REF>
+        <IMAGE_REF alias="wsi"></IMAGE_REF>
         <OBSERVATION_REF alias="OBSERVATION_CdLNJArYbf"/>
         <OBSERVATION_REF alias="OBSERVATION_YrfgzjHECc"/>
         <OBSERVATION_REF alias="OBSERVATION_rRlSexkjLR"/>

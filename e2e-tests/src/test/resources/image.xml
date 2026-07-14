@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?><IMAGE_SET>
-	<IMAGE alias="cat_png">
+	<IMAGE alias="wsi">
 		<IMAGE_OF alias="SLIDE_rSAAqjQQzp"/>
 		<IMAGE_TYPE>
-			<PNG_IMAGE>PNG_IMAGE</PNG_IMAGE>
+			<WSI_IMAGE>WSI_IMAGE</WSI_IMAGE>
 		</IMAGE_TYPE>
 		<FILES>
-			<FILE checksum="853cdcc6f9334b1a0b1dcbce59b112fb40d3f237be1ef9420d8ececa76e75e43" checksum_method="SHA256" filename="test-project/IMAGES/cat.png" filetype="png" unencrypted_checksum="7a087dd8eea083fb17e5c19d0176c9c20faa84e953e3604d7877f7b1fd8089e7"/>
+			<FILE checksum="853cdcc6f9334b1a0b1dcbce59b112fb40d3f237be1ef9420d8ececa76e75e43" checksum_method="SHA256" filename="test-project/IMAGES/1.2.826.0.1.3680043.8.498.19892419232914172529737438501532904243.dcm" filetype="dcm" unencrypted_checksum="7a087dd8eea083fb17e5c19d0176c9c20faa84e953e3604d7877f7b1fd8089e7"/>
+			<FILE checksum="8579b6ea65c914ef9d7d4d5061a0cbcd9caa8a5b7ccf26fb1a17d00f1d0691f1" checksum_method="SHA256" filename="test-project/IMAGES/1.2.826.0.1.3680043.8.498.25547727731242830391830454722824599650.dcm" filetype="dcm" unencrypted_checksum="cb06d31b1288f12bb7f68e4f923833b2d3c1d131b76160d139d8e4b0d8101dc2"/>
+			<FILE checksum="efded068bda60658c357727d1288f0a5fe6ec96875917c87f32a6a0e9a7011b2" checksum_method="SHA256" filename="test-project/IMAGES/1.2.826.0.1.3680043.8.498.48407760015771729984593744789552618416.dcm" filetype="dcm" unencrypted_checksum="c7caf4f92b18f1d645ceff255f84882756db73839b9e136b789f5d2bd0db95d8"/>
+			<FILE checksum="25d2a9042826db3b06ca0d9b9e99fa0b8104e206750dba55dd49b356fbfde81f" checksum_method="SHA256" filename="test-project/IMAGES/1.2.826.0.1.3680043.8.498.68297860750526126870974958290035028993.dcm" filetype="dcm" unencrypted_checksum="888f17fccb9454f4fed8bbce08b3fa26fd04e060660cff17b59aa7046f08f217"/>
+
 		</FILES>
 		<ATTRIBUTES>
 			<STRING_ATTRIBUTE>

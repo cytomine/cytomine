@@ -8,7 +8,6 @@ on:
         required: true
       REGISTRY_TOKEN:
         required: true
-
 permissions: {}
 
 jobs:
@@ -199,11 +198,21 @@ jobs:
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c e2e-tests
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c e2e-tests
 
       - name: Logs e2e tests results - selenium pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c selenium
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c selenium
+
+      - name: Logs pims-cache
+        if: always()
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs pims
+
+      - name: Logs pims
+        if: always()
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs pims-cache
 
       - name: Export test results
         if: always()

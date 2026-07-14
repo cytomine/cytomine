@@ -1,6 +1,6 @@
 [submodule "pims/resources/bigpicture_metaflex"]
 	path = pims/resources/bigpicture_metaflex
-	url = https://github.com/imi-bigpicture/bigpicture-metaflex.git
+	url = git@github.com:imi-bigpicture/bigpicture-metaflex.git
 [submodule "pims/resources/bigpicture_metadata_interface"]
 	path = pims/resources/bigpicture_metadata_interface
-	url = https://github.com/imi-bigpicture/bigpicture-metadata-interface.git
+	url = git@github.com:imi-bigpicture/bigpicture-metadata-interface.git

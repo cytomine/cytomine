@@ -22,7 +22,7 @@
           </b-table-column>
 
           <b-table-column :label="$t('operation')">
-            <b-tag :type="actionTag(row)">{{ actionLabel(row) }}</b-tag>
+            <b-tag :type="operationTag(row)">{{ operationLabel(row) }}</b-tag>
           </b-table-column>
 
           <b-table-column :label="$t('domain')">
@@ -67,7 +67,7 @@
 import {Cytomine} from '@/api';
 import {formatDate} from '@/utils/date';
 
-const ACTION_TAGS = {
+const OPERATION_TAGS = {
   INSERT: 'is-success',
   UPDATE: 'is-info',
   DELETE: 'is-danger',
@@ -142,11 +142,11 @@ export default {
       const tokens = commandType.replace(/_COMMAND$/, '').split('_');
       return {action: tokens[0], domain: tokens.slice(1)};
     },
-    actionTag(command) {
+    operationTag(command) {
       const {action} = this.parseType(command.commandRequest.commandType);
-      return ACTION_TAGS[action] || 'is-light';
+      return OPERATION_TAGS[action] || 'is-light';
     },
-    actionLabel(command) {
+    operationLabel(command) {
       const {action} = this.parseType(command.commandRequest.commandType);
       return this.humanize([action]);
     },

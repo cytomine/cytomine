@@ -118,8 +118,11 @@ jobs:
             echo "Waiting for init container to be running..."
             sleep 2
           done
-
-          kubectl -n $NS exec $POD -c wait-for-image -- mkdir -p /tmp/images/wsi tar -cf - -C e2e-tests/src/test/resources wsi | kubectl -n $NS exec -i $POD -c wait-for-image -- tar -xf - -C /tmp/images
+          kubectl -n $NS exec $POD -c wait-for-image -- mkdir -p /tmp/images/wsi
+          kubectl cp e2e-tests/src/test/resources/wsi/1.2.826.0.1.3680043.8.498.19892419232914172529737438501532904243.dcm $NS/$POD:/tmp/images/wsi/1.2.826.0.1.3680043.8.498.19892419232914172529737438501532904243.dcm -c wait-for-image
+          kubectl cp e2e-tests/src/test/resources/wsi/1.2.826.0.1.3680043.8.498.25547727731242830391830454722824599650.dcm $NS/$POD:/tmp/images/wsi/1.2.826.0.1.3680043.8.498.25547727731242830391830454722824599650.dcm -c wait-for-image
+          kubectl cp e2e-tests/src/test/resources/wsi/1.2.826.0.1.3680043.8.498.48407760015771729984593744789552618416.dcm $NS/$POD:/tmp/images/wsi/1.2.826.0.1.3680043.8.498.48407760015771729984593744789552618416.dcm -c wait-for-image
+          kubectl cp e2e-tests/src/test/resources/wsi/1.2.826.0.1.3680043.8.498.68297860750526126870974958290035028993.dcm $NS/$POD:/tmp/images/wsi/1.2.826.0.1.3680043.8.498.68297860750526126870974958290035028993.dcm -c wait-for-image
           kubectl -n $NS wait --for=condition=complete job/test-dataset-loader --timeout=120s
 
       - name: Install chart

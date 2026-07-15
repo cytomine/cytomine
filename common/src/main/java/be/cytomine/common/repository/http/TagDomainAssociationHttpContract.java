@@ -19,9 +19,7 @@ import be.cytomine.common.repository.model.command.payload.response.TagDomainAss
 import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
 import be.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTagDomainAssociation;
 
-import static be.cytomine.common.repository.http.TagDomainAssociationHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(TagDomainAssociationHttpContract.ROOT_PATH)
 public interface TagDomainAssociationHttpContract {
     String ROOT_PATH = "/tag-domain-associations";
 

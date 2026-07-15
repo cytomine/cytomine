@@ -19,9 +19,7 @@ import be.cytomine.common.repository.model.command.payload.response.RoleResponse
 import be.cytomine.common.repository.model.role.payload.CreateRole;
 import be.cytomine.common.repository.model.role.payload.UpdateRole;
 
-import static be.cytomine.common.repository.http.RoleHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(RoleHttpContract.ROOT_PATH)
 public interface RoleHttpContract {
     String ROOT_PATH = "/roles";
 

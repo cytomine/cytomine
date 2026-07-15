@@ -36,4 +36,6 @@ public interface UserHttpContract {
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
+    @GetExchange("/search/{username}")
+    Optional<UserResponse> search(@PathVariable String username);
 }

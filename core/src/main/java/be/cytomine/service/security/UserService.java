@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.http.UserRoleHttpContract;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.utils.SpringPageCrawler;
@@ -109,7 +110,7 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class UserService extends ModelService {
+public class UserService {
 
     private final AccountService accountService;
 
@@ -189,13 +190,13 @@ public class UserService extends ModelService {
 
     private final UserPositionService userPositionService;
 
-    private final UserRepository userRepository;
+    private final UserHttpContract userRepository;
 
     private final SpringPageCrawler springPageCrawler;
 
     public Optional<User> find(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userRepository.findById(id);
+        return userRepository.get(id);
     }
 
     public Optional<User> find(UUID sub) {

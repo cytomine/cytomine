@@ -7,6 +7,8 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import be.cytomine.common.repository.model.command.payload.response.TagResponse;
+
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface TagMapper {
 
@@ -14,4 +16,7 @@ public interface TagMapper {
     @Mapping(target = "updated", source = "now")
     @BeanMapping(ignoreUnmappedSourceProperties = {"name", "updated"})
     TagEntity update(TagEntity entity, String newName, Timestamp now);
+
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    TagResponse mapToTagResponse(TagEntity entity);
 }

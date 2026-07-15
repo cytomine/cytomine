@@ -15,7 +15,7 @@ import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
 
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import be.cytomine.common.repository.model.command.payload.response.TagResponse;
 import be.cytomine.common.repository.model.tag.payload.CreateTag;
 import be.cytomine.common.repository.model.tag.payload.UpdateTag;
 
@@ -23,14 +23,14 @@ import be.cytomine.common.repository.model.tag.payload.UpdateTag;
 public interface TagHttpContract {
     String ROOT_PATH = "/tag";
 
-    @GetExchange("/{id}")
-    Optional<StorageResponse> get(@PathVariable long id, @RequestParam long userId);
-
     @PostExchange
     Optional<HttpCommandResponse> create(
         @RequestParam long userId,
         @Valid @RequestBody CreateTag payload
     );
+
+    @GetExchange("/{id}")
+    Optional<TagResponse> read(@PathVariable long id, @RequestParam long userId);
 
     @PutExchange("/{id}")
     Optional<HttpCommandResponse> update(
@@ -43,5 +43,5 @@ public interface TagHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
     @GetExchange("/all")
-    Page<StorageResponse> getAll(@RequestParam long userId, Pageable pageable);
+    Page<TagResponse> list(@RequestParam long userId, Pageable pageable);
 }

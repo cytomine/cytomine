@@ -42,14 +42,14 @@ public class TagController {
     public CollectionResponse<TagResponse> list(Pageable pageable) {
         log.debug("GET /tag.json");
         long userId = currentUserService.getCurrentUser().getId();
-        return pageMapper.toCollectionResponse(tagHttpContract.getAll(userId, pageable));
+        return pageMapper.toCollectionResponse(tagHttpContract.list(userId, pageable));
     }
 
     @GetMapping("/tag/{id}.json")
     public TagResponse read(@PathVariable long id) {
         log.debug("GET /tag/{}.json", id);
         long userId = currentUserService.getCurrentUser().getId();
-        return tagHttpContract.get(id, userId)
+        return tagHttpContract.read(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TAG, id)));
     }
 

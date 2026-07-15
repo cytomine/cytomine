@@ -17,6 +17,6 @@ public interface TagMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"name", "updated"})
     TagEntity update(TagEntity entity, String newName, Timestamp now);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"userId", "version"})
     TagResponse mapToTagResponse(TagEntity entity);
 }

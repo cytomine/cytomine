@@ -1,8 +1,11 @@
 package be.cytomine.common.repository.http;
 
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,4 +41,7 @@ public interface UserHttpContract {
 
     @GetExchange("/search/{username}")
     Optional<UserResponse> search(@PathVariable String username);
+
+    @GetExchange("/by-ids")
+    Page<UserResponse> findByIdsIn(@RequestParam Set<Long> ids, Pageable pageable);
 }

@@ -2,11 +2,13 @@ package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.UserMapper;
 import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.service.UserCommandService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,5 +53,10 @@ public class UserController implements UserHttpContract {
     @Override
     public Optional<UserResponse> search(String username) {
         return repository.findByUsernameLikeIgnoreCase(username).map(mapper::mapToUserResponse);
+    }
+
+    @Override
+    public Page<UserResponse> findByIdsIn(Set<Long> ids, Pageable pageable) {
+        return repository.findByIdsIn(ids, pageable);
     }
 }

@@ -216,8 +216,9 @@ public class UserService {
     }
 
     public Optional<UserResponse> findUser(Long id) {
-        securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userRepository.findById(id);
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        securityACLService.checkGuest(currentUser);
+        return userRepository.get(currentUser.id(), id);
     }
 
     public UserResponse get(Long id) {
@@ -227,11 +228,11 @@ public class UserService {
 
     public Optional<UserResponse> findByUsername(String username) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userRepository.findByUsernameLikeIgnoreCase(username);
+        return userRepository.search(username);
     }
 
     public Optional<UserResponse> findByUsernameWithAdmin(String username) {
-        return userRepository.findByUsernameLikeIgnoreCase(username);
+        return userRepository.search(username);
     }
 
     public Optional<UserResponse> findByPublicKey(String publicKey) {
@@ -239,7 +240,7 @@ public class UserService {
         return userRepository.findByPublicKey(publicKey);
     }
 
-    public AuthInformation getAuthenticationRoles(User user) {
+    public AuthInformation getAuthenticationRoles(UserResponse user) {
         AuthInformation authInformation = new AuthInformation();
         authInformation.setAdmin(currentRoleService.isAdmin(user));
         authInformation.setUser(!authInformation.getAdmin() && currentRoleService.isUser(user));
@@ -255,8 +256,8 @@ public class UserService {
         return authInformation;
     }
 
-    public List<UserResponse> list(List<Long> ids) {
-        return userRepository.findAllByIdIn(ids);
+    public Set<UserResponse> list(Set<Long> ids) {
+        return userRepository.findByIdsIn(ids);
     }
 
     // TODO 2024.2

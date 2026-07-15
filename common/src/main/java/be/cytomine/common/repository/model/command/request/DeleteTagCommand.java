@@ -6,7 +6,8 @@ import be.cytomine.common.repository.model.command.payload.request.TagCommandPay
 
 import static java.lang.String.format;
 
-public record DeleteTagCommand(TagCommandPayload before, long userId) implements DeleteCommandRequest<TagCommandPayload> {
+public record DeleteTagCommand(TagCommandPayload before, long userId)
+    implements DeleteCommandRequest<TagCommandPayload> {
     @Override
     public CommandType getCommandType() {
         return CommandType.DELETE_TAG_COMMAND;

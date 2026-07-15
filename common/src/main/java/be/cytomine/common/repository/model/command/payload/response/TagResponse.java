@@ -18,4 +18,3 @@ public record TagResponse(
         return DataType.TAG;
     }
 }
-tag

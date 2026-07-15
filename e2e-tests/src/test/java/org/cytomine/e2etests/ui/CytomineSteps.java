@@ -121,7 +121,7 @@ public class CytomineSteps {
 
         Path tempDir = Files.createTempDirectory("selenium-upload");
         Path copiedFile = tempDir.resolve(imageName);
-        try (var in = getClass().getClassLoader().getResourceAsStream("cat.png")) {
+        try (var in = getClass().getClassLoader().getResourceAsStream("wsi.zip")) {
             Files.copy(in, copiedFile);
         }
         maybeProjectName.ifPresent(projectName -> selectProject(wait, projectName));

@@ -20,9 +20,7 @@ import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
-import static be.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(OntologyHttpContract.ROOT_PATH)
 public interface OntologyHttpContract {
     String ROOT_PATH = "/ontologies";
 

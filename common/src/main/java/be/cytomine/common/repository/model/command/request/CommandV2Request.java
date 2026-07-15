@@ -1,5 +1,6 @@
 package be.cytomine.common.repository.model.command.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -51,9 +52,11 @@ public sealed interface CommandV2Request<T extends HasLongId & HasAclId>
 
     CommandType getCommandType();
 
+    @JsonIgnore
     String getActionMessage();
 
     long id();
 
+    @JsonIgnore
     String getCommand();
 }

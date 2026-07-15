@@ -602,4 +602,20 @@ public class CytomineTests {
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.logout(wait, cytomineUrl);
     }
+
+    @Test
+    void undoCommand() {
+        String ontologyName = "selenium-" + randomUUID();
+        String renamedOntologyName = "selenium-renamed-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String ontologyUrl = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
+        cytomineSteps.renameOntology(wait, ontologyUrl, renamedOntologyName);
+
+        cytomineSteps.undoCommandFromHistory(wait, cytomineUrl, "Update", renamedOntologyName);
+        cytomineSteps.verifyOntologyName(wait, ontologyUrl, ontologyName);
+
+        cytomineSteps.deleteOntology(wait, ontologyUrl);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
 }

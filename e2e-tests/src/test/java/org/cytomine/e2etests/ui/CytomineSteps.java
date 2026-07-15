@@ -104,6 +104,34 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
     }
 
+    public void renameOntology(Wait<WebDriver> wait, String ontologyUrl, String newName) {
+        webDriverUtils.goTo(wait, ontologyUrl);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Rename')]");
+        webDriverUtils.byClear(wait, By.name("name"));
+        webDriverUtils.bySendKeys(wait, By.name("name"), newName);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//a[contains(@class, 'panel-block') and contains(., '" + newName + "')]")
+        );
+    }
+
+    public void verifyOntologyName(Wait<WebDriver> wait, String ontologyUrl, String ontologyName) {
+        webDriverUtils.goTo(wait, ontologyUrl);
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//a[contains(@class, 'panel-block') and contains(., '" + ontologyName + "')]")
+        );
+    }
+
+    public void undoCommandFromHistory(Wait<WebDriver> wait, URL cytomineUrl, String operation, String description) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/history");
+        String row = format("//tr[td[contains(., '%s')] and td//span[contains(., '%s')]]", description, operation);
+        webDriverUtils.xpathClick(wait, row + "//button[contains(., 'Undo')]");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'Action undone')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'Action undone')]"));
+    }
+
     public String getOntologyUrlFromProject(Wait<WebDriver> wait, String projectURL) {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//a[contains(@href, '/information')]");

@@ -24,6 +24,10 @@ public interface CommandMapper {
     );
 
     default CommandV2Response<?> map(CommandV2Entity commandV2Entity) {
-        return new CommandV2Response<>(commandV2Entity.getId(), commandV2Entity.getData());
+        return new CommandV2Response<>(
+            commandV2Entity.getId(),
+            commandV2Entity.getData(),
+            commandV2Entity.getCreated()
+        );
     }
 }

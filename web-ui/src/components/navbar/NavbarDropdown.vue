@@ -17,7 +17,6 @@
   <span class="navbar-link" :class="{'is-active': isActive, ...linkClasses}" tabindex="0">
     <i v-if="icon" :class="[iconPack, icon]"></i>
     {{title}}
-    <b-tag v-if="tag" :type="tag.type">{{tag.text}}</b-tag>
   </span>
   <div class="navbar-dropdown" :class="classes">
     <slot></slot>
@@ -32,7 +31,6 @@ export default {
     icon: String,
     iconPack: {type: String, default: 'fas'},
     title: String,
-    tag: Object,
     classes: Array,
     linkClasses: Object,
     listPathes: Array
@@ -58,9 +56,6 @@ export default {
 </script>
 
 <style>
-.navbar-item .tag {
-  margin-left: 0.5rem;
-}
 @media screen and (min-width: 1024px) {
   .navbar-item.is-hoverable:hover .navbar-dropdown {
     display: block;

@@ -1002,7 +1002,7 @@ export default {
         this.$store.commit(this.imageModule + 'undoAction', opposedAction);
       } catch (err) {
         console.log(err);
-        this.$notify({type: 'error', text: this.$t('notif-error-undo')});
+        this.$notify({type: 'error', text: this.$t('notify-error-undo')});
       }
     },
     async redo() {

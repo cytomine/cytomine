@@ -25,6 +25,7 @@ import ProjectHome from './components/project/ProjectHome.vue';
 import MemberActivityDetails from './components/project/activity/MemberActivityDetails.vue';
 import AdminPanel from './components/admin/AdminPanel.vue';
 import UserActivity from './components/user/UserActivity.vue';
+import UserHistoryPage from './components/user/UserHistoryPage.vue';
 import PageNotFound from './components/PageNotFound.vue';
 
 const routes = [
@@ -148,6 +149,10 @@ const routes = [
         component: AppInfoPage,
       },
     ],
+  },
+  {
+    path: '/history',
+    component: UserHistoryPage,
   },
 
   // redirections for old URLS

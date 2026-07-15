@@ -8,11 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.service.ApplyCommandService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.CommandHttpContract;
@@ -32,14 +30,17 @@ public class CommandController implements CommandHttpContract {
     private final ApplyCommandService applyCommandService;
 
     @Override
-    @PostMapping("/undo/{commandId}")
     public Optional<HttpCommandResponse> undo(UUID commandId, long userId) {
         return applyCommandService.undoCommand(userId, commandId, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    @GetMapping("/{commandId}")
-    public Optional<CommandV2Response<?>> get(@PathVariable UUID commandId, @RequestParam long userId) {
+    public Optional<CommandV2Response<?>> get(UUID commandId, long userId) {
         return commandV2Repository.findById(commandId).map(commandMapper::map);
+    }
+
+    @Override
+    public Page<CommandV2Response<?>> getAllForUser(long userId, Pageable pageable) {
+        return commandV2Repository.findAllByUserId(userId, pageable).map(commandMapper::map);
     }
 }

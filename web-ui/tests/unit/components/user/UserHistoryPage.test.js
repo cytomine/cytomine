@@ -202,22 +202,22 @@ describe('UserHistoryPage.vue', () => {
     expect(wrapper.vm.undoing).toBeNull();
   });
 
-  it('should parse the command type into an action and a domain', async () => {
+  it('should parse the command type into an operation and a domain', async () => {
     const wrapper = await createWrapper();
 
     expect(wrapper.vm.parseType('INSERT_UPLOADED_FILE_COMMAND')).toEqual(
-      {action: 'INSERT', domain: ['UPLOADED', 'FILE']}
+      {operation: 'INSERT', domain: ['UPLOADED', 'FILE']}
     );
-    expect(wrapper.vm.parseType('UNDO_CREATE_COMMAND')).toEqual({action: 'UNDO', domain: ['CREATE']});
+    expect(wrapper.vm.parseType('UNDO_CREATE_COMMAND')).toEqual({operation: 'UNDO', domain: ['CREATE']});
   });
 
-  it('should map each action to a tag type', async () => {
+  it('should map each operation to a tag type', async () => {
     const wrapper = await createWrapper();
 
-    expect(wrapper.vm.actionTag(insertCommand)).toBe('is-success');
-    expect(wrapper.vm.actionTag(updateCommand)).toBe('is-info');
-    expect(wrapper.vm.actionTag(undoCommand)).toBe('is-warning');
-    expect(wrapper.vm.actionTag({commandRequest: {commandType: 'MERGE_TERM_COMMAND'}})).toBe('is-light');
+    expect(wrapper.vm.operationTag(insertCommand)).toBe('is-success');
+    expect(wrapper.vm.operationTag(updateCommand)).toBe('is-info');
+    expect(wrapper.vm.operationTag(undoCommand)).toBe('is-warning');
+    expect(wrapper.vm.operationTag({commandRequest: {commandType: 'MERGE_TERM_COMMAND'}})).toBe('is-light');
   });
 
   it('should resolve the domain of an undo command from its target', async () => {

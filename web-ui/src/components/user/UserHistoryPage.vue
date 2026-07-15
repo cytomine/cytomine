@@ -140,20 +140,20 @@ export default {
     },
     parseType(commandType) {
       const tokens = commandType.replace(/_COMMAND$/, '').split('_');
-      return {action: tokens[0], domain: tokens.slice(1)};
+      return {operation: tokens[0], domain: tokens.slice(1)};
     },
     operationTag(command) {
-      const {action} = this.parseType(command.commandRequest.commandType);
-      return OPERATION_TAGS[action] || 'is-light';
+      const {operation} = this.parseType(command.commandRequest.commandType);
+      return OPERATION_TAGS[operation] || 'is-light';
     },
     operationLabel(command) {
-      const {action} = this.parseType(command.commandRequest.commandType);
-      return this.humanize([action]);
+      const {operation} = this.parseType(command.commandRequest.commandType);
+      return this.humanize([operation]);
     },
     domainLabel(command) {
       const request = command.commandRequest;
-      let {action, domain} = this.parseType(request.commandType);
-      if (action === 'UNDO' && request.target) {
+      let {operation, domain} = this.parseType(request.commandType);
+      if (operation === 'UNDO' && request.target) {
         domain = this.parseType(request.target.commandType).domain;
       }
       return this.humanize(domain);

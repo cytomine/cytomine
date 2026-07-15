@@ -5,6 +5,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +41,9 @@ public class TagController {
     private final TagHttpContract tagHttpContract;
 
     @GetMapping("/tag.json")
-    public CollectionResponse<TagResponse> list(Pageable pageable) {
+    public CollectionResponse<TagResponse> list(
+        @SortDefault(sort = "created", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         log.debug("GET /tag.json");
         long userId = currentUserService.getCurrentUser().getId();
         return pageMapper.toCollectionResponse(tagHttpContract.list(userId, pageable));

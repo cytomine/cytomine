@@ -49,11 +49,6 @@ public class TagService extends ModelService {
         return Tag.class;
     }
 
-    public List<Tag> list() {
-        securityACLService.checkGuest();
-        return tagRepository.findAll();
-    }
-
     public Tag get(Long id) {
         return find(id).orElse(null);
     }

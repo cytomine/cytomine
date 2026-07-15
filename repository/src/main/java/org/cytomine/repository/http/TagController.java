@@ -5,11 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
-import org.cytomine.repository.mapper.TagMapper;
 import org.cytomine.repository.persistence.TagRepository;
-import org.cytomine.repository.persistence.UserRepository;
-import org.cytomine.repository.persistence.entity.TagEntity;
-import org.cytomine.repository.persistence.entity.UserEntity;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.TagCommandService;
 import org.springframework.data.domain.Page;
@@ -32,9 +28,7 @@ import be.cytomine.common.repository.model.tag.payload.UpdateTag;
 public class TagController implements TagHttpContract {
     private final ACLService aclService;
     private final TagCommandService service;
-    private final TagMapper mapper;
     private final TagRepository repository;
-    private final UserRepository userRepository;
 
     @Override
     public Optional<HttpCommandResponse> create(@RequestParam long userId, @RequestBody CreateTag payload) {
@@ -43,7 +37,7 @@ public class TagController implements TagHttpContract {
 
     @Override
     public Optional<TagResponse> read(@PathVariable long id, @RequestParam long userId) {
-        return repository.findById(id).map(this::mapToResponse);
+        return repository.findByIdAndDeletedNull(id).map(service::mapToResponse);
     }
 
     @Override
@@ -63,15 +57,8 @@ public class TagController implements TagHttpContract {
     @Override
     public Page<TagResponse> list(@RequestParam long userId, Pageable pageable) {
         if (aclService.isAdmin(userId)) {
-            return repository.findAllByDeletedNull(pageable).map(this::mapToResponse);
+            return repository.findAllByDeletedNull(pageable).map(service::mapToResponse);
         }
-        return repository.findAllReadableByUser(userId, pageable).map(this::mapToResponse);
-    }
-
-    private TagResponse mapToResponse(TagEntity entity) {
-        String creatorName = userRepository.findById(entity.getUserId())
-            .map(UserEntity::getUsername)
-            .orElse(null);
-        return mapper.mapToTagResponse(entity, creatorName);
+        return repository.findAllReadableByUser(userId, pageable).map(service::mapToResponse);
     }
 }

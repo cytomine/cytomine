@@ -48,6 +48,7 @@ class TagControllerTest implements CRUDCommandTests<CreateTag, TagResponse, Upda
         return new TagResponse(
             response.id(),
             updatePayload.name().orElse(response.name()),
+            response.creatorName(),
             response.created(),
             Optional.of(updatedTime),
             response.deleted()

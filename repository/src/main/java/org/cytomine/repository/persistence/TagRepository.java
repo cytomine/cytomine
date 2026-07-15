@@ -1,5 +1,7 @@
 package org.cytomine.repository.persistence;
 
+import java.util.Optional;
+
 import org.cytomine.repository.persistence.entity.TagEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TagRepository extends JpaRepository<TagEntity, Long> {
+    Optional<TagEntity> findByIdAndDeletedNull(long id);
+
     Page<TagEntity> findAllByDeletedNull(Pageable pageable);
 
     @Query(

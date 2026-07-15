@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface TagDomainAssociationRepository extends JpaRepository<TagDomainAssociationEntity, Long> {
     Optional<TagDomainAssociationEntity> findByIdAndDeletedNull(long id);
 
+    boolean existsByTagIdAndDeletedNull(long tagId);
+
     Page<TagDomainAssociationEntity> findAllByDomainClassNameAndDomainIdAndDeletedNull(
         String domainClassName,
         long domainId,

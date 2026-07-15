@@ -1,6 +1,7 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
+import java.util.Objects;
 import java.util.Optional;
 
 import lombok.Getter;
@@ -9,8 +10,11 @@ import lombok.Setter;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.TagMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.TagDomainAssociationRepository;
 import org.cytomine.repository.persistence.TagRepository;
+import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.persistence.entity.TagEntity;
+import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.TagCommandPayload;
@@ -31,10 +35,13 @@ public class TagCommandService
     implements CRUDCommandService<CreateTag, UpdateTag, TagCommandPayload, TagEntity, TagResponse> {
     @Setter
     private ApplyCommandService applyCommandService;
+    private final ACLService aclService;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
     private final TagMapper tagMapper;
     private final TagRepository tagRepository;
+    private final TagDomainAssociationRepository tagDomainAssociationRepository;
+    private final UserRepository userRepository;
 
     @Override
     public TagEntity updateEntityWithEntity(TagEntity entity, UpdateTag payload, Timestamp now) {
@@ -43,22 +50,25 @@ public class TagCommandService
 
     @Override
     public TagEntity updateEntityWithPayload(TagEntity entity, TagCommandPayload payload, Timestamp now) {
-        return null;
+        return tagMapper.updateWithPayload(entity, payload, now);
     }
 
     @Override
     public TagResponse mapToResponse(TagEntity entity) {
-        return null;
+        String creatorName = userRepository.findById(entity.getUserId())
+            .map(UserEntity::getUsername)
+            .orElse(null);
+        return tagMapper.mapToTagResponse(entity, creatorName);
     }
 
     @Override
     public TagEntity mapCreateToEntity(CreateTag createPayload, long userId, Timestamp creationDate) {
-        return null;
+        return tagMapper.mapToTagEntity(createPayload, userId, creationDate);
     }
 
     @Override
     public TagCommandPayload map(TagEntity entity) {
-        return null;
+        return tagMapper.mapToCommandPayload(entity);
     }
 
     @Override
@@ -92,21 +102,30 @@ public class TagCommandService
 
     @Override
     public boolean canWriteId(long userId, long id) {
-        return false;
+        if (aclService.isAdmin(userId)) {
+            return true;
+        }
+        return isCreator(userId, id) && !tagDomainAssociationRepository.existsByTagIdAndDeletedNull(id);
     }
 
     @Override
     public boolean canDeleteId(long userId, long id) {
-        return false;
+        return aclService.isAdmin(userId) || isCreator(userId, id);
     }
 
     @Override
     public boolean canWriteAclId(long userId, long id) {
-        return false;
+        return canWriteId(userId, id);
     }
 
     @Override
     public boolean canDeleteAclId(long userId, long id) {
-        return false;
+        return canDeleteId(userId, id);
+    }
+
+    private boolean isCreator(long userId, long tagId) {
+        return tagRepository.findById(tagId)
+            .map(tag -> Objects.equals(tag.getUserId(), userId))
+            .orElse(false);
     }
 }

@@ -8,6 +8,7 @@ import be.cytomine.common.repository.model.command.DataType;
 public record TagResponse(
     long id,
     String name,
+    String creatorName,
     LocalDateTime created,
     Optional<LocalDateTime> updated,
     Optional<LocalDateTime> deleted
@@ -17,3 +18,4 @@ public record TagResponse(
         return DataType.TAG;
     }
 }
+tag

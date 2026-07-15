@@ -48,7 +48,7 @@
               :label="$t('created')"
               sortable
             >
-              {{ Number(tag.created) | moment('ll') }}
+              {{ formatDate(tag.created) }}
             </b-table-column>
 
             <b-table-column label=" " centered>
@@ -87,6 +87,7 @@
 
 <script>
 import {TagCollection} from '@/api';
+import {formatDate} from '@/utils/date';
 import {getWildcardRegexp} from '@/utils/string-utils';
 import TagModal from '@/components/tag/TagModal';
 
@@ -119,6 +120,9 @@ export default {
     }
   },
   methods: {
+    formatDate(date) {
+      return formatDate(date, this.$i18n.locale);
+    },
     startTagCreation() {
       this.editedTag = null;
       this.modal = true;

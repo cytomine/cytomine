@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.cytomine.repository.mapper.CommandMapper;
+import org.cytomine.repository.mapper.TagMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TagRepository;
 import org.cytomine.repository.persistence.entity.TagEntity;
@@ -27,14 +29,16 @@ import be.cytomine.common.repository.model.tag.payload.UpdateTag;
 @Getter
 public class TagCommandService
     implements CRUDCommandService<CreateTag, UpdateTag, TagCommandPayload, TagEntity, TagResponse> {
-
+    @Setter
+    private ApplyCommandService applyCommandService;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
+    private final TagMapper tagMapper;
     private final TagRepository tagRepository;
 
     @Override
     public TagEntity updateEntityWithEntity(TagEntity entity, UpdateTag payload, Timestamp now) {
-        return null;
+        return tagMapper.update(entity, payload.name().orElse(entity.getName()), now);
     }
 
     @Override

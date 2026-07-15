@@ -1,0 +1,17 @@
+package org.cytomine.repository.mapper;
+
+import java.sql.Timestamp;
+
+import org.cytomine.repository.persistence.entity.TagEntity;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+@Mapper(componentModel = "spring", uses = {BaseMapper.class})
+public interface TagMapper {
+
+    @Mapping(target = "name", source = "newName")
+    @Mapping(target = "updated", source = "now")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"name", "updated"})
+    TagEntity update(TagEntity entity, String newName, Timestamp now);
+}

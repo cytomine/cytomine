@@ -11,7 +11,7 @@ public record UpdateTagCommand(TagCommandPayload before, TagCommandPayload after
 
     @Override
     public CommandType getCommandType() {
-        return CommandType.UPDATE_TAG_DOMAIN_ASSOCIATION_COMMAND;
+        return CommandType.UPDATE_TAG_COMMAND;
     }
 
     @Override
@@ -21,6 +21,6 @@ public record UpdateTagCommand(TagCommandPayload before, TagCommandPayload after
 
     @Override
     public String getCommand() {
-        return Commands.UPDATE_TAG_DOMAIN_ASSOCIATION;
+        return Commands.UPDATE_TAG;
     }
 }

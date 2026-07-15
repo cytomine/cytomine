@@ -27,7 +27,7 @@ spec:
             - -c
             - |
               echo "Waiting for wsi..."
-              until [ -f /tmp/images/wsi ]; do sleep 2; done
+              until [ -f /tmp/images/wsi/1.2.826.0.1.3680043.8.498.68297860750526126870974958290035028993.dcm ]; do sleep 2; done
               echo "wsi found!"
           volumeMounts:
             - mountPath: /tmp/images

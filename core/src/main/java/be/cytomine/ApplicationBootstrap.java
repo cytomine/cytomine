@@ -15,6 +15,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.nosqlmigration.InitialMongodbSetupMigration;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.security.User;
@@ -61,6 +63,8 @@ class ApplicationBootstrap {
     private final InitialMongodbSetupMigration initialSetupMigration;
 
     private final UserRepository userRepository;
+
+    private final UserHttpContract userHttpContract;
 
     @PostConstruct
     public void init() {
@@ -146,7 +150,7 @@ class ApplicationBootstrap {
         String privateKey = applicationProperties.getImageServerPrivateKey();
         String publicKey = applicationProperties.getImageServerPublicKey();
         if (privateKey != null && publicKey != null) {
-            User imageServerUser = userRepository.findByUsernameLikeIgnoreCase("ImageServer1")
+            UserResponse imageServerUser = userHttpContract.search("ImageServer1")
                 .orElseThrow(() -> new ObjectNotFoundException("No user imageserver1, cannot assign keys"));
             imageServerUser.setPrivateKey(applicationProperties.getImageServerPrivateKey());
             imageServerUser.setPublicKey(applicationProperties.getImageServerPublicKey());

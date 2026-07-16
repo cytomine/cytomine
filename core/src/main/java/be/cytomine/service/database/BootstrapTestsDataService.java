@@ -11,9 +11,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
@@ -63,36 +67,36 @@ public class BootstrapTestsDataService {
     }
 
     private final UserRepository userRepository;
+    private final UserHttpContract userHttpContract;
     private final SecRoleRepository secRoleRepository;
     private final SecUserSecRoleRepository secSecUserSecRoleRepository;
+    private final UserMapper userMapper;
 
-    public User createUserForTests(String login) {
-        Optional<User> alreadyExistingUser = userRepository.findByUsernameLikeIgnoreCase(login.toLowerCase());
+    public UserResponse createUserForTests(String login) {
+        Optional<UserResponse> alreadyExistingUser = userHttpContract.search(login.toLowerCase());
         if (!ROLES.containsKey(login)) {
             throw new RuntimeException("Cannot execute test because user has not authority defined");
         }
         List<String> authoritiesConstants = ROLES.get(login);
 
         if (alreadyExistingUser.isPresent()) {
-            Set<SecRole> allRoleByUser = secSecUserSecRoleRepository.findAllRoleByUser(alreadyExistingUser.get());
+            Set<RoleResponse> allRoleByUser = alreadyExistingUser.get().roles();
             for (String authoritiesConstant : authoritiesConstants) {
-                if (!allRoleByUser.stream().anyMatch(x -> x.getAuthority().equals(authoritiesConstant))) {
-                    throw new RuntimeException("Cannot execute test because already existing user "
-                        + login
-                        + "  has not same roles: not present - "
-                        + authoritiesConstant);
+                if (!allRoleByUser.stream().anyMatch(x -> x.authority().equals(authoritiesConstant))) {
+                    throw new RuntimeException("Cannot execute test because already existing user " + login
+                        + "  has not same roles: not present - " + authoritiesConstant);
                 }
             }
-            for (SecRole secRole : allRoleByUser) {
-                if (!authoritiesConstants.stream().anyMatch(x -> x.equals(secRole.getAuthority()))) {
-                    throw new RuntimeException("Cannot execute test because already existing user "
-                        + login
-                        + " has not same roles: should not be there - "
-                        + secRole.getAuthority());
+            for (RoleResponse role : allRoleByUser) {
+                if (!authoritiesConstants.stream().anyMatch(x -> x.equals(role.authority()))) {
+                    throw new RuntimeException("Cannot execute test because already existing user " + login
+                        + " has not same roles: should not be there - " + role.authority());
                 }
             }
             return alreadyExistingUser.get();
         }
+
+
 
         User user = new User();
         user.setUsername(login);
@@ -110,6 +114,6 @@ public class BootstrapTestsDataService {
             secSecUserSecRoleRepository.save(secSecUserSecRole);
         }
         userRepository.findById(user.getId()); // flush
-        return user;
+        return userMapper.map(user);
     }
 }

@@ -20,9 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findById(Long id);
 
     @EntityGraph(attributePaths = "roles")
-    Optional<User> findByUsernameLikeIgnoreCase(String username);
-
-    @EntityGraph(attributePaths = "roles")
     Optional<User> findByUsername(String username);
 
     @EntityGraph(attributePaths = "roles")

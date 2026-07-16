@@ -57,6 +57,12 @@ public class UserEntity implements HasTimestampCUD {
     @Column
     private String origin;
 
+    @Column
+    private String privateKey;
+
+    @Column
+    private String publicKey;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "sec_user_sec_role",

@@ -9,7 +9,8 @@ import be.cytomine.common.repository.model.command.payload.response.RoleResponse
 
 public record UserCommandPayload(long id, String username, String email, Optional<String> name,
                                  Optional<String> lastname, Optional<String> firstname, Optional<String> language,
-                                 boolean developer, Optional<String> origin, Set<RoleResponse> roles
+                                 boolean developer, Optional<String> origin, Optional<String> privateKey,
+                                 Optional<String> publicKey, Set<RoleResponse> roles
 
 ) implements HasLongId, HasAclId {
     @Override

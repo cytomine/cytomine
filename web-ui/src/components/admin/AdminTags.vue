@@ -93,7 +93,7 @@ export default {
       tags: [],
       total: 0,
       currentPage: 1,
-      perPage: 25,
+      perPage: 20,
       perPageOptions: [10, 20, 50, 100],
       sortField: 'created',
       sortOrder: 'desc',

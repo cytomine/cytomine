@@ -67,12 +67,18 @@ describe('AdminTags.vue', () => {
     jest.clearAllMocks();
   });
 
+  it('should have a default page size available in the per-page options', async () => {
+    const wrapper = await createWrapper();
+
+    expect(wrapper.vm.perPageOptions).toContain(wrapper.vm.perPage);
+  });
+
   it('should fetch the tags on creation', async () => {
     const wrapper = await createWrapper();
 
     expect(Cytomine.instance.api.get).toHaveBeenCalledWith(
       '/tag.json',
-      {params: {page: 0, size: 25, sort: 'created,desc'}},
+      {params: {page: 0, size: 20, sort: 'created,desc'}},
     );
     expect(wrapper.vm.tags).toEqual(tags);
     expect(wrapper.vm.total).toBe(3);

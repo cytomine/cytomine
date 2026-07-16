@@ -35,7 +35,7 @@
             {{ tag.name }}
           </b-table-column>
 
-          <b-table-column field="creatorName" :label="$t('creator')" sortable>
+          <b-table-column field="creatorName" :label="$t('creator')">
             {{ tag.creatorName }}
           </b-table-column>
 

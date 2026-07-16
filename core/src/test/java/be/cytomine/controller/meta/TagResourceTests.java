@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,9 +26,10 @@ import be.cytomine.common.repository.http.TagHttpContract;
 import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TagResponse;
+import be.cytomine.common.repository.model.tag.payload.CreateTag;
+import be.cytomine.common.repository.model.tag.payload.UpdateTag;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.meta.Tag;
-import be.cytomine.utils.JsonObject;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -46,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Transactional
 public class TagResourceTests {
 
     @Autowired
@@ -54,11 +57,13 @@ public class TagResourceTests {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockitoBean
     private TagHttpContract httpContract;
 
     @Test
-    @Transactional
     public void listAllTags() throws Exception {
         Tag tag = builder.givenATag();
         long userId = builder.givenSuperAdmin().getId();
@@ -72,7 +77,6 @@ public class TagResourceTests {
     }
 
     @Test
-    @Transactional
     public void shouldReturnTagWithAllExpectedFields() throws Exception {
         Tag tag = builder.givenATag();
         long userId = builder.givenSuperAdmin().getId();
@@ -87,7 +91,6 @@ public class TagResourceTests {
     }
 
     @Test
-    @Transactional
     public void addValidTag() throws Exception {
         Tag tag = builder.givenATag();
         long userId = builder.givenSuperAdmin().getId();
@@ -95,7 +98,7 @@ public class TagResourceTests {
         when(httpContract.create(eq(userId), any())).thenReturn(Optional.of(
             new HttpCommandResponse(true, toResponse(tag), commandId, Commands.CREATE_TAG, Set.of())));
 
-        String createTagJson = JsonObject.of("name", tag.getName()).toJsonString();
+        String createTagJson = objectMapper.writeValueAsString(new CreateTag(tag.getName()));
 
         mockMvc.perform(post("/api/tag.json").contentType(APPLICATION_JSON).content(createTagJson))
             .andExpect(status().isOk())
@@ -106,13 +109,12 @@ public class TagResourceTests {
     }
 
     @Test
-    @Transactional
     public void addTagWithNoWriteAccessReturnsEmpty() throws Exception {
         Tag tag = builder.givenATag();
         long userId = builder.givenSuperAdmin().getId();
         when(httpContract.create(eq(userId), any())).thenReturn(Optional.empty());
 
-        String createTagJson = JsonObject.of("name", tag.getName()).toJsonString();
+        String createTagJson = objectMapper.writeValueAsString(new CreateTag(tag.getName()));
 
         mockMvc.perform(post("/api/tag.json").contentType(APPLICATION_JSON).content(createTagJson))
             .andExpect(status().isOk())
@@ -120,7 +122,6 @@ public class TagResourceTests {
     }
 
     @Test
-    @Transactional
     public void editValidTag() throws Exception {
         Tag tag = builder.givenATag();
         long userId = builder.givenSuperAdmin().getId();
@@ -128,7 +129,7 @@ public class TagResourceTests {
         when(httpContract.update(eq(tag.getId()), eq(userId), any())).thenReturn(Optional.of(
             new HttpCommandResponse(true, toResponse(tag), commandId, Commands.UPDATE_TAG, Set.of())));
 
-        String updateTagJson = JsonObject.of("name", tag.getName()).toJsonString();
+        String updateTagJson = objectMapper.writeValueAsString(new UpdateTag(Optional.of(tag.getName())));
 
         mockMvc.perform(put("/api/tag/{id}.json", tag.getId()).contentType(APPLICATION_JSON).content(updateTagJson))
             .andExpect(status().isOk())
@@ -139,20 +140,18 @@ public class TagResourceTests {
     }
 
     @Test
-    @Transactional
     public void failWhenEditingTagDoesNotExists() throws Exception {
         Tag tag = builder.givenATag();
         long userId = builder.givenSuperAdmin().getId();
         when(httpContract.update(eq(tag.getId()), eq(userId), any())).thenReturn(Optional.empty());
 
-        String updateTagJson = JsonObject.of("name", tag.getName()).toJsonString();
+        String updateTagJson = objectMapper.writeValueAsString(new UpdateTag(Optional.of(tag.getName())));
 
         mockMvc.perform(put("/api/tag/{id}.json", tag.getId()).contentType(APPLICATION_JSON).content(updateTagJson))
             .andExpect(status().isNotFound());
     }
 
     @Test
-    @Transactional
     public void deleteTag() throws Exception {
         Tag tag = builder.givenATag();
         long userId = builder.givenSuperAdmin().getId();
@@ -169,7 +168,6 @@ public class TagResourceTests {
     }
 
     @Test
-    @Transactional
     public void failWhenDeleteTagNotExists() throws Exception {
         long userId = builder.givenSuperAdmin().getId();
         when(httpContract.delete(eq(0L), eq(userId))).thenReturn(Optional.empty());

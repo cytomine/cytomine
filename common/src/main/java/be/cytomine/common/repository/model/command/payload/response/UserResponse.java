@@ -13,7 +13,8 @@ public record UserResponse(long id, String username, String email, Optional<Stri
                            boolean isDeveloper,
                            //
                            Optional<String> origin, Optional<LocalDateTime> updated, Optional<LocalDateTime> deleted,
-                           LocalDateTime created, Set<RoleResponse> roles) implements ApplyCommandResponse {
+                           LocalDateTime created, Optional<String> privateKey, Optional<String> publicKey,
+                           Set<RoleResponse> roles) implements ApplyCommandResponse {
     public UserResponse {
         if (roles == null) {
             roles = new HashSet<>();

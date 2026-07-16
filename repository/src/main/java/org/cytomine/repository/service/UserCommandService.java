@@ -48,10 +48,10 @@ public class UserCommandService
     public UserEntity updateEntityWithEntity(UserEntity entity, UpdateUser payload, Timestamp now) {
         String entityLanguage = entity.getLanguage() != null ? entity.getLanguage().name() : null;
         return userMapper.update(entity, payload.email().orElse(entity.getEmail()),
-            payload.name().orElse(entity.getName()),
-            payload.firstname().orElse(entity.getFirstname()), payload.lastname().orElse(entity.getLastname()),
-            payload.language().orElse(entityLanguage),payload.publicKey().orElse(entity.getPublicKey()),
-            payload.privateKey().orElse(entity.getPrivateKey()),payload.origin().orElse(entity.getOrigin()), now);
+            payload.name().orElse(entity.getName()), payload.firstname().orElse(entity.getFirstname()),
+            payload.lastname().orElse(entity.getLastname()), payload.language().orElse(entityLanguage),
+            payload.publicKey().orElse(entity.getPublicKey()), payload.privateKey().orElse(entity.getPrivateKey()),
+            payload.origin().orElse(entity.getOrigin()), now);
     }
 
     @Override

@@ -10,6 +10,7 @@ jest.mock('@/api', () => ({
     instance: {
       api: {
         get: jest.fn(),
+        delete: jest.fn(),
       },
     },
   },
@@ -24,8 +25,6 @@ const createTag = (id, name, creatorName) => ({
   name,
   creatorName,
   created: '1752537600000',
-  delete: jest.fn(),
-  populate: jest.fn(),
 });
 
 let tags;
@@ -61,6 +60,7 @@ describe('AdminTags.vue', () => {
       createTag(3, 'kidney', 'jane'),
     ];
     Cytomine.instance.api.get.mockResolvedValue({data: {collection: tags, size: tags.length}});
+    Cytomine.instance.api.delete.mockResolvedValue({data: {}});
   });
 
   afterEach(() => {
@@ -152,13 +152,13 @@ describe('AdminTags.vue', () => {
     expect(wrapper.vm.tags[3]).toEqual(newTag);
   });
 
-  it('should populate the edited tag on update', async () => {
+  it('should replace the edited tag in the list on update', async () => {
     const wrapper = await createWrapper();
 
     wrapper.vm.startTagEdition(wrapper.vm.tags[0]);
     wrapper.vm.updateTag({name: 'renamed'});
 
-    expect(tags[0].populate).toHaveBeenCalledWith({name: 'renamed'});
+    expect(wrapper.vm.tags[0]).toEqual({...tags[0], name: 'renamed'});
   });
 
   it('should delete the tag and remove it from the list on confirmation', async () => {
@@ -166,9 +166,10 @@ describe('AdminTags.vue', () => {
     const deletedTag = wrapper.vm.tags[0];
 
     await wrapper.findAll('tbody tr').at(0).find('button.is-danger').trigger('click');
+    await flushPromises();
 
     expect(wrapper.vm.$buefy.dialog.confirm).toHaveBeenCalled();
-    expect(deletedTag.delete).toHaveBeenCalled();
+    expect(Cytomine.instance.api.delete).toHaveBeenCalledWith(`/tag/${deletedTag.id}.json`);
     expect(wrapper.vm.tags.length).toBe(2);
     expect(wrapper.vm.tags).not.toContain(deletedTag);
     expect(wrapper.vm.$notify).toHaveBeenCalledWith(

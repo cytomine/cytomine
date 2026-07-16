@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import {Tag} from '@/api';
+import {Cytomine} from '@/api';
 import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {
@@ -46,7 +46,7 @@ export default {
   watch: {
     active(val) {
       if (val) {
-        this.internalTag = (this.tag) ? this.tag.clone() : new Tag();
+        this.internalTag = (this.tag) ? {...this.tag} : {};
         this.displayErrors = false;
       }
     }
@@ -61,10 +61,12 @@ export default {
       let labelTranslation = this.editionMode ? 'update' : 'creation';
 
       try {
-        await this.internalTag.save();
+        const {data} = this.editionMode
+          ? await Cytomine.instance.api.put(`/tag/${this.tag.id}.json`, {name: this.internalTag.name})
+          : await Cytomine.instance.api.post('/tag.json', {name: this.internalTag.name});
         this.$notify({type: 'success', text: this.$t('notif-success-tag-' + labelTranslation)});
         this.$emit('update:active', false);
-        this.$emit(this.editionMode ? 'updateTag' : 'addTag', this.internalTag);
+        this.$emit(this.editionMode ? 'updateTag' : 'addTag', data.data);
       } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-tag-' + labelTranslation)});

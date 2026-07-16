@@ -60,6 +60,8 @@ public interface UserMapper {
     @Mapping(target = "language", source = "replace.language")
     @Mapping(target = "developer", source = "replace.developer")
     @Mapping(target = "origin", source = "replace.origin")
+    @Mapping(target = "privateKey", source = "replace.privateKey")
+    @Mapping(target = "publicKey", source = "replace.publicKey")
     @Mapping(target = "roles", source = "replace.roles")
     @Mapping(target = "updated", source = "now")
     @Mapping(target = "id", source = "entity.id")

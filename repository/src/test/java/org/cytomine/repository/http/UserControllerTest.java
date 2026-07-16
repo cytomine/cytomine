@@ -45,12 +45,13 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
 
     CreateUser createPayload =
         new CreateUser(UUID.randomUUID().toString(), Optional.empty(), Optional.empty(), Optional.empty(),
-            UUID.randomUUID().toString(), Optional.empty(), false, Role.ROLE_ADMIN.toString(), "EN");
+            UUID.randomUUID().toString(), Optional.empty(), false, Role.ROLE_ADMIN.toString(), "EN", Optional.empty(),
+            Optional.empty());
 
     UpdateUser updatePayload =
         new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
             Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()), Optional.of("FRENCH"),
-            Optional.empty(), Optional.empty(), Optional.empty());
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
 
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;
@@ -77,6 +78,7 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
             updatePayload.name().or(response::name), updatePayload.lastname().or(response::lastname),
             updatePayload.firstname().or(response::firstname), updatePayload.language().or(response::language),
             response.isDeveloper(), updatePayload.origin().or(response::origin), Optional.of(updatedTime),
-            response.deleted(), response.created(), response.roles());
+            response.deleted(), response.created(), updatePayload.privateKey().or(response::privateKey),
+            updatePayload.publicKey().or(response::publicKey), response.roles());
     }
 }

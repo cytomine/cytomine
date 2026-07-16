@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.DeleteCommand;
@@ -109,7 +110,7 @@ public class AnnotationLinkService extends ModelService {
         json.put("annotationIdent", annotation.getId());
         json.put("annotationClassName", annotation.getClass().getName());
 
-        return executeCommand(new AddCommand(currentUser), null, json);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
     }
 
     @Override
@@ -118,7 +119,7 @@ public class AnnotationLinkService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new DeleteCommand(currentUser, transaction), domain, null);
+        return executeCommand(new DeleteCommand(currentUserService.getCurrentUserOld(), transaction), domain, null);
     }
 
     public CommandResponse addAnnotationLink(
@@ -135,6 +136,6 @@ public class AnnotationLinkService extends ModelService {
             "image", imageId
         );
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUser(), transaction), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld(), transaction), null, jsonObject);
     }
 }

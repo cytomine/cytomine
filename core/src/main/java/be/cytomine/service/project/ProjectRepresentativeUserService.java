@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -102,7 +103,7 @@ public class ProjectRepresentativeUserService extends ModelService {
 
         securityACLService.checkIsUserInProject(user, project);
 
-        return executeCommand(new AddCommand(currentUser), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
     }
 
     public CommandResponse add(JsonObject jsonObject, User adminAsCurrent) {
@@ -126,7 +127,7 @@ public class ProjectRepresentativeUserService extends ModelService {
         }
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), WRITE);
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 

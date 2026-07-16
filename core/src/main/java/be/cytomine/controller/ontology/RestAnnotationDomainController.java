@@ -171,7 +171,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         JsonObject parameters = new JsonObject(bodyMap);
         byte[] report = annotationReportService.downloadDocumentByProject(parameters, project,
-            currentUserService.getCurrentUser().getId());
+            currentUserService.getCurrentUser().id());
         String filename = reportService.getAnnotationReportFileName(reportType.getLabel(), project.getName());
 
         return buildReportResponse(filename, report, reportType);
@@ -278,7 +278,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         //get term
         List<Long> terms = paramsService.getParamsTermList(params.getJSONAttrStr("terms"), image.getProject(),
-            currentUserService.getCurrentUser().getId());
+            currentUserService.getCurrentUser().id());
 
         List response;
         if (user == null) {

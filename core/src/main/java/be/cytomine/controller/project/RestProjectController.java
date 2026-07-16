@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.command.CommandHistory;
@@ -58,6 +60,8 @@ public class RestProjectController extends RestCytomineController {
 
     private final TaskRunService taskRunService;
 
+    private final UserHttpContract userHttpContract;
+
     /**
      * List all ontology visible for the current user For each ontology, print the terms tree
      */
@@ -75,7 +79,7 @@ public class RestProjectController extends RestCytomineController {
         log.debug("REST request to list projects");
         UserResponse user = currentUserService.getCurrentUser();
 
-        if (user.getUsername().equals("admin") && currentRoleService.isAdminByNow(user)) {
+        if (user.username().equals("admin") && currentRoleService.isAdminByNow(user)) {
             user = null;
         }
 
@@ -143,7 +147,7 @@ public class RestProjectController extends RestCytomineController {
     public ResponseEntity<String> listLastOpened(@RequestParam(required = false, defaultValue = "0") Long max) {
         log.debug("REST request to list last opened");
 
-        return responseSuccess(projectService.listLastOpened(currentUserService.getCurrentUser(), max));
+        return responseSuccess(projectService.listLastOpened(currentUserService.getCurrentUserOld(), max));
     }
 
     /**
@@ -152,7 +156,7 @@ public class RestProjectController extends RestCytomineController {
     @GetMapping("/ontology/{id}/project.json")
     public ResponseEntity<String> listByOntology(@PathVariable Long id) {
         log.debug("REST request to list project with ontology {}", id);
-        long ontologyId = ontologyHttpContract.getLight(id, currentUserService.getCurrentUser().getId())
+        long ontologyId = ontologyHttpContract.getLight(id, currentUserService.getCurrentUser().id())
             .map(OntologyLight::id)
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
         return responseSuccess(projectService.listByOntology(ontologyId));
@@ -168,7 +172,8 @@ public class RestProjectController extends RestCytomineController {
         @RequestParam(required = false, defaultValue = "0") Long offset
     ) {
         log.debug("REST request to list project with user {}", id);
-        User user = userService.findUser(id)
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        UserResponse user = userHttpContract.get(id, currentUser.id())
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
         Page<JsonObject> result = projectService.list(
             user, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", max, offset

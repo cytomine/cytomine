@@ -107,7 +107,7 @@ public class ImageGroupService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(json.getJSONAttrLong("project"), Project.class, READ);
 
-        return executeCommand(new AddCommand(currentUser), null, json);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class ImageGroupService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class ImageGroupService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new DeleteCommand(currentUser, transaction), domain, null);
+        return executeCommand(new DeleteCommand(currentUserService.getCurrentUserOld(), transaction), domain, null);
     }
 
     protected void beforeDelete(CytomineDomain domain) {

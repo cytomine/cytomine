@@ -25,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -33,6 +34,7 @@ import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.domain.social.PersistentUserPosition;
 import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.UserAnnotationListing;
 import be.cytomine.repository.image.ImageInstanceRepository;
@@ -90,6 +92,8 @@ public class ImageConsultationService {
     private final SequenceService sequenceService;
 
     private final ImageInstanceService imageInstanceService;
+
+    private final UserMapper userMapper;
 
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
@@ -222,7 +226,8 @@ public class ImageConsultationService {
         Integer max,
         Integer offset
     ) {
-        securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
+        securityACLService.checkIsSameUserOrAdminContainer(project, userMapper.map(user),
+            currentUserService.getCurrentUser());
         if (max != 0) {
             max += offset; // ?
         } else {
@@ -236,7 +241,8 @@ public class ImageConsultationService {
     }
 
     public List<JsonObject> listImageConsultationByProjectAndUserWithDistinctImage(Project project, User user) {
-        securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
+        securityACLService.checkIsSameUserOrAdminContainer(project, userMapper.map(user),
+            currentUserService.getCurrentUser());
         List<Bson> requests = new ArrayList<>();
         List<JsonObject> data = new ArrayList<>();
 
@@ -576,11 +582,10 @@ public class ImageConsultationService {
 
 
     public List listLastOpened(Long max) {
-        User user = (User) currentUserService.getCurrentUser();
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
+        UserResponse user =  currentUserService.getCurrentUser();
 
         List<Bson> requests = new ArrayList<>();
-        requests.add(match(eq("user", user.getId())));
+        requests.add(match(eq("user", user.id())));
         requests.add(sort(ascending("created")));
         requests.add(group(
             "$image",

@@ -42,9 +42,9 @@ public interface UserAnnotationRepository
 
     Long countByProject(Project project);
 
-    Long countByUserAndProject(User user, Project project);
+    Long countByUserIdAndProject(long  userId, Project project);
 
-    Long countByUser(User user);
+    Long countByUserId(long userId);
 
     Long countByProjectAndCreatedAfter(Project project, Date createdMin);
 

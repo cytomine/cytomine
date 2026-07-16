@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -18,7 +19,6 @@ import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.SharedAnnotation;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.ontology.SharedAnnotationRepository;
@@ -76,12 +76,13 @@ public class SharedAnnotationService extends ModelService {
 
 
     public List<SharedAnnotation> listComments(AnnotationDomain annotation) {
-        User user = (User) currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         List<SharedAnnotation> sharedAnnotations = sharedAnnotationRepository
             .findAllByAnnotationIdentOrderByCreatedDesc(annotation.getId());
         boolean isUserAdmin = currentRoleService.isAdminByNow(user);
         sharedAnnotations = sharedAnnotations.stream()
-            .filter(x -> isUserAdmin || x.getSender().equals(user) || x.getReceivers().contains(user))
+            .filter(x -> isUserAdmin || x.getSender().getId().equals(user.id()) || x.getReceivers().stream()
+                .map(CytomineDomain::getId).anyMatch(r -> r == user.id()))
             .distinct()
             .collect(Collectors.toList());
 
@@ -93,22 +94,21 @@ public class SharedAnnotationService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param jsonObject New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     @Override
     @Transactional(dontRollbackOn = IOException.class)
     public CommandResponse add(JsonObject jsonObject) {
-        User sender = (User) currentUserService.getCurrentUser();
+        UserResponse sender = currentUserService.getCurrentUser();
         securityACLService.checkUser(sender);
 
         AnnotationDomain annotation = annotationDomainRepository.findById(jsonObject.getJSONAttrLong("annotationIdent"))
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", jsonObject.getJSONAttrStr("annotationIdent")));
 
-        jsonObject.putIfAbsent("sender", sender.getId());
+        jsonObject.putIfAbsent("sender", sender.id());
 
         securityACLService.checkFullOrRestrictedForOwner(annotation, annotation.user());
-        return executeCommand(new AddCommand(sender), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
     }
 
 
@@ -119,14 +119,12 @@ public class SharedAnnotationService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((SharedAnnotation) domain).getSender());
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 
@@ -149,10 +147,6 @@ public class SharedAnnotationService extends ModelService {
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         throw new RuntimeException("Update is not implemented for shared annotation");
-    }
-
-    @Override
-    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
     }
 
 }

@@ -20,6 +20,7 @@ import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -152,13 +153,13 @@ public class UserAnnotationService extends ModelService {
     }
 
 
-    public Long count(User user, Project project) {
+    public Long count(UserResponse user, Project project) {
         if (project != null) {
             securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
-            return userAnnotationRepository.countByUserAndProject(user, project);
+            return userAnnotationRepository.countByUserIdAndProject(user.id(), project);
         } else {
-            securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-            return userAnnotationRepository.countByUser(user);
+            securityACLService.checkIsSameUser(user.id(), currentUserService.getCurrentUser());
+            return userAnnotationRepository.countByUserId(user.id());
         }
     }
 
@@ -192,7 +193,6 @@ public class UserAnnotationService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param jsonObject New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     @Override
@@ -235,10 +235,10 @@ public class UserAnnotationService extends ModelService {
         securityACLService.checkGuest(currentUser);
         //If user info is missing from input, add it
         if (jsonObject.isMissing("user")) {
-            jsonObject.put("user", currentUser.getId());
+            jsonObject.put("user", currentUser.id());
             jsonObject.put("userObject", currentUser);
             // check if user is the owner of the annotation, if not check project editing mode and user role
-        } else if (!Objects.equals(jsonObject.getJSONAttrLong("user"), currentUser.getId())) {
+        } else if (!Objects.equals(jsonObject.getJSONAttrLong("user"), currentUser.id())) {
             securityACLService.checkFullOrRestrictedForOwner(project, null);
         }
 
@@ -319,7 +319,7 @@ public class UserAnnotationService extends ModelService {
         //Start transaction
         Transaction transaction = transactionService.start();
 
-        CommandResponse commandResponse = executeCommand(new AddCommand(currentUser, transaction), null, jsonObject);
+        CommandResponse commandResponse = executeCommand(new AddCommand(currentUserService.getCurrentUserOld(), transaction), null, jsonObject);
         UserAnnotation addedAnnotation = (UserAnnotation) commandResponse.getObject();
 
         if (addedAnnotation == null) {
@@ -339,8 +339,8 @@ public class UserAnnotationService extends ModelService {
                 addedAnnotation.getId(),
                 termId,
                 null,
-                currentUser.getId(),
-                currentUser,
+                currentUser.id(),
+                currentUserService.getCurrentUserOld(),
                 transaction
             );
             terms.add(((AnnotationTerm) (response.getObject())).getTerm());
@@ -365,7 +365,7 @@ public class UserAnnotationService extends ModelService {
                 addedAnnotation.getId(),
                 key,
                 value,
-                currentUser,
+                currentUserService.getCurrentUserOld(),
                 transaction
             );
         }
@@ -441,7 +441,6 @@ public class UserAnnotationService extends ModelService {
      *
      * @param domain      Domain to update
      * @param jsonNewData New domain datas
-     *
      * @return Response structure (new domain data, old domain data..)
      */
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
@@ -514,7 +513,7 @@ public class UserAnnotationService extends ModelService {
                 validateGeometryService.tryToMakeItValidIfNotValid(jsonNewData.getJSONAttrStr("location"))
             );
         }
-        CommandResponse result = executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
+        CommandResponse result = executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), null), domain, jsonNewData);
 
         return result;
     }
@@ -536,7 +535,6 @@ public class UserAnnotationService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -555,7 +553,7 @@ public class UserAnnotationService extends ModelService {
             log.warn("Deleting annotation index failed: " + e.getMessage());
         }
 
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 

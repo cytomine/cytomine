@@ -121,11 +121,12 @@ public class AsyncService {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        StorageResponse userStorage = storageHttpContract.getAll(currentUser.getId(), Pageable.unpaged())
+        StorageResponse userStorage = storageHttpContract.getAll(currentUser.id(),
+                Pageable.unpaged())
             .stream()
             .filter(storageResponse -> storageResponse.name().contains(currentUser.getUsername()))
             .findFirst()
-            .orElseThrow(() -> new ObjectNotFoundException("User with storage", currentUser.getId()));
+            .orElseThrow(() -> new ObjectNotFoundException("User with storage", currentUser.id()));
         String queryString = "?idStorage=" + userStorage.id() + "&idProject=" + projectId;
         // Send the request
         String uploadUrl = imageServerService.internalImageServerURL() + "/upload";

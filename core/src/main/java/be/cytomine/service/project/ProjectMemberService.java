@@ -10,11 +10,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.NamedCytomineDomain;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
@@ -41,6 +43,7 @@ public class ProjectMemberService {
     private final SecurityACLService securityACLService;
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
     public void addUserToProject(User user, Project project, boolean admin) {
         securityACLService.check(project, ADMINISTRATION);
@@ -75,7 +78,8 @@ public class ProjectMemberService {
             log.info("addUserToProject project=" + project + " user=" + user + " ADMIN=" + admin);
             synchronized (this.getClass()) {
                 if (admin) {
-                    permissionService.addPermission(project, user.getUsername(), ADMINISTRATION, adminUser.getUsername());
+                    permissionService.addPermission(project, user.getUsername(), ADMINISTRATION,
+                        adminUser.getUsername());
                 }
                 permissionService.addPermission(project, user.getUsername(), READ, adminUser.getUsername());
                 if (project.getOntology() != null) {
@@ -134,7 +138,7 @@ public class ProjectMemberService {
             ));
             if (!permissionService.hasACLPermission(project, user.getUsername(), READ)
                 && project.getOntology() != null) {
-                removeOntologyRightIfNecessary(project, (User) user, admin);
+                removeOntologyRightIfNecessary(project, userMapper.map(user), admin);
             }
             // if no representative, add current user as a representative
             boolean hasLostAccessToProject = (!permissionService.hasACLPermission(project, user.getUsername(), READ)
@@ -200,7 +204,7 @@ public class ProjectMemberService {
                 + permissionService.hasACLPermission(project, user.getUsername(), READ));
             if (!permissionService.hasACLPermission(project, user.getUsername(), READ)
                 && project.getOntology() != null) {
-                removeOntologyRightIfNecessary(project, (User) user, admin);
+                removeOntologyRightIfNecessary(project, userMapper.map(adminUser), admin);
             }
 
             // if no representative, add current user as a representative
@@ -210,7 +214,7 @@ public class ProjectMemberService {
                 && projectRepresentativeUserService
                 .listByProjectWithAdmin(project).get(0).getUser().getId().equals(user.getId());
             if (hasLostAccessToProject && isLastRepresentative) {
-                if (!securityACLService.getProjectList(adminUser, null).contains(project)) {
+                if (!securityACLService.getProjectList(userMapper.map(adminUser), null).contains(project)) {
                     // if current user is not in project (= SUPERADMIN), add to the project
                     addUserToProject(adminUser, project, true);
                 }
@@ -237,7 +241,7 @@ public class ProjectMemberService {
         }
     }
 
-    private void removeOntologyRightIfNecessary(Project project, User user, boolean admin) {
+    private void removeOntologyRightIfNecessary(Project project, UserResponse user, boolean admin) {
         // we remove the right ONLY if user has no other project with this ontology
         List<Project> projects = securityACLService.getProjectList(user, project.getOntology().getId());
         List<Project> otherProjects = new ArrayList<>(projects);
@@ -245,16 +249,16 @@ public class ProjectMemberService {
 
         if (otherProjects.isEmpty()) {
             // user has no other project with this ontology, remove the right!
-            permissionService.deletePermission(project.getOntology(), user.getUsername(), READ);
-            permissionService.deletePermission(project.getOntology(), user.getUsername(), ADMINISTRATION);
+            permissionService.deletePermission(project.getOntology(), user.username(), READ);
+            permissionService.deletePermission(project.getOntology(), user.username(), ADMINISTRATION);
         } else if (admin) {
-            List<Long> managedProjectList = projectRepository.listByAdmin(user)
+            List<Long> managedProjectList = projectRepository.listByAdminId(user.id())
                 .stream()
                 .map(NamedCytomineDomain::getId)
                 .toList();
             List<Long> otherProjectsIds = otherProjects.stream().map(CytomineDomain::getId).toList();
             if (managedProjectList.stream().noneMatch(otherProjectsIds::contains)) {
-                permissionService.deletePermission(project.getOntology(), user.getUsername(), ADMINISTRATION);
+                permissionService.deletePermission(project.getOntology(), user.username(), ADMINISTRATION);
             }
         }
     }

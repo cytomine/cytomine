@@ -95,4 +95,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     List<User> findAllByReferenceIn(List<String> ids);
 
+    Optional<User> findByUsernameLikeIgnoreCase(String username);
 }
+

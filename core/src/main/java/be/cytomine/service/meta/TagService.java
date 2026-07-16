@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -70,8 +71,8 @@ public class TagService extends ModelService {
     public CommandResponse add(JsonObject jsonObject) {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
-        jsonObject.put("user", currentUser.getId());
-        return executeCommand(new AddCommand(currentUser), null, jsonObject);
+        jsonObject.put("user", currentUser.id());
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
     }
 
     @Override
@@ -82,14 +83,14 @@ public class TagService extends ModelService {
             //if not admin then check if there is no association
             securityACLService.checkAdmin(currentUser);
         }
-        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator(domain, currentUser);
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 

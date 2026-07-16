@@ -30,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -170,7 +171,7 @@ public class ImageInstanceService extends ModelService {
         Optional<ImageInstance> imageInstance = imageInstanceRepository.findById(id);
         String token = authHeader.replace("Bearer ", "");
         String username = TokenUtils.getUsernameFromToken(token);
-        User user = currentUserService.getCurrentUser(username);
+        UserResponse user = currentUserService.getCurrentUser(username);
         imageInstance.ifPresent(image -> securityACLService.check(image.container(), READ, user));
         return imageInstance;
     }
@@ -343,13 +344,13 @@ public class ImageInstanceService extends ModelService {
 
         String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null
             ? imageInstanceAlias
-              + "."
-              + sortColumn
+            + "."
+            + sortColumn
             : null;
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(AbstractImage.class, sortColumn) != null ? abstractImageAlias
-                                                                                                  + "."
-                                                                                                  + sortColumn : null;
+                + "."
+                + sortColumn : null;
         }
         if (sortedProperty == null) {
             throw new CytomineMethodNotYetImplementedException("ImageInstance list sorted by "
@@ -578,8 +579,8 @@ public class ImageInstanceService extends ModelService {
 
         String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null
             ? imageInstanceAlias
-              + "."
-              + sortColumn
+            + "."
+            + sortColumn
             : null;
         if (sortColumn.equals("blindedName")) {
             sortedProperty = imageInstanceAlias + ".baseImageId";
@@ -587,13 +588,13 @@ public class ImageInstanceService extends ModelService {
 
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(AbstractImage.class, sortColumn) != null ? abstractImageAlias
-                                                                                                  + "."
-                                                                                                  + sortColumn : null;
+                + "."
+                + sortColumn : null;
         }
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(UploadedFile.class, sortColumn) != null ? contentTypeAlias
-                                                                                                 + "."
-                                                                                                 + sortColumn : null;
+                + "."
+                + sortColumn : null;
         }
         if (sortedProperty == null) {
             throw new CytomineMethodNotYetImplementedException("ImageInstance list sorted by "
@@ -847,39 +848,6 @@ public class ImageInstanceService extends ModelService {
     }
 
 
-    public List<Map<String, Object>> listLight(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        boolean isAdmin = currentRoleService.isAdminByNow(user);
-        String request = "select * from user_image where user_image_id = :id order by instance_filename";
-        Query query = getEntityManager().createNativeQuery(request, Tuple.class);
-        query.setParameter("id", user.getId());
-        List<Tuple> resultList = query.getResultList();
-
-        List<Map<String, Object>> results = new ArrayList<>();
-        for (Tuple tuple : resultList) {
-            Map<String, Object> line = new LinkedHashMap<>();
-            line.put("id", tuple.get("id"));
-            line.put("projectName", tuple.get("project_name"));
-            line.put("project", tuple.get("project_id"));
-            if (tuple.get("project_blind") != null && (boolean) tuple.get("project_blind")) {
-                line.put("blindedName", tuple.get("base_image_id"));
-            }
-            if ((tuple.get("project_blind") == null && !((boolean) tuple.get("project_blind")))
-                || isAdmin
-                || (boolean) tuple.get("user_project_manager")) {
-                line.put(
-                    "instanceFilename",
-                    tuple.get("instance_filename") != null
-                        ? tuple.get("instance_filename")
-                        : tuple.get("original_filename")
-                );
-            }
-            results.add(line);
-        }
-        return results;
-    }
-
-
     public List<Map<String, Object>> listLight(Project project) {
         securityACLService.check(project, READ);
         List<Map<String, Object>> data = new ArrayList<>();
@@ -941,7 +909,7 @@ public class ImageInstanceService extends ModelService {
         );
 
         List<Bson> requests = new ArrayList<>();
-        requests.add(match(eq("user", currentUserService.getCurrentUser().getId())));
+        requests.add(match(eq("user", currentUserService.getCurrentUser().id())));
         requests.add(sort(descending("created")));
         requests.add(group("$image", Accumulators.max("created", "$created"), Accumulators.first("user", "$user")));
         requests.add(sort(ascending("_id")));
@@ -981,7 +949,6 @@ public class ImageInstanceService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param json New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     public CommandResponse add(JsonObject json) {
@@ -996,8 +963,8 @@ public class ImageInstanceService extends ModelService {
         securityACLService.check(json.getJSONAttrLong("project"), Project.class, READ);
         securityACLService.checkIsNotReadOnly(json.getJSONAttrLong("project"), Project.class);
 
-        json.put("user", currentUser.getId());
-        return executeCommand(new AddCommand(currentUser), null, json);
+        json.put("user", currentUser.id());
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
 
     }
 
@@ -1036,7 +1003,6 @@ public class ImageInstanceService extends ModelService {
      *
      * @param domain      Domain to update
      * @param jsonNewData New domain datas
-     *
      * @return Response structure (new domain data, old domain data..)
      */
     @Override
@@ -1053,7 +1019,7 @@ public class ImageInstanceService extends ModelService {
 
         JsonObject attributes = domain.toJsonObject();
         CommandResponse commandResponse = executeCommand(
-            new EditCommand(currentUser, transaction),
+            new EditCommand(currentUserService.getCurrentUserOld(), transaction),
             domain,
             jsonNewData
         );
@@ -1086,7 +1052,6 @@ public class ImageInstanceService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -1101,7 +1066,7 @@ public class ImageInstanceService extends ModelService {
         if (Lock.getInstance().lockProject(project)) {
             try {
                 log.debug("Delete image " + domain.getId());
-                Command c = new DeleteCommand(currentUser, transaction);
+                Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
                 return executeCommand(c, domain, null);
             } finally {
                 Lock.getInstance().unlockProject(project);
@@ -1210,7 +1175,7 @@ public class ImageInstanceService extends ModelService {
     public void startReview(ImageInstance imageInstance) {
         securityACLService.checkFullOrRestrictedForOwner(imageInstance, imageInstance.getUser());
         imageInstance.setReviewStart(new Date());
-        imageInstance.setReviewUser(currentUserService.getCurrentUser());
+        imageInstance.setReviewUser(currentUserService.getCurrentUserOld());
         saveDomain(imageInstance);
     }
 
@@ -1221,7 +1186,7 @@ public class ImageInstanceService extends ModelService {
                 + " and image.reviewUser="
                 + imageInstance.getReviewUser());
         }
-        if (!currentUserService.getCurrentUser().getId().equals(imageInstance.getReviewUser().getId())) {
+        if (!(currentUserService.getCurrentUser().id() == imageInstance.getReviewUser().getId())) {
             throw new WrongArgumentException("Review can only be validate or stop by " + imageInstance.getReviewUser()
                 .getUsername());
         }

@@ -660,7 +660,7 @@ public class ProjectService extends ModelService {
 
     public List<NamedCytomineDomain> listByAdmin(User user) {
         securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return projectRepository.listByAdmin(user);
+        return projectRepository.listByAdminId(user.getId());
     }
 
     public List<NamedCytomineDomain> listByUser(User user) {

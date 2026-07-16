@@ -29,7 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.http.UserRoleHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.utils.SpringPageCrawler;
 import be.cytomine.domain.CytomineDomain;
@@ -57,6 +59,7 @@ import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.command.CommandHistoryRepository;
 import be.cytomine.repository.command.CommandRepository;
 import be.cytomine.repository.command.RedoStackItemRepository;
@@ -191,6 +194,10 @@ public class UserService extends ModelService {
 
     private final UserRepository userRepository;
 
+    private final UserHttpContract userHttpContract;
+
+    private final UserMapper userMapper;
+
     private final SpringPageCrawler springPageCrawler;
 
     public Optional<User> find(Long id) {
@@ -238,7 +245,7 @@ public class UserService extends ModelService {
         return userRepository.findByPublicKey(publicKey);
     }
 
-    public AuthInformation getAuthenticationRoles(User user) {
+    public AuthInformation getAuthenticationRoles(UserResponse user) {
         AuthInformation authInformation = new AuthInformation();
         authInformation.setAdmin(currentRoleService.isAdmin(user));
         authInformation.setUser(!authInformation.getAdmin() && currentRoleService.isUser(user));
@@ -646,17 +653,12 @@ public class UserService extends ModelService {
             layersFormatted.addAll(humanAdmins.stream().map(User::toJsonObject).toList());
         }
 
-        if (humanUsers.contains(currentUser) && layersFormatted.stream()
-            .noneMatch(x -> x.getJSONAttrLong("id").equals(currentUser.getId()))) {
-            layersFormatted.add(currentUser.toJsonObject());
-        }
-
         return layersFormatted;
     }
 
     public List<JsonObject> getAllOnlineUserWithTheirPositions(Project project) {
         //Get all project user online
-        List<Long> usersId = this.getAllFriendsUsersOnline(currentUserService.getCurrentUser(), project).stream()
+        List<Long> usersId = this.getAllFriendsUsersOnline(currentUserService.getCurrentUserOld(), project).stream()
             .map(CytomineDomain::getId).collect(Collectors.toList());
         List<JsonObject> usersWithPosition = userPositionService.findUsersPositions(project);
         usersId.removeAll(usersWithPosition.stream().map(JsonObject::getId).toList());
@@ -668,26 +670,26 @@ public class UserService extends ModelService {
         return usersWithPosition;
     }
 
-    public JsonObject getResumeActivities(Project project, User user) {
+    public JsonObject getResumeActivities(Project project, UserResponse user) {
         securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.put("firstConnection",
-            persistentProjectConnectionRepository.findAllByUserAndProject(user.getId(), project.getId(),
+            persistentProjectConnectionRepository.findAllByUserAndProject(user.id(), project.getId(),
                     PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "created"))).stream().findFirst()
                 .map(PersistentProjectConnection::getCreated).orElse(null));
         jsonObject.put("lastConnection",
-            persistentProjectConnectionRepository.findAllByUserAndProject(user.getId(), project.getId(),
+            persistentProjectConnectionRepository.findAllByUserAndProject(user.id(), project.getId(),
                     PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "created"))).stream().findFirst()
                 .map(PersistentProjectConnection::getCreated).orElse(null));
 
         jsonObject.put("totalAnnotations", userAnnotationService.count(user, project));
         jsonObject.put("totalConnections",
-            persistentProjectConnectionRepository.countAllByProjectAndUser(project.getId(), user.getId()));
+            persistentProjectConnectionRepository.countAllByProjectAndUser(project.getId(), user.id()));
         jsonObject.put("totalConsultations",
-            persistentImageConsultationRepository.countByProjectAndUser(project.getId(), user.getId()));
+            persistentImageConsultationRepository.countByProjectAndUser(project.getId(), user.id()));
         jsonObject.put("totalAnnotationSelections",
-            annotationActionRepository.countByProjectAndUserAndAction(project.getId(), user.getId(), "select"));
+            annotationActionRepository.countByProjectAndUserAndAction(project.getId(), user.id(), "select"));
 
         return jsonObject;
     }
@@ -807,7 +809,7 @@ public class UserService extends ModelService {
             UserResponse currentUser = currentUserService.getCurrentUser();
             securityACLService.checkUser(currentUser);
             if (!json.containsKey("user")) {
-                json.put("user", currentUser.getId());
+                json.put("user", currentUser.id());
                 json.put("origin", "ADMINISTRATOR");
             }
             Account account = new Account(json.getJSONAttrStr("username"), json.getJSONAttrStr("lastname"),
@@ -816,7 +818,8 @@ public class UserService extends ModelService {
                 List.of(json.getJSONAttrStr("role").substring(5)));
 
             accountService.createAccount(account);
-            CommandResponse response = executeCommand(new AddCommand(currentUser), null, json);
+            CommandResponse response = executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null,
+                json);
 
             return response;
         }
@@ -838,7 +841,7 @@ public class UserService extends ModelService {
             jsonNewData.getJSONAttrStr("language").toLowerCase(),
             List.of(jsonNewData.getJSONAttrStr("role").substring(5)));
         accountService.update(account);
-        return executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), null), domain, jsonNewData);
     }
 
     /**
@@ -855,7 +858,7 @@ public class UserService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkAdmin(currentUser);
         securityACLService.checkIsSameUser((User) domain, currentUser);
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 
@@ -910,7 +913,7 @@ public class UserService extends ModelService {
             secSecUserSecRoleRepository.save(secSecUserSecRole);
         }
 
-        storageService.initUserStorage((User) domain);
+        storageService.initUserStorage(domain.getId());
     }
 
     @Override
@@ -969,7 +972,7 @@ public class UserService extends ModelService {
     }
 
     public void deleteDependentSecUserSecRole(User user, Transaction transaction, Task task) {
-        long requestingUserId = currentUserService.getCurrentUser().getId();
+        long requestingUserId = currentUserService.getCurrentUser().id();
         for (SecUserSecRole secSecUserSecRole : secSecUserSecRoleRepository.findAllBySecUser(user)) {
             userRoleHttpContract.delete(secSecUserSecRole.getId(), requestingUserId);
         }

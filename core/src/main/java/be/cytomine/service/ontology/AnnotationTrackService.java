@@ -150,7 +150,7 @@ public class AnnotationTrackService extends ModelService {
         securityACLService.checkUser(currentUserService.getCurrentUser());
 
         UserResponse currentUser = currentUserService.getCurrentUser();
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 

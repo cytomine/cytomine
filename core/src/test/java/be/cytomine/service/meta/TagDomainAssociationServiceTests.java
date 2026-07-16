@@ -58,9 +58,6 @@ public class TagDomainAssociationServiceTests {
     TagDomainAssociationRepository tagDomainAssociationRepository;
 
     @Autowired
-    TagService tagService;
-
-    @Autowired
     BasicInstanceBuilder builder;
 
     @Test

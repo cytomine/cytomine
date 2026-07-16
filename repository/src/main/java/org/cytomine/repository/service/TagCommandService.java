@@ -1,8 +1,11 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.TagCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TagResponse;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.CreateTagCommand;
@@ -40,6 +44,7 @@ public class TagCommandService
     private final CommandMapper commandMapper;
     private final TagMapper tagMapper;
     private final TagRepository tagRepository;
+    private final TagDomainAssociationCommandService tagDomainAssociationCommandService;
     private final TagDomainAssociationRepository tagDomainAssociationRepository;
     private final UserRepository userRepository;
 
@@ -98,6 +103,11 @@ public class TagCommandService
     @Override
     public Optional<TagEntity> get(long id) {
         return tagRepository.findById(id);
+    }
+
+    @Override
+    public Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now, UUID parentCommandId) {
+        return tagDomainAssociationCommandService.deleteByTagId(userId, id, now, parentCommandId);
     }
 
     @Override

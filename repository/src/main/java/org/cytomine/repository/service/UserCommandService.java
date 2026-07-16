@@ -50,7 +50,8 @@ public class UserCommandService
         return userMapper.update(entity, payload.email().orElse(entity.getEmail()),
             payload.name().orElse(entity.getName()),
             payload.firstname().orElse(entity.getFirstname()), payload.lastname().orElse(entity.getLastname()),
-            payload.language().orElse(entityLanguage), now);
+            payload.language().orElse(entityLanguage),payload.publicKey().orElse(entity.getPublicKey()),
+            payload.privateKey().orElse(entity.getPrivateKey()),payload.origin().orElse(entity.getOrigin()), now);
     }
 
     @Override

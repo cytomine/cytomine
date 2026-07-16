@@ -51,7 +51,9 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
     UpdateUser updatePayload =
         new UpdateUser(Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()),
             Optional.of(UUID.randomUUID().toString()), Optional.of(UUID.randomUUID().toString()), Optional.of("FRENCH"),
-            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+            Optional.of(UUID.randomUUID().toString()), Optional.of(true), Optional.of(UUID.randomUUID().toString()),
+            Optional.of(UUID.randomUUID().toString()),
+            Optional.empty());
 
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;

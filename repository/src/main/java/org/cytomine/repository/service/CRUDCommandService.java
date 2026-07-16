@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import jakarta.transaction.Transactional;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
@@ -56,7 +57,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
     default Optional<HttpCommandResponse> delete(long userId, long id, LocalDateTime now) {
         return delete(userId, id, now, Optional.empty());
     }
-
+@Transactional
     default Optional<HttpCommandResponse> delete(long userId, long id, LocalDateTime now,
         Optional<UUID> parentCommandId) {
         if (canDeleteId(userId, id)) {
@@ -77,7 +78,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         }
 
     }
-
+    @Transactional
     default Optional<HttpCommandResponse> update(long userId, long id, U updatePayload, LocalDateTime now) {
         if (canWriteId(userId, id)) {
             return get(id).map(e -> {
@@ -97,7 +98,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
             return Optional.empty();
         }
     }
-
+    @Transactional
     default Optional<HttpCommandResponse> create(long userId, C createPayload, LocalDateTime now) {
         E entity = mapCreateToEntity(createPayload, userId, Timestamp.valueOf(now));
         E savedEntity = save(entity);
@@ -130,6 +131,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
 
     boolean canDeleteAclId(long userId, long id);
 
+    @Transactional
     default Optional<HttpCommandResponse> undoDelete(UUID commandId, DeleteCommandRequest<P> deleteCommand, long userId,
         LocalDateTime now) {
         if (!canWriteAclId(userId, deleteCommand.aclId())) {
@@ -157,6 +159,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         }
     }
 
+    @Transactional
     default Optional<HttpCommandResponse> undoCreate(UUID commandId, CreateCommandRequest<P> createCommand, long userId,
         LocalDateTime now) {
         if (!canDeleteAclId(userId, createCommand.aclId())) {
@@ -179,6 +182,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         });
     }
 
+    @Transactional
     default Optional<HttpCommandResponse> undoUpdate(UUID commandId, UpdateCommandRequest<P> updateCommand, long userId,
         LocalDateTime now) {
         if (!canWriteAclId(userId, updateCommand.aclId())) {

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -109,7 +110,7 @@ public class AnnotationTrackService extends ModelService {
         jsonObject.put("annotationIdent", annotation.getId());
         jsonObject.put("annotationClassName", annotation.getClass().getName());
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUser()), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
     }
 
     public CommandResponse addAnnotationTrack(
@@ -125,7 +126,7 @@ public class AnnotationTrackService extends ModelService {
             "track", idTrack,
             "slice", idSlice
         );
-        return executeCommand(new AddCommand(currentUserService.getCurrentUser(), transaction), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld(), transaction), null, jsonObject);
     }
 
     /**
@@ -148,7 +149,7 @@ public class AnnotationTrackService extends ModelService {
         securityACLService.checkFullOrRestrictedForOwner(annotation, annotation.user());
         securityACLService.checkUser(currentUserService.getCurrentUser());
 
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         Command c = new DeleteCommand(currentUser, transaction);
         return executeCommand(c, domain, null);
     }

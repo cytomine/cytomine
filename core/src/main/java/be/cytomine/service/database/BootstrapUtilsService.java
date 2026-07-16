@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.domain.meta.ConfigurationReadingRole;
 import be.cytomine.domain.processing.ImageFilter;
@@ -31,6 +32,7 @@ public class BootstrapUtilsService {
     private final SecUserSecRoleRepository secSecUserSecRoleRepository;
 
     private final UserRepository userRepository;
+    private final UserHttpContract userHttpContract;
 
     private final StorageService storageService;
 
@@ -43,7 +45,7 @@ public class BootstrapUtilsService {
     }
 
     public void createUser(String username, String firstname, String lastname, List<String> roles) {
-        if (userRepository.findByUsernameLikeIgnoreCase(username).isEmpty()) {
+        if (userHttpContract.search(username).isEmpty()) {
             log.info("Creating {}...", username);
             User user = new User();
             user.setUsername(username);
@@ -61,7 +63,7 @@ public class BootstrapUtilsService {
                 secSecUserSecRoleRepository.save(secSecUserSecRole);
             }
 
-            storageService.initUserStorage(user);
+            storageService.initUserStorage(user.getId());
         }
     }
 

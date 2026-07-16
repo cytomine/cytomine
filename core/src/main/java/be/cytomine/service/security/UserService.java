@@ -625,7 +625,7 @@ public class UserService extends ModelService {
      * layer
      */
     public List<JsonObject> listLayers(Project project, ImageInstance image) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(project, READ, currentUser);
 
         List<User> humanAdmins = listAdmins(project);
@@ -804,7 +804,7 @@ public class UserService extends ModelService {
      */
     public CommandResponse add(JsonObject json) {
         synchronized (this.getClass()) {
-            User currentUser = currentUserService.getCurrentUser();
+            UserResponse currentUser = currentUserService.getCurrentUser();
             securityACLService.checkUser(currentUser);
             if (!json.containsKey("user")) {
                 json.put("user", currentUser.getId());
@@ -830,7 +830,7 @@ public class UserService extends ModelService {
      * @return Response structure (new domain data, old domain data..)
      */
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator((User) domain, currentUser);
         Account account = new Account(jsonNewData.getJSONAttrStr("username"), jsonNewData.getJSONAttrStr("lastname"),
             jsonNewData.getJSONAttrStr("firstname"), jsonNewData.getJSONAttrStr("password"),
@@ -852,7 +852,7 @@ public class UserService extends ModelService {
      */
     // TODO IAM: refactor. ADMIN ROLE can delete IAM account (and delete the underlying Cytomine user from the cache)
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkAdmin(currentUser);
         securityACLService.checkIsSameUser((User) domain, currentUser);
         Command c = new DeleteCommand(currentUser, transaction);

@@ -108,7 +108,7 @@ public class AnnotationTermService extends ModelService {
      */
     @Override
     public CommandResponse add(JsonObject jsonObject) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         //Check if user has a role that allows to associate terms with annotations
         securityACLService.checkGuest(currentUser);
         User creator = userRepository.findById(jsonObject.getJSONAttrLong("user", -1L))
@@ -135,7 +135,7 @@ public class AnnotationTermService extends ModelService {
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         //Check if user has a role that allows to associate terms with annotations
         securityACLService.checkGuest(currentUser);
         //if term is added from a user, check if the user has permission for UserAnnotation domain
@@ -178,7 +178,7 @@ public class AnnotationTermService extends ModelService {
      * by this user
      */
     public CommandResponse addWithDeletingOldTerm(Long idAnnotation, Long idTerm, Boolean fromAllUser) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         AnnotationDomain annotation = AnnotationDomain.findAnnotationDomain(getEntityManager(), idAnnotation)
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));
         securityACLService.check(annotation.container(), READ, currentUser);

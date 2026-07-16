@@ -106,7 +106,7 @@ public class TrackService extends ModelService {
 
         securityACLService.check(imageInstance.getProject(), READ);
         securityACLService.checkFullOrRestrictedForOwner(imageInstance, imageInstance.getUser());
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
         return executeCommand(new AddCommand(currentUser), null, jsonObject);
@@ -125,7 +125,7 @@ public class TrackService extends ModelService {
         Track track = ((Track) domain);
         securityACLService.check(domain.container(), READ);
         securityACLService.checkFullOrRestrictedForOwner(track, track.getImage().getUser());
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
         Long imageId = jsonNewData.getJSONAttrLong("image", 0L);
@@ -153,7 +153,7 @@ public class TrackService extends ModelService {
         Track track = ((Track) domain);
         securityACLService.check(domain.container(), READ);
         securityACLService.checkFullOrRestrictedForOwner(track, track.getImage().getUser());
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
         Command c = new DeleteCommand(currentUser, transaction);

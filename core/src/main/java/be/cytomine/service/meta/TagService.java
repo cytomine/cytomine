@@ -68,7 +68,7 @@ public class TagService extends ModelService {
 
     @Override
     public CommandResponse add(JsonObject jsonObject) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         jsonObject.put("user", currentUser.getId());
         return executeCommand(new AddCommand(currentUser), null, jsonObject);
@@ -76,7 +76,7 @@ public class TagService extends ModelService {
 
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator(domain, currentUser);
         if (tagDomainAssociationRepository.countByTag((Tag) domain) > 0) {
             //if not admin then check if there is no association
@@ -87,7 +87,7 @@ public class TagService extends ModelService {
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator(domain, currentUser);
         Command c = new DeleteCommand(currentUser, transaction);
         return executeCommand(c, domain, null);

@@ -66,7 +66,7 @@ public class TaskController extends RestCytomineController {
         } catch (Exception ignored) {
             // TODO
         }
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         boolean printInActivity = json.getJSONAttrBoolean("printInActivity", false);
         Task task = taskService.createNewTask(project, user, printInActivity);
         JsonObject jsonObject = task.toJsonObject();

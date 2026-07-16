@@ -124,7 +124,7 @@ public class SharedAnnotationService extends ModelService {
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((SharedAnnotation) domain).getSender());
         Command c = new DeleteCommand(currentUser, transaction);
         return executeCommand(c, domain, null);

@@ -175,7 +175,7 @@ public class RestUserController extends RestCytomineController {
         @RequestParam(value = "content-Type", required = false, defaultValue = "") String contentType,
         @RequestParam(value = "date", required = false, defaultValue = "") String date
     ) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         String signature = ApiKeyFilter.generateKeys(
             method, contentMD5, contenttype.isEmpty() ? contentType : contenttype, date, user
         );
@@ -184,7 +184,7 @@ public class RestUserController extends RestCytomineController {
 
     @GetMapping("/user/current/keys")
     public ResponseEntity<String> getCurrentUserKeys() {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         return responseSuccess(JsonObject.of(
                 "primaryKey", user.getPublicKey(),
                 "secondaryKey", user.getPrivateKey()

@@ -75,19 +75,20 @@ public class ProjectMemberService {
             log.info("addUserToProject project=" + project + " user=" + user + " ADMIN=" + admin);
             synchronized (this.getClass()) {
                 if (admin) {
-                    permissionService.addPermission(project, user.getUsername(), ADMINISTRATION, adminUser);
+                    permissionService.addPermission(project, user.getUsername(), ADMINISTRATION, adminUser.getUsername());
                 }
-                permissionService.addPermission(project, user.getUsername(), READ, adminUser);
+                permissionService.addPermission(project, user.getUsername(), READ, adminUser.getUsername());
                 if (project.getOntology() != null) {
                     log.info(
                         "addUserToProject ontology=" + project.getOntology() + " user=" + user + " ADMIN=" + admin);
-                    permissionService.addPermission(project.getOntology(), user.getUsername(), READ, adminUser);
+                    permissionService.addPermission(project.getOntology(), user.getUsername(), READ,
+                        adminUser.getUsername());
                     if (admin) {
                         permissionService.addPermission(
                             project.getOntology(),
                             user.getUsername(),
                             ADMINISTRATION,
-                            adminUser);
+                            adminUser.getUsername());
                     }
                 }
             }
@@ -95,7 +96,7 @@ public class ProjectMemberService {
     }
 
     public void deleteUserFromProject(User user, Project project, boolean admin) {
-        if (!Objects.equals(currentUserService.getCurrentUser().getId(), user.getId())) {
+        if (!Objects.equals(currentUserService.getCurrentUser().id(), user.getId())) {
             securityACLService.check(project, ADMINISTRATION);
         }
         if (project != null) {
@@ -147,7 +148,7 @@ public class ProjectMemberService {
             if (hasLostAccessToProject && isLastRepresentative) {
                 if (!securityACLService.getProjectList(currentUserService.getCurrentUser(), null).contains(project)) {
                     // if current user is not in project (= SUPERADMIN), add to the project
-                    addUserToProject(currentUserService.getCurrentUser(), project, true);
+                    addUserToProject(currentUserService.getCurrentUserOld(), project, true);
                 }
                 log.info("add current user "
                     + currentUserService.getCurrentUsername()
@@ -155,7 +156,7 @@ public class ProjectMemberService {
                     + project.getId());
                 ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                 pru.setProject(project);
-                pru.setUser((User) currentUserService.getCurrentUser());
+                pru.setUser(currentUserService.getCurrentUserOld());
                 projectRepresentativeUserService.add(pru.toJsonObject());
 
                 projectRepresentativeUserService.find(project, (User) user)

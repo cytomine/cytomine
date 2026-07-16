@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
@@ -26,12 +28,13 @@ import be.cytomine.security.current.PartialCurrentUser;
 public class CurrentUserService {
 
     private final UserRepository userRepository;
+    private final UserHttpContract userHttpContract;
 
     public String getCurrentUsername() {
         CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException(
             "Cannot read current user"));
         if (currentUser.isFullObjectProvided() || currentUser.isUsernameProvided()) {
-            return currentUser.getUser().getUsername();
+            return currentUser.getUser().username();
         } else {
             throw new ObjectNotFoundException(
                 "User",
@@ -40,16 +43,16 @@ public class CurrentUserService {
         }
     }
 
-    public User getCurrentUser() {
+    public UserResponse getCurrentUser() {
         CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException(
             "Cannot read current user"));
-        User user;
+        UserResponse user;
         if (currentUser.isFullObjectProvided()) {
             user = currentUser.getUser();
         } else if (currentUser.isUsernameProvided()) {
-            user = userRepository.findByUsernameLikeIgnoreCase(currentUser.getUser().getUsername())
+            user = userHttpContract.search(currentUser.getUser().username())
                 .orElseThrow(() -> new ServerException("Cannot find current user with username " + currentUser.getUser()
-                    .getUsername()));
+                    .username()));
         } else {
             throw new ObjectNotFoundException(
                 "User",
@@ -59,8 +62,12 @@ public class CurrentUserService {
         return user;
     }
 
-    public User getCurrentUser(String username) {
-        return userRepository.findByUsernameLikeIgnoreCase(username)
+    public User getCurrentUserOld(){
+        return userRepository.findById(getCurrentUser().id()).orElseThrow();
+    }
+
+    public UserResponse getCurrentUser(String username) {
+        return userHttpContract.search(username)
             .orElseThrow(() -> new ServerException("Cannot find current user with username " + username));
     }
 

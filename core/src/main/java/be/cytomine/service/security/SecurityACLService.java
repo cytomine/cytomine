@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.GenericCytomineDomainContainer;
 import be.cytomine.domain.image.AbstractImage;
@@ -28,6 +29,7 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.security.AclRepository;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
@@ -55,6 +57,8 @@ public class SecurityACLService {
     private final PermissionService permissionService;
 
     private final ProjectRepository projectRepository;
+
+    private final UserRepository userRepository;
 
     private static List<Field> getAllFields(Object obj) {
         List<Field> fields = new ArrayList<>();
@@ -104,7 +108,7 @@ public class SecurityACLService {
 
     }
 
-    public void check(CytomineDomain domain, Permission permission, User currentUser) {
+    public void check(CytomineDomain domain, Permission permission, UserResponse currentUser) {
         if (domain != null) {
             if (!hasPermission(retrieveContainer(domain), permission, currentRoleService.isAdminByNow(currentUser))) {
                 throw new ForbiddenException("You don't have the right to read or modify this resource! "
@@ -126,7 +130,7 @@ public class SecurityACLService {
         checkIsAdminContainer(domain, currentUserService.getCurrentUser());
     }
 
-    public void checkIsAdminContainer(CytomineDomain domain, User currentUser) {
+    public void checkIsAdminContainer(CytomineDomain domain, UserResponse currentUser) {
         if (domain != null) {
             if (!hasPermission(
                 retrieveContainer(domain),
@@ -174,11 +178,11 @@ public class SecurityACLService {
         return false;
     }
 
-    public List<Storage> getStorageList(User user, boolean adminByPass) {
+    public List<Storage> getStorageList(UserResponse user, boolean adminByPass) {
         return getStorageList(user, adminByPass, null);
     }
 
-    public List<Storage> getStorageList(User user, boolean adminByPass, String searchString) {
+    public List<Storage> getStorageList(UserResponse user, boolean adminByPass, String searchString) {
         Query query;
         if (adminByPass && currentRoleService.isAdminByNow(user)) {
             query = entityManager.createQuery("select storage from Storage as storage");
@@ -192,7 +196,7 @@ public class SecurityACLService {
                     + "where aclObjectId.objectId = storage.id "
                     + "and aclEntry.aclObjectIdentity = aclObjectId "
                     + "and aclEntry.sid = aclSid and aclSid.sid like '"
-                    + user.getUsername()
+                    + user.username()
                     + "'"
                     + (StringUtils.isNotBlank(searchString) ? " and lower(storage.name) like '%"
                     + searchString.toLowerCase()
@@ -202,7 +206,7 @@ public class SecurityACLService {
         return (List<Storage>) query.getResultList();
     }
 
-    public List<Project> getProjectList(User user, Long ontologyId) {
+    public List<Project> getProjectList(UserResponse user, Long ontologyId) {
         //faster method
         if (currentRoleService.isAdminByNow(user)) {
             return projectRepository.findAllByOntologyId(ontologyId);
@@ -217,7 +221,7 @@ public class SecurityACLService {
                     + "and aclEntry.aclObjectIdentity = aclObjectId "
                     + (ontologyId != null ? "and project.ontology.id = " + ontologyId : " ")
                     + "and aclEntry.sid = aclSid and aclSid.sid like '"
-                    + user.getUsername()
+                    + user.username()
                     + "'");
             return query.getResultList();
         }
@@ -240,25 +244,25 @@ public class SecurityACLService {
         checkIsSameUser(userId, currentUserService.getCurrentUser());
     }
 
-    public void checkIsSameUser(User user, User currentUser) {
+    public void checkIsSameUser(User user, UserResponse currentUser) {
         checkIsSameUser(user.getId(), currentUser);
     }
 
-    public void checkIsSameUser(Long userId, User currentUser) {
-        boolean sameUser = (Objects.equals(userId, currentUser.getId()));
+    public void checkIsSameUser(Long userId, UserResponse currentUser) {
+        boolean sameUser = (Objects.equals(userId, currentUser.id()));
         sameUser |= currentRoleService.isAdminByNow(currentUser);
         if (!sameUser) {
             throw new ForbiddenException("You don't have the right to read this resource! You must be the same user!");
         }
     }
 
-    public void checkAdmin(User user) {
+    public void checkAdmin(UserResponse user) {
         if (!currentRoleService.isAdminByNow(user)) {
             throw new ForbiddenException("You don't have the right to perform this action! You must be admin!");
         }
     }
 
-    public void checkUser(User user) {
+    public void checkUser(UserResponse user) {
         if (!currentRoleService.isAdminByNow(user) && !currentRoleService.isUserByNow(user)) {
             throw new ForbiddenException("You don't have the right to perform this action! You must be user!");
         }
@@ -268,7 +272,7 @@ public class SecurityACLService {
         checkGuest(currentUserService.getCurrentUser());
     }
 
-    public void checkGuest(User user) {
+    public void checkGuest(UserResponse user) {
         // TODO: optimize this
         if (!currentRoleService.isAdminByNow(user)
             && !currentRoleService.isUserByNow(user)
@@ -315,10 +319,10 @@ public class SecurityACLService {
         }
     }
 
-    public void checkIsSameUserOrAdminContainer(CytomineDomain domain, User user, User currentUser) {
+    public void checkIsSameUserOrAdminContainer(CytomineDomain domain, UserResponse user, UserResponse currentUser) {
         boolean isNotSameUser = (!currentRoleService.isAdminByNow(currentUser) && (!Objects.equals(
-            user.getId(),
-            currentUser.getId()
+            user.id(),
+            currentUser.id()
         )));
         if (isNotSameUser) {
             if (domain != null) {
@@ -383,7 +387,7 @@ public class SecurityACLService {
                 case RESTRICTED:
                     log.debug("Owner is " + (owner != null ? owner.getUsername() : "null"));
                     if (owner != null) {
-                        if (!Objects.equals(owner.getId(), currentUserService.getCurrentUser().getId())) {
+                        if (!Objects.equals(owner.getId(), currentUserService.getCurrentUser().id())) {
                             throw new ForbiddenException(
                                 "You don't have the right to do this. You must be the creator or the container admin");
                         }
@@ -429,9 +433,9 @@ public class SecurityACLService {
         return false;
     }
 
-    public void checkIsCreator(CytomineDomain domain, User currentUser) {
+    public void checkIsCreator(CytomineDomain domain, UserResponse currentUser) {
         if (!currentRoleService.isAdminByNow(currentUser) && (!Objects.equals(
-            currentUser.getId(),
+            currentUser.id(),
             domain.userDomainCreator().getId()
         ))) {
             throw new ForbiddenException("You don't have the right to read this resource! You must be the same user!");
@@ -475,7 +479,7 @@ public class SecurityACLService {
         return domain.container();
     }
 
-    public void checkUserAccessRightsForMeta(CytomineDomain domain, User currentUser) {
+    public void checkUserAccessRightsForMeta(CytomineDomain domain, UserResponse currentUser) {
         //Is domain Project?
         if (domain instanceof Project) {
             checkGuest(currentUser);

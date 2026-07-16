@@ -180,7 +180,7 @@ public class ReviewedAnnotationService extends ModelService {
     public CommandResponse add(JsonObject jsonObject) {
         securityACLService.check(jsonObject.getJSONAttrLong("project"), Project.class, READ);
         securityACLService.checkIsNotReadOnly(jsonObject.getJSONAttrLong("project"), Project.class);
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         //Start transaction
         Transaction transaction = transactionService.start();
@@ -217,7 +217,7 @@ public class ReviewedAnnotationService extends ModelService {
      * @return Response structure (new domain data, old domain data..)
      */
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.checkIsCreator(domain, currentUser);
         CommandResponse result = executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
@@ -236,7 +236,7 @@ public class ReviewedAnnotationService extends ModelService {
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.checkIsCreator(domain, currentUser);
         Command c = new DeleteCommand(currentUser, transaction);

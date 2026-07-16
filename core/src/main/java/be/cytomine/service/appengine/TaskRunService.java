@@ -125,7 +125,7 @@ public class TaskRunService {
 
     public String addTaskRun(Long projectId, String taskId, JsonNode body) {
         Project project = projectService.get(projectId);
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(project, READ);
         securityACLService.checkIsNotReadOnly(project);
@@ -204,7 +204,7 @@ public class TaskRunService {
     }
 
     public List<TaskRunDetail> getTaskRuns(Long projectId) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
@@ -234,7 +234,7 @@ public class TaskRunService {
             throw new ObjectNotFoundException("TaskRun", taskRunId);
         }
 
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         Project project = projectService.get(projectId);
 
         securityACLService.checkUser(currentUser);

@@ -50,7 +50,7 @@ public class RestImageConsultationController extends RestCytomineController {
         @RequestBody JsonObject json
     ) {
         log.info("add an image consultation for image {}", imageId);
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         String session = RequestContextHolder.currentRequestAttributes().getSessionId();
         String mode = json.getJSONAttrStr("mode");
         return responseSuccess(imageConsultationService.add(user, imageId, session, mode, new Date()));

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.DeleteCommand;
@@ -79,7 +80,7 @@ public class AttachedFileService extends ModelService {
 
     public AttachedFile create(String filename, byte[] data, String key, Long domainIdent, String domainClassName)
         throws ClassNotFoundException {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         CytomineDomain recipientDomain = getCytomineDomain(domainClassName, domainIdent);
 
         if (recipientDomain instanceof AbstractImage) {
@@ -101,7 +102,7 @@ public class AttachedFileService extends ModelService {
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         AttachedFile attachedFile = (AttachedFile) domain;
         CytomineDomain parentDomain = getCytomineDomain(
             attachedFile.getDomainClassName(),
@@ -119,7 +120,7 @@ public class AttachedFileService extends ModelService {
             securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
         }
 
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 

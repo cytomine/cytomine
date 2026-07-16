@@ -80,7 +80,7 @@ public class ProjectDefaultLayerService extends ModelService {
 
     @Override
     public CommandResponse add(JsonObject jsonObject) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(jsonObject.getJSONAttrLong("project"), Project.class, WRITE);
         Long userId = jsonObject.getJSONAttrLong("user");
         User user = userRepository.findById(userId)
@@ -96,13 +96,13 @@ public class ProjectDefaultLayerService extends ModelService {
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         securityACLService.check(domain, WRITE);
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), WRITE);
         Command c = new DeleteCommand(currentUser, transaction);
         return executeCommand(c, domain, null);

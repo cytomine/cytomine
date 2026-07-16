@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.common.repository.model.user.payload.UpdateUser;
 import be.cytomine.config.nosqlmigration.InitialMongodbSetupMigration;
 import be.cytomine.config.properties.ApplicationProperties;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.UrlApi;
@@ -152,9 +153,11 @@ class ApplicationBootstrap {
         if (privateKey != null && publicKey != null) {
             UserResponse imageServerUser = userHttpContract.search("ImageServer1")
                 .orElseThrow(() -> new ObjectNotFoundException("No user imageserver1, cannot assign keys"));
-            imageServerUser.setPrivateKey(applicationProperties.getImageServerPrivateKey());
-            imageServerUser.setPublicKey(applicationProperties.getImageServerPublicKey());
-            userRepository.save(imageServerUser);
+            userHttpContract.update(imageServerUser.id(), imageServerUser.id(), new UpdateUser(Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty()
+                , Optional.of(applicationProperties.getImageServerPrivateKey()),
+                Optional.of(applicationProperties.getImageServerPublicKey()), Optional.empty()));
         }
 
         log.info("Check image filters...");

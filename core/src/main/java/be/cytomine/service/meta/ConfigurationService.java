@@ -50,7 +50,7 @@ public class ConfigurationService extends ModelService {
     }
 
     public List<Configuration> list() {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkGuest(currentUser);
         if (currentRoleService.isAdminByNow(currentUser)) {
             return configurationRepository.findAll();
@@ -72,7 +72,7 @@ public class ConfigurationService extends ModelService {
     }
 
     private void checkPermission(Configuration config) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         if (config.getReadingRole().equals(ConfigurationReadingRole.ALL)) {
             return;
         }
@@ -89,7 +89,7 @@ public class ConfigurationService extends ModelService {
     @Override
     public CommandResponse add(JsonObject jsonObject) {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         return executeCommand(new AddCommand(currentUser), null, jsonObject);
     }
 
@@ -97,13 +97,13 @@ public class ConfigurationService extends ModelService {
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkAdmin(currentUser);
         Command c = new DeleteCommand(currentUser, transaction);
         return executeCommand(c, domain, null);

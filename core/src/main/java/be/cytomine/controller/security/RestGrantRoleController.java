@@ -51,7 +51,7 @@ public class RestGrantRoleController extends RestCytomineController {
 
 
     public AuthInformation getCurrentRole() {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         AuthInformation authInformation = new AuthInformation();
         authInformation.setAdmin(currentRoleService.isAdmin(user));
         authInformation.setUser(!authInformation.getAdmin() && currentRoleService.isUser(user));

@@ -46,49 +46,51 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
             "SELECT usi "
                 + "FROM UndoStackItem usi "
                 + "WHERE usi.transaction = :transaction "
-                + "AND usi.user = :user "
+                + "AND usi.user.id = :userId "
                 + "ORDER BY usi.created DESC"
     )
-    List<UndoStackItem> findAllUndoOrderByCreatedDesc(User user, Transaction transaction);
+    List<UndoStackItem> findAllUndoOrderByCreatedDesc(Long userId, Transaction transaction);
 
     @Query(
         value =
             "SELECT rsi "
                 + "FROM RedoStackItem rsi "
                 + "WHERE rsi.transaction = :transaction "
-                + "AND rsi.user = :user "
+                + "AND rsi.user.id = :userId "
                 + "ORDER BY rsi.created DESC"
     )
-    List<RedoStackItem> findAllRedoOrderByCreatedDesc(User user, Transaction transaction);
+    List<RedoStackItem> findAllRedoOrderByCreatedDesc(Long userId, Transaction transaction);
 
     @Query(
-        "SELECT usi FROM UndoStackItem usi WHERE usi.command = :command AND usi.user = :user ORDER BY usi.created DESC")
-    Page<UndoStackItem> findLastUndoStackItems(User user, Command command, Pageable pageable);
+        "SELECT usi FROM UndoStackItem usi WHERE usi.command = :command AND usi.user.id = :userId ORDER BY usi"
+            + ".created DESC")
+    Page<UndoStackItem> findLastUndoStackItems(Long userId, Command command, Pageable pageable);
 
-    @Query("SELECT usi FROM UndoStackItem usi WHERE usi.user = :user ORDER BY usi.created DESC")
-    Page<UndoStackItem> findLastUndoStackItems(User user, Pageable pageable);
+    @Query("SELECT usi FROM UndoStackItem usi WHERE usi.user.id = :user ORDER BY usi.created DESC")
+    Page<UndoStackItem> findLastUndoStackItems(Long userId, Pageable pageable);
 
-    default Optional<UndoStackItem> findLastUndoStackItem(User user, Command command) {
-        return findLastUndoStackItems(user, command, PageRequest.of(0, 1)).stream().findFirst();
+    default Optional<UndoStackItem> findLastUndoStackItem(Long userId, Command command) {
+        return findLastUndoStackItems(userId, command, PageRequest.of(0, 1)).stream().findFirst();
     }
 
-    default Optional<UndoStackItem> findLastUndoStackItem(User user) {
-        return findLastUndoStackItems(user, PageRequest.of(0, 1)).stream().findFirst();
+    default Optional<UndoStackItem> findLastUndoStackItem(Long userId) {
+        return findLastUndoStackItems(userId, PageRequest.of(0, 1)).stream().findFirst();
     }
 
     @Query(
-        "SELECT usi FROM RedoStackItem usi WHERE usi.command = :command AND usi.user = :user ORDER BY usi.created DESC")
-    Page<RedoStackItem> findLastRedoStackItems(User user, Command command, Pageable pageable);
+        "SELECT usi FROM RedoStackItem usi WHERE usi.command = :command AND usi.user.id = :userId ORDER BY usi"
+            + ".created DESC")
+    Page<RedoStackItem> findLastRedoStackItems(Long userId, Command command, Pageable pageable);
 
-    @Query("SELECT usi FROM RedoStackItem usi WHERE usi.user = :user ORDER BY usi.created DESC")
-    Page<RedoStackItem> findLastRedoStackItems(User user, Pageable pageable);
+    @Query("SELECT usi FROM RedoStackItem usi WHERE usi.user.id = :userId ORDER BY usi.created DESC")
+    Page<RedoStackItem> findLastRedoStackItems(Long userId, Pageable pageable);
 
-    default Optional<RedoStackItem> findLastRedoStackItem(User user, Command command) {
-        return findLastRedoStackItems(user, command, PageRequest.of(0, 1)).stream().findFirst();
+    default Optional<RedoStackItem> findLastRedoStackItem(Long userId, Command command) {
+        return findLastRedoStackItems(userId, command, PageRequest.of(0, 1)).stream().findFirst();
     }
 
-    default Optional<RedoStackItem> findLastRedoStackItem(User user) {
-        return findLastRedoStackItems(user, PageRequest.of(0, 1)).stream().findFirst();
+    default Optional<RedoStackItem> findLastRedoStackItem(long userId) {
+        return findLastRedoStackItems(userId, PageRequest.of(0, 1)).stream().findFirst();
     }
 
     void deleteAllByProject(Project project);

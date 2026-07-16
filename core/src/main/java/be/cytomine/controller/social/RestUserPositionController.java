@@ -79,7 +79,7 @@ public class RestUserPositionController extends RestCytomineController {
         JsonObject json
     ) {
         Date date = new Date();
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
 
         Point topLeft = new Point(
             json.getJSONAttrDouble("topLeftX", 0d),

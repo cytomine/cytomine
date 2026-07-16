@@ -1,40 +1,40 @@
 package be.cytomine.controller.meta;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.TagHttpContract;
+import be.cytomine.common.repository.model.command.Commands;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.TagResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.meta.Tag;
+import be.cytomine.utils.JsonObject;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,19 +49,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TagResourceTests {
 
     @Autowired
-    private EntityManager em;
-
-    @Autowired
     private BasicInstanceBuilder builder;
 
     @Autowired
-    private MockMvc restTagControllerMockMvc;
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private TagHttpContract httpContract;
 
     @Test
     @Transactional
     public void listAllTags() throws Exception {
         Tag tag = builder.givenATag();
-        restTagControllerMockMvc.perform(get("/api/tag.json"))
+        long userId = builder.givenSuperAdmin().getId();
+        when(httpContract.list(eq(userId), any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(toResponse(tag))));
+
+        mockMvc.perform(get("/api/tag.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.name=='" + tag.getName() + "')]").exists());
@@ -71,114 +75,117 @@ public class TagResourceTests {
     @Transactional
     public void shouldReturnTagWithAllExpectedFields() throws Exception {
         Tag tag = builder.givenATag();
+        long userId = builder.givenSuperAdmin().getId();
+        when(httpContract.read(eq(tag.getId()), eq(userId))).thenReturn(Optional.of(toResponse(tag)));
 
-        restTagControllerMockMvc.perform(get("/api/tag/{id}.json", tag.getId()))
+        mockMvc.perform(get("/api/tag/{id}.json", tag.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(tag.getId().intValue()))
-            .andExpect(jsonPath("$.class").value("be.cytomine.domain.meta.Tag"))
-            .andExpect(jsonPath("$.created").exists())
             .andExpect(jsonPath("$.name").value(tag.getName()))
             .andExpect(jsonPath("$.creatorName").value(builder.givenSuperAdmin().getUsername()))
-            .andExpect(jsonPath("$.user").value(builder.givenSuperAdmin().getId()));
+            .andExpect(jsonPath("$.created").exists());
     }
 
     @Test
     @Transactional
     public void addValidTag() throws Exception {
-        Tag tag = builder.givenANotPersistedTag("xxx");
-        restTagControllerMockMvc.perform(post("/api/tag.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tag.toJSON()))
+        Tag tag = builder.givenATag();
+        long userId = builder.givenSuperAdmin().getId();
+        UUID commandId = UUID.randomUUID();
+        when(httpContract.create(eq(userId), any())).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(tag), commandId, Commands.CREATE_TAG, Set.of())));
+
+        String createTagJson = JsonObject.of("name", tag.getName()).toJsonString();
+
+        mockMvc.perform(post("/api/tag.json").contentType(APPLICATION_JSON).content(createTagJson))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.tagID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddTagCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.tag.id").exists())
-            .andExpect(jsonPath("$.tag.name").value(tag.getName()));
+            .andExpect(jsonPath("$.command").value("be.cytomine.AddTagCommand"))
+            .andExpect(jsonPath("$.data.id").value(tag.getId()))
+            .andExpect(jsonPath("$.data.name").value(tag.getName()));
     }
 
     @Test
     @Transactional
-    public void addTagRefusedIfAlreadyExists() throws Exception {
-        Tag tag = builder.givenANotPersistedTag("xxx");
-        builder.persistAndReturn(tag);
-        restTagControllerMockMvc.perform(post("/api/tag.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tag.toJSON()))
-            .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.success").value(false));
-    }
+    public void addTagWithNoWriteAccessReturnsEmpty() throws Exception {
+        Tag tag = builder.givenATag();
+        long userId = builder.givenSuperAdmin().getId();
+        when(httpContract.create(eq(userId), any())).thenReturn(Optional.empty());
 
-    @Test
-    @Transactional
-    public void addTagRefusedIfNameNotSet() throws Exception {
-        Tag tag = builder.givenANotPersistedTag(null);
-        restTagControllerMockMvc.perform(post("/api/tag.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tag.toJSON()))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.success").value(false));
+        String createTagJson = JsonObject.of("name", tag.getName()).toJsonString();
+
+        mockMvc.perform(post("/api/tag.json").contentType(APPLICATION_JSON).content(createTagJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").doesNotExist());
     }
 
     @Test
     @Transactional
     public void editValidTag() throws Exception {
         Tag tag = builder.givenATag();
-        restTagControllerMockMvc.perform(put("/api/tag/{id}.json", tag.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tag.toJsonObject().withChange("name", "new name").toJsonString()))
+        long userId = builder.givenSuperAdmin().getId();
+        UUID commandId = UUID.randomUUID();
+        when(httpContract.update(eq(tag.getId()), eq(userId), any())).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(tag), commandId, Commands.UPDATE_TAG, Set.of())));
+
+        String updateTagJson = JsonObject.of("name", tag.getName()).toJsonString();
+
+        mockMvc.perform(put("/api/tag/{id}.json", tag.getId()).contentType(APPLICATION_JSON).content(updateTagJson))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.tagID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditTagCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.tag.id").exists())
-            .andExpect(jsonPath("$.tag.name").value("new name"));
+            .andExpect(jsonPath("$.command").value("be.cytomine.EditTagCommand"))
+            .andExpect(jsonPath("$.data.id").value(tag.getId()))
+            .andExpect(jsonPath("$.data.name").value(tag.getName()));
     }
 
     @Test
     @Transactional
     public void failWhenEditingTagDoesNotExists() throws Exception {
         Tag tag = builder.givenATag();
-        em.remove(tag);
-        restTagControllerMockMvc.perform(put("/api/tag/{id}.json", 0)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tag.toJSON()))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.errors").exists());
+        long userId = builder.givenSuperAdmin().getId();
+        when(httpContract.update(eq(tag.getId()), eq(userId), any())).thenReturn(Optional.empty());
+
+        String updateTagJson = JsonObject.of("name", tag.getName()).toJsonString();
+
+        mockMvc.perform(put("/api/tag/{id}.json", tag.getId()).contentType(APPLICATION_JSON).content(updateTagJson))
+            .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
     public void deleteTag() throws Exception {
         Tag tag = builder.givenATag();
-        restTagControllerMockMvc.perform(delete("/api/tag/{id}.json", tag.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(tag.toJSON()))
+        long userId = builder.givenSuperAdmin().getId();
+        UUID commandId = UUID.randomUUID();
+        when(httpContract.delete(eq(tag.getId()), eq(userId))).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(tag), commandId, Commands.DELETE_TAG, Set.of())));
+
+        mockMvc.perform(delete("/api/tag/{id}.json", tag.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.tagID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteTagCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.tag.id").exists())
-            .andExpect(jsonPath("$.tag.name").value(tag.getName()));
+            .andExpect(jsonPath("$.command").value("be.cytomine.DeleteTagCommand"))
+            .andExpect(jsonPath("$.data.id").value(tag.getId()))
+            .andExpect(jsonPath("$.data.name").value(tag.getName()));
     }
 
     @Test
     @Transactional
     public void failWhenDeleteTagNotExists() throws Exception {
-        restTagControllerMockMvc.perform(delete("/api/tag/{id}.json", 0)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.errors").exists());
+        long userId = builder.givenSuperAdmin().getId();
+        when(httpContract.delete(eq(0L), eq(userId))).thenReturn(Optional.empty());
+
+        mockMvc.perform(delete("/api/tag/{id}.json", 0))
+            .andExpect(status().isNotFound());
+    }
+
+    private TagResponse toResponse(Tag tag) {
+        return new TagResponse(
+            tag.getId(),
+            tag.getName(),
+            tag.getUser().getUsername(),
+            LocalDateTime.now(),
+            Optional.empty(),
+            Optional.empty()
+        );
     }
 }

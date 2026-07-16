@@ -46,11 +46,14 @@ public interface UserMapper {
     @Mapping(target = "firstname", source = "newFirstname")
     @Mapping(target = "lastname", source = "newLastname")
     @Mapping(target = "language", source = "newLanguage")
+    @Mapping(target = "privateKey", source = "privateKey")
+    @Mapping(target = "publicKey", source = "publicKey")
+    @Mapping(target = "origin", source = "origin")
     @Mapping(target = "updated", source = "now")
     @BeanMapping(ignoreUnmappedSourceProperties = {"username", "email", "name", "firstname", "lastname", "language",
-        "updated"})
-    UserEntity update(UserEntity entity, String newEmail, String newName, String newFirstname,
-        String newLastname, String newLanguage, Timestamp now);
+        "updated", "privateKey", "publicKey", "origin"})
+    UserEntity update(UserEntity entity, String newEmail, String newName, String newFirstname, String newLastname,
+        String newLanguage, String publicKey, String privateKey, String origin, Timestamp now);
 
     @Mapping(target = "username", source = "replace.username")
     @Mapping(target = "name", source = "replace.name")
@@ -60,6 +63,8 @@ public interface UserMapper {
     @Mapping(target = "language", source = "replace.language")
     @Mapping(target = "developer", source = "replace.developer")
     @Mapping(target = "origin", source = "replace.origin")
+    @Mapping(target = "privateKey", source = "replace.privateKey")
+    @Mapping(target = "publicKey", source = "replace.publicKey")
     @Mapping(target = "roles", source = "replace.roles")
     @Mapping(target = "updated", source = "now")
     @Mapping(target = "id", source = "entity.id")

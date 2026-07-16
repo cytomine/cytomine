@@ -2,13 +2,21 @@ import {createLocalVue, mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AdminTags from '@/components/admin/AdminTags';
-import {TagCollection} from '@/api';
+import {Cytomine} from '@/api';
 import {flushPromises} from '../../../utils';
 
 jest.mock('@/api', () => ({
-  TagCollection: {
-    fetchAll: jest.fn(),
+  Cytomine: {
+    instance: {
+      api: {
+        get: jest.fn(),
+      },
+    },
   },
+}));
+
+jest.mock('@/utils/date', () => ({
+  formatDate: jest.fn((date) => date),
 }));
 
 const createTag = (id, name, creatorName) => ({
@@ -25,13 +33,13 @@ let tags;
 const createWrapper = async (options = {}) => {
   const localVue = createLocalVue();
   localVue.use(Buefy);
-  localVue.filter('moment', (value) => value);
 
   const wrapper = mount(AdminTags, {
     localVue,
     stubs: {'tag-modal': true},
     mocks: {
       $t: (message) => message,
+      $i18n: {locale: 'en'},
       $notify: jest.fn(),
       $buefy: {
         dialog: {
@@ -52,7 +60,7 @@ describe('AdminTags.vue', () => {
       createTag(2, 'lung', 'john'),
       createTag(3, 'kidney', 'jane'),
     ];
-    TagCollection.fetchAll.mockResolvedValue({array: tags});
+    Cytomine.instance.api.get.mockResolvedValue({data: {collection: tags, size: tags.length}});
   });
 
   afterEach(() => {
@@ -62,8 +70,12 @@ describe('AdminTags.vue', () => {
   it('should fetch the tags on creation', async () => {
     const wrapper = await createWrapper();
 
-    expect(TagCollection.fetchAll).toHaveBeenCalled();
+    expect(Cytomine.instance.api.get).toHaveBeenCalledWith(
+      '/tag.json',
+      {params: {page: 0, size: 25, sort: 'created,desc'}},
+    );
     expect(wrapper.vm.tags).toEqual(tags);
+    expect(wrapper.vm.total).toBe(3);
     expect(wrapper.vm.loading).toBe(false);
   });
 
@@ -80,13 +92,16 @@ describe('AdminTags.vue', () => {
   });
 
   it('should display an error message when the fetch fails', async () => {
-    TagCollection.fetchAll.mockRejectedValue(new Error('network error'));
+    Cytomine.instance.api.get.mockRejectedValue(new Error('network error'));
 
     const wrapper = await createWrapper();
 
-    expect(wrapper.vm.tags).toBeNull();
+    expect(wrapper.vm.error).toBe(true);
     expect(wrapper.vm.loading).toBe(false);
     expect(wrapper.text()).toContain('unexpected-error-info-message');
+    expect(wrapper.vm.$notify).toHaveBeenCalledWith(
+      {type: 'error', text: 'notify-error-fetch-tag'},
+    );
   });
 
   it('should filter the tags by name from the search string', async () => {

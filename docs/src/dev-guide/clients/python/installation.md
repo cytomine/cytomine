@@ -41,14 +41,17 @@ pip install requests requests-toolbelt cachecontrol six future shapely numpy ope
 
 ### Download the source code
 
-1. Go to the [Github repository](https://github.com/cytomine/Cytomine-python-client/releases/latest) for the Cytomine API client library to get the latest release
-2. On this page, click **Source code** and download the archive
-3. Extract the downloaded `Cytomine-python-client.zip` archive
-4. Open the `Cytomine-python-client` folder
+The Cytomine API client for Python is part of the [Cytomine repository](https://github.com/cytomine/cytomine), in the `clients/python` folder. To get the source code, clone the repository:
+
+```bash
+git clone https://github.com/cytomine/cytomine.git
+```
+
+Alternatively, on the repository page, click **Code**, then **Download ZIP** and extract the downloaded archive.
 
 ### Install the Cytomine Python client
 
-In the `Cytomine-python-client` folder, run:
+In the `clients/python` folder of the repository, run:
 
 ```bash
 pip install .

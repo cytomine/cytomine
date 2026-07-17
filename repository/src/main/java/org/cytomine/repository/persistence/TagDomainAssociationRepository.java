@@ -14,11 +14,7 @@ public interface TagDomainAssociationRepository extends JpaRepository<TagDomainA
 
     boolean existsByTagIdAndDeletedNull(long tagId);
 
-    @Query(
-        value = "SELECT tda.id FROM tag_domain_association tda WHERE tda.tag_id = :tagId AND tda.deleted IS NULL",
-        nativeQuery = true
-    )
-    Set<Long> findAllIdsByTagId(long tagId);
+    Set<Long> findAllIdsByTagIdAndDeletedNull(long tagId);
 
     Page<TagDomainAssociationEntity> findAllByDomainClassNameAndDomainIdAndDeletedNull(
         String domainClassName,

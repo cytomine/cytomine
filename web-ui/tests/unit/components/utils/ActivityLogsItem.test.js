@@ -33,15 +33,16 @@ describe('ActivityLogsItem.vue', () => {
   localVue.component('router-link', {template: '<a><slot></slot></a>'});
   localVue.component('router-view', {template: '<div><slot></slot></div>'});
 
-  beforeAll(() => {
-    localVue.filter('moment', jest.fn((value, format) => moment.utc(Number(value)).format(format)));
-  });
+  const utcMoment = value => moment.utc(Number(value));
 
   beforeEach(() => {
     wrapper = shallowMount(ActivityLogsItem, {
       localVue,
       propsData: {
         action
+      },
+      mocks: {
+        $moment: utcMoment
       },
       computed: {
         shortTermToken: () => 'mock-token'
@@ -62,7 +63,7 @@ describe('ActivityLogsItem.vue', () => {
   });
 
   it('should create the correct annotation route and preview', async () => {
-    wrapper.vm.$options.created[0].call(wrapper.vm);
+    wrapper.vm.$options.created.call(wrapper.vm);
     await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.route).toBe('/project/123/image/456/annotation/1');

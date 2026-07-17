@@ -38,7 +38,7 @@ describe('ImageField.vue', () => {
       },
       propsData: {
         parameter: mockParameter,
-        value: null,
+        modelValue: null,
       },
       stubs: {
         AnnotationSelection: true,
@@ -48,14 +48,14 @@ describe('ImageField.vue', () => {
   });
 
   it('should render the component correctly', () => {
-    expect(wrapper.find('.field label').text()).toBe(mockParameter.display_name);
+    expect(wrapper.find('.field label').text()).toEqual(mockParameter.display_name);
     expect(wrapper.findAllComponents({name: 'BButton'}).length).toBe(2);
     expect(wrapper.find('.value-container').exists()).toBe(false);
 
     const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
-    expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
+    expect(tooltips.at(0).props('label')).toEqual(mockParameter.description);
   });
 
   it('should not have a default value for input', () => {
@@ -64,20 +64,20 @@ describe('ImageField.vue', () => {
 
   it('should render the annotation with id when selected', async () => {
     const mockedData = {type: 'annotation', id: 42};
-    await wrapper.setProps({value: mockedData});
+    await wrapper.setProps({modelValue: mockedData});
     await wrapper.setData({type: mockedData.type});
 
-    expect(wrapper.vm.value).toBe(mockedData);
+    expect(wrapper.vm.modelValue).toEqual(mockedData);
     expect(wrapper.find('.value-container').exists()).toBe(true);
     expect(wrapper.find('.value-container').text()).toBe('annotation 42');
   });
 
   it('should render the image with id when selected', async () => {
     const mockedData = {type: 'image', id: 42};
-    await wrapper.setProps({value: mockedData});
+    await wrapper.setProps({modelValue: mockedData});
     await wrapper.setData({type: mockedData.type});
 
-    expect(wrapper.vm.value).toBe(mockedData);
+    expect(wrapper.vm.modelValue).toEqual(mockedData);
     expect(wrapper.find('.value-container').exists()).toBe(true);
     expect(wrapper.find('.value-container').text()).toBe('image 42');
   });
@@ -86,7 +86,7 @@ describe('ImageField.vue', () => {
     const mockedData = {type: 'image', id: 42};
     await wrapper.setData({input: mockedData});
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input.at(0)).toEqual([mockedData]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'].at(0)).toEqual([mockedData]);
   });
 });

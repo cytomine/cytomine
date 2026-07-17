@@ -13,10 +13,10 @@
  limitations under the License.-->
 
 <template>
-<v-popover
+<v-dropdown
   placement="right"
-  trigger="manual"
-  :open="opened"
+  :triggers="[]"
+  :shown="opened"
   :auto-hide="false"
 > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
@@ -37,7 +37,7 @@
     </template>
   </div>
 
-  <template #popover>
+  <template #popper>
     <annotation-details
       v-click-outside.capture="(event) => close(event)"
       :annotation="annot"
@@ -58,7 +58,7 @@
     /> <!-- Display component only if it is the currently displayed annotation
             (prevents fetching unnecessary information) -->
   </template>
-</v-popover>
+</v-dropdown>
 </template>
 
 <script>
@@ -173,7 +173,7 @@ export default {
     await this.fetchThumbnail();
     this.$eventBus.$on('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // unsubscribe from all events
     this.$eventBus.$off('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   }

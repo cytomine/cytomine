@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-loading :is-full-page="false" :active="loading" />
+    <b-loading :is-full-page="false" :model-value="loading" />
     <template v-if="!loading">
       <b-message v-if="!tags" type="is-danger" has-icon icon-size="is-small">
         <h2> {{ $t('error') }} </h2>
@@ -48,7 +48,7 @@
               :label="$t('created')"
               sortable
             >
-              {{ Number(tag.created) | moment('ll') }}
+              {{ $moment(Number(tag.created)).format('ll') }}
             </b-table-column>
 
             <b-table-column label=" " centered>
@@ -79,7 +79,7 @@
           </template>
         </b-table>
 
-        <tag-modal :active.sync="modal" :tag="editedTag" @addTag="addTag" @updateTag="updateTag" />
+        <tag-modal v-model:active="modal" :tag="editedTag" @addTag="addTag" @updateTag="updateTag" />
       </template>
     </template>
   </div>

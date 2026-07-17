@@ -14,7 +14,7 @@
 
 <template>
 <table class="table">
-  <b-loading :is-full-page="false" :active.sync="loading" />
+  <b-loading :is-full-page="false" v-model="loading" />
   <tbody v-if="!loading">
     <tr>
       <td>{{$t('operating-system')}}</td>
@@ -35,7 +35,7 @@
               <div class="details">
                 <p>
                   <strong>{{$t('duration')}}:</strong>
-                  {{ consultation.time | duration('humanize') }}
+                  {{ $moment.duration(consultation.time).humanize() }}
                   <br>
                   <strong>{{$t('annotation-creations')}}:</strong>
                   {{consultation.countCreatedAnnotations || 0}}

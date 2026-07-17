@@ -14,7 +14,7 @@
 
 <template>
 <div>
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <template v-if="!loading">
     <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
       <h2> {{ $t('error') }} </h2>
@@ -35,10 +35,10 @@
 
       <cytomine-table
         :collection="userCollection"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
+        v-model:currentPage="currentPage"
+        v-model:perPage="perPage"
+        v-model:sort="sortField"
+        v-model:order="sortOrder"
         :detailed=true
         :revision="revision"
       >
@@ -67,11 +67,11 @@
           </b-table-column>
 
           <b-table-column field="created" :label="$t('created')" sortable width="150">
-            {{Number(user.created) | moment('ll LT')}}
+            {{ $moment(Number(user.created)).format('ll LT') }}
           </b-table-column>
 
           <b-table-column field="updated" :label="$t('updated')" sortable width="150">
-            <template v-if="user.updated">{{Number(user.updated) | moment('ll LT')}}</template>
+            <template v-if="user.updated">{{ $moment(Number(user.updated)).format('ll LT') }}</template>
             <template v-else>-</template>
           </b-table-column>
 
@@ -101,7 +101,7 @@
         </template>
       </cytomine-table>
 
-      <user-modal :active.sync="modal" :user="editedUser" @addUser="refreshUsers" @updateUser="updateUser" />
+      <user-modal v-model:active="modal" :user="editedUser" @addUser="refreshUsers" @updateUser="updateUser" />
     </template>
   </template>
 </div>

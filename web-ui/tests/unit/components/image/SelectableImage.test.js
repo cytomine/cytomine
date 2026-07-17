@@ -41,7 +41,7 @@ describe('SelectableImage.vue', () => {
     const imageThumbnail = wrapper.findComponent(ImageThumbnail);
 
     expect(imageThumbnail.exists()).toBe(true);
-    expect(imageThumbnail.props('image')).toBe(mockImage);
+    expect(imageThumbnail.props('image')).toEqual(mockImage);
     expect(imageThumbnail.props('size')).toBe(128);
   });
 

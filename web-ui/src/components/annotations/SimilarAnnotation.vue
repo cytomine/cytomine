@@ -10,7 +10,7 @@
       :h="'auto'"
       :w="450"
     >
-      <b-loading :is-full-page="false" :active="loading"/>
+      <b-loading :is-full-page="false" :model-value="loading"/>
 
       <div class="actions">
         <h1>{{ $t('similar-annotations') }}</h1>
@@ -78,6 +78,7 @@ import {Annotation, AnnotationTerm} from '@/api';
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 import CytomineTerm from '@/components/ontology/CytomineTerm';
 import VueDraggableResizable from 'vue-draggable-resizable';
+import 'vue-draggable-resizable/style.css';
 
 export default {
   name: 'SimilarAnnotation',
@@ -184,7 +185,7 @@ export default {
     this.countTerm();
     this.loading = false;
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$eventBus.$off('update-suggested-terms', this.countTerm);
   }
 };

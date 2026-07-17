@@ -8,7 +8,7 @@
   <p>{{ $t('error-load-annotations-filters') }}</p>
 </div>
 <div v-else class="content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <div v-if="!loading">
     <div class="box">
       <h2> {{ $t('display') }} </h2>

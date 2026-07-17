@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import {flushPromises, shallowMount} from '@vue/test-utils';
 
 import AnnotationSelection from '@/components/annotations/AnnotationSelection';
 import CytomineModal from '@/components/utils/CytomineModal';
@@ -74,6 +74,7 @@ describe('AnnotationSelection.vue', () => {
 
   it('should render the loading when the data is fetched', async () => {
     const wrapper = createWrapper();
+    await flushPromises(); // let created() finish before forcing the loading state
 
     await wrapper.setData({loading: true});
 
@@ -97,7 +98,7 @@ describe('AnnotationSelection.vue', () => {
 
     wrapper.setData({selectedAnnotation: mockAnnotations[0]});
 
-    expect(wrapper.vm.selectedAnnotation).toBe(mockAnnotations[0]);
+    expect(wrapper.vm.selectedAnnotation).toEqual(mockAnnotations[0]);
 
     wrapper.vm.cancelAnnotation();
     await wrapper.vm.$nextTick();

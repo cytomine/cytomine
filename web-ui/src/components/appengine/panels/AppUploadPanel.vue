@@ -32,7 +32,7 @@
         <div class="file-list">
           <div v-for="file in selectedFiles" :key="file.name">
             <FileUploadItem
-              ref="fileUploadChildren"
+              :ref="el => { if (el) fileUploadChildren.push(el); }"
               :file="file"
               @file:remove="handleRemoveFile"
               @task-upload:success="handleTaskUploaded"
@@ -55,6 +55,7 @@ export default {
   data() {
     return {
       selectedFiles: [],
+      fileUploadChildren: [],
     };
   },
   methods: {
@@ -66,13 +67,13 @@ export default {
       this.selectedFiles = this.selectedFiles.filter(f => f.name !== file.name);
     },
     async handleUploadAll() {
-      if (!this.$refs.fileUploadChildren) {
+      if (!this.fileUploadChildren.length) {
         return;
       }
 
       try {
         await Promise.all(
-          this.$refs.fileUploadChildren.map(child => child.handleTaskUpload())
+          this.fileUploadChildren.map(child => child.handleTaskUpload())
         );
       } catch (error) {
         console.error(error);

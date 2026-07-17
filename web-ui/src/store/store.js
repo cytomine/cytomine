@@ -14,8 +14,7 @@
 * limitations under the License.
 */
 
-import Vue from 'vue';
-import Vuex from 'vuex';
+import {createStore} from 'vuex';
 
 import appStores from './modules/app-stores.js';
 import currentUser from './modules/current-user.js';
@@ -23,8 +22,7 @@ import currentProject from './modules/current-project.js';
 import ontologies from './modules/ontologies.js';
 import listProjects from './modules/list-projects.js';
 
-Vue.use(Vuex);
-let store = new Vuex.Store({
+let store = createStore({
   actions: {
     logout({state, commit}) {
       commit('appStores/reset');

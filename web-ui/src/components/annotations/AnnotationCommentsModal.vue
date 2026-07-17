@@ -25,7 +25,7 @@
       <div v-for="comment in comments" :key="comment.id">
         <p class="comment-sender is-size-7">
           <strong>{{ comment.senderName }}</strong>
-          <span class="has-text-grey">{{Number(comment.created) | moment('ll LT')}}</span>
+          <span class="has-text-grey">{{ $moment(Number(comment.created)).format('ll LT') }}</span>
         </p>
         <p class="comment-content">{{comment.comment}}</p>
         <hr>
@@ -82,7 +82,6 @@ export default {
     DomainTagInput,
     CytomineModalCard
   },
-  $_veeValidate: {validator: 'new'},
   props: {
     annotation: Object,
     comments: Array
@@ -150,11 +149,11 @@ export default {
 </script>
 
 <style scoped>
->>> .modal-card {
+:deep(.modal-card) {
   max-height: 80vh;
 }
 
->>> .modal-card-body {
+:deep(.modal-card-body) {
   display: flex;
   flex-direction: column;
 }
@@ -174,7 +173,7 @@ export default {
   margin-bottom: 0.5em;
 }
 
->>> textarea {
+:deep(textarea) {
   margin: 0.75em 0 0;
 }
 
@@ -182,7 +181,7 @@ hr {
   margin: 0.75em 0 !important;
 }
 
->>> .dropdown-content {
+:deep(.dropdown-content) {
   max-height: 7em !important;
 }
 </style>

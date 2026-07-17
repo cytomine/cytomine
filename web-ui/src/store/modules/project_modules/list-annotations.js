@@ -14,7 +14,6 @@
 * limitations under the License.
 */
 
-import Vue from 'vue';
 
 export default {
   namespaced: true,
@@ -93,7 +92,7 @@ export default {
     },
 
     setCurrentPage(state, {prop, page}) {
-      Vue.set(state.currentPages, prop, page);
+      state.currentPages[prop] = page;
     }
   }
 };

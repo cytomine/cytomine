@@ -36,7 +36,7 @@
       <!-- Display linked images -->
       <tr v-for="index in linkedIndexes" :key="index">
         <td>
-          <b-checkbox :value="true" @input="unlink"/>
+          <b-checkbox :model-value="true" @update:model-value="unlink"/>
         </td>
         <td>
           {{$t('viewer-view', {number: imagesWithNum[index].number})}}
@@ -47,7 +47,7 @@
       <!-- Display other groups to linked with -->
       <tr v-for="{images, index, number} in otherGroups" :key="`group${number}`">
         <td>
-          <b-checkbox :value="false" @change.native="event => handleCheckboxChange(event, index)"/>
+          <b-checkbox :model-value="false" @change="event => handleCheckboxChange(event, index)"/>
         </td>
         <td>
           {{$t('link-group', {number})}}
@@ -64,7 +64,7 @@
       <!-- Display unlinked images -->
       <tr v-for="{image, index, number} in otherSoloImages" :key="index">
         <td>
-          <b-checkbox :value="false" @change.native="event => handleCheckboxChange(event, null, index)"/>
+          <b-checkbox :model-value="false" @change="event => handleCheckboxChange(event, null, index)"/>
         </td>
         <td>
           {{$t('viewer-view', {number})}} (<image-name :image="image" />)
@@ -231,7 +231,7 @@ ul.group {
   margin-right: 0.5em;
 }
 
->>> .b-checkbox {
+:deep(.b-checkbox) {
   align-items: flex-start !important;
   margin-top: 0.25em;
 }

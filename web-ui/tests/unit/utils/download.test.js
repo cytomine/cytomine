@@ -72,7 +72,7 @@ describe('triggerBlobDownload()', () => {
     const blob = new Blob(['{}'], {type: 'application/geo+json'});
     triggerBlobDownload(blob, filename);
 
-    expect(anchorMock.href).toBe(mockUrl);
+    expect(anchorMock.href).toEqual(mockUrl);
     expect(anchorMock.download).toBe(filename);
   });
 

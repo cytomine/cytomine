@@ -14,7 +14,7 @@
 
 <template>
 <div class="project-image-filters-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
     <h2> {{ $t('error') }} </h2>
     <p> {{ $t('unexpected-error-info-message') }} </p>

@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {Bar} from 'vue-chartjs';
+import {Bar} from './base-charts';
 
 export default {
   name: 'activity-overview-chart',

@@ -41,7 +41,6 @@ export default {
     active: Boolean
   },
   components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
   data() {
     return {
       name: ''

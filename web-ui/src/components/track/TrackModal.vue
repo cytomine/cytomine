@@ -35,7 +35,7 @@
 
 <script>
 import {Track} from '@/api';
-import {Sketch} from 'vue-color';
+import {Sketch} from '@ckpack/vue-color';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
 export default {
@@ -48,7 +48,6 @@ export default {
     'sketch-picker': Sketch,
     CytomineModalCard
   },
-  $_veeValidate: {validator: 'new'},
   data() {
     return {
       name: '',

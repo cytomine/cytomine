@@ -76,9 +76,9 @@ describe('SimilarAnnotation.vue', () => {
           },
         },
       }),
-      'currentProject/imageModule': () => state.currentProject.imageModule,
-      'currentProject/terms': () => state.currentProject.terms,
-      'currentProject/currentViewer': () => state.currentProject.currentViewer,
+      'currentProject/imageModule': s => s.currentProject.imageModule,
+      'currentProject/terms': s => s.currentProject.terms,
+      'currentProject/currentViewer': s => s.currentProject.currentViewer,
     };
 
     mutations = {
@@ -127,7 +127,7 @@ describe('SimilarAnnotation.vue', () => {
     await wrapper.vm.$nextTick();
 
     const annotationPreviews = wrapper.findAllComponents(AnnotationPreview);
-    expect(annotationPreviews.length).toBe(mockAnnotations.length);
+    expect(annotationPreviews.length).toEqual(mockAnnotations.length);
     expect(annotationPreviews.at(0).props('annot')).toEqual(mockAnnotations[0]);
     expect(annotationPreviews.at(1).props('annot')).toEqual(mockAnnotations[1]);
 
@@ -153,7 +153,8 @@ describe('SimilarAnnotation.vue', () => {
   });
 
   it('should close the window when close button is clicked', async () => {
-    const closeButton = wrapper.find('.button.is-small.close');
+    const closeButtons = wrapper.findAll('.button.is-small.close');
+    const closeButton = closeButtons[closeButtons.length - 1];
     await closeButton.trigger('click');
 
     expect(wrapper.vm.showSimilarAnnotations).toBe(false);

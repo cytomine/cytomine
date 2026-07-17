@@ -41,7 +41,6 @@ export default {
     title: String
   },
   components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
   data() {
     return {
       newName: ''
@@ -71,7 +70,7 @@ export default {
 </script>
 
 <style scoped>
->>> input[type=text] {
+:deep(input[type=text]) {
   width: 26em;
 }
 </style>

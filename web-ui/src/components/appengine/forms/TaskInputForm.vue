@@ -4,14 +4,13 @@
       v-for="input in taskInputs"
       :key="input.id"
       :parameter="input"
-      :value="inputs[input.name].value"
-      @input="onInputChange(input.name, $event)"
+      :model-value="inputs[input.name].value"
+      @update:model-value="onInputChange(input.name, $event)"
     />
   </div>
 </template>
 
 <script>
-import Vue from 'vue';
 
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
 import Task from '@/utils/appengine/task';
@@ -73,7 +72,7 @@ export default {
           }
         })();
 
-        Vue.set(inputs, input.name, {value, type: input.type});
+        inputs[input.name] = {value, type: input.type};
       };
 
       for (let input of this.taskInputs) {
@@ -83,7 +82,7 @@ export default {
         }
       }
 
-      this.$emit('input', inputs);
+      this.$emit('update:modelValue', inputs);
     },
     onInputChange(name, value) {
       const updated = {
@@ -94,7 +93,7 @@ export default {
         }
       };
 
-      this.$emit('input', updated);
+      this.$emit('update:modelValue', updated);
     },
   },
   async created() {

@@ -14,72 +14,26 @@
 * limitations under the License.
 */
 
-import Vue from 'vue';
+import {createApp} from 'vue';
 import axios from 'axios';
+import moment from 'moment';
+import html2canvas from 'html2canvas';
+
 import constants from '@/utils/constants.js';
+import eventBus from '@/utils/event-bus.js';
+import {clickOutside, shortkey} from '@/utils/directives.js';
+import VeeValidateShim from '@/utils/vee-validate-shim.js';
 
-import VueRouter from 'vue-router';
 import router from './routes.js';
-Vue.use(VueRouter);
-
 import i18n from './lang.js';
-
 import store from './store/store.js';
 
-import Buefy from 'buefy';
-Vue.use(Buefy, {defaultIconPack: 'fas'});
+import Buefy from '@ntohq/buefy-next';
+import Notifications from '@kyvg/vue3-notification';
+import FloatingVue from 'floating-vue';
+import 'floating-vue/dist/style.css';
 
-import VeeValidate, {Validator} from 'vee-validate';
-Validator.extend('positive', value => Number(value) > 0);
-Vue.use(VeeValidate, {
-  i18nRootKey: 'validations',
-  i18n,
-  inject: false
-});
-
-import Notifications from 'vue-notification';
-Vue.use(Notifications);
-
-import VTooltip from 'v-tooltip';
-Vue.use(VTooltip);
-
-import VueMoment from 'vue-moment';
-const moment = require('moment');
-Vue.use(VueMoment, {moment});
-
-import VueShortKey from 'vue-shortkey';
-Vue.use(VueShortKey, {
-  prevent: [
-    'input[type=text]',
-    'input[type=password]',
-    'input[type=search]',
-    'input[type=email]',
-    'textarea',
-    '.ql-editor'
-  ]
-});
-
-import VueHtml2Canvas from 'vue-html2canvas';
-
-Vue.use(VueHtml2Canvas);
-
-import * as vClickOutside from 'v-click-outside-x';
-Vue.use(vClickOutside);
-
-import VueLayers from 'vuelayers';
-import CytomineSource from './vuelayers-suppl/cytomine-source';
-import RasterSource from './vuelayers-suppl/raster-source';
-import TranslateInteraction from './vuelayers-suppl/translate-interaction';
-import RotateInteraction from './vuelayers-suppl/rotate-interaction';
-import ModifyInteraction from './vuelayers-suppl/modify-interaction';
-import RescaleInteraction from './vuelayers-suppl/rescale-interaction';
-Vue.use(VueLayers);
-Vue.use(CytomineSource);
-Vue.use(RasterSource);
-Vue.use(TranslateInteraction);
-Vue.use(RotateInteraction);
-Vue.use(ModifyInteraction);
-Vue.use(RescaleInteraction);
+import OlComponents from '@/components/viewer/ol';
 
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -95,9 +49,6 @@ Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
 
 import App from './App.vue';
 
-Vue.config.productionTip = false;
-Vue.prototype.$eventBus = new Vue();
-
 // Load configuration before initializing Keycloak
 axios.get('configuration.json').then(response => {
   const settings = response.data;
@@ -111,19 +62,36 @@ axios.get('configuration.json').then(response => {
   // Now import and initialize Keycloak with loaded config
   import('./keycloak').then(module => {
     const Keycloak = module.default;
-    Vue.use(Keycloak);
+    const {getKeycloak} = module;
 
-    Vue.$keycloak
+    getKeycloak()
       .init({
         onLoad: 'login-required'
       })
       .then(() => {
-        new Vue({
-          render: h => h(App),
-          router,
-          store,
-          i18n
-        }).$mount('#app');
+        const app = createApp(App);
+
+        app.use(router);
+        app.use(i18n);
+        app.use(store);
+        app.use(Keycloak);
+        app.use(Buefy, {defaultIconPack: 'fas'});
+        app.use(Notifications);
+        app.use(FloatingVue);
+        app.use(VeeValidateShim);
+        app.use(OlComponents);
+
+        app.directive('click-outside', clickOutside);
+        app.directive('shortkey', shortkey);
+
+        app.config.globalProperties.$eventBus = eventBus;
+        app.config.globalProperties.$moment = moment;
+        app.config.globalProperties.$html2canvas = async (el, options = {}) => {
+          const canvas = await html2canvas(el, options);
+          return options.type === 'dataURL' ? canvas.toDataURL() : canvas;
+        };
+
+        app.mount('#app');
       });
   });
 });

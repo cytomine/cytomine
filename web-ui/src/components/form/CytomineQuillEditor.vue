@@ -16,8 +16,7 @@
 <div class="cytomine-quill-editor">
   <div id="tooltip-container"></div> <!-- invisible div defining the allowed positions for ql tooltip -->
 
-  <quill-editor :value="value" @input="$emit('input', $event)" :options="editorOptions" ref="quillEditor">
-    <template #toolbar>
+  <div class="quill-editor">
       <div id="toolbar">
         <span class="ql-formats">
           <select class="ql-header">
@@ -117,30 +116,25 @@
           </span>
         </span>
       </div>
-    </template>
-  </quill-editor>
+      <div ref="editor"></div>
+  </div>
 </div>
 </template>
 
 <script>
-import {quillEditor} from 'vue-quill-editor';
+import Quill from 'quill';
+import 'quill/dist/quill.core.css';
+import 'quill/dist/quill.snow.css';
 
 export default {
   name: 'cytomine-quill-editor',
-  components: {quillEditor},
   props: {
-    value: String,
+    modelValue: String,
     placeholder: String
   },
+  emits: ['update:modelValue'],
   data() {
     return {
-      editorOptions: {
-        bounds: '#tooltip-container',
-        placeholder: this.placeholder || this.$t('enter-text'),
-        modules: {
-          toolbar: '#toolbar'
-        }
-      },
       expandedSpecialChars: false,
       specialCharacters: [
         '$', '€', '£', '¢', '¥', '¤', '‰', '©', '®', '™', '§', '¶', 'Æ', 'æ', 'Œ', 'œ',
@@ -148,10 +142,33 @@ export default {
       ]
     };
   },
-  computed: {
-    quill() {
-      return this.$refs.quillEditor.quill;
+  watch: {
+    modelValue(value) {
+      if (this.quill && value !== this.quill.root.innerHTML) {
+        this.quill.root.innerHTML = value || '';
+      }
     }
+  },
+  mounted() {
+    this.quill = new Quill(this.$refs.editor, {
+      theme: 'snow',
+      bounds: '#tooltip-container',
+      placeholder: this.placeholder || this.$t('enter-text'),
+      modules: {
+        toolbar: '#toolbar'
+      }
+    });
+    this.quill.root.innerHTML = this.modelValue || '';
+    this.quill.on('text-change', () => {
+      let html = this.quill.root.innerHTML;
+      if (html === '<p><br></p>') {
+        html = '';
+      }
+      this.$emit('update:modelValue', html);
+    });
+  },
+  beforeUnmount() {
+    this.quill = null;
   },
   methods: {
     insertSpecialCharacter(char) {

@@ -100,13 +100,13 @@
         </tr>
       </thead>
       <tbody>
-        <template v-for="mc in filteredManipulableChannels">
-          <tr :key="`channel-${image.id}-${mc.index}`">
+        <template v-for="mc in filteredManipulableChannels" :key="`channel-${image.id}-${mc.index}`">
+          <tr>
             <td class="checkbox-column">
               <b-checkbox
                 size="is-small"
-                :value="mc.visible"
-                @input="setApparentChannelVisibility(mc.index, $event)"
+                :model-value="mc.visible"
+                @update:model-value="setApparentChannelVisibility(mc.index, $event)"
                 :disabled="isApparentChannelVisibilityDisabled(mc)"
               />
             </td>
@@ -502,32 +502,32 @@ export default {
   display: block;
 }
 
-th, ::v-deep td {
+th, :deep(td) {
   padding: 0.25em !important;
   vertical-align: middle !important;
 }
 
-::v-deep .checkbox-column {
+:deep(.checkbox-column) {
   min-width: 2.2em;
   text-align: center !important;
 }
 
-::v-deep .name-column {
+:deep(.name-column) {
   width: 60%;
 }
 
-::v-deep .bounds-column {
+:deep(.bounds-column) {
   width: 40%;
   text-align: right;
 }
 
-::v-deep .settings-column {
+:deep(.settings-column) {
   min-width: 2.2em;
   font-weight: normal;
 }
 
 /** Settings **/
-.settings-column ::v-deep .dropdown-content {
+.settings-column :deep(.dropdown-content) {
   padding: 0;
 }
 
@@ -542,11 +542,11 @@ th, ::v-deep td {
 }
 
 /** Checkbox **/
-::v-deep .checkbox .control-label {
+:deep(.checkbox .control-label) {
   padding: 0 !important;
 }
 
-::v-deep .checkbox {
+:deep(.checkbox) {
   margin: 0 !important;
   position: relative;
   top: 0.25em;
@@ -558,7 +558,7 @@ th, ::v-deep td {
   margin-right: calc(-0.175em - 1px);
 }
 
-.subscript, ::v-deep .subscript {
+.subscript, :deep(.subscript) {
   position: relative;
   top: 0.65em;
   left: 1px;

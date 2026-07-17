@@ -30,7 +30,7 @@ describe('DomainTagInput.vue', () => {
       localVue,
       mocks,
       propsData: {
-        value,
+        modelValue: value,
         domains
       }
     });
@@ -49,11 +49,11 @@ describe('DomainTagInput.vue', () => {
   });
 
   it('should emit input event when a tag is added', async () => {
-    wrapper.vm.$emit('input', [{id: 2, name: 'test.com'}]);
+    wrapper.vm.$emit('update:modelValue', [{id: 2, name: 'test.com'}]);
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input[0]).toEqual([[{id: 2, name: 'test.com'}]]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'][0]).toEqual([[{id: 2, name: 'test.com'}]]);
   });
 
   it('should not allow duplicate domains to be added', async () => {

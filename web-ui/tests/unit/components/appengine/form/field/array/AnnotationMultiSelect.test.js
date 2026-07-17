@@ -58,8 +58,8 @@ describe('AnnotationMultiSelect.vue', () => {
 
     expect(wrapper.vm.loading).toBe(false);
     const components = wrapper.findAllComponents(SelectableAnnotation);
-    expect(components.exists()).toBe(true);
-    expect(components.length).toBe(mockedAnnotations.length);
+    expect(components.length).toBeGreaterThan(0);
+    expect(components.length).toEqual(mockedAnnotations.length);
   });
 
   it('should emit an input event when selecting annotations', async () => {
@@ -68,7 +68,7 @@ describe('AnnotationMultiSelect.vue', () => {
     const selectedAnnotationIds = [42, 1337];
     await wrapper.setData({selectedAnnotationIds: selectedAnnotationIds});
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input[0]).toEqual([selectedAnnotationIds]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'][0]).toEqual([selectedAnnotationIds]);
   });
 });

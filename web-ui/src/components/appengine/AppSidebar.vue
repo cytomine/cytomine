@@ -5,26 +5,32 @@
         <h1 class="sidebar-title">{{ $t('app-engine.applications') }}</h1>
 
         <ul>
-          <router-link tag="li" to="/apps" exact>
+          <router-link to="/apps" custom v-slot="{navigate, isExactActive}">
+            <li :class="{'is-active': isExactActive}" @click="navigate">
             <a>
               <i class="fas fa-code"></i>
               {{ $t('app-engine.tasks.installed') }}
             </a>
-          </router-link>
-          <router-link tag="li" to="/apps/store">
+          </li>
+      </router-link>
+          <router-link to="/apps/store" custom v-slot="{navigate, isActive}">
+            <li :class="{'is-active': isActive}" @click="navigate">
             <a>
               <i class="fas fa-store"></i>
               {{ $t('app-store') }}
             </a>
-          </router-link>
+          </li>
+      </router-link>
         </ul>
         <ul class="bottom-menu">
-          <router-link tag="li" to="/apps/configuration">
+          <router-link to="/apps/configuration" custom v-slot="{navigate, isActive}">
+            <li :class="{'is-active': isActive}" @click="navigate">
             <a>
               <i class="fas fa-cogs"></i>
               {{ $t('configuration') }}
             </a>
-          </router-link>
+          </li>
+      </router-link>
         </ul>
       </nav>
     </div>

@@ -57,7 +57,7 @@ describe('AnnotationPreview.vue', () => {
       await wrapper.vm.$nextTick();
 
       expect(global.URL.createObjectURL).toHaveBeenCalled();
-      expect(wrapper.vm.imageDataUrl).toBe(mockBlobUrl);
+      expect(wrapper.vm.imageDataUrl).toEqual(mockBlobUrl);
     });
 
     it('should revoke old URL when fetching new thumbnail', async () => {
@@ -80,8 +80,7 @@ describe('AnnotationPreview.vue', () => {
     it('should display preview button is showDetails is true', () => {
       const wrapper = createWrapper();
 
-      const buttonWrapper = wrapper.findComponent({ref: 'previewButton'});
-      expect(buttonWrapper.exists()).toBe(true);
+      expect(wrapper.vm.$refs.previewButton).toBeTruthy();
     });
 
     it('should not display preview button is showDetails is false', () => {
@@ -91,8 +90,7 @@ describe('AnnotationPreview.vue', () => {
         }
       });
 
-      const buttonWrapper = wrapper.findComponent({ref: 'previewButton'});
-      expect(buttonWrapper.exists()).toBe(false);
+      expect(wrapper.vm.$refs.previewButton).toBeFalsy();
     });
   });
 });

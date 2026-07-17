@@ -14,7 +14,7 @@
 
 <template>
 <form @submit.prevent="createProject(); loading = true">
-  <b-loading :active="loading" :is-full-page="false" />
+  <b-loading :model-value="loading" :is-full-page="false" />
 
   <template v-if="!loading">
     <cytomine-modal :active="active" :title="$t('create-project')" @close="$emit('update:active', false)">
@@ -79,7 +79,6 @@ export default {
     ontologies: Array
   },
   components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
   data() {
     return {
       loading: false,

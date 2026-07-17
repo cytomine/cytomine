@@ -52,7 +52,7 @@ describe('AppLayout.vue', () => {
 
       expect(wrapper.find('.app-container').exists()).toBe(true);
       expect(wrapper.find('.app-content').exists()).toBe(true);
-      expect(wrapper.find('router-view-stub').exists()).toBe(true);
+      expect(wrapper.find('router-view, router-view-stub').exists()).toBe(true);
       expect(wrapper.findComponent(AppSidebar).exists()).toBe(true);
     });
 
@@ -86,7 +86,7 @@ describe('AppLayout.vue', () => {
       const wrapper = createDisabledWrapper();
 
       expect(wrapper.find('.app-container').exists()).toBe(false);
-      expect(wrapper.find('router-view-stub').exists()).toBe(false);
+      expect(wrapper.find('router-view, router-view-stub').exists()).toBe(false);
       expect(wrapper.findComponent(AppSidebar).exists()).toBe(false);
       expect(wrapper.findComponent(BMessage).exists()).toBe(true);
     });

@@ -34,7 +34,7 @@ limitations under the License.-->
     <tr v-if="isPropDisplayed('created')">
       <td class="prop-label">{{$t('created-on')}}</td>
       <td class="prop-content" colspan="3">
-        {{ Number(imageGroup.created) | moment('ll') }}
+        {{ $moment(Number(imageGroup.created)).format('ll') }}
       </td>
     </tr>
     <tr v-if="isPropDisplayed('description')">
@@ -112,12 +112,12 @@ limitations under the License.-->
   <rename-modal
       :title="$t('rename-image-group')"
       :currentName="imageGroup.name"
-      :active.sync="isRenameModalActive"
+      v-model:active="isRenameModalActive"
       @rename="rename"
   />
 
   <add-to-image-group-modal
-    :active.sync="isAddToModalActive"
+    v-model:active="isAddToModalActive"
     :image-group="imageGroup"
     @addToImageGroup="$emit('addToImageGroup', $event)"
   />

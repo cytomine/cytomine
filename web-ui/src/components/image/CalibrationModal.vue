@@ -74,7 +74,6 @@ export default {
     image: {type: Object}
   },
   components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
   data() {
     return {
       calibrationFieldX: '',

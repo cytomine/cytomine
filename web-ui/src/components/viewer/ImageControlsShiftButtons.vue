@@ -7,12 +7,12 @@
     >
       <i class="fas" :class="{'fa-step-forward': forward, 'fa-step-backward': !forward}"></i>
     </button>
-    <v-popover
+    <v-dropdown
         :placement="selectorPlacement"
-        trigger="manual"
-        :open="opened"
+        :triggers="[]"
+        :shown="opened"
         :auto-hide="false"
-        :popover-inner-class="'tooltip-inner popover-inner step-selector'"
+        :popper-class="'tooltip-inner popover-inner step-selector'"
     >
       <button
           class="button is-small item"
@@ -27,7 +27,7 @@
         </div>
       </button>
 
-      <template #popover>
+      <template #popper>
         <div
           v-click-outside="() => stopEdition()"
           v-click-outside:contextmenu.capture="() => stopEdition()"
@@ -36,13 +36,13 @@
           <b-input :placeholder="$t('step')" size="is-small"
              v-model="editedValue"
              ref="inputStepSelector"
-             @hook:mounted="focus()"
+             @vue:mounted="focus()"
              @blur="stopEdition()"
-             @keyup.enter.native="stopEdition()"
+             @keyup.enter="stopEdition()"
           />
         </div>
       </template>
-    </v-popover>
+    </v-dropdown>
   </div>
 </template>
 

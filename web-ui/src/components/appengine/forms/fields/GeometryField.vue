@@ -10,8 +10,8 @@
         {{ $t('select') }}
       </b-button>
 
-      <div class="annotation-container" v-if="value">
-        {{ $t('annotation') }} {{ value }}
+      <div class="annotation-container" v-if="modelValue">
+        {{ $t('annotation') }} {{ modelValue }}
       </div>
     </b-field>
 
@@ -21,7 +21,7 @@
       </b-tooltip>
     </div>
 
-    <annotation-selection :active.sync="selectAnnotation" @select-annotation="input = $event"/>
+    <annotation-selection v-model:active="selectAnnotation" @select-annotation="input = $event"/>
   </div>
 </template>
 
@@ -35,7 +35,7 @@ export default {
   },
   props: {
     parameter: {type: Object, required: true},
-    value: {},
+    modelValue: {},
   },
   data() {
     return {
@@ -45,10 +45,10 @@ export default {
   computed: {
     input: {
       get() {
-        return this.value;
+        return this.modelValue;
       },
       set(value) {
-        this.$emit('input', value);
+        this.$emit('update:modelValue', value);
       }
     },
   }

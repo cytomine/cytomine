@@ -21,7 +21,7 @@
     <project-sidebar v-if="!loading" :key="idProject" />
 
     <div class="app-content">
-      <b-loading :is-full-page="false" :active="loading" />
+      <b-loading :is-full-page="false" :model-value="loading" />
       <router-view v-if="!loading" />
     </div>
   </div>
@@ -98,7 +98,7 @@ export default {
   mounted() {
     this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationEventHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationEventHandler);
   }
 };

@@ -4,47 +4,61 @@
     <h1 class="project-name">{{`${$t('project')}: ${project.name}`}}</h1>
     <ul>
       <template v-if="isTabDisplayed('images')">
-        <router-link tag="li" :to="`/project/${project.id}/images`">
+        <router-link :to="`/project/${project.id}/images`" custom v-slot="{navigate, isActive}">
+          <li :class="{'is-active': isActive}" @click="navigate">
           <a>
             <i class="far fa-image"></i>
             {{ $t('images') }}
           </a>
-        </router-link>
+        </li>
+      </router-link>
       </template>
-      <router-link v-if="isTabDisplayed('image-groups')" tag="li" :to="`/project/${project.id}/image-groups`">
+      <router-link v-if="isTabDisplayed('image-groups')" :to="`/project/${project.id}/image-groups`" custom v-slot="{navigate, isActive}">
+        <li :class="{'is-active': isActive}" @click="navigate">
         <a>
           <i class="far fa-images"></i>
           {{ $t('image-groups') }}
         </a>
+      </li>
       </router-link>
-      <router-link v-if="isTabDisplayed('annotations')" tag="li" :to="`/project/${project.id}/annotations`">
+      <router-link v-if="isTabDisplayed('annotations')" :to="`/project/${project.id}/annotations`" custom v-slot="{navigate, isActive}">
+        <li :class="{'is-active': isActive}" @click="navigate">
         <a>
           <i class="far fa-edit"></i>
           {{ $t('annotations') }}
         </a>
+      </li>
       </router-link>
-      <router-link v-if="isTabDisplayed('apps')" tag="li" :to="`/project/${project.id}/apps`">
+      <router-link v-if="isTabDisplayed('apps')" :to="`/project/${project.id}/apps`" custom v-slot="{navigate, isActive}">
+        <li :class="{'is-active': isActive}" @click="navigate">
         <a><i class="fas fa-code"></i>{{ $t('app-engine.applications') }}</a>
+      </li>
       </router-link>
-      <router-link v-if="isTabDisplayed('activities')" tag="li" :to="`/project/${project.id}/activity`">
+      <router-link v-if="isTabDisplayed('activities')" :to="`/project/${project.id}/activity`" custom v-slot="{navigate, isActive}">
+        <li :class="{'is-active': isActive}" @click="navigate">
         <a>
           <i class="fas fa-tachometer-alt"></i>
           {{ $t('activity') }}
         </a>
+      </li>
       </router-link>
-      <router-link v-if="isTabDisplayed('information')" tag="li" :to="`/project/${project.id}/information`">
+      <router-link v-if="isTabDisplayed('information')" :to="`/project/${project.id}/information`" custom v-slot="{navigate, isActive}">
+        <li :class="{'is-active': isActive}" @click="navigate">
         <a>
           <i class="fas fa-info-circle"></i>
           {{ $t('information') }}
         </a>
-        </router-link>
+        </li>
+      </router-link>
     </ul>
     <ul class="bottom-menu">
-      <router-link v-if="isTabDisplayed('configuration')" tag="li" :to="`/project/${project.id}/configuration`">
+      <router-link v-if="isTabDisplayed('configuration')" :to="`/project/${project.id}/configuration`" custom v-slot="{navigate, isActive}">
+        <li :class="{'is-active': isActive}" @click="navigate">
         <a>
           <i class="fas fa-cogs"></i>
           {{ $t('configuration') }}
         </a>
+      </li>
       </router-link>
     </ul>
   </nav>
@@ -85,7 +99,7 @@ export default {
   mounted() {
     this.$refs.sidebar.addEventListener('transitionend', this.transitionEndHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$refs.sidebar.removeEventListener('transitionend', this.transitionEndHandler);
   }
 };

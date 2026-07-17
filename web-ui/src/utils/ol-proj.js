@@ -14,24 +14,20 @@
 * limitations under the License.
 */
 
-import {pick} from 'vuelayers/lib/util/minilo';
-import Interaction from './interaction.vue';
+// Replacements for the projection helpers previously imported from
+// 'vuelayers/lib/ol-ext'.
 
-function plugin(Vue, options = {}) {
-  if (plugin.installed) {
-    return;
-  }
-  plugin.installed = true;
+import Projection from 'ol/proj/Projection';
+import {addProjection, get} from 'ol/proj';
 
-  options = pick(options, 'dataProjection');
-  Object.assign(Interaction, options);
-
-  Vue.component(Interaction.name, Interaction);
+export function createProj({code, units, extent}) {
+  return new Projection({code, units, extent});
 }
 
-export default plugin;
+export function addProj(projection) {
+  addProjection(projection);
+}
 
-export {
-  Interaction,
-  plugin as install,
-};
+export function getProj(code) {
+  return get(code);
+}

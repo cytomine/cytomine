@@ -66,7 +66,7 @@ describe('TaskInputForm.vue', () => {
     await wrapper.vm.$nextTick();
     await wrapper.vm.$nextTick();
 
-    const emitted = wrapper.emitted().input[0][0];
+    const emitted = wrapper.emitted()['update:modelValue'][0][0];
 
     for (const input of expectedInputs) {
       expect(emitted[input.name].value).toBe(input.default);
@@ -123,7 +123,7 @@ describe('TaskInputForm.vue', () => {
     const wrapper = createWrapper({
       propsData: {
         inputs: {
-          test: {value: 'old'},
+          test: {modelValue: 'old'},
         },
       },
     });
@@ -131,7 +131,7 @@ describe('TaskInputForm.vue', () => {
 
     wrapper.vm.onInputChange('test', newValue);
 
-    const emitted = wrapper.emitted().input.pop()[0];
+    const emitted = wrapper.emitted()['update:modelValue'].pop()[0];
     expect(emitted.test.value).toBe(newValue);
   });
 });

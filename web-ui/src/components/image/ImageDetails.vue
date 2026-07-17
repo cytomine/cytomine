@@ -19,7 +19,7 @@
     <p> {{ $t('unexpected-error-info-message') }} </p>
   </b-message>
   <table v-else class="table">
-    <b-loading :is-full-page="false" :active="loading" class="small" />
+    <b-loading :is-full-page="false" :model-value="loading" class="small" />
     <tbody v-if="!loading">
       <tr v-if="isPropDisplayed('overview')">
         <td class="prop-label">{{$t('overview')}}</td>
@@ -266,29 +266,29 @@
   <rename-modal
     :title="$t('rename-image')"
     :currentName="image.instanceFilename"
-    :active.sync="isRenameModalActive"
+    v-model:active="isRenameModalActive"
     @rename="rename"
   />
 
   <magnification-modal
     :image="image"
-    :active.sync="isMagnificationModalActive"
+    v-model:active="isMagnificationModalActive"
     @setMagnification="(event) => $emit('setMagnification', event)"
   />
 
   <calibration-modal
     :image="image"
-    :active.sync="isCalibrationModalActive"
+    v-model:active="isCalibrationModalActive"
     @setResolution="(event) => $emit('setResolution', event)"
   />
 
   <image-metadata-modal
-    :active.sync="isMetadataModalActive"
+    v-model:active="isMetadataModalActive"
     :image="image"
   />
 
   <simple-add-to-image-group-modal
-    :active.sync="isAddToImageGroupModalActive"
+    v-model:active="isAddToImageGroupModalActive"
     :image="image"
     @addToImageGroup="(event) => imageGroupLinks.push(event)"
   />
@@ -540,7 +540,7 @@ td.prop-content-half {
   max-width: 12rem;
 }
 
-::v-deep .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 18rem;
   max-width: 50vw;
 }

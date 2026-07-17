@@ -1,4 +1,4 @@
-import {Line} from 'vue-chartjs';
+import {Line} from './base-charts';
 import ChartZoom from 'chartjs-plugin-zoom';
 
 export default {

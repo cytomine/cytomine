@@ -304,7 +304,7 @@ export default {
     this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationHandler);
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // unsubscribe from all events
     this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
     this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
@@ -368,7 +368,7 @@ export default {
   height: 100%;
 }
 
->>> h2 {
+:deep(h2) {
   margin-bottom: 0;
 }
 
@@ -378,7 +378,7 @@ export default {
   min-width: 18em;
 }
 
->>> ul.pagination-list {
+:deep(ul.pagination-list) {
   justify-content: flex-end;
 }
 </style>

@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import Vue from 'vue';
+import {getKeycloak} from '@/keycloak';
 
 export function appendShortTermToken(url, shortTermToken) {
   if (url === null || shortTermToken === null) {
@@ -28,6 +28,7 @@ export function appendShortTermToken(url, shortTermToken) {
 }
 
 export async function updateToken(minValidity = 70) {
-  await Vue.$keycloak.updateToken(minValidity);
-  return Vue.$keycloak.token;
+  const keycloak = getKeycloak();
+  await keycloak.updateToken(minValidity);
+  return keycloak.token;
 }

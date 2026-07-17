@@ -96,7 +96,8 @@ describe('AppDashboardPage.vue', () => {
         currentProject: () => ({id: '999'}),
       },
       stubs: {
-        'b-table': true,
+        // template stub: prevents rendering of the scoped row slots with empty props
+        'b-table': {template: '<div class="b-table-stub" />'},
       },
       ...options,
     },

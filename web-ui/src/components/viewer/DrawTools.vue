@@ -1248,7 +1248,7 @@ export default {
   mounted() {
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }
 };
@@ -1380,7 +1380,7 @@ $colorActiveIcon: #fff;
       padding: 0.75em 0;
     }
 
-    .sl-vue-tree-sidebar {
+    .sl-vue-tree-next-sidebar {
       margin-right: 1.5em;
     }
   }

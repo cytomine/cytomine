@@ -5,7 +5,7 @@
     <p v-if="errorBadImageProject">{{ $t('error-loading-image-bad-project') }}</p>
   </div>
   <div v-else class="cytomine-viewer">
-    <b-loading :is-full-page="false" :active="loading" />
+    <b-loading :is-full-page="false" :model-value="loading" />
 
     <div class="viewer-main">
       <div v-if="!loading" class="maps-wrapper">
@@ -307,7 +307,7 @@ export default {
   mounted() {
     this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
     clearInterval(this.reloadInterval);
   }

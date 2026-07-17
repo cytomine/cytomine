@@ -14,7 +14,7 @@
 
 <template>
 <div class="list-projects-wrapper content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <div class="box error" v-if="error">
     <h2> {{ $t('error') }} </h2>
     <p>{{ $t('unexpected-error-info-message') }}</p>
@@ -47,7 +47,7 @@
         </button>
       </div>
 
-      <b-collapse :open="filtersOpened">
+      <b-collapse :model-value="filtersOpened">
         <div class="filters">
           <div class="columns">
             <div class="column filter">
@@ -129,11 +129,11 @@
         :collection="projectCollection"
         :is-empty="nbEmptyFilters > 0"
         class="table-projects"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :openedDetailed.sync="openedDetails"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
+        v-model:currentPage="currentPage"
+        v-model:perPage="perPage"
+        v-model:openedDetailed="openedDetails"
+        v-model:sort="sortField"
+        v-model:order="sortOrder"
         :revision="revision"
       >
         <template #default="{row: project}">
@@ -171,7 +171,7 @@
           </b-table-column>
 
           <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-            {{ Number(project.lastActivity) | moment('ll') }}
+            {{ $moment(Number(project.lastActivity)).format('ll') }}
           </b-table-column>
 
           <b-table-column label=" " centered width="150">
@@ -207,7 +207,7 @@
     </div>
   </div>
 
-  <add-project-modal :active.sync="creationModal" :ontologies="ontologies" />
+  <add-project-modal v-model:active="creationModal" :ontologies="ontologies" />
 </div>
 </template>
 

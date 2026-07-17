@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {HorizontalBar} from 'vue-chartjs';
+import {HorizontalBar} from './base-charts';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 export default {

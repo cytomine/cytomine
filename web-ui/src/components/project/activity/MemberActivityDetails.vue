@@ -14,7 +14,7 @@
 
 <template>
 <div class="user-activity-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <div class="content-wrapper" v-if="!loading">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
@@ -38,9 +38,9 @@
         <h1>{{$t('activity-of-user', {username: user.fullName})}}</h1>
 
         <ul>
-          <li><strong>{{$t('registration-date')}}:</strong> {{Number(user.created) | moment('ll LTS')}}</li>
-          <li><strong>{{$t('first-project-connection')}}:</strong> {{Number(resumeActivity.firstConnection) | moment('ll LTS')}}</li>
-          <li><strong>{{$t('last-project-connection')}}:</strong> {{Number(resumeActivity.lastConnection) | moment('ll LTS')}}</li>
+          <li><strong>{{$t('registration-date')}}:</strong> {{ $moment(Number(user.created)).format('ll LTS') }}</li>
+          <li><strong>{{$t('first-project-connection')}}:</strong> {{ $moment(Number(resumeActivity.firstConnection)).format('ll LTS') }}</li>
+          <li><strong>{{$t('last-project-connection')}}:</strong> {{ $moment(Number(resumeActivity.lastConnection)).format('ll LTS') }}</li>
         </ul>
 
         <hr>
@@ -87,11 +87,11 @@
         >
           <template #default="{row: connection}">
             <b-table-column :label="$t('date')" field="created" sortable>
-              {{ Number(connection.created) | moment('ll LT') }}
+              {{ $moment(Number(connection.created)).format('ll LT') }}
             </b-table-column>
 
             <b-table-column :label="$t('duration')" field="time" sortable>
-              {{ connection.time | duration('humanize') }}
+              {{ $moment.duration(connection.time).humanize() }}
               <span class="tag is-success" v-if="connection.online">{{$t('ongoing')}}</span>
             </b-table-column>
 
@@ -190,7 +190,7 @@
             </b-table-column>
 
             <b-table-column :label="$t('duration')" field="time" sortable>
-              {{ consultation.time | duration('humanize') }}
+              {{ $moment.duration(consultation.time).humanize() }}
             </b-table-column>
 
             <b-table-column :label="$t('number-consultations')" field="frequency" centered sortable>
@@ -198,11 +198,11 @@
             </b-table-column>
 
             <b-table-column :label="$t('first-consultation')" field="first" centered sortable>
-              {{ Number(consultation.first) | moment('ll LT')}}
+              {{ $moment(Number(consultation.first)).format('ll LT') }}
             </b-table-column>
 
             <b-table-column :label="$t('last-consultation')" field="last" centered sortable>
-              {{ Number(consultation.last) | moment('ll LT')}}
+              {{ $moment(Number(consultation.last)).format('ll LT') }}
             </b-table-column>
 
             <b-table-column :label="$t('number-annotation-creations')" field="countCreatedAnnotations" centered sortable>
@@ -335,7 +335,7 @@ export default {
     await this.fetchData();
     this.loading = false;
   },
-  destroyed() {
+  unmounted() {
     clearTimeout(this.timeout);
   }
 };

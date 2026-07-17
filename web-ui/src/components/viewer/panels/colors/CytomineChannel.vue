@@ -14,10 +14,10 @@
 
 <template>
 <div>
-  <v-popover
+  <v-dropdown
     placement="right"
-    :popover-inner-class="'color-selector'"
-    :open.sync="showColorSelector"
+    :popper-class="'color-selector'"
+    v-model:shown="showColorSelector"
     :delay="0"
   >
     <div
@@ -26,16 +26,16 @@
       :class="{'is-selected': showColorSelector, 'is-clickable': editableColor}"
       @click="openColorSelector"
     ></div>
-    <template #popover v-if="showColorSelector">
+    <template #popper v-if="showColorSelector">
       <sketch-picker
-        :value="formattedColor"
-        @input="setColor"
+        :model-value="formattedColor"
+        @update:model-value="setColor"
         :presetColors="presetColors"
         :disable-alpha="true"
       />
     </template>
 
-  </v-popover>
+  </v-dropdown>
   <a
     role="button"
     @click.stop="$emit('click')"
@@ -49,7 +49,7 @@
 <script>
 import _ from 'lodash';
 
-import {Sketch} from 'vue-color';
+import {Sketch} from '@ckpack/vue-color';
 
 export default {
   name: 'cytomine-channel',

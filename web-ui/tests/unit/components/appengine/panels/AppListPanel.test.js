@@ -51,7 +51,7 @@ describe('AppListPanel.vue', () => {
 
     const appCards = wrapper.findAllComponents(AppCard);
 
-    appCards.wrappers.forEach((cardWrapper, index) => {
+    appCards.forEach((cardWrapper, index) => {
       expect(cardWrapper.props('app')).toEqual(mockApplications[index]);
     });
   });

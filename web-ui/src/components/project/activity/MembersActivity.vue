@@ -41,7 +41,7 @@
         </div>
       </div>
 
-      <b-collapse :open="filtersOpened">
+      <b-collapse :model-value="filtersOpened">
         <div class="filters columns">
           <div class="column filter">
             <div class="filter-label">
@@ -96,7 +96,7 @@
 
           <b-table-column field="lastConnection" :label="$t('last-connection')" sortable width="100">
             <template v-if="member.lastConnection">
-              {{Number(member.lastConnection) | moment('ll LT')}}
+              {{ $moment(Number(member.lastConnection)).format('ll LT') }}
             </template>
             <em v-else class="has-text-grey">{{$t('no-record')}}</em>
           </b-table-column>

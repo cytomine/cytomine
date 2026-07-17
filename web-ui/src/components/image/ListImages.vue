@@ -22,7 +22,7 @@
   <p>{{ $t('unexpected-error-info-message') }}</p>
 </div>
 <div v-else class="content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('images')}}
@@ -51,7 +51,7 @@
         </button>
       </div>
 
-      <b-collapse :open="filtersOpened">
+      <b-collapse :model-value="filtersOpened">
         <div class="filters">
           <div class="columns">
             <div class="column filter is-one-quarter">
@@ -151,11 +151,11 @@
       <cytomine-table
         :collection="imageCollection"
         :is-empty="nbEmptyFilters > 0"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :openedDetailed.sync="openedDetails"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
+        v-model:currentPage="currentPage"
+        v-model:perPage="perPage"
+        v-model:openedDetailed="openedDetails"
+        v-model:sort="sortField"
+        v-model:order="sortOrder"
         :revision="revision"
       >
         <template #default="{row: image}">
@@ -218,7 +218,7 @@
       </cytomine-table>
     </div>
 
-    <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
+    <add-image-modal v-model:active="addImageModal" @addImage="refreshData" />
   </div>
 </div>
 </template>
@@ -501,7 +501,7 @@ export default {
   align-items: center;
 }
 
-::v-deep .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }
@@ -510,12 +510,12 @@ export default {
   display: flex;
 }
 
-::v-deep .search-images {
+:deep(.search-images) {
   max-width: 30rem;
   margin-right: 1rem;
 }
 
-::v-deep td, ::v-deep th {
+:deep(td), :deep(th) {
   vertical-align: middle !important;
 }
 </style>

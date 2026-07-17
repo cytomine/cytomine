@@ -15,8 +15,8 @@
 
 <template>
 <b-taginput
-  :value="value"
-  @input="$emit('input', $event)"
+  :model-value="modelValue"
+  @update:model-value="$emit('update:modelValue', $event)"
   :data="filteredDomains"
   autocomplete
   :open-on-focus="true"
@@ -36,7 +36,7 @@ import {getWildcardRegexp} from '@/utils/string-utils';
 export default {
   name: 'domain-tag-input',
   props: {
-    value: Array,
+    modelValue: Array,
     domains: Array,
     identifier: {
       type: String,
@@ -66,7 +66,7 @@ export default {
   },
   computed: {
     filteredDomains() {
-      let selectedIds = this.value.map(v => v[this.identifier]);
+      let selectedIds = this.modelValue.map(v => v[this.identifier]);
       let filtered = this.domains.filter(user => !selectedIds.includes(user[this.identifier]));
       if (this.searchString === '') {
         return filtered;

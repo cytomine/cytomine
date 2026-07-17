@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-loading class="small" :active="loading" :is-full-page="false"/>
+    <b-loading class="small" :model-value="loading" :is-full-page="false"/>
 
     <div v-if="!loading" class="image-content">
       <selectable-image
@@ -51,7 +51,7 @@ export default {
   },
   watch: {
     selectedImages(images) {
-      this.$emit('input', images);
+      this.$emit('update:modelValue', images);
     }
   },
   async created() {

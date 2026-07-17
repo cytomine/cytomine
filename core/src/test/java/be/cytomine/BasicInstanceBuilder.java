@@ -87,7 +87,8 @@ public class BasicInstanceBuilder {
 
     SecRoleRepository secRoleRepository;
 
-    UserResponseRepository userRepository;
+    UserRepository userRepository;
+    UserResponseRepository userResponseRepository;
 
     ApplicationBootstrap applicationBootstrap;
 
@@ -98,9 +99,10 @@ public class BasicInstanceBuilder {
     public BasicInstanceBuilder(
         EntityManager em,
         TransactionTemplate transactionTemplate,
-        UserResponseRepository userRepository,
+        UserRepository userRepository,
         PermissionService permissionService,
         SecRoleRepository secRoleRepository,
+        UserResponseRepository userResponseRepository,
         ApplicationBootstrap applicationBootstrap
     ) {
         if (secRoleRepository.count() == 0) {
@@ -111,6 +113,7 @@ public class BasicInstanceBuilder {
         this.permissionService = permissionService;
         this.secRoleRepository = secRoleRepository;
         this.transactionTemplate = transactionTemplate;
+        this.userResponseRepository = userResponseRepository;
 
         this.transactionTemplate.execute(new TransactionCallbackWithoutResult() {
             @Override
@@ -123,7 +126,7 @@ public class BasicInstanceBuilder {
         });
     }
 
-    public UserResponse givenDefaultUser() {
+    public User givenDefaultUser() {
         if (aUser == null) {
             aUser = givenAUser("user");
         }
@@ -145,7 +148,7 @@ public class BasicInstanceBuilder {
     }
 
 
-    public UserResponse givenAUser(String username) {
+    public User givenAUser(String username) {
         User user = persistAndReturn(givenANotPersistedUser());
         user.setUsername(username);
         user = persistAndReturn(user);

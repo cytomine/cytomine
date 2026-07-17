@@ -34,7 +34,7 @@
 
 <script>
 import {Tag} from '@/api';
-import CytomineModal from '@/components/utils/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
 
 export default {
   name: 'tag-modal',

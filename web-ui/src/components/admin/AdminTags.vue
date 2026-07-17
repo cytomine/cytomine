@@ -88,7 +88,7 @@
 <script>
 import {TagCollection} from '@/api';
 import {getWildcardRegexp} from '@/utils/string-utils';
-import TagModal from '@/components/tag/TagModal';
+import TagModal from '@/components/tag/TagModal.vue';
 
 export default {
   name: 'admin-tags',

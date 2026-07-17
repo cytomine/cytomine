@@ -91,7 +91,7 @@
 <script>
 import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
-import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable';
+import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable.vue';
 import {get} from '@/utils/store-helpers';
 import {formatDate} from '@/utils/date';
 

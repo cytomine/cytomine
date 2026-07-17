@@ -168,13 +168,13 @@ limitations under the License.-->
 <script>
 import {get, sync, syncBoundsFilter} from '@/utils/store-helpers';
 
-import CytomineSlider from '@/components/form/CytomineSlider';
+import CytomineSlider from '@/components/form/CytomineSlider.vue';
 
-import ImageGroupDetails from '@/components/image-group/ImageGroupDetails';
-import ImageGroupPreview from '@/components/image-group/ImageGroupPreview';
-import AddImageGroupModal from '@/components/image-group/AddImageGroupModal';
-import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal';
-import OpenImageGroupButton from '@/components/image-group/OpenImageGroupButton';
+import ImageGroupDetails from '@/components/image-group/ImageGroupDetails.vue';
+import ImageGroupPreview from '@/components/image-group/ImageGroupPreview.vue';
+import AddImageGroupModal from '@/components/image-group/AddImageGroupModal.vue';
+import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal.vue';
+import OpenImageGroupButton from '@/components/image-group/OpenImageGroupButton.vue';
 
 import {ImageGroupCollection} from '@/api';
 import {getWildcardRegexp} from '@/utils/string-utils';

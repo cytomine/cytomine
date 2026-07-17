@@ -36,8 +36,8 @@
 import {get} from '@/utils/store-helpers';
 
 import {UserCollection} from '@/api';
-import DomainTagInput from '@/components/utils/DomainTagInput';
-import CytomineModal from '@/components/utils/CytomineModal';
+import DomainTagInput from '@/components/utils/DomainTagInput.vue';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
 
 export default {
   name: 'add-member-modal',

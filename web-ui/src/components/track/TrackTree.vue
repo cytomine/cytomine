@@ -64,8 +64,8 @@
 
 <script>
 import SlVueTree from 'sl-vue-tree';
-import CytomineTrack from './CytomineTrack';
-import TrackModal from './TrackModal';
+import CytomineTrack from './CytomineTrack.vue';
+import TrackModal from './TrackModal.vue';
 import {Track} from '@/api';
 
 export default {

@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import CytomineModal from '@/components/utils/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
 
 export default {
   name: 'magnification-modal',

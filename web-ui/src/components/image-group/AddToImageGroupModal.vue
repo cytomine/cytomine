@@ -76,9 +76,9 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {ImageInstanceCollection, ImageGroupImageInstance} from '@/api';
-import CytomineModal from '@/components/utils/CytomineModal';
-import CytomineTable from '@/components/utils/CytomineTable';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
+import CytomineTable from '@/components/utils/CytomineTable.vue';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 
 export default {
   name: 'add-to-image-group-modal',

@@ -38,8 +38,8 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import ImageName from '@/components/image/ImageName';
-import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
+import ImageName from '@/components/image/ImageName.vue';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
 
 import {AnnotationGroup, AnnotationLink} from '@/api';
 import {listAnnotationsInGroup} from '@/utils/annotation-utils';

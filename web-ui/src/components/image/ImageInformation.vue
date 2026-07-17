@@ -65,8 +65,8 @@
 </template>
 
 <script>
-import ImageName from './ImageName';
-import ImageDetails from './ImageDetails';
+import ImageName from './ImageName.vue';
+import ImageDetails from './ImageDetails.vue';
 
 import {ImageInstance} from '@/api';
 import vendorFromFormat from '@/utils/vendor';

@@ -257,14 +257,14 @@
 <script>
 import _ from 'lodash';
 import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
-import ImageName from '@/components/image/ImageName';
-import CytomineTable from '@/components/utils/CytomineTable';
-import ProjectDetails from '@/components/project/ProjectDetails';
-import ImageDetails from '@/components/image/ImageDetails';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import ImageName from '@/components/image/ImageName.vue';
+import CytomineTable from '@/components/utils/CytomineTable.vue';
+import ProjectDetails from '@/components/project/ProjectDetails.vue';
+import ImageDetails from '@/components/image/ImageDetails.vue';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
 import {ImageInstanceCollection, ProjectCollection, TagCollection} from '@/api';
-import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {

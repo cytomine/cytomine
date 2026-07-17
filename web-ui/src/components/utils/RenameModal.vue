@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import CytomineModal from './CytomineModal';
+import CytomineModal from './CytomineModal.vue';
 
 export default {
   name: 'rename-modal',

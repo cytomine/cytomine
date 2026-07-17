@@ -44,7 +44,7 @@ import VTooltip from 'v-tooltip';
 Vue.use(VTooltip);
 
 import VueMoment from 'vue-moment';
-const moment = require('moment');
+import moment from 'moment';
 Vue.use(VueMoment, {moment});
 
 import VueShortKey from 'vue-shortkey';

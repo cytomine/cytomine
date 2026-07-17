@@ -147,7 +147,7 @@ public class TagDomainAssociationCommandService implements
     }
 
     public Set<HttpCommandResponse> deleteByTagId(long userId, long tagId, LocalDateTime now, UUID parentCommandId) {
-        return tagDomainAssociationRepository.findAllIdsByTagIdAndDeletedNull(tagId)
+        return tagDomainAssociationRepository.findAllIdsByTagId(tagId)
             .stream()
             .map(associationId -> delete(userId, associationId, now, Optional.of(parentCommandId)))
             .flatMap(Optional::stream)

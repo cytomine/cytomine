@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.project.ProjectService;

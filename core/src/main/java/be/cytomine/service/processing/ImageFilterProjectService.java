@@ -18,7 +18,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.processing.ImageFilter;
 import be.cytomine.domain.processing.ImageFilterProject;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.processing.ImageFilterProjectRepository;

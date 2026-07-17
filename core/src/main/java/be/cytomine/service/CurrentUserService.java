@@ -62,13 +62,13 @@ public class CurrentUserService {
         return user;
     }
 
-    public User getCurrentUserOld(){
-        return userRepository.findById(getCurrentUser().id()).orElseThrow();
-    }
-
     public UserResponse getCurrentUser(String username) {
         return userHttpContract.search(username)
             .orElseThrow(() -> new ServerException("Cannot find current user with username " + username));
+    }
+
+    public User getCurrentUserOld() {
+        return userRepository.findById(getCurrentUser().id()).orElseThrow();
     }
 
     public static Optional<CurrentUser> getSecurityCurrentUser() {

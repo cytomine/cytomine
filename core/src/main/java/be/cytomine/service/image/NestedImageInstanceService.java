@@ -19,7 +19,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.NestedImageInstance;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.image.NestedImageInstanceRepository;
 import be.cytomine.service.CurrentUserService;
@@ -104,7 +103,8 @@ public class NestedImageInstanceService extends ModelService {
         securityACLService.check(jsonNewData.getJSONAttrLong("project"), Project.class, READ);
         securityACLService.checkIsNotReadOnly(domain.container());
         securityACLService.checkIsNotReadOnly(jsonNewData.getJSONAttrLong("project"), Project.class);
-        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+        return executeCommand(
+            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
     }
 
     /**

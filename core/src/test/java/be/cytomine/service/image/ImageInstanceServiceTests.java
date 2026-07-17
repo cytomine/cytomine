@@ -310,7 +310,8 @@ public class ImageInstanceServiceTests {
         Date consultation = new Date();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
-        imageConsultationService.add(builder.givenSuperAdmin().getId(), imageInstance1.getId(), "xxx", "view", consultation);
+        imageConsultationService.add(builder.givenSuperAdmin().getId(), imageInstance1.getId(), "xxx", "view",
+            consultation);
 
         ImageSearchExtension imageSearchExtension = new ImageSearchExtension();
         imageSearchExtension.setWithLastActivity(true);
@@ -788,7 +789,8 @@ public class ImageInstanceServiceTests {
             0d,
             false
         );
-        imageConsultationService.add(builder.givenSuperAdmin().getId(), imageInstance.getId(), "xxx", "view", new Date());
+        imageConsultationService.add(builder.givenSuperAdmin().getId(), imageInstance.getId(), "xxx", "view",
+            new Date());
 
         AssertionsForClassTypes.assertThat(entityManager.find(ReviewedAnnotation.class, reviewedAnnotation.getId()))
             .isNotNull();

@@ -24,16 +24,16 @@ public interface BaseMapper {
         return t.orElse(null);
     }
 
+    default Optional<LocalDateTime> map(Date maybeDate) {
+        return Optional.ofNullable(maybeDate)
+            .map(date -> LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
+    }
+
     default LocalDateTime mapTimestamp(Timestamp value) {
         return value.toInstant().atZone(ZoneOffset.systemDefault()).toLocalDateTime();
     }
 
     default Optional<LocalDateTime> mapToLocalDateTime(Timestamp value) {
         return Optional.ofNullable(value).map(this::mapTimestamp);
-    }
-
-    default Optional<LocalDateTime> map(Date maybeDate) {
-        return Optional.ofNullable(maybeDate)
-            .map(date -> LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
     }
 }

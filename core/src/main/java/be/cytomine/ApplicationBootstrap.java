@@ -155,8 +155,8 @@ class ApplicationBootstrap {
                 .orElseThrow(() -> new ObjectNotFoundException("No user imageserver1, cannot assign keys"));
             userHttpContract.update(imageServerUser.id(), imageServerUser.id(), new UpdateUser(Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty()
-                , Optional.of(applicationProperties.getImageServerPrivateKey()),
+                Optional.empty(),
+                Optional.of(applicationProperties.getImageServerPrivateKey()),
                 Optional.of(applicationProperties.getImageServerPublicKey()), Optional.empty()));
         }
 

@@ -16,7 +16,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.meta.AttachedFileRepository;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;

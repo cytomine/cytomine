@@ -17,7 +17,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.InvalidRequestException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationGroupRepository;
@@ -98,7 +97,8 @@ public class AnnotationGroupService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+        return executeCommand(
+            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
     }
 
     @Override

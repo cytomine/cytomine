@@ -20,7 +20,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.AnnotationTrack;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.image.SliceInstanceRepository;
 import be.cytomine.repository.ontology.AnnotationIndexRepository;
@@ -117,7 +116,8 @@ public class SliceInstanceService extends ModelService {
         securityACLService.check(jsonNewData.getJSONAttrLong("project"), Project.class, READ);
         securityACLService.checkIsNotReadOnly(domain.container());
         securityACLService.checkIsNotReadOnly(jsonNewData.getJSONAttrLong("project"), Project.class);
-        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+        return executeCommand(
+            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
     }
 
     /**

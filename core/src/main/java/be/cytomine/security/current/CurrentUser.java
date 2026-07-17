@@ -17,7 +17,6 @@ package be.cytomine.security.current;
  */
 
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.domain.security.User;
 
 public interface CurrentUser {
 

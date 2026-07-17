@@ -153,10 +153,12 @@ public class ImageConsultationResourceTests {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        imageConsultationService.add(user.getId(), imageInstance1.getId(), "xxx", "mode", DateUtils.addSeconds(new Date(),
-            -3));
-        imageConsultationService.add(user.getId(), imageInstance1.getId(), "xxx", "mode", DateUtils.addSeconds(new Date(), -2));
-        imageConsultationService.add(user.getId(), imageInstance2.getId(), "xxx", "mode", DateUtils.addSeconds(new Date(), -1));
+        imageConsultationService.add(user.getId(), imageInstance1.getId(), "xxx", "mode",
+            DateUtils.addSeconds(new Date(), -3));
+        imageConsultationService.add(user.getId(), imageInstance1.getId(), "xxx", "mode",
+            DateUtils.addSeconds(new Date(), -2));
+        imageConsultationService.add(user.getId(), imageInstance2.getId(), "xxx", "mode",
+            DateUtils.addSeconds(new Date(), -1));
 
         restImageConsultationControllerMockMvc.perform(get("/api/imageinstance/method/lastopened.json")
                 .param("max", "10"))

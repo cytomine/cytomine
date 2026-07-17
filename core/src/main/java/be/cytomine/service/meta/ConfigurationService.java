@@ -19,7 +19,6 @@ import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.domain.meta.ConfigurationReadingRole;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.repository.meta.ConfigurationRepository;
@@ -99,7 +98,8 @@ public class ConfigurationService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         UserResponse currentUser = currentUserService.getCurrentUser();
-        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+        return executeCommand(
+            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
     }
 
     @Override

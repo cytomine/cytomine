@@ -124,7 +124,8 @@ public class AbstractSliceService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), WRITE);
-        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+        return executeCommand(
+            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
     }
 
     /**

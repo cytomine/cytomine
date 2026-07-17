@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.utils.WeakConcurrentHashMap;
 
@@ -96,8 +95,8 @@ public class CurrentRoleService {
 
         boolean isSuperAdmin = user.roles().stream().anyMatch(role -> role.authority().equals("ROLE_SUPER_ADMIN"));
         // role super admin don't need to open a admin session, so we don't remove the role admin from the current role
-        return !currentAdmins.containsKey(user.username()) && !isSuperAdmin ?
-            user.roles().stream()
+        return !currentAdmins.containsKey(user.username()) && !isSuperAdmin
+            ? user.roles().stream()
                 .filter(role -> !role.authority().equals("ROLE_ADMIN"))
                 .collect(Collectors.toSet()) : user.roles();
     }

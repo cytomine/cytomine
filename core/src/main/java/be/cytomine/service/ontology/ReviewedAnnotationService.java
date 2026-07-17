@@ -221,7 +221,8 @@ public class ReviewedAnnotationService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.checkIsCreator(domain, currentUser);
-        CommandResponse result = executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), null), domain, jsonNewData);
+        CommandResponse result = executeCommand(
+            new EditCommand(currentUserService.getCurrentUserOld(), null), domain, jsonNewData);
         return result;
     }
 

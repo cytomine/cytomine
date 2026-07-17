@@ -18,7 +18,6 @@ import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.meta.Tag;
 import be.cytomine.domain.meta.TagDomainAssociation;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.meta.TagDomainAssociationRepository;
 import be.cytomine.repository.meta.TagRepository;
@@ -83,7 +82,8 @@ public class TagService extends ModelService {
             //if not admin then check if there is no association
             securityACLService.checkAdmin(currentUser);
         }
-        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+        return executeCommand(
+            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
     }
 
     @Override

@@ -19,7 +19,6 @@ import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.RedoStackItem;
 import be.cytomine.domain.command.UndoStackItem;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.command.CommandRepository;
 import be.cytomine.service.CommandService;

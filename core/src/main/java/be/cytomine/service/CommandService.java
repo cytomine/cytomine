@@ -21,7 +21,6 @@ import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.RedoStackItem;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.command.UndoStackItem;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.command.CommandRepository;
@@ -179,7 +178,7 @@ public class CommandService {
         return redo(null);
     }
 
-    public List<CommandResponse> redo(RedoStackItem redoItem,long userId) {
+    public List<CommandResponse> redo(RedoStackItem redoItem, long userId) {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
@@ -211,7 +210,8 @@ public class CommandService {
         UserResponse user = currentUserService.getCurrentUser();
         Optional<RedoStackItem> lastRedoStackItem;
         if (commandId != null) {
-            lastRedoStackItem = commandRepository.findLastRedoStackItem(user.id(), commandRepository.getById(commandId));
+            lastRedoStackItem =
+                commandRepository.findLastRedoStackItem(user.id(), commandRepository.getById(commandId));
         } else {
             lastRedoStackItem = commandRepository.findLastRedoStackItem(user.id());
         }

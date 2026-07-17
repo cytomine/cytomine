@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.auth.AuthInformation;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;

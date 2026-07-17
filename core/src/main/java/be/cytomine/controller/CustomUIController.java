@@ -22,7 +22,6 @@ import be.cytomine.common.repository.model.command.payload.response.RoleResponse
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.SecRole;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.CurrentRoleService;

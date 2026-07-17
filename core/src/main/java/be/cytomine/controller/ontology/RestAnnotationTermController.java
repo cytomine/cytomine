@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.ontology.AnnotationDomain;
@@ -175,7 +174,7 @@ public class RestAnnotationTermController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm));
         long userId = userService.find(idUser != null ? idUser : -1L)
             .map(CytomineDomain::getId)
-            .orElse( currentUserService.getCurrentUser().id());
+            .orElse(currentUserService.getCurrentUser().id());
         return delete(
             annotationTermService,
             JsonObject.of(

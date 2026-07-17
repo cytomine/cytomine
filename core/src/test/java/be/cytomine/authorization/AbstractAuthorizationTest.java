@@ -12,7 +12,6 @@ import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;

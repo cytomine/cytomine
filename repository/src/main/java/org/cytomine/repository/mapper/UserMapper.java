@@ -12,6 +12,7 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.request.UserCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
+import be.cytomine.common.repository.utils.BaseMapper;
 import be.cytomine.common.repository.utils.Language;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class, RoleMapper.class})

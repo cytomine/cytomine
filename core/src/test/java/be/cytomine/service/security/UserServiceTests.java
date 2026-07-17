@@ -41,6 +41,7 @@ import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.domain.social.PersistentUserPosition;
 import be.cytomine.dto.auth.AuthInformation;
 import be.cytomine.dto.image.AreaDTO;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 import be.cytomine.repositorynosql.social.LastUserPositionRepository;
 import be.cytomine.repositorynosql.social.PersistentConnectionRepository;
@@ -77,52 +78,39 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @Transactional
 public class UserServiceTests {
 
+    private static WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     UserService userService;
-
     @Autowired
     private ProjectMemberService projectMemberService;
-
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private ImageConsultationService imageConsultationService;
-
     @Autowired
     private ProjectConnectionService projectConnectionService;
-
     @Autowired
     private PersistentConnectionRepository persistentConnectionRepository;
-
     @Autowired
     private LastConnectionRepository lastConnectionRepository;
-
     @Autowired
     private PersistentImageConsultationRepository persistentImageConsultationRepository;
-
     @Autowired
     private PersistentProjectConnectionRepository persistentProjectConnectionRepository;
-
     @Autowired
     private ProjectConnectionRepository projectConnectionRepository;
-
     @Autowired
     private PersistentUserPositionRepository persistentUserPositionRepository;
-
     @Autowired
     private LastUserPositionRepository lastUserPositionRepository;
-
     @Autowired
     private SequenceService sequenceService;
-
     @Autowired
     private PermissionService permissionService;
-
     @Autowired
     private UserPositionService userPositionService;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
+    @Autowired
+    private UserMapper userMapper;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -163,7 +151,7 @@ public class UserServiceTests {
 
     PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
         return projectConnectionService.add(
-            user,
+            user.getId(),
             project,
             "xxx",
             "linux",
@@ -178,7 +166,7 @@ public class UserServiceTests {
         ImageInstance imageInstance,
         Date created
     ) {
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
     PersistentConnection givenALastConnection(User user, Long idProject, Date date) {
@@ -228,7 +216,7 @@ public class UserServiceTests {
     @Test
     void getAuthRolesForUser() {
         User user = builder.givenAUser();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isFalse();
         assertThat(authInformation.getUser()).isTrue();
         assertThat(authInformation.getGuest()).isFalse();
@@ -238,11 +226,10 @@ public class UserServiceTests {
         assertThat(authInformation.getGuestByNow()).isFalse();
     }
 
-
     @Test
     void getAuthRolesForGuest() {
         User user = builder.givenAGuest();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isFalse();
         assertThat(authInformation.getUser()).isFalse();
         assertThat(authInformation.getGuest()).isTrue();
@@ -255,7 +242,7 @@ public class UserServiceTests {
     @Test
     void getAuthRolesForSuperamdin() {
         User user = builder.givenSuperAdmin();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isTrue();
         assertThat(authInformation.getUser()).isFalse();
         assertThat(authInformation.getGuest()).isFalse();
@@ -268,7 +255,7 @@ public class UserServiceTests {
     @Test
     void getAuthRolesForAdmin() {
         User user = builder.givenAnAdmin();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isTrue();
         assertThat(authInformation.getUser()).isFalse();
         assertThat(authInformation.getGuest()).isFalse();
@@ -585,7 +572,6 @@ public class UserServiceTests {
             .collect(Collectors.toList())).contains(user.getId());
     }
 
-
     @Test
     void listUserExtendedWithLastImageName() {
         User userWhoHasOpenImage = builder.givenAUser();
@@ -626,7 +612,6 @@ public class UserServiceTests {
         );
         assertThat(page.getContent().stream().map(x -> x.getJSONAttrLong("lastImage"))).contains(imageInstance.getId());
     }
-
 
     @Test
     void listUserExtendedWithLastConnection() {
@@ -926,13 +911,11 @@ public class UserServiceTests {
             DateUtils.addSeconds(new Date(), -10)
         );
 
-
         assertThat(userService.getAllOnlineUserIds(project)).contains(userOnline.getId())
             .doesNotContain(userOnlineButOnDifferentProject.getId(), userOffline.getId());
         assertThat(userService.getAllOnlineUsers(project)).contains(userOnline)
             .doesNotContain(userOnlineButOnDifferentProject, userOffline);
     }
-
 
     @Test
     void listFriendUsers() {
@@ -1020,7 +1003,6 @@ public class UserServiceTests {
         assertThat(allOnlineUserWithTheirPositions.get(0).get("frequency")).isEqualTo(1);
     }
 
-
     @Test
     void listOnlineUserForProjectWitTheirPosition() {
         User userOnline = builder.givenDefaultUser();
@@ -1071,7 +1053,7 @@ public class UserServiceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,
@@ -1100,7 +1082,7 @@ public class UserServiceTests {
 
         givenAPersistentImageConsultation(userOnline, builder.givenAnImageInstance(project), new Date());
 
-        JsonObject data = userService.getResumeActivities(project, userOnline);
+        JsonObject data = userService.getResumeActivities(project, userMapper.map(userOnline));
 
         assertThat(data.getJSONAttrDate("firstConnection")).isEqualTo(firstConnection.getCreated());
         assertThat(data.getJSONAttrDate("lastConnection")).isEqualTo(lastConnection.getCreated());

@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.request.StorageCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.storage.payload.CreateStorage;
+import be.cytomine.common.repository.utils.BaseMapper;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface StorageMapper {

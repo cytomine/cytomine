@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.request.RoleCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import be.cytomine.common.repository.model.role.payload.CreateRole;
+import be.cytomine.common.repository.utils.BaseMapper;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface RoleMapper {

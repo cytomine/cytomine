@@ -15,6 +15,7 @@ import org.mapstruct.Named;
 import be.cytomine.common.repository.model.command.payload.request.UploadedFileCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
+import be.cytomine.common.repository.utils.BaseMapper;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface UploadedFileMapper {

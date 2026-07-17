@@ -127,23 +127,16 @@ public class StatsServiceTests {
     }
 
     PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
-        return projectConnectionService.add(user, project, "xxx", "linux", "chrome", "123", created);
+        return projectConnectionService.add(user.getId(), project, "xxx", "linux", "chrome", "123", created);
     }
 
-    PersistentImageConsultation givenAPersistentImageConsultation(
-        User user,
-        ImageInstance imageInstance,
-        Date created
-    ) {
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+    PersistentImageConsultation givenAPersistentImageConsultation(User user, ImageInstance imageInstance,
+        Date created) {
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
-    AnnotationAction givenAPersistentAnnotationAction(
-        Date creation,
-        AnnotationDomain annotationDomain,
-        User user,
-        String action
-    ) {
+    AnnotationAction givenAPersistentAnnotationAction(Date creation, AnnotationDomain annotationDomain, User user,
+        String action) {
         return annotationActionService.add(annotationDomain, user, action, creation);
     }
 
@@ -179,10 +172,8 @@ public class StatsServiceTests {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
         entityManager.refresh(annotationTerm.getUserAnnotation());
 
-        List<JsonObject> jsonObjects = statsService.statAnnotationTermedByProject(
-            annotationTerm.getTerm().getId(),
-            annotationTerm.getTerm().getOntology().getId()
-        );
+        List<JsonObject> jsonObjects = statsService.statAnnotationTermedByProject(annotationTerm.getTerm().getId(),
+            annotationTerm.getTerm().getOntology().getId());
         assertThat(jsonObjects).hasSize(1);
         assertThat(jsonObjects.getFirst().get("username")).isEqualTo(project.getName());
         assertThat(jsonObjects.getFirst().get("value")).isEqualTo(1L);
@@ -198,30 +189,16 @@ public class StatsServiceTests {
         annotation2.setCreated(DateUtils.addDays(new Date(), -10));
         builder.persistAndReturn(annotation2);
 
-        List<JsonObject> jsonObjects = statsService.statAnnotationEvolution(
-            project,
-            Optional.empty(),
-            7,
-            DateUtils.addDays(new Date(), -30),
-            DateUtils.addDays(new Date(), 0),
-            true,
-            false
-        );
+        List<JsonObject> jsonObjects =
+            statsService.statAnnotationEvolution(project, Optional.empty(), 7, DateUtils.addDays(new Date(), -30),
+                DateUtils.addDays(new Date(), 0), true, false);
 
         assertThat(jsonObjects).hasSize(5);
-        assertThat(jsonObjects.stream()
-            .filter(x -> x.getJSONAttrLong("size") == 1)
-            .collect(Collectors.toList())).hasSize(2);
+        assertThat(
+            jsonObjects.stream().filter(x -> x.getJSONAttrLong("size") == 1).collect(Collectors.toList())).hasSize(2);
 
-        statsService.statAnnotationEvolution(
-            project,
-            Optional.of(builder.givenATerm(project.getOntology()).getId()),
-            7,
-            DateUtils.addDays(new Date(), -30),
-            DateUtils.addDays(new Date(), 0),
-            true,
-            false
-        );
+        statsService.statAnnotationEvolution(project, Optional.of(builder.givenATerm(project.getOntology()).getId()), 7,
+            DateUtils.addDays(new Date(), -30), DateUtils.addDays(new Date(), 0), true, false);
     }
 
     @Test
@@ -234,30 +211,16 @@ public class StatsServiceTests {
         annotation2.setCreated(DateUtils.addDays(new Date(), -10));
         builder.persistAndReturn(annotation2);
 
-        List<JsonObject> jsonObjects = statsService.statReviewedAnnotationEvolution(
-            project,
-            Optional.empty(),
-            7,
-            DateUtils.addDays(new Date(), -30),
-            DateUtils.addDays(new Date(), 0),
-            true,
-            false
-        );
+        List<JsonObject> jsonObjects = statsService.statReviewedAnnotationEvolution(project, Optional.empty(), 7,
+            DateUtils.addDays(new Date(), -30), DateUtils.addDays(new Date(), 0), true, false);
 
         assertThat(jsonObjects).hasSize(5);
-        assertThat(jsonObjects.stream()
-            .filter(x -> x.getJSONAttrLong("size") == 1)
-            .collect(Collectors.toList())).hasSize(2);
+        assertThat(
+            jsonObjects.stream().filter(x -> x.getJSONAttrLong("size") == 1).collect(Collectors.toList())).hasSize(2);
 
-        statsService.statReviewedAnnotationEvolution(
-            project,
-            Optional.of(builder.givenATerm(project.getOntology()).getId()),
-            7,
-            DateUtils.addDays(new Date(), -30),
-            DateUtils.addDays(new Date(), 0),
-            true,
-            false
-        );
+        statsService.statReviewedAnnotationEvolution(project,
+            Optional.of(builder.givenATerm(project.getOntology()).getId()), 7, DateUtils.addDays(new Date(), -30),
+            DateUtils.addDays(new Date(), 0), true, false);
     }
 
     @Test
@@ -290,42 +253,29 @@ public class StatsServiceTests {
 
         assertThat(results).hasSize(2);
 
-        results = statsService.statUserSlide(
-            project,
-            DateUtils.addDays(new Date(), -40),
-            DateUtils.addDays(new Date(), -20)
-        );
+        results =
+            statsService.statUserSlide(project, DateUtils.addDays(new Date(), -40), DateUtils.addDays(new Date(), -20));
 
         assertThat(results).hasSize(2);
         assertThat(results.get(0).get("value")).isEqualTo(0);
         assertThat(results.get(1).get("value")).isEqualTo(0);
     }
 
-
     @Test
     void statsTermSlide() {
         Project project = builder.givenAProject();
         long userId = builder.givenSuperAdmin().getId();
 
-        when(statsHttpContract.findTermsByProject(
-            project.getId(),
-            userId,
-            Optional.empty(),
-            Optional.empty(),
-            Pageable.unpaged()
-        )).thenReturn(new PageImpl<>(List.of()));
+        when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
+            Pageable.unpaged())).thenReturn(new PageImpl<>(List.of()));
         List<StatTerm> results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         assertThat(results).hasSize(0);
 
         Term term = builder.givenATerm(project.getOntology());
 
-        when(statsHttpContract.findTermsByProject(
-            project.getId(),
-            userId,
-            Optional.empty(),
-            Optional.empty(),
-            Pageable.unpaged()
-        )).thenReturn(new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 0))));
+        when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
+            Pageable.unpaged())).thenReturn(
+            new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 0))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().id()).isEqualTo(term.getId());
@@ -336,13 +286,9 @@ public class StatsServiceTests {
         builder.givenAnAnnotationTerm(annotation1, term);
         builder.persistAndReturn(annotation1);
 
-        when(statsHttpContract.findTermsByProject(
-            project.getId(),
-            userId,
-            Optional.empty(),
-            Optional.empty(),
-            Pageable.unpaged()
-        )).thenReturn(new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 1))));
+        when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
+            Pageable.unpaged())).thenReturn(
+            new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 1))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().id()).isEqualTo(term.getId());
@@ -350,31 +296,19 @@ public class StatsServiceTests {
 
         Term term2 = builder.givenATerm(project.getOntology());
 
-        when(statsHttpContract.findTermsByProject(
-            project.getId(),
-            userId,
-            Optional.empty(),
-            Optional.empty(),
-            Pageable.unpaged()
-        )).thenReturn(new PageImpl<>(List.of(
-            new StatTerm(term.getId(), term.getName(), term.getColor(), 1),
-            new StatTerm(term2.getId(), term2.getName(), term2.getColor(), 0)
-        )));
+        when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
+            Pageable.unpaged())).thenReturn(new PageImpl<>(
+            List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 1),
+                new StatTerm(term2.getId(), term2.getName(), term2.getColor(), 0))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         assertThat(results).hasSize(2);
 
         Optional<LocalDateTime> startDate = Optional.of(LocalDateTime.now().minusDays(42));
         Optional<LocalDateTime> endDate = Optional.of(LocalDateTime.now().minusDays(20));
-        when(statsHttpContract.findTermsByProject(
-            project.getId(),
-            userId,
-            startDate,
-            endDate,
-            Pageable.unpaged()
-        )).thenReturn(new PageImpl<>(List.of(
-            new StatTerm(term.getId(), term.getName(), term.getColor(), 0),
-            new StatTerm(term2.getId(), term2.getName(), term2.getColor(), 0)
-        )));
+        when(statsHttpContract.findTermsByProject(project.getId(), userId, startDate, endDate,
+            Pageable.unpaged())).thenReturn(new PageImpl<>(
+            List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 0),
+                new StatTerm(term2.getId(), term2.getName(), term2.getColor(), 0))));
         results = statsService.statTermSlide(project, startDate, endDate);
         assertThat(results).hasSize(2);
         assertThat(results.get(0).count()).isEqualTo(0);
@@ -386,13 +320,8 @@ public class StatsServiceTests {
         Project project = builder.givenAProject();
         long userId = builder.givenSuperAdmin().getId();
 
-        when(statsHttpContract.findTermsByProject(
-            eq(project.getId()),
-            eq(userId),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Pageable.unpaged())
-        )).thenReturn(new PageImpl<>(List.of()));
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), eq(Optional.empty()),
+            eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(new PageImpl<>(List.of()));
         List<JsonObject> results = statsService.statTerm(project, null, null, false);
 
         assertThat(results).hasSize(0); //no term
@@ -402,13 +331,9 @@ public class StatsServiceTests {
         long termId = annotationTerm.getTerm().getId();
         Term term = annotationTerm.getTerm();
 
-        when(statsHttpContract.findTermsByProject(
-            eq(project.getId()),
-            eq(userId),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Pageable.unpaged())
-        )).thenReturn(new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 1))));
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), eq(Optional.empty()),
+            eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(
+            new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 1))));
         results = statsService.statTerm(project, null, null, false);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().getId()).isEqualTo(annotationTerm.getTerm().getId());
@@ -419,31 +344,19 @@ public class StatsServiceTests {
         builder.givenAnAnnotationTerm(annotation1, annotationTerm.getTerm());
         builder.persistAndReturn(annotation1);
 
-        when(statsHttpContract.findTermsByProject(
-            eq(project.getId()),
-            eq(userId),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Pageable.unpaged())
-        )).thenReturn(new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 2))));
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), eq(Optional.empty()),
+            eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(
+            new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 2))));
         results = statsService.statTerm(project, null, null, false);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().getId()).isEqualTo(annotationTerm.getTerm().getId());
         assertThat(results.getFirst().get("value")).isEqualTo(2L);
 
-        when(statsHttpContract.findTermsByProject(
-            eq(project.getId()),
-            eq(userId),
-            any(),
-            any(),
-            eq(Pageable.unpaged())
-        )).thenReturn(new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 0))));
-        results = statsService.statTerm(
-            project,
-            DateUtils.addDays(new Date(), -40),
-            DateUtils.addDays(new Date(), -20),
-            false
-        );
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(), any(),
+            eq(Pageable.unpaged()))).thenReturn(
+            new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 0))));
+        results = statsService.statTerm(project, DateUtils.addDays(new Date(), -40), DateUtils.addDays(new Date(), -20),
+            false);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().get("value")).isEqualTo(0L);
     }
@@ -452,12 +365,8 @@ public class StatsServiceTests {
     void statPerTermAndImage() {
         Project project = builder.givenAProject();
 
-        when(statsHttpContract.findPerTermAndImageByProject(
-            eq(project.getId()),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Pageable.unpaged())
-        )).thenReturn(new PageImpl<>(List.of()));
+        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), eq(Optional.empty()),
+            eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(new PageImpl<>(List.of()));
         List<StatPerTermAndImage> results = statsService.statPerTermAndImage(project, null, null);
 
         assertThat(results).hasSize(0); //no annotations
@@ -467,48 +376,34 @@ public class StatsServiceTests {
         long termId = annotationTerm.getTerm().getId();
         long imageId = annotationTerm.getUserAnnotation().getImage().getId();
 
-        when(statsHttpContract.findPerTermAndImageByProject(
-            eq(project.getId()),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Pageable.unpaged())
-        )).thenReturn(new PageImpl<>(List.of(new StatPerTermAndImage(imageId, termId, 1L))));
+        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), eq(Optional.empty()),
+            eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(
+            new PageImpl<>(List.of(new StatPerTermAndImage(imageId, termId, 1L))));
         results = statsService.statPerTermAndImage(project, null, null);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().termId()).isEqualTo(annotationTerm.getTerm().getId());
         assertThat(results.getFirst().imageId()).isEqualTo(annotationTerm.getUserAnnotation().getImage().getId());
         assertThat(results.getFirst().countAnnotations()).isEqualTo(1L);
 
-        AnnotationTerm annotationTermWithSameImageAndSameTerm = builder.givenAnAnnotationTerm(
-            builder.givenAUserAnnotation(project)
-        );
+        AnnotationTerm annotationTermWithSameImageAndSameTerm =
+            builder.givenAnAnnotationTerm(builder.givenAUserAnnotation(project));
         annotationTermWithSameImageAndSameTerm.getUserAnnotation()
             .setImage(annotationTerm.getUserAnnotation().getImage());
         annotationTermWithSameImageAndSameTerm.setTerm(annotationTerm.getTerm());
 
-        when(statsHttpContract.findPerTermAndImageByProject(
-            eq(project.getId()),
-            eq(Optional.empty()),
-            eq(Optional.empty()),
-            eq(Pageable.unpaged())
-        )).thenReturn(new PageImpl<>(List.of(new StatPerTermAndImage(imageId, termId, 2L))));
+        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), eq(Optional.empty()),
+            eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(
+            new PageImpl<>(List.of(new StatPerTermAndImage(imageId, termId, 2L))));
         results = statsService.statPerTermAndImage(project, null, null);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().termId()).isEqualTo(annotationTerm.getTerm().getId());
         assertThat(results.getFirst().imageId()).isEqualTo(annotationTerm.getUserAnnotation().getImage().getId());
         assertThat(results.getFirst().countAnnotations()).isEqualTo(2L);
 
-        when(statsHttpContract.findPerTermAndImageByProject(
-            eq(project.getId()),
-            any(),
-            any(),
-            eq(Pageable.unpaged())
-        )).thenReturn(new PageImpl<>(List.of()));
-        results = statsService.statPerTermAndImage(
-            project,
-            DateUtils.addDays(new Date(), -40),
-            DateUtils.addDays(new Date(), -20)
-        );
+        when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), any(), any(),
+            eq(Pageable.unpaged()))).thenReturn(new PageImpl<>(List.of()));
+        results = statsService.statPerTermAndImage(project, DateUtils.addDays(new Date(), -40),
+            DateUtils.addDays(new Date(), -20));
         assertThat(results).hasSize(0);
     }
 
@@ -529,15 +424,10 @@ public class StatsServiceTests {
 
         Term term = annotation1.getTerms().getFirst();
         User superAdmin = builder.givenSuperAdmin();
-        when(statsHttpContract.findUserTermsByProject(
-            project.getId(),
-            superAdmin.getId(),
-            Pageable.unpaged()
-        )).thenReturn(new PageImpl<>(List.of(new FlatStatUserTerm(
-            superAdmin.getId(),
-            superAdmin.getUsername(),
-            new StatTerm(term.getId(), term.getName(), term.getColor(), 2)
-        ))));
+        when(statsHttpContract.findUserTermsByProject(project.getId(), superAdmin.getId(),
+            Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(
+            new FlatStatUserTerm(superAdmin.getId(), superAdmin.getUsername(),
+                new StatTerm(term.getId(), term.getName(), term.getColor(), 2)))));
 
         Set<StatTerm> terms;
 
@@ -600,13 +490,8 @@ public class StatsServiceTests {
         givenAPersistentConnectionInProject(builder.givenSuperAdmin(), project, DateUtils.addDays(new Date(), -15));
         givenAPersistentConnectionInProject(builder.givenSuperAdmin(), project, DateUtils.addDays(new Date(), -5));
 
-        List<JsonObject> jsonObjects = statsService.statConnectionsEvolution(
-            project,
-            7,
-            DateUtils.addDays(new Date(), -18),
-            null,
-            false
-        );
+        List<JsonObject> jsonObjects =
+            statsService.statConnectionsEvolution(project, 7, DateUtils.addDays(new Date(), -18), null, false);
         assertThat(jsonObjects).hasSize(3);
         assertThat(jsonObjects.get(0).getJSONAttrLong("size")).isEqualTo(2);
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(1);
@@ -618,13 +503,8 @@ public class StatsServiceTests {
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(3);
         assertThat(jsonObjects.get(2).getJSONAttrLong("size")).isEqualTo(3);
 
-        jsonObjects = statsService.statConnectionsEvolution(
-            project,
-            7,
-            DateUtils.addDays(new Date(), -18),
-            DateUtils.addDays(new Date(), -6),
-            true
-        );
+        jsonObjects = statsService.statConnectionsEvolution(project, 7, DateUtils.addDays(new Date(), -18),
+            DateUtils.addDays(new Date(), -6), true);
         assertThat(jsonObjects).hasSize(2);
     }
 
@@ -636,25 +516,15 @@ public class StatsServiceTests {
         givenAPersistentImageConsultation(builder.givenSuperAdmin(), imageInstance, DateUtils.addDays(new Date(), -15));
         givenAPersistentImageConsultation(builder.givenSuperAdmin(), imageInstance, DateUtils.addDays(new Date(), -5));
 
-        List<JsonObject> jsonObjects = statsService.statImageConsultationsEvolution(
-            project,
-            7,
-            DateUtils.addDays(new Date(), -18),
-            null,
-            false
-        );
+        List<JsonObject> jsonObjects =
+            statsService.statImageConsultationsEvolution(project, 7, DateUtils.addDays(new Date(), -18), null, false);
         assertThat(jsonObjects).hasSize(3);
         assertThat(jsonObjects.get(0).getJSONAttrLong("size")).isEqualTo(2);
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(1);
         assertThat(jsonObjects.get(2).getJSONAttrLong("size")).isEqualTo(0);
 
-        jsonObjects = statsService.statImageConsultationsEvolution(
-            project,
-            7,
-            DateUtils.addDays(new Date(), -18),
-            null,
-            true
-        );
+        jsonObjects =
+            statsService.statImageConsultationsEvolution(project, 7, DateUtils.addDays(new Date(), -18), null, true);
         assertThat(jsonObjects).hasSize(3);
         assertThat(jsonObjects.get(0).getJSONAttrLong("size")).isEqualTo(2);
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(3);
@@ -665,52 +535,26 @@ public class StatsServiceTests {
     void shouldReturnAnnotationActionEvolutionStatsOverTime() {
         Project project = builder.givenAProject();
         AnnotationDomain annotation = builder.givenAUserAnnotation(project);
-        givenAPersistentAnnotationAction(
-            DateUtils.addDays(new Date(), -15),
-            annotation,
-            builder.givenSuperAdmin(),
-            "select"
-        );
-        givenAPersistentAnnotationAction(
-            DateUtils.addDays(new Date(), -15),
-            annotation,
-            builder.givenSuperAdmin(),
-            "move"
-        );
-        givenAPersistentAnnotationAction(
-            DateUtils.addDays(new Date(), -15),
-            annotation,
-            builder.givenSuperAdmin(),
-            "select"
-        );
-        givenAPersistentAnnotationAction(
-            DateUtils.addDays(new Date(), -5),
-            annotation,
-            builder.givenSuperAdmin(),
-            "select"
-        );
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -15), annotation, builder.givenSuperAdmin(),
+            "select");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -15), annotation, builder.givenSuperAdmin(),
+            "move");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -15), annotation, builder.givenSuperAdmin(),
+            "select");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -5), annotation, builder.givenSuperAdmin(),
+            "select");
 
-        List<JsonObject> jsonObjects = statsService.statAnnotationActionsEvolution(
-            project,
-            7,
-            DateUtils.addDays(new Date(), -18),
-            null,
-            false,
-            "select"
-        );
+        List<JsonObject> jsonObjects =
+            statsService.statAnnotationActionsEvolution(project, 7, DateUtils.addDays(new Date(), -18), null, false,
+                "select");
         assertThat(jsonObjects).hasSize(3);
         assertThat(jsonObjects.get(0).getJSONAttrLong("size")).isEqualTo(2);
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(1);
         assertThat(jsonObjects.get(2).getJSONAttrLong("size")).isEqualTo(0);
 
-        jsonObjects = statsService.statAnnotationActionsEvolution(
-            project,
-            7,
-            DateUtils.addDays(new Date(), -18),
-            null,
-            true,
-            "select"
-        );
+        jsonObjects =
+            statsService.statAnnotationActionsEvolution(project, 7, DateUtils.addDays(new Date(), -18), null, true,
+                "select");
         assertThat(jsonObjects).hasSize(3);
         assertThat(jsonObjects.get(0).getJSONAttrLong("size")).isEqualTo(2);
         assertThat(jsonObjects.get(1).getJSONAttrLong("size")).isEqualTo(3);

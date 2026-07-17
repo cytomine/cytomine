@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.CropOffset;
 import be.cytomine.domain.appengine.TaskRun;
@@ -29,6 +30,7 @@ import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.dto.appengine.task.output.CollectionOutput;
 import be.cytomine.dto.appengine.task.output.GeometryOutput;
+import be.cytomine.mapper.UserMapperImpl;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
 import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.CurrentUserService;
@@ -53,6 +55,7 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskRunServiceTest {
+    private final UserMapperImpl userMapper = new UserMapperImpl();
 
     @Mock
     private AnnotationService annotationService;
@@ -176,8 +179,8 @@ public class TaskRunServiceTest {
         taskRunLayer.setParameterName("input");
         taskRunLayer.setOffsets(List.of(new CropOffset(0, 0)));
         AnnotationLayer annotationLayer = new AnnotationLayer();
-
-        doNothing().when(securityACLService).checkUser(currentUser);
+        UserResponse userResponse = userMapper.map(currentUser);
+        doNothing().when(securityACLService).checkUser(userResponse);
         doNothing().when(securityACLService).check(project, READ);
         doNothing().when(securityACLService).checkIsNotReadOnly(project);
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
@@ -185,7 +188,7 @@ public class TaskRunServiceTest {
         when(appEngineService.get("task-runs/" + taskRunId + "/outputs")).thenReturn(outputsJson);
         when(appEngineService.get("task-runs/" + taskRunId)).thenReturn(taskRunJson);
         when(appEngineService.getTaskRunOutputs(taskRunId)).thenReturn(List.of(collectionOutput));
-        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+        when(currentUserService.getCurrentUser()).thenReturn(userResponse);
         when(geometryService.addOffset(
             any(Geometry.class),
             anyInt(),
@@ -283,11 +286,11 @@ public class TaskRunServiceTest {
         taskRunLayer.getOffsets().add(new CropOffset(0, 0));
 
         AnnotationLayer annotationLayer = new AnnotationLayer();
-
-        doNothing().when(securityACLService).checkUser(currentUser);
+        UserResponse userResponse = userMapper.map(currentUser);
+        doNothing().when(securityACLService).checkUser(userResponse);
         doNothing().when(securityACLService).check(project, READ);
         doNothing().when(securityACLService).checkIsNotReadOnly(project);
-        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+        when(currentUserService.getCurrentUser()).thenReturn(userResponse);
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
         when(annotationLayerService.createAnnotationLayer("layer-name")).thenReturn(annotationLayer);
         when(appEngineService.get("task-runs/" + taskRunId + "/outputs")).thenReturn(outputsJson);
@@ -343,11 +346,11 @@ public class TaskRunServiceTest {
 
         String geoJson1 = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}";
         String geoJson2 = "{\"type\":\"Point\",\"coordinates\":[3.0,4.0]}";
-
-        doNothing().when(securityACLService).checkUser(currentUser);
+        UserResponse userResponse = userMapper.map(currentUser);
+        doNothing().when(securityACLService).checkUser(userResponse);
         doNothing().when(securityACLService).check(project, READ);
         doNothing().when(securityACLService).checkIsNotReadOnly(project);
-        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+        when(currentUserService.getCurrentUser()).thenReturn(userResponse);
         when(projectService.get(projectId)).thenReturn(project);
         when(taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)).thenReturn(Optional.of(taskRun));
         when(userAnnotationService.get(1L)).thenReturn(annotation1);

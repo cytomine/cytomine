@@ -75,7 +75,7 @@ public class ImageConsultationServiceTests {
             sliceCoordinatesService.getReferenceSlice(imageInstance),
             USER_VIEW
         );
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
     PersistentUserPosition givenAPersistentUserPosition(
@@ -86,7 +86,7 @@ public class ImageConsultationServiceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,

@@ -48,7 +48,7 @@ public class TaskService {
         return comments;
     }
 
-    public Task createNewTask(Project project,long userId, boolean printInActivity) {
+    public Task createNewTask(Project project, long userId, boolean printInActivity) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         Task task = new Task();
         task.setProjectIdent(project != null ? project.getId() : null);
@@ -110,7 +110,6 @@ public class TaskService {
         task = get(task.getId());
         return task;
     }
-
 
     public List<String> getLastComments(Task task, int max) {
         //sql request retrieve n last comments for task

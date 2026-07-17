@@ -9,7 +9,6 @@ import java.util.UUID;
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
-import org.cytomine.repository.mapper.BaseMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.TermRepository;
@@ -29,6 +28,7 @@ import be.cytomine.common.repository.model.command.payload.response.OntologyResp
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
+import be.cytomine.common.repository.utils.BaseMapper;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc

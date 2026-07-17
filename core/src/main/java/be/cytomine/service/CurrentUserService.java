@@ -81,7 +81,7 @@ public class CurrentUserService {
             return null;
         } else if (authentication.getDetails() instanceof User) {
             FullCurrentUser fullCurrentUser = new FullCurrentUser();
-            fullCurrentUser.setUser((User) authentication.getDetails());
+            fullCurrentUser.setUser((UserResponse) authentication.getDetails());
             return fullCurrentUser;
         } else if (authentication.getPrincipal() instanceof String) {
             PartialCurrentUser partialCurrentUser = new PartialCurrentUser();

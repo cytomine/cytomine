@@ -99,19 +99,23 @@ public class ProjectConnectionService {
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
 
+    private static Consumer<Document> printDocuments() {
+        return doc -> System.out.println(doc.toJson(JsonWriterSettings.builder().indent(true).build()));
+    }
+
     public PersistentProjectConnection add(
-        User user,
+        long userId,
         Project project,
         String session,
         String os,
         String browser,
         String browserVersion
     ) {
-        return add(user, project, session, os, browser, browserVersion, new Date());
+        return add(userId, project, session, os, browser, browserVersion, new Date());
     }
 
     public PersistentProjectConnection add(
-        User user,
+        long userId,
         Project project,
         String session,
         String os,
@@ -120,11 +124,11 @@ public class ProjectConnectionService {
         Date created
     ) {
         securityACLService.check(project, READ);
-        closeLastProjectConnection(user.getId(), project.getId(), created);
+        closeLastProjectConnection(userId, project.getId(), created);
 
         PersistentProjectConnection connection = new PersistentProjectConnection();
         connection.setId(sequenceService.generateID());
-        connection.setUser(user.getId());
+        connection.setUser(userId);
         connection.setProject(project.getId());
         connection.setCreated(created);
         connection.setSession(session);
@@ -143,8 +147,7 @@ public class ProjectConnectionService {
         String sortProperty,
         String sortDirection
     ) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
+        securityACLService.checkIsSameUserOrAdminContainer(project, userId, currentUserService.getCurrentUser());
 
         return persistentProjectConnectionRepository.findAllByUserAndProject(
             userId,
@@ -157,7 +160,6 @@ public class ProjectConnectionService {
             )
         ).stream().findFirst();
     }
-
 
     public List<JsonObject> lastConnectionInProject(
         Project project,
@@ -203,7 +205,6 @@ public class ProjectConnectionService {
             .map(x -> JsonObject.of("user", x.get("_id"), "created", x.get("created")))
             .collect(Collectors.toList());
     }
-
 
     /**
      * return the last connection in a project by user. If a user (in the userIds array) doesn't have a connection yet,
@@ -281,7 +282,6 @@ public class ProjectConnectionService {
         }
         return results;
     }
-
 
     private void fillProjectConnection(PersistentProjectConnection connection, Date before) {
         Date after = connection.getCreated();
@@ -502,7 +502,6 @@ public class ProjectConnectionService {
         return results;
     }
 
-
     public List<JsonObject> totalNumberOfConnectionsByProject() {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
 
@@ -588,7 +587,6 @@ public class ProjectConnectionService {
             );
         }
     }
-
 
     public List<JsonObject> numberOfProjectConnections(
         String period,
@@ -750,23 +748,19 @@ public class ProjectConnectionService {
         return connections;
     }
 
-
     public List<JsonObject> averageOfProjectConnections(
         String period,
         Long afterThan,
         Long beforeThan,
         Project project,
-        User user
+        long userId
     ) {
         if (project != null) {
             securityACLService.check(project, READ);
-            if (user != null) {
-                securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
-            }
+            securityACLService.checkIsSameUserOrAdminContainer(project, userId, currentUserService.getCurrentUser());
         } else {
             securityACLService.checkAdmin(currentUserService.getCurrentUser());
         }
-
 
         if (beforeThan == null) {
             beforeThan = new Date().getTime();
@@ -888,9 +882,9 @@ public class ProjectConnectionService {
         if (project != null) {
             matchs.add(match(eq("project", project.getId())));
         }
-        if (user != null) {
-            matchs.add(match(eq("user", user.getId())));
-        }
+
+        matchs.add(match(eq("user", userId)));
+
 
         List<Bson> requests = new ArrayList<>();
         requests.addAll(matchs);
@@ -921,7 +915,6 @@ public class ProjectConnectionService {
         }
         return connections;
     }
-
 
     public List<PersistentImageConsultation> getUserActivityDetails(Long activityId) {
         PersistentProjectConnection connection = persistentProjectConnectionRepository.findById(activityId)
@@ -968,10 +961,5 @@ public class ProjectConnectionService {
         fillProjectConnection(connection.get(), before);
 
         persistentProjectConnectionRepository.save(connection.get());
-    }
-
-
-    private static Consumer<Document> printDocuments() {
-        return doc -> System.out.println(doc.toJson(JsonWriterSettings.builder().indent(true).build()));
     }
 }

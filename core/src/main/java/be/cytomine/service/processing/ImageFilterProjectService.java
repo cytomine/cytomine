@@ -85,7 +85,7 @@ public class ImageFilterProjectService extends ModelService {
 
         securityACLService.check(project, ADMINISTRATION);
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUser()), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
     }
 
     @Override

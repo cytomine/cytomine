@@ -671,7 +671,7 @@ public class UserService extends ModelService {
     }
 
     public JsonObject getResumeActivities(Project project, UserResponse user) {
-        securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
+        securityACLService.checkIsSameUserOrAdminContainer(project, user.id(), currentUserService.getCurrentUser());
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.put("firstConnection",
@@ -683,7 +683,7 @@ public class UserService extends ModelService {
                     PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "created"))).stream().findFirst()
                 .map(PersistentProjectConnection::getCreated).orElse(null));
 
-        jsonObject.put("totalAnnotations", userAnnotationService.count(user, project));
+        jsonObject.put("totalAnnotations", userAnnotationService.count(user.id(), project));
         jsonObject.put("totalConnections",
             persistentProjectConnectionRepository.countAllByProjectAndUser(project.getId(), user.id()));
         jsonObject.put("totalConsultations",

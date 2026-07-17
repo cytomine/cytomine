@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -121,7 +122,7 @@ public class AbstractImageService extends ModelService {
         Optional<AbstractImage> abstractImage = abstractImageRepository.findById(id);
         String token = authHeader.replace("Bearer ", "");
         String username = TokenUtils.getUsernameFromToken(token);
-        User user = currentUserService.getCurrentUser(username);
+        UserResponse user = currentUserService.getCurrentUser(username);
         abstractImage.ifPresent(image -> securityACLService.check(image.container(), READ, user));
         return abstractImage;
     }

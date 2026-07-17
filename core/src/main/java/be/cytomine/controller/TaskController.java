@@ -69,7 +69,7 @@ public class TaskController extends RestCytomineController {
         }
         UserResponse user = currentUserService.getCurrentUser();
         boolean printInActivity = json.getJSONAttrBoolean("printInActivity", false);
-        Task task = taskService.createNewTask(project, user, printInActivity);
+        Task task = taskService.createNewTask(project, user.id(), printInActivity);
         JsonObject jsonObject = task.toJsonObject();
         jsonObject.put("comments", taskService.getLastComments(task, 5));
         return responseSuccess(JsonObject.of("task", jsonObject));

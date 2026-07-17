@@ -153,13 +153,13 @@ public class UserAnnotationService extends ModelService {
     }
 
 
-    public Long count(UserResponse user, Project project) {
+    public Long count(long userId, Project project) {
         if (project != null) {
-            securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
-            return userAnnotationRepository.countByUserIdAndProject(user.id(), project);
+            securityACLService.checkIsSameUserOrAdminContainer(project, userId, currentUserService.getCurrentUser());
+            return userAnnotationRepository.countByUserIdAndProject(userId, project);
         } else {
-            securityACLService.checkIsSameUser(user.id(), currentUserService.getCurrentUser());
-            return userAnnotationRepository.countByUserId(user.id());
+            securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
+            return userAnnotationRepository.countByUserId(userId);
         }
     }
 
@@ -319,7 +319,8 @@ public class UserAnnotationService extends ModelService {
         //Start transaction
         Transaction transaction = transactionService.start();
 
-        CommandResponse commandResponse = executeCommand(new AddCommand(currentUserService.getCurrentUserOld(), transaction), null, jsonObject);
+        CommandResponse commandResponse =
+            executeCommand(new AddCommand(currentUserService.getCurrentUserOld(), transaction), null, jsonObject);
         UserAnnotation addedAnnotation = (UserAnnotation) commandResponse.getObject();
 
         if (addedAnnotation == null) {
@@ -513,7 +514,8 @@ public class UserAnnotationService extends ModelService {
                 validateGeometryService.tryToMakeItValidIfNotValid(jsonNewData.getJSONAttrStr("location"))
             );
         }
-        CommandResponse result = executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), null), domain, jsonNewData);
+        CommandResponse result =
+            executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), null), domain, jsonNewData);
 
         return result;
     }

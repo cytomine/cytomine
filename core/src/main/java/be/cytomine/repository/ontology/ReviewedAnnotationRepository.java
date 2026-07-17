@@ -38,7 +38,7 @@ public interface ReviewedAnnotationRepository
 
     Long countByProject(Project project);
 
-    Long countByUser(User user);
+    long countByUserId(long userId);
 
     Long countByProjectAndCreatedAfter(Project project, Date createdMin);
 

@@ -59,7 +59,7 @@ public class RestProjectConnectionController extends RestCytomineController {
         String browser = json.getJSONAttrStr("browser");
         String browserVersion = json.getJSONAttrStr("browserVersion");
         return responseSuccess(projectConnectionService.add(
-            currentUserService.getCurrentUser(), project, session, os, browser, browserVersion
+            currentUserService.getCurrentUser().id(), project, session, os, browser, browserVersion
         ));
 
     }
@@ -174,14 +174,14 @@ public class RestProjectConnectionController extends RestCytomineController {
     public ResponseEntity<String> averageOfProjectConnections(
         @RequestParam(required = false) Long afterThan,
         @RequestParam(required = false) Long beforeThan,
-        @RequestParam(required = true) String period,
+        @RequestParam String period,
         @RequestParam(required = false, value = "project", defaultValue = "0") Long projectId,
         @RequestParam(required = false, value = "user", defaultValue = "0") Long userId
     ) {
         Project project = projectService.find(projectId).orElse(null);
         User user = userService.find(userId).orElse(null);
         return responseSuccess(projectConnectionService.averageOfProjectConnections(
-            period, afterThan, beforeThan, project, user
+            period, afterThan, beforeThan, project, user.getId()
         ));
     }
 

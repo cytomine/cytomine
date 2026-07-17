@@ -62,14 +62,14 @@ public class UserRoleController {
         @RequestBody CreateUserRole createUserRole
     ) {
         log.debug("POST /user/{}/role.json", userId);
-        long requestingUserId = currentUserService.getCurrentUser().getId();
+        long requestingUserId = currentUserService.getCurrentUser().id();
         return userRoleHttpContract.create(requestingUserId, createUserRole);
     }
 
     @DeleteMapping("/user/{userId}/role/{roleId}.json")
     public HttpCommandResponse delete(@PathVariable long userId, @PathVariable long roleId) {
         log.debug("DELETE /user/{}/role/{}.json", userId, roleId);
-        long requestingUserId = currentUserService.getCurrentUser().getId();
+        long requestingUserId = currentUserService.getCurrentUser().id();
         UserRoleResponse userRole = userRoleHttpContract.getByUserIdAndRoleId(userId, roleId)
             .orElseThrow(() -> new ResponseStatusException(
                 NOT_FOUND, format(UNABLE_TO_FIND_USER_ROLE, userId, roleId)));
@@ -85,7 +85,7 @@ public class UserRoleController {
         Pageable pageable
     ) {
         log.debug("PUT /user/{}/role/{}/define.json", targetUserId, role);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         userRoleHttpContract.define(userId, targetUserId, role);
         return pageMapper.toCollectionResponse(userRoleHttpContract.listByUserId(userId, pageable));
     }

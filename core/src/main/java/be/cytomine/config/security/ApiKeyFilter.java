@@ -16,6 +16,8 @@ package be.cytomine.config.security;
  * limitations under the License.
  */
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -23,8 +25,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -61,12 +61,12 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         String contentMd5,
         String contentType,
         String date,
-        User user
+        String privatekey
     ) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
         String canonicalHeaders = method + "\n" + contentMd5 + "\n" + contentType + "\n" + date;
 
-        String key = user.getPrivateKey();
-        SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
+
+        SecretKeySpec signingKey = new SecretKeySpec(privatekey.getBytes(), "HmacSHA1");
         // get an hmac_sha1 Mac instance and initialize with the signing key
         Mac mac = Mac.getInstance("HmacSHA1");
         mac.init(signingKey);
@@ -121,7 +121,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                 log.debug("User cannot be extracted with accessKey {}", accessKey);
                 throw new AuthenticationException("User cannot be extracted with accessKey " + accessKey);
             } else {
-                String signature = generateKeys(request.getMethod(), contentMd5, contentType, date, user.get());
+                String signature =
+                    generateKeys(request.getMethod(), contentMd5, contentType, date, user.get().getPrivateKey());
                 if (authorizationSign.equals(signature)) {
                     this.reauthenticate(user.get());
                     return true;
@@ -136,7 +137,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                         contentMd5,
                         "",
                         date,
-                        user.get()
+                        user.get().getPrivateKey()
                     );
                     if (authorizationSign.equals(signatureWithEmptyContentType)) {
                         this.reauthenticate(user.get());

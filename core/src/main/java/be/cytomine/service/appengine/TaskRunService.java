@@ -44,6 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.CropOffset;
 import be.cytomine.domain.appengine.TaskRun;
@@ -145,7 +146,7 @@ public class TaskRunService {
         ImageInstance image = imageInstanceService.get(body.get("image").asLong());
 
         TaskRun taskRun = new TaskRun();
-        taskRun.setUser(currentUser);
+        taskRun.setUser(currentUserService.getCurrentUserOld());
         taskRun.setProject(project);
         taskRun.setTaskRunId(taskRunResponse.id());
         taskRun.setImage(image);
@@ -597,7 +598,7 @@ public class TaskRunService {
         }
 
         // pull the images and store them in the project
-        asyncService.launchImageAdditionJob(outputs, projectId, currentUserService.getCurrentUser());
+        asyncService.launchImageAdditionJob(outputs, projectId, currentUserService.getCurrentUserOld());
 
         String taskRunData = appEngineService.get("task-runs/" + taskRunId);
         TaskRunResponse taskRunResponse;

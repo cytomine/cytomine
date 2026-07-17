@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
@@ -77,6 +79,7 @@ public class RestImageInstanceController extends RestCytomineController {
 
     private final CurrentUserService currentUserService;
 
+    private final UserHttpContract userHttpContract;
 
     @GetMapping("/imageinstance/{id}.json")
     public ResponseEntity<String> show(@PathVariable Long id) {
@@ -104,14 +107,11 @@ public class RestImageInstanceController extends RestCytomineController {
     }
 
     @GetMapping("/user/{id}/imageinstance/light.json")
-    public ResponseEntity<String> listLightByUser(@PathVariable Long id) {
+    public ResponseEntity<String> listLightByUser(@PathVariable long id) {
         log.debug("REST request to get image instance light by user {}", id);
         UserResponse currentUser = currentUserService.getCurrentUser();
-        if (id != 0) {
-            currentUser = userService.find(id)
-                .orElseThrow(() -> new ObjectNotFoundException("User", id));
-        }
-        return responseSuccess(imageInstanceService.listLight(currentUser));
+        UserResponse userResponse = userHttpContract.get(id, currentUser.id()).orElseThrow();
+        return responseSuccess(imageInstanceService.listLight(userResponse));
     }
 
     @GetMapping("/abstractimage/{id}/imageinstance.json")

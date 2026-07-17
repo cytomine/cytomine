@@ -848,6 +848,38 @@ public class ImageInstanceService extends ModelService {
     }
 
 
+    public List<Map<String, Object>> listLight(UserResponse user) {
+        securityACLService.checkIsSameUser(currentUserService.getCurrentUser().id(), user);
+        boolean isAdmin = currentRoleService.isAdminByNow(user);
+        String request = "select * from user_image where user_image_id = :id order by instance_filename";
+        Query query = getEntityManager().createNativeQuery(request, Tuple.class);
+        query.setParameter("id", user.id());
+        List<Tuple> resultList = query.getResultList();
+
+        List<Map<String, Object>> results = new ArrayList<>();
+        for (Tuple tuple : resultList) {
+            Map<String, Object> line = new LinkedHashMap<>();
+            line.put("id", tuple.get("id"));
+            line.put("projectName", tuple.get("project_name"));
+            line.put("project", tuple.get("project_id"));
+            if (tuple.get("project_blind") != null && (boolean) tuple.get("project_blind")) {
+                line.put("blindedName", tuple.get("base_image_id"));
+            }
+            if ((tuple.get("project_blind") == null && !((boolean) tuple.get("project_blind")))
+                || isAdmin
+                || (boolean) tuple.get("user_project_manager")) {
+                line.put(
+                    "instanceFilename",
+                    tuple.get("instance_filename") != null
+                        ? tuple.get("instance_filename")
+                        : tuple.get("original_filename")
+                );
+            }
+            results.add(line);
+        }
+        return results;
+    }
+
     public List<Map<String, Object>> listLight(Project project) {
         securityACLService.check(project, READ);
         List<Map<String, Object>> data = new ArrayList<>();

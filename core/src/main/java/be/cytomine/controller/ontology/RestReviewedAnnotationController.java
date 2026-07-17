@@ -95,7 +95,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     public ResponseEntity<String> countByUser(@PathVariable(value = "idUser") Long idUser) {
         log.debug("REST request to count reviewed annotation for current user");
         return responseSuccess(
-            JsonObject.of("total", reviewedAnnotationService.count(currentUserService.getCurrentUser()))
+            JsonObject.of("total", reviewedAnnotationService.count(currentUserService.getCurrentUser().id()))
         );
     }
 
@@ -276,7 +276,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
 
         terms =
             terms == null || terms.isBlank()
-                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().getId())
+                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().id())
                 .stream().map(String::valueOf).collect(
                     Collectors.joining(",")) :
                 terms;
@@ -284,7 +284,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         JsonObject params = mergeQueryParamsAndBodyParams();
         params.put("reviewed", true);
         byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, users, params, terms, format,
-            currentUserService.getCurrentUser().getId());
+            currentUserService.getCurrentUser().id());
         responseReportFile(reportService.getAnnotationReportFileName(format, idProject), report, format);
     }
 

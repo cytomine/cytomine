@@ -12,6 +12,13 @@ export default defineConfig(({command}) => ({
   },
   // Replaces babel-plugin-transform-remove-console (production only)
   esbuild: command === 'build' ? {drop: ['console']} : undefined,
+  build: {
+    commonjsOptions: {
+      // UMD/CJS libraries (vue-slider-component, vue-draggable-resizable, ...) do
+      // require('vue') and expect the Vue constructor, not the ESM namespace
+      requireReturnsDefault: id => id.includes('node_modules/vue/') ? 'preferred' : 'auto'
+    }
+  },
   server: {
     host: true,
     port: 8080,

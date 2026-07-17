@@ -21,11 +21,9 @@ export default defineConfig(({command}) => ({
   },
   server: {
     host: true,
-    port: 8080,
+    port: Number(process.env.PORT) || 8080,
+    strictPort: true,
     hmr: {
-      protocol: 'ws',
-      host: '127.0.0.1',
-      clientPort: 80,
       path: '/dev-ws'
     }
   }

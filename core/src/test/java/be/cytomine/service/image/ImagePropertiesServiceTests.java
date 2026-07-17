@@ -6,8 +6,6 @@ import java.nio.charset.StandardCharsets;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,6 +17,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractImage;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
@@ -33,7 +32,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class ImagePropertiesServiceTests {
 
@@ -43,17 +42,7 @@ public class ImagePropertiesServiceTests {
     @Autowired
     ImagePropertiesService imagePropertiesService;
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     @Test
     void extractPopulatedPropertiesToAbstractImage() throws IOException, IllegalAccessException {
@@ -65,7 +54,7 @@ public class ImagePropertiesServiceTests {
         image.setPhysicalSizeX(2d);
         image.setColorspace("empty");
 
-        configureFor("localhost", 8888); //       /image/upload1644425985928451/LUNG1_pyr.tif/info
+        configureFor("localhost", wireMockServer.port()); //       /image/upload1644425985928451/LUNG1_pyr.tif/info
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8

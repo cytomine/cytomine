@@ -12,7 +12,6 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +28,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.image.server.Storage;
@@ -74,11 +74,11 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class UserServiceTests {
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     UserService userService;
     @Autowired
@@ -127,15 +127,9 @@ public class UserServiceTests {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer.start();
-        WireMock.configureFor("localhost", 8888);
+        WireMock.configureFor("localhost", wireMockServer.port());
 
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach

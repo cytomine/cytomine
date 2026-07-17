@@ -27,8 +27,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +42,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.utils.JsonObject;
 
@@ -65,7 +64,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class AbstractSliceResourceTests {
 
@@ -75,17 +74,7 @@ public class AbstractSliceResourceTests {
     @Autowired
     private MockMvc restAbstractSliceControllerMockMvc;
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     @Test
     @Transactional
@@ -231,7 +220,7 @@ public class AbstractSliceResourceTests {
             .toString()
             .getBytes();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -265,7 +254,7 @@ public class AbstractSliceResourceTests {
         byte[] mockResponse = UUID.randomUUID()
             .toString()
             .getBytes();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -307,7 +296,7 @@ public class AbstractSliceResourceTests {
     public void getAbstractSliceCrop() throws Exception {
         AbstractSlice image = givenTestAbstractSlice();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -344,7 +333,7 @@ public class AbstractSliceResourceTests {
             .toString()
             .getBytes();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/window";

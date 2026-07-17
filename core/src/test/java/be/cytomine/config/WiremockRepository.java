@@ -110,6 +110,51 @@ public class WiremockRepository {
                 .withBody(UUID.randomUUID().toString())
             )
         );
+
+        SERVER.stubFor(WireMock.get(urlPathEqualTo("/users/search/ImageServer1"))
+            .atPriority(1)
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody("""
+                    {
+                      "dataType": "USER",
+                      "id": 1,
+                      "username": "ImageServer1",
+                      "email": "imageserver@cytomine.local",
+                      "name": "Image Server",
+                      "lastname": null,
+                      "firstname": null,
+                      "language": null,
+                      "isDeveloper": false,
+                      "origin": null,
+                      "updated": null,
+                      "deleted": null,
+                      "created": "2024-01-01T00:00:00",
+                      "privateKey": "imageServerPrivateKey",
+                      "publicKey": "imageServerPublicKey",
+                      "roles": []
+                    }
+                    """)
+            )
+        );
+
+        SERVER.stubFor(WireMock.get(urlPathMatching("/users/search/.*"))
+            .atPriority(10)
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody("null")
+            )
+        );
+
+        SERVER.stubFor(WireMock.put(urlPathMatching("/users/\\d+"))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody("null")
+            )
+        );
     }
 
     @Bean

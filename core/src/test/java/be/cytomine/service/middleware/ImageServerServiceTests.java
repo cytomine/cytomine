@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
@@ -26,6 +24,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.UploadedFile;
@@ -50,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class ImageServerServiceTests {
 
@@ -60,21 +59,11 @@ public class ImageServerServiceTests {
     @Autowired
     ImageServerService imageServerService;
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     @Test
     void retrieveStorageSpaces() throws IOException {
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/storage/size.json"))
             .willReturn(
                 aResponse().withBody(
@@ -90,7 +79,7 @@ public class ImageServerServiceTests {
 
     @Test
     void retrieveFormats() {
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/formats"))
             .willReturn(
                 aResponse().withBody(
@@ -148,7 +137,7 @@ public class ImageServerServiceTests {
         image.getUploadedFile().setOriginalFilename("CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
         String url = "/image/" + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/export?filename=" + URLEncoder.encode(image.getOriginalFilename(), StandardCharsets.UTF_8);
@@ -180,7 +169,7 @@ public class ImageServerServiceTests {
         uploadedFile.setOriginalFilename("CMU-2.zip");
         uploadedFile.setContentType("ZIP");
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
         String url = "/file/" + URLEncoder.encode(uploadedFile.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/export?filename=" + URLEncoder.encode(uploadedFile.getOriginalFilename(), StandardCharsets.UTF_8);
@@ -201,7 +190,7 @@ public class ImageServerServiceTests {
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
 
-        configureFor("localhost", 8888); //       /image/upload1644425985928451/LUNG1_pyr.tif/info
+        configureFor("localhost", wireMockServer.port()); //       /image/upload1644425985928451/LUNG1_pyr.tif/info
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -270,7 +259,7 @@ public class ImageServerServiceTests {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -289,7 +278,7 @@ public class ImageServerServiceTests {
         AbstractImage image = builder.givenAnAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         byte[] mockResponse = UUID.randomUUID()
             .toString()
             .getBytes();
@@ -321,7 +310,7 @@ public class ImageServerServiceTests {
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -370,7 +359,7 @@ public class ImageServerServiceTests {
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -425,7 +414,7 @@ public class ImageServerServiceTests {
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         byte[] mockResponse = UUID.randomUUID()
             .toString()
             .getBytes();
@@ -478,7 +467,7 @@ public class ImageServerServiceTests {
             .toString()
             .getBytes();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/window";
@@ -508,7 +497,7 @@ public class ImageServerServiceTests {
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         System.out.println("/image/"
             + URLEncoder.encode(slice.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/histogram/per-image?n_bins=256");
@@ -561,7 +550,7 @@ public class ImageServerServiceTests {
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 slice.getPath(),
                 StandardCharsets.UTF_8
@@ -591,7 +580,7 @@ public class ImageServerServiceTests {
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         System.out.println("/image/"
             + URLEncoder.encode(slice.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/histogram/per-plane/z/0/t/0?n_bins=256&channels=0");
@@ -649,7 +638,7 @@ public class ImageServerServiceTests {
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 slice.getPath(),
                 StandardCharsets.UTF_8
@@ -680,7 +669,7 @@ public class ImageServerServiceTests {
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 slice.getPath(),
                 StandardCharsets.UTF_8
@@ -730,7 +719,7 @@ public class ImageServerServiceTests {
         image.getUploadedFile().setContentType("MRXS");
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 slice.getPath(),
                 StandardCharsets.UTF_8

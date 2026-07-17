@@ -31,7 +31,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +47,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.NestedImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -86,7 +86,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class ImageInstanceServiceTests {
 
@@ -117,7 +117,7 @@ public class ImageInstanceServiceTests {
     @Autowired
     PersistentImageConsultationRepository persistentImageConsultationRepository;
 
-    private static WireMockServer wireMockServer;
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -130,16 +130,9 @@ public class ImageInstanceServiceTests {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
         WireMock.configureFor("localhost", wireMockServer.port());
 
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach

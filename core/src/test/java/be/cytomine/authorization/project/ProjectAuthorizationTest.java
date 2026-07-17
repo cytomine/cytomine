@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.meta.AttachedFile;
@@ -62,7 +62,7 @@ import static org.springframework.security.acls.domain.BasePermission.ADMINISTRA
 @Transactional
 public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
-    private static WireMockServer wireMockServer;
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
     @Autowired
@@ -123,15 +123,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
-
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach

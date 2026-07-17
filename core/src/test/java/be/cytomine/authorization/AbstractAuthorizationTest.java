@@ -9,6 +9,7 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
@@ -58,11 +59,11 @@ public abstract class AbstractAuthorizationTest {
         // This code is called every execution of an authorization (a lot...)
         // So it is a "ugly" implementation of the 'addPermission' that is very fast.
 
-        User user = (User) currentUserService.getCurrentUser();
+        UserResponse user =  currentUserService.getCurrentUser();
 
         Long aclClassId = permissionService.getAclClassId(container);
         //get acl sid for current user (run request)
-        Long sidCurrentUser = permissionService.getAclSid(user.getUsername());
+        Long sidCurrentUser = permissionService.getAclSid(user.username());
         //get acl object id
         Long aclObjectIdentity = permissionService.getAclObjectIdentity(container, aclClassId, sidCurrentUser);
 

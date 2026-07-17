@@ -145,7 +145,7 @@ public class UserResourceTests {
         User user, Project project,
         Date created
     ) {
-        return projectConnectionService.add(user, project, "xxx", "linux", "chrome", "123", created);
+        return projectConnectionService.add(user.getId(), project, "xxx", "linux", "chrome", "123", created);
     }
 
     PersistentImageConsultation givenAPersistentImageConsultation(
@@ -153,7 +153,7 @@ public class UserResourceTests {
         ImageInstance imageInstance,
         Date created
     ) {
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
     PersistentUserPosition givenAPersistentUserPosition(
@@ -162,7 +162,7 @@ public class UserResourceTests {
         AreaDTO areaDTO
     ) {
         return userPositionService.add(
-            creation, user, sliceInstance, sliceInstance.getImage(),
+            creation, user.getId(), sliceInstance, sliceInstance.getImage(),
             areaDTO,
             1,
             5.0,

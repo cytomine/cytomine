@@ -32,6 +32,7 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.meta.AttachedFileService;
@@ -61,42 +62,34 @@ import static org.springframework.security.acls.domain.BasePermission.ADMINISTRA
 @Transactional
 public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
+    private static WireMockServer wireMockServer;
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
-
     @Autowired
     private ProjectMemberService projectMemberService;
-
     @Autowired
     private ProjectService projectService;
-
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private ProjectRepresentativeUserService projectRepresentativeUserService;
-
     @Autowired
     private ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
-
     @Autowired
     private DescriptionService descriptionService;
-
     @Autowired
     private AttachedFileService attachedFileService;
-
     @Autowired
     private PropertyService propertyService;
-
     @Autowired
     private ImageInstanceService imageInstanceService;
-
     @Autowired
     private UserAnnotationService userAnnotationService;
 
-    private Project project = null;
+    @Autowired
+    private UserMapper userMapper;
 
-    private static WireMockServer wireMockServer;
+    private Project project = null;
 
     private static void setupStub() {
         /* Simulate call to PIMS */
@@ -164,7 +157,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void userWithAtLeastReadPermissionCanListProjects() {
         assertThat(projectService.list(
-                (User) userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get(),
+                userMapper.map(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get()),
                 new ProjectSearchExtension(),
                 new ArrayList<>(),
                 "created",

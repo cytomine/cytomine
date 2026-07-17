@@ -93,7 +93,7 @@ public class UserPositionServiceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,
@@ -393,7 +393,7 @@ public class UserPositionServiceTests {
         );
         Date date = new Date();
 
-        userPositionService.add(date, user, sliceInstance, imageInstance, area, 0, (double) 0, true);
+        userPositionService.add(date, user.getId(), sliceInstance, imageInstance, area, 0, (double) 0, true);
     }
 
     @Test

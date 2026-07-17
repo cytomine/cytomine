@@ -14,6 +14,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
@@ -61,6 +62,7 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
+import be.cytomine.repository.security.UserResponseRepository;
 import be.cytomine.service.PermissionService;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -85,7 +87,7 @@ public class BasicInstanceBuilder {
 
     SecRoleRepository secRoleRepository;
 
-    UserRepository userRepository;
+    UserResponseRepository userRepository;
 
     ApplicationBootstrap applicationBootstrap;
 
@@ -96,7 +98,7 @@ public class BasicInstanceBuilder {
     public BasicInstanceBuilder(
         EntityManager em,
         TransactionTemplate transactionTemplate,
-        UserRepository userRepository,
+        UserResponseRepository userRepository,
         PermissionService permissionService,
         SecRoleRepository secRoleRepository,
         ApplicationBootstrap applicationBootstrap
@@ -121,7 +123,7 @@ public class BasicInstanceBuilder {
         });
     }
 
-    public User givenDefaultUser() {
+    public UserResponse givenDefaultUser() {
         if (aUser == null) {
             aUser = givenAUser("user");
         }
@@ -143,7 +145,7 @@ public class BasicInstanceBuilder {
     }
 
 
-    public User givenAUser(String username) {
+    public UserResponse givenAUser(String username) {
         User user = persistAndReturn(givenANotPersistedUser());
         user.setUsername(username);
         user = persistAndReturn(user);
@@ -309,11 +311,11 @@ public class BasicInstanceBuilder {
     }
 
     public void addUserToProject(Project project, String username, Permission permission) {
-        permissionService.addPermission(project, username, permission, this.givenSuperAdmin());
+        permissionService.addPermission(project, username, permission, this.givenSuperAdmin().getUsername());
     }
 
     public void addUserToProject(Project project, String username) {
-        permissionService.addPermission(project, username, ADMINISTRATION, this.givenSuperAdmin());
+        permissionService.addPermission(project, username, ADMINISTRATION, this.givenSuperAdmin().getUsername());
     }
 
     public <T> T persistAndReturn(T instance) {
@@ -354,7 +356,7 @@ public class BasicInstanceBuilder {
         storage = persistAndReturn(storage);
         permissionService.addPermission(
             storage, storage.getUser().getUsername(), ADMINISTRATION,
-            storage.getUser()
+            storage.getUser().getUsername()
         );
         return storage;
     }

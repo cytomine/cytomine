@@ -126,7 +126,7 @@ public class UserPositionResourceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,
@@ -281,8 +281,8 @@ public class UserPositionResourceTests {
 
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Long imageId = imageInstance.getId();
-        Long currentUserId = currentUserService.getCurrentUser().getId();
-        String currentUserAndImageId = currentUserId.toString() + "/" + imageId.toString();
+        Long currentUserId = currentUserService.getCurrentUser().id();
+        String currentUserAndImageId = currentUserId + "/" + imageId.toString();
 
         WebSocketUserPositionHandler.sessionsBroadcast.put(currentUserAndImageId, sessionDecoratorA);
         WebSocketUserPositionHandler.sessionsTracked.put(

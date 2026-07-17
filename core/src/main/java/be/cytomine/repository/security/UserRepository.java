@@ -11,9 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.security.User;
 
-/**
- * Spring Data JPA repository for the user entity.
- */
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     @EntityGraph(attributePaths = "roles")
@@ -95,6 +93,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     List<User> findAllByReferenceIn(List<String> ids);
 
-    Optional<User> findByUsernameLikeIgnoreCase(String username);
+
 }
 

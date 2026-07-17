@@ -149,7 +149,7 @@ public class ProjectResourceTests {
 
     PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
         return projectConnectionService.add(
-            user,
+            user.getId(),
             project,
             "xxx",
             "linux",

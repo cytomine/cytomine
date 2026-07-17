@@ -117,8 +117,8 @@ public class ReviewedAnnotationServiceTests {
     @Test
     void countReviewedAnnotationWithSuccess() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        assertThat(reviewedAnnotationService.count((User) reviewedAnnotation.getUser())).isGreaterThanOrEqualTo(1L);
-        assertThat(reviewedAnnotationService.count(builder.givenAUser())).isEqualTo(0);
+        assertThat(reviewedAnnotationService.count( reviewedAnnotation.getUser().getId())).isGreaterThanOrEqualTo(1L);
+        assertThat(reviewedAnnotationService.count(builder.givenAUser().getId())).isEqualTo(0);
     }
 
 

@@ -18,6 +18,7 @@ import be.cytomine.authorization.AbstractAuthorizationTest;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.search.UserSearchExtension;
 import be.cytomine.service.security.AccountService;
@@ -38,6 +39,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Autowired
     UserService userService;
     @Autowired
+    UserMapper userMapper;
+    @Autowired
     BasicInstanceBuilder builder;
     @MockitoBean
     private AccountService accountService;
@@ -52,8 +55,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         assertThat(userService.find(userNoAcl.getId())).isPresent();
         assertThat(userService.get(userNoAcl.getId())).isNotNull();
         assertThat(userService.findByUsername(userNoAcl.getUsername())).isPresent();
-        assertThat(userService.findByPublicKey(((User) userNoAcl).getPublicKey())).isPresent();
-        assertThat(userService.getAuthenticationRoles(userNoAcl)).isNotNull();
+        assertThat(userService.findByPublicKey(userNoAcl.getPublicKey())).isPresent();
+        assertThat(userService.getAuthenticationRoles(userMapper.map(userNoAcl))).isNotNull();
     }
 
     @Test

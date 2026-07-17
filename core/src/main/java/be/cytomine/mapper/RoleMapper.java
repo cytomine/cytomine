@@ -5,7 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
-import be.cytomine.common.repository.utils.BaseMapper;
+import be.cytomine.common.mapper.BaseMapper;
 import be.cytomine.domain.security.SecRole;
 
 @Mapper(componentModel = "spring", uses = BaseMapper.class)

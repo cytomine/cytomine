@@ -1,4 +1,4 @@
-package be.cytomine.common.repository.utils;
+package be.cytomine.common.mapper;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

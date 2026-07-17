@@ -28,7 +28,7 @@ import be.cytomine.common.repository.model.command.payload.response.OntologyResp
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
-import be.cytomine.common.repository.utils.BaseMapper;
+import be.cytomine.common.mapper.BaseMapper;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc

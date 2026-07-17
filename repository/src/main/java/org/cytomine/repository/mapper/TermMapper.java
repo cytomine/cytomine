@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
-import be.cytomine.common.repository.utils.BaseMapper;
+import be.cytomine.common.mapper.BaseMapper;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface TermMapper {

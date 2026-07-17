@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 
 import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
 import be.cytomine.common.repository.model.command.request.CommandV2Request;
-import be.cytomine.common.repository.utils.BaseMapper;
+import be.cytomine.common.mapper.BaseMapper;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface CommandMapper {

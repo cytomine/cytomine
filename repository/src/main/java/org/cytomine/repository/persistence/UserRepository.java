@@ -15,5 +15,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByUsernameLikeIgnoreCase(String query);
 
-    Page<UserResponse> findByIdsIn(Set<Long> ids, Pageable pageable);
+    Page<UserResponse> findByIdIn(Set<Long> ids, Pageable pageable);
 }

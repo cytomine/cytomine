@@ -46,10 +46,9 @@ class TagDomainAssociationControllerTest
 
     @Override
     public void beforeCreate(long userId) {
-        Long tagId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update(
-            "INSERT INTO tag (id, version, name, user_id) VALUES (?, 0, ?, ?)",
-            tagId, UUID.randomUUID().toString(), userId
+        Long tagId = jdbcTemplate.queryForObject(
+            "INSERT INTO tag (version, name, user_id) VALUES (0, ?, ?) RETURNING id",
+            Long.class, UUID.randomUUID().toString(), userId
         );
         createPayload = new CreateTagDomainAssociation(tagId, "be.cytomine.domain.ontology.Ontology", userId);
     }

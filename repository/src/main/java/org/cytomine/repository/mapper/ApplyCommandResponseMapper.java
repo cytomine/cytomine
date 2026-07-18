@@ -14,6 +14,7 @@ import be.cytomine.common.repository.model.command.payload.response.OntologyResp
 import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
+import be.cytomine.common.repository.model.command.payload.response.TagResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
@@ -32,6 +33,7 @@ public interface ApplyCommandResponseMapper {
             case TermResponse tr -> setDeleteTimeTR(tr, deleteTime);
             case StorageResponse sr -> setDeleteTimeSR(sr, deleteTime);
             case TermRelationResponse trr -> setDeleteTimeTRR(trr, deleteTime);
+            case TagResponse tar -> setDeleteTimeTAR(tar, deleteTime);
             case TagDomainAssociationResponse tdar -> setDeleteTimeTDAR(tdar, deleteTime);
             case UndoCommandResponse ucr -> ucr;
             case UploadedFileResponse ufr -> setDeleteTimeUFR(ufr, deleteTime);
@@ -67,6 +69,10 @@ public interface ApplyCommandResponseMapper {
 
     @Mapping(target = "deleted", source = "deleteTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
+    TagResponse setDeleteTimeTAR(TagResponse tar, Optional<LocalDateTime> deleteTime);
+
+    @Mapping(target = "deleted", source = "deleteTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
     TagDomainAssociationResponse setDeleteTimeTDAR(TagDomainAssociationResponse or, Optional<LocalDateTime> deleteTime);
 
     @Mapping(target = "deleted", source = "deleteTime")
@@ -89,6 +95,7 @@ public interface ApplyCommandResponseMapper {
             case TermResponse tr -> setUpdateTimeTR(tr, updateTime);
             case StorageResponse sr -> setUpdateTimeSR(sr, updateTime);
             case TermRelationResponse trr -> setUpdateTimeTRR(trr, updateTime);
+            case TagResponse tar -> setUpdateTimeTAR(tar, updateTime);
             case TagDomainAssociationResponse tdar -> setUpdateTimeTDAR(tdar, updateTime);
             case UndoCommandResponse ucr -> ucr;
             case UploadedFileResponse ufr -> setUpdateTimeUFR(ufr, updateTime);
@@ -121,6 +128,10 @@ public interface ApplyCommandResponseMapper {
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
     StorageResponse setUpdateTimeSR(StorageResponse or, Optional<LocalDateTime> updateTime);
+
+    @Mapping(target = "updated", source = "updateTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
+    TagResponse setUpdateTimeTAR(TagResponse tar, Optional<LocalDateTime> updateTime);
 
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})

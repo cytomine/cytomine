@@ -130,6 +130,26 @@ public class CytomineTests {
     }
 
     @Test
+    void manageTagsInAdminPanel() {
+        String firstTagName = "selenium-tag-a-" + randomUUID();
+        String secondTagName = "selenium-tag-b-" + randomUUID();
+        String renamedTagName = "selenium-tag-renamed-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createTag(wait, cytomineUrl, firstTagName);
+        cytomineSteps.createTag(wait, cytomineUrl, secondTagName);
+
+        cytomineSteps.sortTags(wait, cytomineUrl, firstTagName, secondTagName);
+        cytomineSteps.changeTagsPerPage(wait, cytomineUrl, 10, firstTagName, secondTagName);
+
+        cytomineSteps.editTag(wait, cytomineUrl, firstTagName, renamedTagName);
+
+        cytomineSteps.deleteTag(wait, cytomineUrl, renamedTagName);
+        cytomineSteps.deleteTag(wait, cytomineUrl, secondTagName);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
     void createAndDeleteProject() {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);

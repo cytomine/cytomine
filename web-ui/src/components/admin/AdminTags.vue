@@ -1,92 +1,83 @@
 <template>
   <div>
-    <b-loading :is-full-page="false" :active="loading" />
-    <template v-if="!loading">
-      <b-message v-if="!tags" type="is-danger" has-icon icon-size="is-small">
-        <h2> {{ $t('error') }} </h2>
-        <p> {{ $t('unexpected-error-info-message') }} </p>
-      </b-message>
-      <template v-else>
-        <div class="columns">
-          <div class="column is-one-quarter">
-            <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
-          </div>
-
-          <div class="column is-one-half has-text-right-desktop">
-            <button class="button is-link" @click="startTagCreation()">
-              {{$t('button-new-tag')}}
-            </button>
-          </div>
+    <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+      <h2> {{ $t('error') }} </h2>
+      <p> {{ $t('unexpected-error-info-message') }} </p>
+    </b-message>
+    <template v-else>
+      <div class="columns">
+        <div class="column is-one-quarter">
+          <b-input v-model="searchString" :placeholder="$t('search-placeholder')" type="search" icon="search" />
         </div>
 
-        <b-table
-          :data="filteredTags"
-          :paginated="true"
-          :per-page="perPage"
-          pagination-size="is-small"
-        >
+        <div class="column is-one-half has-text-right-desktop">
+          <button class="button is-link" @click="startTagCreation()">
+            {{$t('button-new-tag')}}
+          </button>
+        </div>
+      </div>
 
-          <template #default="{row: tag}">
-            <b-table-column
-              :field="'name'"
-              :label="$t('name')"
-              sortable
-            >
-            {{tag.name}}
-            </b-table-column>
+      <b-table
+        :current-page.sync="currentPage"
+        :data="filteredTags"
+        :default-sort="[sortField, sortOrder]"
+        :loading="loading"
+        :per-page="perPage"
+        :total="total"
+        backend-pagination
+        backend-sorting
+        paginated
+        pagination-size="is-small"
+        @sort="onSort"
+      >
+        <template #default="{row: tag}">
+          <b-table-column field="name" :label="$t('name')" sortable>
+            {{ tag.name }}
+          </b-table-column>
 
-            <b-table-column
-              :field="'creatorName'"
-              :label="$t('creator')"
-              sortable
-            >
-              {{tag.creatorName}}
-            </b-table-column>
+          <b-table-column field="creatorName" :label="$t('creator')">
+            {{ tag.creatorName }}
+          </b-table-column>
 
-            <b-table-column
-              :field="'created'"
-              :label="$t('created')"
-              sortable
-            >
-              {{ Number(tag.created) | moment('ll') }}
-            </b-table-column>
+          <b-table-column field="created" :label="$t('created')" sortable>
+            {{ formatDate(tag.created) }}
+          </b-table-column>
 
-            <b-table-column label=" " centered>
-              <div class="buttons">
-                <button class="button is-small is-link" @click="startTagEdition(tag)">
-                  {{$t('button-edit')}}
-                </button>
-                <button class="button is-small is-danger" @click="deleteTagDialog(tag)">
-                  {{$t('button-delete')}}
-                </button>
-              </div>
-            </b-table-column>
-          </template>
-
-          <template #empty>
-            <div class="content has-text-grey has-text-centered">
-              <p>{{$t('no-tag-fitting-criteria')}}</p>
+          <b-table-column label=" " centered>
+            <div class="buttons">
+              <button class="button is-small is-link" @click="startTagEdition(tag)">
+                {{ $t('button-edit') }}
+              </button>
+              <button class="button is-small is-danger" @click="deleteTagDialog(tag)">
+                {{ $t('button-delete') }}
+              </button>
             </div>
-          </template>
+          </b-table-column>
+        </template>
 
-          <template #bottom-left>
-            <b-select v-model="perPage" size="is-small">
-              <option value="10">{{$t('count-per-page', {count: 10})}}</option>
-              <option value="25">{{$t('count-per-page', {count: 25})}}</option>
-              <option value="50">{{$t('count-per-page', {count: 50})}}</option>
-              <option value="100">{{$t('count-per-page', {count: 100})}}</option>
-            </b-select>
-          </template>
-        </b-table>
+        <template #empty>
+          <div class="content has-text-grey has-text-centered">
+            <p>{{ $t('no-tag-fitting-criteria') }}</p>
+          </div>
+        </template>
 
-        <tag-modal :active.sync="modal" :tag="editedTag" @addTag="addTag" @updateTag="updateTag" />
-      </template>
+        <template #bottom-left>
+          <b-select v-model="perPage" size="is-small">
+            <option v-for="option in perPageOptions" :key="option" :value="option">
+              {{ $t('count-per-page', {count: option}) }}
+            </option>
+          </b-select>
+        </template>
+      </b-table>
+
+      <tag-modal :active.sync="modal" :tag="editedTag" @addTag="addTag" @updateTag="updateTag" />
     </template>
   </div>
 </template>
 
 <script>
-import {TagCollection} from '@/api';
+import {Cytomine} from '@/api';
+import {formatDate} from '@/utils/date';
 import {getWildcardRegexp} from '@/utils/string-utils';
 import TagModal from '@/components/tag/TagModal';
 
@@ -98,10 +89,16 @@ export default {
   data() {
     return {
       loading: true,
-      tags: null,
-      addTagModal: false,
+      error: false,
+      tags: [],
+      total: 0,
+      currentPage: 1,
+      perPage: 20,
+      perPageOptions: [10, 20, 50, 100],
+      sortField: 'created',
+      sortOrder: 'desc',
       searchString: '',
-      perPage: 25,
+      addTagModal: false,
       modal: false,
       editedTag: null
     };
@@ -118,7 +115,47 @@ export default {
       return this.tags.filter(ts => this.regexp.test(ts.name));
     }
   },
+  watch: {
+    currentPage() {
+      this.fetchTags();
+    },
+    perPage() {
+      if (this.currentPage === 1) {
+        this.fetchTags();
+      } else {
+        this.currentPage = 1;
+      }
+    },
+  },
   methods: {
+    formatDate(date) {
+      return formatDate(date, this.$i18n.locale);
+    },
+    async fetchTags() {
+      this.loading = true;
+      try {
+        const {data} = await Cytomine.instance.api.get(
+          '/tag.json',
+          {params: {page: this.currentPage - 1, size: this.perPage, sort: `${this.sortField},${this.sortOrder}`}},
+        );
+        this.tags = data.collection;
+        this.total = data.size;
+      } catch (error) {
+        console.log(error);
+        this.error = true;
+        this.$notify({type: 'error', text: this.$t('notify-error-fetch-tag')});
+      }
+      this.loading = false;
+    },
+    onSort(field, order) {
+      this.sortField = field;
+      this.sortOrder = order;
+      if (this.currentPage === 1) {
+        this.fetchTags();
+      } else {
+        this.currentPage = 1;
+      }
+    },
     startTagCreation() {
       this.editedTag = null;
       this.modal = true;
@@ -131,7 +168,10 @@ export default {
       this.modal = true;
     },
     updateTag(tag) {
-      this.editedTag.populate(tag);
+      const index = this.tags.indexOf(this.editedTag);
+      if (index !== -1) {
+        this.tags.splice(index, 1, {...this.editedTag, ...tag});
+      }
     },
 
     deleteTagDialog(tag) {
@@ -144,9 +184,9 @@ export default {
         onConfirm: () => this.deleteTag(tag)
       });
     },
-    deleteTag(tag) {
+    async deleteTag(tag) {
       try {
-        tag.delete();
+        await Cytomine.instance.api.delete(`/tag/${tag.id}.json`);
         this.tags.splice(this.tags.indexOf(tag), 1);
         this.$notify({
           type: 'success',
@@ -156,18 +196,13 @@ export default {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-tag-delete', {tagName: this.currentTag.name})
+          text: this.$t('notif-error-tag-delete', {tagName: tag.name})
         });
       }
     },
   },
-  async created() {
-    try {
-      this.tags = (await TagCollection.fetchAll()).array;
-    } catch (error) {
-      console.log(error);
-    }
-    this.loading = false;
+  created() {
+    this.fetchTags();
   }
 };
 </script>

@@ -3,12 +3,21 @@ package be.cytomine.service;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 
+@Component
 public class UrlApi {
 
-    private static String serverUrl = "http://localhost:8090";
+    private static UrlApi instance;
+
+    @Value("${application.serverURL}")
+    private String serverUrl;
 
     private static final Map<String, Set<String>> ASSOCIATED_PER_FORMAT_HINTS = Map.of(
         "macro", Set.of("SVS", "NDPI", "VMS", "SCN", "MRXS", "BIF", "VENTANA", "PHILIPS"),
@@ -16,36 +25,41 @@ public class UrlApi {
         "thumb", Set.of("SVS", "MRXS", "BIF", "VENTANA")
     );
 
-    public static void setServerURL(String url) {
-        serverUrl = url;
+    @PostConstruct
+    private void init() {
+        instance = this;
     }
 
-    public static String getServerUrl() {
+    public static UrlApi get() {
+        return instance;
+    }
+
+    public String getServerUrl() {
         return serverUrl;
     }
 
 
-    public static String getAbstractImageThumbUrl(Long idImage, String format) {
+    public String getAbstractImageThumbUrl(Long idImage, String format) {
         return serverUrl + "/api/abstractimage/" + idImage + "/thumb." + format;
     }
 
-    public static String getImageInstanceThumbUrl(Long idImage) {
+    public String getImageInstanceThumbUrl(Long idImage) {
         return serverUrl + "/api/imageinstance/" + idImage + "/thumb.png";
     }
 
-    public static String getImageInstanceThumbUrlWithMaxSize(Long idImage) {
+    public String getImageInstanceThumbUrlWithMaxSize(Long idImage) {
         return (getImageInstanceThumbUrlWithMaxSize(idImage, 256, "png"));
     }
 
-    public static String getImageInstanceThumbUrlWithMaxSize(Long idImage, Integer maxSize, String format) {
+    public String getImageInstanceThumbUrlWithMaxSize(Long idImage, Integer maxSize, String format) {
         return serverUrl + "/api/imageinstance/" + idImage + "/thumb." + format + "?maxSize=" + maxSize;
     }
 
-    public static String getAbstractImageThumbUrlWithMaxSize(Long idAbstractImage, Integer maxSize, String format) {
+    public String getAbstractImageThumbUrlWithMaxSize(Long idAbstractImage, Integer maxSize, String format) {
         return serverUrl + "/api/abstractimage/" + idAbstractImage + "/thumb." + format + "?maxSize=" + maxSize;
     }
 
-    public static String getAssociatedImage(
+    public String getAssociatedImage(
         Long id,
         String imageType,
         String label,
@@ -60,7 +74,7 @@ public class UrlApi {
         return serverUrl + "/api/" + imageType + "/" + id + "/associated/" + label + "." + format + size;
     }
 
-    public static String getAssociatedImage(
+    public String getAssociatedImage(
         AbstractImage image,
         String label,
         String contentType,
@@ -70,7 +84,7 @@ public class UrlApi {
         return getAssociatedImage(image.getId(), "abstractimage", label, contentType, maxSize, format);
     }
 
-    public static String getAssociatedImage(
+    public String getAssociatedImage(
         ImageInstance image,
         String label,
         String contentType,
@@ -80,19 +94,19 @@ public class UrlApi {
         return getAssociatedImage(image.getId(), "imageinstance", label, contentType, maxSize, format);
     }
 
-    public static String getAnnotationURL(Long idProject, Long idImage, Long idAnnotation) {
+    public String getAnnotationURL(Long idProject, Long idImage, Long idAnnotation) {
         return serverUrl + "/#/project/" + idProject + "/image/" + idImage + "/annotation/" + idAnnotation;
     }
 
-    public static String getAbstractSliceThumbUrl(Long idSlice, String format) {
+    public String getAbstractSliceThumbUrl(Long idSlice, String format) {
         return serverUrl + "/api/abstractslice/" + idSlice + "/thumb." + format;
     }
 
-    public static String getUserAnnotationCropWithAnnotationId(Long idAnnotation, String format) {
+    public String getUserAnnotationCropWithAnnotationId(Long idAnnotation, String format) {
         return serverUrl + "/api/userannotation/" + idAnnotation + "/crop." + format;
     }
 
-    public static String getUserAnnotationCropWithAnnotationIdWithMaxSize(
+    public String getUserAnnotationCropWithAnnotationIdWithMaxSize(
         Long idAnnotation,
         int maxSize,
         String format
@@ -100,11 +114,11 @@ public class UrlApi {
         return serverUrl + "/api/userannotation/" + idAnnotation + "/crop." + format + "?maxSize=" + maxSize;
     }
 
-    public static String getReviewedAnnotationCropWithAnnotationId(Long idAnnotation, String format) {
+    public String getReviewedAnnotationCropWithAnnotationId(Long idAnnotation, String format) {
         return serverUrl + "/api/reviewedannotation/" + idAnnotation + "/crop." + format;
     }
 
-    public static String getReviewedAnnotationCropWithAnnotationIdWithMaxSize(
+    public String getReviewedAnnotationCropWithAnnotationIdWithMaxSize(
         Long idAnnotation,
         int maxSize,
         String format

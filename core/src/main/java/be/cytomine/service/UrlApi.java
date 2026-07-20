@@ -21,11 +21,6 @@ public class UrlApi {
         "thumb", Set.of("SVS", "MRXS", "BIF", "VENTANA")
     );
 
-    public String getServerUrl() {
-        return serverUrl;
-    }
-
-
     public String getAbstractImageThumbUrl(long idImage, String format) {
         return serverUrl + "/api/abstractimage/" + idImage + "/thumb." + format;
     }

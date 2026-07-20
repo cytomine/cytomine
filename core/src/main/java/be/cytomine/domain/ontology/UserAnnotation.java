@@ -222,18 +222,18 @@ public class UserAnnotation extends AnnotationDomain implements Serializable {
         return getDataFromDomain(this);
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
         JsonObject returnArray = AnnotationDomain.getDataFromDomain(domain);
         UserAnnotation annotation = (UserAnnotation) domain;
-        returnArray.put("cropURL", UrlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put("cropURL", urlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
         returnArray.put(
             "smallCropURL",
-            UrlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
+            urlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
         );
-        returnArray.put("url", UrlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put("url", urlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
         returnArray.put(
             "imageURL",
-            UrlApi.getAnnotationURL(
+            urlApi.getAnnotationURL(
                 annotation.getImage().getProject().getId(),
                 annotation.getImage().getId(),
                 annotation.getId()

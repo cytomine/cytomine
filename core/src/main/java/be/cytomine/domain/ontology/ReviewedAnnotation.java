@@ -219,7 +219,7 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         return getDataFromDomain(this);
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
         JsonObject returnArray = AnnotationDomain.getDataFromDomain(domain);
         ReviewedAnnotation annotation = (ReviewedAnnotation) domain;
 
@@ -230,15 +230,15 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         returnArray.put("terms", annotation.termsId());
         returnArray.put("term", annotation.termsId());
 
-        returnArray.put("cropURL", UrlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put("cropURL", urlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
         returnArray.put(
             "smallCropURL",
-            UrlApi.getReviewedAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
+            urlApi.getReviewedAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
         );
-        returnArray.put("url", UrlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put("url", urlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
         returnArray.put(
             "imageURL",
-            UrlApi.getAnnotationURL(
+            urlApi.getAnnotationURL(
                 annotation.getImage().getProject().getId(),
                 annotation.getImage().getId(),
                 annotation.getId()

@@ -25,9 +25,6 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional
 public class AbstractSliceAuthorizationTest extends CRUDAuthorizationTest {
-
-    // We need more flexibility:
-
     @Autowired
     AbstractSliceService abstractSliceService;
     @Autowired

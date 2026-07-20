@@ -36,6 +36,7 @@ public class AnnotationLinkResourceTests {
     private MockMvc restAnnotationLinkControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void addValidAnnotationLink() throws Exception {

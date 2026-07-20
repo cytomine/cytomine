@@ -30,14 +30,11 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
 
     @Autowired
     BasicInstanceBuilder builder;
+    Configuration configForAdmin;
+    Configuration configForUser;
+    Configuration configForAll;
     @Autowired
     private UrlApi urlApi;
-
-    Configuration configForAdmin;
-
-    Configuration configForUser;
-
-    Configuration configForAll;
 
     @BeforeEach
     public void before() throws Exception {

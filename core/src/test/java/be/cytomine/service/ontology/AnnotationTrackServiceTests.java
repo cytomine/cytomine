@@ -40,7 +40,6 @@ import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
@@ -95,7 +94,6 @@ public class AnnotationTrackServiceTests {
         annotationTrack.setAnnotation(annotation);
         assertThat(annotationTrackService.find(annotation, annotationTrack.getTrack()).isPresent());
     }
-
 
     @Test
     void listAllAnnotationTrackByTrack() {

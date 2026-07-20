@@ -57,6 +57,7 @@ public class NestedImageInstanceResourceTests {
     private MockMvc restNestedImageInstanceControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listNestedImageInstanceByImageInstance() throws Exception {
@@ -92,7 +93,6 @@ public class NestedImageInstanceResourceTests {
             .andExpect(jsonPath("$.baseImage").hasJsonPath()); // expect to have field from imageinstance
     }
 
-
     @Test
     @Transactional
     public void getAnNestedImageInstanceNotExist() throws Exception {
@@ -104,7 +104,6 @@ public class NestedImageInstanceResourceTests {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors.message").exists());
     }
-
 
     @Test
     @Transactional
@@ -149,9 +148,7 @@ public class NestedImageInstanceResourceTests {
             .andExpect(jsonPath("$.nestedimageinstance.id").exists())
             .andExpect(jsonPath("$.nestedimageinstance.x").value("123"));
 
-
     }
-
 
     @Test
     @Transactional
@@ -170,7 +167,6 @@ public class NestedImageInstanceResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.nestedimageinstance.id").exists());
-
 
     }
 

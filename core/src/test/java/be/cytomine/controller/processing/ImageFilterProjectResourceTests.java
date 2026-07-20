@@ -54,6 +54,7 @@ public class ImageFilterProjectResourceTests {
     private MockMvc restImageFilterProjectMockMvc;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listAll() throws Exception {

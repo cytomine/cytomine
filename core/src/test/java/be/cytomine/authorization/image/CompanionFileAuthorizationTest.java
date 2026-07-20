@@ -27,13 +27,11 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @Transactional
 public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
 
-    private CompanionFile companionFile = null;
-
     @Autowired
     CompanionFileService companionFileService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    private CompanionFile companionFile = null;
     @Autowired
     private UrlApi urlApi;
 
@@ -67,7 +65,6 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(() -> companionFileService.list(companionFile.getImage()));
         expectForbidden(() -> companionFileService.list(companionFile.getUploadedFile()));
     }
-
 
     @Override
     public void whenIGetDomain() {
@@ -106,7 +103,6 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(WRITE);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

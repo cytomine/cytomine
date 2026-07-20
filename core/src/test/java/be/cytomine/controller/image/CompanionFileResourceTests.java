@@ -65,14 +65,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class CompanionFileResourceTests {
 
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restCompanionFileControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
 
     @BeforeAll
     public static void beforeAll() {
@@ -83,7 +82,6 @@ public class CompanionFileResourceTests {
     public static void afterAll() {
         wireMockServer.stop();
     }
-
 
     @Test
     @Transactional

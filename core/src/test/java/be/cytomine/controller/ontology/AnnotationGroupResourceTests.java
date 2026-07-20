@@ -48,6 +48,7 @@ public class AnnotationGroupResourceTests {
     private AnnotationGroupService annotationGroupService;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     void findAnnotationGroupWithSuccess() {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();

@@ -80,21 +80,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class AbstractImageResourceTests {
 
+    private static final String KEY_ID = "some random string";
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
+    private static RSAKey rsaKey;
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restAbstractImageControllerMockMvc;
-
     @Autowired
     private ApplicationProperties applicationProperties;
     @Autowired
     private UrlApi urlApi;
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
-    private static RSAKey rsaKey;
-
-    private static final String KEY_ID = "some random string";
 
     @BeforeAll
     public static void beforeAll() throws JOSEException {
@@ -105,6 +101,23 @@ public class AbstractImageResourceTests {
     @AfterAll
     public static void afterAll() {
         wireMockServer.stop();
+    }
+
+    public static void configureWireMock(WireMockServer wireMockServer) throws JOSEException {
+        rsaKey = new RSAKeyGenerator(2048)
+            .keyUse(KeyUse.SIGNATURE)
+            .algorithm(new Algorithm("RS256"))
+            .keyID(KEY_ID)
+            .generate();
+
+        RSAKey rsaPublicJWK = rsaKey.toPublicJWK();
+        String jwkResponse = String.format("{\"keys\": [%s]}", rsaPublicJWK.toJSONString());
+
+        wireMockServer.stubFor(com.github.tomakehurst.wiremock.client.WireMock.get(urlMatching("/"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(jwkResponse)));
+
     }
 
     @Test
@@ -307,7 +320,6 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.size").value(3))
             .andExpect(jsonPath("$.totalPages").value(1));
 
-
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage.json")
                 .param("offset", "0")
                 .param("max", "1")
@@ -320,7 +332,6 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.perPage").value(1))
             .andExpect(jsonPath("$.size").value(3))
             .andExpect(jsonPath("$.totalPages").value(3));
-
 
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage.json")
                 .param("offset", "1")
@@ -348,7 +359,6 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.size").value(3))
             .andExpect(jsonPath("$.totalPages").value(1));
 
-
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage.json")
                 .param("offset", "0")
                 .param("max", "500")
@@ -363,7 +373,6 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.size").value(3))
             .andExpect(jsonPath("$.totalPages").value(1));
 
-
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage.json")
                 .param("offset", "500")
                 .param("max", "0")
@@ -375,7 +384,6 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.size").value(3))
             .andExpect(jsonPath("$.totalPages").value(1));
     }
-
 
     @Test
     @Transactional
@@ -416,7 +424,6 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.dimensions").hasJsonPath());
     }
 
-
     @Test
     @Transactional
     public void getAnAbstractImageNotExist() throws Exception {
@@ -437,7 +444,6 @@ public class AbstractImageResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(image.getId().intValue()));
     }
-
 
     @Test
     @Transactional
@@ -475,9 +481,7 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.abstractimage.id").exists())
             .andExpect(jsonPath("$.abstractimage.width").value(999));
 
-
     }
-
 
     @Test
     @Transactional
@@ -493,9 +497,7 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.abstractimage.id").exists());
 
-
     }
-
 
     @Test
     @Transactional
@@ -525,24 +527,6 @@ public class AbstractImageResourceTests {
     public void getAbstractImageUploaderForAbstractImageNotExist() throws Exception {
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/{id}/user.json", 0))
             .andExpect(status().isNotFound());
-    }
-
-    public static void configureWireMock(WireMockServer wireMockServer) throws JOSEException {
-        rsaKey = new RSAKeyGenerator(2048)
-            .keyUse(KeyUse.SIGNATURE)
-            .algorithm(new Algorithm("RS256"))
-            .keyID(KEY_ID)
-            .generate();
-
-        RSAKey rsaPublicJWK = rsaKey.toPublicJWK();
-        String jwkResponse = String.format("{\"keys\": [%s]}", rsaPublicJWK.toJSONString());
-
-        wireMockServer.stubFor(com.github.tomakehurst.wiremock.client.WireMock.get(urlMatching("/"))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(jwkResponse)));
-
-
     }
 
     private String getSignedNotExpiredJwt() throws Exception {
@@ -578,7 +562,6 @@ public class AbstractImageResourceTests {
         return signedJWT.serialize();
     }
 
-
     @Test
     @Transactional
     public void getAbstractImageThumb() throws Exception {
@@ -588,7 +571,8 @@ public class AbstractImageResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
@@ -633,7 +617,8 @@ public class AbstractImageResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
@@ -657,7 +642,6 @@ public class AbstractImageResourceTests {
         assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
-
     @Test
     @Transactional
     public void getAbstractImageAssocietedLabel() throws Exception {
@@ -669,7 +653,8 @@ public class AbstractImageResourceTests {
             ).replace("%2F", "/") + "/info/associated"))
                 .willReturn(
                     aResponse().withBody(
-                        "{\"items\": [{\"name\":\"macro\"},{\"name\":\"thumbnail\"},{\"name\":\"label\"}], \"size\": 0}")
+                        "{\"items\": [{\"name\":\"macro\"},{\"name\":\"thumbnail\"},{\"name\":\"label\"}], \"size\": "
+                            + "0}")
                 )
         );
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/{id}/associated.json", image.getId()))
@@ -677,7 +662,6 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(equalTo(3))))
             .andExpect(jsonPath("$.collection", containsInAnyOrder("label", "macro", "thumbnail")));
     }
-
 
     @Test
     @Transactional
@@ -689,7 +673,8 @@ public class AbstractImageResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
@@ -725,17 +710,19 @@ public class AbstractImageResourceTests {
 
         configureFor("localhost", 8888);
 
-
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/annotation/crop";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))"
+                + "\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
 
@@ -769,7 +756,8 @@ public class AbstractImageResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         configureFor("localhost", 8888);
 
@@ -778,7 +766,9 @@ public class AbstractImageResourceTests {
             + "/window";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"timepoints\":0,\"region\":{\"left\":10,\"top\":20,\"width\":30,\"height\":40}}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"timepoints\":0,\"region\":{\"left\":10,\"top\":20,\"width\":30,"
+                + "\"height\":40}}";
         System.out.println(url);
         System.out.println(body);
         stubFor(post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(equalTo(body))
@@ -796,7 +786,6 @@ public class AbstractImageResourceTests {
         List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
-
 
     private AbstractImage givenTestAbstractImage() {
         AbstractImage image = builder.givenAnAbstractImage();
@@ -846,25 +835,35 @@ public class AbstractImageResourceTests {
             ).replace("%2F", "/") + "/metadata"))
                 .willReturn(
                     aResponse().withBody(
-                        "{\"size\":11,\"items\":[{\"key\":\"JFIFVersion\",\"value\":1.01,\"type\":\"DECIMAL\",\"namespace\":\"JFIF\"},"
+                        "{\"size\":11,\"items\":[{\"key\":\"JFIFVersion\",\"value\":1.01,\"type\":\"DECIMAL\","
+                            + "\"namespace\":\"JFIF\"},"
                             +
-                            "{\"key\":\"ResolutionUnit\",\"value\":\"inches\",\"type\":\"STRING\",\"namespace\":\"JFIF\"},{\"key\":\"XResolution\","
+                            "{\"key\":\"ResolutionUnit\",\"value\":\"inches\",\"type\":\"STRING\","
+                            + "\"namespace\":\"JFIF\"},{\"key\":\"XResolution\","
                             +
-                            "\"value\":300,\"type\":\"INTEGER\",\"namespace\":\"JFIF\"},{\"key\":\"YResolution\",\"value\":300,\"type\":\"INTEGER\","
+                            "\"value\":300,\"type\":\"INTEGER\",\"namespace\":\"JFIF\"},{\"key\":\"YResolution\","
+                            + "\"value\":300,\"type\":\"INTEGER\","
                             +
-                            "\"namespace\":\"JFIF\"},{\"key\":\"ProfileCMMType\",\"value\":\"Little CMS\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "\"namespace\":\"JFIF\"},{\"key\":\"ProfileCMMType\",\"value\":\"Little CMS\","
+                            + "\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ProfileVersion\",\"value\":\"4.3.0\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "{\"key\":\"ProfileVersion\",\"value\":\"4.3.0\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ProfileClass\",\"value\":\"Display Device Profile\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "{\"key\":\"ProfileClass\",\"value\":\"Display Device Profile\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ColorSpaceData\",\"value\":\"RGB\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "{\"key\":\"ColorSpaceData\",\"value\":\"RGB\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ProfileConnectionSpace\",\"value\":\"XYZ\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "{\"key\":\"ProfileConnectionSpace\",\"value\":\"XYZ\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ProfileDateTime\",\"value\":\"2021:03:02 20:40:36\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "{\"key\":\"ProfileDateTime\",\"value\":\"2021:03:02 20:40:36\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ProfileFileSignature\",\"value\":\"acsp\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"}]}")
+                            "{\"key\":\"ProfileFileSignature\",\"value\":\"acsp\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"}]}")
                 )
         );
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/{id}/metadata.json", image.getId()))
@@ -873,13 +872,11 @@ public class AbstractImageResourceTests {
             .andExpect(jsonPath("$.collection[?(@.key==\"ProfileClass\")]").exists());
     }
 
-
     @Test
     public void regenaratePropertiesToAbstractImage() throws Exception {
         AbstractImage image = givenTestAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-
 
         image.setWidth(1);
         image.setPhysicalSizeX(2d);

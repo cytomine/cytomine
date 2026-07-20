@@ -54,6 +54,7 @@ public class ProjectRepresentativeUserResourceTests {
     private MockMvc restProjectRepresentativeUserControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listAllProjectRepresentativeUsers() throws Exception {

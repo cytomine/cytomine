@@ -28,14 +28,11 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
 
     // We need more flexibility:
 
-    private AbstractImage abstractImage = null;
-
     @Autowired
     AbstractImageService abstractImageService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
+    private AbstractImage abstractImage = null;
     @Autowired
     private UrlApi urlApi;
 
@@ -68,7 +65,6 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
         AbstractImage anotherAbstractImage = builder.givenAnAbstractImage();
         assertThat(abstractImageService.list()).doesNotContain(anotherAbstractImage);
     }
-
 
     @Override
     public void whenIGetDomain() {
@@ -105,7 +101,6 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(WRITE);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

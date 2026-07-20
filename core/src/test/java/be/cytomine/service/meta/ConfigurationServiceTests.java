@@ -125,7 +125,6 @@ public class ConfigurationServiceTests {
         assertThat(edited.getValue()).isEqualTo("NEW VALUE");
     }
 
-
     @Test
     void deleteConfigurationWithSuccess() {
         Configuration configuration = builder.givenAConfiguration("xxx");

@@ -59,6 +59,7 @@ public class ProjectDefaultLayerResourceTests {
     private MockMvc restProjectDefaultLayerControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listAllProjectDefaultLayers() throws Exception {
@@ -71,7 +72,6 @@ public class ProjectDefaultLayerResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.id=='" + projectDefaultLayer.getId() + "')]").exists());
     }
-
 
     @Test
     @Transactional
@@ -175,7 +175,6 @@ public class ProjectDefaultLayerResourceTests {
             .andExpect(jsonPath("$.projectdefaultlayer.id").exists())
             .andExpect(jsonPath("$.projectdefaultlayer.hideByDefault").value(true));
     }
-
 
     @Test
     @Transactional

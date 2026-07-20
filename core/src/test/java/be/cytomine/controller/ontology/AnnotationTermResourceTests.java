@@ -68,6 +68,7 @@ public class AnnotationTermResourceTests {
     private WiremockRepository wiremockRepository;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listByUserAnnotation() throws Exception {
@@ -103,7 +104,6 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
-
     @Test
     @Transactional
     public void listByReviewedAnnotation() throws Exception {
@@ -116,7 +116,6 @@ public class AnnotationTermResourceTests {
                 + reviewedAnnotation.getTerms().get(0).getId()
                 + "')]").exists());
     }
-
 
     @Test
     @Transactional
@@ -210,7 +209,6 @@ public class AnnotationTermResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void addAnnotationTermWithTermFromBadOntology() throws Exception {
@@ -264,7 +262,6 @@ public class AnnotationTermResourceTests {
             .andExpect(status().isBadRequest());
 
     }
-
 
     @Test
     @Transactional
@@ -364,7 +361,6 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.annotationterm.id").exists())
             .andExpect(jsonPath("$.annotationterm.term").exists());
 
-
         assertThat(annotationTermRepository.findByUserAnnotationIdAndTermIdAndUserId(
                 previousAnnotationTerm.getUserAnnotation().getId(),
                 previousAnnotationTerm.getTerm().getId(),
@@ -378,7 +374,6 @@ public class AnnotationTermResourceTests {
             )
         ).isPresent();
     }
-
 
     @Test
     @Transactional

@@ -55,6 +55,7 @@ public class DescriptionResourceTests {
     private MockMvc restDescriptionControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listAllDescription() throws Exception {

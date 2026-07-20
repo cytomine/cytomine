@@ -57,7 +57,6 @@ import be.cytomine.utils.filters.SearchParameterEntry;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
@@ -226,7 +225,6 @@ public class AbstractImageServiceTests {
         AssertionsForClassTypes.assertThat(abstractImageService.find(0L)).isEmpty();
     }
 
-
     @Test
     void detectIfUnusedAbstractImageIsUnused() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
@@ -250,7 +248,6 @@ public class AbstractImageServiceTests {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         assertThat(abstractImageService.listUnused()).doesNotContain(imageInstance.getBaseImage());
     }
-
 
     @Test
     void addValidAbstractImageWithSuccess() {
@@ -434,6 +431,5 @@ public class AbstractImageServiceTests {
             }
         );
     }
-
 
 }

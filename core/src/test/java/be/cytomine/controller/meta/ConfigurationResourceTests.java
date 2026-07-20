@@ -55,6 +55,7 @@ public class ConfigurationResourceTests {
     private MockMvc restConfigurationControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listAllConfigs() throws Exception {

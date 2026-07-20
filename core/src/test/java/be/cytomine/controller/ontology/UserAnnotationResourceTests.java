@@ -96,6 +96,25 @@ public class UserAnnotationResourceTests {
     private User me;
     private UserAnnotation userAnnotation;
 
+    public static UserAnnotation givenAUserAnnotationWithValidImageServer(BasicInstanceBuilder builder)
+        throws ParseException {
+        AbstractImage image = builder.givenAnAbstractImage();
+        image.setWidth(109240);
+        image.setHeight(220696);
+        image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
+        image.getUploadedFile().setContentType("MRXS");
+        ImageInstance imageInstance = builder.givenAnImageInstance(image, builder.givenAProject());
+        imageInstance.setInstanceFilename("CMU-2");
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
+        slice.setUploadedFile(image.getUploadedFile());
+        SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
+        return builder.givenAUserAnnotation(
+            sliceInstance,
+            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(),
+            null
+        );
+    }
+
     @Test
     @Transactional
     public void shouldReturnUserAnnotationWithAllExpectedFields() throws Exception {
@@ -132,7 +151,6 @@ public class UserAnnotationResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + userAnnotation.getId() + "')]").exists());
     }
-
 
     @Test
     @Transactional
@@ -176,7 +194,6 @@ public class UserAnnotationResourceTests {
             .andExpect(jsonPath("$.total").value(0));
     }
 
-
     @Test
     @Transactional
     public void countAnnotationsByProjectWithDates() throws Exception {
@@ -185,7 +202,6 @@ public class UserAnnotationResourceTests {
 
         UserAnnotation newUserAnnotation =
             builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(oldUserAnnotation.getProject()));
-
 
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/project/{idProject}/userannotation/count.json",
@@ -236,7 +252,6 @@ public class UserAnnotationResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(0));
     }
-
 
     @Test
     @Transactional
@@ -353,7 +368,9 @@ public class UserAnnotationResourceTests {
         JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put(
             "location",
-            "POLYGON ((225.73582220103702 306.89723126347087, 225.73582220103702 307.93556995227914, 226.08028300710947 307.93556995227914, 226.08028300710947 306.89723126347087, 225.73582220103702 306.89723126347087))"
+            "POLYGON ((225.73582220103702 306.89723126347087, 225.73582220103702 307.93556995227914, 226"
+                + ".08028300710947 307.93556995227914, 226.08028300710947 306.89723126347087, 225.73582220103702 306"
+                + ".89723126347087))"
         ); // too small
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -395,7 +412,6 @@ public class UserAnnotationResourceTests {
             .andExpect(jsonPath("$.annotation.term", hasSize(2)));
     }
 
-
     @Test
     @Transactional
     public void editValidUserAnnotation() throws Exception {
@@ -433,7 +449,6 @@ public class UserAnnotationResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void deleteUserAnnotationNotExistFails() throws Exception {
@@ -447,7 +462,6 @@ public class UserAnnotationResourceTests {
 
     }
 
-
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @jakarta.transaction.Transactional
@@ -458,13 +472,16 @@ public class UserAnnotationResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/annotation/crop";
         String
             body
-            = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1)"
+                + ")\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
@@ -495,13 +512,16 @@ public class UserAnnotationResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/annotation/mask";
         String
             body
-            = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\",\"fill_color\":\"#fff\"}],\"timepoints\":0}";
+            =
+            "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1)"
+                + ")\",\"fill_color\":\"#fff\"}],\"timepoints\":0}";
         System.out.println(url);
         System.out.println(body);
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
@@ -522,7 +542,6 @@ public class UserAnnotationResourceTests {
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
-
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @jakarta.transaction.Transactional
@@ -533,7 +552,8 @@ public class UserAnnotationResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode(
             annotation.getImage().getBaseImage().getPath(),
@@ -541,7 +561,9 @@ public class UserAnnotationResourceTests {
         ).replace("%2F", "/") + "/annotation/crop";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":100}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))"
+                + "\"}],\"timepoints\":0,\"background_transparency\":100}";
         System.out.println(url);
         System.out.println(body);
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
@@ -560,25 +582,6 @@ public class UserAnnotationResourceTests {
             .andReturn();
         List<LoggedRequest> all = WiremockRepository.SERVER.findAll(RequestPatternBuilder.allRequests());
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
-    }
-
-    public static UserAnnotation givenAUserAnnotationWithValidImageServer(BasicInstanceBuilder builder)
-        throws ParseException {
-        AbstractImage image = builder.givenAnAbstractImage();
-        image.setWidth(109240);
-        image.setHeight(220696);
-        image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
-        image.getUploadedFile().setContentType("MRXS");
-        ImageInstance imageInstance = builder.givenAnImageInstance(image, builder.givenAProject());
-        imageInstance.setInstanceFilename("CMU-2");
-        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
-        slice.setUploadedFile(image.getUploadedFile());
-        SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
-        return builder.givenAUserAnnotation(
-            sliceInstance,
-            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(),
-            null
-        );
     }
 
     @Test

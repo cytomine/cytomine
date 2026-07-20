@@ -77,7 +77,7 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @Transactional
 public class UserServiceTests {
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     UserService userService;
     @Autowired

@@ -54,6 +54,7 @@ public class AnnotationTrackResourceTests {
     private MockMvc restAnnotationTrackControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listAllAnnotationTracksByTrack() throws Exception {

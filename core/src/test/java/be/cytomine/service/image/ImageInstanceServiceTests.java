@@ -91,34 +91,25 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @Transactional
 public class ImageInstanceServiceTests {
 
+    private static WireMockServer wireMockServer;
     @Autowired
     ImageInstanceService imageInstanceService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     EntityManager entityManager;
-
     @Autowired
     AnnotationActionRepository annotationActionRepository;
-
     @Autowired
     AnnotationActionService annotationActionService;
-
     @Autowired
     UserPositionService userPositionService;
-
     @Autowired
     PersistentUserPositionRepository persistentUserPositionRepository;
-
     @Autowired
     ImageConsultationService imageConsultationService;
-
     @Autowired
     PersistentImageConsultationRepository persistentImageConsultationRepository;
-
-    private static WireMockServer wireMockServer;
     @Autowired
     private UrlApi urlApi;
 
@@ -176,7 +167,6 @@ public class ImageInstanceServiceTests {
         Collections.shuffle(doubleChoices);
         List<String> stringChoices = new ArrayList<>(List.of("aaa", "zzzz", "AAAA"));
         Collections.shuffle(stringChoices);
-
 
         for (int k = 0; k < 2; k++) { // execute twice the creation of images (6 images)
             for (int i = 0; i < 3; i++) {
@@ -252,7 +242,6 @@ public class ImageInstanceServiceTests {
         assertThat(imageInstanceBounds.getCountImageReviewedAnnotations()
             .getMin()).isEqualTo(0L); //special case since default value is 0
         assertThat(imageInstanceBounds.getCountImageReviewedAnnotations().getMax()).isEqualTo(3L);
-
 
         assertThat(imageInstanceBounds.getMagnification().getList()).contains(1, 2, 3);
         assertThat(imageInstanceBounds.getMimeType().getList()).contains("aaa", "zzzz", "AAAA");
@@ -399,10 +388,8 @@ public class ImageInstanceServiceTests {
         ImageInstance img2 = builder.givenAnImageInstance(project);
         img2.getBaseImage().setWidth(501);
 
-
         assertThat(imageInstanceService.list(user, new ArrayList<>()).stream().map(x -> x.get("id")))
             .contains(img1.getId(), img2.getId());
-
 
         List<SearchParameterEntry> searchParameterEntryList =
             new ArrayList<>(List.of(
@@ -428,7 +415,6 @@ public class ImageInstanceServiceTests {
             );
         assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
-
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
@@ -548,7 +534,6 @@ public class ImageInstanceServiceTests {
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
     }
-
 
     @Test
     void listAllImageIdsForProject() {
@@ -751,7 +736,6 @@ public class ImageInstanceServiceTests {
         );
     }
 
-
     @Test
     void deleteImageInstanceWithSuccess() {
         ImageInstance imageInstance = builder.givenAnImageInstance();
@@ -830,7 +814,6 @@ public class ImageInstanceServiceTests {
         assertThat(persistentImageConsultationRepository.count()).isEqualTo(0);
         assertThat(persistentUserPositionRepository.count()).isEqualTo(0);
     }
-
 
     @Test
     void projectCounter() {

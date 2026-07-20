@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class ImageGroupImageInstanceResourceTests {
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     private UrlApi urlApi;
     @Autowired

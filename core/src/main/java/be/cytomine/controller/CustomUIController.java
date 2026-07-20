@@ -26,6 +26,7 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.meta.PropertyService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
@@ -54,6 +55,7 @@ public class CustomUIController extends RestCytomineController {
     private final ApplicationProperties applicationProperties;
 
     static String CUSTOM_UI_PROJECT = "@CUSTOM_UI_PROJECT";
+    private final UrlApi urlApi;
 
     @GetMapping("/custom-ui/config.json")
     public ResponseEntity<String> retrieveUIConfig(

@@ -145,11 +145,9 @@ public class ProjectConnectionServiceTests {
     @Test
     void findLastUsersConnectionInProject() {
 
-
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
-
 
         List<JsonObject> maps = projectConnectionService.lastConnectionInProject(
             projet,
@@ -298,7 +296,6 @@ public class ProjectConnectionServiceTests {
         UserAnnotation annotation = builder.givenANotPersistedUserAnnotation(projet);
         builder.persistAndReturn(annotation);
 
-
         connection = givenAPersistentConnectionInProject(user, projet, DateUtils.addSeconds(new Date(), 1));
         connection = givenAPersistentConnectionInProject(user, projet, DateUtils.addSeconds(new Date(), 10));
         Page<PersistentProjectConnection>
@@ -312,7 +309,6 @@ public class ProjectConnectionServiceTests {
         for (PersistentProjectConnection persistentProjectConnection : allByUserAndProject) {
             System.out.println("Annotations: " + persistentProjectConnection.getCountCreatedAnnotations());
         }
-
 
         assertThat(allByUserAndProject).hasSize(3);
         assertThat(allByUserAndProject.getContent().get(0).getCountCreatedAnnotations()).isNull();
@@ -413,7 +409,6 @@ public class ProjectConnectionServiceTests {
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
 
-
         List<JsonObject> results;
 
         results = projectConnectionService
@@ -430,7 +425,6 @@ public class ProjectConnectionServiceTests {
         givenAPersistentConnectionInProject(user, projet);
         givenAPersistentConnectionInProject(user, projet);
 
-
         results = projectConnectionService
             .numberOfConnectionsByProjectAndUser(
                 projet,
@@ -443,7 +437,6 @@ public class ProjectConnectionServiceTests {
         assertThat(results).hasSize(1);
         assertThat(results.get(0).get("user")).isEqualTo(user.getId());
         assertThat(results.get(0).get("frequency")).isEqualTo(2);
-
 
         givenAPersistentConnectionInProject(anotherUser, projet);
 
@@ -470,7 +463,6 @@ public class ProjectConnectionServiceTests {
         User user = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
 
-
         List<JsonObject> results;
 
         results = projectConnectionService
@@ -490,7 +482,6 @@ public class ProjectConnectionServiceTests {
 
         givenAPersistentConnectionInProject(user, projet);
         givenAPersistentConnectionInProject(user, projet);
-
 
         results = projectConnectionService
             .numberOfConnectionsOfGivenByProject(
@@ -627,7 +618,6 @@ public class ProjectConnectionServiceTests {
             .isEqualTo(1);
     }
 
-
     @Test
     void numberOfConnectionsByProjectOrderedByPeriod() throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -721,7 +711,6 @@ public class ProjectConnectionServiceTests {
             .findFirst();
         assertThat(entry).isPresent();
         //assertThat(entry.get().get("time")).isEqualTo(simpleDateFormat.parse("2022-01-01T13:00:00"));
-
 
         givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-20T03:00:00"));
 

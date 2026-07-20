@@ -70,15 +70,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class AbstractSliceResourceTests {
 
-    @Autowired
-    private BasicInstanceBuilder builder;
-
-    @Autowired
-    private MockMvc restAbstractSliceControllerMockMvc;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     UrlApi urlApi;
+    @Autowired
+    private BasicInstanceBuilder builder;
+    @Autowired
+    private MockMvc restAbstractSliceControllerMockMvc;
 
     @BeforeAll
     public static void beforeAll() {
@@ -259,7 +257,6 @@ public class AbstractSliceResourceTests {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors").exists());
     }
-
 
     @Test
     @Transactional

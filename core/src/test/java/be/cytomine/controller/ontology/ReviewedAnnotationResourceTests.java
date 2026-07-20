@@ -100,6 +100,25 @@ public class ReviewedAnnotationResourceTests {
     private User me;
     private ReviewedAnnotation reviewedAnnotation;
 
+    public static ReviewedAnnotation givenAReviewedAnnotationWithValidImageServer(BasicInstanceBuilder builder)
+        throws ParseException {
+        AbstractImage image = builder.givenAnAbstractImage();
+        image.setWidth(109240);
+        image.setHeight(220696);
+        image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
+        image.getUploadedFile().setContentType("MRXS");
+        ImageInstance imageInstance = builder.givenAnImageInstance(image, builder.givenAProject());
+        imageInstance.setInstanceFilename("CMU-2");
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
+        slice.setUploadedFile(image.getUploadedFile());
+        SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
+        return builder.givenAReviewedAnnotation(
+            sliceInstance,
+            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(),
+            null
+        );
+    }
+
     @Test
     @Transactional
     public void shouldReturnReviewedAnnotationWithAllExpectedFields() throws Exception {
@@ -170,7 +189,6 @@ public class ReviewedAnnotationResourceTests {
             .andExpect(jsonPath("$.total").value(0));
     }
 
-
     @Test
     @Transactional
     public void countAnnotationsByProjectWithDates() throws Exception {
@@ -179,7 +197,6 @@ public class ReviewedAnnotationResourceTests {
 
         ReviewedAnnotation newReviewedAnnotation =
             builder.persistAndReturn(builder.givenANotPersistedReviewedAnnotation(oldReviewedAnnotation.getProject()));
-
 
         restReviewedAnnotationControllerMockMvc.perform(get(
                 "/api/project/{idProject}/reviewedannotation/count.json",
@@ -194,7 +211,8 @@ public class ReviewedAnnotationResourceTests {
                 "/api/project/{idProject}/reviewedannotation/count.json",
                 oldReviewedAnnotation.getProject().getId()
             )
-                .param("startDate", String.valueOf(DateUtils.addSeconds(oldReviewedAnnotation.getCreated(), -1).getTime())))
+                .param("startDate",
+                    String.valueOf(DateUtils.addSeconds(oldReviewedAnnotation.getCreated(), -1).getTime())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(2));
 
@@ -202,7 +220,8 @@ public class ReviewedAnnotationResourceTests {
                 "/api/project/{idProject}/reviewedannotation/count.json",
                 oldReviewedAnnotation.getProject().getId()
             )
-                .param("endDate", String.valueOf(DateUtils.addSeconds(newReviewedAnnotation.getCreated(), 1).getTime())))
+                .param("endDate",
+                    String.valueOf(DateUtils.addSeconds(newReviewedAnnotation.getCreated(), 1).getTime())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(2));
 
@@ -210,7 +229,8 @@ public class ReviewedAnnotationResourceTests {
                 "/api/project/{idProject}/reviewedannotation/count.json",
                 oldReviewedAnnotation.getProject().getId()
             )
-                .param("startDate", String.valueOf(DateUtils.addSeconds(newReviewedAnnotation.getCreated(), -1).getTime())))
+                .param("startDate",
+                    String.valueOf(DateUtils.addSeconds(newReviewedAnnotation.getCreated(), -1).getTime())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(1));
 
@@ -218,7 +238,8 @@ public class ReviewedAnnotationResourceTests {
                 "/api/project/{idProject}/reviewedannotation/count.json",
                 oldReviewedAnnotation.getProject().getId()
             )
-                .param("endDate", String.valueOf(DateUtils.addSeconds(oldReviewedAnnotation.getCreated(), 1).getTime())))
+                .param("endDate",
+                    String.valueOf(DateUtils.addSeconds(oldReviewedAnnotation.getCreated(), 1).getTime())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(1));
 
@@ -230,7 +251,6 @@ public class ReviewedAnnotationResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(0));
     }
-
 
     @Test
     @Transactional
@@ -358,7 +378,6 @@ public class ReviewedAnnotationResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void deleteReviewedAnnotation() throws Exception {
@@ -379,7 +398,6 @@ public class ReviewedAnnotationResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void deleteReviewedAnnotationNotExistFails() throws Exception {
@@ -392,7 +410,6 @@ public class ReviewedAnnotationResourceTests {
             .andExpect(jsonPath("$.errors").exists());
 
     }
-
 
     @Test
     @Transactional
@@ -408,7 +425,6 @@ public class ReviewedAnnotationResourceTests {
             .andExpect(status().isOk());
         assertThat(imageInstance.getReviewStart()).isNotNull();
     }
-
 
     @Test
     @Transactional
@@ -454,7 +470,6 @@ public class ReviewedAnnotationResourceTests {
             .andExpect(status().isBadRequest());
     }
 
-
     @Test
     @Transactional
     public void addAnnotationReview() throws Exception {
@@ -473,12 +488,10 @@ public class ReviewedAnnotationResourceTests {
                 .content(""))
             .andExpect(status().isOk());
 
-
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isPresent();
         wireMockServer.verify(WireMock.putRequestedFor(urlPathMatching("/reviewed-annotations/terms/.*"))
             .withRequestBody(WireMock.containing(annotationTerm.getTerm().getId().toString())));
     }
-
 
     @Test
     @Transactional
@@ -499,12 +512,10 @@ public class ReviewedAnnotationResourceTests {
                 .content("").param("terms", anotherTerm.getId().toString()))
             .andExpect(status().isOk());
 
-
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isPresent();
         wireMockServer.verify(WireMock.putRequestedFor(urlPathMatching("/reviewed-annotations/terms/.*"))
             .withRequestBody(WireMock.containing(anotherTerm.getId().toString())));
     }
-
 
     @Test
     @Transactional
@@ -523,7 +534,6 @@ public class ReviewedAnnotationResourceTests {
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(reviewedAnnotation.getParentIdent())).isEmpty();
     }
-
 
     @Test
     @Transactional
@@ -544,10 +554,8 @@ public class ReviewedAnnotationResourceTests {
                 .content("").param("users", userAnnotation.getUser().getId().toString()))
             .andExpect(status().isOk());
 
-
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isPresent();
     }
-
 
     @Test
     @Transactional
@@ -566,10 +574,8 @@ public class ReviewedAnnotationResourceTests {
                 .content("").param("users", reviewedAnnotation.getUser().getId().toString()))
             .andExpect(status().isOk());
 
-
         assertThat(reviewedAnnotationRepository.findByParentIdent(reviewedAnnotation.getParentIdent())).isEmpty();
     }
-
 
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
@@ -579,13 +585,16 @@ public class ReviewedAnnotationResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/annotation/crop";
         String
             body
-            = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1)"
+                + ")\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
         wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
@@ -595,7 +604,6 @@ public class ReviewedAnnotationResourceTests {
                     aResponse().withBody(mockResponse)
                 )
         );
-
 
         MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(get(
                 "/api/reviewedannotation/{id}/crop.png?maxSize=512",
@@ -615,13 +623,16 @@ public class ReviewedAnnotationResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/annotation/mask";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\",\"fill_color\":\"#fff\"}],\"timepoints\":0}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))"
+                + "\",\"fill_color\":\"#fff\"}],\"timepoints\":0}";
         System.out.println(url);
         System.out.println(body);
         wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
@@ -631,7 +642,6 @@ public class ReviewedAnnotationResourceTests {
                     aResponse().withBody(mockResponse)
                 )
         );
-
 
         MvcResult mvcResult = restReviewedAnnotationControllerMockMvc.perform(get(
                 "/api/reviewedannotation/{id}/mask.png",
@@ -651,8 +661,8 @@ public class ReviewedAnnotationResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
-
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode(
             annotation.getImage().getBaseImage().getPath(),
@@ -660,7 +670,9 @@ public class ReviewedAnnotationResourceTests {
         ).replace("%2F", "/") + "/annotation/crop";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":100}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))"
+                + "\"}],\"timepoints\":0,\"background_transparency\":100}";
         System.out.println(url);
         System.out.println(body);
         wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
@@ -679,24 +691,5 @@ public class ReviewedAnnotationResourceTests {
             .andReturn();
         List<LoggedRequest> all = wireMockServer.findAll(RequestPatternBuilder.allRequests());
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
-    }
-
-    public static ReviewedAnnotation givenAReviewedAnnotationWithValidImageServer(BasicInstanceBuilder builder)
-        throws ParseException {
-        AbstractImage image = builder.givenAnAbstractImage();
-        image.setWidth(109240);
-        image.setHeight(220696);
-        image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
-        image.getUploadedFile().setContentType("MRXS");
-        ImageInstance imageInstance = builder.givenAnImageInstance(image, builder.givenAProject());
-        imageInstance.setInstanceFilename("CMU-2");
-        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
-        slice.setUploadedFile(image.getUploadedFile());
-        SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
-        return builder.givenAReviewedAnnotation(
-            sliceInstance,
-            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(),
-            null
-        );
     }
 }

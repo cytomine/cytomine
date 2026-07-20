@@ -61,6 +61,7 @@ public class PropertyResourceTests {
     private MockMvc restPropertyControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listAllPropertyForProject() throws Exception {
@@ -185,7 +186,6 @@ public class PropertyResourceTests {
                 + "')].user").value(builder.givenSuperAdmin().getId().intValue()));
     }
 
-
     @Test
     @Transactional
     public void listKeysImageinstanceWithProjectFilter() throws Exception {
@@ -197,7 +197,6 @@ public class PropertyResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[0]").value("key"));
     }
-
 
     @Test
     @Transactional
@@ -212,7 +211,6 @@ public class PropertyResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))));
     }
-
 
     @Test
     @Transactional
@@ -235,7 +233,6 @@ public class PropertyResourceTests {
             .andExpect(status().isNotFound());
     }
 
-
     @Test
     @Transactional
     public void showPropertyForProjectKeyNotExists() throws Exception {
@@ -247,7 +244,6 @@ public class PropertyResourceTests {
             ))
             .andExpect(status().isNotFound());
     }
-
 
     @Test
     @Transactional
@@ -269,7 +265,6 @@ public class PropertyResourceTests {
         restPropertyControllerMockMvc.perform(get("/api/annotation/{annotation}/key/{key}/property.json", 0L, "xxx"))
             .andExpect(status().isNotFound());
     }
-
 
     @Test
     @Transactional
@@ -354,7 +349,6 @@ public class PropertyResourceTests {
             .andExpect(status().isNotFound());
     }
 
-
     @Test
     @Transactional
     public void addValidProperty() throws Exception {
@@ -393,7 +387,6 @@ public class PropertyResourceTests {
             .andExpect(status().isOk());
     }
 
-
     @Test
     @Transactional
     public void addValidPropertyOtherPath() throws Exception {
@@ -410,7 +403,6 @@ public class PropertyResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.property.id").exists());
     }
-
 
     @Test
     @Transactional

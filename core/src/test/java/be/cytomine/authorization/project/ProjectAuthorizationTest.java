@@ -155,7 +155,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void userWithAtLeastReadPermissionCanListProjects() {
         assertThat(projectService.list(
-                (User) userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get(),
+                userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get(),
                 new ProjectSearchExtension(),
                 new ArrayList<>(),
                 "created",
@@ -1318,7 +1318,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Map<String, Object> result = new HashMap<>();
 
         //Add a simple project user
-        User simpleUser = (User) userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get();
+        User simpleUser = userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get();
 
         //Add a project admin
         User admin = builder.givenAUser();

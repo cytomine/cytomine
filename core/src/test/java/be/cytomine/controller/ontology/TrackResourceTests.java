@@ -55,6 +55,7 @@ public class TrackResourceTests {
     private MockMvc restTrackControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listTracksByImageinstance() throws Exception {
@@ -107,7 +108,6 @@ public class TrackResourceTests {
         restTrackControllerMockMvc.perform(get("/api/track/{id}.json", 0))
             .andExpect(status().isNotFound());
     }
-
 
     @Test
     @Transactional

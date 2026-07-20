@@ -3,9 +3,14 @@ package be.cytomine.service;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.annotation.PostConstruct;
+import org.springframework.stereotype.Component;
+
+import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 
+@Component
 public class UrlApi {
 
     private static String serverUrl = "http://localhost:8090";
@@ -16,8 +21,15 @@ public class UrlApi {
         "thumb", Set.of("SVS", "MRXS", "BIF", "VENTANA")
     );
 
-    public static void setServerURL(String url) {
-        serverUrl = url;
+    private final ApplicationProperties applicationProperties;
+
+    public UrlApi(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
+    }
+
+    @PostConstruct
+    public void init() {
+        serverUrl = applicationProperties.getServerURL();
     }
 
     public static String getServerUrl() {

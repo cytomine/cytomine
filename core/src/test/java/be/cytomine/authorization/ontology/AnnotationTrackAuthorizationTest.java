@@ -30,7 +30,7 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private AnnotationTrack annotationTrack = null;
 
     @BeforeEach

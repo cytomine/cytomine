@@ -51,7 +51,7 @@ public class DescriptionServiceTests {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     public void listDescription() {

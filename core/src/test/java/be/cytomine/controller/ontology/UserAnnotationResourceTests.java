@@ -44,6 +44,7 @@ import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
@@ -86,7 +87,8 @@ public class UserAnnotationResourceTests {
 
     @Autowired
     private WiremockRepository wiremockRepository;
-
+    @Autowired
+    private UrlApi urlApi;
     private Project project;
     private ImageInstance image;
     private SliceInstance slice;
@@ -333,7 +335,7 @@ public class UserAnnotationResourceTests {
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -348,7 +350,7 @@ public class UserAnnotationResourceTests {
     @Transactional
     public void addUserAnnotationWithNotValidLocation() throws Exception {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put(
             "location",
             "POLYGON ((225.73582220103702 306.89723126347087, 225.73582220103702 307.93556995227914, 226.08028300710947 307.93556995227914, 226.08028300710947 306.89723126347087, 225.73582220103702 306.89723126347087))"
@@ -363,7 +365,7 @@ public class UserAnnotationResourceTests {
     @Transactional
     public void addValidUserAnnotationWithoutProject() throws Exception {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.remove("project");
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
@@ -383,7 +385,7 @@ public class UserAnnotationResourceTests {
         Term term2 = builder.givenATerm(userAnnotation.getProject().getOntology());
         wiremockRepository.stubTerm(term1);
         wiremockRepository.stubTerm(term2);
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("term", Arrays.asList(term1.getId(), term2.getId()));
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
@@ -400,7 +402,7 @@ public class UserAnnotationResourceTests {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(put("/api/userannotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -419,7 +421,7 @@ public class UserAnnotationResourceTests {
 
         restUserAnnotationControllerMockMvc.perform(delete("/api/userannotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -438,7 +440,7 @@ public class UserAnnotationResourceTests {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(delete("/api/userannotation/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists());
@@ -584,7 +586,7 @@ public class UserAnnotationResourceTests {
     public void createCommentsForAnnotation() throws Exception {
         SharedAnnotation annotation = builder.givenASharedAnnotation();
 
-        JsonObject jsonObject = annotation.toJsonObject();
+        JsonObject jsonObject = annotation.toJsonObject(urlApi);
         jsonObject.put("subject", "subject for test mail");
         jsonObject.put("message", "message for test mail");
         jsonObject.put("users", List.of(builder.givenSuperAdmin().getId()));

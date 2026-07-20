@@ -54,7 +54,7 @@ public class LastConnection extends CytomineSocialDomain {
     private Integer version = 0;
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObjectSocial() {
         throw new WrongArgumentException("getDataFromDomain is not implemented for this class");
     }
 }

@@ -29,7 +29,7 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private Track track = null;
 
     @BeforeEach

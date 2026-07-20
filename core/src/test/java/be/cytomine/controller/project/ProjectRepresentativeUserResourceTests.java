@@ -31,6 +31,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
+import be.cytomine.service.UrlApi;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -51,7 +52,8 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Autowired
     private MockMvc restProjectRepresentativeUserControllerMockMvc;
-
+    @Autowired
+    private UrlApi urlApi;
     @Test
     @Transactional
     public void listAllProjectRepresentativeUsers() throws Exception {
@@ -123,7 +125,7 @@ public class ProjectRepresentativeUserResourceTests {
                 projectRepresentativeUser.getProject().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectRepresentativeUser.toJSON()))
+                .content(projectRepresentativeUser.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -145,7 +147,7 @@ public class ProjectRepresentativeUserResourceTests {
                 projectRepresentativeUser.getProject().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectRepresentativeUser.toJSON()))
+                .content(projectRepresentativeUser.toJSON(urlApi)))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.success").value(false));
     }
@@ -162,7 +164,7 @@ public class ProjectRepresentativeUserResourceTests {
                 projectRepresentativeUser.getProject().getId(), projectRepresentativeUser.getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectRepresentativeUser.toJSON()))
+                .content(projectRepresentativeUser.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -184,7 +186,7 @@ public class ProjectRepresentativeUserResourceTests {
             )
                 .param("user", projectRepresentativeUser.getUser().getId().toString())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectRepresentativeUser.toJSON()))
+                .content(projectRepresentativeUser.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

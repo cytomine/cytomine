@@ -92,7 +92,7 @@ public class ReviewedAnnotationServiceTests {
     @Autowired
     ImageInstanceService imageInstanceService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void getReviewedAnnotationWithSuccess() {

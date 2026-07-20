@@ -37,7 +37,7 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
     BasicInstanceBuilder builder;
 
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @BeforeEach
     public void before() throws Exception {

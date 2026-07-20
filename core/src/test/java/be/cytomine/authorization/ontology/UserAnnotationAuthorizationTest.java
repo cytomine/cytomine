@@ -36,7 +36,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     private static WireMockServer wireMockServer;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     @Autowired
     private BasicInstanceBuilder builder;
     @Autowired

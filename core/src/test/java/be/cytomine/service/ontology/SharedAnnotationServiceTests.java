@@ -64,7 +64,7 @@ public class SharedAnnotationServiceTests {
     @Autowired
     TransactionService transactionService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void listAllSharedAnnotationWithSuccess() {

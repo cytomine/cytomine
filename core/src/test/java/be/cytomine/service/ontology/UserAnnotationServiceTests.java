@@ -92,7 +92,7 @@ public class UserAnnotationServiceTests {
     @Autowired
     WiremockRepository wiremockRepository;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void getUserAnnotationWithSuccess() {

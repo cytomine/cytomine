@@ -45,6 +45,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.AbstractSlice;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
@@ -76,6 +77,8 @@ public class AbstractSliceResourceTests {
     private MockMvc restAbstractSliceControllerMockMvc;
 
     private static WireMockServer wireMockServer = new WireMockServer(8888);
+    @Autowired
+    UrlApi urlApi;
 
     @BeforeAll
     public static void beforeAll() {
@@ -159,7 +162,7 @@ public class AbstractSliceResourceTests {
         AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
         restAbstractSliceControllerMockMvc.perform(post("/api/abstractslice.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(abstractSlice.toJSON()))
+                .content(abstractSlice.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -174,7 +177,7 @@ public class AbstractSliceResourceTests {
     @Transactional
     public void editValidAbstractSlice() throws Exception {
         AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
-        JsonObject jsonObject = abstractSlice.toJsonObject();
+        JsonObject jsonObject = abstractSlice.toJsonObject(urlApi);
         jsonObject.put("time", 3);
         restAbstractSliceControllerMockMvc.perform(put("/api/abstractslice/{id}.json", abstractSlice.getId())
                 .contentType(MediaType.APPLICATION_JSON)

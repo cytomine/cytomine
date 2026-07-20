@@ -33,7 +33,7 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
     @Autowired
     AnnotationLinkService annotationLinkService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private AnnotationLink annotationLink = null;
 
     @BeforeEach

@@ -117,7 +117,7 @@ public class ProjectServiceTests {
     @Autowired
     ProjectRepresentativeUserService projectRepresentativeUserService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     private static void setupStub() {
         /* Simulate call to PIMS */

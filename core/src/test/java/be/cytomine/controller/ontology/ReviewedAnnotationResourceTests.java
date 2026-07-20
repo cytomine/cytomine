@@ -46,6 +46,7 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
+import be.cytomine.service.UrlApi;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -90,7 +91,8 @@ public class ReviewedAnnotationResourceTests {
 
     @Autowired
     private WiremockRepository wiremockRepository;
-
+    @Autowired
+    private UrlApi urlApi;
     private Project project;
     private ImageInstance image;
     private SliceInstance slice;
@@ -325,7 +327,7 @@ public class ReviewedAnnotationResourceTests {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(post("/api/reviewedannotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
+                .content(reviewedAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -345,7 +347,7 @@ public class ReviewedAnnotationResourceTests {
                 reviewedAnnotation.getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
+                .content(reviewedAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -366,7 +368,7 @@ public class ReviewedAnnotationResourceTests {
                 reviewedAnnotation.getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
+                .content(reviewedAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -384,7 +386,7 @@ public class ReviewedAnnotationResourceTests {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restReviewedAnnotationControllerMockMvc.perform(delete("/api/reviewedannotation/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
+                .content(reviewedAnnotation.toJSON(urlApi)))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists());

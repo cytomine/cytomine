@@ -31,7 +31,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     Configuration configForAdmin;
 

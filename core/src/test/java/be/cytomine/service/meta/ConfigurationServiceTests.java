@@ -69,7 +69,7 @@ public class ConfigurationServiceTests {
     @Autowired
     SecurityACLService securityACLService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void listAllConfigurationWithSuccess() {

@@ -120,7 +120,7 @@ public class ImageInstanceServiceTests {
 
     private static WireMockServer wireMockServer;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     private static void setupStub() {
         /* Simulate call to CBIR */

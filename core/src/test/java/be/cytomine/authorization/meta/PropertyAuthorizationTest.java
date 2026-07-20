@@ -35,7 +35,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private Property propertyForProject = null;
     private Property propertyForAnnotation = null;
     private Property propertyForAbstractImage = null;

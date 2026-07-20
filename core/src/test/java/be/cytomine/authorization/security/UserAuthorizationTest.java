@@ -45,7 +45,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @MockitoBean
     private OntologyHttpContract ontologyHttpContract;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     @WithMockUser(username = GUEST)

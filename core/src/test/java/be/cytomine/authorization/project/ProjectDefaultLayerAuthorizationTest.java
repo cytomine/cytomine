@@ -30,7 +30,7 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private ProjectDefaultLayer projectDefaultLayer = null;
 
     @BeforeEach

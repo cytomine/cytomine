@@ -51,6 +51,7 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.ReportType;
 
@@ -104,7 +105,8 @@ public class AnnotationDomainResourceTests {
 
     @Autowired
     private WiremockRepository wiremockRepository;
-
+    @Autowired
+    private UrlApi urlApi;
     Project project;
     ImageInstance image;
     SliceInstance slice;
@@ -1232,7 +1234,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -1253,9 +1255,9 @@ public class AnnotationDomainResourceTests {
         restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonObject.toJsonString(List.of(
-                    userAnnotation1.toJsonObject(),
-                    userAnnotation2.toJsonObject(),
-                    userAnnotation3.toJsonObject()
+                    userAnnotation1.toJsonObject(urlApi),
+                    userAnnotation2.toJsonObject(urlApi),
+                    userAnnotation3.toJsonObject(urlApi)
                 ))))
             .andExpect(status().isOk());
     }
@@ -1266,7 +1268,7 @@ public class AnnotationDomainResourceTests {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -1284,7 +1286,7 @@ public class AnnotationDomainResourceTests {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", reviewedAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
+                .content(reviewedAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -1307,7 +1309,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(delete("/api/annotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -1327,7 +1329,7 @@ public class AnnotationDomainResourceTests {
                 reviewedAnnotation.getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
+                .content(reviewedAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -1354,7 +1356,7 @@ public class AnnotationDomainResourceTests {
         MvcResult mvcResult = restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
                 .param("minPoint", String.valueOf(minPoint)).param("maxPoint", String.valueOf(maxPoint))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotation.toJSON()))
+                .content(annotation.toJSON(urlApi)))
             .andExpect(status().isOk()).andReturn();
         Map<String, Object> annotationResponse = (Map<String, Object>) JsonObject.toMap(mvcResult.getResponse()
             .getContentAsString()).get("annotation");
@@ -1373,7 +1375,7 @@ public class AnnotationDomainResourceTests {
         mvcResult = restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
                 .param("minPoint", String.valueOf(minPoint)).param("maxPoint", String.valueOf(maxPoint))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotation.toJSON()))
+                .content(annotation.toJSON(urlApi)))
             .andExpect(status().isOk()).andReturn();
         annotationResponse = (Map<String, Object>) JsonObject.toMap(mvcResult.getResponse().getContentAsString())
             .get("annotation");
@@ -1406,7 +1408,7 @@ public class AnnotationDomainResourceTests {
             )
                 .param("minPoint", String.valueOf(minPoint)).param("maxPoint", String.valueOf(maxPoint))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotation.toJSON()))
+                .content(annotation.toJSON(urlApi)))
             .andExpect(status().isOk()).andReturn();
 
         assertThat(annotation.getLocation().getNumPoints()).isLessThanOrEqualTo(

@@ -86,7 +86,7 @@ public class AbstractImageServiceTests {
     @Autowired
     ImageInstanceService imageInstanceService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void listAllImageByFilters() {

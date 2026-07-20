@@ -28,7 +28,7 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     @Autowired
     private BasicInstanceBuilder builder;
     @Autowired

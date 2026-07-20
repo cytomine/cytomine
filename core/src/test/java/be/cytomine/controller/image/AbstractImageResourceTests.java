@@ -48,6 +48,7 @@ import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
@@ -87,7 +88,8 @@ public class AbstractImageResourceTests {
 
     @Autowired
     private ApplicationProperties applicationProperties;
-
+    @Autowired
+    private UrlApi urlApi;
     private static WireMockServer wireMockServer = new WireMockServer(8888);
 
     private static RSAKey rsaKey;
@@ -443,7 +445,7 @@ public class AbstractImageResourceTests {
         AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
         restAbstractImageControllerMockMvc.perform(post("/api/abstractimage.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(abstractImage.toJSON()))
+                .content(abstractImage.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -458,7 +460,7 @@ public class AbstractImageResourceTests {
     @Transactional
     public void editValidAbstractImage() throws Exception {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
-        JsonObject jsonObject = abstractImage.toJsonObject();
+        JsonObject jsonObject = abstractImage.toJsonObject(urlApi);
         jsonObject.put("width", 999);
         restAbstractImageControllerMockMvc.perform(put("/api/abstractimage/{id}.json", abstractImage.getId())
                 .contentType(MediaType.APPLICATION_JSON)

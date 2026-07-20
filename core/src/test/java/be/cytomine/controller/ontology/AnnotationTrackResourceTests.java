@@ -31,6 +31,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.AnnotationTrack;
+import be.cytomine.service.UrlApi;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -51,7 +52,8 @@ public class AnnotationTrackResourceTests {
 
     @Autowired
     private MockMvc restAnnotationTrackControllerMockMvc;
-
+    @Autowired
+    private UrlApi urlApi;
     @Test
     @Transactional
     public void listAllAnnotationTracksByTrack() throws Exception {
@@ -138,7 +140,7 @@ public class AnnotationTrackResourceTests {
         AnnotationTrack annotationTrack = builder.givenANotPersistedAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(post("/api/annotationtrack.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationTrack.toJSON()))
+                .content(annotationTrack.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -159,7 +161,7 @@ public class AnnotationTrackResourceTests {
                 annotationTrack.getTrack().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationTrack.toJSON()))
+                .content(annotationTrack.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -176,7 +178,7 @@ public class AnnotationTrackResourceTests {
         AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         restAnnotationTrackControllerMockMvc.perform(delete("/api/annotationtrack/{annotation}/{track}.json", 0, 0)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationTrack.toJSON()))
+                .content(annotationTrack.toJSON(urlApi)))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists());

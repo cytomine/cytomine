@@ -31,6 +31,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.NestedImageInstance;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -54,7 +55,8 @@ public class NestedImageInstanceResourceTests {
 
     @Autowired
     private MockMvc restNestedImageInstanceControllerMockMvc;
-
+    @Autowired
+    private UrlApi urlApi;
     @Test
     @Transactional
     public void listNestedImageInstanceByImageInstance() throws Exception {
@@ -113,7 +115,7 @@ public class NestedImageInstanceResourceTests {
                 builder.givenAnImageInstance().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(companionFile.toJSON()))
+                .content(companionFile.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -128,7 +130,7 @@ public class NestedImageInstanceResourceTests {
     @Transactional
     public void editValidNestedImageInstance() throws Exception {
         NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
-        JsonObject jsonObject = nestedImageInstance.toJsonObject();
+        JsonObject jsonObject = nestedImageInstance.toJsonObject(urlApi);
         jsonObject.put("x", "123");
         restNestedImageInstanceControllerMockMvc.perform(put(
                 "/api/imageinstance/{imageInstanceId}/nested/{id}.json",

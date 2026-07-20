@@ -34,7 +34,7 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private SliceInstance sliceInstance = null;
 
     @BeforeEach

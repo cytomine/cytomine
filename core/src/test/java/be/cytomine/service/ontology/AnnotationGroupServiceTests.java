@@ -38,7 +38,7 @@ public class AnnotationGroupServiceTests {
     @Autowired
     AnnotationGroupService annotationGroupService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void findAnnotationGroupWithSuccess() {

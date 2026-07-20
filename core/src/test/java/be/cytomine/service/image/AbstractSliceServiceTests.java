@@ -75,7 +75,7 @@ public class AbstractSliceServiceTests {
     @Autowired
     ImageInstanceService imageInstanceService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void listAllImageByAbstractImage() {

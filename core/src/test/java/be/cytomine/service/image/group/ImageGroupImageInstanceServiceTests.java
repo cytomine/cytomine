@@ -33,7 +33,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class ImageGroupImageInstanceServiceTests {
 
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     @Autowired
     private BasicInstanceBuilder builder;
     @Autowired

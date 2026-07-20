@@ -36,6 +36,7 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static org.hamcrest.Matchers.greaterThan;
@@ -58,7 +59,8 @@ public class PropertyResourceTests {
 
     @Autowired
     private MockMvc restPropertyControllerMockMvc;
-
+    @Autowired
+    private UrlApi urlApi;
     @Test
     @Transactional
     public void listAllPropertyForProject() throws Exception {
@@ -363,7 +365,7 @@ public class PropertyResourceTests {
                 property.getDomainIdent()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(property.toJSON()))
+                .content(property.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -386,7 +388,8 @@ public class PropertyResourceTests {
                 property1.getDomainIdent()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonObject.toJsonString(List.of(property1.toJsonObject(), property2.toJsonObject()))))
+                .content(JsonObject.toJsonString(List.of(property1.toJsonObject(urlApi),
+                    property2.toJsonObject(urlApi)))))
             .andExpect(status().isOk());
     }
 
@@ -397,7 +400,7 @@ public class PropertyResourceTests {
         Property property = builder.givenANotPersistedProperty(builder.givenAProject(), "key", "value");
         restPropertyControllerMockMvc.perform(post("/api/property.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(property.toJSON()))
+                .content(property.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -421,7 +424,7 @@ public class PropertyResourceTests {
                 property.getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(property.toJsonObject().withChange("value", "v2").toJsonString()))
+                .content(property.toJsonObject(urlApi).withChange("value", "v2").toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

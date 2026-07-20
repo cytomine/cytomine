@@ -31,7 +31,7 @@ public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest 
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private NestedImageInstance nestedImageInstance = null;
 
     @BeforeEach

@@ -31,7 +31,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private AnnotationTerm annotationTerm = null;
 
     @BeforeEach

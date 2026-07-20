@@ -20,6 +20,7 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.AnnotationGroupService;
 import be.cytomine.utils.JsonObject;
 
@@ -45,7 +46,8 @@ public class AnnotationGroupResourceTests {
 
     @Autowired
     private AnnotationGroupService annotationGroupService;
-
+    @Autowired
+    private UrlApi urlApi;
     @Test
     void findAnnotationGroupWithSuccess() {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
@@ -64,7 +66,7 @@ public class AnnotationGroupResourceTests {
         AnnotationGroup annotationGroup = builder.givenANotPersistedAnnotationGroup();
         restAnnotationGroupControllerMockMvc.perform(post("/api/annotationgroup.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationGroup.toJSON()))
+                .content(annotationGroup.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -80,7 +82,7 @@ public class AnnotationGroupResourceTests {
     @Transactional
     public void editValidAnnotationGroup() throws Exception {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
-        JsonObject jsonObject = annotationGroup.toJsonObject();
+        JsonObject jsonObject = annotationGroup.toJsonObject(urlApi);
         String type = UUID.randomUUID().toString();
         jsonObject.put("type", type);
         restAnnotationGroupControllerMockMvc.perform(put("/api/annotationgroup/{id}.json", annotationGroup.getId())

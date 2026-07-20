@@ -57,7 +57,7 @@ public class PropertyServiceTests {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     public void listProperty() {

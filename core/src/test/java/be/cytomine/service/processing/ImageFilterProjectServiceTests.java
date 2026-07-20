@@ -37,7 +37,7 @@ public class ImageFilterProjectServiceTests {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     public void findImageFilterProjectWithSuccess() {

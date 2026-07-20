@@ -80,7 +80,7 @@ public class AnnotationAction extends CytomineSocialDomain implements Cloneable 
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObjectSocial() {
         return getDataFromDomain(this);
     }
 

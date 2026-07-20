@@ -69,6 +69,7 @@ import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
@@ -109,7 +110,8 @@ public class ImageInstanceResourceTests {
 
     @Autowired
     private ApplicationProperties applicationProperties;
-
+    @Autowired
+    private UrlApi urlApi;
     private static WireMockServer wireMockServer = new WireMockServer(8888);
 
     private static RSAKey rsaKey;
@@ -610,7 +612,7 @@ public class ImageInstanceResourceTests {
         ImageInstance imageInstance = builder.givenANotPersistedImageInstance();
         restImageInstanceControllerMockMvc.perform(post("/api/imageinstance.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(imageInstance.toJSON()))
+                .content(imageInstance.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -626,7 +628,7 @@ public class ImageInstanceResourceTests {
     public void editValidImageInstance() throws Exception {
         Project project = builder.givenAProject();
         ImageInstance imageInstance = builder.givenAnImageInstance();
-        JsonObject jsonObject = imageInstance.toJsonObject();
+        JsonObject jsonObject = imageInstance.toJsonObject(urlApi);
         jsonObject.put("project", project.getId());
         restImageInstanceControllerMockMvc.perform(put("/api/imageinstance/{id}.json", imageInstance.getId())
                 .contentType(MediaType.APPLICATION_JSON)

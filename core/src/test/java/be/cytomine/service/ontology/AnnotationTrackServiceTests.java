@@ -63,7 +63,7 @@ public class AnnotationTrackServiceTests {
     @Autowired
     TransactionService transactionService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void getAnnotationTrackWithSuccess() {

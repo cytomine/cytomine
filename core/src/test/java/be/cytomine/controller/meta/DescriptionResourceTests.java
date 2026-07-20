@@ -31,6 +31,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.meta.Description;
+import be.cytomine.service.UrlApi;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -52,7 +53,8 @@ public class DescriptionResourceTests {
 
     @Autowired
     private MockMvc restDescriptionControllerMockMvc;
-
+    @Autowired
+    private UrlApi urlApi;
     @Test
     @Transactional
     public void listAllDescription() throws Exception {
@@ -98,7 +100,7 @@ public class DescriptionResourceTests {
                 description.getDomainIdent()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(description.toJSON()))
+                .content(description.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -120,7 +122,7 @@ public class DescriptionResourceTests {
                 description.getDomainIdent()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(description.toJsonObject().withChange("data", "v2").toJsonString()))
+                .content(description.toJsonObject(urlApi).withChange("data", "v2").toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

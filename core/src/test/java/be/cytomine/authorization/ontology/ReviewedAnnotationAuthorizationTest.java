@@ -38,7 +38,7 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private ReviewedAnnotation reviewedAnnotation = null;
 
     @BeforeEach

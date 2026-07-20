@@ -33,7 +33,7 @@ public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTe
     @Autowired
     ImageGroupImageInstanceService imageGroupImageInstanceService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private ImageGroupImageInstance igii = null;
 
     @BeforeEach

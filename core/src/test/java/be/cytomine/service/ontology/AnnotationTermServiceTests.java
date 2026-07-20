@@ -69,7 +69,7 @@ public class AnnotationTermServiceTests {
     @Autowired
     WiremockRepository wiremockRepository;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void findAnnotationTermWithSuccess() {

@@ -36,7 +36,7 @@ public class AnnotationLinkServiceTests {
     @Autowired
     AnnotationLinkService annotationLinkService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void findAnnotationLinkWithSuccess() {

@@ -37,7 +37,7 @@ public class ImageGroupImageInstanceResourceTests {
 
     private static WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     @Autowired
     private BasicInstanceBuilder builder;
     @Autowired

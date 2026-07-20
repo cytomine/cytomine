@@ -72,7 +72,7 @@ public class NestedImageInstanceServiceTests {
     @Autowired
     EntityManager entityManager;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void listAllNestedImageImageByImageInstance() {

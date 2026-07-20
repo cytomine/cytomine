@@ -53,7 +53,7 @@ public abstract class RestCytomineController {
     protected HttpServletResponse response;
 
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Autowired
     private TransactionService transactionService;
@@ -219,7 +219,7 @@ public abstract class RestCytomineController {
                 }
             } else if (!list.isEmpty() && (list.get(0) instanceof CytomineSocialDomain)) {
                 for (Object o : list) {
-                    JsonObject jsonObject = ((CytomineSocialDomain) o).toJsonObject();
+                    JsonObject jsonObject = ((CytomineSocialDomain) o).toJsonObjectSocial();
                     filterOneElement(jsonObject);
                     filtered.add(jsonObject);
                 }
@@ -267,7 +267,7 @@ public abstract class RestCytomineController {
     }
 
     protected ResponseEntity<String> responseSuccess(CytomineSocialDomain response) {
-        return JsonResponseEntity.status(HttpStatus.OK).body(response.toJsonObject().toJsonString());
+        return JsonResponseEntity.status(HttpStatus.OK).body(response.toJsonObjectSocial().toJsonString());
     }
 
     protected ResponseEntity<String> responseSuccess(String response) {
@@ -342,7 +342,7 @@ public abstract class RestCytomineController {
     protected List<JsonObject> convertCytomineSocialDomainListToJSON(List<? extends CytomineSocialDomain> list) {
         List<JsonObject> results = new ArrayList<>();
         for (CytomineSocialDomain cytomineDomain : list) {
-            results.add(cytomineDomain.toJsonObject());
+            results.add(cytomineDomain.toJsonObjectSocial());
         }
         return results;
     }

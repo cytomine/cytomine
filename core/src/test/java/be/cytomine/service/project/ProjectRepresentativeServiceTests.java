@@ -55,7 +55,7 @@ public class ProjectRepresentativeServiceTests {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void getProjectRepresentativeUserWithSuccess() {

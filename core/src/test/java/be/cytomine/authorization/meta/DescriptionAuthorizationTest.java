@@ -35,7 +35,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private Description descriptionForProject = null;
     private Description descriptionForAnnotation = null;
     private Description descriptionForAbstractImage = null;

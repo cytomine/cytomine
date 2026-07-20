@@ -36,7 +36,7 @@ public class ImageGroupServiceTests {
     @Autowired
     ImageGroupService imageGroupService;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @Test
     void getNonExistingImagegroupReturnNull() {

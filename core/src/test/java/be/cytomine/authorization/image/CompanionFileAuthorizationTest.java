@@ -35,7 +35,7 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     @BeforeEach
     public void before() throws Exception {

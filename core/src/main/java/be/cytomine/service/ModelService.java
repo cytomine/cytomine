@@ -87,7 +87,7 @@ public abstract class ModelService<T extends CytomineDomain> {
     TagDomainAssociationService tagDomainAssociationService;
 
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
 
     /**
      * Save a domain on database, throw error if cannot save

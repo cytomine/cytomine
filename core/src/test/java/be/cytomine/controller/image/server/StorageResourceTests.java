@@ -28,6 +28,7 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.server.Storage;
+import be.cytomine.service.UrlApi;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -48,14 +49,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class StorageResourceTests {
 
     @Autowired
+    private UrlApi urlApi;
+    @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
-
     @Autowired
     private BasicInstanceBuilder builder;
-
     @MockitoBean
     private StorageHttpContract storageHttpContract;
 
@@ -119,7 +119,8 @@ public class StorageResourceTests {
             new StorageResponse(1L, userId, storage.getName(), LocalDateTime.now(), Optional.empty(), Optional.empty()),
             commandId, Commands.CREATE_STORAGE, Set.of())));
 
-        mockMvc.perform(post("/api/storage.json").contentType(MediaType.APPLICATION_JSON).content(storage.toJSON()))
+        mockMvc.perform(
+                post("/api/storage.json").contentType(MediaType.APPLICATION_JSON).content(storage.toJSON(urlApi)))
             .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.CREATE_STORAGE))
             .andExpect(jsonPath("$.data.name").value(storage.getName()));
@@ -135,7 +136,8 @@ public class StorageResourceTests {
             new HttpCommandResponse(true, toResponse(storage), commandId, Commands.UPDATE_STORAGE, Set.of())));
 
         mockMvc.perform(put("/api/storage/{id}.json", storage.getId()).contentType(MediaType.APPLICATION_JSON)
-                .content(storage.toJSON())).andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
+                .content(storage.toJSON(urlApi))).andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value(Commands.UPDATE_STORAGE))
             .andExpect(jsonPath("$.data.id").value(storage.getId().intValue()))
             .andExpect(jsonPath("$.data.name").value(storage.getName()));
@@ -149,7 +151,7 @@ public class StorageResourceTests {
         when(storageHttpContract.update(eq(0L), eq(userId), any())).thenReturn(Optional.empty());
 
         mockMvc.perform(
-                put("/api/storage/{id}.json", 0).contentType(MediaType.APPLICATION_JSON).content(storage.toJSON()))
+                put("/api/storage/{id}.json", 0).contentType(MediaType.APPLICATION_JSON).content(storage.toJSON(urlApi)))
             .andExpect(status().isNotFound());
     }
 

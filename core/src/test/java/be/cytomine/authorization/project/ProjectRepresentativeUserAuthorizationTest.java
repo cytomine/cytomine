@@ -30,7 +30,7 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private ProjectRepresentativeUser projectRepresentativeUser = null;
 
     @BeforeEach

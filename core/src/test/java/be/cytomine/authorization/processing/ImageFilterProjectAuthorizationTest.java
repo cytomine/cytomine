@@ -29,7 +29,7 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
-    UrlApi urlApi;
+    private UrlApi urlApi;
     private ImageFilterProject imageFilterProject = null;
 
     @BeforeEach

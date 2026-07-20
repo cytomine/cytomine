@@ -151,7 +151,8 @@ public class StorageResourceTests {
         when(storageHttpContract.update(eq(0L), eq(userId), any())).thenReturn(Optional.empty());
 
         mockMvc.perform(
-                put("/api/storage/{id}.json", 0).contentType(MediaType.APPLICATION_JSON).content(storage.toJSON(urlApi)))
+                put("/api/storage/{id}.json", 0).contentType(MediaType.APPLICATION_JSON)
+                    .content(storage.toJSON(urlApi)))
             .andExpect(status().isNotFound());
     }
 

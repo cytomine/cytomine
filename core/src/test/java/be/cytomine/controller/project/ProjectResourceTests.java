@@ -729,7 +729,8 @@ public class ProjectResourceTests {
         Ontology newOntology = builder.givenAnOntology();
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi).withChange("ontology", List.of(newOntology.getId())).toJsonString()))
+                .content(project.toJsonObject(urlApi)
+                    .withChange("ontology", List.of(newOntology.getId())).toJsonString()))
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists())

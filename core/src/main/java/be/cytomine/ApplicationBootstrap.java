@@ -30,7 +30,7 @@ import be.cytomine.service.UrlApi;
 @RequiredArgsConstructor
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
 @Transactional
-class ApplicationInitializer {
+class ApplicationBootstrap {
 
     private final ApplicationProperties applicationProperties;
 

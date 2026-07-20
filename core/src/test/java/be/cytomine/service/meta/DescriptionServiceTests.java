@@ -33,10 +33,10 @@ import be.cytomine.domain.meta.Description;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -50,6 +50,8 @@ public class DescriptionServiceTests {
 
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    UrlApi urlApi;
 
     @Test
     public void listDescription() {
@@ -63,7 +65,6 @@ public class DescriptionServiceTests {
         Description description = builder.givenADescription(project);
         assertThat(descriptionService.findByDomain(project)).contains(description);
     }
-
 
     @Test
     public void findDescriptionForDomainIdent() {
@@ -84,12 +85,11 @@ public class DescriptionServiceTests {
         );
     }
 
-
     @Test
     public void createDescription() {
         Project project = builder.givenAProject();
         Description description = builder.givenANotPersistedDescription(project);
-        CommandResponse commandResponse = descriptionService.add(description.toJsonObject());
+        CommandResponse commandResponse = descriptionService.add(description.toJsonObject(urlApi));
         assertThat(commandResponse).isNotNull();
         assertThat(descriptionService.findByDomain(project)).isNotNull();
     }
@@ -100,19 +100,18 @@ public class DescriptionServiceTests {
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
                 Description description = builder.givenADescription(project);
-                CommandResponse commandResponse = descriptionService.add(description.toJsonObject()
+                CommandResponse commandResponse = descriptionService.add(description.toJsonObject(urlApi)
                     .withChange("id", null));
             }
         );
     }
-
 
     @Test
     public void editDescription() {
         Project project = builder.givenAProject();
         Description description = builder.givenADescription(project);
         description.setData("v2");
-        CommandResponse commandResponse = descriptionService.update(description, description.toJsonObject());
+        CommandResponse commandResponse = descriptionService.update(description, description.toJsonObject(urlApi));
         assertThat(commandResponse).isNotNull();
         assertThat(descriptionService.findByDomain(project).get().getData()).isEqualTo("v2");
     }

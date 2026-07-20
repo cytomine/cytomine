@@ -17,6 +17,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectDefaultLayerService;
 
 @AutoConfigureMockMvc
@@ -24,14 +25,13 @@ import be.cytomine.service.project.ProjectDefaultLayerService;
 @Transactional
 public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
 
-
-    private ProjectDefaultLayer projectDefaultLayer = null;
-
     @Autowired
     ProjectDefaultLayerService projectDefaultLayerService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    UrlApi urlApi;
+    private ProjectDefaultLayer projectDefaultLayer = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -70,7 +70,8 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
         User user = builder.givenAUser();
         builder.addUserToProject(projectDefaultLayer.getProject(), user.getUsername());
         projectDefaultLayerService.add(
-            builder.givenANotPersistedProjectRepresentativeUser(projectDefaultLayer.getProject(), user).toJsonObject()
+            builder.givenANotPersistedProjectRepresentativeUser(projectDefaultLayer.getProject(), user)
+                .toJsonObject(urlApi)
         );
     }
 
@@ -100,7 +101,6 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(BasePermission.WRITE);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

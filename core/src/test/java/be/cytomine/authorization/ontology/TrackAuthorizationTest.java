@@ -16,6 +16,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.ontology.Track;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.TrackService;
 
 @AutoConfigureMockMvc
@@ -23,13 +24,13 @@ import be.cytomine.service.ontology.TrackService;
 @Transactional
 public class TrackAuthorizationTest extends CRUDAuthorizationTest {
 
-    private Track track = null;
-
     @Autowired
     TrackService trackService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    UrlApi urlApi;
+    private Track track = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -61,12 +62,12 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
         Track track = builder.givenANotPersistedTrack();
         track.setProject(this.track.getProject());
         track.setImage(this.track.getImage());
-        trackService.add(track.toJsonObject());
+        trackService.add(track.toJsonObject(urlApi));
     }
 
     @Override
     public void whenIEditDomain() {
-        trackService.update(track, track.toJsonObject());
+        trackService.update(track, track.toJsonObject(urlApi));
     }
 
     @Override
@@ -92,7 +93,6 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(BasePermission.READ);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

@@ -17,6 +17,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
 
 @AutoConfigureMockMvc
@@ -24,13 +25,13 @@ import be.cytomine.service.project.ProjectRepresentativeUserService;
 @Transactional
 public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorizationTest {
 
-    private ProjectRepresentativeUser projectRepresentativeUser = null;
-
     @Autowired
     ProjectRepresentativeUserService projectRepresentativeUserService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    UrlApi urlApi;
+    private ProjectRepresentativeUser projectRepresentativeUser = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -81,7 +82,7 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
         projectRepresentativeUserService.add(
             builder.givenANotPersistedProjectRepresentativeUser(
                 projectRepresentativeUser.getProject(), user
-            ).toJsonObject()
+            ).toJsonObject(urlApi)
         );
     }
 
@@ -113,7 +114,6 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(BasePermission.WRITE);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

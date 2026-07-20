@@ -16,6 +16,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.SliceInstanceService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -28,13 +29,13 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
 
     // We need more flexibility:
 
-    private SliceInstance sliceInstance = null;
-
     @Autowired
     SliceInstanceService sliceInstanceService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    UrlApi urlApi;
+    private SliceInstance sliceInstance = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -107,7 +108,6 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(() -> whenIDeleteDomain());
     }
 
-
     @Override
     public void whenIGetDomain() {
         sliceInstanceService.get(sliceInstance.getId());
@@ -119,12 +119,12 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
             builder.givenANotPersistedSliceInstance(
                 builder.givenAnImageInstance(sliceInstance.getProject()),
                 builder.givenAnAbstractSlice()
-            ).toJsonObject());
+            ).toJsonObject(urlApi));
     }
 
     @Override
     public void whenIEditDomain() {
-        sliceInstanceService.update(sliceInstance, sliceInstance.toJsonObject());
+        sliceInstanceService.update(sliceInstance, sliceInstance.toJsonObject(urlApi));
     }
 
     @Override
@@ -147,7 +147,6 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(READ);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

@@ -20,6 +20,7 @@ import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -32,8 +33,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class ImageGroupImageInstanceServiceTests {
 
     @Autowired
+    UrlApi urlApi;
+    @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private ImageGroupImageInstanceService imageGroupImageInstanceService;
 
@@ -89,7 +91,7 @@ public class ImageGroupImageInstanceServiceTests {
     void addValidImagegroupImageinstanceWithSuccess() {
         ImageGroupImageInstance igii = builder.givenANotPersistedImageGroupImageInstance();
 
-        CommandResponse commandResponse = imageGroupImageInstanceService.add(igii.toJsonObject());
+        CommandResponse commandResponse = imageGroupImageInstanceService.add(igii.toJsonObject(urlApi));
 
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -105,7 +107,7 @@ public class ImageGroupImageInstanceServiceTests {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> imageGroupImageInstanceService.add(igii.toJsonObject()
+            () -> imageGroupImageInstanceService.add(igii.toJsonObject(urlApi)
                 .withChange("group", builder.givenAnImageGroup().getId()))
         );
     }
@@ -115,7 +117,7 @@ public class ImageGroupImageInstanceServiceTests {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> imageGroupImageInstanceService.add(igii.toJsonObject()
+            () -> imageGroupImageInstanceService.add(igii.toJsonObject(urlApi)
                 .withChange("image", builder.givenAnImageInstance().getId()))
         );
     }

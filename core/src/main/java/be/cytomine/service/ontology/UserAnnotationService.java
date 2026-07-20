@@ -350,7 +350,7 @@ public class UserAnnotationService extends ModelService {
 
         ((Map<String, Object>) commandResponse.getData().get("annotation")).put(
             "term",
-            terms.stream().map(x -> x.toJsonObject().getId()).toList()
+            terms.stream().map(x -> x.toJsonObject(urlApi).getId()).toList()
         );
 
 
@@ -675,13 +675,13 @@ public class UserAnnotationService extends ModelService {
                     "You cannot delete an annotation with substract! Use reject or delete tool.");
             }
 
-            JsonObject jsonObject = based.toJsonObject();
+            JsonObject jsonObject = based.toJsonObject(urlApi);
             based.setLocation(oldLocation);
             result = update(based, jsonObject);
 
             for (UserAnnotation other : allAnnotationWithSameTerm) {
                 other.setLocation(other.getLocation().difference(newGeometry));
-                update(other, other.toJsonObject());
+                update(other, other.toJsonObject(urlApi));
             }
         } else {
             log.info("doCorrectUserAnnotation : union");
@@ -693,7 +693,7 @@ public class UserAnnotationService extends ModelService {
                 based.setLocation(based.getLocation().union(other.getLocation()));
                 delete(other, null, null, false);
             }
-            JsonObject jsonObject = based.toJsonObject();
+            JsonObject jsonObject = based.toJsonObject(urlApi);
             based.setLocation(oldLocation);
             result = update(based, jsonObject);
         }

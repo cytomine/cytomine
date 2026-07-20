@@ -42,6 +42,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.DateUtils;
 import be.cytomine.utils.JsonObject;
 
@@ -129,14 +130,14 @@ public abstract class CytomineDomain {
         return null;
     }
 
-    public abstract JsonObject toJsonObject();
+    public abstract JsonObject toJsonObject(UrlApi urlApi);
 
     public Map<String, Object> getCallBack() {
         return Map.of();
     }
 
-    public String toJSON() {
-        return toJsonObject().toJsonString();
+    public String toJSON(UrlApi urlApi) {
+        return toJsonObject(urlApi).toJsonString();
     }
 
     public boolean canUpdateContent() {

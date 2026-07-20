@@ -32,6 +32,7 @@ import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -46,13 +47,24 @@ import be.cytomine.utils.filters.SearchParametersUtils;
 public abstract class RestCytomineController {
 
     @Autowired
-    private TransactionService transactionService;
-
-    @Autowired
     protected HttpServletRequest request;
 
     @Autowired
     protected HttpServletResponse response;
+
+    @Autowired
+    UrlApi urlApi;
+
+    @Autowired
+    private TransactionService transactionService;
+
+    private static JsonObject buildJsonNotFound(String className, Map<String, Object> filters) {
+        log.info("responseNotFound $className $id");
+        log.error(className + " with filter " + filters + " does not exist");
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("errors", Map.of("message", className + " not found with filters : " + filters));
+        return jsonObject;
+    }
 
     protected String getRequestETag() {
         return request.getHeader("If-None-Match");
@@ -201,7 +213,7 @@ public abstract class RestCytomineController {
             filtered = new ArrayList();
             if (!list.isEmpty() && (list.get(0) instanceof CytomineDomain)) {
                 for (Object o : list) {
-                    JsonObject jsonObject = ((CytomineDomain) o).toJsonObject();
+                    JsonObject jsonObject = ((CytomineDomain) o).toJsonObject(urlApi);
                     filterOneElement(jsonObject);
                     filtered.add(jsonObject);
                 }
@@ -243,7 +255,7 @@ public abstract class RestCytomineController {
     }
 
     protected ResponseEntity<String> responseSuccess(CytomineDomain response, boolean isFilterRequired) {
-        JsonObject json = response.toJsonObject();
+        JsonObject json = response.toJsonObject(urlApi);
         if (isFilterRequired) {
             filterOneElement(json);
         }
@@ -251,7 +263,7 @@ public abstract class RestCytomineController {
     }
 
     protected ResponseEntity<String> responseSuccess(CytomineDomain response) {
-        return JsonResponseEntity.status(HttpStatus.OK).body(response.toJSON());
+        return JsonResponseEntity.status(HttpStatus.OK).body(response.toJSON(urlApi));
     }
 
     protected ResponseEntity<String> responseSuccess(CytomineSocialDomain response) {
@@ -322,7 +334,7 @@ public abstract class RestCytomineController {
     protected List<JsonObject> convertCytomineDomainListToJSON(List<? extends CytomineDomain> list) {
         List<JsonObject> results = new ArrayList<>();
         for (CytomineDomain cytomineDomain : list) {
-            results.add(cytomineDomain.toJsonObject());
+            results.add(cytomineDomain.toJsonObject(urlApi));
         }
         return results;
     }
@@ -435,14 +447,6 @@ public abstract class RestCytomineController {
             return service.add(json, task);
         }
 
-    }
-
-    private static JsonObject buildJsonNotFound(String className, Map<String, Object> filters) {
-        log.info("responseNotFound $className $id");
-        log.error(className + " with filter " + filters + " does not exist");
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("errors", Map.of("message", className + " not found with filters : " + filters));
-        return jsonObject;
     }
 
     protected ResponseEntity<String> responseNotFound(String className, String id) {

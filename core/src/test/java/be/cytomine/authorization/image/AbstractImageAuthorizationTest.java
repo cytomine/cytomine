@@ -15,6 +15,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.AbstractImageService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -34,6 +35,9 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
 
     @Autowired
     BasicInstanceBuilder builder;
+
+    @Autowired
+    UrlApi urlApi;
 
     @BeforeEach
     public void before() throws Exception {
@@ -73,12 +77,12 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void whenIAddDomain() {
-        abstractImageService.add(builder.givenANotPersistedAbstractImage().toJsonObject());
+        abstractImageService.add(builder.givenANotPersistedAbstractImage().toJsonObject(urlApi));
     }
 
     @Override
     public void whenIEditDomain() {
-        abstractImageService.update(abstractImage, abstractImage.toJsonObject());
+        abstractImageService.update(abstractImage, abstractImage.toJsonObject(urlApi));
     }
 
     @Override

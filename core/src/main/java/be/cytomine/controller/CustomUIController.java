@@ -100,10 +100,10 @@ public class CustomUIController extends RestCytomineController {
                     property.setValue(jsonObject.toJsonString());
                     property.setDomain(project);
 
-                    CommandResponse result = propertyService.add(property.toJsonObject());
+                    CommandResponse result = propertyService.add(property.toJsonObject(urlApi));
                     responseSuccess((String) ((LinkedHashMap) result.getData().get("property")).get("value"));
                 } else {
-                    JsonObject jsonEdit = optionalProperty.get().toJsonObject()
+                    JsonObject jsonEdit = optionalProperty.get().toJsonObject(urlApi)
                         .withChange("value", jsonObject.toJsonString());
 
                     CommandResponse result = propertyService.update(optionalProperty.get(), jsonEdit);

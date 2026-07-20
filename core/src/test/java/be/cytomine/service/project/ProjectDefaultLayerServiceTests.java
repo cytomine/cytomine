@@ -32,6 +32,7 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -48,6 +49,8 @@ public class ProjectDefaultLayerServiceTests {
 
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    UrlApi urlApi;
 
     @Test
     void getProjectDefaultLayerWithSuccess() {
@@ -86,7 +89,7 @@ public class ProjectDefaultLayerServiceTests {
     void addValidProjectDefaultLayerWithSuccess() {
         ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
 
-        CommandResponse commandResponse = projectDefaultLayerService.add(projectDefaultLayer.toJsonObject());
+        CommandResponse commandResponse = projectDefaultLayerService.add(projectDefaultLayer.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -100,7 +103,7 @@ public class ProjectDefaultLayerServiceTests {
         ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
-                projectDefaultLayerService.add(projectDefaultLayer.toJsonObject().withChange("project", 0L));
+                projectDefaultLayerService.add(projectDefaultLayer.toJsonObject(urlApi).withChange("project", 0L));
             }
         );
     }
@@ -110,7 +113,7 @@ public class ProjectDefaultLayerServiceTests {
         ProjectDefaultLayer projectDefaultLayer = builder.givenANotPersistedProjectDefaultLayer();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
-                projectDefaultLayerService.add(projectDefaultLayer.toJsonObject().withChange("user", 0L));
+                projectDefaultLayerService.add(projectDefaultLayer.toJsonObject(urlApi).withChange("user", 0L));
             }
         );
     }
@@ -120,7 +123,7 @@ public class ProjectDefaultLayerServiceTests {
         ProjectDefaultLayer projectDefaultLayer = builder.givenAProjectDefaultLayer();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                projectDefaultLayerService.add(projectDefaultLayer.toJsonObject().withChange("id", null));
+                projectDefaultLayerService.add(projectDefaultLayer.toJsonObject(urlApi).withChange("id", null));
             }
         );
     }

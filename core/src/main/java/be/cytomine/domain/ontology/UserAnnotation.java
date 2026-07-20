@@ -218,7 +218,7 @@ public class UserAnnotation extends AnnotationDomain implements Serializable {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

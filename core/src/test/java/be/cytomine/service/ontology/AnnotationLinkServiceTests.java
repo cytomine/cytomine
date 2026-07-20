@@ -18,6 +18,7 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.ontology.AnnotationLink;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -34,6 +35,8 @@ public class AnnotationLinkServiceTests {
 
     @Autowired
     AnnotationLinkService annotationLinkService;
+    @Autowired
+    UrlApi urlApi;
 
     @Test
     void findAnnotationLinkWithSuccess() {
@@ -88,7 +91,7 @@ public class AnnotationLinkServiceTests {
     void addValidAnnotationLinkWithSuccess() {
         AnnotationLink annotationLink = builder.givenANotPersistedAnnotationLink();
 
-        CommandResponse commandResponse = annotationLinkService.add(annotationLink.toJsonObject());
+        CommandResponse commandResponse = annotationLinkService.add(annotationLink.toJsonObject(urlApi));
 
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);

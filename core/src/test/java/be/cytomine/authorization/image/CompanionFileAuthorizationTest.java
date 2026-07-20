@@ -16,6 +16,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.CompanionFile;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.CompanionFileService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -33,6 +34,8 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
 
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    UrlApi urlApi;
 
     @BeforeEach
     public void before() throws Exception {
@@ -75,12 +78,12 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     protected void whenIAddDomain() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         abstractImage.getUploadedFile().setStorage(companionFile.getImage().getUploadedFile().getStorage());
-        companionFileService.add(builder.givenANotPersistedCompanionFile(abstractImage).toJsonObject());
+        companionFileService.add(builder.givenANotPersistedCompanionFile(abstractImage).toJsonObject(urlApi));
     }
 
     @Override
     public void whenIEditDomain() {
-        companionFileService.update(companionFile, companionFile.toJsonObject());
+        companionFileService.update(companionFile, companionFile.toJsonObject(urlApi));
     }
 
     @Override

@@ -18,6 +18,7 @@ import be.cytomine.authorization.AbstractAuthorizationTest;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.search.UserSearchExtension;
 import be.cytomine.service.security.AccountService;
@@ -43,6 +44,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     private AccountService accountService;
     @MockitoBean
     private OntologyHttpContract ontologyHttpContract;
+    @Autowired
+    UrlApi urlApi;
 
     @Test
     @WithMockUser(username = GUEST)
@@ -110,14 +113,14 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @WithMockUser(username = USER_NO_ACL)
     public void userCanAddUser() {
         User user = builder.givenANotPersistedUser();
-        expectOK(() -> userService.add(user.toJsonObject().withChange("password", UUID.randomUUID().toString())));
+        expectOK(() -> userService.add(user.toJsonObject(urlApi).withChange("password", UUID.randomUUID().toString())));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void userCanModifyHimself() {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
-        JsonObject userJson = user.toJsonObject()
+        JsonObject userJson = user.toJsonObject(urlApi)
             .withChange("name", "user_can_modify_himself")
             .withChange("firstname", "John")
             .withChange("lastname", "Doe")
@@ -134,7 +137,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @WithMockUser(username = SUPERADMIN)
     public void shouldUpdateUserNameWhenAdminModifiesUser() {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
-        JsonObject userJson = user.toJsonObject()
+        JsonObject userJson = user.toJsonObject(urlApi)
             .withChange("name", "admin_can_modify_a_user")
             .withChange("firstname", "John")
             .withChange("lastname", "Doe")
@@ -153,7 +156,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         User user = userRepository.findByUsernameLikeIgnoreCase(GUEST).get();
         expectForbidden(() -> userService.update(
             user,
-            user.toJsonObject().withChange("name", "user_can_modify_himself")
+            user.toJsonObject(urlApi).withChange("name", "user_can_modify_himself")
         ));
     }
 

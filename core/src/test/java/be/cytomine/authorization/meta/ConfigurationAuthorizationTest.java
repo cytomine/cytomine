@@ -15,6 +15,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.AbstractAuthorizationTest;
 import be.cytomine.domain.meta.Configuration;
 import be.cytomine.domain.meta.ConfigurationReadingRole;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.meta.ConfigurationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +30,8 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
 
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    UrlApi urlApi;
 
     Configuration configForAdmin;
 
@@ -100,7 +103,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void adminCanCreateConfig() {
-        expectOK(() -> configurationService.add(configForUser.toJsonObject()
+        expectOK(() -> configurationService.add(configForUser.toJsonObject(urlApi)
             .withChange("id", null)
             .withChange("key", UUID.randomUUID().toString())));
     }
@@ -108,7 +111,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void userCannotCreateConfig() {
-        expectForbidden(() -> configurationService.add(configForUser.toJsonObject()
+        expectForbidden(() -> configurationService.add(configForUser.toJsonObject(urlApi)
             .withChange("id", null)
             .withChange("key", UUID.randomUUID().toString())));
     }
@@ -118,7 +121,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     public void adminCanEditConfig() {
         expectOK(() -> configurationService.update(
             configForUser,
-            configForUser.toJsonObject().withChange("value", "newvalue")
+            configForUser.toJsonObject(urlApi).withChange("value", "newvalue")
         ));
     }
 
@@ -127,7 +130,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     public void userCannotEditConfig() {
         expectForbidden(() -> configurationService.update(
             configForUser,
-            configForUser.toJsonObject().withChange("value", "newvalue")
+            configForUser.toJsonObject(urlApi).withChange("value", "newvalue")
         ));
     }
 

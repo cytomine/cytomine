@@ -59,6 +59,7 @@ import be.cytomine.repository.ReviewedAnnotationListing;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -90,6 +91,8 @@ public class ReviewedAnnotationServiceTests {
 
     @Autowired
     ImageInstanceService imageInstanceService;
+    @Autowired
+    UrlApi urlApi;
 
     @Test
     void getReviewedAnnotationWithSuccess() {
@@ -314,7 +317,7 @@ public class ReviewedAnnotationServiceTests {
     @Test
     void addValidReviewedAnnotationWithSuccess() {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
-        CommandResponse commandResponse = reviewedAnnotationService.add(reviewedAnnotation.toJsonObject()
+        CommandResponse commandResponse = reviewedAnnotationService.add(reviewedAnnotation.toJsonObject(urlApi)
             .withChange("term", builder.givenATerm(reviewedAnnotation.getProject().getOntology()).getId()));
 
         assertThat(commandResponse).isNotNull();
@@ -341,7 +344,7 @@ public class ReviewedAnnotationServiceTests {
 
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                reviewedAnnotationService.add(reviewedAnnotation.toJsonObject()
+                reviewedAnnotationService.add(reviewedAnnotation.toJsonObject(urlApi)
                     .withChange("id", null));
             }
         );
@@ -353,7 +356,7 @@ public class ReviewedAnnotationServiceTests {
         reviewedAnnotation.setLocation(new WKTReader().read(
             "LINESTRING( 181.05636403199998 324.87936288, 208.31216076799996 303.464094016)"
         ));
-        JsonObject jsonObject = reviewedAnnotation.toJsonObject();
+        JsonObject jsonObject = reviewedAnnotation.toJsonObject(urlApi);
         CommandResponse commandResponse = reviewedAnnotationService.add(jsonObject);
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(((ReviewedAnnotation) commandResponse.getObject()).getLocation().toText())
@@ -373,7 +376,7 @@ public class ReviewedAnnotationServiceTests {
         builder.persistAndReturn(reviewedAnnotation);
         CommandResponse commandResponse = reviewedAnnotationService.update(
             reviewedAnnotation,
-            reviewedAnnotation.toJsonObject().withChange(
+            reviewedAnnotation.toJsonObject(urlApi).withChange(
                 "location", newLocation)
         );
 
@@ -400,7 +403,7 @@ public class ReviewedAnnotationServiceTests {
     @Test
     void editReviewedAnnotationEmptyPolygon() throws ParseException {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        JsonObject jsonObject = reviewedAnnotation.toJsonObject();
+        JsonObject jsonObject = reviewedAnnotation.toJsonObject(urlApi);
         jsonObject.put("location", "POINT (BAD GEOMETRY)");
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -435,7 +438,7 @@ public class ReviewedAnnotationServiceTests {
         Term term1 = builder.givenATerm(reviewedAnnotation.getProject().getOntology());
         Term term2 = builder.givenATerm(reviewedAnnotation.getProject().getOntology());
 
-        JsonObject jsonObject = reviewedAnnotation.toJsonObject();
+        JsonObject jsonObject = reviewedAnnotation.toJsonObject(urlApi);
         jsonObject.put("term", List.of(term1.getId(), term2.getId()));
 
         CommandResponse commandResponse = reviewedAnnotationService.add(jsonObject);
@@ -602,7 +605,7 @@ public class ReviewedAnnotationServiceTests {
 
 
         reviewedAnnotationService.edit(
-            ((ReviewedAnnotation) response.getObject()).toJsonObject()
+            ((ReviewedAnnotation) response.getObject()).toJsonObject(urlApi)
                 .withChange("location", "POLYGON ((19830 21680, 21070 21600, 20470 20740, 19830 21680))"), false
         );
         assertThat(((ReviewedAnnotation) response.getObject()).getWktLocation()).isEqualTo(

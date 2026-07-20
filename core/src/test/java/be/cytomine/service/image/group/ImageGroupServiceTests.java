@@ -17,6 +17,7 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
@@ -34,6 +35,8 @@ public class ImageGroupServiceTests {
 
     @Autowired
     ImageGroupService imageGroupService;
+    @Autowired
+    UrlApi urlApi;
 
     @Test
     void getNonExistingImagegroupReturnNull() {
@@ -69,7 +72,7 @@ public class ImageGroupServiceTests {
     void addValidImagegroupWithSuccess() {
         ImageGroup imageGroup = builder.givenANotPersistedImagegroup();
 
-        CommandResponse commandResponse = imageGroupService.add(imageGroup.toJsonObject());
+        CommandResponse commandResponse = imageGroupService.add(imageGroup.toJsonObject(urlApi));
 
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -81,7 +84,7 @@ public class ImageGroupServiceTests {
         ImageGroup imageGroup = builder.givenAnImageGroup();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
-                imageGroupService.add(imageGroup.toJsonObject().withChange("project", null));
+                imageGroupService.add(imageGroup.toJsonObject(urlApi).withChange("project", null));
             }
         );
     }
@@ -92,7 +95,7 @@ public class ImageGroupServiceTests {
         Project project2 = builder.givenAProject();
         ImageGroup imageGroup = builder.givenAnImageGroup(project1);
 
-        JsonObject jsonObject = imageGroup.toJsonObject();
+        JsonObject jsonObject = imageGroup.toJsonObject(urlApi);
         jsonObject.put("project", project2.getId());
 
         CommandResponse commandResponse = imageGroupService.edit(jsonObject, true);

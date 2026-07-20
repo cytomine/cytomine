@@ -22,13 +22,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
@@ -70,8 +69,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
@@ -80,6 +77,7 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
+@MockedUser
 @Transactional
 public class UserServiceTests {
 
@@ -118,8 +116,6 @@ public class UserServiceTests {
     private UserMapper userMapper;
     @Autowired
     private UserRepository userRepository;
-    @MockitoBean
-    private UserHttpContract userHttpContract;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -143,9 +139,6 @@ public class UserServiceTests {
 
     @BeforeEach
     public void init() {
-        when(userHttpContract.search(anyString())).thenAnswer(invocation ->
-            userRepository.findByUsernameLikeIgnoreCase(invocation.getArgument(0)).map(userMapper::map));
-
         persistentConnectionRepository.deleteAll();
         lastConnectionRepository.deleteAll();
         persistentImageConsultationRepository.deleteAll();

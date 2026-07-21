@@ -542,7 +542,7 @@ public class CytomineTests {
         String imageName = "wsi";
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
 
-        cytomineSteps.checkPimsImportProject(new WebDriverWait(driver, Duration.ofMinutes(5)),
+        cytomineSteps.checkPimsImportProject(wait,
             cytomineUrl, projectName, imageName);
 
         cytomineSteps.logout(wait, cytomineUrl);

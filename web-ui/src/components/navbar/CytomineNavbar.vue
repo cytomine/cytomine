@@ -80,11 +80,11 @@
 import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
 
-import NavbarDropdown from './NavbarDropdown';
-import NavigationTree from './NavigationTree';
-import HotkeysModal from './HotkeysModal';
-import AboutCytomineModal from './AboutCytomineModal';
-import CytomineSearcher from '@/components/search/CytomineSearcher';
+import NavbarDropdown from './NavbarDropdown.vue';
+import NavigationTree from './NavigationTree.vue';
+import HotkeysModal from './HotkeysModal.vue';
+import AboutCytomineModal from './AboutCytomineModal.vue';
+import CytomineSearcher from '@/components/search/CytomineSearcher.vue';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
 import {KeycloakRole} from '@/constants/UserRole.js';

@@ -65,6 +65,7 @@ import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.service.PermissionService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.search.ProjectSearchExtension;
 import be.cytomine.service.security.SecurityACLService;
@@ -94,37 +95,29 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class ProjectServiceTests {
 
+    private static WireMockServer wireMockServer;
     @Autowired
     ProjectService projectService;
-
     @Autowired
     BasicInstanceBuilder basicInstanceBuilder;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     PersistentProjectConnectionRepository persistentProjectConnectionRepository;
-
     @Autowired
     ProjectConnectionService projectConnectionService;
-
     @Autowired
     UserAnnotationService userAnnotationService;
-
     @Autowired
     SecurityACLService securityACLService;
-
     @Autowired
     PermissionService permissionService;
-
     @Autowired
     EntityManager entityManager;
-
     @Autowired
     ProjectRepresentativeUserService projectRepresentativeUserService;
-
-    private static WireMockServer wireMockServer;
+    @Autowired
+    private UrlApi urlApi;
 
     private static void setupStub() {
         /* Simulate call to PIMS */
@@ -321,9 +314,9 @@ public class ProjectServiceTests {
         builder.addUserToProject(project2, builder.givenSuperAdmin().getUsername());
 
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project2);
-        userAnnotationService.add(userAnnotation.toJsonObject());
+        userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
         userAnnotation = builder.givenANotPersistedUserAnnotation(project1);
-        userAnnotationService.add(userAnnotation.toJsonObject());
+        userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
 
         ProjectSearchExtension projectSearchExtension = new ProjectSearchExtension();
         projectSearchExtension.setWithMembersCount(true);
@@ -367,8 +360,8 @@ public class ProjectServiceTests {
         UserAnnotation userAnnotation1 = builder.givenANotPersistedUserAnnotation(project1);
         UserAnnotation userAnnotation2 = builder.givenANotPersistedUserAnnotation(project2);
 
-        userAnnotationService.add(userAnnotation1.toJsonObject());
-        userAnnotationService.add(userAnnotation2.toJsonObject());
+        userAnnotationService.add(userAnnotation1.toJsonObject(urlApi));
+        userAnnotationService.add(userAnnotation2.toJsonObject(urlApi));
 
         assertThat(projectService.findCommandHistory(
             List.of(project1, project2),
@@ -430,7 +423,6 @@ public class ProjectServiceTests {
 
     }
 
-
     @Test
     void listUserProjectWithAnnotationFilters() {
         Project project1 = builder.givenAProject();
@@ -479,7 +471,6 @@ public class ProjectServiceTests {
         );
         assertThat(page.getTotalElements()).isEqualTo(0);
 
-
         page = projectService.list(
             builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(List.of(
                 new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 150)
@@ -501,7 +492,6 @@ public class ProjectServiceTests {
             )), "created", "desc", 0L, 0L
         );
         assertThat(page.getTotalElements()).isEqualTo(0);
-
 
         page = projectService.list(
             builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(List.of(
@@ -525,7 +515,6 @@ public class ProjectServiceTests {
         );
         assertThat(page.getTotalElements()).isEqualTo(0);
 
-
         page = projectService.list(
             builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(List.of(
                 new SearchParameterEntry("numberOfJobAnnotations", SearchOperation.lte, 350)
@@ -548,7 +537,6 @@ public class ProjectServiceTests {
         );
         assertThat(page.getTotalElements()).isEqualTo(0);
     }
-
 
     @Test
     void listUserProjectWithNameFilter() {
@@ -600,7 +588,6 @@ public class ProjectServiceTests {
         assertThat(page.getContent().get(0).get("id")).isEqualTo(project2.getId());
     }
 
-
     @Test
     void listUserProjectWithPagination() {
         Project project1 = builder.givenAProject();
@@ -642,7 +629,6 @@ public class ProjectServiceTests {
         assertThat(page.getContent().get(1).get("id")).isEqualTo(project2.getId());
         assertThat(page.getContent().get(2).get("id")).isEqualTo(project3.getId());
 
-
         page = projectService.list(
             builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(List.of(
                 new SearchParameterEntry("ontology", SearchOperation.in, List.of(project1.getOntology().getId()))
@@ -672,7 +658,6 @@ public class ProjectServiceTests {
         assertThat(page.getTotalElements()).isEqualTo(5);
         assertThat(page.getContent()).hasSize(0);
     }
-
 
     @Test
     void listUserProjectWithNoUser() {
@@ -712,7 +697,6 @@ public class ProjectServiceTests {
 
         builder.addUserToProject(project1, "superadmin");
 
-
         ProjectSearchExtension projectSearchExtension = new ProjectSearchExtension();
         projectSearchExtension.setWithCurrentUserRoles(true);
         List<SearchParameterEntry> searchParameterEntries = new ArrayList<>();
@@ -742,7 +726,6 @@ public class ProjectServiceTests {
         Project project1 = builder.givenAProject();
 
         builder.addUserToProject(project1, "superadmin");
-
 
         ProjectSearchExtension projectSearchExtension = new ProjectSearchExtension();
         projectSearchExtension.setWithMembersCount(true);
@@ -778,7 +761,6 @@ public class ProjectServiceTests {
 
         builder.addUserToProject(project1, "superadmin");
 
-
         ProjectSearchExtension projectSearchExtension = new ProjectSearchExtension();
         projectSearchExtension.setWithCurrentUserRoles(true);
         List<SearchParameterEntry> searchParameterEntries = new ArrayList<>();
@@ -803,7 +785,6 @@ public class ProjectServiceTests {
             projectWhereUserIsMissing.getId());
     }
 
-
     @Test
     void listProjectByOnotology() {
         Project project1 = builder.givenAProject();
@@ -822,7 +803,7 @@ public class ProjectServiceTests {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project1);
 
         assertThat(projectService.lastAction(project1, 10)).hasSize(0);
-        userAnnotationService.add(userAnnotation.toJsonObject());
+        userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
         assertThat(projectService.lastAction(project1, 10)).hasSize(1);
     }
 
@@ -846,12 +827,11 @@ public class ProjectServiceTests {
         assertThat(projectService.listByUser(user)).contains(new NamedCytomineDomain(project1.getId()));
     }
 
-
     @Test
     void addProject() {
         Project project = basicInstanceBuilder.givenANotPersistedProject();
 
-        CommandResponse commandResponse = projectService.add(project.toJsonObject());
+        CommandResponse commandResponse = projectService.add(project.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -878,7 +858,7 @@ public class ProjectServiceTests {
         User user = builder.givenAUser();
         User admin = builder.givenAUser();
 
-        CommandResponse commandResponse = projectService.add(project.toJsonObject()
+        CommandResponse commandResponse = projectService.add(project.toJsonObject(urlApi)
             .withChange("users", List.of(user.getId()))
             .withChange("admins", List.of(admin.getId()))
         );
@@ -916,7 +896,7 @@ public class ProjectServiceTests {
 
         CommandResponse commandResponse = projectService.update(
             project,
-            project.toJsonObject().withChange("name", "NEW NAME")
+            project.toJsonObject(urlApi).withChange("name", "NEW NAME")
         );
 
         assertThat(commandResponse).isNotNull();
@@ -933,7 +913,7 @@ public class ProjectServiceTests {
         Ontology anotherOntology = builder.givenAnOntology();
 
         CommandResponse commandResponse = projectService.update(
-            project, project.toJsonObject()
+            project, project.toJsonObject(urlApi)
                 .withChange("ontology", anotherOntology.getId())
         );
 
@@ -955,7 +935,7 @@ public class ProjectServiceTests {
         Assertions.assertThrows(
             ForbiddenException.class, () -> {
                 projectService.update(
-                    project, project.toJsonObject()
+                    project, project.toJsonObject(urlApi)
                         .withChange("ontology", anotherOntology.getId())
                 );
             }
@@ -963,7 +943,7 @@ public class ProjectServiceTests {
         assertThat(project.getOntology()).isNotEqualTo(anotherOntology);
 
         CommandResponse commandResponse = projectService.update(
-            project, project.toJsonObject()
+            project, project.toJsonObject(urlApi)
                 .withChange("ontology", anotherOntology.getId())
                 .withChange("forceOntologyUpdate", true)
         );
@@ -985,7 +965,7 @@ public class ProjectServiceTests {
         builder.addUserToProject(project, previousUser.getUsername(), READ);
 
         CommandResponse commandResponse = projectService.update(
-            project, project.toJsonObject()
+            project, project.toJsonObject(urlApi)
                 .withChange("users", List.of(newUser.getId()))
         );
 
@@ -1006,7 +986,7 @@ public class ProjectServiceTests {
         builder.addUserToProject(project, previousUser.getUsername(), ADMINISTRATION);
 
         CommandResponse commandResponse = projectService.update(
-            project, project.toJsonObject()
+            project, project.toJsonObject(urlApi)
                 .withChange("admins", List.of(newUser.getId()))
         );
 
@@ -1042,7 +1022,7 @@ public class ProjectServiceTests {
         assertThat(projectRepresentativeUserService.find(project, newUser)).isEmpty();
 
         CommandResponse commandResponse = projectService.update(
-            project, project.toJsonObject()
+            project, project.toJsonObject(urlApi)
                 .withChange("representatives", List.of(newUser.getId()))
         );
 
@@ -1061,7 +1041,7 @@ public class ProjectServiceTests {
         Assertions.assertThrows(
             ConstraintException.class, () -> projectService.update(
                 project,
-                project.toJsonObject().withChange("representatives", List.of(userNotInProject.getId()))
+                project.toJsonObject(urlApi).withChange("representatives", List.of(userNotInProject.getId()))
             )
         );
 
@@ -1125,12 +1105,11 @@ public class ProjectServiceTests {
         AssertionsForClassTypes.assertThat(projectService.find(project.getId()).isEmpty());
     }
 
-
     @Test
     void deleteProjectJustBeeingCreated() {
         Project project = basicInstanceBuilder.givenANotPersistedProject();
 
-        CommandResponse commandResponse = projectService.add(project.toJsonObject());
+        CommandResponse commandResponse = projectService.add(project.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -1142,7 +1121,6 @@ public class ProjectServiceTests {
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);
     }
-
 
     @Test
     void deleteProjectWithDependencies() {

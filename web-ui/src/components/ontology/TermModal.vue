@@ -36,7 +36,7 @@
 <script>
 import {Term} from '@/api';
 import {Sketch} from 'vue-color';
-import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
   name: 'term-modal',

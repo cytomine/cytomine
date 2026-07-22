@@ -115,7 +115,6 @@ public class AnnotationActionResourceTests {
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(1);
     }
 
-
     @Test
     @Transactional
     public void listLastUserOnImage() throws Exception {

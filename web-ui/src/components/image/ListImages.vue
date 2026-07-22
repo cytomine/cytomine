@@ -229,13 +229,13 @@ import {ImageInstanceCollection, TagCollection} from '@/api';
 import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
 import vendorFromFormat from '@/utils/vendor';
 
-import AddImageModal from '@/components/image/AddImageModal';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineSlider from '@/components/form/CytomineSlider';
-import CytomineTable from '@/components/utils/CytomineTable';
-import ImageDetails from '@/components/image/ImageDetails';
-import ImageName from '@/components/image/ImageName';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
+import AddImageModal from '@/components/image/AddImageModal.vue';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
+import CytomineSlider from '@/components/form/CytomineSlider.vue';
+import CytomineTable from '@/components/utils/CytomineTable.vue';
+import ImageDetails from '@/components/image/ImageDetails.vue';
+import ImageName from '@/components/image/ImageName.vue';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = {rootModuleProp: 'storeModule'};

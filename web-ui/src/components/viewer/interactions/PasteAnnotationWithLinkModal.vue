@@ -83,9 +83,9 @@
 <script>
 import WKT from 'ol/format/WKT';
 import {get} from '@/utils/store-helpers';
-import ImageName from '@/components/image/ImageName';
-import CytomineModalCard from '@/components/utils/CytomineModalCard';
-import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
+import ImageName from '@/components/image/ImageName.vue';
+import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
 
 import {ImageGroup, ImageInstanceCollection, AnnotationGroup, AnnotationCollection, Annotation, AnnotationLink} from '@/api';
 import {getCenter, containsExtent, getIntersection} from 'ol/extent';

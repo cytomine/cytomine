@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import CytomineModal from '@/components/utils/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
 import ImageMetadata from '@/components/image/ImageMetadata.vue';
 
 export default {

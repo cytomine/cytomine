@@ -59,12 +59,12 @@ import be.cytomine.repository.ReviewedAnnotationListing;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -73,23 +73,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 public class ReviewedAnnotationServiceTests {
 
+    static Map<String, String> POLYGONES = Map.of(
+        "a", "POLYGON ((1 1, 2 1, 2 2, 1 2, 1 1))",
+        "b", "POLYGON ((1 3, 2 3, 2 5, 1 5, 1 3))",
+        "c", "POLYGON ((3 1, 5 1,  5 3, 3 3, 3 1))",
+        "d", "POLYGON ((4 4,8 4, 8 7,4 7,4 4))",
+        "e", "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))"
+    ); //e intersect a,b and c
     @Autowired
     ReviewedAnnotationService reviewedAnnotationService;
-
     @Autowired
     ReviewedAnnotationRepository reviewedAnnotationRepository;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     CommandService commandService;
-
     @Autowired
     EntityManager entityManager;
-
     @Autowired
     ImageInstanceService imageInstanceService;
+    @Autowired
+    TransactionTemplate transactionTemplate;
+    @Autowired
+    UserAnnotationRepository userAnnotationRepository;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void getReviewedAnnotationWithSuccess() {
@@ -117,10 +125,9 @@ public class ReviewedAnnotationServiceTests {
     @Test
     void countReviewedAnnotationWithSuccess() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        assertThat(reviewedAnnotationService.count((User) reviewedAnnotation.getUser())).isGreaterThanOrEqualTo(1L);
+        assertThat(reviewedAnnotationService.count(reviewedAnnotation.getUser())).isGreaterThanOrEqualTo(1L);
         assertThat(reviewedAnnotationService.count(builder.givenAUser())).isEqualTo(0);
     }
-
 
     @Test
     void countByProjectWithDate() {
@@ -204,14 +211,6 @@ public class ReviewedAnnotationServiceTests {
         assertThat(resultForUser).isEmpty();
     }
 
-    static Map<String, String> POLYGONES = Map.of(
-        "a", "POLYGON ((1 1, 2 1, 2 2, 1 2, 1 1))",
-        "b", "POLYGON ((1 3, 2 3, 2 5, 1 5, 1 3))",
-        "c", "POLYGON ((3 1, 5 1,  5 3, 3 3, 3 1))",
-        "d", "POLYGON ((4 4,8 4, 8 7,4 7,4 4))",
-        "e", "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))"
-    ); //e intersect a,b and c
-
     @Test
     void listIncluded() throws ParseException {
         SliceInstance sliceInstance = builder.givenASliceInstance();
@@ -255,7 +254,6 @@ public class ReviewedAnnotationServiceTests {
         assertThat(ids).contains(a3.getId());
         assertThat(ids).doesNotContain(a4.getId());
 
-
         list = reviewedAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
@@ -291,7 +289,6 @@ public class ReviewedAnnotationServiceTests {
         assertThat(ids).doesNotContain(a5.getId());
     }
 
-
     @Test
     void listTermsForReviewed() throws ParseException {
         SliceInstance sliceInstance = builder.givenASliceInstance();
@@ -310,11 +307,10 @@ public class ReviewedAnnotationServiceTests {
         assertThat(terms.stream().map(UserTermMapping::getTerm)).contains(reviewedAnnotation.getTerms().get(0).getId());
     }
 
-
     @Test
     void addValidReviewedAnnotationWithSuccess() {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
-        CommandResponse commandResponse = reviewedAnnotationService.add(reviewedAnnotation.toJsonObject()
+        CommandResponse commandResponse = reviewedAnnotationService.add(reviewedAnnotation.toJsonObject(urlApi)
             .withChange("term", builder.givenATerm(reviewedAnnotation.getProject().getOntology()).getId()));
 
         assertThat(commandResponse).isNotNull();
@@ -333,7 +329,6 @@ public class ReviewedAnnotationServiceTests {
             .isPresent();
     }
 
-
     @Test
     void addValidReviewedAnnotationIsRefuseIfAlreadyExists() {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
@@ -341,7 +336,7 @@ public class ReviewedAnnotationServiceTests {
 
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                reviewedAnnotationService.add(reviewedAnnotation.toJsonObject()
+                reviewedAnnotationService.add(reviewedAnnotation.toJsonObject(urlApi)
                     .withChange("id", null));
             }
         );
@@ -353,7 +348,7 @@ public class ReviewedAnnotationServiceTests {
         reviewedAnnotation.setLocation(new WKTReader().read(
             "LINESTRING( 181.05636403199998 324.87936288, 208.31216076799996 303.464094016)"
         ));
-        JsonObject jsonObject = reviewedAnnotation.toJsonObject();
+        JsonObject jsonObject = reviewedAnnotation.toJsonObject(urlApi);
         CommandResponse commandResponse = reviewedAnnotationService.add(jsonObject);
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(((ReviewedAnnotation) commandResponse.getObject()).getLocation().toText())
@@ -361,7 +356,6 @@ public class ReviewedAnnotationServiceTests {
         assertThat(((ReviewedAnnotation) commandResponse.getObject()).getWktLocation())
             .isEqualTo("LINESTRING (181.05636403199998 324.87936288, 208.31216076799996 303.464094016)");
     }
-
 
     @Test
     void editValidReviewedAnnotationWithSuccess() throws ParseException {
@@ -373,7 +367,7 @@ public class ReviewedAnnotationServiceTests {
         builder.persistAndReturn(reviewedAnnotation);
         CommandResponse commandResponse = reviewedAnnotationService.update(
             reviewedAnnotation,
-            reviewedAnnotation.toJsonObject().withChange(
+            reviewedAnnotation.toJsonObject(urlApi).withChange(
                 "location", newLocation)
         );
 
@@ -400,7 +394,7 @@ public class ReviewedAnnotationServiceTests {
     @Test
     void editReviewedAnnotationEmptyPolygon() throws ParseException {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        JsonObject jsonObject = reviewedAnnotation.toJsonObject();
+        JsonObject jsonObject = reviewedAnnotation.toJsonObject(urlApi);
         jsonObject.put("location", "POINT (BAD GEOMETRY)");
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -428,20 +422,19 @@ public class ReviewedAnnotationServiceTests {
         AssertionsForClassTypes.assertThat(reviewedAnnotationService.find(reviewedAnnotation.getId()).isEmpty());
     }
 
-
     @Test
     void deleteReviewedAnnotationWithTerms() {
         ReviewedAnnotation reviewedAnnotation = builder.givenANotPersistedReviewedAnnotation();
         Term term1 = builder.givenATerm(reviewedAnnotation.getProject().getOntology());
         Term term2 = builder.givenATerm(reviewedAnnotation.getProject().getOntology());
 
-        JsonObject jsonObject = reviewedAnnotation.toJsonObject();
+        JsonObject jsonObject = reviewedAnnotation.toJsonObject(urlApi);
         jsonObject.put("term", List.of(term1.getId(), term2.getId()));
 
         CommandResponse commandResponse = reviewedAnnotationService.add(jsonObject);
 
         commandResponse = reviewedAnnotationService.delete(
-            (ReviewedAnnotation) commandResponse.getObject(),
+            commandResponse.getObject(),
             null,
             null,
             true
@@ -450,7 +443,6 @@ public class ReviewedAnnotationServiceTests {
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);
     }
-
 
     @Test
     void imageReviewingWithNewReviewedAnnotation() {
@@ -480,7 +472,6 @@ public class ReviewedAnnotationServiceTests {
         );
     }
 
-
     @Test
     void lockImageReviewingIfReviewStop() {
 
@@ -498,7 +489,6 @@ public class ReviewedAnnotationServiceTests {
         );
     }
 
-
     @Test
     void lockImageReviewingIfReviewHasNeverBeenStarted() {
 
@@ -514,7 +504,6 @@ public class ReviewedAnnotationServiceTests {
         );
     }
 
-
     @Test
     void addReviewWithTerms() {
 
@@ -529,7 +518,7 @@ public class ReviewedAnnotationServiceTests {
         entityManager.refresh(userAnnotation);
 
         CommandResponse response = reviewedAnnotationService.reviewAnnotation(userAnnotation.getId(), null);
-        entityManager.refresh(((ReviewedAnnotation) response.getObject()));
+        entityManager.refresh(response.getObject());
         assertThat(((ReviewedAnnotation) response.getObject()).getTerms()).containsExactly(annotationTerm.getTerm());
 
     }
@@ -572,7 +561,6 @@ public class ReviewedAnnotationServiceTests {
         );
     }
 
-
     @Test
     public void removeReviewByAnotherUserThanReviewerFails() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
@@ -597,12 +585,10 @@ public class ReviewedAnnotationServiceTests {
         userAnnotation.setImage(image);
         builder.persistAndReturn(userAnnotation);
 
-
         CommandResponse response = reviewedAnnotationService.reviewAnnotation(userAnnotation.getId(), null);
 
-
         reviewedAnnotationService.edit(
-            ((ReviewedAnnotation) response.getObject()).toJsonObject()
+            response.getObject().toJsonObject(urlApi)
                 .withChange("location", "POLYGON ((19830 21680, 21070 21600, 20470 20740, 19830 21680))"), false
         );
         assertThat(((ReviewedAnnotation) response.getObject()).getWktLocation()).isEqualTo(
@@ -636,7 +622,6 @@ public class ReviewedAnnotationServiceTests {
         );
     }
 
-
     @Test
     void reviewAllUserLayers() {
         ImageInstance image = builder.givenAnImageInstance();
@@ -653,7 +638,6 @@ public class ReviewedAnnotationServiceTests {
         assertThat(ids).hasSize(1);
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isPresent();
     }
-
 
     @Test
     void reviewAllUserLayersNotInReviewMode() {
@@ -676,12 +660,6 @@ public class ReviewedAnnotationServiceTests {
             }
         );
     }
-
-    @Autowired
-    TransactionTemplate transactionTemplate;
-
-    @Autowired
-    UserAnnotationRepository userAnnotationRepository;
 
     @Test
     void annotationReviewedCounterForUserAnnotation() {
@@ -747,7 +725,6 @@ public class ReviewedAnnotationServiceTests {
         assertThat(reviewedAnnotationRepository.findById(anotherAnnotation.getId())).isEmpty();
     }
 
-
     @Test
     void doAnnotationCorrectionsWithRemove() throws ParseException {
 
@@ -776,6 +753,5 @@ public class ReviewedAnnotationServiceTests {
 
         assertThat(reviewedAnnotationRepository.findById(anotherAnnotation.getId())).isPresent();
     }
-
 
 }

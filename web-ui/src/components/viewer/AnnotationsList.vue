@@ -79,9 +79,9 @@ import {UserCollection} from '@/api';
 
 import {get} from '@/utils/store-helpers';
 
-import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy';
-import OntologyTree from '@/components/ontology/OntologyTree';
-import TrackTree from '@/components/track/TrackTree';
+import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy.vue';
+import OntologyTree from '@/components/ontology/OntologyTree.vue';
+import TrackTree from '@/components/track/TrackTree.vue';
 
 export default {
   name: 'annotations-list',

@@ -16,6 +16,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.CompanionFile;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.CompanionFileService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -26,13 +27,13 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @Transactional
 public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
 
-    private CompanionFile companionFile = null;
-
     @Autowired
     CompanionFileService companionFileService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    private CompanionFile companionFile = null;
+    @Autowired
+    private UrlApi urlApi;
 
     @BeforeEach
     public void before() throws Exception {
@@ -65,7 +66,6 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(() -> companionFileService.list(companionFile.getUploadedFile()));
     }
 
-
     @Override
     public void whenIGetDomain() {
         companionFileService.get(companionFile.getId());
@@ -75,12 +75,12 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     protected void whenIAddDomain() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         abstractImage.getUploadedFile().setStorage(companionFile.getImage().getUploadedFile().getStorage());
-        companionFileService.add(builder.givenANotPersistedCompanionFile(abstractImage).toJsonObject());
+        companionFileService.add(builder.givenANotPersistedCompanionFile(abstractImage).toJsonObject(urlApi));
     }
 
     @Override
     public void whenIEditDomain() {
-        companionFileService.update(companionFile, companionFile.toJsonObject());
+        companionFileService.update(companionFile, companionFile.toJsonObject(urlApi));
     }
 
     @Override
@@ -103,7 +103,6 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(WRITE);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

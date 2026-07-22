@@ -127,7 +127,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Project", id));
         ImageInstance image = imageInstanceService.find(idImage).orElse(null);
 
-        return responseSuccess(userService.listLayers(project, image), isFilterRequired());
+        return responseSuccess(userService.listLayers(project), isFilterRequired());
 
     }
 

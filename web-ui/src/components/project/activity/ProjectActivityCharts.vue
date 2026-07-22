@@ -276,7 +276,7 @@ import AnnotatedImagesByTermChart from '@/components/charts/AnnotatedImagesByTer
 import AnnotationContributorChart from '@/components/charts/AnnotationContributorChart.js';
 import AnnotatedImagesByContributorChart from '@/components/charts/AnnotatedImagesByContributorChart.js';
 import ActivityOverviewChart from '@/components/charts/ActivityOverviewChart.js';
-import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
+import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect.vue';
 
 import {AnnotationType} from '@/api';
 

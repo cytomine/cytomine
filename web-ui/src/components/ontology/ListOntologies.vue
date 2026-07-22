@@ -98,8 +98,8 @@ import {get, sync} from '@/utils/store-helpers';
 import {getWildcardRegexp} from '@/utils/string-utils';
 
 import {OntologyCollection} from '@/api';
-import OntologyDetails from './OntologyDetails';
-import AddOntologyModal from './AddOntologyModal';
+import OntologyDetails from './OntologyDetails.vue';
+import AddOntologyModal from './AddOntologyModal.vue';
 
 export default {
   name: 'list-ontologies',

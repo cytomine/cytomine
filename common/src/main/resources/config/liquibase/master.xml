@@ -124,4 +124,16 @@
 
     <include file="/config/liquibase/changelog/2026-07-15-tag-id-sequence.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-20-seed-roles.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-20-seed-image-filters.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-20-seed-imageserver-user.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-20-seed-test-users.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

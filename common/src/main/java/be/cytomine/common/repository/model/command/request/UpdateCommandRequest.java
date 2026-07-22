@@ -7,9 +7,16 @@ import be.cytomine.common.repository.model.HasLongId;
 import be.cytomine.common.repository.model.command.payload.request.UpdateCommandPayload;
 
 public sealed interface UpdateCommandRequest<T extends HasLongId & HasAclId> extends CommandV2Request<T>
-    permits UpdateOntologyCommand, UpdateRoleCommand, UpdateTagDomainAssociationCommand, UpdateTermCommand,
-    UpdateTermRelationCommand, UpdateStorageCommand, UpdateUploadedFileCommand, UpdateUserRoleCommand,
-    UpdateUserCommand {
+    permits UpdateOntologyCommand,
+    UpdateRoleCommand,
+    UpdateStorageCommand,
+    UpdateTagCommand,
+    UpdateTagDomainAssociationCommand,
+    UpdateTermCommand,
+    UpdateTermRelationCommand,
+    UpdateUploadedFileCommand,
+    UpdateUserCommand,
+    UpdateUserRoleCommand {
 
     T before();
 

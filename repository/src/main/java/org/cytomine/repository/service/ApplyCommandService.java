@@ -15,6 +15,7 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.request.CreateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.CreateRoleCommand;
 import be.cytomine.common.repository.model.command.request.CreateStorageCommand;
+import be.cytomine.common.repository.model.command.request.CreateTagCommand;
 import be.cytomine.common.repository.model.command.request.CreateTagDomainAssociationCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermCommand;
 import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
@@ -24,6 +25,7 @@ import be.cytomine.common.repository.model.command.request.CreateUserRoleCommand
 import be.cytomine.common.repository.model.command.request.DeleteOntologyCommand;
 import be.cytomine.common.repository.model.command.request.DeleteRoleCommand;
 import be.cytomine.common.repository.model.command.request.DeleteStorageCommand;
+import be.cytomine.common.repository.model.command.request.DeleteTagCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTagDomainAssociationCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
 import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
@@ -36,6 +38,7 @@ import be.cytomine.common.repository.model.command.request.UndoUpdateCommand;
 import be.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
 import be.cytomine.common.repository.model.command.request.UpdateRoleCommand;
 import be.cytomine.common.repository.model.command.request.UpdateStorageCommand;
+import be.cytomine.common.repository.model.command.request.UpdateTagCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTagDomainAssociationCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
 import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
@@ -49,6 +52,7 @@ public class ApplyCommandService {
     private final CommandV2Repository commandRepository;
     private final RoleCommandService roleCommandService;
     private final StorageCommandService storageCommandService;
+    private final TagCommandService tagCommandService;
     private final TagDomainAssociationCommandService tagDomainAssociationCommandService;
     private final TermCommandService termCommandService;
     private final TermRelationCommandService termRelationCommandService;
@@ -97,6 +101,9 @@ public class ApplyCommandService {
                     uploadedFileCommandService.undoUpdate(commandEntity.getId(), uufc, userId, now);
                 case DeleteUploadedFileCommand dufc ->
                     uploadedFileCommandService.undoDelete(commandEntity.getId(), dufc, userId, now);
+                case CreateTagCommand ctc -> tagCommandService.undoCreate(commandEntity.getId(), ctc, userId, now);
+                case UpdateTagCommand utc -> tagCommandService.undoUpdate(commandEntity.getId(), utc, userId, now);
+                case DeleteTagCommand dtc -> tagCommandService.undoDelete(commandEntity.getId(), dtc, userId, now);
                 case CreateTagDomainAssociationCommand ctdac ->
                     tagDomainAssociationCommandService.undoCreate(commandEntity.getId(), ctdac, userId, now);
                 case UpdateTagDomainAssociationCommand utdac ->
@@ -130,6 +137,12 @@ public class ApplyCommandService {
                     case CreateStorageCommand csc ->
                         storageCommandService.undoDelete(v.commandId(), new DeleteStorageCommand(csc.after(), userId),
                             userId, now);
+                    case CreateTagCommand ctc -> tagCommandService.undoDelete(
+                        v.commandId(),
+                        new DeleteTagCommand(ctc.after(), userId),
+                        userId,
+                        now
+                    );
                     case CreateTagDomainAssociationCommand ctdac ->
                         tagDomainAssociationCommandService.undoDelete(v.commandId(),
                             new DeleteTagDomainAssociationCommand(ctdac.after(), userId), userId, now);
@@ -156,6 +169,12 @@ public class ApplyCommandService {
                     case DeleteRoleCommand drc ->
                         roleCommandService.undoCreate(v.commandId(), new CreateRoleCommand(drc.before(), userId),
                             userId, now);
+                    case DeleteTagCommand dtc -> tagCommandService.undoCreate(
+                        v.commandId(),
+                        new CreateTagCommand(dtc.before(), userId),
+                        userId,
+                        now
+                    );
                     case DeleteTagDomainAssociationCommand dtdac ->
                         tagDomainAssociationCommandService.undoCreate(v.commandId(),
                             new CreateTagDomainAssociationCommand(dtdac.before(), userId), userId, now);
@@ -177,6 +196,12 @@ public class ApplyCommandService {
                         new UpdateRoleCommand(urc.after(), urc.before(), userId), userId, now);
                     case UpdateStorageCommand usc -> storageCommandService.undoUpdate(v.commandId(),
                         new UpdateStorageCommand(usc.after(), usc.before(), userId), userId, now);
+                    case UpdateTagCommand utc -> tagCommandService.undoUpdate(
+                        v.commandId(),
+                        new UpdateTagCommand(utc.after(), utc.before(), userId),
+                        userId,
+                        now
+                    );
                     case UpdateTagDomainAssociationCommand utdac ->
                         tagDomainAssociationCommandService.undoUpdate(v.commandId(),
                             new UpdateTagDomainAssociationCommand(utdac.after(), utdac.before(), userId), userId, now);

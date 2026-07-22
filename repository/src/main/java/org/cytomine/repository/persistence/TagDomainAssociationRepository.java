@@ -1,6 +1,7 @@
 package org.cytomine.repository.persistence;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.cytomine.repository.persistence.entity.TagDomainAssociationEntity;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,14 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface TagDomainAssociationRepository extends JpaRepository<TagDomainAssociationEntity, Long> {
     Optional<TagDomainAssociationEntity> findByIdAndDeletedNull(long id);
+
+    boolean existsByTagIdAndDeletedNull(long tagId);
+
+    @Query(
+        value = "SELECT tda.id FROM tag_domain_association tda WHERE tda.tag_id = :tagId AND tda.deleted IS NULL",
+        nativeQuery = true
+    )
+    Set<Long> findAllIdsByTagId(long tagId);
 
     Page<TagDomainAssociationEntity> findAllByDomainClassNameAndDomainIdAndDeletedNull(
         String domainClassName,

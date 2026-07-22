@@ -759,6 +759,7 @@ notify-error-app-deletion,Failed to delete the app,Échec de la suppression de l
 notify-error-app-deletion-forbidden,Only admin can delete apps,Seul l'administrateur peut supprimer des applications,Solo el administrador puede eliminar aplicaciones,Alleen admin kan apps verwijderen
 notify-error-app-installation,Failed to install the app,Échec de l'installation de l'application,Error al instalar la aplicación,Installatie van de app mislukt
 notify-error-empty-list,The list is empty,La liste est vide,La lista está vacía,De lijst is leeg
+notify-error-fetch-tag,Failed to fetch the tags,Une erreur a empêché de récupérer les tags,Error al obtener las etiquetas,Een fout verhinderde het ophalen van de tags
 notify-error-not-enough-item,Not enough items provided,Pas assez d'éléments fournis,No se han proporcionado suficientes elementos,Niet genoeg items verstrekt
 notify-error-undo,Failed to undo last action,Une erreur a empêché d'annuler la dernière action,No se pudo deshacer la última acción,Een fout verhinderde het ongedaan maken van de laatste actie
 notify-success-app-deletion,App deleted successfully,Application supprimée avec succès,Aplicación eliminada con éxito,App succesvol verwijderd

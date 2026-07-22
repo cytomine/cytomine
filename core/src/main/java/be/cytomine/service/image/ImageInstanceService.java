@@ -69,6 +69,7 @@ import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.meta.PropertyService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.ontology.TrackService;
@@ -101,7 +102,7 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class ImageInstanceService extends ModelService {
 
-    private static List<String> ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH = List.of("width", "height");
+    private static final List<String> ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH = List.of("width", "height");
 
     private final EntityManager entityManager;
 
@@ -147,6 +148,7 @@ public class ImageInstanceService extends ModelService {
 
     private final MongoClient mongoClient;
 
+    private final UrlApi urlApi;
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
 
@@ -522,7 +524,7 @@ public class ImageInstanceService extends ModelService {
             JsonObject object = ImageInstance.getDataFromDomain(new ImageInstance().buildDomainFromJson(
                 result,
                 entityManager
-            ));
+            ), urlApi);
             object.put("projectBlind", result.get("projectBlind"));
             object.put("projectName", result.get("projectName"));
             results.add(result);
@@ -666,7 +668,7 @@ public class ImageInstanceService extends ModelService {
 
         if (blindedNameSearch != null) {
             joinAI = true;
-            blindedNameSearch = ((SearchParameterEntry) blindedNameSearch);
+            blindedNameSearch = blindedNameSearch;
 
             try {
                 securityACLService.checkIsAdminContainer(project, currentUserService.getCurrentUser());
@@ -809,7 +811,7 @@ public class ImageInstanceService extends ModelService {
             JsonObject object = ImageInstance.getDataFromDomain(new ImageInstance().buildDomainFromJson(
                 result,
                 entityManager
-            )); //TODO: select N+1
+            ), urlApi); //TODO: select N+1
             object.put("numberOfAnnotations", result.get("countImageAnnotations"));
             object.put("numberOfJobAnnotations", result.get("countImageJobAnnotations"));
             object.put("numberOfReviewedAnnotations", result.get("countImageReviewedAnnotations"));
@@ -1019,7 +1021,7 @@ public class ImageInstanceService extends ModelService {
             p.setKey(property.getKey());
             p.setValue(property.getValue());
             p.setDomain(domain);
-            propertyService.add(p.toJsonObject());
+            propertyService.add(p.toJsonObject(urlApi));
         }
 
     }
@@ -1051,7 +1053,7 @@ public class ImageInstanceService extends ModelService {
 
         jsonNewData.putIfAbsent("user", ((ImageInstance) domain).getUser().getId());
 
-        JsonObject attributes = domain.toJsonObject();
+        JsonObject attributes = domain.toJsonObject(urlApi);
         CommandResponse commandResponse = executeCommand(
             new EditCommand(currentUser, transaction),
             domain,
@@ -1068,10 +1070,10 @@ public class ImageInstanceService extends ModelService {
 
         if (resolutionUpdated) {
             for (ReviewedAnnotation reviewedAnnotation : reviewedAnnotationRepository.findAllByImage(imageInstance)) {
-                reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject());
+                reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject(urlApi));
             }
             for (UserAnnotation userAnnotation : userAnnotationRepository.findAllByImage(imageInstance)) {
-                userAnnotationService.update(userAnnotation, userAnnotation.toJsonObject());
+                userAnnotationService.update(userAnnotation, userAnnotation.toJsonObject(urlApi));
             }
         }
 

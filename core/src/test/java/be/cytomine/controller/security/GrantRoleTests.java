@@ -39,10 +39,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class GrantRoleTests {
 
+    protected MockHttpSession session;
     @Autowired
     private MockMvc restGrandRoleControllerMockMvc;
-
-    protected MockHttpSession session;
 
     @Test
     @WithMockUser(username = "admin")

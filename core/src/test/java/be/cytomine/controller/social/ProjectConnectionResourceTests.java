@@ -224,7 +224,6 @@ public class ProjectConnectionResourceTests {
             .andExpect(status().isOk());
     }
 
-
     @Test
     @Transactional
     public void getNumberConnectionFrequencyByUser() throws Exception {

@@ -37,13 +37,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Transactional
 public class ImagePropertiesServiceTests {
 
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     ImagePropertiesService imagePropertiesService;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
 
     @BeforeAll
     public static void beforeAll() {

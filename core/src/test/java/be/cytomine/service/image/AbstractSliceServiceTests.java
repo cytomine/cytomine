@@ -40,12 +40,12 @@ import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -74,6 +74,8 @@ public class AbstractSliceServiceTests {
 
     @Autowired
     ImageInstanceService imageInstanceService;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void listAllImageByAbstractImage() {
@@ -107,7 +109,6 @@ public class AbstractSliceServiceTests {
         assertThat(abstractSliceService.list(file1)).doesNotContain(abstractSlice2);
     }
 
-
     @Test
     void findAbstractSliceByImageAndCoordinates() {
 
@@ -123,7 +124,6 @@ public class AbstractSliceServiceTests {
         abstractSlice2.setTime(4);
         builder.persistAndReturn(abstractSlice2);
 
-
         assertThat(abstractSliceService.find(abstractSlice1.getImage(), 1, 2, 3)).isPresent();
         assertThat(abstractSliceService.find(abstractSlice1.getImage(), 1, 2, 4)).isPresent();
         assertThat(abstractSliceService.find(abstractSlice1.getImage(), 2, 2, 3)).isEmpty();
@@ -135,7 +135,6 @@ public class AbstractSliceServiceTests {
         assertThat(abstractSliceService.findImageUploaded(abstractSlice1.getId()))
             .isEqualTo(abstractSlice1.getUploadedFile().getUser());
     }
-
 
     @Test
     void getUnexistingAbstractSliceReturnNull() {
@@ -158,7 +157,7 @@ public class AbstractSliceServiceTests {
     void addValidAbstractSliceWithSuccess() {
         AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
 
-        CommandResponse commandResponse = abstractSliceService.add(abstractSlice.toJsonObject());
+        CommandResponse commandResponse = abstractSliceService.add(abstractSlice.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -171,7 +170,7 @@ public class AbstractSliceServiceTests {
         AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                abstractSliceService.add(abstractSlice.toJsonObject().withChange("id", null));
+                abstractSliceService.add(abstractSlice.toJsonObject(urlApi).withChange("id", null));
             }
         );
     }
@@ -181,7 +180,7 @@ public class AbstractSliceServiceTests {
         AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                abstractSliceService.add(abstractSlice.toJsonObject().withChange("image", null));
+                abstractSliceService.add(abstractSlice.toJsonObject(urlApi).withChange("image", null));
             }
         );
     }
@@ -194,7 +193,7 @@ public class AbstractSliceServiceTests {
         abstractSlice.setTime(100);
         abstractSlice = builder.persistAndReturn(abstractSlice);
 
-        JsonObject jsonObject = abstractSlice.toJsonObject();
+        JsonObject jsonObject = abstractSlice.toJsonObject(urlApi);
         jsonObject.put("channel", 2);
         jsonObject.put("zStack", 20);
         jsonObject.put("time", 200);
@@ -230,6 +229,5 @@ public class AbstractSliceServiceTests {
             }
         );
     }
-
 
 }

@@ -92,6 +92,54 @@ public class AbstractImage extends CytomineDomain {
 
     private Integer tileSize = 256;
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        AbstractImage abstractImage = (AbstractImage) domain;
+        returnArray.put("filename", abstractImage.getFilename());
+        returnArray.put("originalFilename", abstractImage.getOriginalFilename());
+        returnArray.put("uploadedFile", abstractImage.getUploadedFileId());
+        returnArray.put("path", abstractImage.getPath());
+        returnArray.put("contentType", abstractImage.getContentType());
+
+        returnArray.put("width", abstractImage.getWidth());
+        returnArray.put("height", abstractImage.getHeight());
+        returnArray.put("depth", abstractImage.getDepth());
+        returnArray.put("duration", abstractImage.getDuration());
+        returnArray.put("channels", abstractImage.getChannels());
+        returnArray.put("extrinsicChannels", abstractImage.getExtrinsicChannels());
+        returnArray.put("dimensions", abstractImage.getDimensions());
+        returnArray.put("apparentChannels", abstractImage.getExtrinsicChannels());
+
+        returnArray.put("physicalSizeX", abstractImage.getPhysicalSizeX());
+        returnArray.put("physicalSizeY", abstractImage.getPhysicalSizeY());
+        returnArray.put("physicalSizeZ", abstractImage.getPhysicalSizeZ());
+
+        returnArray.put("fps", abstractImage.getFps());
+        returnArray.put("zoom", abstractImage.getZoomLevels());  // /!!\ Breaking API : image?.getZoomLevels()?.max
+
+        returnArray.put("tileSize", abstractImage.getTileSize());
+        returnArray.put("isVirtual", abstractImage.isVirtual());
+
+        returnArray.put("magnification", abstractImage.getMagnification());
+        returnArray.put("bitPerSample", abstractImage.getBitPerSample());
+        returnArray.put("samplePerPixel", abstractImage.getSamplePerPixel());
+        returnArray.put("colorspace", abstractImage.getColorspace());
+        returnArray.put("thumb", urlApi.getAbstractImageThumbUrlWithMaxSize(abstractImage.id, 512, "png"));
+        returnArray.put("preview", urlApi.getAbstractImageThumbUrlWithMaxSize(abstractImage.id, 1024, "png"));
+        returnArray.put(
+            "macroURL",
+            urlApi.getAssociatedImage(
+                abstractImage,
+                "macro",
+                Optional.ofNullable(abstractImage.getUploadedFile()).map(UploadedFile::getContentType).orElse(null),
+                512,
+                "png"
+            )
+        );
+
+        returnArray.put("inProject", abstractImage.getInProject());
+        return returnArray;
+    }
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         AbstractImage abstractImage = this;
@@ -133,63 +181,13 @@ public class AbstractImage extends CytomineDomain {
         return abstractImage;
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        AbstractImage abstractImage = (AbstractImage) domain;
-        returnArray.put("filename", abstractImage.getFilename());
-        returnArray.put("originalFilename", abstractImage.getOriginalFilename());
-        returnArray.put("uploadedFile", abstractImage.getUploadedFileId());
-        returnArray.put("path", abstractImage.getPath());
-        returnArray.put("contentType", abstractImage.getContentType());
-
-        returnArray.put("width", abstractImage.getWidth());
-        returnArray.put("height", abstractImage.getHeight());
-        returnArray.put("depth", abstractImage.getDepth());
-        returnArray.put("duration", abstractImage.getDuration());
-        returnArray.put("channels", abstractImage.getChannels());
-        returnArray.put("extrinsicChannels", abstractImage.getExtrinsicChannels());
-        returnArray.put("dimensions", abstractImage.getDimensions());
-        returnArray.put("apparentChannels", abstractImage.getExtrinsicChannels());
-
-        returnArray.put("physicalSizeX", abstractImage.getPhysicalSizeX());
-        returnArray.put("physicalSizeY", abstractImage.getPhysicalSizeY());
-        returnArray.put("physicalSizeZ", abstractImage.getPhysicalSizeZ());
-
-        returnArray.put("fps", abstractImage.getFps());
-        returnArray.put("zoom", abstractImage.getZoomLevels());  // /!!\ Breaking API : image?.getZoomLevels()?.max
-
-        returnArray.put("tileSize", abstractImage.getTileSize());
-        returnArray.put("isVirtual", abstractImage.isVirtual());
-
-        returnArray.put("magnification", abstractImage.getMagnification());
-        returnArray.put("bitPerSample", abstractImage.getBitPerSample());
-        returnArray.put("samplePerPixel", abstractImage.getSamplePerPixel());
-        returnArray.put("colorspace", abstractImage.getColorspace());
-        returnArray.put("thumb", UrlApi.getAbstractImageThumbUrlWithMaxSize(abstractImage.id, 512, "png"));
-        returnArray.put("preview", UrlApi.getAbstractImageThumbUrlWithMaxSize(abstractImage.id, 1024, "png"));
-        returnArray.put(
-            "macroURL",
-            UrlApi.getAssociatedImage(
-                abstractImage,
-                "macro",
-                Optional.ofNullable(abstractImage.getUploadedFile()).map(UploadedFile::getContentType).orElse(null),
-                512,
-                "png"
-            )
-        );
-
-        returnArray.put("inProject", abstractImage.getInProject());
-        return returnArray;
-    }
-
     public int getApparentChannels() {
         return channels * samplePerPixel;
     }
 
     public boolean isVirtual() {
-        return uploadedFile != null ? uploadedFile.isVirtual() : false;
+        return uploadedFile != null && uploadedFile.isVirtual();
     }
-
 
     public Long getUploadedFileId() {
         return this.getUploadedFile() != null ? this.getUploadedFile().getId() : null;
@@ -239,7 +237,6 @@ public class AbstractImage extends CytomineDomain {
         return String.join("", dimensions);
     }
 
-
     /**
      * Get the container domain for this domain (usefull for security)
      *
@@ -253,9 +250,8 @@ public class AbstractImage extends CytomineDomain {
     }
 
     @Override
-    public JsonObject toJsonObject() {
-        return getDataFromDomain(this);
+    public JsonObject toJsonObject(UrlApi urlApi) {
+        return getDataFromDomain(this, urlApi);
     }
-
 
 }

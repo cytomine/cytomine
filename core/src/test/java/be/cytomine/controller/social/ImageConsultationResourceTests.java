@@ -126,7 +126,6 @@ public class ImageConsultationResourceTests {
         assertThat(persisted.getContent().get(0).getMode()).isEqualTo("view");
     }
 
-
     @Test
     @Transactional
     public void shouldReturnLastConsultedImagePerUserForProject() throws Exception {

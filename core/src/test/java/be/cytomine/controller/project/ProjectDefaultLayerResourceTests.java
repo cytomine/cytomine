@@ -32,6 +32,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.project.ProjectDefaultLayer;
+import be.cytomine.service.UrlApi;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -56,6 +57,8 @@ public class ProjectDefaultLayerResourceTests {
 
     @Autowired
     private MockMvc restProjectDefaultLayerControllerMockMvc;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     @Transactional
@@ -69,7 +72,6 @@ public class ProjectDefaultLayerResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.id=='" + projectDefaultLayer.getId() + "')]").exists());
     }
-
 
     @Test
     @Transactional
@@ -129,7 +131,7 @@ public class ProjectDefaultLayerResourceTests {
                 projectDefaultLayer.getProject().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectDefaultLayer.toJSON()))
+                .content(projectDefaultLayer.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -149,7 +151,7 @@ public class ProjectDefaultLayerResourceTests {
                 projectDefaultLayer.getProject().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectDefaultLayer.toJSON()))
+                .content(projectDefaultLayer.toJSON(urlApi)))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.success").value(false));
     }
@@ -163,7 +165,7 @@ public class ProjectDefaultLayerResourceTests {
                 projectDefaultLayer.getProject().getId(), projectDefaultLayer.getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectDefaultLayer.toJsonObject().withChange("hideByDefault", true).toJsonString()))
+                .content(projectDefaultLayer.toJsonObject(urlApi).withChange("hideByDefault", true).toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -174,7 +176,6 @@ public class ProjectDefaultLayerResourceTests {
             .andExpect(jsonPath("$.projectdefaultlayer.hideByDefault").value(true));
     }
 
-
     @Test
     @Transactional
     public void failWhenEditingProjectDefaultLayerDoesNotExists() throws Exception {
@@ -182,7 +183,7 @@ public class ProjectDefaultLayerResourceTests {
         em.remove(projectDefaultLayer);
         restProjectDefaultLayerControllerMockMvc.perform(put("/api/project/{project}/defaultlayer/{id}.json", 0, 0)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectDefaultLayer.toJSON()))
+                .content(projectDefaultLayer.toJSON(urlApi)))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists());
@@ -198,7 +199,7 @@ public class ProjectDefaultLayerResourceTests {
                 projectDefaultLayer.getProject().getId(), projectDefaultLayer.getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectDefaultLayer.toJSON()))
+                .content(projectDefaultLayer.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

@@ -22,6 +22,22 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.meta.ConfigurationRepository;
 import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.database.BootstrapDataService;
+import be.cytomine.service.database.BootstrapTestsDataService;
+import be.cytomine.service.database.BootstrapUtilsService;
+import be.cytomine.service.utils.Dataset;
+import be.cytomine.utils.EnvironmentUtils;
+
+import static be.cytomine.service.database.BootstrapTestsDataService.ADMIN;
+import static be.cytomine.service.database.BootstrapTestsDataService.CREATOR;
+import static be.cytomine.service.database.BootstrapTestsDataService.GUEST;
+import static be.cytomine.service.database.BootstrapTestsDataService.SUPERADMIN;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_ACL_ADMIN;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_ACL_CREATE;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_ACL_DELETE;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_ACL_READ;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_ACL_WRITE;
+import static be.cytomine.service.database.BootstrapTestsDataService.USER_NO_ACL;
 import be.cytomine.service.UrlApi;
 
 @Component

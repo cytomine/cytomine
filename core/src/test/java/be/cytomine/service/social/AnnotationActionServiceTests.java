@@ -24,7 +24,6 @@ import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")

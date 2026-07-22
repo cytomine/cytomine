@@ -43,7 +43,6 @@ import be.cytomine.utils.filters.SearchParameterEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
@@ -122,6 +121,5 @@ public class TagDomainAssociationServiceTests {
             new SearchParameterEntry("domainIdent", SearchOperation.in, List.of(domain1.getId()))
         )))).doesNotContain(tag1Domain1, tag1Domain2, tag2Domain1, tag2Domain2);
     }
-
 
 }

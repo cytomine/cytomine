@@ -1,8 +1,8 @@
 --liquibase formatted sql
 --changeset cytomine:2026-07-20-seed-imageserver-user
 
-INSERT INTO sec_user (username, name, reference, enabled, account_expired, account_locked)
-SELECT 'ImageServer1', 'Image Server', md5('ImageServer1'), true, false, false
+INSERT INTO sec_user (username, name, reference, enabled, account_expired, account_locked, public_key, private_key)
+SELECT 'ImageServer1', 'Image Server', md5('ImageServer1'), true, false, false, gen_random_uuid()::text, gen_random_uuid()::text
 WHERE NOT EXISTS (SELECT 1 FROM sec_user WHERE username = 'ImageServer1');
 
 --changeset cytomine:2026-07-20-seed-imageserver-user-keys context:test

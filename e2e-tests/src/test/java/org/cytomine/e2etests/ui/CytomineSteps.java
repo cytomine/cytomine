@@ -627,7 +627,7 @@ public class CytomineSteps {
         String imageName
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/projects");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + projectName + ")]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + projectName + "')]"));
         webDriverUtils.xpathClick(wait, "//a[contains(text(), '" + projectName + "')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
     }

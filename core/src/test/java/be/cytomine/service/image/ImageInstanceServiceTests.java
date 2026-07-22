@@ -65,6 +65,7 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.search.ImageSearchExtension;
 import be.cytomine.service.social.AnnotationActionService;
 import be.cytomine.service.social.ImageConsultationService;
@@ -90,34 +91,27 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @Transactional
 public class ImageInstanceServiceTests {
 
+    private static WireMockServer wireMockServer;
     @Autowired
     ImageInstanceService imageInstanceService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     EntityManager entityManager;
-
     @Autowired
     AnnotationActionRepository annotationActionRepository;
-
     @Autowired
     AnnotationActionService annotationActionService;
-
     @Autowired
     UserPositionService userPositionService;
-
     @Autowired
     PersistentUserPositionRepository persistentUserPositionRepository;
-
     @Autowired
     ImageConsultationService imageConsultationService;
-
     @Autowired
     PersistentImageConsultationRepository persistentImageConsultationRepository;
-
-    private static WireMockServer wireMockServer;
+    @Autowired
+    private UrlApi urlApi;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -173,7 +167,6 @@ public class ImageInstanceServiceTests {
         Collections.shuffle(doubleChoices);
         List<String> stringChoices = new ArrayList<>(List.of("aaa", "zzzz", "AAAA"));
         Collections.shuffle(stringChoices);
-
 
         for (int k = 0; k < 2; k++) { // execute twice the creation of images (6 images)
             for (int i = 0; i < 3; i++) {
@@ -249,7 +242,6 @@ public class ImageInstanceServiceTests {
         assertThat(imageInstanceBounds.getCountImageReviewedAnnotations()
             .getMin()).isEqualTo(0L); //special case since default value is 0
         assertThat(imageInstanceBounds.getCountImageReviewedAnnotations().getMax()).isEqualTo(3L);
-
 
         assertThat(imageInstanceBounds.getMagnification().getList()).contains(1, 2, 3);
         assertThat(imageInstanceBounds.getMimeType().getList()).contains("aaa", "zzzz", "AAAA");
@@ -396,10 +388,8 @@ public class ImageInstanceServiceTests {
         ImageInstance img2 = builder.givenAnImageInstance(project);
         img2.getBaseImage().setWidth(501);
 
-
         assertThat(imageInstanceService.list(user, new ArrayList<>()).stream().map(x -> x.get("id")))
             .contains(img1.getId(), img2.getId());
-
 
         List<SearchParameterEntry> searchParameterEntryList =
             new ArrayList<>(List.of(
@@ -425,7 +415,6 @@ public class ImageInstanceServiceTests {
             );
         assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
-
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
@@ -546,7 +535,6 @@ public class ImageInstanceServiceTests {
             .contains(img1.getId()).doesNotContain(img2.getId());
     }
 
-
     @Test
     void listAllImageIdsForProject() {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
@@ -629,7 +617,7 @@ public class ImageInstanceServiceTests {
     void addValidImageInstanceWithSuccess() {
         ImageInstance imageInstance = builder.givenANotPersistedImageInstance();
 
-        CommandResponse commandResponse = imageInstanceService.add(imageInstance.toJsonObject());
+        CommandResponse commandResponse = imageInstanceService.add(imageInstance.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -642,7 +630,7 @@ public class ImageInstanceServiceTests {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Assertions.assertThrows(
             AlreadyExistException.class,
-            () -> imageInstanceService.add(imageInstance.toJsonObject().withChange("id", null))
+            () -> imageInstanceService.add(imageInstance.toJsonObject(urlApi).withChange("id", null))
         );
     }
 
@@ -651,7 +639,7 @@ public class ImageInstanceServiceTests {
         ImageInstance imageInstance = builder.givenANotPersistedImageInstance(null, builder.givenAProject());
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> imageInstanceService.add(imageInstance.toJsonObject())
+            () -> imageInstanceService.add(imageInstance.toJsonObject(urlApi))
         );
     }
 
@@ -666,7 +654,7 @@ public class ImageInstanceServiceTests {
         );
         imageInstance = builder.persistAndReturn(imageInstance);
 
-        JsonObject jsonObject = imageInstance.toJsonObject();
+        JsonObject jsonObject = imageInstance.toJsonObject(urlApi);
         jsonObject.put("project", project2.getId());
 
         CommandResponse commandResponse = imageInstanceService.edit(jsonObject, true);
@@ -684,7 +672,7 @@ public class ImageInstanceServiceTests {
         imageInstance.getBaseImage().setMagnification(10);
         builder.persistAndReturn(imageInstance.getBaseImage());
 
-        JsonObject jsonObject = imageInstance.toJsonObject();
+        JsonObject jsonObject = imageInstance.toJsonObject(urlApi);
         jsonObject.put("magnification", 20);
 
         CommandResponse commandResponse = imageInstanceService.update(imageInstance, jsonObject);
@@ -707,7 +695,8 @@ public class ImageInstanceServiceTests {
         Double perimeter = userAnnotation.getPerimeter();
         Double area = userAnnotation.getArea();
 
-        imageInstanceService.update(imageInstance, imageInstance.toJsonObject().withChange("physicalSizeX", 2.5d));
+        imageInstanceService.update(imageInstance,
+            imageInstance.toJsonObject(urlApi).withChange("physicalSizeX", 2.5d));
 
         assertThat(userAnnotation.getPerimeter()).isNotEqualTo(perimeter);
         assertThat(userAnnotation.getArea()).isNotEqualTo(area);
@@ -722,7 +711,8 @@ public class ImageInstanceServiceTests {
         Double perimeter = reviewedAnnotation.getPerimeter();
         Double area = reviewedAnnotation.getArea();
 
-        imageInstanceService.update(imageInstance, imageInstance.toJsonObject().withChange("physicalSizeX", 2.5d));
+        imageInstanceService.update(imageInstance,
+            imageInstance.toJsonObject(urlApi).withChange("physicalSizeX", 2.5d));
 
         assertThat(reviewedAnnotation.getPerimeter()).isNotEqualTo(perimeter);
         assertThat(reviewedAnnotation.getArea()).isNotEqualTo(area);
@@ -733,7 +723,7 @@ public class ImageInstanceServiceTests {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> imageInstanceService.add(imageInstance.toJsonObject().withChange("baseImage", null))
+            () -> imageInstanceService.add(imageInstance.toJsonObject(urlApi).withChange("baseImage", null))
         );
     }
 
@@ -742,10 +732,9 @@ public class ImageInstanceServiceTests {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> imageInstanceService.add(imageInstance.toJsonObject().withChange("project", null))
+            () -> imageInstanceService.add(imageInstance.toJsonObject(urlApi).withChange("project", null))
         );
     }
-
 
     @Test
     void deleteImageInstanceWithSuccess() {
@@ -825,7 +814,6 @@ public class ImageInstanceServiceTests {
         assertThat(persistentImageConsultationRepository.count()).isEqualTo(0);
         assertThat(persistentUserPositionRepository.count()).isEqualTo(0);
     }
-
 
     @Test
     void projectCounter() {

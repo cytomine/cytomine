@@ -65,12 +65,12 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 import {UploadedFileCollection, UploadedFile} from '@/api';
 import filesize from 'filesize';
 import _ from 'lodash';
-import CytomineTable from '@/components/utils/CytomineTable';
-import UploadedFileStatusComponent from './UploadedFileStatus';
+import CytomineTable from '@/components/utils/CytomineTable.vue';
+import UploadedFileStatusComponent from './UploadedFileStatus.vue';
 import {appendShortTermToken} from '@/utils/token-utils';
 import {formatDate} from '@/utils/date';
 

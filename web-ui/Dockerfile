@@ -16,8 +16,8 @@ COPY ./package-lock.json /app/package-lock.json
 COPY ./src /app/src
 COPY ./public /app/public
 COPY ./scripts /app/scripts
-COPY ./babel.config.js /app/babel.config.js
-COPY ./.eslintrc.js /app/.eslintrc.js
+COPY ./index.html /app/index.html
+COPY ./vite.config.mjs /app/vite.config.mjs
 
 RUN npm install && npm run build
 

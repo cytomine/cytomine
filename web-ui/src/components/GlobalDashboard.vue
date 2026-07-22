@@ -116,8 +116,8 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import ListImagesPreview from '@/components/image/ListImagesPreview';
-import ImagePreview from '@/components/image/ImagePreview';
+import ListImagesPreview from '@/components/image/ListImagesPreview.vue';
+import ImagePreview from '@/components/image/ImagePreview.vue';
 
 import {ImageInstanceCollection, ProjectCollection} from '@/api';
 

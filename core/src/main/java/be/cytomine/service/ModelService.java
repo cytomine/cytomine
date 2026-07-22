@@ -86,6 +86,9 @@ public abstract class ModelService<T extends CytomineDomain> {
     @Autowired
     TagDomainAssociationService tagDomainAssociationService;
 
+    @Autowired
+    private UrlApi urlApi;
+
     /**
      * Save a domain on database, throw error if cannot save
      */
@@ -186,7 +189,7 @@ public abstract class ModelService<T extends CytomineDomain> {
             //Create a backup (for 'undo' op)
             //We create before for deleteCommand to keep data from HasMany inside json (data will
             // be deleted later)
-            Object backup = domainToDelete.toJSON();
+            Object backup = domainToDelete.toJSON(urlApi);
             ((DeleteCommand) c).setBackup(backup);
             this.deleteDependencies(domainToDelete, c.getTransaction(), task);
 
@@ -271,7 +274,6 @@ public abstract class ModelService<T extends CytomineDomain> {
         return response;
     }
 
-
     /**
      * Edit domain from database
      *
@@ -318,7 +320,6 @@ public abstract class ModelService<T extends CytomineDomain> {
         afterUpdate(domain, response);
         return response;
     }
-
 
     /**
      * Destroy domain from database
@@ -504,7 +505,8 @@ public abstract class ModelService<T extends CytomineDomain> {
         return entityManager;
     }
 
-    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {}
+    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
+    }
 
     public CytomineDomain getCytomineDomain(String domainClassName, Long domainId) {
         try {

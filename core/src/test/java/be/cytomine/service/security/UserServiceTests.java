@@ -77,52 +77,37 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @Transactional
 public class UserServiceTests {
 
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     UserService userService;
-
     @Autowired
     private ProjectMemberService projectMemberService;
-
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private ImageConsultationService imageConsultationService;
-
     @Autowired
     private ProjectConnectionService projectConnectionService;
-
     @Autowired
     private PersistentConnectionRepository persistentConnectionRepository;
-
     @Autowired
     private LastConnectionRepository lastConnectionRepository;
-
     @Autowired
     private PersistentImageConsultationRepository persistentImageConsultationRepository;
-
     @Autowired
     private PersistentProjectConnectionRepository persistentProjectConnectionRepository;
-
     @Autowired
     private ProjectConnectionRepository projectConnectionRepository;
-
     @Autowired
     private PersistentUserPositionRepository persistentUserPositionRepository;
-
     @Autowired
     private LastUserPositionRepository lastUserPositionRepository;
-
     @Autowired
     private SequenceService sequenceService;
-
     @Autowired
     private PermissionService permissionService;
-
     @Autowired
     private UserPositionService userPositionService;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -237,7 +222,6 @@ public class UserServiceTests {
         assertThat(authInformation.getUserByNow()).isTrue();
         assertThat(authInformation.getGuestByNow()).isFalse();
     }
-
 
     @Test
     void getAuthRolesForGuest() {
@@ -585,7 +569,6 @@ public class UserServiceTests {
             .collect(Collectors.toList())).contains(user.getId());
     }
 
-
     @Test
     void listUserExtendedWithLastImageName() {
         User userWhoHasOpenImage = builder.givenAUser();
@@ -626,7 +609,6 @@ public class UserServiceTests {
         );
         assertThat(page.getContent().stream().map(x -> x.getJSONAttrLong("lastImage"))).contains(imageInstance.getId());
     }
-
 
     @Test
     void listUserExtendedWithLastConnection() {
@@ -831,7 +813,7 @@ public class UserServiceTests {
         builder.addUserToProject(project, user.getUsername(), WRITE);
         builder.addUserToProject(project, anotherUserInProject.getUsername(), WRITE);
 
-        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
+        assertThat(userService.listLayers(project)
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .contains(user.getId(), anotherUserInProject.getId())
@@ -850,7 +832,7 @@ public class UserServiceTests {
         builder.addUserToProject(project, user.getUsername(), WRITE);
         builder.addUserToProject(project, adminInProject.getUsername(), ADMINISTRATION);
 
-        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
+        assertThat(userService.listLayers(project)
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .hasSize(1)
@@ -870,7 +852,7 @@ public class UserServiceTests {
         builder.addUserToProject(project, user.getUsername(), WRITE);
         builder.addUserToProject(project, userInProject.getUsername(), WRITE);
 
-        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
+        assertThat(userService.listLayers(project)
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .hasSize(1)
@@ -890,7 +872,7 @@ public class UserServiceTests {
         builder.addUserToProject(project, user.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, userInProject.getUsername(), WRITE);
 
-        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
+        assertThat(userService.listLayers(project)
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .hasSize(2)
@@ -926,13 +908,11 @@ public class UserServiceTests {
             DateUtils.addSeconds(new Date(), -10)
         );
 
-
         assertThat(userService.getAllOnlineUserIds(project)).contains(userOnline.getId())
             .doesNotContain(userOnlineButOnDifferentProject.getId(), userOffline.getId());
         assertThat(userService.getAllOnlineUsers(project)).contains(userOnline)
             .doesNotContain(userOnlineButOnDifferentProject, userOffline);
     }
-
 
     @Test
     void listFriendUsers() {
@@ -1019,7 +999,6 @@ public class UserServiceTests {
         assertThat(allOnlineUserWithTheirPositions.get(0).get("lastConnection")).isNotNull();
         assertThat(allOnlineUserWithTheirPositions.get(0).get("frequency")).isEqualTo(1);
     }
-
 
     @Test
     void listOnlineUserForProjectWitTheirPosition() {

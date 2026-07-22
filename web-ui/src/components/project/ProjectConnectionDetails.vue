@@ -53,7 +53,7 @@
 
 <script>
 import {ImageConsultationCollection} from '@/api';
-import ImagePreview from '@/components/image/ImagePreview';
+import ImagePreview from '@/components/image/ImagePreview.vue';
 
 export default {
   name: 'project-connection-details',

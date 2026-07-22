@@ -31,7 +31,7 @@ import {get} from '@/utils/store-helpers';
 
 import {ImageInstanceCollection} from '@/api';
 
-import ImagePreview from './ImagePreview';
+import ImagePreview from './ImagePreview.vue';
 
 export default {
   name: 'list-images-preview',

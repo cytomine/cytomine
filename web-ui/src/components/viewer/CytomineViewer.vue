@@ -37,9 +37,9 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import CytomineImage from './CytomineImage';
-import ImageSelector from './ImageSelector';
-import AppBottomDrawer from '@/components/appengine/AppBottomDrawer';
+import CytomineImage from './CytomineImage.vue';
+import ImageSelector from './ImageSelector.vue';
+import AppBottomDrawer from '@/components/appengine/AppBottomDrawer.vue';
 
 import viewerModuleModel from '@/store/modules/project_modules/viewer';
 

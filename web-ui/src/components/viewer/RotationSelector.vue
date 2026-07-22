@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import CytomineSlider from '@/components/form/CytomineSlider';
+import CytomineSlider from '@/components/form/CytomineSlider.vue';
 
 export default {
   name: 'rotation-selector',

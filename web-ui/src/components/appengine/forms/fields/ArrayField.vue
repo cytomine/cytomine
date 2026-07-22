@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import ArrayModal from '@/components/appengine/forms/fields/array/ArrayModal';
+import ArrayModal from '@/components/appengine/forms/fields/array/ArrayModal.vue';
 
 export default {
   name: 'ArrayField',

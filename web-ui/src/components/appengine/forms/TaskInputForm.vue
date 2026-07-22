@@ -13,7 +13,7 @@
 <script>
 import Vue from 'vue';
 
-import AppEngineField from '@/components/appengine/forms/fields/AppEngineField';
+import AppEngineField from '@/components/appengine/forms/fields/AppEngineField.vue';
 import Task from '@/utils/appengine/task';
 import {hasBinaryType} from '@/utils/app';
 

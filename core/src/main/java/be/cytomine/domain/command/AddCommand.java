@@ -23,6 +23,7 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
 /**
@@ -51,7 +52,7 @@ public class AddCommand extends Command {
      *
      * @return Message
      */
-    public CommandResponse execute(ModelService service) {
+    public CommandResponse execute(ModelService service, UrlApi urlApi) {
         //Create new domain from json data
         json.put("id", null);
         CytomineDomain newDomain = service.createFromJSON(json);
@@ -59,7 +60,7 @@ public class AddCommand extends Command {
         CommandResponse response = service.create(newDomain, printMessage);
         //Init command domain
         newDomain = response.getObject();
-        fillCommandInfo(newDomain, (String) response.getData().get("message"));
+        fillCommandInfo(newDomain, (String) response.getData().get("message"), urlApi);
         if (newDomain != null) {
             CytomineDomain container = newDomain.container();
             if (container != null && container instanceof Project) {

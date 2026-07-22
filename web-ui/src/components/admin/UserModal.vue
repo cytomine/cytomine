@@ -97,7 +97,7 @@
 import {User} from '@/api';
 import {rolesMapping} from '@/utils/role-utils';
 import {UserRole} from '@/constants/UserRole.js';
-import CytomineModal from '@/components/utils/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
 
 const defaultRole = UserRole.GUEST;
 const defaultLanguage = {value: 'EN', name:'English'};

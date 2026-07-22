@@ -59,7 +59,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import ImageName from '@/components/image/ImageName';
+import ImageName from '@/components/image/ImageName.vue';
 
 export default {
   name: 'navigation-tree',
@@ -103,7 +103,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~bulma/sass/utilities/mixins.sass';
+@import 'bulma/sass/utilities/mixins.sass';
 
 .project-item {
   color: #333;

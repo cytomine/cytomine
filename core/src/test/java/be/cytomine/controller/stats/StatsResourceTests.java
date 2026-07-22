@@ -294,7 +294,6 @@ public class StatsResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
             .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId()))
             .andExpect(jsonPath("$.collection[0].value").value(0));
-        ;
 
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
@@ -308,7 +307,6 @@ public class StatsResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
             .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId()))
             .andExpect(jsonPath("$.collection[0].value").value(2));
-        ;
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/userslide.json", project.getId())
                 .param("startDate", String.valueOf(DateUtils.addDays(new Date(), -20).getTime()))
@@ -346,7 +344,6 @@ public class StatsResourceTests {
             .andExpect(jsonPath("$.collection[0].terms[0].count").value(2));
 
     }
-
 
     @Test
     void statsUserAnnotationEvolution() throws Exception {

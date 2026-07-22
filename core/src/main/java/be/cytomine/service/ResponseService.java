@@ -21,6 +21,7 @@ import static be.cytomine.utils.ClassUtils.getClassName;
 @Transactional()
 public class ResponseService {
 
+    private final UrlApi urlApi;
     private final MessageSource messageSource;
 
     /**
@@ -60,7 +61,8 @@ public class ResponseService {
         params.put("message", message);
         params.put("callback", paramsCallback);
         params.put("printMessage", printMessage);
-        params.put(objectName.toLowerCase(), JsonObject.toMap(object.toJSON()));     //Project.getDataFromDomain(object)
+        params.put(objectName.toLowerCase(),
+            JsonObject.toMap(object.toJSON(urlApi)));     //Project.getDataFromDomain(object)
 
         CommandResponse commandResponse = new CommandResponse();
         commandResponse.setData(params);
@@ -77,7 +79,7 @@ public class ResponseService {
     ) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("success", success);
-        params.put("message", messageSource.getMessage(messageKey, new Object[]{}, Locale.ENGLISH));
+        params.put("message", messageSource.getMessage(messageKey, new Object[] {}, Locale.ENGLISH));
         params.put("callback", callback);
         params.put("printMessage", printMessage);
         return params;

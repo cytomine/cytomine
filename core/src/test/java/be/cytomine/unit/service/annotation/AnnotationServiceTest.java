@@ -27,17 +27,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class AnnotationServiceTest {
 
+    private static Annotation mockAnnotation;
+    private static AnnotationLayer mockAnnotationLayer;
+    private static String mockGeometry;
     @Mock
     private AnnotationRepository annotationRepository;
-
     @InjectMocks
     private AnnotationService annotationService;
-
-    private static Annotation mockAnnotation;
-
-    private static AnnotationLayer mockAnnotationLayer;
-
-    private static String mockGeometry;
 
     @BeforeAll
     public static void setUp() {

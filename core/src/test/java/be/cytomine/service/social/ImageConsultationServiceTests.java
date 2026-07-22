@@ -111,7 +111,6 @@ public class ImageConsultationServiceTests {
 
         consultation = givenAPersistentImageConsultation(user, imageInstance, new Date());
 
-
         Optional<PersistentImageConsultation>
             connectionOptional
             = persistentImageConsultationRepository.findAllByUserAndImageAndCreatedLessThan(
@@ -122,7 +121,6 @@ public class ImageConsultationServiceTests {
         AssertionsForClassTypes.assertThat(connectionOptional.get().getSession()).isEqualTo("xxx");
         AssertionsForClassTypes.assertThat(connectionOptional.get().getTime()).isEqualTo(0);
     }
-
 
     @Test
     void fillProjectConnectionUpdateAnnotationsCounter() {
@@ -186,7 +184,6 @@ public class ImageConsultationServiceTests {
         givenAPersistentImageConsultation(user, imageInstance1, new Date());
         givenAPersistentImageConsultation(user, imageInstance1, new Date());
 
-
         List<JsonObject> results = imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
             imageInstance1.getProject(), user);
         assertThat(results).hasSize(1);
@@ -226,7 +223,6 @@ public class ImageConsultationServiceTests {
         assertThat(results.get(1).get("user")).isEqualTo(user1.getId());
         assertThat(results.get(1).get("image")).isEqualTo(imageInstance2.getId());
 
-
         results = imageConsultationService.lastImageOfUsersByProject(
             imageInstance1.getProject(),
             List.of(user1.getId()),
@@ -249,7 +245,6 @@ public class ImageConsultationServiceTests {
         assertThat(results).hasSize(1);
 
     }
-
 
     @Test
     void shouldReturnLastConsultedImagePerUserForProject() {

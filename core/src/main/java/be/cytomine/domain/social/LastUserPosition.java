@@ -113,7 +113,7 @@ public class LastUserPosition extends CytomineSocialDomain {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObjectSocial() {
         return getDataFromDomain(this);
     }
 }

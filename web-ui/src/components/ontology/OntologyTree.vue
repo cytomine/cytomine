@@ -64,8 +64,8 @@
 
 <script>
 import SlVueTree from 'sl-vue-tree';
-import CytomineTerm from './CytomineTerm';
-import TermModal from './TermModal';
+import CytomineTerm from './CytomineTerm.vue';
+import TermModal from './TermModal.vue';
 import {Term} from '@/api';
 import {getWildcardRegexp} from '@/utils/string-utils';
 

@@ -54,13 +54,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 public class ImageServerServiceTests {
 
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     ImageServerService imageServerService;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
 
     @BeforeAll
     public static void beforeAll() {
@@ -78,7 +76,8 @@ public class ImageServerServiceTests {
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/storage/size.json"))
             .willReturn(
                 aResponse().withBody(
-                    "{\"used\":193396892,\"available\":445132860,\"usedP\":0.302878435,\"hostname\":\"b52416f53249\",\"mount\":\"/data/images\",\"ip\":null}")
+                    "{\"used\":193396892,\"available\":445132860,\"usedP\":0.302878435,\"hostname\":\"b52416f53249\","
+                        + "\"mount\":\"/data/images\",\"ip\":null}")
             )
         );
 
@@ -277,7 +276,8 @@ public class ImageServerServiceTests {
             ).replace("%2F", "/") + "/info/associated"))
                 .willReturn(
                     aResponse().withBody(
-                        "{\"items\": [{\"name\":\"macro\"},{\"name\":\"thumbnail\"},{\"name\":\"label\"}], \"size\": 0}")
+                        "{\"items\": [{\"name\":\"macro\"},{\"name\":\"thumbnail\"},{\"name\":\"label\"}], \"size\": "
+                            + "0}")
                 )
         );
         int size = imageServerService.associated(image).size();
@@ -462,7 +462,6 @@ public class ImageServerServiceTests {
         }
         assertThat(crop).isEqualTo(mockResponse);
     }
-
 
     @Test
     void getWindowForAbstractImage() throws UnsupportedEncodingException, ParseException {

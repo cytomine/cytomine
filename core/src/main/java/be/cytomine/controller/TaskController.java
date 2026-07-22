@@ -30,6 +30,7 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
@@ -42,10 +43,9 @@ import be.cytomine.utils.Task;
 public class TaskController extends RestCytomineController {
 
     private final CurrentUserService currentUserService;
-
     private final ProjectService projectService;
-
     private final TaskService taskService;
+    private final UrlApi urlApi;
 
     @GetMapping("/task/{id}.json")
     public ResponseEntity<String> show(@PathVariable Long id) {
@@ -53,7 +53,7 @@ public class TaskController extends RestCytomineController {
         if (task == null) {
             throw new ObjectNotFoundException("Task", id);
         }
-        JsonObject jsonObject = task.toJsonObject();
+        JsonObject jsonObject = task.toJsonObject(urlApi);
         jsonObject.put("comments", taskService.getLastComments(task, 5));
         return responseSuccess(jsonObject);
     }
@@ -69,7 +69,7 @@ public class TaskController extends RestCytomineController {
         User user = currentUserService.getCurrentUser();
         boolean printInActivity = json.getJSONAttrBoolean("printInActivity", false);
         Task task = taskService.createNewTask(project, user, printInActivity);
-        JsonObject jsonObject = task.toJsonObject();
+        JsonObject jsonObject = task.toJsonObject(urlApi);
         jsonObject.put("comments", taskService.getLastComments(task, 5));
         return responseSuccess(JsonObject.of("task", jsonObject));
     }

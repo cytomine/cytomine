@@ -167,7 +167,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~vue-slider-component/theme/default.css';
+@import 'vue-slider-component/theme/default.css';
 
 .vue-slider-dot-tooltip-inner {
   font-size: 0.9rem !important;

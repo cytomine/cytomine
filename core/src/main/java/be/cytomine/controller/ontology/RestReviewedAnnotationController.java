@@ -30,6 +30,7 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
@@ -72,6 +73,8 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     private final TaskService taskService;
 
     private final TermHttpContract termHttpContract;
+
+    private final UrlApi urlApi;
 
     @GetMapping("/reviewedannotation.json")
     public ResponseEntity<String> list(
@@ -171,7 +174,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         return responseSuccess(JsonObject.of(
             "message",
             imageInstance.getReviewUser().getUsername() + " start reviewing on " + imageInstance.getInstanceFilename(),
-            "imageinstance", ImageInstance.getDataFromDomain(imageInstance)
+            "imageinstance", ImageInstance.getDataFromDomain(imageInstance, urlApi)
         ));
     }
 
@@ -195,7 +198,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
 
         return responseSuccess(JsonObject.of(
             "message", message,
-            "imageinstance", ImageInstance.getDataFromDomain(imageInstance)
+            "imageinstance", ImageInstance.getDataFromDomain(imageInstance, urlApi)
         ));
     }
 

@@ -128,7 +128,7 @@ public class PersistentProjectConnection extends CytomineSocialDomain implements
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObjectSocial() {
         return getDataFromDomain(this);
     }
 }

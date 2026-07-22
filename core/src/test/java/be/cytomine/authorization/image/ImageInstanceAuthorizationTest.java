@@ -19,6 +19,7 @@ import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -29,13 +30,13 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
 
-    private ImageInstance imageInstance = null;
-
     @Autowired
     ImageInstanceService imageInstanceService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
+    private ImageInstance imageInstance = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -108,7 +109,6 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(() -> whenIDeleteDomain());
     }
 
-
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void userCannotStopReviewStartedBySomeoneElse() {
@@ -141,12 +141,12 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     @Override
     protected void whenIAddDomain() {
         imageInstanceService.add(builder.givenANotPersistedImageInstance(imageInstance.getProject())
-            .toJsonObject());
+            .toJsonObject(urlApi));
     }
 
     @Override
     public void whenIEditDomain() {
-        imageInstanceService.update(imageInstance, imageInstance.toJsonObject());
+        imageInstanceService.update(imageInstance, imageInstance.toJsonObject(urlApi));
     }
 
     @Override
@@ -169,7 +169,6 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(READ);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

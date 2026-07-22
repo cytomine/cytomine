@@ -29,6 +29,7 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.GenericCytomineDomainContainer;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -48,6 +49,16 @@ public class TagDomainAssociation extends CytomineDomain {
     @Column(name = "domain_id")
     private Long domainIdent;
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        TagDomainAssociation tagDomainAssocitation = (TagDomainAssociation) domain;
+        returnArray.put("domainIdent", tagDomainAssocitation.getDomainIdent());
+        returnArray.put("domainClassName", tagDomainAssocitation.getDomainClassName());
+        returnArray.put("tag", tagDomainAssocitation.getTag().getId());
+        returnArray.put("tagName", tagDomainAssocitation.getTag().getName());
+        return returnArray;
+    }
+
     public void setDomain(CytomineDomain domain) {
         domainClassName = domain.getClass().getName();
         domainIdent = domain.getId();
@@ -62,23 +73,8 @@ public class TagDomainAssociation extends CytomineDomain {
         return tagDomainAssocitation;
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        TagDomainAssociation tagDomainAssocitation = (TagDomainAssociation) domain;
-        returnArray.put("domainIdent", tagDomainAssocitation.getDomainIdent());
-        returnArray.put("domainClassName", tagDomainAssocitation.getDomainClassName());
-        returnArray.put("tag", tagDomainAssocitation.getTag().getId());
-        returnArray.put("tagName", tagDomainAssocitation.getTag().getName());
-        return returnArray;
-    }
-
     @Override
-    public String toJSON() {
-        return toJsonObject().toJsonString();
-    }
-
-    @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

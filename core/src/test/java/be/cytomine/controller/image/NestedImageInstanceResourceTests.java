@@ -31,6 +31,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.NestedImageInstance;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -54,6 +55,8 @@ public class NestedImageInstanceResourceTests {
 
     @Autowired
     private MockMvc restNestedImageInstanceControllerMockMvc;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     @Transactional
@@ -90,7 +93,6 @@ public class NestedImageInstanceResourceTests {
             .andExpect(jsonPath("$.baseImage").hasJsonPath()); // expect to have field from imageinstance
     }
 
-
     @Test
     @Transactional
     public void getAnNestedImageInstanceNotExist() throws Exception {
@@ -103,7 +105,6 @@ public class NestedImageInstanceResourceTests {
             .andExpect(jsonPath("$.errors.message").exists());
     }
 
-
     @Test
     @Transactional
     public void addValidNestedImageInstance() throws Exception {
@@ -113,7 +114,7 @@ public class NestedImageInstanceResourceTests {
                 builder.givenAnImageInstance().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(companionFile.toJSON()))
+                .content(companionFile.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -128,7 +129,7 @@ public class NestedImageInstanceResourceTests {
     @Transactional
     public void editValidNestedImageInstance() throws Exception {
         NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
-        JsonObject jsonObject = nestedImageInstance.toJsonObject();
+        JsonObject jsonObject = nestedImageInstance.toJsonObject(urlApi);
         jsonObject.put("x", "123");
         restNestedImageInstanceControllerMockMvc.perform(put(
                 "/api/imageinstance/{imageInstanceId}/nested/{id}.json",
@@ -147,9 +148,7 @@ public class NestedImageInstanceResourceTests {
             .andExpect(jsonPath("$.nestedimageinstance.id").exists())
             .andExpect(jsonPath("$.nestedimageinstance.x").value("123"));
 
-
     }
-
 
     @Test
     @Transactional
@@ -168,7 +167,6 @@ public class NestedImageInstanceResourceTests {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.nestedimageinstance.id").exists());
-
 
     }
 

@@ -31,6 +31,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.processing.ImageFilterProject;
+import be.cytomine.service.UrlApi;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -51,6 +52,8 @@ public class ImageFilterProjectResourceTests {
 
     @Autowired
     private MockMvc restImageFilterProjectMockMvc;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     @Transactional
@@ -95,7 +98,7 @@ public class ImageFilterProjectResourceTests {
         );
         restImageFilterProjectMockMvc.perform(post("/api/imagefilterproject.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(imageFilterProject.toJSON()))
+                .content(imageFilterProject.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

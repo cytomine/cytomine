@@ -36,6 +36,35 @@ public class SimplifyGeometryServiceTests {
     @Autowired
     SimplifyGeometryService simplifyGeometryService;
 
+    public static int getPointMultiplyByGeometriesOrInteriorRings(Geometry geometry, long numberOfPoints) {
+        int result = 0;
+        if (geometry instanceof MultiPolygon) {
+            for (int i = 0; i < geometry.getNumGeometries(); i++) {
+                Geometry geom = geometry.getGeometryN(i);
+                int nbInteriorRing = 1;
+                if (geom instanceof Polygon) {
+                    nbInteriorRing = ((Polygon) geom).getNumInteriorRing();
+                }
+                result += geom.getNumGeometries() * nbInteriorRing;
+            }
+        } else {
+            int nbInteriorRing = 1;
+            if (geometry instanceof Polygon) {
+                nbInteriorRing = ((Polygon) geometry).getNumInteriorRing();
+            }
+            result = geometry.getNumGeometries() * nbInteriorRing;
+        }
+        result = Math.max(1, result);
+
+        if (result > 10) {
+            result /= 2;
+        }
+        result = Math.min(10, result);
+
+        result *= numberOfPoints;
+        return result;
+    }
+
     @Test
     public void simplifyBigAnnotation() throws ParseException {
 
@@ -61,12 +90,12 @@ public class SimplifyGeometryServiceTests {
         );
 
         assertThat(result.getNewAnnotation()
-            .getNumPoints()).isLessThanOrEqualTo((int) getPointMultiplyByGeometriesOrInteriorRings(
+            .getNumPoints()).isLessThanOrEqualTo(getPointMultiplyByGeometriesOrInteriorRings(
             annotation.getLocation(),
             maxPoint
         ));
         assertThat(result.getNewAnnotation()
-            .getNumPoints()).isGreaterThanOrEqualTo((int) getPointMultiplyByGeometriesOrInteriorRings(
+            .getNumPoints()).isGreaterThanOrEqualTo(getPointMultiplyByGeometriesOrInteriorRings(
             annotation.getLocation(),
             minPoint
         ));
@@ -77,12 +106,12 @@ public class SimplifyGeometryServiceTests {
         result = simplifyGeometryService.simplifyPolygon(annotation.getLocation(), minPoint, maxPoint);
 
         assertThat(result.getNewAnnotation()
-            .getNumPoints()).isLessThanOrEqualTo((int) getPointMultiplyByGeometriesOrInteriorRings(
+            .getNumPoints()).isLessThanOrEqualTo(getPointMultiplyByGeometriesOrInteriorRings(
             annotation.getLocation(),
             maxPoint
         ));
         assertThat(result.getNewAnnotation()
-            .getNumPoints()).isGreaterThanOrEqualTo((int) getPointMultiplyByGeometriesOrInteriorRings(
+            .getNumPoints()).isGreaterThanOrEqualTo(getPointMultiplyByGeometriesOrInteriorRings(
             annotation.getLocation(),
             minPoint
         ));
@@ -93,12 +122,12 @@ public class SimplifyGeometryServiceTests {
         result = simplifyGeometryService.simplifyPolygon(annotation.getLocation(), minPoint, maxPoint);
 
         assertThat(result.getNewAnnotation()
-            .getNumPoints()).isLessThanOrEqualTo((int) getPointMultiplyByGeometriesOrInteriorRings(
+            .getNumPoints()).isLessThanOrEqualTo(getPointMultiplyByGeometriesOrInteriorRings(
             annotation.getLocation(),
             maxPoint
         ));
         assertThat(result.getNewAnnotation()
-            .getNumPoints()).isGreaterThanOrEqualTo((int) getPointMultiplyByGeometriesOrInteriorRings(
+            .getNumPoints()).isGreaterThanOrEqualTo(getPointMultiplyByGeometriesOrInteriorRings(
             annotation.getLocation(),
             minPoint
         ));
@@ -131,12 +160,12 @@ public class SimplifyGeometryServiceTests {
         );
 
         assertThat(result.getNewAnnotation()
-            .getNumPoints()).isLessThanOrEqualTo((int) getPointMultiplyByGeometriesOrInteriorRings(
+            .getNumPoints()).isLessThanOrEqualTo(getPointMultiplyByGeometriesOrInteriorRings(
             annotation.getLocation(),
             maxPoint
         ));
         assertThat(result.getNewAnnotation()
-            .getNumPoints()).isGreaterThanOrEqualTo((int) getPointMultiplyByGeometriesOrInteriorRings(
+            .getNumPoints()).isGreaterThanOrEqualTo(getPointMultiplyByGeometriesOrInteriorRings(
             annotation.getLocation(),
             minPoint
         ));
@@ -168,12 +197,12 @@ public class SimplifyGeometryServiceTests {
         );
 
         assertThat(result.getNewAnnotation()
-            .getNumPoints()).isLessThanOrEqualTo((int) getPointMultiplyByGeometriesOrInteriorRings(
+            .getNumPoints()).isLessThanOrEqualTo(getPointMultiplyByGeometriesOrInteriorRings(
             annotation.getLocation(),
             maxPoint
         ));
         assertThat(result.getNewAnnotation()
-            .getNumPoints()).isGreaterThanOrEqualTo((int) getPointMultiplyByGeometriesOrInteriorRings(
+            .getNumPoints()).isGreaterThanOrEqualTo(getPointMultiplyByGeometriesOrInteriorRings(
             annotation.getLocation(),
             minPoint
         ));
@@ -194,34 +223,5 @@ public class SimplifyGeometryServiceTests {
         );
 
         assertThat(simplifiedAnnotation.getNewAnnotation().norm().toText()).isEqualTo(expected.toText());
-    }
-
-    public static int getPointMultiplyByGeometriesOrInteriorRings(Geometry geometry, long numberOfPoints) {
-        int result = 0;
-        if (geometry instanceof MultiPolygon) {
-            for (int i = 0; i < geometry.getNumGeometries(); i++) {
-                Geometry geom = geometry.getGeometryN(i);
-                int nbInteriorRing = 1;
-                if (geom instanceof Polygon) {
-                    nbInteriorRing = ((Polygon) geom).getNumInteriorRing();
-                }
-                result += geom.getNumGeometries() * nbInteriorRing;
-            }
-        } else {
-            int nbInteriorRing = 1;
-            if (geometry instanceof Polygon) {
-                nbInteriorRing = ((Polygon) geometry).getNumInteriorRing();
-            }
-            result = geometry.getNumGeometries() * nbInteriorRing;
-        }
-        result = Math.max(1, result);
-
-        if (result > 10) {
-            result /= 2;
-        }
-        result = Math.min(10, result);
-
-        result *= numberOfPoints;
-        return result;
     }
 }

@@ -17,11 +17,8 @@ package be.cytomine.domain;
  */
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EntityManager;
@@ -30,10 +27,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -42,6 +35,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.DateUtils;
 import be.cytomine.utils.JsonObject;
 
@@ -109,18 +103,6 @@ public abstract class CytomineDomain {
         return null;
     }
 
-    public List<ValidationError> validate() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        Set<ConstraintViolation<CytomineDomain>> violations = validator.validate(this);
-        return violations.stream().map(ValidationError::new).collect(Collectors.toList());
-    }
-
-    /**
-     * Get the container domain for this domain (usefull for security)
-     *
-     * @return Container of this domain
-     */
     public CytomineDomain container() {
         return null;
     }
@@ -129,14 +111,14 @@ public abstract class CytomineDomain {
         return null;
     }
 
-    public abstract JsonObject toJsonObject();
+    public abstract JsonObject toJsonObject(UrlApi urlApi);
 
     public Map<String, Object> getCallBack() {
         return Map.of();
     }
 
-    public String toJSON() {
-        return toJsonObject().toJsonString();
+    public String toJSON(UrlApi urlApi) {
+        return toJsonObject(urlApi).toJsonString();
     }
 
     public boolean canUpdateContent() {

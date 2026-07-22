@@ -41,6 +41,7 @@ import lombok.Setter;
 
 import be.cytomine.common.repository.utils.Language;
 import be.cytomine.domain.CytomineDomain;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Table(name = "sec_user", uniqueConstraints = @UniqueConstraint(name = "unique_reference", columnNames = {"reference"}))
@@ -187,12 +188,12 @@ public class User extends CytomineDomain {
     }
 
     @Override
-    public String toJSON() {
+    public String toJSON(UrlApi urlApi) {
         return getDataFromDomain(this).toJsonString();
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

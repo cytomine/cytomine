@@ -50,8 +50,8 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Unit Tests
-        run: npm run test:unit
+      - name: Run tests
+        run: npm run test
 
       - name: Upload test coverage
         if: ${{ always() }}
@@ -59,12 +59,4 @@ jobs:
         with:
           name: coverage
           path: ./web-ui/coverage
-          retention-days: 7
-
-      - name: Upload test report
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: test-report.html
-          path: ./web-ui/reports/test-report.html
           retention-days: 7

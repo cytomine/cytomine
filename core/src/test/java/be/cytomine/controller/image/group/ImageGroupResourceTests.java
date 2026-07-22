@@ -17,6 +17,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.group.ImageGroup;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -34,8 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ImageGroupResourceTests {
 
     @Autowired
+    private UrlApi urlApi;
+    @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restImageGroupControllerMockMvc;
 
@@ -79,7 +81,7 @@ public class ImageGroupResourceTests {
         ImageGroup imageGroup = builder.givenANotPersistedImagegroup();
         restImageGroupControllerMockMvc.perform(post("/api/imagegroup.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(imageGroup.toJSON()))
+                .content(imageGroup.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -93,7 +95,7 @@ public class ImageGroupResourceTests {
     @Transactional
     public void editValidImagegroup() throws Exception {
         ImageGroup imageGroup = builder.givenAnImageGroup();
-        JsonObject jsonObject = imageGroup.toJsonObject();
+        JsonObject jsonObject = imageGroup.toJsonObject(urlApi);
         String name = UUID.randomUUID().toString();
         jsonObject.put("name", name);
         restImageGroupControllerMockMvc.perform(put("/api/imagegroup/{id}.json", imageGroup.getId())

@@ -38,11 +38,11 @@ import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.GeometryUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -56,6 +56,8 @@ public class PropertyServiceTests {
 
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     public void listProperty() {
@@ -70,7 +72,6 @@ public class PropertyServiceTests {
         assertThat(propertyService.list(project)).contains(property);
     }
 
-
     @Test
     public void findById() {
         Property property = builder.givenAProperty(builder.givenAProject());
@@ -83,7 +84,6 @@ public class PropertyServiceTests {
         Property property = builder.givenAProperty(project);
         assertThat(propertyService.findByDomainAndKey(project, property.getKey())).isPresent();
     }
-
 
     @Test
     public void findByIdThatDoNotExists() {
@@ -111,7 +111,7 @@ public class PropertyServiceTests {
         Project project = builder.givenAProject();
 
         CommandResponse commandResponse =
-            propertyService.add(builder.givenANotPersistedProperty(project, "key", "value").toJsonObject());
+            propertyService.add(builder.givenANotPersistedProperty(project, "key", "value").toJsonObject(urlApi));
         assertThat(commandResponse).isNotNull();
         assertThat(propertyService.findByDomainAndKey(project, "key")).isPresent();
     }
@@ -125,7 +125,7 @@ public class PropertyServiceTests {
 
         CommandResponse commandResponse = propertyService.update(
             property,
-            property.toJsonObject().withChange("value", "NEW VALUE")
+            property.toJsonObject(urlApi).withChange("value", "NEW VALUE")
         );
 
         assertThat(commandResponse).isNotNull();
@@ -134,7 +134,6 @@ public class PropertyServiceTests {
         Property edited = propertyService.findByDomainAndKey(project, "key").get();
         assertThat(edited.getValue()).isEqualTo("NEW VALUE");
     }
-
 
     @Test
     public void deleteProperty() {

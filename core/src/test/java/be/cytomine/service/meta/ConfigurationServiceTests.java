@@ -34,6 +34,7 @@ import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.meta.ConfigurationRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.PermissionService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
@@ -67,6 +68,8 @@ public class ConfigurationServiceTests {
 
     @Autowired
     SecurityACLService securityACLService;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void listAllConfigurationWithSuccess() {
@@ -89,7 +92,7 @@ public class ConfigurationServiceTests {
     void addValidConfigurationWithSuccess() {
         Configuration configuration = builder.givenANotPersistedConfiguration("xxx");
 
-        CommandResponse commandResponse = configurationService.add(configuration.toJsonObject());
+        CommandResponse commandResponse = configurationService.add(configuration.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -101,7 +104,7 @@ public class ConfigurationServiceTests {
 
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                configurationService.add(configuration.toJsonObject().withChange("id", null));
+                configurationService.add(configuration.toJsonObject(urlApi).withChange("id", null));
             }
         );
     }
@@ -112,7 +115,7 @@ public class ConfigurationServiceTests {
 
         CommandResponse commandResponse = configurationService.update(
             configuration,
-            configuration.toJsonObject().withChange("value", "NEW VALUE")
+            configuration.toJsonObject(urlApi).withChange("value", "NEW VALUE")
         );
 
         assertThat(commandResponse).isNotNull();
@@ -121,7 +124,6 @@ public class ConfigurationServiceTests {
         Configuration edited = configurationService.findByKey("xxx").get();
         assertThat(edited.getValue()).isEqualTo("NEW VALUE");
     }
-
 
     @Test
     void deleteConfigurationWithSuccess() {

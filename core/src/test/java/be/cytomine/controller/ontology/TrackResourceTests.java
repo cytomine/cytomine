@@ -31,6 +31,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.Track;
+import be.cytomine.service.UrlApi;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -52,6 +53,8 @@ public class TrackResourceTests {
 
     @Autowired
     private MockMvc restTrackControllerMockMvc;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     @Transactional
@@ -106,14 +109,13 @@ public class TrackResourceTests {
             .andExpect(status().isNotFound());
     }
 
-
     @Test
     @Transactional
     public void addValidTrack() throws Exception {
         Track track = builder.givenANotPersistedTrack();
         restTrackControllerMockMvc.perform(post("/api/track.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(track.toJSON()))
+                .content(track.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -131,7 +133,7 @@ public class TrackResourceTests {
         Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(put("/api/track/{id}.json", track.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(track.toJSON()))
+                .content(track.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -150,7 +152,7 @@ public class TrackResourceTests {
         Track track = builder.givenATrack();
         restTrackControllerMockMvc.perform(delete("/api/track/{id}.json", track.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(track.toJSON()))
+                .content(track.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

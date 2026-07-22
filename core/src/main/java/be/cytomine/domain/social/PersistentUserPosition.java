@@ -139,7 +139,7 @@ public class PersistentUserPosition extends CytomineSocialDomain {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObjectSocial() {
         return getDataFromDomain(this);
     }
 }

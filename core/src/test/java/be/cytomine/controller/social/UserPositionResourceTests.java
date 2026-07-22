@@ -287,11 +287,11 @@ public class UserPositionResourceTests {
         WebSocketUserPositionHandler.sessionsBroadcast.put(currentUserAndImageId, sessionDecoratorA);
         WebSocketUserPositionHandler.sessionsTracked.put(
             sessionDecoratorA,
-            new ConcurrentWebSocketSessionDecorator[]{sessionDecoratorB}
+            new ConcurrentWebSocketSessionDecorator[] {sessionDecoratorB}
         );
         WebSocketUserPositionHandler.sessions.put(
             userA.getId().toString(),
-            new ConcurrentWebSocketSessionDecorator[]{sessionDecoratorA}
+            new ConcurrentWebSocketSessionDecorator[] {sessionDecoratorA}
         );
         UserPositionService.broadcasters.put(currentUserAndImageId, new ArrayList<>(Collections.singleton(userB)));
 
@@ -476,7 +476,7 @@ public class UserPositionResourceTests {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
         String userAndImageId = user.getId().toString() + "/" + imageInstance.getId().toString();
-        String followerAndImageId = admin.getId().toString() + "/" + imageInstance.getId().toString();
+        String followerAndImageId = admin.getId().toString() + "/" + imageInstance.getId();
 
         UserPositionService.broadcasters.put(userAndImageId, new ArrayList<>(Collections.singleton(admin)));
         UserPositionService.followers.put(followerAndImageId, false);

@@ -15,6 +15,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.NestedImageInstance;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.NestedImageInstanceService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -25,13 +26,13 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
 
-    private NestedImageInstance nestedImageInstance = null;
-
     @Autowired
     NestedImageInstanceService nestedImageInstanceService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
+    private NestedImageInstance nestedImageInstance = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -59,7 +60,6 @@ public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest 
         expectForbidden(() -> nestedImageInstanceService.list(nestedImageInstance.getParent()));
     }
 
-
     @Override
     public void whenIGetDomain() {
         nestedImageInstanceService.get(nestedImageInstance.getId());
@@ -70,12 +70,12 @@ public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest 
         NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         nestedImageInstance.setProject(this.nestedImageInstance.getProject());
         nestedImageInstance.setBaseImage(builder.givenAnAbstractImage());
-        nestedImageInstanceService.add(nestedImageInstance.toJsonObject());
+        nestedImageInstanceService.add(nestedImageInstance.toJsonObject(urlApi));
     }
 
     @Override
     public void whenIEditDomain() {
-        nestedImageInstanceService.update(nestedImageInstance, nestedImageInstance.toJsonObject());
+        nestedImageInstanceService.update(nestedImageInstance, nestedImageInstance.toJsonObject(urlApi));
     }
 
     @Override
@@ -98,7 +98,6 @@ public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest 
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(READ);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

@@ -46,6 +46,7 @@ import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.meta.AttachedFileService;
 import be.cytomine.service.security.SecurityACLService;
@@ -94,6 +95,8 @@ public class AbstractImageService extends ModelService {
     private final NestedImageInstanceRepository nestedImageInstanceRepository;
 
     private final AttachedFileService attachedFileService;
+
+    private final UrlApi urlApi;
 
     @Override
     public Class currentDomain() {
@@ -244,7 +247,7 @@ public class AbstractImageService extends ModelService {
         User currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), WRITE);
 
-        JsonObject versionBeforeUpdate = domain.toJsonObject();
+        JsonObject versionBeforeUpdate = domain.toJsonObject(urlApi);
 
         CommandResponse commandResponse = executeCommand(
             new EditCommand(currentUser, transaction),
@@ -283,7 +286,7 @@ public class AbstractImageService extends ModelService {
                 ));
             }
             for (ImageInstance image : images) {
-                JsonObject json = image.toJsonObject();
+                JsonObject json = image.toJsonObject(urlApi);
                 json.put("physicalSizeX", abstractImage.getPhysicalSizeX());
                 json.put("magnification", abstractImage.getMagnification());
                 imageInstanceService.update(image, json);
@@ -302,7 +305,7 @@ public class AbstractImageService extends ModelService {
             }
 
             for (ImageInstance image : images) {
-                JsonObject json = image.toJsonObject();
+                JsonObject json = image.toJsonObject(urlApi);
                 json.put("physicalSizeX", abstractImage.getPhysicalSizeX());
                 imageInstanceService.update(image, json);
             }
@@ -321,7 +324,7 @@ public class AbstractImageService extends ModelService {
             }
 
             for (ImageInstance image : images) {
-                JsonObject json = image.toJsonObject();
+                JsonObject json = image.toJsonObject(urlApi);
                 json.put("magnification", abstractImage.getMagnification());
                 imageInstanceService.update(image, json);
             }

@@ -30,6 +30,7 @@ import lombok.Setter;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -78,12 +79,7 @@ public class Track extends CytomineDomain {
     }
 
     @Override
-    public String toJSON() {
-        return getDataFromDomain(this).toJsonString();
-    }
-
-    @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

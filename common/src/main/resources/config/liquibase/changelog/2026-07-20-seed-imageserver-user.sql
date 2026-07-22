@@ -5,6 +5,12 @@ INSERT INTO sec_user (username, name, reference, enabled, account_expired, accou
 SELECT 'ImageServer1', 'Image Server', md5('ImageServer1'), true, false, false
 WHERE NOT EXISTS (SELECT 1 FROM sec_user WHERE username = 'ImageServer1');
 
+--changeset cytomine:2026-07-20-seed-imageserver-user-keys context:test
+UPDATE sec_user
+SET public_key = '9a8b8369-2446-44cb-b0af-604a74e1dcdb',
+    private_key = 'd70607f5-c478-403c-be11-3dbc1716d1cf'
+WHERE username = 'ImageServer1';
+
 INSERT INTO sec_user_sec_role (sec_user_id, sec_role_id)
 SELECT u.id, r.id FROM sec_user u, sec_role r
 WHERE u.username = 'ImageServer1' AND r.authority IN ('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')

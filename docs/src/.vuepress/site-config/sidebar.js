@@ -21,6 +21,7 @@ module.exports = {
         ["/user-guide/annotations", "Annotations"],
         ["/user-guide/annotation-link", "Annotation Link"],
         ["/user-guide/storage", "Storage"],
+	["/user-guide/appengine", "App Engine"],
       ],
     },
   ],

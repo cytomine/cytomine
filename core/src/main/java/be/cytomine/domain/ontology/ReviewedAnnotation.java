@@ -214,6 +214,11 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         return annotation;
     }
 
+    @Override
+    public JsonObject toJsonObject(UrlApi urlApi) {
+        return getDataFromDomain(this, urlApi);
+    }
+
     public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
         JsonObject returnArray = AnnotationDomain.getDataFromDomain(domain);
         ReviewedAnnotation annotation = (ReviewedAnnotation) domain;
@@ -242,11 +247,6 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         returnArray.put("reviewed", true);
 
         return returnArray;
-    }
-
-    @Override
-    public JsonObject toJsonObject(UrlApi urlApi) {
-        return getDataFromDomain(this, urlApi);
     }
 
     @Override

@@ -443,7 +443,7 @@ public class UserResourceTests {
     //        User user = builder.given_a_user();
     //        restUserControllerMockMvc.perform(post("/api/user.json")
     //                        .contentType(MediaType.APPLICATION_JSON)
-    //                        .content(user.toJSON()))
+    //                        .content(user.toJSON(urlApi)))
     //                .andDo(print())
     //                .andExpect(status().isConflict())
     //                .andExpect(jsonPath("$.success").value(false));
@@ -480,7 +480,7 @@ public class UserResourceTests {
     //
     //        User user = userRepository.findByUsernameLikeIgnoreCase("TEST_CREATE").get();
     //
-    //        JsonObject jsonObject = user.toJsonObject();
+    //        JsonObject jsonObject = user.toJsonObject(urlApi);
     //        jsonObject.put("name", "TEST_CREATE_CHANGE");
     //
     //        restUserControllerMockMvc.perform(put("/api/user/{id}.json", jsonObject.getId())
@@ -502,7 +502,7 @@ public class UserResourceTests {
     //        User user = builder.given_a_user();
     //        restUserControllerMockMvc.perform(delete("/api/user/{id}.json", user.getId())
     //                        .contentType(MediaType.APPLICATION_JSON)
-    //                        .content(user.toJSON()))
+    //                        .content(user.toJSON(urlApi)))
     //                .andDo(print())
     //                .andExpect(status().isOk())
     //                .andExpect(jsonPath("$.printMessage").value(true))

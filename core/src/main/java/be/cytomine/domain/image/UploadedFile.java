@@ -19,6 +19,7 @@ import be.cytomine.common.repository.utils.LongArrayToBytesConverter;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -119,12 +120,7 @@ public class UploadedFile extends CytomineDomain implements Serializable {
     }
 
     @Override
-    public String toJSON() {
-        return toJsonObject().toJsonString();
-    }
-
-    @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

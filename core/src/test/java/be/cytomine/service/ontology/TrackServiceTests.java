@@ -36,6 +36,7 @@ import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.TrackRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 
@@ -62,6 +63,8 @@ public class TrackServiceTests {
 
     @Autowired
     TransactionService transactionService;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void getTrackWithSuccess() {
@@ -100,7 +103,6 @@ public class TrackServiceTests {
         assertThat(trackService.list(builder.givenAProject()).size()).isEqualTo(0);
     }
 
-
     @Test
     void countByProject() {
         Track track = builder.givenATrack();
@@ -136,11 +138,10 @@ public class TrackServiceTests {
             .isEqualTo(0);
     }
 
-
     @Test
     void addValidTrackWithSuccess() {
         Track track = builder.givenANotPersistedTrack();
-        CommandResponse commandResponse = trackService.add(track.toJsonObject());
+        CommandResponse commandResponse = trackService.add(track.toJsonObject(urlApi));
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(trackService.find(commandResponse.getObject().getId())).isPresent();
@@ -153,7 +154,7 @@ public class TrackServiceTests {
         Track track = builder.givenANotPersistedTrack();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
-                trackService.add(track.toJsonObject().withChange("image", null));
+                trackService.add(track.toJsonObject(urlApi).withChange("image", null));
             }
         );
     }
@@ -163,7 +164,7 @@ public class TrackServiceTests {
         Track track = builder.givenATrack();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                trackService.add(track.toJsonObject().withChange("id", null));
+                trackService.add(track.toJsonObject(urlApi).withChange("id", null));
             }
         );
     }
@@ -174,7 +175,7 @@ public class TrackServiceTests {
 
         CommandResponse commandResponse = trackService.update(
             track,
-            track.toJsonObject().withChange("name", "NEW NAME").withChange("color", "NEW COLOR")
+            track.toJsonObject(urlApi).withChange("name", "NEW NAME").withChange("color", "NEW COLOR")
         );
 
         assertThat(commandResponse).isNotNull();
@@ -191,7 +192,7 @@ public class TrackServiceTests {
         track.setName("OLD NAME");
         track = builder.persistAndReturn(track);
 
-        trackService.update(track, track.toJsonObject().withChange("name", "NEW NAME"));
+        trackService.update(track, track.toJsonObject(urlApi).withChange("name", "NEW NAME"));
 
         assertThat(trackRepository.getById(track.getId()).getName()).isEqualTo("NEW NAME");
 
@@ -225,7 +226,6 @@ public class TrackServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(trackService.find(annotationTrack.getId()).isEmpty());
     }
-
 
     @Test
     void undoRedoTrackDeletionWithSuccess() {

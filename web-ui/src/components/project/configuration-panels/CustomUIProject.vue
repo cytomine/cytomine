@@ -57,9 +57,9 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
-import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
-import IconUnlinkAnnotations from '@/components/icons/IconUnlinkAnnotations';
+import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand.vue';
+import IconLineFreeHand from '@/components/icons/IconLineFreeHand.vue';
+import IconUnlinkAnnotations from '@/components/icons/IconUnlinkAnnotations.vue';
 
 export default {
   name: 'custom-ui-project',

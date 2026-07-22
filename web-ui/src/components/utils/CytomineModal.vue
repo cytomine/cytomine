@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import CytomineModalCard from './CytomineModalCard';
+import CytomineModalCard from './CytomineModalCard.vue';
 
 export default {
   name: 'cytomine-modal',

@@ -125,9 +125,6 @@
     <include file="/config/liquibase/changelog/2026-07-15-tag-id-sequence.sql"
              relativeToChangelogFile="false"/>
 
-    <include file="/config/liquibase/changelog/2026-07-20-configuration-id-sequence.sql"
-             relativeToChangelogFile="false"/>
-
     <include file="/config/liquibase/changelog/2026-07-20-seed-roles.sql"
              relativeToChangelogFile="false"/>
 

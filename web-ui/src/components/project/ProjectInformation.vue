@@ -33,7 +33,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import ProjectDetails from './ProjectDetails';
+import ProjectDetails from './ProjectDetails.vue';
 import {Project} from '@/api';
 export default {
   name: 'project-information',

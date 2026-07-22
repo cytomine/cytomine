@@ -35,7 +35,6 @@ import be.cytomine.service.CurrentRoleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
@@ -130,7 +129,6 @@ public class CurrentRoleServiceTests {
         assertThat(currentRoleService.isGuest(builder.givenDefaultGuest())).isTrue();
         assertThat(currentRoleService.hasCurrentUserAdminRole(builder.givenDefaultGuest())).isFalse();
     }
-
 
     @Test
     @WithMockUser(username = "admin")

@@ -15,6 +15,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.AbstractImageService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -27,13 +28,13 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
 
     // We need more flexibility:
 
-    private AbstractImage abstractImage = null;
-
     @Autowired
     AbstractImageService abstractImageService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    private AbstractImage abstractImage = null;
+    @Autowired
+    private UrlApi urlApi;
 
     @BeforeEach
     public void before() throws Exception {
@@ -65,7 +66,6 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
         assertThat(abstractImageService.list()).doesNotContain(anotherAbstractImage);
     }
 
-
     @Override
     public void whenIGetDomain() {
         abstractImageService.get(abstractImage.getId());
@@ -73,12 +73,12 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void whenIAddDomain() {
-        abstractImageService.add(builder.givenANotPersistedAbstractImage().toJsonObject());
+        abstractImageService.add(builder.givenANotPersistedAbstractImage().toJsonObject(urlApi));
     }
 
     @Override
     public void whenIEditDomain() {
-        abstractImageService.update(abstractImage, abstractImage.toJsonObject());
+        abstractImageService.update(abstractImage, abstractImage.toJsonObject(urlApi));
     }
 
     @Override
@@ -101,7 +101,6 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(WRITE);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

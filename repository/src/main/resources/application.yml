@@ -20,6 +20,7 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:config/liquibase/master.xml
+    contexts: prod
 
 application:
   adminEmail: ${ADMIN_EMAIL:dev@cytomine.com}

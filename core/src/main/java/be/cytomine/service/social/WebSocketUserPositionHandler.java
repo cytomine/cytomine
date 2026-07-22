@@ -187,7 +187,7 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
                 false
             );
             if (lastPosition.isPresent()) {
-                TextMessage position = new TextMessage(lastPosition.get().toJsonObject().toJsonString());
+                TextMessage position = new TextMessage(lastPosition.get().toJsonObjectSocial().toJsonString());
                 sendPosition(session, position);
             }
         }

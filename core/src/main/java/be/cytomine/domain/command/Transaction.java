@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -29,12 +30,7 @@ import be.cytomine.utils.JsonObject;
 public class Transaction extends CytomineDomain {
 
     @Override
-    public String toJSON() {
-        return toJsonObject().toJsonString();
-    }
-
-    @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return CytomineDomain.getDataFromDomain(this);
     }
 }

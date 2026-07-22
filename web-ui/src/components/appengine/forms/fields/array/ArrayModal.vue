@@ -48,14 +48,14 @@
 </template>
 
 <script>
-import BooleanField from '@/components/appengine/forms/fields/BooleanField';
-import CytomineModal from '@/components/utils/CytomineModal';
-import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
-import GeometryArrayField from '@/components/appengine/forms/fields/array/GeometryArrayField';
-import ImageArrayField from '@/components/appengine/forms/fields/array/ImageArrayField';
-import IntegerField from '@/components/appengine/forms/fields/IntegerField';
-import NumberField from '@/components/appengine/forms/fields/NumberField';
-import StringField from '@/components/appengine/forms/fields/StringField';
+import BooleanField from '@/components/appengine/forms/fields/BooleanField.vue';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
+import EnumerationField from '@/components/appengine/forms/fields/EnumerationField.vue';
+import GeometryArrayField from '@/components/appengine/forms/fields/array/GeometryArrayField.vue';
+import ImageArrayField from '@/components/appengine/forms/fields/array/ImageArrayField.vue';
+import IntegerField from '@/components/appengine/forms/fields/IntegerField.vue';
+import NumberField from '@/components/appengine/forms/fields/NumberField.vue';
+import StringField from '@/components/appengine/forms/fields/StringField.vue';
 
 export default {
   name: 'ArrayModal',

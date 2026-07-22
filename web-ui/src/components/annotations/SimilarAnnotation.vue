@@ -76,7 +76,7 @@
 import {Annotation, AnnotationTerm} from '@/api';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
-import CytomineTerm from '@/components/ontology/CytomineTerm';
+import CytomineTerm from '@/components/ontology/CytomineTerm.vue';
 import VueDraggableResizable from 'vue-draggable-resizable';
 
 export default {

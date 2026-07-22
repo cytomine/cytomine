@@ -18,6 +18,7 @@ import be.cytomine.dto.NamedCytomineDomain;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 
@@ -41,6 +42,8 @@ public class ProjectMemberService {
     private final SecurityACLService securityACLService;
 
     private final UserService userService;
+
+    private final UrlApi urlApi;
 
     public void addUserToProject(User user, Project project, boolean admin) {
         securityACLService.check(project, ADMINISTRATION);
@@ -156,7 +159,7 @@ public class ProjectMemberService {
                 ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                 pru.setProject(project);
                 pru.setUser((User) currentUserService.getCurrentUser());
-                projectRepresentativeUserService.add(pru.toJsonObject());
+                projectRepresentativeUserService.add(pru.toJsonObject(urlApi));
 
                 projectRepresentativeUserService.find(project, (User) user)
                     .ifPresent(x -> projectRepresentativeUserService.delete(x, null, null, false));
@@ -221,7 +224,7 @@ public class ProjectMemberService {
                 ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                 pru.setProject(project);
                 pru.setUser((User) adminUser);
-                projectRepresentativeUserService.add(pru.toJsonObject(), adminUser);
+                projectRepresentativeUserService.add(pru.toJsonObject(urlApi), adminUser);
 
                 Optional<ProjectRepresentativeUser> foundRepOptional = projectRepresentativeUserService
                     .find(project, (User) user);

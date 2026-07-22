@@ -44,7 +44,7 @@
 <script>
 
 import {Tag, TagDomainAssociation, TagDomainAssociationCollection} from '@/api';
-import AddTagDomainAssociationModal from '@/components/tag/AddTagDomainAssociationModal';
+import AddTagDomainAssociationModal from '@/components/tag/AddTagDomainAssociationModal.vue';
 import {get} from '@/utils/store-helpers';
 
 export default {

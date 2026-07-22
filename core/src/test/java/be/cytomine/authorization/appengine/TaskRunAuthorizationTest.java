@@ -37,14 +37,11 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
 
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private TaskRunService taskRunService;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
     private TaskRun taskRun = null;
 
     @BeforeAll

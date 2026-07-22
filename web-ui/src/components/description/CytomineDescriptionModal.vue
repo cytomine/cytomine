@@ -48,8 +48,8 @@
 </template>
 
 <script>
-import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
-import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import CytomineQuillEditor from '@/components/form/CytomineQuillEditor.vue';
+import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 import constants from '@/utils/constants.js';
 
 export default {

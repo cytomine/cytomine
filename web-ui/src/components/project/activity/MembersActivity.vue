@@ -148,12 +148,12 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import Username from '@/components/user/Username';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
+import Username from '@/components/user/Username.vue';
 
 import constants from '@/utils/constants.js';
 import {getWildcardRegexp} from '@/utils/string-utils';
-import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 
 export default {
   name: 'members-activity',

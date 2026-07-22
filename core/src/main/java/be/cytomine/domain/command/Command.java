@@ -33,6 +33,7 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
@@ -99,37 +100,9 @@ public abstract class Command extends CytomineDomain {
     protected String serviceName;
 
     /**
-     * If command is save on undo stack, refuse undo Usefull for project delete (cannot undo)
+     * If command is saved on undo stack, refuse undo Usefull for project delete (cannot undo)
      */
     protected boolean refuseUndo = false;
-
-    public String toString() {
-        return this.getClass().getSimpleName() + " " + this.id + "[" + this.created + "]";
-    }
-
-    /**
-     * Add command info for the new domain concerned by the command
-     *
-     * @param newObject New domain
-     * @param message   Message build for the command
-     */
-    protected void fillCommandInfo(CytomineDomain newObject, String message) {
-        data = newObject.toJSON();
-        actionMessage = message;
-    }
-
-    /**
-     * Add command info for the new domain concerned by the command
-     *
-     * @param newObject New json domain
-     * @param message   Message build for the command
-     */
-    protected void fillCommandInfoJSON(String newObject, String message) {
-        data = newObject;
-        actionMessage = message;
-    }
-
-    public abstract CommandResponse execute(ModelService service);
 
     /**
      * Define fields available for JSON response
@@ -160,13 +133,41 @@ public abstract class Command extends CytomineDomain {
         return returnArray;
     }
 
+    public String toString() {
+        return this.getClass().getSimpleName() + " " + this.id + "[" + this.created + "]";
+    }
+
+    /**
+     * Add command info for the new domain concerned by the command
+     *
+     * @param newObject New domain
+     * @param message   Message build for the command
+     */
+    protected void fillCommandInfo(CytomineDomain newObject, String message, UrlApi urlApi) {
+        data = newObject.toJSON(urlApi);
+        actionMessage = message;
+    }
+
+    /**
+     * Add command info for the new domain concerned by the command
+     *
+     * @param newObject New json domain
+     * @param message   Message build for the command
+     */
+    protected void fillCommandInfoJSON(String newObject, String message) {
+        data = newObject;
+        actionMessage = message;
+    }
+
+    public abstract CommandResponse execute(ModelService service, UrlApi urlApi);
+
     @Override
-    public String toJSON() {
+    public String toJSON(UrlApi urlApi) {
         return getDataFromDomain(this).toJsonString();
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 }

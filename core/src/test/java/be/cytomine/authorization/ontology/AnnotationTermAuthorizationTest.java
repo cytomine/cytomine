@@ -18,6 +18,7 @@ import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.AnnotationTermService;
 
 @AutoConfigureMockMvc
@@ -25,13 +26,13 @@ import be.cytomine.service.ontology.AnnotationTermService;
 @Transactional
 public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
 
-    private AnnotationTerm annotationTerm = null;
-
     @Autowired
     AnnotationTermService annotationTermService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
+    private AnnotationTerm annotationTerm = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -118,7 +119,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     @Override
     protected void whenIAddDomain() {
         annotationTermService.add(
-            builder.givenANotPersistedAnnotationTerm(annotationTerm.getUserAnnotation()).toJsonObject()
+            builder.givenANotPersistedAnnotationTerm(annotationTerm.getUserAnnotation()).toJsonObject(urlApi)
         );
     }
 
@@ -145,7 +146,6 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(BasePermission.READ);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

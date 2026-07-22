@@ -136,7 +136,6 @@ public class BasicInstanceBuilder {
         return aGuest;
     }
 
-
     public User givenAUser(String username) {
         User user = persistAndReturn(givenANotPersistedUser());
         user.setUsername(username);

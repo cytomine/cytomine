@@ -48,7 +48,7 @@
 
 <script>
 import {AttachedFile} from '@/api';
-import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
   name: 'attached-file-modal',

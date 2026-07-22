@@ -305,7 +305,7 @@ public class ImageInstance extends CytomineDomain {
 
     @Override
     public JsonObject toJsonObject(UrlApi urlApi) {
-        return getDataFromDomain(this);
+        return getDataFromDomain(this, urlApi);
     }
 
     public String getBlindOriginalFilename() {

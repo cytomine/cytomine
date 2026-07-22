@@ -216,7 +216,7 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
 
     @Override
     public JsonObject toJsonObject(UrlApi urlApi) {
-        return getDataFromDomain(this);
+        return getDataFromDomain(this, urlApi);
     }
 
     public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {

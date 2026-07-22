@@ -186,7 +186,7 @@ public class AbstractImage extends CytomineDomain {
     }
 
     public boolean isVirtual() {
-        return uploadedFile != null ? uploadedFile.isVirtual() : false;
+        return uploadedFile != null && uploadedFile.isVirtual();
     }
 
     public Long getUploadedFileId() {
@@ -251,7 +251,7 @@ public class AbstractImage extends CytomineDomain {
 
     @Override
     public JsonObject toJsonObject(UrlApi urlApi) {
-        return getDataFromDomain(this);
+        return getDataFromDomain(this, urlApi);
     }
 
 }

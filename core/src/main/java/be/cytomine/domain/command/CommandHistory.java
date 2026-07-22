@@ -82,12 +82,7 @@ public class CommandHistory extends CytomineDomain {
     }
 
     @Override
-    public String toJSON(UrlApi urlApi) {
-        return getDataFromDomain(this).toJsonString();
-    }
-
-    @Override
     public JsonObject toJsonObject(UrlApi urlApi) {
-        return getDataFromDomain(this);
+        return getDataFromDomain(this, urlApi);
     }
 }

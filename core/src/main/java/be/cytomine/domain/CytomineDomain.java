@@ -17,11 +17,8 @@ package be.cytomine.domain;
  */
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EntityManager;
@@ -30,10 +27,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -110,18 +103,6 @@ public abstract class CytomineDomain {
         return null;
     }
 
-    public List<ValidationError> validate() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        Set<ConstraintViolation<CytomineDomain>> violations = validator.validate(this);
-        return violations.stream().map(ValidationError::new).collect(Collectors.toList());
-    }
-
-    /**
-     * Get the container domain for this domain (usefull for security)
-     *
-     * @return Container of this domain
-     */
     public CytomineDomain container() {
         return null;
     }

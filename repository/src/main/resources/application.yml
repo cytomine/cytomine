@@ -20,3 +20,4 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:config/liquibase/master.xml
+    contexts: prod

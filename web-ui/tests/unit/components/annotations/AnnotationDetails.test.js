@@ -10,18 +10,18 @@ vi.mock('@/api', () => ({
     USER: 'USER',
     REVIEWED: 'REVIEWED',
   },
-  AnnotationTerm: vi.fn().mockImplementation(function () {
-    return {save: vi.fn().mockResolvedValue({})};
-  }),
-  AnnotationTrack: vi.fn().mockImplementation(function () {
-    return {save: vi.fn().mockResolvedValue({})};
-  }),
+  AnnotationTerm: vi.fn().mockImplementation(() => ({
+    save: vi.fn().mockResolvedValue({}),
+  })),
+  AnnotationTrack: vi.fn().mockImplementation(() => ({
+    save: vi.fn().mockResolvedValue({}),
+  })),
   AnnotationCommentCollection: {
-    fetchAll: vi.fn().mockResolvedValue({array: []})
+    fetchAll: vi.fn().mockResolvedValue({array: []}),
   },
   PropertyCollection: {
-    fetchAll: vi.fn().mockResolvedValue({array: []})
-  }
+    fetchAll: vi.fn().mockResolvedValue({array: []}),
+  },
 }));
 
 const localVue = createLocalVue();

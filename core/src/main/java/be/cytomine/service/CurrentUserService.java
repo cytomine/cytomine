@@ -11,10 +11,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.security.current.CurrentUser;
 import be.cytomine.security.current.FullCurrentUser;
 import be.cytomine.security.current.PartialCurrentUser;
@@ -25,44 +26,7 @@ import be.cytomine.security.current.PartialCurrentUser;
 @Service
 public class CurrentUserService {
 
-    private final UserRepository userRepository;
-
-    public String getCurrentUsername() {
-        CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException(
-            "Cannot read current user"));
-        if (currentUser.isFullObjectProvided() || currentUser.isUsernameProvided()) {
-            return currentUser.getUser().getUsername();
-        } else {
-            throw new ObjectNotFoundException(
-                "User",
-                "Cannot read current username. Object " + currentUser + " is not supported"
-            );
-        }
-    }
-
-    public User getCurrentUser() {
-        CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException(
-            "Cannot read current user"));
-        User user;
-        if (currentUser.isFullObjectProvided()) {
-            user = currentUser.getUser();
-        } else if (currentUser.isUsernameProvided()) {
-            user = userRepository.findByUsernameLikeIgnoreCase(currentUser.getUser().getUsername())
-                .orElseThrow(() -> new ServerException("Cannot find current user with username " + currentUser.getUser()
-                    .getUsername()));
-        } else {
-            throw new ObjectNotFoundException(
-                "User",
-                "Cannot read current user. Object " + currentUser + " is not supported"
-            );
-        }
-        return user;
-    }
-
-    public User getCurrentUser(String username) {
-        return userRepository.findByUsernameLikeIgnoreCase(username)
-            .orElseThrow(() -> new ServerException("Cannot find current user with username " + username));
-    }
+    private final UserHttpContract userRepository;
 
     public static Optional<CurrentUser> getSecurityCurrentUser() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
@@ -91,6 +55,43 @@ public class CurrentUserService {
             return partialCurrentUser;
         }
         return null;
+    }
+
+    public String getCurrentUsername() {
+        CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException(
+            "Cannot read current user"));
+        if (currentUser.isFullObjectProvided() || currentUser.isUsernameProvided()) {
+            return currentUser.getUser().username();
+        } else {
+            throw new ObjectNotFoundException(
+                "User",
+                "Cannot read current username. Object " + currentUser + " is not supported"
+            );
+        }
+    }
+
+    public UserResponse getCurrentUser() {
+        CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException(
+            "Cannot read current user"));
+        UserResponse user;
+        if (currentUser.isFullObjectProvided()) {
+            user = currentUser.getUser();
+        } else if (currentUser.isUsernameProvided()) {
+            user = userRepository.search(currentUser.getUser().username())
+                .orElseThrow(() -> new ServerException("Cannot find current user with username " + currentUser.getUser()
+                    .username()));
+        } else {
+            throw new ObjectNotFoundException(
+                "User",
+                "Cannot read current user. Object " + currentUser + " is not supported"
+            );
+        }
+        return user;
+    }
+
+    public UserResponse getCurrentUser(String username) {
+        return userRepository.search(username)
+            .orElseThrow(() -> new ServerException("Cannot find current user with username " + username));
     }
 
 }

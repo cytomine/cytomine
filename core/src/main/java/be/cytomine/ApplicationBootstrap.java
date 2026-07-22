@@ -15,6 +15,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.config.nosqlmigration.InitialMongodbSetupMigration;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.security.User;
@@ -60,7 +61,7 @@ class ApplicationBootstrap {
 
     private final InitialMongodbSetupMigration initialSetupMigration;
 
-    private final UserRepository userRepository;
+    private final UserHttpContract userRepository;
 
     @PostConstruct
     public void init() {

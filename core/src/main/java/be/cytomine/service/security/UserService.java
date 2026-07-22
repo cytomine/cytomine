@@ -29,7 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.http.UserRoleHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.utils.SpringPageCrawler;
 import be.cytomine.domain.CytomineDomain;
@@ -75,14 +77,12 @@ import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
 import be.cytomine.repository.security.AclRepository;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.SecUserSecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.ModelService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.server.StorageService;
@@ -109,7 +109,7 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class UserService extends ModelService {
+public class UserService {
 
     private final AccountService accountService;
 
@@ -189,20 +189,21 @@ public class UserService extends ModelService {
 
     private final UserPositionService userPositionService;
 
-    private final UserRepository userRepository;
+    private final UserHttpContract userRepository;
 
     private final SpringPageCrawler springPageCrawler;
 
-    public Optional<User> find(Long id) {
-        securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userRepository.findById(id);
+    public Optional<UserResponse> find(Long id) {
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        securityACLService.checkGuest(currentUser);
+        return userRepository.get(id, currentUser.id());
     }
 
-    public Optional<User> find(UUID sub) {
+    public Optional<UserResponse> find(UUID sub) {
         return userRepository.findByReference(String.valueOf(sub));
     }
 
-    public Optional<User> find(String id) {
+    public Optional<UserResponse> find(String id) {
         try {
             return find(Long.valueOf(id));
         } catch (NumberFormatException ex) {
@@ -210,35 +211,36 @@ public class UserService extends ModelService {
         }
     }
 
-    public List<User> find(List<String> ids) {
+    public List<UserResponse> find(List<String> ids) {
         return userRepository.findAllByReferenceIn(ids);
     }
 
-    public Optional<User> findUser(Long id) {
-        securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userRepository.findById(id);
+    public Optional<UserResponse> findUser(Long id) {
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        securityACLService.checkGuest(currentUser);
+        return userRepository.get(currentUser.id(), id);
     }
 
-    public User get(Long id) {
+    public UserResponse get(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return find(id).orElse(null);
     }
 
-    public Optional<User> findByUsername(String username) {
+    public Optional<UserResponse> findByUsername(String username) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userRepository.findByUsernameLikeIgnoreCase(username);
+        return userRepository.search(username);
     }
 
-    public Optional<User> findByUsernameWithAdmin(String username) {
-        return userRepository.findByUsernameLikeIgnoreCase(username);
+    public Optional<UserResponse> findByUsernameWithAdmin(String username) {
+        return userRepository.search(username);
     }
 
-    public Optional<User> findByPublicKey(String publicKey) {
+    public Optional<UserResponse> findByPublicKey(String publicKey) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return userRepository.findByPublicKey(publicKey);
     }
 
-    public AuthInformation getAuthenticationRoles(User user) {
+    public AuthInformation getAuthenticationRoles(UserResponse user) {
         AuthInformation authInformation = new AuthInformation();
         authInformation.setAdmin(currentRoleService.isAdmin(user));
         authInformation.setUser(!authInformation.getAdmin() && currentRoleService.isUser(user));
@@ -254,8 +256,8 @@ public class UserService extends ModelService {
         return authInformation;
     }
 
-    public List<User> list(List<Long> ids) {
-        return userRepository.findAllByIdIn(ids);
+    public Set<UserResponse> list(Set<Long> ids) {
+        return userRepository.findByIdsIn(ids);
     }
 
     // TODO 2024.2
@@ -785,7 +787,7 @@ public class UserService extends ModelService {
     /**
      * Get all user that share at least a same project as user from argument and
      */
-    public List<User> getAllFriendsUsersOnline(User user, Project project) {
+    public List<User> getAllFriendsUsersOnline(UserResponse user, Project project) {
         securityACLService.check(project, READ);
         //no need to make insterect because getAllOnlineUsers(project) contains only friends users
         return getAllOnlineUsers(project);

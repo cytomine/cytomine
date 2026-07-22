@@ -62,7 +62,7 @@
 <script>
 import constants from '@/utils/constants.js';
 
-import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
   name: 'AboutCytomineModal',

@@ -127,14 +127,14 @@ limitations under the License.-->
 <script>
 import {get} from '@/utils/store-helpers';
 
-import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
-import CytomineTags from '@/components/tag/CytomineTags';
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
-import RenameModal from '@/components/utils/RenameModal';
-import ImagePreview from '../image/ImagePreview';
-import ImageGroupPreview from '@/components/image-group/ImageGroupPreview';
-import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal';
+import CytomineDescription from '@/components/description/CytomineDescription.vue';
+import CytomineProperties from '@/components/property/CytomineProperties.vue';
+import CytomineTags from '@/components/tag/CytomineTags.vue';
+import AttachedFiles from '@/components/attached-file/AttachedFiles.vue';
+import RenameModal from '@/components/utils/RenameModal.vue';
+import ImagePreview from '../image/ImagePreview.vue';
+import ImageGroupPreview from '@/components/image-group/ImageGroupPreview.vue';
+import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal.vue';
 import constants from '@/utils/constants';
 
 import {ImageGroup, ImageGroupImageInstance, PropertyCollection} from '@/api';

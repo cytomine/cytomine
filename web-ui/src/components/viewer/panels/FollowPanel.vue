@@ -64,7 +64,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import Username from '@/components/user/Username';
+import Username from '@/components/user/Username.vue';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {UserPosition} from '@/api';
 

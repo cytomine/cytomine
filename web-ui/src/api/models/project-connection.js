@@ -1,3 +1,5 @@
+import {detect} from 'detect-browser';
+
 import Model from './model.js';
 import Cytomine from '../cytomine.js';
 
@@ -24,7 +26,6 @@ export default class ProjectConnection extends Model {
 
   /** @override */
   async save() {
-    const {detect} = require('detect-browser');
     const browser = detect();
 
     if (browser) {

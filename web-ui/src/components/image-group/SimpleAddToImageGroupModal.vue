@@ -66,7 +66,7 @@ limitations under the License.-->
 </template>
 
 <script>
-import CytomineModal from '@/components/utils/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
 
 import {ImageGroupCollection, ImageGroup, ImageGroupImageInstance} from '@/api';
 

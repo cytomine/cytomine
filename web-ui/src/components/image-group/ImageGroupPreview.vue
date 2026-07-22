@@ -38,7 +38,7 @@ limitations under the License.-->
 <script>
 import {get} from '@/utils/store-helpers';
 
-import ImageThumbnail from '@/components/image/ImageThumbnail';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 
 export default {
   name: 'image-group-preview',

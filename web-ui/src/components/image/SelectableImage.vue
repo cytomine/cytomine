@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import ImageThumbnail from '@/components/image/ImageThumbnail';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 import {get} from '@/utils/store-helpers';
 
 export default {

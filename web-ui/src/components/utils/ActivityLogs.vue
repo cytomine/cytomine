@@ -42,7 +42,7 @@ import {Project} from '@/api';
 import moment from 'moment';
 import _ from 'lodash';
 
-import ActivityLogsItem from './ActivityLogsItem';
+import ActivityLogsItem from './ActivityLogsItem.vue';
 
 export default {
   name: 'activity-logs',

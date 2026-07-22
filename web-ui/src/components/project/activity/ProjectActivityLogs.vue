@@ -30,7 +30,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import ActivityLogs from '@/components/utils/ActivityLogs';
+import ActivityLogs from '@/components/utils/ActivityLogs.vue';
 
 export default {
   name: 'project-activity-logs',

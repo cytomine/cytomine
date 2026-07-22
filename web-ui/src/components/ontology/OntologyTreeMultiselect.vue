@@ -76,8 +76,8 @@
 </template>
 
 <script>
-import OntologyTree from './OntologyTree';
-import CytomineTerm from './CytomineTerm';
+import OntologyTree from './OntologyTree.vue';
+import CytomineTerm from './CytomineTerm.vue';
 import {getAllTerms} from '@/utils/ontology-utils';
 
 export default {

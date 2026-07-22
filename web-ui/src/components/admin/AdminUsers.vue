@@ -109,10 +109,10 @@
 
 <script>
 
-import CytomineTable from '@/components/utils/CytomineTable';
+import CytomineTable from '@/components/utils/CytomineTable.vue';
 import {UserCollection} from '@/api';
-import UserModal from './UserModal';
-import UserDetails from './UserDetails';
+import UserModal from './UserModal.vue';
+import UserDetails from './UserDetails.vue';
 import {rolesMapping} from '@/utils/role-utils';
 
 export default {

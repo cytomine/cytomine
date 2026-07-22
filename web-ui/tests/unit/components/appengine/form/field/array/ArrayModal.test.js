@@ -7,18 +7,18 @@ import CytomineModal from '@/components/utils/CytomineModal';
 import GeometryArrayField from '@/components/appengine/forms/fields/array/GeometryArrayField';
 import ImageArrayField from '@/components/appengine/forms/fields/array/ImageArrayField';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(),
+        get: vi.fn(),
       },
     },
   },
 }));
 
-jest.mock('@/utils/image-utils', () => ({
-  isWebPSupported: jest.fn(() => true)
+vi.mock('@/utils/image-utils', () => ({
+  isWebPSupported: vi.fn(() => true)
 }));
 
 describe('ArrayModal.vue', () => {
@@ -33,7 +33,7 @@ describe('ArrayModal.vue', () => {
       localVue,
       mocks: {
         $t: msg => msg,
-        $notify: jest.fn()
+        $notify: vi.fn()
       },
       stubs: {
         AnnotationMultiSelect: true,

@@ -2,18 +2,18 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField.vue';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(),
+        get: vi.fn(),
       },
     },
   },
 }));
 
-jest.mock('@/utils/image-utils', () => ({
-  isWebPSupported: jest.fn(() => true)
+vi.mock('@/utils/image-utils', () => ({
+  isWebPSupported: vi.fn(() => true)
 }));
 
 describe('AppEngineField.vue', () => {

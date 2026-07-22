@@ -3,15 +3,15 @@ import {shallowMount} from '@vue/test-utils';
 import CytomineStorage from '@/components/storage/CytomineStorage.vue';
 import {StorageCollection, UploadedFileStatus} from '@/api';
 
-jest.mock('@/utils/image-utils', () => ({
-  isWebPSupported: jest.fn(() => true),
+vi.mock('@/utils/image-utils', () => ({
+  isWebPSupported: vi.fn(() => true),
 }));
 
-jest.mock('@/api', () => ({
-  Cytomine: {instance: {fetchSignature: jest.fn(), api: {get: jest.fn()}}},
-  StorageCollection: {fetchAll: jest.fn()},
-  ProjectCollection: {fetchAll: jest.fn()},
-  UploadedFile: jest.fn(),
+vi.mock('@/api', () => ({
+  Cytomine: {instance: {fetchSignature: vi.fn(), api: {get: vi.fn()}}},
+  StorageCollection: {fetchAll: vi.fn()},
+  ProjectCollection: {fetchAll: vi.fn()},
+  UploadedFile: vi.fn(),
   UploadedFileStatus: {
     UPLOADED: 0,
     DETECTING_FORMAT: 10,
@@ -21,7 +21,7 @@ jest.mock('@/api', () => ({
     DEPLOYED: 100,
     CONVERTED: 104,
   },
-  User: {fetchCurrentUserKeys: jest.fn()},
+  User: {fetchCurrentUserKeys: vi.fn()},
 }));
 
 describe('CytomineStorage.vue', () => {
@@ -45,7 +45,7 @@ describe('CytomineStorage.vue', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should select the storage belonging to the current user', async () => {

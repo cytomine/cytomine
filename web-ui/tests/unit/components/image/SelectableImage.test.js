@@ -2,8 +2,8 @@ import {shallowMount} from '@vue/test-utils';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 import SelectableImage from '@/components/image/SelectableImage';
 
-jest.mock('@/utils/image-utils', () => ({
-  isWebPSupported: jest.fn(() => true)
+vi.mock('@/utils/image-utils', () => ({
+  isWebPSupported: vi.fn(() => true)
 }));
 
 describe('SelectableImage.vue', () => {

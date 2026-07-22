@@ -10,12 +10,14 @@ const mockedAnnotations = [
   {id: 2, name: 'Annotation 2'},
 ];
 
-jest.mock('@/api', () => ({
-  AnnotationCollection: jest.fn().mockImplementation(() => ({
-    fetchAll: jest.fn().mockResolvedValue({
-      array: mockedAnnotations,
-    }),
-  })),
+vi.mock('@/api', () => ({
+  AnnotationCollection: vi.fn().mockImplementation(function () {
+    return {
+      fetchAll: vi.fn().mockResolvedValue({
+        array: mockedAnnotations,
+      }),
+    };
+  }),
 }));
 
 describe('AnnotationMultiSelect.vue', () => {

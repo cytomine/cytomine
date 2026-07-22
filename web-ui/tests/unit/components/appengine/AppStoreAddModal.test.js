@@ -16,7 +16,7 @@ describe('AppStoreAddModal.vue', () => {
         active: true,
       },
       mocks: {
-        $notify: jest.fn(),
+        $notify: vi.fn(),
         $t: (key) => key,
       },
       stubs: {

@@ -68,11 +68,11 @@
 import {get} from '@/utils/store-helpers';
 import moment from 'moment';
 
-import ProjectActivityCharts from './activity/ProjectActivityCharts';
-import MembersActivity from './activity/MembersActivity';
-import ProjectActivityLogs from './activity/ProjectActivityLogs';
+import ProjectActivityCharts from './activity/ProjectActivityCharts.vue';
+import MembersActivity from './activity/MembersActivity.vue';
+import ProjectActivityLogs from './activity/ProjectActivityLogs.vue';
 
-import CytomineDatepicker from '@/components/form/CytomineDatepicker';
+import CytomineDatepicker from '@/components/form/CytomineDatepicker.vue';
 
 const defaultTab = 'charts';
 

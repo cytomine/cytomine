@@ -27,6 +27,7 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -66,12 +67,7 @@ public class ProjectDefaultLayer extends CytomineDomain {
     }
 
     @Override
-    public String toJSON() {
-        return toJsonObject().toJsonString();
-    }
-
-    @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

@@ -58,21 +58,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class AnnotationIndexResourceTests {
 
-    @Autowired
-    private EntityManager em;
-
-    @Autowired
-    private BasicInstanceBuilder builder;
-
-    @Autowired
-    private MockMvc restAnnotationIndexControllerMockMvc;
-
-    @Autowired
-    private TransactionTemplate transactionTemplate;
-
-    @Autowired
-    private AnnotationIndexRepository annotationIndexRepository;
-
     Project project;
     ImageInstance image;
     SliceInstance slice;
@@ -82,6 +67,16 @@ public class AnnotationIndexResourceTests {
     UserAnnotation a2;
     UserAnnotation a3;
     UserAnnotation a4;
+    @Autowired
+    private EntityManager em;
+    @Autowired
+    private BasicInstanceBuilder builder;
+    @Autowired
+    private MockMvc restAnnotationIndexControllerMockMvc;
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+    @Autowired
+    private AnnotationIndexRepository annotationIndexRepository;
 
     void createAnnotationSet() throws ParseException {
         project = builder.givenAProject();

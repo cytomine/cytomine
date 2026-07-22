@@ -73,7 +73,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import OntologyTree from '@/components/ontology/OntologyTree';
+import OntologyTree from '@/components/ontology/OntologyTree.vue';
 
 export default {
   name: 'ontology-panel',

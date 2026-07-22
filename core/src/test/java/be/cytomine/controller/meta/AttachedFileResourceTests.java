@@ -167,7 +167,6 @@ public class AttachedFileResourceTests {
         assertThat(attachedFile.getData()).isEqualTo("hello".getBytes());
     }
 
-
     @Test
     @Transactional
     public void deleteAttachedFile() throws Exception {

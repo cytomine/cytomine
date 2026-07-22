@@ -12,7 +12,7 @@
 
 <script>
 import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect.vue';
-import ImageMultiSelect from '@/components/appengine/forms/fields/array/ImageMultiSelect';
+import ImageMultiSelect from '@/components/appengine/forms/fields/array/ImageMultiSelect.vue';
 
 export default {
   name: 'ImageArrayField',

@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import AnnotationSelection from '@/components/annotations/AnnotationSelection';
+import AnnotationSelection from '@/components/annotations/AnnotationSelection.vue';
 
 export default {
   name: 'GeometryField',

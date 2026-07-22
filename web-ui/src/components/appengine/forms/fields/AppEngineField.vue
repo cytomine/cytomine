@@ -3,15 +3,15 @@
 </template>
 
 <script>
-import ArrayField from '@/components/appengine/forms/fields/ArrayField';
-import BooleanField from '@/components/appengine/forms/fields/BooleanField';
-import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
-import FileField from '@/components/appengine/forms/fields/FileField';
-import GeometryField from '@/components/appengine/forms/fields/GeometryField';
-import ImageField from '@/components/appengine/forms/fields/ImageField';
-import IntegerField from '@/components/appengine/forms/fields/IntegerField';
-import NumberField from '@/components/appengine/forms/fields/NumberField';
-import StringField from '@/components/appengine/forms/fields/StringField';
+import ArrayField from '@/components/appengine/forms/fields/ArrayField.vue';
+import BooleanField from '@/components/appengine/forms/fields/BooleanField.vue';
+import EnumerationField from '@/components/appengine/forms/fields/EnumerationField.vue';
+import FileField from '@/components/appengine/forms/fields/FileField.vue';
+import GeometryField from '@/components/appengine/forms/fields/GeometryField.vue';
+import ImageField from '@/components/appengine/forms/fields/ImageField.vue';
+import IntegerField from '@/components/appengine/forms/fields/IntegerField.vue';
+import NumberField from '@/components/appengine/forms/fields/NumberField.vue';
+import StringField from '@/components/appengine/forms/fields/StringField.vue';
 
 export default {
   name: 'AppEngineField',

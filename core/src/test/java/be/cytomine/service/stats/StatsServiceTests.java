@@ -301,7 +301,6 @@ public class StatsServiceTests {
         assertThat(results.get(1).get("value")).isEqualTo(0);
     }
 
-
     @Test
     void statsTermSlide() {
         Project project = builder.givenAProject();

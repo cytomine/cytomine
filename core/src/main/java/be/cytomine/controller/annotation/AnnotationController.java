@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.controller.ontology.RestAnnotationDomainController;
 import be.cytomine.domain.annotation.Annotation;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.annotation.AnnotationService;
 
 @Slf4j
@@ -22,8 +23,8 @@ import be.cytomine.service.annotation.AnnotationService;
 public class AnnotationController {
 
     private final AnnotationService annotationService;
-
     private final RestAnnotationDomainController annotationDomainController;
+    private final UrlApi urlApi;
 
     @GetMapping("/annotations/{id}")
     public ResponseEntity<String> getById(@PathVariable Long id) throws IOException {
@@ -31,7 +32,7 @@ public class AnnotationController {
 
         Optional<Annotation> annotation = annotationService.find(id);
         if (annotation.isPresent()) {
-            return ResponseEntity.ok(annotation.get().toJSON());
+            return ResponseEntity.ok(annotation.get().toJSON(urlApi));
         }
 
         // Retro-compatible method to get the annotation.

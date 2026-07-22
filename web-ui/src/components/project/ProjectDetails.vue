@@ -140,13 +140,13 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import ListImagesPreview from '@/components/image/ListImagesPreview';
-import ListUsernames from '@/components/user/ListUsernames';
-import ProjectActions from './ProjectActions';
-import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
-import CytomineTags from '@/components/tag/CytomineTags';
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
+import ListImagesPreview from '@/components/image/ListImagesPreview.vue';
+import ListUsernames from '@/components/user/ListUsernames.vue';
+import ProjectActions from './ProjectActions.vue';
+import CytomineDescription from '@/components/description/CytomineDescription.vue';
+import CytomineProperties from '@/components/property/CytomineProperties.vue';
+import CytomineTags from '@/components/tag/CytomineTags.vue';
+import AttachedFiles from '@/components/attached-file/AttachedFiles.vue';
 
 export default {
   name: 'project-details',

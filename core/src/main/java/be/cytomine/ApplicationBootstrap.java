@@ -20,7 +20,6 @@ import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.security.UserRepository;
-import be.cytomine.service.UrlApi;
 import be.cytomine.service.database.BootstrapDataService;
 import be.cytomine.service.database.BootstrapTestsDataService;
 import be.cytomine.service.database.BootstrapUtilsService;
@@ -98,8 +97,6 @@ class ApplicationBootstrap {
         log.info("#############################################################################");
         log.info("#############################################################################");
         log.info("#############################################################################");
-
-        UrlApi.setServerURL(applicationProperties.getServerURL());
 
         if (EnvironmentUtils.isTest(environment) && userRepository.count() == 0) {
             bootstrapDataService.initData();

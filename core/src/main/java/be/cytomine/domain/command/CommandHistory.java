@@ -12,6 +12,7 @@ import lombok.Setter;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -69,11 +70,11 @@ public class CommandHistory extends CytomineDomain {
         throw new RuntimeException("Not supported");
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         CommandHistory commandHistory = (CommandHistory) domain;
         returnArray.put(
-            "command", commandHistory.getCommand() != null ? commandHistory.getCommand().toJsonObject() : null
+            "command", commandHistory.getCommand() != null ? commandHistory.getCommand().toJsonObject(urlApi) : null
         );
         returnArray.put("prefixAction", commandHistory.prefixAction);
         returnArray.put("user", commandHistory.user);
@@ -81,12 +82,7 @@ public class CommandHistory extends CytomineDomain {
     }
 
     @Override
-    public String toJSON() {
-        return getDataFromDomain(this).toJsonString();
-    }
-
-    @Override
-    public JsonObject toJsonObject() {
-        return getDataFromDomain(this);
+    public JsonObject toJsonObject(UrlApi urlApi) {
+        return getDataFromDomain(this, urlApi);
     }
 }

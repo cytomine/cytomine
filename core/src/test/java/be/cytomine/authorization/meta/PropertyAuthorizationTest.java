@@ -22,6 +22,7 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.meta.PropertyService;
 
 @AutoConfigureMockMvc
@@ -29,22 +30,20 @@ import be.cytomine.service.meta.PropertyService;
 @Transactional
 public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
 
-
+    @Autowired
+    PropertyService propertyService;
+    @Autowired
+    BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
     private Property propertyForProject = null;
     private Property propertyForAnnotation = null;
     private Property propertyForAbstractImage = null;
     private Property propertyForImageInstance = null;
-
     private Project project = null;
     private AnnotationDomain annotationDomain = null;
     private AbstractImage abstractImage = null;
     private ImageInstance imageInstance = null;
-
-    @Autowired
-    PropertyService propertyService;
-
-    @Autowired
-    BasicInstanceBuilder builder;
 
     @BeforeEach
     public void before() throws Exception {
@@ -120,7 +119,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
             ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ)
                 .get());
             propertyService.add(builder.givenANotPersistedProperty(annotationDomain, "key", "value")
-                .toJsonObject());
+                .toJsonObject(urlApi));
         });
     }
 
@@ -135,12 +134,12 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     protected void whenIAddDomain() {
         AnnotationDomain annotationDomain = builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(
             project));
-        propertyService.add(builder.givenANotPersistedProperty(annotationDomain, "key", "value").toJsonObject());
+        propertyService.add(builder.givenANotPersistedProperty(annotationDomain, "key", "value").toJsonObject(urlApi));
     }
 
     @Override
     protected void whenIEditDomain() {
-        propertyService.update(propertyForAnnotation, propertyForAnnotation.toJsonObject());
+        propertyService.update(propertyForAnnotation, propertyForAnnotation.toJsonObject(urlApi));
     }
 
     @Override
@@ -154,7 +153,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     public void userCanAddForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(imageInstance, "key", "value")
-            .toJsonObject()));
+            .toJsonObject(urlApi)));
     }
 
     @Test
@@ -163,7 +162,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(imageInstance, "key", "value")
-            .toJsonObject()));
+            .toJsonObject(urlApi)));
     }
 
     @Test
@@ -173,7 +172,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(imageInstance, "key", "value")
-            .toJsonObject()));
+            .toJsonObject(urlApi)));
     }
 
     @Test
@@ -183,7 +182,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
             builder.givenAnImageInstance(),
             "key",
             "value"
-        ).toJsonObject()));
+        ).toJsonObject(urlApi)));
     }
 
     @Test
@@ -191,7 +190,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     public void userCanEditForImage() {
         expectOK(() -> propertyService.update(
             propertyForImageInstance,
-            propertyForImageInstance.toJsonObject(),
+            propertyForImageInstance.toJsonObject(urlApi),
             null,
             null
         ));
@@ -204,7 +203,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> propertyService.update(
             builder.givenAProperty(imageInstance),
-            builder.givenAProperty(imageInstance).toJsonObject(),
+            builder.givenAProperty(imageInstance).toJsonObject(urlApi),
             null
         ));
 
@@ -217,7 +216,8 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
         Property propertyForImageInstance = builder.givenAProperty(imageInstance);
-        expectOK(() -> propertyService.update(propertyForImageInstance, propertyForImageInstance.toJsonObject(), null));
+        expectOK(() -> propertyService.update(propertyForImageInstance, propertyForImageInstance.toJsonObject(urlApi),
+            null));
     }
 
     @Test
@@ -226,7 +226,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         Property propertyForImageInstanceLocal = builder.givenAProperty(imageInstance);
         expectForbidden(() -> propertyService.update(
             propertyForImageInstanceLocal,
-            propertyForImageInstanceLocal.toJsonObject(),
+            propertyForImageInstanceLocal.toJsonObject(urlApi),
             null
         ));
     }
@@ -267,7 +267,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
             builder.givenAProject(),
             "key",
             "value"
-        ).toJsonObject()));
+        ).toJsonObject(urlApi)));
     }
 
     @Test
@@ -277,7 +277,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
             builder.givenAProject(),
             "key",
             "value"
-        ).toJsonObject()));
+        ).toJsonObject(urlApi)));
     }
 
     @Test
@@ -286,13 +286,13 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(projectLocal, "key", "value")
-            .toJsonObject()));
+            .toJsonObject(urlApi)));
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void adminCanEditForProject() {
-        expectOK(() -> propertyService.update(propertyForProject, propertyForProject.toJsonObject(), null, null));
+        expectOK(() -> propertyService.update(propertyForProject, propertyForProject.toJsonObject(urlApi), null, null));
     }
 
     @Test
@@ -300,7 +300,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     public void userWithReadCannotEditForProject() {
         expectForbidden(() -> propertyService.update(
             propertyForProject,
-            propertyForProject.toJsonObject(),
+            propertyForProject.toJsonObject(urlApi),
             null,
             null
         ));
@@ -312,7 +312,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
         Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
         Property property = builder.givenAProperty(projectLocal);
-        expectOK(() -> propertyService.update(property, property.toJsonObject(), null));
+        expectOK(() -> propertyService.update(property, property.toJsonObject(urlApi), null));
     }
 
     @Test

@@ -212,16 +212,16 @@
 </template>
 
 <script>
-import CytomineTable from '@/components/utils/CytomineTable';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineSlider from '@/components/form/CytomineSlider';
-import ProjectDetails from './ProjectDetails';
-import AddProjectModal from './AddProjectModal';
+import CytomineTable from '@/components/utils/CytomineTable.vue';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
+import CytomineSlider from '@/components/form/CytomineSlider.vue';
+import ProjectDetails from './ProjectDetails.vue';
+import AddProjectModal from './AddProjectModal.vue';
 
 import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
 
 import {ProjectCollection, OntologyCollection, TagCollection} from '@/api';
-import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 export default {
   name: 'list-projects',
   components: {

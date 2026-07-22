@@ -31,7 +31,7 @@
 
 <script>
 import {Cytomine, AttachedFileCollection} from '@/api';
-import AttachedFileModal from './AttachedFileModal';
+import AttachedFileModal from './AttachedFileModal.vue';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers.js';
 

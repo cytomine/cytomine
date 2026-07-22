@@ -33,7 +33,7 @@
 
 <script>
 import {ImageGroup} from '@/api';
-import CytomineModal from '@/components/utils/CytomineModal';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
 import {get} from '@/utils/store-helpers';
 
 export default {

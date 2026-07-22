@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import ImageName from '@/components/image/ImageName';
+import ImageName from '@/components/image/ImageName.vue';
 export default {
   name: 'open-image-group-button',
   components: {

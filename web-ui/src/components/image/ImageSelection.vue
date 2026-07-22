@@ -32,8 +32,8 @@
 </template>
 
 <script>
-import CytomineModal from '@/components/utils/CytomineModal';
-import SelectableImage from '@/components/image/SelectableImage';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
+import SelectableImage from '@/components/image/SelectableImage.vue';
 import {get} from '@/utils/store-helpers';
 import {ImageInstanceCollection} from '@/api';
 

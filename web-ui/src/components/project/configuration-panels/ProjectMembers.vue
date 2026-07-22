@@ -113,11 +113,11 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import CytomineTable from '@/components/utils/CytomineTable';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import AddMemberModal from './AddMemberModal';
+import CytomineTable from '@/components/utils/CytomineTable.vue';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
+import AddMemberModal from './AddMemberModal.vue';
 import {Cytomine, UserCollection, ProjectRepresentative} from '@/api';
-import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {

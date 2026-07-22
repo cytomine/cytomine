@@ -83,8 +83,8 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {Cytomine, Ontology, User, ProjectCollection} from '@/api';
-import OntologyTree from './OntologyTree';
-import RenameModal from '@/components/utils/RenameModal';
+import OntologyTree from './OntologyTree.vue';
+import RenameModal from '@/components/utils/RenameModal.vue';
 import {getFilename, triggerBlobDownload} from '@/utils/download';
 
 export default {

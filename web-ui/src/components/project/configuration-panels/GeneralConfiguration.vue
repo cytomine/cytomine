@@ -159,8 +159,8 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import ProjectActions from '../ProjectActions';
-import DefaultProperty from './DefaultProperty';
+import ProjectActions from '../ProjectActions.vue';
+import DefaultProperty from './DefaultProperty.vue';
 import {Project, ProjectDefaultLayer, ProjectDefaultLayerCollection} from '@/api';
 
 export default {

@@ -42,6 +42,7 @@ import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.security.AclRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.service.PermissionService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.social.ProjectConnectionService;
 
@@ -103,7 +104,8 @@ public class ProjectResourceTests {
 
     @Autowired
     private PersistentProjectConnectionRepository persistentProjectConnectionRepository;
-
+    @Autowired
+    private UrlApi urlApi;
     @MockitoBean
     private OntologyHttpContract ontologyHttpContract;
 
@@ -196,7 +198,7 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
-        userAnnotationService.add(userAnnotation.toJsonObject());
+        userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("max", "10")
@@ -527,7 +529,7 @@ public class ProjectResourceTests {
         /* Test project creation */
         restProjectControllerMockMvc.perform(post("/api/project.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJSON()))
+                .content(project.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -553,7 +555,7 @@ public class ProjectResourceTests {
         /* Test project creation */
         restProjectControllerMockMvc.perform(post("/api/project.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJSON()))
+                .content(project.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -577,7 +579,7 @@ public class ProjectResourceTests {
         project.setName("add_valid_project_with_users_admins");
         restProjectControllerMockMvc.perform(post("/api/project.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject()
+                .content(project.toJsonObject(urlApi)
                     .withChange("users", List.of(user.getId()))
                     .withChange("admins", List.of(admin.getId()))
                     .toJsonString()))
@@ -621,7 +623,7 @@ public class ProjectResourceTests {
 
         restProjectControllerMockMvc.perform(post("/api/project.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject().withChange("id", null).toJsonString()))
+                .content(project.toJsonObject(urlApi).withChange("id", null).toJsonString()))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").value(containsString("already exist")));
@@ -633,7 +635,7 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject().withChange("name", "new_name").toJsonString()))
+                .content(project.toJsonObject(urlApi).withChange("name", "new_name").toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -652,7 +654,7 @@ public class ProjectResourceTests {
         em.remove(project);
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJSON()))
+                .content(project.toJSON(urlApi)))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists());
@@ -669,7 +671,7 @@ public class ProjectResourceTests {
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject().withChange("users", List.of(newUser.getId())).toJsonString()))
+                .content(project.toJsonObject(urlApi).withChange("users", List.of(newUser.getId())).toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -694,7 +696,7 @@ public class ProjectResourceTests {
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject().withChange("admins", List.of(newUser.getId())).toJsonString()))
+                .content(project.toJsonObject(urlApi).withChange("admins", List.of(newUser.getId())).toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -719,7 +721,8 @@ public class ProjectResourceTests {
         Ontology newOntology = builder.givenAnOntology();
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject().withChange("ontology", List.of(newOntology.getId())).toJsonString()))
+                .content(project.toJsonObject(urlApi)
+                    .withChange("ontology", List.of(newOntology.getId())).toJsonString()))
             .andExpect(status().isForbidden())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists())
@@ -734,7 +737,7 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJSON()))
+                .content(project.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -762,7 +765,7 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, builder.givenSuperAdmin().getUsername());
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
-        userAnnotationService.add(userAnnotation.toJsonObject());
+        userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
 
         restProjectControllerMockMvc.perform(get("/api/project/{id}/last/{max}.json", project.getId(), 10))
             .andExpect(status().isOk())
@@ -1015,7 +1018,7 @@ public class ProjectResourceTests {
         builder.addUserToProject(project, creator.getUsername());
 
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
-        userAnnotationService.add(userAnnotation.toJsonObject());
+        userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
 
         restProjectControllerMockMvc.perform(get("/api/commandhistory.json")
                 .param("fullData", "true"))
@@ -1038,7 +1041,7 @@ public class ProjectResourceTests {
         Date start = DateUtils.addSeconds(new Date(), -5);
         Date stop = DateUtils.addSeconds(new Date(), 5);
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
-        userAnnotationService.add(userAnnotation.toJsonObject());
+        userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
 
         restProjectControllerMockMvc.perform(get("/api/project/{id}/commandhistory.json", project.getId())
                 .param("startDate", start.getTime() + "")

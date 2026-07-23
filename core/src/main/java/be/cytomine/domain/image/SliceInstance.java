@@ -28,6 +28,7 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -117,7 +118,7 @@ public class SliceInstance extends CytomineDomain implements Serializable {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

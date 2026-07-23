@@ -51,6 +51,8 @@ public class ImageGroupImageInstanceService extends ModelService {
 
     private final ImageGroupImageInstanceRepository imageGroupImageInstanceRepository;
 
+    private final UrlApi urlApi;
+
     @Override
     public Class currentDomain() {
         return ImageGroupImageInstance.class;
@@ -147,7 +149,7 @@ public class ImageGroupImageInstanceService extends ModelService {
             images.add(Map.of(
                 "id", igii.getImage().getId(),
                 "instanceFilename", igii.getImage().getBlindInstanceFilename(),
-                "thumb", UrlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
+                "thumb", urlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
                 "width", igii.getImage().getBaseImage().getWidth(),
                 "height", igii.getImage().getBaseImage().getHeight()
             ));

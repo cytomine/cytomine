@@ -66,13 +66,13 @@ public interface UserAnnotationRepository
     )
     List<Tuple> listTuplesLight();
 
-    default List<AnnotationLight> listLight() {
+    default List<AnnotationLight> listLight(UrlApi urlApi) {
         List<AnnotationLight> annotationLights = new ArrayList<>();
         for (Tuple tuple : listTuplesLight()) {
             annotationLights.add(new AnnotationLight(
                     (Long) tuple.get("id"),
                     (Long) tuple.get("container"),
-                    UrlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize((Long) tuple.get("id"), 256, "png")
+                urlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize((Long) tuple.get("id"), 256, "png")
                 )
             );
         }

@@ -302,16 +302,16 @@
 import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
 import constants from '@/utils/constants.js';
 
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineDatepicker from '@/components/form/CytomineDatepicker';
-import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
+import CytomineDatepicker from '@/components/form/CytomineDatepicker.vue';
+import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect.vue';
 
-import ListAnnotationsBy from './ListAnnotationsBy';
+import ListAnnotationsBy from './ListAnnotationsBy.vue';
 
 import {Cytomine, ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection} from '@/api';
 
 import {defaultColors} from '@/utils/style-utils.js';
-import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
+import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect.vue';
 import {getFilename, triggerBlobDownload} from '@/utils/download';
 
 import _ from 'lodash';

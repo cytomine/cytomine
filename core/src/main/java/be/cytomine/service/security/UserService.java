@@ -87,6 +87,7 @@ import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.PermissionService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.ontology.AnnotationTermService;
@@ -199,6 +200,8 @@ public class UserService extends ModelService {
     private final UserMapper userMapper;
 
     private final SpringPageCrawler springPageCrawler;
+
+    private final UrlApi urlApi;
 
     public Optional<User> find(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
@@ -574,7 +577,7 @@ public class UserService extends ModelService {
         List<JsonObject> results = new ArrayList<>();
         List<Object[]> resultList = query.getResultList();
         for (Object[] row : resultList) {
-            JsonObject jsonObject = ((User) row[0]).toJsonObject();
+            JsonObject jsonObject = ((User) row[0]).toJsonObject(urlApi);
             jsonObject.put("role", (String) row[1]);
             results.add(jsonObject);
         }
@@ -631,14 +634,14 @@ public class UserService extends ModelService {
      * List all layers from a project Each user has its own layer If project has private layer, just get current user
      * layer
      */
-    public List<JsonObject> listLayers(Project project, ImageInstance image) {
+    public List<JsonObject> listLayers(Project project) {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(project, READ, currentUser);
 
         List<User> humanAdmins = listAdmins(project);
         List<User> humanUsers = listUsers(project);
 
-        List<JsonObject> humanUsersFormatted = humanUsers.stream().map(User::toJsonObject).toList();
+        List<JsonObject> humanUsersFormatted = humanUsers.stream().map(u -> u.toJsonObject(urlApi)).toList();
 
         List<JsonObject> layersFormatted = new ArrayList<>();
 
@@ -650,7 +653,7 @@ public class UserService extends ModelService {
             layersFormatted.addAll(
                 humanUsersFormatted.stream().filter(x -> !humanAdminsIds.contains(x.getJSONAttrLong("id"))).toList());
         } else if (!project.isHideAdminsLayers()) {
-            layersFormatted.addAll(humanAdmins.stream().map(User::toJsonObject).toList());
+            layersFormatted.addAll(humanAdmins.stream().map(u -> u.toJsonObject(urlApi)).toList());
         }
 
         return layersFormatted;

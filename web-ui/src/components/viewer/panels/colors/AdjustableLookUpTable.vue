@@ -128,7 +128,7 @@
 <script>
 import {sameHistogramBounds} from '@/utils/histogram-utils';
 
-import CytomineSlider from '@/components/form/CytomineSlider';
+import CytomineSlider from '@/components/form/CytomineSlider.vue';
 
 export default {
   name: 'AdjustableLookUpTable',

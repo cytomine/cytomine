@@ -205,10 +205,10 @@ import {sameHistogramBounds} from '@/utils/histogram-utils';
 
 import {ImageFilterProjectCollection} from '@/api';
 
-import CytomineChannel from '@/components/viewer/panels/colors/CytomineChannel';
-import AdjustableLookUpTable from '@/components/viewer/panels/colors/AdjustableLookUpTable';
+import CytomineChannel from '@/components/viewer/panels/colors/CytomineChannel.vue';
+import AdjustableLookUpTable from '@/components/viewer/panels/colors/AdjustableLookUpTable.vue';
 import HistogramChart from '@/components/charts/HistogramChart';
-import EditableTextBound from '@/components/viewer/panels/colors/EditableTextBound';
+import EditableTextBound from '@/components/viewer/panels/colors/EditableTextBound.vue';
 
 export default {
   name: 'color-manipulation',

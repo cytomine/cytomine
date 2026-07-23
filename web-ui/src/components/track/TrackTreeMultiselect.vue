@@ -76,8 +76,8 @@
 </template>
 
 <script>
-import TrackTree from './TrackTree';
-import CytomineTrack from './CytomineTrack';
+import TrackTree from './TrackTree.vue';
+import CytomineTrack from './CytomineTrack.vue';
 
 export default {
   name: 'track-tree-multiselect',

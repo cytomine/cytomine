@@ -23,6 +23,7 @@ import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.UserAnnotationService;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
@@ -34,11 +35,11 @@ import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @Autowired
+    private UrlApi urlApi;
+    @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private UserAnnotationService userAnnotationService;
-
     private UserAnnotation userAnnotation = null;
 
     private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
@@ -142,12 +143,12 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @Override
     protected void whenIAddDomain() {
         UserAnnotation annotation = builder.givenANotPersistedUserAnnotation(this.userAnnotation.getProject());
-        userAnnotationService.add(annotation.toJsonObject());
+        userAnnotationService.add(annotation.toJsonObject(urlApi));
     }
 
     @Override
     public void whenIEditDomain() {
-        userAnnotationService.update(userAnnotation, userAnnotation.toJsonObject());
+        userAnnotationService.update(userAnnotation, userAnnotation.toJsonObject(urlApi));
     }
 
     @Override

@@ -132,7 +132,8 @@ public class RestUserPositionController extends RestCytomineController {
         }
         userPositionService.addAsFollower(user, currentUserService.getCurrentUserOld(), imageInstance);
         return responseSuccess(userPositionService.lastPositionByUser(
-            imageInstance, sliceInstance, user, broadcast).map(LastUserPosition::toJsonObject).orElse(new JsonObject())
+                imageInstance, sliceInstance, user, broadcast).map(LastUserPosition::toJsonObjectSocial)
+            .orElse(new JsonObject())
         );
     }
 

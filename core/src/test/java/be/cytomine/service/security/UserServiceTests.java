@@ -815,7 +815,7 @@ public class UserServiceTests {
         builder.addUserToProject(project, user.getUsername(), WRITE);
         builder.addUserToProject(project, anotherUserInProject.getUsername(), WRITE);
 
-        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
+        assertThat(userService.listLayers(project)
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .contains(user.getId(), anotherUserInProject.getId())
@@ -834,7 +834,7 @@ public class UserServiceTests {
         builder.addUserToProject(project, user.getUsername(), WRITE);
         builder.addUserToProject(project, adminInProject.getUsername(), ADMINISTRATION);
 
-        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
+        assertThat(userService.listLayers(project)
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .hasSize(1)
@@ -854,7 +854,7 @@ public class UserServiceTests {
         builder.addUserToProject(project, user.getUsername(), WRITE);
         builder.addUserToProject(project, userInProject.getUsername(), WRITE);
 
-        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
+        assertThat(userService.listLayers(project)
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .hasSize(1)
@@ -874,7 +874,7 @@ public class UserServiceTests {
         builder.addUserToProject(project, user.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, userInProject.getUsername(), WRITE);
 
-        assertThat(userService.listLayers(project, builder.givenAnImageInstance(project))
+        assertThat(userService.listLayers(project)
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
             .hasSize(2)

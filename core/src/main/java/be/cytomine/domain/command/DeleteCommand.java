@@ -26,6 +26,7 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
 @Getter
@@ -34,6 +35,12 @@ import be.cytomine.utils.CommandResponse;
 @DiscriminatorValue("be.cytomine.domain.command.DeleteCommand")
 public class DeleteCommand extends Command {
 
+    @Transient
+    Object backup;
+    /**
+     * Add project link in command
+     */
+    boolean linkProject = true;
 
     public DeleteCommand(User currentUser, Transaction transaction) {
         this.user = currentUser;
@@ -43,20 +50,12 @@ public class DeleteCommand extends Command {
     public DeleteCommand() {
     }
 
-    @Transient
-    Object backup;
-
-    /**
-     * Add project link in command
-     */
-    boolean linkProject = true;
-
     /**
      * Process an Add operation for this command
      *
      * @return Message
      */
-    public CommandResponse execute(ModelService service) {
+    public CommandResponse execute(ModelService service, UrlApi urlApi) {
         //Retrieve domain to delete it
         CytomineDomain oldDomain = domain;
         //Init command info

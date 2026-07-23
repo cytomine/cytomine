@@ -99,8 +99,8 @@
 import {get,syncMultiselectFilter} from '@/utils/store-helpers';
 import {IMAGE_FORMAT} from '@/utils/image-utils';
 
-import ImageName from '@/components/image/ImageName';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
+import ImageName from '@/components/image/ImageName.vue';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
 import {ImageGroupCollection, ImageInstanceCollection, TagCollection} from '@/api';
 import _ from 'lodash';
 import {appendShortTermToken} from '@/utils/token-utils.js';

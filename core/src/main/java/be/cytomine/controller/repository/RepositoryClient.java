@@ -20,6 +20,7 @@ import be.cytomine.common.repository.http.RoleHttpContract;
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
+import be.cytomine.common.repository.http.TagHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.http.UploadedFileHttpContract;
@@ -94,7 +95,13 @@ public class RepositoryClient {
         return createClient(repositoryRestClient, ReviewedAnnotationHttpContract.class);
     }
 
-    @Bean TagDomainAssociationHttpContract tagDomainAssociationClient(RestClient repositoryRestClient) {
+    @Bean
+    TagHttpContract tagHttpContract(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, TagHttpContract.class);
+    }
+
+    @Bean
+    TagDomainAssociationHttpContract tagDomainAssociationClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, TagDomainAssociationHttpContract.class);
     }
 

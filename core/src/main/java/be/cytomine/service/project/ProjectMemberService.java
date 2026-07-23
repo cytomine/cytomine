@@ -9,9 +9,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
@@ -20,6 +19,7 @@ import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 
@@ -44,6 +44,8 @@ public class ProjectMemberService {
 
     private final UserService userService;
     private final UserMapper userMapper;
+
+    private final UrlApi urlApi;
 
     public void addUserToProject(User user, Project project, boolean admin) {
         securityACLService.check(project, ADMINISTRATION);
@@ -161,9 +163,9 @@ public class ProjectMemberService {
                 ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                 pru.setProject(project);
                 pru.setUser(currentUserService.getCurrentUserOld());
-                projectRepresentativeUserService.add(pru.toJsonObject());
+                projectRepresentativeUserService.add(pru.toJsonObject(urlApi));
 
-                projectRepresentativeUserService.find(project, (User) user)
+                projectRepresentativeUserService.find(project,  user)
                     .ifPresent(x -> projectRepresentativeUserService.delete(x, null, null, false));
 
             }
@@ -226,7 +228,7 @@ public class ProjectMemberService {
                 ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                 pru.setProject(project);
                 pru.setUser((User) adminUser);
-                projectRepresentativeUserService.add(pru.toJsonObject(), adminUser);
+                projectRepresentativeUserService.add(pru.toJsonObject(urlApi), adminUser);
 
                 Optional<ProjectRepresentativeUser> foundRepOptional = projectRepresentativeUserService
                     .find(project, (User) user);

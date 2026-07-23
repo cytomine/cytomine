@@ -134,8 +134,8 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import ImageName from '@/components/image/ImageName';
-import CalibrationModal from '@/components/image/CalibrationModal';
+import ImageName from '@/components/image/ImageName.vue';
+import CalibrationModal from '@/components/image/CalibrationModal.vue';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
 export default {

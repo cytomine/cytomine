@@ -93,6 +93,8 @@ public class ImageConsultationService {
 
     private final ImageInstanceService imageInstanceService;
 
+    private final UrlApi urlApi;
+
     private final UserMapper userMapper;
 
     @Value("${spring.data.mongodb.database}")
@@ -124,7 +126,7 @@ public class ImageConsultationService {
         consultation.setSession(session);
         consultation.setMode(mode);
         consultation.setImageName(imageInstance.getBlindInstanceFilename());
-        consultation.setImageThumb(UrlApi.getImageInstanceThumbUrlWithMaxSize(imageInstance.getId(), 512, "png"));
+        consultation.setImageThumb(urlApi.getImageInstanceThumbUrlWithMaxSize(imageInstance.getId(), 512, "png"));
 
 
         persistentImageConsultationRepository.insert(consultation);
@@ -253,7 +255,7 @@ public class ImageConsultationService {
                 jsonObject.put("user", result.get("user"));
                 jsonObject.put("time", result.get("time"));
                 if (image != null) {
-                    jsonObject.put("imageThumb", UrlApi.getImageInstanceThumbUrl(image.getId()));
+                    jsonObject.put("imageThumb", urlApi.getImageInstanceThumbUrl(image.getId()));
                     jsonObject.put("project", image.getProject().getId());
                 }
                 jsonObject.put("imageName", filename);
@@ -515,7 +517,7 @@ public class ImageConsultationService {
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.put("id", result.get("_id"));
                 jsonObject.put("date", result.get("date"));
-                jsonObject.put("thumb", UrlApi.getImageInstanceThumbUrl(imageInstance.getId()));
+                jsonObject.put("thumb", urlApi.getImageInstanceThumbUrl(imageInstance.getId()));
                 jsonObject.put("instanceFilename", imageInstance.getBlindInstanceFilename());
                 jsonObject.put("project", imageInstance.getProject().getId());
                 data.add(jsonObject);

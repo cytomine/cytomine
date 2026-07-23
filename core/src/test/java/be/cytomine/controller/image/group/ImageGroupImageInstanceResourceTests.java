@@ -1,5 +1,6 @@
 package be.cytomine.controller.image.group;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,9 +34,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class ImageGroupImageInstanceResourceTests {
 
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
+    @Autowired
+    private UrlApi urlApi;
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restImageGroupImageInstanceControllerMockMvc;
 
@@ -60,7 +64,7 @@ public class ImageGroupImageInstanceResourceTests {
                 igii.getImage().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(igii.toJSON()))
+                .content(igii.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

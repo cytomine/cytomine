@@ -158,13 +158,13 @@
 </template>
 
 <script>
-import CytomineSlider from '@/components/form/CytomineSlider';
-import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons';
+import CytomineSlider from '@/components/form/CytomineSlider.vue';
+import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons.vue';
 
 import {formatMinutesSeconds, slicePositionToRank} from '@/utils/slice-utils.js';
 import constants from '@/utils/constants';
 import _ from 'lodash';
-import ChannelName from '@/components/viewer/ChannelName';
+import ChannelName from '@/components/viewer/ChannelName.vue';
 
 export default {
   name: 'image-controls',

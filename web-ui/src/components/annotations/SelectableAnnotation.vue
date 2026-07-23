@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import AnnotationPreview from '@/components/annotations/AnnotationPreview';
+import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 
 export default {
   name: 'SelectableAnnotation',

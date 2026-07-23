@@ -25,6 +25,7 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.ClassUtils;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -48,10 +49,10 @@ public class EditCommand extends Command {
      * @param oldObject domain before update
      * @param message   Message build for the command
      */
-    protected void fillCommandInfo(CytomineDomain newObject, String oldObject, String message) {
+    protected void fillCommandInfo(CytomineDomain newObject, String oldObject, UrlApi urlApi, String message) {
         HashMap<String, Object> paramsData = new HashMap<>();
         paramsData.put("previous" + ClassUtils.getClassName(newObject), JsonObject.toMap(oldObject));
-        paramsData.put("new" + ClassUtils.getClassName(newObject), newObject.toJsonObject());
+        paramsData.put("new" + ClassUtils.getClassName(newObject), newObject.toJsonObject(urlApi));
         data = JsonObject.toJsonString(paramsData);
         actionMessage = message;
     }
@@ -71,10 +72,10 @@ public class EditCommand extends Command {
      *
      * @return Message
      */
-    public CommandResponse execute(ModelService service) {
+    public CommandResponse execute(ModelService service, UrlApi urlApi) {
         //Retrieve domain to update it
         CytomineDomain updatedDomain = this.domain;
-        String oldDomain = updatedDomain.toJSON();
+        String oldDomain = updatedDomain.toJSON(urlApi);
         updatedDomain.buildDomainFromJson(json, service.getEntityManager());
         //Init command info TODO
         CytomineDomain container = updatedDomain.container();
@@ -82,7 +83,7 @@ public class EditCommand extends Command {
             super.setProject((Project) container);
         }
         CommandResponse response = service.edit(updatedDomain, printMessage);
-        fillCommandInfo(updatedDomain, oldDomain, (String) response.getData().get("message"));
+        fillCommandInfo(updatedDomain, oldDomain, urlApi, (String) response.getData().get("message"));
         return response;
     }
 }

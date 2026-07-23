@@ -16,6 +16,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.AnnotationGroupService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -27,11 +28,11 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Autowired
+    private UrlApi urlApi;
+    @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private AnnotationGroupService annotationGroupService;
-
     private AnnotationGroup annotationGroup = null;
 
     @BeforeEach
@@ -52,13 +53,13 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     @Override
     protected void whenIAddDomain() {
         annotationGroupService.add(builder.givenANotPersistedAnnotationGroup(
-            annotationGroup.getProject(), annotationGroup.getImageGroup()).toJsonObject()
+            annotationGroup.getProject(), annotationGroup.getImageGroup()).toJsonObject(urlApi)
         );
     }
 
     @Override
     protected void whenIEditDomain() {
-        annotationGroupService.update(annotationGroup, annotationGroup.toJsonObject());
+        annotationGroupService.update(annotationGroup, annotationGroup.toJsonObject(urlApi));
     }
 
     @Override

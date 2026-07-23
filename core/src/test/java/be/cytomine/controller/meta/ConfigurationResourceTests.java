@@ -31,6 +31,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.meta.Configuration;
+import be.cytomine.service.UrlApi;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -52,6 +53,8 @@ public class ConfigurationResourceTests {
 
     @Autowired
     private MockMvc restConfigurationControllerMockMvc;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     @Transactional
@@ -84,7 +87,7 @@ public class ConfigurationResourceTests {
         Configuration configuration = builder.givenANotPersistedConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(post("/api/configuration.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(configuration.toJSON()))
+                .content(configuration.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -102,7 +105,7 @@ public class ConfigurationResourceTests {
         Configuration configuration = builder.givenAConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(put("/api/configuration/key/{key}.json", configuration.getKey())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(configuration.toJSON()))
+                .content(configuration.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -120,7 +123,7 @@ public class ConfigurationResourceTests {
         Configuration configuration = builder.givenAConfiguration("xxx");
         restConfigurationControllerMockMvc.perform(delete("/api/configuration/key/{key}.json", configuration.getKey())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(configuration.toJSON()))
+                .content(configuration.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

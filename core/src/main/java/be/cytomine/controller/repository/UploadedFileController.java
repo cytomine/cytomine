@@ -60,6 +60,7 @@ public class UploadedFileController {
     private final PageMapper pageMapper;
     private final UploadedFileHttpContract uploadedFileHttpContract;
     private final UploadedFileMapper uploadedFileMapper;
+    private final UrlApi urlApi;
 
     @GetMapping("/uploadedfile.json")
     public CollectionResponse<UploadedFileResponse> getAll(
@@ -143,7 +144,7 @@ public class UploadedFileController {
 
     private UploadedFileResponse withThumbnailUrl(UploadedFileResponse r, Long abstractImageId) {
         Optional<String> thumbnailUrl = Optional.ofNullable(abstractImageId)
-            .map(id -> UrlApi.getAbstractImageThumbUrl(id, "png"));
+            .map(id -> urlApi.getAbstractImageThumbUrl(id, "png"));
         return uploadedFileMapper.withThumbnailUrl(r, thumbnailUrl);
     }
 }

@@ -38,7 +38,6 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
 
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private TaskRunService taskRunService;
 

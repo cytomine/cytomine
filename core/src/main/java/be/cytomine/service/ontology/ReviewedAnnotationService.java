@@ -44,6 +44,7 @@ import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.utils.TaskService;
@@ -85,6 +86,8 @@ public class ReviewedAnnotationService extends ModelService {
     private final UserRepository userRepository;
 
     private final ValidateGeometryService validateGeometryService;
+
+    private final UrlApi urlApi;
 
     @Override
     public Class currentDomain() {
@@ -275,7 +278,7 @@ public class ReviewedAnnotationService extends ModelService {
             )
             .collect(Collectors.toSet());
 
-        JsonObject reviewJson = review.toJsonObject();
+        JsonObject reviewJson = review.toJsonObject(urlApi);
         reviewJson.put("terms", new ArrayList<>(termsToAdd));
 
         CommandResponse commandResponse = this.add(reviewJson);
@@ -537,13 +540,13 @@ public class ReviewedAnnotationService extends ModelService {
                     "You cannot delete an annotation with substract! Use reject or delete tool.");
             }
 
-            JsonObject jsonObject = based.toJsonObject();
+            JsonObject jsonObject = based.toJsonObject(urlApi);
             based.setLocation(oldLocation);
             result = update(based, jsonObject);
 
             for (ReviewedAnnotation other : allAnnotationWithSameTerm) {
                 other.setLocation(other.getLocation().difference(newGeometry));
-                update(other, other.toJsonObject());
+                update(other, other.toJsonObject(urlApi));
             }
         } else {
             log.info("doCorrectUserAnnotation : union");
@@ -556,7 +559,7 @@ public class ReviewedAnnotationService extends ModelService {
                 delete(other, null, null, false);
             }
 
-            JsonObject jsonObject = based.toJsonObject();
+            JsonObject jsonObject = based.toJsonObject(urlApi);
             based.setLocation(oldLocation);
             result = update(based, jsonObject);
         }

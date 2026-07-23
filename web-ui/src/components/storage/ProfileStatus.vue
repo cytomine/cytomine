@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import UploadedFileStatus from '@/components/storage/UploadedFileStatus';
+import UploadedFileStatus from '@/components/storage/UploadedFileStatus.vue';
 import {UploadedFileStatus as UFStatus} from '@/constants/UploadedFileStatus';
 import {CompanionFileCollection, CompanionFile} from '@/api';
 

@@ -4,6 +4,7 @@ public enum DataType {
     ONTOLOGY,
     ROLE,
     STORAGE,
+    TAG,
     TAG_DOMAIN_ASSOCIATION,
     TERM,
     TERM_RELATION,

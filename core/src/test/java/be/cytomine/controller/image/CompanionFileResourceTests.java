@@ -38,6 +38,7 @@ import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.CompanionFile;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
@@ -65,13 +66,12 @@ public class CompanionFileResourceTests {
 
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restCompanionFileControllerMockMvc;
 
     private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
-
-
+    @Autowired
+    private UrlApi urlApi;
     @Test
     @Transactional
     public void listCompanionFileByAbstractImage() throws Exception {
@@ -144,7 +144,7 @@ public class CompanionFileResourceTests {
         CompanionFile companionFile = builder.givenANotPersistedCompanionFile(builder.givenAnAbstractImage());
         restCompanionFileControllerMockMvc.perform(post("/api/companionfile.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(companionFile.toJSON()))
+                .content(companionFile.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -158,7 +158,7 @@ public class CompanionFileResourceTests {
     @Transactional
     public void editValidCompanionFile() throws Exception {
         CompanionFile companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
-        JsonObject jsonObject = companionFile.toJsonObject();
+        JsonObject jsonObject = companionFile.toJsonObject(urlApi);
         jsonObject.put("filename", "toto");
         restCompanionFileControllerMockMvc.perform(put("/api/companionfile/{id}.json", companionFile.getId())
                 .contentType(MediaType.APPLICATION_JSON)

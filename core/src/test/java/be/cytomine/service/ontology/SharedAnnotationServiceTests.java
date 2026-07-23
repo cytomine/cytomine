@@ -35,6 +35,7 @@ import be.cytomine.domain.ontology.SharedAnnotation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.repository.ontology.SharedAnnotationRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -62,6 +63,8 @@ public class SharedAnnotationServiceTests {
 
     @Autowired
     TransactionService transactionService;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void listAllSharedAnnotationWithSuccess() {
@@ -105,7 +108,7 @@ public class SharedAnnotationServiceTests {
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
         SharedAnnotation sharedAnnotation = builder.givenANotPersistedSharedAnnotation();
         sharedAnnotation.setAnnotation(annotationDomain);
-        JsonObject json = sharedAnnotation.toJsonObject();
+        JsonObject json = sharedAnnotation.toJsonObject(urlApi);
         json.put("subject", "subject for test mail");
         json.put("message", "message for test mail");
         json.put("users", List.of(builder.givenSuperAdmin().getId()));
@@ -117,11 +120,9 @@ public class SharedAnnotationServiceTests {
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
-
         assertThat(sharedAnnotationService.listComments(annotationDomain).size()).isEqualTo(1);
 
     }
-
 
     @Test
     void deleteSharedAnnotationWithSuccess() {

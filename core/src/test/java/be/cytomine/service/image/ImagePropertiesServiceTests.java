@@ -38,7 +38,6 @@ public class ImagePropertiesServiceTests {
 
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     ImagePropertiesService imagePropertiesService;
 

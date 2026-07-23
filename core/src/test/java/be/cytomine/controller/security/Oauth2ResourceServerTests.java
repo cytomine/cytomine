@@ -71,23 +71,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class Oauth2ResourceServerTests {
 
-    @Autowired
-    private MockMvc allProtectedMockMvc;
-
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final String KEY_ID = "some random string";
+    private static RSAKey rsaKey;
     @Autowired
     AuthenticationSuccessListener authenticationSuccessListener;
-
     @Autowired
     ApplicationEventPublisher applicationEventPublisher;
-
+    @Autowired
+    private MockMvc allProtectedMockMvc;
     @Autowired
     private UserRepository userRepository;
-
-    private static final WireMockServer wireMockServer = new WireMockServer(8888);
-
-    private static RSAKey rsaKey;
-
-    private static final String KEY_ID = "some random string";
 
     public static void configureWireMock(WireMockServer wireMockServer) throws JOSEException {
         rsaKey = new RSAKeyGenerator(2048)

@@ -20,3 +20,9 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:config/liquibase/master.xml
+    contexts: prod
+
+application:
+  adminEmail: ${ADMIN_EMAIL:dev@cytomine.com}
+  imageServerPublicKey: ${IMAGE_SERVER_PUBLIC_KEY:imageServerPublicKey}
+  imageServerPrivateKey: ${IMAGE_SERVER_PRIVATE_KEY:imageServerPrivateKey}

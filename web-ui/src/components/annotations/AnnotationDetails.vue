@@ -288,20 +288,20 @@ import {get} from '@/utils/store-helpers';
 
 import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack, PropertyCollection} from '@/api';
 import copyToClipboard from 'copy-to-clipboard';
-import ImageName from '@/components/image/ImageName';
-import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
-import CytomineTags from '@/components/tag/CytomineTags';
-import CytomineTerm from '@/components/ontology/CytomineTerm';
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
-import OntologyTree from '@/components/ontology/OntologyTree';
-import TrackTree from '@/components/track/TrackTree';
-import CytomineTrack from '@/components/track/CytomineTrack';
-import AnnotationCommentsModal from './AnnotationCommentsModal';
-import ProfileModal from '@/components/viewer/ProfileModal';
-import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
+import ImageName from '@/components/image/ImageName.vue';
+import CytomineDescription from '@/components/description/CytomineDescription.vue';
+import CytomineProperties from '@/components/property/CytomineProperties.vue';
+import CytomineTags from '@/components/tag/CytomineTags.vue';
+import CytomineTerm from '@/components/ontology/CytomineTerm.vue';
+import AttachedFiles from '@/components/attached-file/AttachedFiles.vue';
+import OntologyTree from '@/components/ontology/OntologyTree.vue';
+import TrackTree from '@/components/track/TrackTree.vue';
+import CytomineTrack from '@/components/track/CytomineTrack.vue';
+import AnnotationCommentsModal from './AnnotationCommentsModal.vue';
+import ProfileModal from '@/components/viewer/ProfileModal.vue';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
 import {appendShortTermToken} from '@/utils/token-utils.js';
-import ChannelName from '@/components/viewer/ChannelName';
+import ChannelName from '@/components/viewer/ChannelName.vue';
 import constants from '@/utils/constants.js';
 
 export default {

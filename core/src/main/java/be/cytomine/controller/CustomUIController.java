@@ -26,6 +26,7 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.meta.PropertyService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
@@ -54,6 +55,7 @@ public class CustomUIController extends RestCytomineController {
     private final ApplicationProperties applicationProperties;
 
     static String CUSTOM_UI_PROJECT = "@CUSTOM_UI_PROJECT";
+    private final UrlApi urlApi;
 
     @GetMapping("/custom-ui/config.json")
     public ResponseEntity<String> retrieveUIConfig(
@@ -100,10 +102,10 @@ public class CustomUIController extends RestCytomineController {
                     property.setValue(jsonObject.toJsonString());
                     property.setDomain(project);
 
-                    CommandResponse result = propertyService.add(property.toJsonObject());
+                    CommandResponse result = propertyService.add(property.toJsonObject(urlApi));
                     responseSuccess((String) ((LinkedHashMap) result.getData().get("property")).get("value"));
                 } else {
-                    JsonObject jsonEdit = optionalProperty.get().toJsonObject()
+                    JsonObject jsonEdit = optionalProperty.get().toJsonObject(urlApi)
                         .withChange("value", jsonObject.toJsonString());
 
                     CommandResponse result = propertyService.update(optionalProperty.get(), jsonEdit);

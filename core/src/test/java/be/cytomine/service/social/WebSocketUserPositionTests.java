@@ -328,7 +328,6 @@ public class WebSocketUserPositionTests {
         assertThat(WebSocketUserPositionHandler.sessionsTracked.get(createdSession).length).isEqualTo(0);
     }
 
-
     private void connectSession(WebSocketSession session, String userId, String imageId, String broadcast) {
         when(session.getAttributes()).thenReturn(Map.of("userId", userId, "imageId", imageId, "broadcast", broadcast));
         webSocketUserPositionHandler.afterConnectionEstablished(session);
@@ -342,7 +341,7 @@ public class WebSocketUserPositionTests {
         WebSocketUserPositionHandler.sessionsBroadcast.put(userAndImageId, broadcastSession);
         WebSocketUserPositionHandler.sessionsTracked.put(
             broadcastSession,
-            new ConcurrentWebSocketSessionDecorator[]{followerSession}
+            new ConcurrentWebSocketSessionDecorator[] {followerSession}
         );
         assertThat(WebSocketUserPositionHandler.sessionsTracked.get(broadcastSession).length).isEqualTo(1);
     }

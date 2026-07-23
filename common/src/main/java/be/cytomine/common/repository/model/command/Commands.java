@@ -1,6 +1,10 @@
 package be.cytomine.common.repository.model.command;
 
 public interface Commands {
+    String CREATE_TAG = "be.cytomine.AddTagCommand";
+    String UPDATE_TAG = "be.cytomine.EditTagCommand";
+    String DELETE_TAG = "be.cytomine.DeleteTagCommand";
+
     String CREATE_TERM = "be.cytomine.AddTermCommand";
     String CREATE_TERM_RELATION = "be.cytomine.AddTermRelationCommand";
     String CREATE_ONTOLOGY = "be.cytomine.AddOntologyCommand";

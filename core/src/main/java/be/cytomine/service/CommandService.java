@@ -44,16 +44,17 @@ public class CommandService {
     private final CurrentUserService currentUserService;
     private final ResponseService responseService;
     private final SecurityACLService securityACLService;
+    private final UrlApi urlApi;
 
     CommandResponse processCommand(Command c, ModelService service) throws CytomineException {
         if (c instanceof AddCommand) {
-            return processCommand(c, service, SUCCESS_ADD_CODE);
+            return processCommand(c, service, urlApi, SUCCESS_ADD_CODE);
         }
         if (c instanceof EditCommand) {
-            return processCommand(c, service, SUCCESS_EDIT_CODE);
+            return processCommand(c, service, urlApi, SUCCESS_EDIT_CODE);
         }
         if (c instanceof DeleteCommand) {
-            return processCommand(c, service, SUCCESS_DELETE_CODE);
+            return processCommand(c, service, urlApi, SUCCESS_DELETE_CODE);
         }
         throw new ObjectNotFoundException("Command not supported");
     }
@@ -62,10 +63,11 @@ public class CommandService {
      * Execute a 'command' c with json data Store command in undo stack if necessary and in command history if success,
      * put http response code as successCode
      */
-    CommandResponse processCommand(Command c, ModelService service, int successCode) throws CytomineException {
+    CommandResponse processCommand(Command c, ModelService service, UrlApi urlApi, int successCode)
+        throws CytomineException {
         //execute command
         log.debug("processCommand");
-        CommandResponse result = c.execute(service);
+        CommandResponse result = c.execute(service, urlApi);
         if (result.getStatus() == successCode) {
             if ((service instanceof ProjectService && c instanceof DeleteCommand)) {
                 // project has been deleted in this command, so we cannot link the command to the deleted project

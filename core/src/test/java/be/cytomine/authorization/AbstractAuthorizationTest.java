@@ -83,5 +83,4 @@ public abstract class AbstractAuthorizationTest {
         Assertions.assertDoesNotThrow(executable);
     }
 
-
 }

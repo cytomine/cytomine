@@ -63,6 +63,7 @@ import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.PermissionService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.ontology.AnnotationTermService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
@@ -140,6 +141,8 @@ public class ProjectService extends ModelService {
     private final ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
 
     private final RetrievalService retrievalService;
+
+    private final UrlApi urlApi;
 
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
@@ -859,7 +862,7 @@ public class ProjectService extends ModelService {
                     ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                     pru.setProject(project);
                     pru.setUser(optionalUser.get());
-                    projectRepresentativeUserService.add(pru.toJsonObject());
+                    projectRepresentativeUserService.add(pru.toJsonObject(urlApi));
                 }
             }
 
@@ -1017,7 +1020,7 @@ public class ProjectService extends ModelService {
             ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
             pru.setProject((Project) domain);
             pru.setUser(currentUserService.getCurrentUserOld());
-            projectRepresentativeUserService.add(pru.toJsonObject());
+            projectRepresentativeUserService.add(pru.toJsonObject(urlApi));
         }
 
     }

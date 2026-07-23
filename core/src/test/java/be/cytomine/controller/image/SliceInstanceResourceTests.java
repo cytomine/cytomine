@@ -29,6 +29,7 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
@@ -57,8 +58,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class SliceInstanceResourceTests {
 
     @Autowired
+    private UrlApi urlApi;
+    @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restSliceInstanceControllerMockMvc;
 
@@ -127,7 +129,7 @@ public class SliceInstanceResourceTests {
         SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
         restSliceInstanceControllerMockMvc.perform(post("/api/sliceinstance.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(sliceInstance.toJSON()))
+                .content(sliceInstance.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -142,7 +144,7 @@ public class SliceInstanceResourceTests {
     @Transactional
     public void editValidSliceInstance() throws Exception {
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        JsonObject jsonObject = sliceInstance.toJsonObject();
+        JsonObject jsonObject = sliceInstance.toJsonObject(urlApi);
         restSliceInstanceControllerMockMvc.perform(put("/api/sliceinstance/{id}.json", sliceInstance.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonObject.toJsonString()))
@@ -256,14 +258,17 @@ public class SliceInstanceResourceTests {
         configureFor("localhost", wireMockServer.port());
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/annotation/crop";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))"
+                + "\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
 
@@ -294,7 +299,8 @@ public class SliceInstanceResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         configureFor("localhost", wireMockServer.port());
         String url = "/image/"
@@ -302,7 +308,9 @@ public class SliceInstanceResourceTests {
             + "/window";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))"
+                + "\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(equalTo(body))
@@ -310,7 +318,6 @@ public class SliceInstanceResourceTests {
                 aResponse().withBody(mockResponse)
             )
         );
-
 
         MvcResult mvcResult = restSliceInstanceControllerMockMvc.perform(get(
                 "/api/sliceinstance/{id}/window-10-20-30-40.png",
@@ -322,7 +329,6 @@ public class SliceInstanceResourceTests {
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
 
     }
-
 
     @Test
     @Transactional
@@ -376,7 +382,6 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.collection[0].histogram[0]").value(900));
     }
 
-
     @Test
     @Transactional
     public void histogramsBounds() throws Exception {
@@ -402,7 +407,6 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
             .andExpect(jsonPath("$.collection[0].color").value("#f00"));
     }
-
 
     @Test
     @Transactional
@@ -448,7 +452,6 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
             .andExpect(jsonPath("$.collection[0].type").value("FAST"));
     }
-
 
     @Test
     @Transactional

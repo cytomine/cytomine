@@ -40,7 +40,6 @@ import be.cytomine.dto.image.SliceCoordinates;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
@@ -75,7 +74,6 @@ public class SliceCoordinatesServiceTests {
         assertThat(sliceCoordinates.getTimes()).containsExactly(100, 200, 300, 400); //order matter
     }
 
-
     @Test
     public void getSliceCoordinatesReference() {
         AbstractImage image = builder.givenAnAbstractImage();
@@ -92,7 +90,6 @@ public class SliceCoordinatesServiceTests {
         assertThat(sliceCoordinate.getZStack()).isEqualTo(20);
         assertThat(sliceCoordinate.getTime()).isEqualTo(300);
     }
-
 
     @Test
     public void getReferenceSlice() {
@@ -111,7 +108,6 @@ public class SliceCoordinatesServiceTests {
         assertThat(slice.getTime()).isEqualTo(300);
     }
 
-
     private void buildSlices(AbstractImage image, List<Integer> channels, List<Integer> zStacks, List<Integer> times) {
         for (Integer channel : channels) {
             for (Integer zStack : zStacks) {
@@ -121,7 +117,6 @@ public class SliceCoordinatesServiceTests {
             }
         }
     }
-
 
     private AbstractSlice buildSlice(AbstractImage image, int c, int z, int t) {
         AbstractSlice slice = builder.givenAnAbstractSlice();

@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
 import be.cytomine.common.repository.model.command.request.CommandV2Request;
 
-@Mapper(componentModel = "spring", uses = {BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
 public interface CommandMapper {
 
     @Mapping(target = "id", ignore = true)

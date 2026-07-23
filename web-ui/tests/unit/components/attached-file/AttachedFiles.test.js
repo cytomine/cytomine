@@ -4,12 +4,12 @@ import Buefy from 'buefy';
 import attachedFiles from '@/components/attached-file/AttachedFiles';
 import {AttachedFileCollection} from '@/api';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {host: 'https://test.cytomine.com'}
   },
   AttachedFileCollection: {
-    fetchAll: jest.fn().mockResolvedValue({array: []})
+    fetchAll: vi.fn().mockResolvedValue({array: []})
   }
 }));
 
@@ -29,13 +29,13 @@ describe('attached-files.vue', () => {
       },
       mocks: {
         $t: (message) => message,
-        $notify: jest.fn(),
+        $notify: vi.fn(),
         $buefy: {
           modal: {
-            open: jest.fn()
+            open: vi.fn()
           },
           dialog: {
-            confirm: jest.fn((options) => options.onConfirm())
+            confirm: vi.fn((options) => options.onConfirm())
           }
         }
       }
@@ -45,7 +45,7 @@ describe('attached-files.vue', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render the component correctly', () => {

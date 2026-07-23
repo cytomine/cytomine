@@ -4,12 +4,12 @@ import moment from 'moment';
 import ActivityLogsItem from '@/components/utils/ActivityLogsItem';
 import VueRouter from 'vue-router';
 
-jest.mock('@/utils/token-utils', () => ({
-  appendShortTermToken: jest.fn((url, token) => `${url}?token=${token}`)
+vi.mock('@/utils/token-utils', () => ({
+  appendShortTermToken: vi.fn((url, token) => `${url}?token=${token}`)
 }));
 
-jest.mock('@/utils/store-helpers', () => ({
-  get: jest.fn(() => 'mock-token')
+vi.mock('@/utils/store-helpers', () => ({
+  get: vi.fn(() => 'mock-token')
 }));
 
 describe('ActivityLogsItem.vue', () => {
@@ -34,7 +34,7 @@ describe('ActivityLogsItem.vue', () => {
   localVue.component('router-view', {template: '<div><slot></slot></div>'});
 
   beforeAll(() => {
-    localVue.filter('moment', jest.fn((value, format) => moment.utc(Number(value)).format(format)));
+    localVue.filter('moment', vi.fn((value, format) => moment.utc(Number(value)).format(format)));
   });
 
   beforeEach(() => {
@@ -50,7 +50,7 @@ describe('ActivityLogsItem.vue', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render the correct timestamp and message', () => {

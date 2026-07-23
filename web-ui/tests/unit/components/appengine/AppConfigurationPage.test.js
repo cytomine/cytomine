@@ -12,16 +12,16 @@ const localVue = createLocalVue();
 localVue.use(Buefy);
 localVue.use(Vuex);
 
-const mockNotify = jest.fn();
-const mockDialog = {confirm: jest.fn()};
+const mockNotify = vi.fn();
+const mockDialog = {confirm: vi.fn()};
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        delete: jest.fn(),
-        post: jest.fn(),
-        put: jest.fn(),
+        delete: vi.fn(),
+        post: vi.fn(),
+        put: vi.fn(),
       },
     },
   },
@@ -44,7 +44,7 @@ describe('AppConfigurationPage.vue', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should add a store correctly', async () => {

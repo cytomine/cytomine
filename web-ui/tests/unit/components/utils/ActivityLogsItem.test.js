@@ -12,6 +12,11 @@ vi.mock('@/utils/store-helpers', () => ({
   get: vi.fn(() => 'mock-token')
 }));
 
+vi.mock('@/utils/date', () => ({
+  // Formats in UTC so the assertion is deterministic regardless of the test runner's local timezone
+  formatMomentDate: vi.fn((value, format) => moment.utc(Number(value)).format(format))
+}));
+
 describe('ActivityLogsItem.vue', () => {
   let wrapper;
   const action = {
@@ -32,10 +37,6 @@ describe('ActivityLogsItem.vue', () => {
   localVue.use(VueRouter);
   localVue.component('router-link', {template: '<a><slot></slot></a>'});
   localVue.component('router-view', {template: '<div><slot></slot></div>'});
-
-  beforeAll(() => {
-    localVue.filter('moment', vi.fn((value, format) => moment.utc(Number(value)).format(format)));
-  });
 
   beforeEach(() => {
     wrapper = shallowMount(ActivityLogsItem, {

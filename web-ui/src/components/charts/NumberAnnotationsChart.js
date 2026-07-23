@@ -17,6 +17,7 @@
 import {Bar} from 'vue-chartjs';
 
 import {AnnotationType} from '@/api';
+import {formatMomentDate} from '@/utils/date';
 export default {
   name: 'number-annotations-chart',
   extends: Bar,
@@ -77,9 +78,8 @@ export default {
     },
     updateLabels() {
       this.chartData.labels = this.annotationsEvolution[AnnotationType.USER].map(item => {
-        let moment = this.$options.filters.moment;
-        return this.daysRange === 1 ? moment(Number(item.date), 'll')
-          : [moment(Number(item.date), 'll') + ' - ',  moment(Number(item.endDate), 'll')];
+        return this.daysRange === 1 ? formatMomentDate(Number(item.date), 'll')
+          : [formatMomentDate(Number(item.date), 'll') + ' - ',  formatMomentDate(Number(item.endDate), 'll')];
       });
     },
     updateChart() {

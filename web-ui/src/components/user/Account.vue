@@ -101,7 +101,7 @@
             horizontal
           >
             <template v-if="currentPasswordInfo">
-              {{ $t('last-updated-on') }} {{Number(currentPasswordInfo.createdDate) | moment('ll LT')}}.
+              {{ $t('last-updated-on') }} {{formatMomentDate(Number(currentPasswordInfo.createdDate), 'll LT')}}.
             </template>
             <em v-else>{{ $t('no-password') }}</em>
           </b-field>
@@ -169,6 +169,7 @@ import {MyAccount, User} from '@/api';
 import {rolesMapping} from '@/utils/role-utils';
 import {KeycloakRole, UserRole} from '@/constants/UserRole.js';
 import copyToClipboard from 'copy-to-clipboard';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   // eslint-disable-next-line
@@ -216,6 +217,7 @@ export default {
   watch: {
   },
   methods: {
+    formatMomentDate,
     async editDetails() {
       let result = await this.$validator.validateAll('profile');
       if (!result) {

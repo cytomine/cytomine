@@ -67,11 +67,11 @@
           </b-table-column>
 
           <b-table-column field="created" :label="$t('created')" sortable width="150">
-            {{Number(user.created) | moment('ll LT')}}
+            {{formatMomentDate(Number(user.created), 'll LT')}}
           </b-table-column>
 
           <b-table-column field="updated" :label="$t('updated')" sortable width="150">
-            <template v-if="user.updated">{{Number(user.updated) | moment('ll LT')}}</template>
+            <template v-if="user.updated">{{formatMomentDate(Number(user.updated), 'll LT')}}</template>
             <template v-else>-</template>
           </b-table-column>
 
@@ -114,6 +114,7 @@ import {UserCollection} from '@/api';
 import UserModal from './UserModal.vue';
 import UserDetails from './UserDetails.vue';
 import {rolesMapping} from '@/utils/role-utils';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'admin-users',
@@ -155,6 +156,7 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
     displayMemberOrigin(member) {
       let key;
       if (member.origin === 'BOOTSTRAP') {

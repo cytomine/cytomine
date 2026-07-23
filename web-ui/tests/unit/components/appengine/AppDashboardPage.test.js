@@ -36,19 +36,21 @@ const makeTaskRun = (overrides = {}) => ({
   task: {name: 'Test App', version: '1.0.0', namespace: 'namespace'},
   inputs: null,
   outputs: null,
-  isTerminalState: jest.fn(() => true),
-  fetchInputs: jest.fn(),
-  fetchOutputs: jest.fn(),
-  fetchLogs: jest.fn(),
-  delete: jest.fn(),
+  isTerminalState: vi.fn(() => true),
+  fetchInputs: vi.fn(),
+  fetchOutputs: vi.fn(),
+  fetchLogs: vi.fn(),
+  delete: vi.fn(),
   ...overrides,
 });
 
-jest.mock('@/utils/appengine/task', () => ({
-  fetchTaskRunStatus: jest.fn(() => Promise.resolve(mockTask))
+vi.mock('@/utils/appengine/task', () => ({
+  default: {
+    fetchTaskRunStatus: vi.fn(() => Promise.resolve(mockTask))
+  }
 }));
 
-jest.mock('@/utils/appengine/task-run', () => {
+vi.mock('@/utils/appengine/task-run', () => {
   const STATES = {
     CREATED: 'CREATED',
     PROVISIONED: 'PROVISIONED',
@@ -60,16 +62,18 @@ jest.mock('@/utils/appengine/task-run', () => {
     FINISHED: 'FINISHED',
   };
 
-  const mockIsFinished = jest.fn(function () {
+  const mockIsFinished = vi.fn(function () {
     return this.state === STATES.FINISHED;
   });
 
-  const mockTaskRun = jest.fn().mockImplementation((resource) => ({
-    ...resource,
-    isFinished: mockIsFinished,
-  }));
+  const mockTaskRun = vi.fn().mockImplementation(function (resource) {
+    return {
+      ...resource,
+      isFinished: mockIsFinished,
+    };
+  });
 
-  mockTaskRun.fetchByProject = jest.fn(() => Promise.resolve([
+  mockTaskRun.fetchByProject = vi.fn(() => Promise.resolve([
     mockTaskRun1,
     mockTaskRun2,
   ]));

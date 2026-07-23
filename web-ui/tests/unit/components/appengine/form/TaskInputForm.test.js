@@ -4,16 +4,16 @@ import TaskInputForm from '@/components/appengine/forms/TaskInputForm.vue';
 import Task from '@/utils/appengine/task';
 import {hasBinaryType} from '@/utils/app';
 
-jest.mock('@/utils/appengine/task');
-jest.mock('@/utils/app', () => ({
-  hasBinaryType: jest.fn(),
+vi.mock('@/utils/appengine/task');
+vi.mock('@/utils/app', () => ({
+  hasBinaryType: vi.fn(),
 }));
 
 describe('TaskInputForm.vue', () => {
   const mockTask = {
     namespace: 'mock-namespace',
     version: '1.0.0',
-    fetchOutputs: jest.fn(),
+    fetchOutputs: vi.fn(),
   };
 
   const createWrapper = (overrides = {}) => {
@@ -33,7 +33,7 @@ describe('TaskInputForm.vue', () => {
     const expectedTask = {
       namespace: 'sort-namespace',
       version: '1.2.3',
-      fetchOutputs: jest.fn(),
+      fetchOutputs: vi.fn(),
     };
     const expectedInputs = [
       {id: 1, name: 'inputB', type: {id: 'string'}, default: 'hello'},
@@ -96,7 +96,7 @@ describe('TaskInputForm.vue', () => {
         inputs: {some: 'value'},
       },
     });
-    const spy = jest.spyOn(wrapper.vm, 'resetForm');
+    const spy = vi.spyOn(wrapper.vm, 'resetForm');
 
     await wrapper.setProps({inputs: {}});
 
@@ -111,7 +111,7 @@ describe('TaskInputForm.vue', () => {
     const newTask = {
       namespace: 'new-ns',
       version: '2.0',
-      fetchOutputs: jest.fn(),
+      fetchOutputs: vi.fn(),
     };
 
     await wrapper.setProps({task: newTask});

@@ -5,23 +5,23 @@ import VueRouter from 'vue-router';
 import {AnnotationType} from '@/api';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   AnnotationType: {
     USER: 'USER',
     REVIEWED: 'REVIEWED',
   },
-  AnnotationTerm: jest.fn().mockImplementation(() => ({
-    save: jest.fn().mockResolvedValue({})
+  AnnotationTerm: vi.fn().mockImplementation(() => ({
+    save: vi.fn().mockResolvedValue({}),
   })),
-  AnnotationTrack: jest.fn().mockImplementation(() => ({
-    save: jest.fn().mockResolvedValue({})
+  AnnotationTrack: vi.fn().mockImplementation(() => ({
+    save: vi.fn().mockResolvedValue({}),
   })),
   AnnotationCommentCollection: {
-    fetchAll: jest.fn().mockResolvedValue({array: []})
+    fetchAll: vi.fn().mockResolvedValue({array: []}),
   },
   PropertyCollection: {
-    fetchAll: jest.fn().mockResolvedValue({array: []})
-  }
+    fetchAll: vi.fn().mockResolvedValue({array: []}),
+  },
 }));
 
 const localVue = createLocalVue();
@@ -87,7 +87,7 @@ const mockStore = {
   getters: {
     'currentProject/canEditAnnot': () => true,
   },
-  dispatch: jest.fn(),
+  dispatch: vi.fn(),
 };
 
 describe('AnnotationDetails.vue', () => {
@@ -131,9 +131,9 @@ describe('AnnotationDetails.vue', () => {
       },
       mocks: {
         $eventBus: {
-          $emit: jest.fn(),
+          $emit: vi.fn(),
         },
-        $notify: jest.fn(),
+        $notify: vi.fn(),
         $store: mockStore,
         $t: (key) => key,
       },

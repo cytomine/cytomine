@@ -8,7 +8,8 @@ export default defineConfig(({command}) => ({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+    },
+    extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.vue', '.json']
   },
   // Replaces babel-plugin-transform-remove-console (production only)
   esbuild: command === 'build' ? {drop: ['console']} : undefined,

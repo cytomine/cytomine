@@ -4,20 +4,20 @@ import OntologyDetails from '@/components/ontology/OntologyDetails.vue';
 import {Cytomine, Ontology, ProjectCollection, User} from '@/api';
 import {flushPromises} from '../../../utils';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Ontology: {
-    fetch: jest.fn()
+    fetch: vi.fn()
   },
   ProjectCollection: {
-    fetchAll: jest.fn()
+    fetchAll: vi.fn()
   },
   User: {
-    fetch: jest.fn()
+    fetch: vi.fn()
   },
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn()
+        get: vi.fn()
       }
     }
   }
@@ -25,7 +25,7 @@ jest.mock('@/api', () => ({
 
 describe('OntologyDetails.vue', () => {
   const propsOntology = {id: 1};
-  const fullOntology = {id: 1, name: 'Test Ontology', user: 10, projects: [1, 2], save: jest.fn()};
+  const fullOntology = {id: 1, name: 'Test Ontology', user: 10, projects: [1, 2], save: vi.fn()};
   const defaultProjectCollection = [{id: 1}, {id: 2}];
   const defaultUser = {id: 10, fullName: 'John Doe'};
 
@@ -51,10 +51,10 @@ describe('OntologyDetails.vue', () => {
       mocks: {
         $buefy: {
           dialog: {
-            confirm: jest.fn(({onConfirm}) => onConfirm())
+            confirm: vi.fn(({onConfirm}) => onConfirm())
           }
         },
-        $notify: jest.fn(),
+        $notify: vi.fn(),
         $store: mockStore,
         $t: (key) => key,
       },
@@ -69,7 +69,7 @@ describe('OntologyDetails.vue', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fetch ontology, projects and creator on created', async () => {
@@ -123,8 +123,8 @@ describe('OntologyDetails.vue', () => {
   });
 
   it('should handle rename error', async () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-    Ontology.fetch.mockResolvedValue({...fullOntology, save: jest.fn().mockRejectedValue(new Error('fail'))});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    Ontology.fetch.mockResolvedValue({...fullOntology, save: vi.fn().mockRejectedValue(new Error('fail'))});
     const wrapper = createWrapper();
     await flushPromises();
 

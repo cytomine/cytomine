@@ -47,10 +47,10 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import GeneralConfiguration from './configuration-panels/GeneralConfiguration';
-import ProjectMembers from './configuration-panels/ProjectMembers';
-import CustomUIProject from './configuration-panels/CustomUIProject';
-import ProjectImageFilters from './configuration-panels/ProjectImageFilters';
+import GeneralConfiguration from './configuration-panels/GeneralConfiguration.vue';
+import ProjectMembers from './configuration-panels/ProjectMembers.vue';
+import CustomUIProject from './configuration-panels/CustomUIProject.vue';
+import ProjectImageFilters from './configuration-panels/ProjectImageFilters.vue';
 
 const defaultTab = 'general';
 

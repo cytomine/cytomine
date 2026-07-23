@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import AnnotationSelection from '@/components/annotations/AnnotationSelection';
-import ImageSelection from '@/components/image/ImageSelection';
+import AnnotationSelection from '@/components/annotations/AnnotationSelection.vue';
+import ImageSelection from '@/components/image/ImageSelection.vue';
 
 export default {
   name: 'ImageField',

@@ -76,7 +76,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import AnnotationPreview from './AnnotationPreview';
+import AnnotationPreview from './AnnotationPreview.vue';
 
 import {AnnotationCollection} from '@/api';
 import constants from '@/utils/constants';

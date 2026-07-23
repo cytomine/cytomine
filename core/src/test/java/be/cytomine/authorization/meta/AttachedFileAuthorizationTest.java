@@ -27,18 +27,13 @@ import be.cytomine.service.meta.AttachedFileService;
 @Transactional
 public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
-
-    private AttachedFile attachedFile = null;
-
-    private Project project = null;
-
-    private AnnotationDomain attachedFileAnnotation = null;
-
     @Autowired
     AttachedFileService attachedFileService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    private AttachedFile attachedFile = null;
+    private Project project = null;
+    private AnnotationDomain attachedFileAnnotation = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -307,7 +302,6 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
         expectOK(() -> attachedFileService.delete(attachedFile, null, null, true));
     }
 
-
     @Override
     protected Optional<Permission> minimalPermissionForCreate() {
         return Optional.of(BasePermission.WRITE);
@@ -322,7 +316,6 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(BasePermission.WRITE);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

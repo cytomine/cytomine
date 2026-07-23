@@ -41,7 +41,7 @@
 
 <script>
 import {Description} from '@/api';
-import DescriptionModal from './CytomineDescriptionModal';
+import DescriptionModal from './CytomineDescriptionModal.vue';
 
 import constants from '@/utils/constants.js';
 

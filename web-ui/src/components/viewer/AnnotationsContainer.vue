@@ -41,9 +41,9 @@ import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annot
 
 import WKT from 'ol/format/WKT';
 
-import AnnotationsList from './AnnotationsList';
-import AnnotationDetailsContainer from './AnnotationDetailsContainer';
-import SimilarAnnotation from '@/components/annotations/SimilarAnnotation';
+import AnnotationsList from './AnnotationsList.vue';
+import AnnotationDetailsContainer from './AnnotationDetailsContainer.vue';
+import SimilarAnnotation from '@/components/annotations/SimilarAnnotation.vue';
 import {listAnnotationsInGroup, updateAnnotationLinkProperties} from '@/utils/annotation-utils';
 
 import {Annotation} from '@/api';

@@ -35,7 +35,6 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
@@ -88,7 +87,7 @@ public class AttachedFileServiceTests {
         AttachedFile attachedFile =
             attachedFileService.create(
                 "test.txt",
-                new String("hello").getBytes(),
+                "hello".getBytes(),
                 "test",
                 project.getId(),
                 project.getClass().getName()

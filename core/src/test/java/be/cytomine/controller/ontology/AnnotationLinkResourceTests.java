@@ -15,6 +15,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.ontology.AnnotationLink;
+import be.cytomine.service.UrlApi;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,6 +34,8 @@ public class AnnotationLinkResourceTests {
 
     @Autowired
     private MockMvc restAnnotationLinkControllerMockMvc;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     @Transactional
@@ -40,7 +43,7 @@ public class AnnotationLinkResourceTests {
         AnnotationLink annotationLink = builder.givenANotPersistedAnnotationLink();
         restAnnotationLinkControllerMockMvc.perform(post("/api/annotationlink.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationLink.toJSON()))
+                .content(annotationLink.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

@@ -44,6 +44,7 @@ import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
@@ -86,13 +87,33 @@ public class UserAnnotationResourceTests {
 
     @Autowired
     private WiremockRepository wiremockRepository;
-
+    @Autowired
+    private UrlApi urlApi;
     private Project project;
     private ImageInstance image;
     private SliceInstance slice;
     private Term term;
     private User me;
     private UserAnnotation userAnnotation;
+
+    public static UserAnnotation givenAUserAnnotationWithValidImageServer(BasicInstanceBuilder builder)
+        throws ParseException {
+        AbstractImage image = builder.givenAnAbstractImage();
+        image.setWidth(109240);
+        image.setHeight(220696);
+        image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
+        image.getUploadedFile().setContentType("MRXS");
+        ImageInstance imageInstance = builder.givenAnImageInstance(image, builder.givenAProject());
+        imageInstance.setInstanceFilename("CMU-2");
+        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
+        slice.setUploadedFile(image.getUploadedFile());
+        SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
+        return builder.givenAUserAnnotation(
+            sliceInstance,
+            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(),
+            null
+        );
+    }
 
     @Test
     @Transactional
@@ -130,7 +151,6 @@ public class UserAnnotationResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + userAnnotation.getId() + "')]").exists());
     }
-
 
     @Test
     @Transactional
@@ -174,7 +194,6 @@ public class UserAnnotationResourceTests {
             .andExpect(jsonPath("$.total").value(0));
     }
 
-
     @Test
     @Transactional
     public void countAnnotationsByProjectWithDates() throws Exception {
@@ -183,7 +202,6 @@ public class UserAnnotationResourceTests {
 
         UserAnnotation newUserAnnotation =
             builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(oldUserAnnotation.getProject()));
-
 
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/project/{idProject}/userannotation/count.json",
@@ -234,7 +252,6 @@ public class UserAnnotationResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(0));
     }
-
 
     @Test
     @Transactional
@@ -333,7 +350,7 @@ public class UserAnnotationResourceTests {
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -348,10 +365,12 @@ public class UserAnnotationResourceTests {
     @Transactional
     public void addUserAnnotationWithNotValidLocation() throws Exception {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put(
             "location",
-            "POLYGON ((225.73582220103702 306.89723126347087, 225.73582220103702 307.93556995227914, 226.08028300710947 307.93556995227914, 226.08028300710947 306.89723126347087, 225.73582220103702 306.89723126347087))"
+            "POLYGON ((225.73582220103702 306.89723126347087, 225.73582220103702 307.93556995227914, 226"
+                + ".08028300710947 307.93556995227914, 226.08028300710947 306.89723126347087, 225.73582220103702 306"
+                + ".89723126347087))"
         ); // too small
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -363,7 +382,7 @@ public class UserAnnotationResourceTests {
     @Transactional
     public void addValidUserAnnotationWithoutProject() throws Exception {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.remove("project");
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
@@ -383,7 +402,7 @@ public class UserAnnotationResourceTests {
         Term term2 = builder.givenATerm(userAnnotation.getProject().getOntology());
         wiremockRepository.stubTerm(term1);
         wiremockRepository.stubTerm(term2);
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("term", Arrays.asList(term1.getId(), term2.getId()));
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
@@ -393,14 +412,13 @@ public class UserAnnotationResourceTests {
             .andExpect(jsonPath("$.annotation.term", hasSize(2)));
     }
 
-
     @Test
     @Transactional
     public void editValidUserAnnotation() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(put("/api/userannotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -419,7 +437,7 @@ public class UserAnnotationResourceTests {
 
         restUserAnnotationControllerMockMvc.perform(delete("/api/userannotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -431,20 +449,18 @@ public class UserAnnotationResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void deleteUserAnnotationNotExistFails() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(delete("/api/userannotation/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.success").value(false))
             .andExpect(jsonPath("$.errors").exists());
 
     }
-
 
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
@@ -456,13 +472,16 @@ public class UserAnnotationResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/annotation/crop";
         String
             body
-            = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1)"
+                + ")\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
@@ -493,13 +512,16 @@ public class UserAnnotationResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode("1636379100999/CMU-2/CMU-2.mrxs", StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/annotation/mask";
         String
             body
-            = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\",\"fill_color\":\"#fff\"}],\"timepoints\":0}";
+            =
+            "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1)"
+                + ")\",\"fill_color\":\"#fff\"}],\"timepoints\":0}";
         System.out.println(url);
         System.out.println(body);
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
@@ -520,7 +542,6 @@ public class UserAnnotationResourceTests {
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
-
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @jakarta.transaction.Transactional
@@ -531,7 +552,8 @@ public class UserAnnotationResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode(
             annotation.getImage().getBaseImage().getPath(),
@@ -539,7 +561,9 @@ public class UserAnnotationResourceTests {
         ).replace("%2F", "/") + "/annotation/crop";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":100}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))"
+                + "\"}],\"timepoints\":0,\"background_transparency\":100}";
         System.out.println(url);
         System.out.println(body);
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
@@ -560,31 +584,12 @@ public class UserAnnotationResourceTests {
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
-    public static UserAnnotation givenAUserAnnotationWithValidImageServer(BasicInstanceBuilder builder)
-        throws ParseException {
-        AbstractImage image = builder.givenAnAbstractImage();
-        image.setWidth(109240);
-        image.setHeight(220696);
-        image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
-        image.getUploadedFile().setContentType("MRXS");
-        ImageInstance imageInstance = builder.givenAnImageInstance(image, builder.givenAProject());
-        imageInstance.setInstanceFilename("CMU-2");
-        AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
-        slice.setUploadedFile(image.getUploadedFile());
-        SliceInstance sliceInstance = builder.givenASliceInstance(imageInstance, slice);
-        return builder.givenAUserAnnotation(
-            sliceInstance,
-            "POLYGON((1 1,50 10,50 50,10 50,1 1))", builder.givenSuperAdmin(),
-            null
-        );
-    }
-
     @Test
     @Transactional
     public void createCommentsForAnnotation() throws Exception {
         SharedAnnotation annotation = builder.givenASharedAnnotation();
 
-        JsonObject jsonObject = annotation.toJsonObject();
+        JsonObject jsonObject = annotation.toJsonObject(urlApi);
         jsonObject.put("subject", "subject for test mail");
         jsonObject.put("message", "message for test mail");
         jsonObject.put("users", List.of(builder.givenSuperAdmin().getId()));

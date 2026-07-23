@@ -85,9 +85,9 @@
 <script>
 import VueDraggableResizable from 'vue-draggable-resizable';
 import {Cytomine, UserCollection} from '@/api';
-import AnnotationDetails from '@/components/annotations/AnnotationDetails';
-import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
-import AnnotationSimpleDetails from '@/components/viewer/annotations/AnnotationSimpleDetails';
+import AnnotationDetails from '@/components/annotations/AnnotationDetails.vue';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
+import AnnotationSimpleDetails from '@/components/viewer/annotations/AnnotationSimpleDetails.vue';
 
 export default {
   name: 'annotations-details-container',

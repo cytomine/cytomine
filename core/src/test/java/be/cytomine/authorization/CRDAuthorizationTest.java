@@ -26,7 +26,6 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
         "ROLE_SUPERADMIN"
     );
 
-
     boolean isPermissionForbidden(Optional<Permission> permissionRequired, Permission permission) {
         return permissionRequired.isPresent()
             && (permission == null || permissionRequired.get().getMask() > permission.getMask());

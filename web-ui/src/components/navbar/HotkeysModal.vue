@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 import shortcuts from '@/utils/shortcuts.js';
 import {getWildcardRegexp} from '@/utils/string-utils';
 

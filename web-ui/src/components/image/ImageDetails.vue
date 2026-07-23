@@ -304,17 +304,17 @@ import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 import {get} from '@/utils/store-helpers';
 import vendorFromFormat from '@/utils/vendor';
 
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
-import CalibrationModal from '@/components/image/CalibrationModal';
-import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
-import CytomineTags from '@/components/tag/CytomineTags';
-import ImageMetadataModal from '@/components/image/ImageMetadataModal';
-import ImageStatus from '@/components/image/ImageStatus';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
-import MagnificationModal from '@/components/image/MagnificationModal';
-import RenameModal from '@/components/utils/RenameModal';
-import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal';
+import AttachedFiles from '@/components/attached-file/AttachedFiles.vue';
+import CalibrationModal from '@/components/image/CalibrationModal.vue';
+import CytomineDescription from '@/components/description/CytomineDescription.vue';
+import CytomineProperties from '@/components/property/CytomineProperties.vue';
+import CytomineTags from '@/components/tag/CytomineTags.vue';
+import ImageMetadataModal from '@/components/image/ImageMetadataModal.vue';
+import ImageStatus from '@/components/image/ImageStatus.vue';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
+import MagnificationModal from '@/components/image/MagnificationModal.vue';
+import RenameModal from '@/components/utils/RenameModal.vue';
+import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal.vue';
 
 export default {
   name: 'image-details',

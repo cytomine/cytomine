@@ -19,6 +19,7 @@ package be.cytomine.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 /**
@@ -33,7 +34,7 @@ public class GenericCytomineDomainContainer extends CytomineDomain {
     private String containerClass;
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return null;
     }
 

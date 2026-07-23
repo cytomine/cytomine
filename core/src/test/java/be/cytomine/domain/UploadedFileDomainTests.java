@@ -61,11 +61,10 @@ public class UploadedFileDomainTests {
         }
     }
 
-
     @Test
     void supportLongArrayPersistence() {
         UploadedFile uploadedFile = builder.givenANotPersistedUploadedFile();
-        uploadedFile.setProjects(new Long[]{1L, 2L, 3L});
+        uploadedFile.setProjects(new Long[] {1L, 2L, 3L});
         uploadedFile = uploadedFileRepository.save(uploadedFile);
         entityManager.flush();
         Long id = uploadedFile.getId();

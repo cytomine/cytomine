@@ -39,6 +39,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.image.CompanionFile;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
@@ -64,13 +65,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class CompanionFileResourceTests {
 
+    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restCompanionFileControllerMockMvc;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
+    @Autowired
+    private UrlApi urlApi;
 
     @BeforeAll
     public static void beforeAll() {
@@ -81,7 +82,6 @@ public class CompanionFileResourceTests {
     public static void afterAll() {
         wireMockServer.stop();
     }
-
 
     @Test
     @Transactional
@@ -155,7 +155,7 @@ public class CompanionFileResourceTests {
         CompanionFile companionFile = builder.givenANotPersistedCompanionFile(builder.givenAnAbstractImage());
         restCompanionFileControllerMockMvc.perform(post("/api/companionfile.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(companionFile.toJSON()))
+                .content(companionFile.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -169,7 +169,7 @@ public class CompanionFileResourceTests {
     @Transactional
     public void editValidCompanionFile() throws Exception {
         CompanionFile companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
-        JsonObject jsonObject = companionFile.toJsonObject();
+        JsonObject jsonObject = companionFile.toJsonObject(urlApi);
         jsonObject.put("filename", "toto");
         restCompanionFileControllerMockMvc.perform(put("/api/companionfile/{id}.json", companionFile.getId())
                 .contentType(MediaType.APPLICATION_JSON)

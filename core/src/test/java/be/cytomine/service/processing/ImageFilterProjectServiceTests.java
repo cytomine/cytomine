@@ -16,6 +16,7 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.processing.ImageFilterProject;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +36,8 @@ public class ImageFilterProjectServiceTests {
 
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     public void findImageFilterProjectWithSuccess() {
@@ -71,11 +74,10 @@ public class ImageFilterProjectServiceTests {
                 builder.givenAnImageFilter(),
                 builder.givenAProject()
             );
-        CommandResponse commandResponse = imageFilterProjectService.add(imageFilterProject.toJsonObject());
+        CommandResponse commandResponse = imageFilterProjectService.add(imageFilterProject.toJsonObject(urlApi));
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
     }
-
 
     @Test
     public void addAlreadyExistingImageFilterProject() {
@@ -88,7 +90,7 @@ public class ImageFilterProjectServiceTests {
 
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                imageFilterProjectService.add(imageFilterProject.toJsonObject());
+                imageFilterProjectService.add(imageFilterProject.toJsonObject(urlApi));
             }
         );
     }
@@ -102,7 +104,7 @@ public class ImageFilterProjectServiceTests {
             );
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
-                imageFilterProjectService.add(imageFilterProject.toJsonObject().withChange("project", 0L));
+                imageFilterProjectService.add(imageFilterProject.toJsonObject(urlApi).withChange("project", 0L));
             }
         );
     }
@@ -116,7 +118,7 @@ public class ImageFilterProjectServiceTests {
             );
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
-                imageFilterProjectService.add(imageFilterProject.toJsonObject().withChange("imageFilter", 0L));
+                imageFilterProjectService.add(imageFilterProject.toJsonObject(urlApi).withChange("imageFilter", 0L));
             }
         );
     }

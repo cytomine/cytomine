@@ -41,11 +41,11 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -68,6 +68,8 @@ public class AnnotationTermServiceTests {
 
     @Autowired
     WiremockRepository wiremockRepository;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void findAnnotationTermWithSuccess() {
@@ -119,7 +121,7 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
-        CommandResponse commandResponse = annotationTermService.add(annotationTerm.toJsonObject());
+        CommandResponse commandResponse = annotationTermService.add(annotationTerm.toJsonObject(urlApi));
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(annotationTermRepository
@@ -149,10 +151,10 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
-        annotationTermService.add(annotationTerm.toJsonObject());
+        annotationTermService.add(annotationTerm.toJsonObject(urlApi));
         Assertions.assertThrows(
             AlreadyExistException.class,
-            () -> annotationTermService.add(annotationTerm.toJsonObject())
+            () -> annotationTermService.add(annotationTerm.toJsonObject(urlApi))
         );
     }
 
@@ -182,7 +184,7 @@ public class AnnotationTermServiceTests {
         annotationTerm.setTerm(builder.givenATerm(builder.givenAnOntology()));
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> annotationTermService.add(annotationTerm.toJsonObject())
+            () -> annotationTermService.add(annotationTerm.toJsonObject(urlApi))
         );
     }
 
@@ -293,7 +295,7 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
-        JsonObject jsonObject = annotationTerm.toJsonObject();
+        JsonObject jsonObject = annotationTerm.toJsonObject(urlApi);
         jsonObject.put("userannotation", -1L);
         Assertions.assertThrows(ObjectNotFoundException.class, () -> annotationTermService.add(jsonObject));
     }
@@ -303,7 +305,7 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
-        JsonObject jsonObject = annotationTerm.toJsonObject();
+        JsonObject jsonObject = annotationTerm.toJsonObject(urlApi);
         jsonObject.put("term", -1L);
         Assertions.assertThrows(WrongArgumentException.class, () -> annotationTermService.add(jsonObject));
     }

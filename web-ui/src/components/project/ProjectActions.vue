@@ -85,8 +85,8 @@
 
 <script>
 import {OntologyCollection} from '@/api';
-import CytomineModal from '@/components/utils/CytomineModal';
-import RenameModal from '@/components/utils/RenameModal';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
+import RenameModal from '@/components/utils/RenameModal.vue';
 
 export default {
   name: 'project-actions',

@@ -192,29 +192,29 @@
 import {get} from '@/utils/store-helpers';
 import _ from 'lodash';
 
-import ImageName from '@/components/image/ImageName';
-import AnnotationLayer from './AnnotationLayer';
-import RotationSelector from './RotationSelector';
-import ScaleLine from './ScaleLine';
-import DrawTools from './DrawTools';
-import ImageControls from './ImageControls';
-import AnnotationsContainer from './AnnotationsContainer';
+import ImageName from '@/components/image/ImageName.vue';
+import AnnotationLayer from './AnnotationLayer.vue';
+import RotationSelector from './RotationSelector.vue';
+import ScaleLine from './ScaleLine.vue';
+import DrawTools from './DrawTools.vue';
+import ImageControls from './ImageControls.vue';
+import AnnotationsContainer from './AnnotationsContainer.vue';
 
-import InformationPanel from './panels/InformationPanel';
+import InformationPanel from './panels/InformationPanel.vue';
 import MetadataPanel from './panels/MetadataPanel.vue';
-import DigitalZoom from './panels/DigitalZoom';
-import ColorManipulation from './panels/ColorManipulation';
-import LinkPanel from './panels/LinkPanel';
-import LayersPanel from './panels/LayersPanel';
-import OntologyPanel from './panels/OntologyPanel';
-import PropertiesPanel from './panels/PropertiesPanel';
-import FollowPanel from './panels/FollowPanel';
-import ReviewPanel from './panels/ReviewPanel';
+import DigitalZoom from './panels/DigitalZoom.vue';
+import ColorManipulation from './panels/ColorManipulation.vue';
+import LinkPanel from './panels/LinkPanel.vue';
+import LayersPanel from './panels/LayersPanel.vue';
+import OntologyPanel from './panels/OntologyPanel.vue';
+import PropertiesPanel from './panels/PropertiesPanel.vue';
+import FollowPanel from './panels/FollowPanel.vue';
+import ReviewPanel from './panels/ReviewPanel.vue';
 
-import SelectInteraction from './interactions/SelectInteraction';
-import DrawInteraction from './interactions/DrawInteraction';
-import ModifyInteraction from './interactions/ModifyInteraction';
-import ToggleScaleLine from './interactions/ToggleScaleLine';
+import SelectInteraction from './interactions/SelectInteraction.vue';
+import DrawInteraction from './interactions/DrawInteraction.vue';
+import ModifyInteraction from './interactions/ModifyInteraction.vue';
+import ToggleScaleLine from './interactions/ToggleScaleLine.vue';
 
 import {addProj, createProj, getProj} from 'vuelayers/lib/ol-ext';
 
@@ -832,7 +832,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~vuelayers/lib/style.css';
+@import 'vuelayers/lib/style.css';
 
 $backgroundPanelBar: #555;
 $widthPanelBar: 2.8rem;

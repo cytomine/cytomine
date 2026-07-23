@@ -1,4 +1,4 @@
-{{- $secretObj := (lookup "v1" "Secret" .Release.Namespace "repository-secret") | default dict }}
+{{- $secretObj := (lookup "v1" "Secret" .Release.Namespace "core-secret") | default dict }}
 {{- $secretData := (get $secretObj "data") | default dict }}
 apiVersion: apps/v1
 kind: Deployment

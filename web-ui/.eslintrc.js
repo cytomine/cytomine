@@ -5,9 +5,23 @@ module.exports = {
   },
   'extends': [
     'eslint:recommended',
-    'plugin:jest/recommended',
+    'plugin:vitest/legacy-recommended',
     'plugin:vue/essential'
   ],
+  globals: {
+    suite: 'readonly',
+    test: 'readonly',
+    describe: 'readonly',
+    it: 'readonly',
+    expect: 'readonly',
+    assert: 'readonly',
+    vitest: 'readonly',
+    vi: 'readonly',
+    beforeAll: 'readonly',
+    afterAll: 'readonly',
+    beforeEach: 'readonly',
+    afterEach: 'readonly'
+  },
   rules: {
     'array-bracket-spacing': ['error', 'never'],
     'brace-style': ['error', '1tbs'],
@@ -32,8 +46,8 @@ module.exports = {
     }],
     'space-infix-ops': ['error'],
     'space-in-parens': ['error'],
-    'jest/expect-expect': 'off',
-    'jest/no-commented-out-tests': 'off',
-    'jest/no-disabled-tests': 'off',
+    'vitest/expect-expect': 'off',
+    'vitest/no-commented-out-tests': 'off',
+    'vitest/no-disabled-tests': 'off',
   },
 };

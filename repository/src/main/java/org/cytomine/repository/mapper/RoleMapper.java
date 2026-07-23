@@ -12,7 +12,7 @@ import be.cytomine.common.repository.model.command.payload.response.RoleResponse
 import be.cytomine.common.repository.model.role.payload.CreateRole;
 import be.cytomine.common.mapper.BaseMapper;
 
-@Mapper(componentModel = "spring", uses = {BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
 public interface RoleMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})

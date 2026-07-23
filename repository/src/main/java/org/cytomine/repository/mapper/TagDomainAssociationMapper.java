@@ -12,7 +12,7 @@ import be.cytomine.common.repository.model.command.payload.response.TagDomainAss
 import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
 import be.cytomine.common.mapper.BaseMapper;
 
-@Mapper(componentModel = "spring", uses = BaseMapper.class)
+@Mapper(componentModel = "spring", uses = be.cytomine.common.mapper.BaseMapper.class)
 public interface TagDomainAssociationMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})

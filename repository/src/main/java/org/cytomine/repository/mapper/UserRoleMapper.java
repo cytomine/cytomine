@@ -12,7 +12,7 @@ import be.cytomine.common.repository.model.command.payload.response.UserRoleResp
 import be.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
 import be.cytomine.common.mapper.BaseMapper;
 
-@Mapper(componentModel = "spring", uses = {BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
 public interface UserRoleMapper {
     @Mapping(target = "deleted", source = "now")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted"})

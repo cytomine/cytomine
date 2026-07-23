@@ -12,7 +12,7 @@ import be.cytomine.common.repository.model.command.payload.response.TermRelation
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 import be.cytomine.common.mapper.BaseMapper;
 
-@Mapper(componentModel = "spring", uses = BaseMapper.class)
+@Mapper(componentModel = "spring", uses = be.cytomine.common.mapper.BaseMapper.class)
 public interface TermRelationMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})

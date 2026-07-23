@@ -12,7 +12,7 @@ import be.cytomine.common.repository.model.command.payload.request.TagCommandPay
 import be.cytomine.common.repository.model.command.payload.response.TagResponse;
 import be.cytomine.common.repository.model.tag.payload.CreateTag;
 
-@Mapper(componentModel = "spring", uses = {BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
 public interface TagMapper {
 
     @Mapping(target = "id", ignore = true)

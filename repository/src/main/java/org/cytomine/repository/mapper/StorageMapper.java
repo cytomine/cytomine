@@ -12,7 +12,7 @@ import be.cytomine.common.repository.model.command.payload.response.StorageRespo
 import be.cytomine.common.repository.model.storage.payload.CreateStorage;
 import be.cytomine.common.mapper.BaseMapper;
 
-@Mapper(componentModel = "spring", uses = {BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
 public interface StorageMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})

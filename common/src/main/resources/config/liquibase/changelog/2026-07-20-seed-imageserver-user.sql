@@ -1,8 +1,8 @@
 --liquibase formatted sql
 --changeset cytomine:2026-07-20-seed-imageserver-user
 
-INSERT INTO sec_user (username, name, reference, enabled, account_expired, account_locked)
-SELECT 'ImageServer1', 'Image Server', md5('ImageServer1'), true, false, false
+INSERT INTO sec_user (username, name, reference, enabled, account_expired, account_locked, public_key, private_key)
+SELECT 'ImageServer1', 'Image Server', md5('ImageServer1'), true, false, false, gen_random_uuid()::text, gen_random_uuid()::text
 WHERE NOT EXISTS (SELECT 1 FROM sec_user WHERE username = 'ImageServer1');
 
 INSERT INTO sec_user_sec_role (sec_user_id, sec_role_id)
@@ -48,3 +48,9 @@ SELECT nextval('hibernate_sequence'), 2, aoi.id, false, false, true, 16, sid.id
 FROM acl_object_identity aoi, storage s, acl_sid sid
 WHERE aoi.object_id_identity = s.id AND s.name = 'ImageServer1 storage' AND sid.sid = 'ImageServer1'
 AND NOT EXISTS (SELECT 1 FROM acl_entry ae WHERE ae.acl_object_identity = aoi.id AND ae.sid = sid.id AND ae.mask = 16);
+
+--changeset cytomine:2026-07-20-seed-imageserver-user-keys context:test
+UPDATE sec_user
+SET public_key = '9a8b8369-2446-44cb-b0af-604a74e1dcdb',
+    private_key = 'd70607f5-c478-403c-be11-3dbc1716d1cf'
+WHERE username = 'ImageServer1';

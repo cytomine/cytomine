@@ -4,13 +4,13 @@ import Buefy from 'buefy';
 import ImageMultiSelect from '@/components/appengine/forms/fields/array/ImageMultiSelect';
 import SelectableImage from '@/components/image/SelectableImage';
 
-jest.mock('@/utils/image-utils', () => ({
-  isWebPSupported: jest.fn(() => true)
+vi.mock('@/utils/image-utils', () => ({
+  isWebPSupported: vi.fn(() => true)
 }));
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   ImageInstanceCollection: {
-    fetchAll: jest.fn().mockResolvedValue({
+    fetchAll: vi.fn().mockResolvedValue({
       array: [
         {id: 1, name: 'Image 1'},
         {id: 2, name: 'Image 2'},

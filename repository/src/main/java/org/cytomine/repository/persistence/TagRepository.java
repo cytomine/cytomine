@@ -21,7 +21,7 @@ public interface TagRepository extends JpaRepository<TagEntity, Long> {
             JOIN acl_entry ae ON ae.acl_object_identity = aoi.id
             JOIN acl_sid sid ON sid.id = ae.sid
             JOIN sec_user u ON u.username = sid.sid
-            WHERE s.deleted IS NULL AND u.id = :userId
+            WHERE t.deleted IS NULL AND u.id = :userId
             """,
         countQuery = """
             SELECT count(DISTINCT t.id) FROM tag t
@@ -30,7 +30,7 @@ public interface TagRepository extends JpaRepository<TagEntity, Long> {
             JOIN acl_entry ae ON ae.acl_object_identity = aoi.id
             JOIN acl_sid sid ON sid.id = ae.sid
             JOIN sec_user u ON u.username = sid.sid
-            WHERE s.deleted IS NULL AND u.id = :userId
+            WHERE t.deleted IS NULL AND u.id = :userId
             """,
         nativeQuery = true
     )

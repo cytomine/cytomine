@@ -4,18 +4,18 @@ import Buefy from 'buefy';
 import ArrayField from '@/components/appengine/forms/fields/ArrayField';
 import ArrayModal from '@/components/appengine/forms/fields/array/ArrayModal';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(),
+        get: vi.fn(),
       },
     },
   },
 }));
 
-jest.mock('@/utils/image-utils', () => ({
-  isWebPSupported: jest.fn(() => true)
+vi.mock('@/utils/image-utils', () => ({
+  isWebPSupported: vi.fn(() => true)
 }));
 
 describe('ArrayField.vue', () => {

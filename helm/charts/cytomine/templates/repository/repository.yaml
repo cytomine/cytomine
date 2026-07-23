@@ -92,9 +92,15 @@ spec:
             - name: POSTGIS_DB_NAME
               value: {{ .Values.postgresql.database }}
             - name:  IMAGE_SERVER_PRIVATE_KEY
-              value: {{ get $secretData "IMAGE_SERVER_PRIVATE_KEY" | default (uuidv4 | b64enc) | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: core-secret
+                  key: IMAGE_SERVER_PRIVATE_KEY
             - name: IMAGE_SERVER_PUBLIC_KEY
-              value: {{ get $secretData "IMAGE_SERVER_PUBLIC_KEY" | default (uuidv4 | b64enc) | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: core-secret
+                  key: IMAGE_SERVER_PUBLIC_KEY
 
           volumeMounts:
             - name: temp

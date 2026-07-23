@@ -106,4 +106,34 @@
 
     <include file="/config/liquibase/changelog/2026-06-26-command-parent.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-08-sec-role-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-09-sec-user-sec-role-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-10-user-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-13-version-created-defaults.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-14-remove-ontology-name-constraint.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-15-tag-id-sequence.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-20-seed-roles.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-20-seed-image-filters.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-20-seed-imageserver-user.sql"
+             relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-20-seed-test-users.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

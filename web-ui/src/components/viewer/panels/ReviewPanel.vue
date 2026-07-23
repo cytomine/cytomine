@@ -102,9 +102,9 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import Username from '@/components/user/Username';
-import ListUsernames from '@/components/user/ListUsernames';
-import CytomineTask from '@/components/utils/CytomineTask';
+import Username from '@/components/user/Username.vue';
+import ListUsernames from '@/components/user/ListUsernames.vue';
+import CytomineTask from '@/components/utils/CytomineTask.vue';
 import {User, Task, AnnotationCollection} from '@/api';
 
 export default {

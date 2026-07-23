@@ -72,9 +72,9 @@
 import {get} from '@/utils/store-helpers';
 
 import {AnnotationComment} from '@/api';
-import DomainTagInput from '@/components/utils/DomainTagInput';
+import DomainTagInput from '@/components/utils/DomainTagInput.vue';
 
-import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
   name: 'annotation-comments-modal',

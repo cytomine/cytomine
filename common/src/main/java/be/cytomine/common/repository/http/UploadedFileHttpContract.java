@@ -19,9 +19,7 @@ import be.cytomine.common.repository.model.command.payload.response.UploadedFile
 import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 
-import static be.cytomine.common.repository.http.UploadedFileHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(UploadedFileHttpContract.ROOT_PATH)
 public interface UploadedFileHttpContract {
     String ROOT_PATH = "/uploaded-files";
 

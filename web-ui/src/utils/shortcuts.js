@@ -1,4 +1,5 @@
-const {detect} = require('detect-browser');
+import {detect} from 'detect-browser';
+
 const browser = detect();
 const shortkey = (browser && browser.os === 'Mac OS') ? 'meta' : 'ctrl';
 

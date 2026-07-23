@@ -26,6 +26,7 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -67,12 +68,12 @@ public class UndoStackItem extends CytomineDomain {
     }
 
     @Override
-    public String toJSON() {
+    public String toJSON(UrlApi urlApi) {
         return getDataFromDomain(this).toJsonString();
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 }

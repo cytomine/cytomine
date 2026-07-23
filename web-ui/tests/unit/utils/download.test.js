@@ -40,24 +40,24 @@ describe('triggerBlobDownload()', () => {
   let anchorMock;
 
   beforeEach(() => {
-    createObjectURLMock = jest.fn().mockReturnValue(mockUrl);
-    revokeObjectURLMock = jest.fn();
+    createObjectURLMock = vi.fn().mockReturnValue(mockUrl);
+    revokeObjectURLMock = vi.fn();
     window.URL.createObjectURL = createObjectURLMock;
     window.URL.revokeObjectURL = revokeObjectURLMock;
 
     anchorMock = {
-      click: jest.fn(),
-      remove: jest.fn(),
+      click: vi.fn(),
+      remove: vi.fn(),
       href: '',
       download: '',
     };
 
-    jest.spyOn(document, 'createElement').mockReturnValue(anchorMock);
-    jest.spyOn(document.body, 'appendChild').mockImplementation(() => {});
+    vi.spyOn(document, 'createElement').mockReturnValue(anchorMock);
+    vi.spyOn(document.body, 'appendChild').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('should create an object URL from the blob', () => {

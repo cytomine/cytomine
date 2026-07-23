@@ -2,26 +2,30 @@ package be.cytomine.controller.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import be.cytomine.common.repository.http.RoleHttpContract;
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
+import be.cytomine.common.repository.http.TagHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.http.UploadedFileHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.http.UserRoleHttpContract;
 import be.cytomine.common.repository.utils.SpringPage;
 
 @Configuration
@@ -33,18 +37,22 @@ public class RepositoryClient {
     // Not sure if it should or not be shared between each client instance.
     @Bean
     RestClient repositoryRestClient() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new Jdk8Module());
-        objectMapper.registerModule(new JavaTimeModule());
-
         SimpleModule module = new SimpleModule();
         module.addAbstractTypeMapping(Page.class, SpringPage.class);
-        objectMapper.registerModule(module);
+
+        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
+            .modulesToInstall(module)
+            .build();
 
         return RestClient.builder()
             .baseUrl(repositoryURL)
             .messageConverters(converters -> converters.addFirst(new MappingJackson2HttpMessageConverter(objectMapper)))
             .build();
+    }
+
+    @Bean
+    CommandHttpContract  commandHttpContract(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, CommandHttpContract.class);
     }
 
     @Bean
@@ -78,17 +86,38 @@ public class RepositoryClient {
     }
 
     @Bean
+    RoleHttpContract roleServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, RoleHttpContract.class);
+    }
+
+    @Bean
     ReviewedAnnotationHttpContract reviewedAnnotationClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, ReviewedAnnotationHttpContract.class);
     }
 
-    @Bean TagDomainAssociationHttpContract tagDomainAssociationClient(RestClient repositoryRestClient) {
+    @Bean
+    TagHttpContract tagHttpContract(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, TagHttpContract.class);
+    }
+
+    @Bean
+    TagDomainAssociationHttpContract tagDomainAssociationClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, TagDomainAssociationHttpContract.class);
     }
 
     @Bean
     UploadedFileHttpContract uploadedFileServiceClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, UploadedFileHttpContract.class);
+    }
+
+    @Bean
+    UserRoleHttpContract userRoleServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, UserRoleHttpContract.class);
+    }
+
+    @Bean
+    UserHttpContract userServiceClient(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, UserHttpContract.class);
     }
 
     private <T> T createClient(RestClient repositoryRestClient, Class<T> repoType) {

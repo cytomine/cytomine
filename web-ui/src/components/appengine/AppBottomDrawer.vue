@@ -77,9 +77,9 @@
 
 <script>
 import Task from '@/utils/appengine/task';
-import TaskInputForm from '@/components/appengine/forms/TaskInputForm';
+import TaskInputForm from '@/components/appengine/forms/TaskInputForm.vue';
 import TaskRun from '@/utils/appengine/task-run';
-import TaskRunTable from '@/components/appengine/task-run/TaskRunTable';
+import TaskRunTable from '@/components/appengine/task-run/TaskRunTable.vue';
 import {get} from '@/utils/store-helpers';
 
 export default {

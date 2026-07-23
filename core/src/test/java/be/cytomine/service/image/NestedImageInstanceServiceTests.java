@@ -40,12 +40,12 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -71,7 +71,8 @@ public class NestedImageInstanceServiceTests {
 
     @Autowired
     EntityManager entityManager;
-
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void listAllNestedImageImageByImageInstance() {
@@ -111,7 +112,7 @@ public class NestedImageInstanceServiceTests {
     void addValidNestedImageInstanceWithSuccess() {
         NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
 
-        CommandResponse commandResponse = nestedImageInstanceService.add(nestedImageInstance.toJsonObject());
+        CommandResponse commandResponse = nestedImageInstanceService.add(nestedImageInstance.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -120,13 +121,12 @@ public class NestedImageInstanceServiceTests {
         NestedImageInstance created = nestedImageInstanceService.find(commandResponse.getObject().getId()).get();
     }
 
-
     @Test
     void addAlreadyExistingNestedImageInstanceFails() {
         NestedImageInstance nestedImageInstance = builder.givenANestedImageInstance();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("id", null));
+                nestedImageInstanceService.add(nestedImageInstance.toJsonObject(urlApi).withChange("id", null));
             }
         );
     }
@@ -136,7 +136,7 @@ public class NestedImageInstanceServiceTests {
         NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("baseImage", null));
+                nestedImageInstanceService.add(nestedImageInstance.toJsonObject(urlApi).withChange("baseImage", null));
             }
         );
     }
@@ -146,7 +146,7 @@ public class NestedImageInstanceServiceTests {
         NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("parent", null));
+                nestedImageInstanceService.add(nestedImageInstance.toJsonObject(urlApi).withChange("parent", null));
             }
         );
     }
@@ -156,7 +156,7 @@ public class NestedImageInstanceServiceTests {
         NestedImageInstance nestedImageInstance = builder.givenANotPersistedNestedImageInstance();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
-                nestedImageInstanceService.add(nestedImageInstance.toJsonObject().withChange("project", null));
+                nestedImageInstanceService.add(nestedImageInstance.toJsonObject(urlApi).withChange("project", null));
             }
         );
     }
@@ -170,7 +170,7 @@ public class NestedImageInstanceServiceTests {
         nestedImageInstance.setProject(project1);
         nestedImageInstance = builder.persistAndReturn(nestedImageInstance);
 
-        JsonObject jsonObject = nestedImageInstance.toJsonObject();
+        JsonObject jsonObject = nestedImageInstance.toJsonObject(urlApi);
         jsonObject.put("project", project2.getId());
 
         CommandResponse commandResponse = nestedImageInstanceService.edit(jsonObject, true);

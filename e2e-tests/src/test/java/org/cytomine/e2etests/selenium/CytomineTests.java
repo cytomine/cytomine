@@ -130,6 +130,26 @@ public class CytomineTests {
     }
 
     @Test
+    void manageTagsInAdminPanel() {
+        String firstTagName = "selenium-tag-a-" + randomUUID();
+        String secondTagName = "selenium-tag-b-" + randomUUID();
+        String renamedTagName = "selenium-tag-renamed-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createTag(wait, cytomineUrl, firstTagName);
+        cytomineSteps.createTag(wait, cytomineUrl, secondTagName);
+
+        cytomineSteps.sortTags(wait, cytomineUrl, firstTagName, secondTagName);
+        cytomineSteps.changeTagsPerPage(wait, cytomineUrl, 10, firstTagName, secondTagName);
+
+        cytomineSteps.editTag(wait, cytomineUrl, firstTagName, renamedTagName);
+
+        cytomineSteps.deleteTag(wait, cytomineUrl, renamedTagName);
+        cytomineSteps.deleteTag(wait, cytomineUrl, secondTagName);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
     void createAndDeleteProject() {
         String projectName = "selenium-" + randomUUID();
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
@@ -210,6 +230,23 @@ public class CytomineTests {
         cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
+    void addImageToStorageAndSort() {
+        Set<String> imageNames = Set.of(
+            "selenium-" + randomUUID() + ".png",
+            "selenium-" + randomUUID() + ".png",
+            "selenium-" + randomUUID() + ".png"
+        );
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        imageNames.forEach(name -> cytomineSteps.addImage(wait, cytomineUrl, name, Optional.empty()));
+
+        cytomineSteps.sortImagesInStorage(wait, cytomineUrl, imageNames);
+
+        imageNames.forEach(name -> cytomineSteps.deleteImage(wait, cytomineUrl, name));
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
@@ -584,6 +621,22 @@ public class CytomineTests {
         cytomineSteps.deleteProject(wait, projectUrl);
         cytomineSteps.deleteOntology(wait, ontologyUrl);
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
+    void undoCommand() {
+        String ontologyName = "selenium-" + randomUUID();
+        String renamedOntologyName = "selenium-renamed-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        String ontologyUrl = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
+        cytomineSteps.renameOntology(wait, ontologyUrl, renamedOntologyName);
+
+        cytomineSteps.undoCommandFromHistory(wait, cytomineUrl, "Update", renamedOntologyName);
+        cytomineSteps.verifyOntologyName(wait, ontologyUrl, ontologyName);
+
+        cytomineSteps.deleteOntology(wait, ontologyUrl);
         cytomineSteps.logout(wait, cytomineUrl);
     }
 }

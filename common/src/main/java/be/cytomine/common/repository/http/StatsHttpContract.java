@@ -14,9 +14,7 @@ import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
 import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 
-import static be.cytomine.common.repository.http.StatsHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(StatsHttpContract.ROOT_PATH)
 public interface StatsHttpContract {
     String ROOT_PATH = "/stats";
 

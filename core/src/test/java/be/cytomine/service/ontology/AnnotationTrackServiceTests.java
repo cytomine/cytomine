@@ -34,11 +34,11 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.ontology.AnnotationTrackRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -61,7 +61,8 @@ public class AnnotationTrackServiceTests {
 
     @Autowired
     TransactionService transactionService;
-
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void getAnnotationTrackWithSuccess() {
@@ -94,7 +95,6 @@ public class AnnotationTrackServiceTests {
         assertThat(annotationTrackService.find(annotation, annotationTrack.getTrack()).isPresent());
     }
 
-
     @Test
     void listAllAnnotationTrackByTrack() {
         AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
@@ -115,7 +115,7 @@ public class AnnotationTrackServiceTests {
     void addValidAnnotationTrackWithSuccess() {
         AnnotationTrack annotationTrack = builder.givenANotPersistedAnnotationTrack();
 
-        CommandResponse commandResponse = annotationTrackService.add(annotationTrack.toJsonObject());
+        CommandResponse commandResponse = annotationTrackService.add(annotationTrack.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -127,7 +127,7 @@ public class AnnotationTrackServiceTests {
 
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                annotationTrackService.add(annotationTrack.toJsonObject()
+                annotationTrackService.add(annotationTrack.toJsonObject(urlApi)
                     .withChange("id", null));
             }
         );

@@ -25,6 +25,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -37,7 +39,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import be.cytomine.common.repository.utils.Language;
 import be.cytomine.domain.CytomineDomain;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Table(name = "sec_user", uniqueConstraints = @UniqueConstraint(name = "unique_reference", columnNames = {"reference"}))
@@ -79,6 +83,7 @@ public class User extends CytomineDomain {
     protected String email;
 
     @Deprecated
+    @Enumerated(EnumType.STRING)
     protected Language language;
 
     @Deprecated
@@ -183,12 +188,12 @@ public class User extends CytomineDomain {
     }
 
     @Override
-    public String toJSON() {
+    public String toJSON(UrlApi urlApi) {
         return getDataFromDomain(this).toJsonString();
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

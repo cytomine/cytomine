@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import Username from './Username';
+import Username from './Username.vue';
 export default {
   name: 'list-usernames',
   components: {Username},

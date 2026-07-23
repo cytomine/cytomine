@@ -6,9 +6,9 @@ import ActivityLogs from '@/components/utils/ActivityLogs';
 import ActivityLogsItem from '@/components/utils/ActivityLogsItem';
 import {Project} from '@/api';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Project: {
-    fetchCommandHistory: jest.fn()
+    fetchCommandHistory: vi.fn()
   }
 }));
 
@@ -27,7 +27,7 @@ describe('ActivityLogs.vue', () => {
   let wrapper;
 
   beforeAll(() => {
-    localVue.filter('moment', jest.fn((value, format) => moment(Number(value)).format(format)));
+    localVue.filter('moment', vi.fn((value, format) => moment(Number(value)).format(format)));
   });
 
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe('ActivityLogs.vue', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render the loading state correctly', async () => {

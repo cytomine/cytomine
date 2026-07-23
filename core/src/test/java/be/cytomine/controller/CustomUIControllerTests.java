@@ -151,7 +151,6 @@ public class CustomUIControllerTests {
             .andExpect(jsonPath("$.project-jobs-tab").value(false));
     }
 
-
     @Test
     @Transactional
     @WithMockUser(username = "superadmin")
@@ -163,7 +162,6 @@ public class CustomUIControllerTests {
             .andExpect(jsonPath("$.project-explore-hide-tools.ADMIN_PROJECT").value(true))
             .andExpect(jsonPath("$.project-jobs-tab.CONTRIBUTOR_PROJECT").value(false));
     }
-
 
     @Test
     @Transactional

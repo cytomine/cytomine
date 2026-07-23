@@ -49,9 +49,9 @@
 </template>
 
 <script>
-import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 import AnnotationProfileChart from '@/components/charts/AnnotationProfileChart';
-import AnnotationProfileProjectionTable from '@/components/viewer/AnnotationProfileProjectionTable';
+import AnnotationProfileProjectionTable from '@/components/viewer/AnnotationProfileProjectionTable.vue';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers';
 

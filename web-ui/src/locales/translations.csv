@@ -3,6 +3,7 @@ about-cytomine,About Cytomine,À propos de Cytomine,Sobre Cytomine,Over Cytomine
 absolute-link-mode,Absolute,Absolu,,Absoluut
 access-denied,Access denied,Accès non autorisé,Acceso denegado,Verboden Acces
 account,Account,Compte,Cuenta,Rekening
+action,Action,Action,Acción,Actie
 actions,Actions,Actions,Acciones,Acties
 active-projects,Active projects,Projets actifs,Proyectos activos,Actieve projecten
 activity-chart-info-message,This chart presents the activity performed in the selected period,Ce graphique présente un résumé de l'activité ayant eu lieu durant la période sélectionnée,Este gráfico presenta la actividad en el período seleccionado,Deze grafiek toont een samenvatting van de activiteit die plaatsvond tijdens de geselecteerde periode
@@ -699,7 +700,6 @@ notif-error-track-creation,Failed to create the track,Erreur durant la création
 notif-error-track-deletion,Failed to delete the track.,Erreur lors de la suppression de la trace,,Fout bij verwijderen van de track
 notif-error-track-update,Failed to update the track,Erreur durant la modification de la trace,,Fout bij het wijzigen van de track
 notif-error-tracked-user-position,Failed to retrieve the position of the followed user,Erreur lors de la récupération de la position de l'utilisateur suivi,Error al recuperar la posición del usuario seguido,Fout bij het ophalen van de positie van de gevolgde user
-notif-error-undo,Failed to undo last action,Une erreur a empêché d'annuler la dernière action,No se pudo deshacer la última acción,Een fout verhinderde het ongedaan maken van de laatste actie
 notif-error-unvalidate-review,Failed to unvalidate the image review,Une erreur a empêché d'annuler la validation de l'image,No se pudo invalidar la revisión de la imagen,Een fout verhinderde het ongedaan maken van de afbeeldingsreview
 notif-error-update-description,Failed to update description,Une erreur a empêché de sauvegarder la description,Error al actualizar la descripción,Een fout verhinderde het opslaan van de beschrijving
 notif-error-user-creation,Failed to create the user,Une erreur a empêché la création de l'utilisateur,Error al crear el usuario,Een fout verhinderde het aanmaken van de user
@@ -759,13 +759,16 @@ notify-error-app-deletion,Failed to delete the app,Échec de la suppression de l
 notify-error-app-deletion-forbidden,Only admin can delete apps,Seul l'administrateur peut supprimer des applications,Solo el administrador puede eliminar aplicaciones,Alleen admin kan apps verwijderen
 notify-error-app-installation,Failed to install the app,Échec de l'installation de l'application,Error al instalar la aplicación,Installatie van de app mislukt
 notify-error-empty-list,The list is empty,La liste est vide,La lista está vacía,De lijst is leeg
+notify-error-fetch-tag,Failed to fetch the tags,Une erreur a empêché de récupérer les tags,Error al obtener las etiquetas,Een fout verhinderde het ophalen van de tags
 notify-error-not-enough-item,Not enough items provided,Pas assez d'éléments fournis,No se han proporcionado suficientes elementos,Niet genoeg items verstrekt
+notify-error-undo,Failed to undo last action,Une erreur a empêché d'annuler la dernière action,No se pudo deshacer la última acción,Een fout verhinderde het ongedaan maken van de laatste actie
 notify-success-app-deletion,App deleted successfully,Application supprimée avec succès,Aplicación eliminada con éxito,App succesvol verwijderd
 notify-success-app-installation,App installed successfully,Application installée avec succès,Aplicación instalada con éxito,App succesvol geïnstalleerd
 notify-success-app-store-addition,App store added successfully,Magasin d'applications ajouté avec succès,Tienda de aplicaciones añadida con éxito,App store succesvol toegevoegd
 notify-success-app-store-deletion,App store deleted successfully,Magasin d'applications supprimé avec succès,Tienda de aplicaciones eliminada con éxito,App store succesvol verwijderd
 notify-success-create-array-inputs,The array was successfully provisioned,Le tableau a été approvisionné avec succès,La matriz se aprovisionó correctamente,De array is succesvol ingericht
 notify-success-task-upload,The task has been successfully uploaded,La tâche a été chargée avec succès,La tarea se ha cargado con éxito,De taak is succesvol geüpload
+notify-success-undo,Action undone,Action annulée,Acción deshecha,Actie ongedaan gemaakt
 number-annotation-creations,Number of annotation creations,Nombre d'annotations créées,Número de anotaciones creadas,Aantal aangemaakte annotaties
 number,Number,Nombre,Número,Nummer
 number-annotations-chart-info-message,This chart presents the number of annotation creations during the selected period,Ce graphique présente le nombre d'annotations créées durant la période sélectionnée,Este gráfico presenta el número de anotaciones creadas durante el período seleccionado.,Deze grafiek toont het aantal annotaties dat tijdens de geselecteerde periode is gemaakt
@@ -800,6 +803,7 @@ operating-system,Operating system,Système d'exploitation,Sistema operativo,Oper
 open-images-from-to,Open images from {from} to {to},Ouvrir les images {from} à {to},Abrir imágenes de {from} a {to},Afbeeldingen openen van {van} tot {tot}
 optional-parameters,Optional parameters,Paramètres optionnels,Parámetros opcionales,Optionele parameters
 open-source-project,Open-source project,Projet open-source,Proyecto de código abierto,Open source-project
+operation,Operation,Opération,Operación,Bewerking
 orange,Orange,Orange,Naranja,Oranje
 open-view-select-annot-to-link,Open another view with an image from the same image group and select annotation to link with.,Une nouvelle vue avec une image du même groupe d'images doit être ouverte avec l'annotation à lier sélectionnée.,Abra otra vista con una imagen del mismo grupo de imágenes y seleccione la anotación para vincularla.,Open een andere weergave met een afbeelding uit dezelfde afbeeldingsgroep en selecteer een annotatie om mee te linken.
 original-no-filter,Original (no filter),Pas de filtre,Original (sin filtro),Geen filter
@@ -1116,8 +1120,9 @@ use-existing-image-group,Use existing image group,Utiliser un groupe d'images ex
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante,Usar ontología existente,Gebruik een bestaande ontologie
 used-in-project-no-access,Used in projects that you are not allowed to see,Utilisée dans des projets auxquels vous n'avez pas accès,Usado en proyectos que no puedes ver,Wordt gebruikt in projecten waartoe u geen toegang heeft
 used-storage-space,Used storage space,Espace de stockage utilisé,Espacio de almacenamiento utilizado,Opslagruimte gebruikt
-user-annotations,Manual Annotations,Annotations manuelles,Anotaciones manuales,Handmatige annotaties
 user,User,Utilisateur,Usuario,Users
+user-annotations,Manual Annotations,Annotations manuelles,Anotaciones manuales,Handmatige annotaties
+user-history,User history,Historique de l'utilisateur,Historial del usuario,Gebruikersgeschiedenis van de gebruiker
 username,Username,Nom d'utilisateur,Nombre de usuario,Usersnaam
 users,Users,Utilisateurs,Usuarios,Users
 validate-annotation,Validate annotation,Valider l'annotation,Validar anotación,Annotatie valideren

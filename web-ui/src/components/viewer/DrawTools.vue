@@ -450,13 +450,13 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import OntologyTree from '@/components/ontology/OntologyTree';
-import TrackTree from '@/components/track/TrackTree';
-import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
-import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
-import IconUnlinkAnnotations from '@/components/icons/IconUnlinkAnnotations';
-import PasteAnnotationWithLinkModal from '@/components/viewer/interactions/PasteAnnotationWithLinkModal';
-import AnnotationLinkSelector from '@/components/viewer/interactions/AnnotationLinkSelector';
+import OntologyTree from '@/components/ontology/OntologyTree.vue';
+import TrackTree from '@/components/track/TrackTree.vue';
+import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand.vue';
+import IconLineFreeHand from '@/components/icons/IconLineFreeHand.vue';
+import IconUnlinkAnnotations from '@/components/icons/IconUnlinkAnnotations.vue';
+import PasteAnnotationWithLinkModal from '@/components/viewer/interactions/PasteAnnotationWithLinkModal.vue';
+import AnnotationLinkSelector from '@/components/viewer/interactions/AnnotationLinkSelector.vue';
 
 import WKT from 'ol/format/WKT';
 import {containsExtent, getCenter, getIntersection} from 'ol/extent';
@@ -1002,7 +1002,7 @@ export default {
         this.$store.commit(this.imageModule + 'undoAction', opposedAction);
       } catch (err) {
         console.log(err);
-        this.$notify({type: 'error', text: this.$t('notif-error-undo')});
+        this.$notify({type: 'error', text: this.$t('notify-error-undo')});
       }
     },
     async redo() {

@@ -1,0 +1,25 @@
+package org.cytomine.repository.persistence;
+
+import java.util.Optional;
+import java.util.Set;
+
+import org.cytomine.repository.persistence.entity.UserRoleEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+public interface UserRoleRepository extends JpaRepository<UserRoleEntity, Long> {
+
+    Optional<UserRoleEntity> findByIdAndDeletedNull(long id);
+
+    Page<UserRoleEntity> findAllBySecUserIdAndDeletedNull(long secUserId, Pageable pageable);
+
+    Optional<UserRoleEntity> findBySecUserIdAndSecRoleIdAndDeletedNull(long secUserId, long secRoleId);
+
+    Set<UserRoleEntity> findAllBySecUserId(long userId);
+
+    @Query(value = "SELECT s.id FROM sec_user_sec_role s WHERE s.sec_user_id = :targetUserId AND s.deleted IS NULL",
+        nativeQuery = true)
+    Set<Long> findAllIdsSecBySecUserId(long targetUserId);
+}

@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -63,8 +64,8 @@ public class NestedImageInstance extends ImageInstance {
         return nestedImageInstance;
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = ImageInstance.getDataFromDomain(domain);
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
+        JsonObject returnArray = ImageInstance.getDataFromDomain(domain, urlApi);
         NestedImageInstance nestedImageInstance = (NestedImageInstance) domain;
         returnArray.put("parent", nestedImageInstance.getParentId());
         returnArray.put("x", nestedImageInstance.getX());
@@ -77,8 +78,8 @@ public class NestedImageInstance extends ImageInstance {
     }
 
     @Override
-    public JsonObject toJsonObject() {
-        return getDataFromDomain(this);
+    public JsonObject toJsonObject(UrlApi urlApi) {
+        return getDataFromDomain(this, urlApi);
     }
 
 }

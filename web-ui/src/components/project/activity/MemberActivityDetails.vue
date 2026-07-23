@@ -244,14 +244,14 @@ import {get} from '@/utils/store-helpers';
 
 import {User, ProjectConnectionCollection, ImageConsultationCollection} from '@/api';
 
-import CytomineDatepicker from '@/components/form/CytomineDatepicker';
-import ProjectConnectionDetails from '@/components/project/ProjectConnectionDetails';
+import CytomineDatepicker from '@/components/form/CytomineDatepicker.vue';
+import ProjectConnectionDetails from '@/components/project/ProjectConnectionDetails.vue';
 import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 
 import constants from '@/utils/constants.js';
 
 import moment from 'moment';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 import {appendShortTermToken} from '@/utils/token-utils.js';
 
 

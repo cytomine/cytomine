@@ -50,7 +50,7 @@ limitations under the License.-->
 <script>
 import {get} from '@/utils/store-helpers';
 
-import AnnotationPreview from '@/components/annotations/AnnotationPreview';
+import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 import constants from '@/utils/constants';
 
 import {Annotation} from '@/api';

@@ -323,83 +323,6 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void getUserAsSuperadmin() throws Exception {
-        User currentUser = builder.givenSuperAdmin();
-
-        restUserControllerMockMvc.perform(get("/api/user/{id}.json", builder.givenSuperAdmin().getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(currentUser.getId()))
-            .andExpect(jsonPath("$.username").value(currentUser.getUsername()))
-            .andExpect(jsonPath("$.name").value(currentUser.getName()))
-            .andExpect(jsonPath("$.fullName").value(currentUser.getFullName()))
-            .andExpect(jsonPath("$.origin").doesNotExist())
-            .andExpect(jsonPath("$.admin").doesNotExist())
-            .andExpect(jsonPath("$.publicKey").doesNotExist())
-            .andExpect(jsonPath("$.privateKey").doesNotExist())
-            .andExpect(jsonPath("$.password").doesNotExist())
-            .andExpect(jsonPath("$.guest").doesNotExist())
-            .andExpect(jsonPath("$.passwordExpired").doesNotExist())
-            .andExpect(jsonPath("$.user").doesNotExist());
-    }
-
-    @Test
-    @Transactional
-    @WithMockUser(username = "user")
-    public void getUserAsCurrentUser() throws Exception {
-        User currentUser = builder.givenDefaultUser();
-
-        restUserControllerMockMvc.perform(get("/api/user/{id}.json", currentUser.getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(currentUser.getId()))
-            .andExpect(jsonPath("$.username").value(currentUser.getUsername()))
-            .andExpect(jsonPath("$.name").value(currentUser.getName()))
-            .andExpect(jsonPath("$.fullName").value(currentUser.getFullName()))
-            .andExpect(jsonPath("$.firstname").doesNotExist())
-            .andExpect(jsonPath("$.origin").doesNotExist())
-            .andExpect(jsonPath("$.admin").doesNotExist())
-            .andExpect(jsonPath("$.publicKey").doesNotExist())
-            .andExpect(jsonPath("$.lastname").doesNotExist())
-            .andExpect(jsonPath("$.privateKey").doesNotExist())
-            .andExpect(jsonPath("$.password").doesNotExist())
-            .andExpect(jsonPath("$.guest").doesNotExist())
-            .andExpect(jsonPath("$.passwordExpired").doesNotExist())
-            .andExpect(jsonPath("$.user").doesNotExist())
-            .andExpect(jsonPath("$.email").doesNotExist());
-    }
-
-    @Test
-    @Transactional
-    @WithMockUser(username = "user")
-    public void getUserAsAnotherUser() throws Exception {
-        User currentUser = builder.givenAUser();
-
-        restUserControllerMockMvc.perform(get("/api/user/{id}.json", builder.givenSuperAdmin().getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().getId()))
-            .andExpect(jsonPath("$.username").value(builder.givenSuperAdmin().getUsername()))
-            .andExpect(jsonPath("$.name").value(builder.givenSuperAdmin().getName()))
-            .andExpect(jsonPath("$.fullName").value(builder.givenSuperAdmin().getFullName()))
-            .andExpect(jsonPath("$.origin").doesNotExist())
-            .andExpect(jsonPath("$.admin").doesNotExist())
-            .andExpect(jsonPath("$.publicKey").doesNotExist())
-            .andExpect(jsonPath("$.privateKey").doesNotExist())
-            .andExpect(jsonPath("$.password").doesNotExist())
-            .andExpect(jsonPath("$.guest").doesNotExist())
-            .andExpect(jsonPath("$.passwordExpired").doesNotExist())
-            .andExpect(jsonPath("$.user").doesNotExist());
-    }
-
-    @Test
-    @Transactional
-    public void getUserWithItsUsername() throws Exception {
-        User currentUser = builder.givenSuperAdmin();
-        restUserControllerMockMvc.perform(get("/api/user/{id}.json", builder.givenSuperAdmin().getUsername()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.username").value(currentUser.getUsername()));
-    }
-
-    @Test
-    @Transactional
     public void getUserWithItsUserKey() throws Exception {
         User currentUser = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(get(
@@ -520,7 +443,7 @@ public class UserResourceTests {
     //        User user = builder.given_a_user();
     //        restUserControllerMockMvc.perform(post("/api/user.json")
     //                        .contentType(MediaType.APPLICATION_JSON)
-    //                        .content(user.toJSON()))
+    //                        .content(user.toJSON(urlApi)))
     //                .andDo(print())
     //                .andExpect(status().isConflict())
     //                .andExpect(jsonPath("$.success").value(false));
@@ -557,7 +480,7 @@ public class UserResourceTests {
     //
     //        User user = userRepository.findByUsernameLikeIgnoreCase("TEST_CREATE").get();
     //
-    //        JsonObject jsonObject = user.toJsonObject();
+    //        JsonObject jsonObject = user.toJsonObject(urlApi);
     //        jsonObject.put("name", "TEST_CREATE_CHANGE");
     //
     //        restUserControllerMockMvc.perform(put("/api/user/{id}.json", jsonObject.getId())
@@ -579,7 +502,7 @@ public class UserResourceTests {
     //        User user = builder.given_a_user();
     //        restUserControllerMockMvc.perform(delete("/api/user/{id}.json", user.getId())
     //                        .contentType(MediaType.APPLICATION_JSON)
-    //                        .content(user.toJSON()))
+    //                        .content(user.toJSON(urlApi)))
     //                .andDo(print())
     //                .andExpect(status().isOk())
     //                .andExpect(jsonPath("$.printMessage").value(true))

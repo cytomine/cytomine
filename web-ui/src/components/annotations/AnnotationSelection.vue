@@ -40,8 +40,8 @@
 import {AnnotationCollection} from '@/api';
 import {get} from '@/utils/store-helpers';
 
-import CytomineModal from '@/components/utils/CytomineModal';
-import SelectableAnnotation from '@/components/annotations/SelectableAnnotation';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
+import SelectableAnnotation from '@/components/annotations/SelectableAnnotation.vue';
 
 export default {
   name: 'AnnotationSelection',

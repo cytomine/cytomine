@@ -46,6 +46,7 @@ spring:
 
   liquibase:
     change-log: classpath:config/liquibase/master.xml
+    contexts: test
 
   data:
     mongodb:

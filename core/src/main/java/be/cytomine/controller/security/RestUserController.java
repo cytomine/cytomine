@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -130,7 +127,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Project", id));
         ImageInstance image = imageInstanceService.find(idImage).orElse(null);
 
-        return responseSuccess(userService.listLayers(project, image), isFilterRequired());
+        return responseSuccess(userService.listLayers(project), isFilterRequired());
 
     }
 
@@ -146,20 +143,6 @@ public class RestUserController extends RestCytomineController {
             userService.list(retrieveSearchParameters(), sortColumn, sortDirection, max, offset),
             isFilterRequired()
         );
-    }
-
-    @GetMapping("/user/{id}.json")
-    public ResponseEntity<String> getUser(
-        @PathVariable String id
-    ) {
-        log.debug("REST request to get User : {}", id);
-
-        Optional<User> user = userService.find(id);
-        if (user.isEmpty()) {
-            user = userService.findByUsername(id);
-        }
-
-        return user.map(u -> responseSuccess(u, isFilterRequired())).orElseGet(() -> responseNotFound("User", id));
     }
 
     /**
@@ -226,25 +209,6 @@ public class RestUserController extends RestCytomineController {
     ) {
         log.debug("REST request to get current User");
         return responseSuccess(currentUserService.getCurrentUser());
-    }
-
-    @PostMapping("/user.json")
-    public ResponseEntity<String> createUser(@RequestBody String json) {
-        log.debug("REST request to save User : " + json);
-        return add(userService, json);
-    }
-
-    @PutMapping("/user/{id}.json")
-    public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody JsonObject json) {
-        log.debug("REST request to update User : {}", id);
-        return update(userService, json);
-    }
-
-    //TODO IAM: refactor so that only ADMIN role can delete IAM ACCOUNT
-    @DeleteMapping("/user/{id}.json")
-    public ResponseEntity<String> deleteUser(@PathVariable String id) {
-        log.debug("REST request to delete User: {}", id);
-        return delete(userService, JsonObject.of("id", Long.parseLong(id)), null);
     }
 
     @GetMapping("/project/{id}/user.json")

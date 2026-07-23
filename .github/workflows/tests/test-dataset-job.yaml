@@ -56,7 +56,7 @@ spec:
               cp /tmp/metadata/policy.xml /data/dataset/test-project/METADATA/policy.xml
               cp -r /tmp/images/wsi /data/dataset/test-project/IMAGES/wsi
           volumeMounts:
-            - mountPath: /data
+            - mountPath: /data/dataset
               name: dataset-pvc
             - mountPath: /tmp/metadata
               name: dataset-metadata

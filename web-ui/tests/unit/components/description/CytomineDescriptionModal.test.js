@@ -4,15 +4,19 @@ import VueI18n from 'vue-i18n';
 import CytomineDescriptionModal from '@/components/description/CytomineDescriptionModal';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
-jest.mock('@/components/utils/CytomineModalCard', () => ({
-  name: 'cytomine-modal-card',
-  template: '<div><slot></slot></div>'
+vi.mock('@/components/utils/CytomineModalCard', () => ({
+  default: {
+    name: 'cytomine-modal-card',
+    template: '<div><slot></slot></div>'
+  }
 }));
 
-jest.mock('@/components/form/CytomineQuillEditor', () => ({
-  name: 'cytomine-quill-editor',
-  template: '<div><slot></slot></div>',
-  props: ['value', 'placeholder']
+vi.mock('@/components/form/CytomineQuillEditor', () => ({
+  default: {
+    name: 'cytomine-quill-editor',
+    template: '<div><slot></slot></div>',
+    props: ['value', 'placeholder']
+  }
 }));
 
 describe('CytomineDescriptionModal', () => {
@@ -26,7 +30,7 @@ describe('CytomineDescriptionModal', () => {
       localVue,
       mocks: {
         $t: (message) => message,
-        $notify: jest.fn()
+        $notify: vi.fn()
       },
       propsData: {
         description: {data: 'Test description'},

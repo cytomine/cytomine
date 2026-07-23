@@ -50,6 +50,7 @@ spring:
 
   data:
     mongodb:
+      auto-index-creation: false
       authentication-database: admin
       username: ${MONGO_USER:mongoadmin}
       password: ${MONGO_PASS:password}
@@ -62,12 +63,6 @@ spring:
     port: 587
     username: CONFIGURE_YOUR_MAILGUN_CREDENTIALS # example: postmaster@sandboxdcb41...5909.mailgun.org
     password: CONFIGURE_YOUR_MAILGUN_CREDENTIALS # example: 0da253cf5...24-4662f38e
-
-mongock:
-  migration-scan-package:
-    be.cytomine.config.nosqlmigration
-
-  port: 8080
 
 javamelody:
   enabled: false

@@ -174,17 +174,17 @@ export default {
 </script>
 
 <style scoped>
->>> .animation-content {
+:deep(.animation-content) {
   max-width: 60% !important;
   width: 60%;
 }
 
->>> .modal-card {
+:deep(.modal-card) {
   width: 100%;
   height: 80vh;
 }
 
->>> .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }

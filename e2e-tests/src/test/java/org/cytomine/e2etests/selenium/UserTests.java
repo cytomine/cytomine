@@ -66,6 +66,46 @@ public class UserTests {
     }
 
     @Test
+    void login() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+    }
+
+    @Test
+    void logout() {
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
+    void createNewUser() {
+        String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
+        String firstname = "Selenium";
+        String lastname = "User-" + randomUUID().toString().substring(0, 8);
+        String email = username + "@selenium.test";
+        String password = "Selenium1!";
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
+        cytomineSteps.logout(wait, cytomineUrl);
+        keycloakClient.deleteUser(username);
+    }
+
+    @Test
+    void editUser() {
+        String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
+        String firstname = "Selenium";
+        String lastname = "User-" + randomUUID().toString().substring(0, 8);
+        String email = username + "@selenium.test";
+        String password = "Selenium1!";
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
+        cytomineSteps.editUser(wait, cytomineUrl, username, "UpdatedFirst", "UpdatedLast");
+        cytomineSteps.logout(wait, cytomineUrl);
+        keycloakClient.deleteUser(username);
+    }
+
+    @Test
     void createNewUserAndLoginAsUser() {
         String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
         String firstname = "Selenium";

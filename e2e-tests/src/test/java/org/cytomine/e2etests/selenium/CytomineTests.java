@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import lombok.SneakyThrows;
-import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.AnnotationTools;
 import org.cytomine.e2etests.ui.CytomineSteps;
@@ -31,7 +30,7 @@ import org.springframework.context.annotation.Import;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toSet;
 
-@Import({SeleniumDriver.class, AnnotationTools.class, CytomineSteps.class, WebDriverUtils.class, KeycloakClient.class})
+@Import({SeleniumDriver.class, AnnotationTools.class, CytomineSteps.class, WebDriverUtils.class})
 @SpringBootTest
 public class CytomineTests {
     @Autowired
@@ -54,9 +53,6 @@ public class CytomineTests {
     @Autowired
     CytomineSteps cytomineSteps;
 
-    @Autowired
-    KeycloakClient keycloakClient;
-
     @BeforeEach
     void setUp() {
         driver = driverProvider.driver();
@@ -69,46 +65,6 @@ public class CytomineTests {
             .map(Method::getName)
             .orElseGet(() -> "no-name-" + randomUUID()));
         driver.quit();
-    }
-
-    @Test
-    void login() {
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-    }
-
-    @Test
-    void logout() {
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.logout(wait, cytomineUrl);
-    }
-
-    @Test
-    void createNewUser() {
-        String username = "seluser-" + randomUUID().toString().substring(0, 8);
-        String firstname = "Selenium";
-        String lastname = "User-" + randomUUID().toString().substring(0, 8);
-        String email = username + "@selenium.test";
-        String password = "Selenium1!";
-
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
-        cytomineSteps.logout(wait, cytomineUrl);
-        keycloakClient.deleteUser(username);
-    }
-
-    @Test
-    void editUser() {
-        String username = "seluser-" + randomUUID().toString().substring(0, 8);
-        String firstname = "Selenium";
-        String lastname = "User-" + randomUUID().toString().substring(0, 8);
-        String email = username + "@selenium.test";
-        String password = "Selenium1!";
-
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
-        cytomineSteps.editUser(wait, cytomineUrl, username, "UpdatedFirst", "UpdatedLast");
-        cytomineSteps.logout(wait, cytomineUrl);
-        keycloakClient.deleteUser(username);
     }
 
     @Test

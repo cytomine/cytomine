@@ -631,7 +631,7 @@ public class CytomineSteps {
         String email,
         String password
     ) {
-        createUser(wait, cytomineUrl, username, firstname, lastname, email, password, Role.ADMIN);
+        createUser(wait, cytomineUrl, username, firstname, lastname, email, password, Role.GUEST);
     }
 
     public void createUser(

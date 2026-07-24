@@ -77,11 +77,8 @@ jobs:
 
       - name: Count e2e tests in selenium folder
         run: |
-          SELENIUM_DIR=e2e-tests/src/test/java/org/cytomine/e2etests/selenium
-          TEST_COUNT=$(grep -rh "@Test" $SELENIUM_DIR --include="*.java" | wc -l)
-          ROLE_COUNT=$(grep -cE '^[[:space:]]+[A-Z][A-Z0-9_]*\(' e2e-tests/src/test/java/org/cytomine/e2etests/utils/Role.java)
-          ENUM_PARAM_COUNT=$(grep -rh "@EnumSource(Role.class)" $SELENIUM_DIR --include="*.java" | wc -l)
-          E2E_TEST_COUNT=$((TEST_COUNT + ENUM_PARAM_COUNT * ROLE_COUNT)) >> $GITHUB_ENV
+          E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/selenium/ --include="*.java" | wc -l)
+          echo "E2E_TEST_COUNT=$E2E_TEST_COUNT" >> $GITHUB_ENV
 
       - name: Lint charts
         run: |

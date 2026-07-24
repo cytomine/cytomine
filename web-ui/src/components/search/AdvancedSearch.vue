@@ -437,7 +437,7 @@ export default {
   margin-bottom: 0.4em;
 }
 
->>> .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }

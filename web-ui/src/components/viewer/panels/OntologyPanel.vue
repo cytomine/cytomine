@@ -190,11 +190,11 @@ input[type="range"].slider {
   display: block;
 }
 
->>> .checkbox .control-label {
+:deep(.checkbox .control-label) {
   padding: 0 !important;
 }
 
->>> .ontology-tree .sl-vue-tree-node-item, >>> .ontology-tree .no-result {
+:deep(.ontology-tree .sl-vue-tree-node-item), :deep(.ontology-tree .no-result) {
   line-height: 2;
   font-size: 0.9em;
 }

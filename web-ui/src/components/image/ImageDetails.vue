@@ -540,7 +540,7 @@ td.prop-content-half {
   max-width: 12rem;
 }
 
-::v-deep .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 18rem;
   max-width: 50vw;
 }

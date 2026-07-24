@@ -350,12 +350,12 @@ export default {
   display: flex;
 }
 
->>> .search-images {
+:deep(.search-images) {
   max-width: 30rem;
   margin-right: 1rem;
 }
 
->>> td, >>> th {
+:deep(td), :deep(th) {
   vertical-align: middle !important;
 }
 </style>

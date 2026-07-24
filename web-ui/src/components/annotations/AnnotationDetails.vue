@@ -662,17 +662,11 @@ a.is-fullwidth {
   margin-top: 4px;
 }
 
-/**
-* https://stackoverflow.com/a/55368933
-* Since the project is using Sass and Vue 2.6.10, use `::v-deep` instead of `>>>` so it doesn't break validation.
-* Note that it's deprecated but will in Vue 3.
-* TODO: update >>> and ::v-deep using the unified :deep() selector when using the latest Vue.
-*/
-::v-deep .sl-vue-tree-node-item {
+:deep(.sl-vue-tree-node-item) {
   font-size: 0.9em;
 }
 
-::v-deep .tag {
+:deep(.tag) {
     margin-right: 5px;
     margin-bottom: 5px !important;
     background-color: rgba(0, 0, 0, 0.04);

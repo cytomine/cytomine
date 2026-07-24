@@ -19,7 +19,7 @@
     <b-message type="is-success" size="is-small" has-icon>
       <i18n :path="isReviewer ? 'you-have-validated-image-on' : 'image-validated-by-on'">
         <username v-if="!isReviewer" place="user" :user="reviewer" />
-        <span place="date">{{ Number(image.reviewStop) | moment('ll LT') }}</span>
+        <span place="date">{{ formatMomentDate(Number(image.reviewStop), 'll LT') }}</span>
       </i18n>
     </b-message>
 
@@ -34,7 +34,7 @@
       <div v-if="!reviewMode">
         <b-message type="is-info" size="is-small" has-icon>
           <i18n path="you-are-reviewing-image-since">
-            <span place="date">{{ Number(image.reviewStart) | moment('ll LT') }}</span>
+            <span place="date">{{ formatMomentDate(Number(image.reviewStart), 'll LT') }}</span>
           </i18n>
         </b-message>
         <button class="button is-small is-fullwidth" @click="reviewMode = true">
@@ -85,7 +85,7 @@
     <b-message v-else type="is-info" size="is-small" has-icon>
       <i18n path="image-in-review-by-since">
         <username place="user" :user="reviewer" />
-        <span place="date">{{ Number(image.reviewStart) | moment('ll LT') }}</span>
+        <span place="date">{{ formatMomentDate(Number(image.reviewStart), 'll LT') }}</span>
       </i18n>
     </b-message>
   </template>
@@ -105,6 +105,7 @@ import {get} from '@/utils/store-helpers';
 import Username from '@/components/user/Username.vue';
 import ListUsernames from '@/components/user/ListUsernames.vue';
 import CytomineTask from '@/components/utils/CytomineTask.vue';
+import {formatMomentDate} from '@/utils/date';
 import {User, Task, AnnotationCollection} from '@/api';
 
 export default {
@@ -160,6 +161,7 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
     commitImage() {
       this.$store.commit(this.imageModule + 'setImageInstance', this.image);
     },

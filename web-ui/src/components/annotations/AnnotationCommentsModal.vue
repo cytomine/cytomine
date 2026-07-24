@@ -25,7 +25,7 @@
       <div v-for="comment in comments" :key="comment.id">
         <p class="comment-sender is-size-7">
           <strong>{{ comment.senderName }}</strong>
-          <span class="has-text-grey">{{Number(comment.created) | moment('ll LT')}}</span>
+          <span class="has-text-grey">{{formatMomentDate(Number(comment.created), 'll LT')}}</span>
         </p>
         <p class="comment-content">{{comment.comment}}</p>
         <hr>
@@ -75,6 +75,7 @@ import {AnnotationComment} from '@/api';
 import DomainTagInput from '@/components/utils/DomainTagInput.vue';
 
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'annotation-comments-modal',
@@ -118,6 +119,7 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
     async share() {
       let result = await this.$validator.validateAll();
       if (!result) {

@@ -34,7 +34,7 @@ limitations under the License.-->
     <tr v-if="isPropDisplayed('created')">
       <td class="prop-label">{{$t('created-on')}}</td>
       <td class="prop-content" colspan="3">
-        {{ Number(imageGroup.created) | moment('ll') }}
+        {{ formatMomentDate(Number(imageGroup.created), 'll') }}
       </td>
     </tr>
     <tr v-if="isPropDisplayed('description')">
@@ -136,6 +136,7 @@ import ImagePreview from '../image/ImagePreview.vue';
 import ImageGroupPreview from '@/components/image-group/ImageGroupPreview.vue';
 import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal.vue';
 import constants from '@/utils/constants';
+import {formatMomentDate} from '@/utils/date';
 
 import {ImageGroup, ImageGroupImageInstance, PropertyCollection} from '@/api';
 
@@ -181,6 +182,7 @@ export default {
     },
   },
   methods: {
+    formatMomentDate,
     removeProp(prop) {
       this.properties = this.properties.filter(p => p.id !== prop.id);
     },

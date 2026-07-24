@@ -139,6 +139,17 @@ public class WiremockRepository {
             )
         );
 
+        stubTestUser("SUPER_ADMIN_ACL", 1001, "ROLE_SUPER_ADMIN");
+        stubTestUser("ADMIN_ACL", 1002, "ROLE_ADMIN");
+        stubTestUser("ACL_USER_NO_ACL", 1003, "ROLE_USER");
+        stubTestUser("USER_ACL_READ", 1004, "ROLE_USER");
+        stubTestUser("USER_ACL_WRITE", 1005, "ROLE_USER");
+        stubTestUser("USER_ACL_CREATE", 1006, "ROLE_USER");
+        stubTestUser("USER_ACL_DELETE", 1007, "ROLE_USER");
+        stubTestUser("USER_ACL_ADMIN", 1008, "ROLE_USER");
+        stubTestUser("CREATOR", 1009, "ROLE_USER");
+        stubTestUser("GUEST_ACL", 1010, "ROLE_GUEST");
+
         SERVER.stubFor(WireMock.get(urlPathMatching("/users/search/.*"))
             .atPriority(10)
             .willReturn(aResponse()
@@ -170,6 +181,36 @@ public class WiremockRepository {
             registry.add("application.pimsURL", () -> "http://localhost:" + SERVER.port());
             registry.add("application.repositoryURL", () -> "http://localhost:" + SERVER.port());
         };
+    }
+
+    private static void stubTestUser(String username, long id, String role) {
+        SERVER.stubFor(WireMock.get(urlPathEqualTo("/users/search/" + username))
+            .atPriority(2)
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody("""
+                    {
+                      "dataType": "USER",
+                      "id": %d,
+                      "username": "%s",
+                      "email": "%s@test.cytomine.local",
+                      "name": "firstname lastname",
+                      "lastname": null,
+                      "firstname": null,
+                      "language": null,
+                      "isDeveloper": false,
+                      "origin": null,
+                      "updated": null,
+                      "deleted": null,
+                      "created": "2024-01-01T00:00:00",
+                      "privateKey": null,
+                      "publicKey": null,
+                      "roles": [{"dataType": "ROLE", "id": 1, "authority": "%s", "created": "2024-01-01T00:00:00", "updated": null, "deleted": null}]
+                    }
+                    """.formatted(id, username, username.toLowerCase(), role))
+            )
+        );
     }
 
     @SneakyThrows

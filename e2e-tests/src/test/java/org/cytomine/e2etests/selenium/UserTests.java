@@ -8,6 +8,7 @@ import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.AnnotationTools;
 import org.cytomine.e2etests.ui.CytomineSteps;
+import org.cytomine.e2etests.ui.UserSteps;
 import org.cytomine.e2etests.ui.WebDriverUtils;
 import org.cytomine.e2etests.utils.Role;
 import org.cytomine.e2etests.utils.Screenshots;
@@ -27,11 +28,21 @@ import org.springframework.context.annotation.Import;
 
 import static java.util.UUID.randomUUID;
 
-@Import({SeleniumDriver.class, AnnotationTools.class, CytomineSteps.class, WebDriverUtils.class, KeycloakClient.class})
+@Import({
+    AnnotationTools.class,
+    CytomineSteps.class,
+    KeycloakClient.class,
+    SeleniumDriver.class,
+    UserSteps.class,
+    WebDriverUtils.class
+})
 @SpringBootTest
 public class UserTests {
     @Autowired
     CytomineSteps cytomineSteps;
+
+    @Autowired
+    UserSteps userSteps;
 
     @Autowired
     SeleniumDriver driverProvider;
@@ -85,7 +96,7 @@ public class UserTests {
         String password = "Selenium1!";
 
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
+        userSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
         cytomineSteps.logout(wait, cytomineUrl);
         keycloakClient.deleteUser(username);
     }
@@ -99,8 +110,8 @@ public class UserTests {
         String password = "Selenium1!";
 
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
-        cytomineSteps.editUser(wait, cytomineUrl, username, "UpdatedFirst", "UpdatedLast");
+        userSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
+        userSteps.editUser(wait, cytomineUrl, username, "UpdatedFirst", "UpdatedLast");
         cytomineSteps.logout(wait, cytomineUrl);
         keycloakClient.deleteUser(username);
     }
@@ -114,7 +125,7 @@ public class UserTests {
         String password = "Selenium1!";
 
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
+        userSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
         cytomineSteps.logout(wait, cytomineUrl);
 
         cytomineSteps.login(wait, cytomineUrl, username, password);
@@ -133,11 +144,11 @@ public class UserTests {
         String password = "Selenium1!";
 
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password, role);
+        userSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password, role);
         cytomineSteps.logout(wait, cytomineUrl);
 
         cytomineSteps.login(wait, cytomineUrl, username, password);
-        cytomineSteps.verifyAccountRole(wait, cytomineUrl, role);
+        userSteps.verifyAccountRole(wait, cytomineUrl, role);
         cytomineSteps.logout(wait, cytomineUrl);
 
         keycloakClient.deleteUser(username);

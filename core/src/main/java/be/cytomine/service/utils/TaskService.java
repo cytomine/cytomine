@@ -48,19 +48,11 @@ public class TaskService {
         return comments;
     }
 
-    /**
-     * Create a new task
-     *
-     * @param project Project concerning by this task
-     * @param user    User that create the task
-     *
-     * @return Task created
-     */
-    public Task createNewTask(Project project, User user, boolean printInActivity) {
+    public Task createNewTask(Project project, long userId, boolean printInActivity) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         Task task = new Task();
         task.setProjectIdent(project != null ? project.getId() : null);
-        task.setUserIdent(user.getId());
+        task.setUserIdent(userId);
         task.setPrintInActivity(printInActivity);
         //task.addToComments("Task started...")
         task = saveOnDatabase(task);
@@ -118,7 +110,6 @@ public class TaskService {
         task = get(task.getId());
         return task;
     }
-
 
     public List<String> getLastComments(Task task, int max) {
         //sql request retrieve n last comments for task

@@ -19,6 +19,7 @@ import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -111,8 +112,8 @@ public class ReviewedAnnotationService extends ModelService {
         return optionalReviewedAnnotation;
     }
 
-    public Long count(User user) {
-        return reviewedAnnotationRepository.countByUser(user);
+    public Long count(long userId) {
+        return reviewedAnnotationRepository.countByUserId(userId);
     }
 
     public Long countByProject(Project project, Date startDate, Date endDate) {
@@ -183,7 +184,7 @@ public class ReviewedAnnotationService extends ModelService {
     public CommandResponse add(JsonObject jsonObject) {
         securityACLService.check(jsonObject.getJSONAttrLong("project"), Project.class, READ);
         securityACLService.checkIsNotReadOnly(jsonObject.getJSONAttrLong("project"), Project.class);
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         //Start transaction
         Transaction transaction = transactionService.start();
@@ -202,7 +203,7 @@ public class ReviewedAnnotationService extends ModelService {
 
         synchronized (this.getClass()) {
             CommandResponse commandResponse = executeCommand(
-                new AddCommand(currentUser, transaction),
+                new AddCommand(currentUserService.getCurrentUserOld(), transaction),
                 null,
                 jsonObject
             );
@@ -220,10 +221,11 @@ public class ReviewedAnnotationService extends ModelService {
      * @return Response structure (new domain data, old domain data..)
      */
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.checkIsCreator(domain, currentUser);
-        CommandResponse result = executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
+        CommandResponse result = executeCommand(
+            new EditCommand(currentUserService.getCurrentUserOld(), null), domain, jsonNewData);
         return result;
     }
 
@@ -239,10 +241,10 @@ public class ReviewedAnnotationService extends ModelService {
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.checkIsCreator(domain, currentUser);
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 
@@ -256,7 +258,7 @@ public class ReviewedAnnotationService extends ModelService {
         if (basedAnnotation.getImage().getReviewUser() != null
             && !Objects.equals(
             basedAnnotation.getImage().getReviewUser().getId(),
-            currentUserService.getCurrentUser().getId()
+            currentUserService.getCurrentUser().id()
         )) {
             throw new WrongArgumentException("You must be the image reviewer to accept annotation. Image reviewer is "
                 + basedAnnotation.getImage().getReviewUser());
@@ -283,7 +285,7 @@ public class ReviewedAnnotationService extends ModelService {
 
         reviewedAnnotationHttpContract.replaceAllTermIds(
             commandResponse.getObject().getId(),
-            currentUserService.getCurrentUser().getId(), termsToAdd
+            currentUserService.getCurrentUser().id(), termsToAdd
         );
 
         return commandResponse;
@@ -296,7 +298,7 @@ public class ReviewedAnnotationService extends ModelService {
         if (reviewedAnnotation.getImage().getReviewUser() != null && !Objects.equals(
             reviewedAnnotation.getImage()
                 .getReviewUser()
-                .getId(), currentUserService.getCurrentUser().getId()
+                .getId(), currentUserService.getCurrentUser().id()
         )) {
             throw new WrongArgumentException("You must be the image reviewer to reject annotation. Image reviewer is  "
                 + reviewedAnnotation.getImage().getReviewUser().getUsername());
@@ -323,7 +325,7 @@ public class ReviewedAnnotationService extends ModelService {
         review.setSlice(annotation.getSlice());
         review.setProject(annotation.getProject());
         review.setGeometryCompression(annotation.getGeometryCompression());
-        review.setReviewUser(currentUserService.getCurrentUser());
+        review.setReviewUser(currentUserService.getCurrentUserOld());
         return review;
     }
 
@@ -344,7 +346,7 @@ public class ReviewedAnnotationService extends ModelService {
             throw new WrongArgumentException("Cannot review annotation, enable image review mode!");
         } else if (imageInstance.getReviewUser() != null && !Objects.equals(
             imageInstance.getReviewUser().getId(),
-            currentUserService.getCurrentUser().getId()
+            currentUserService.getCurrentUser().id()
         )) {
             throw new WrongArgumentException("You must be the image reviewer to review annotation. Image reviewer is "
                 + imageInstance.getReviewUser());
@@ -406,7 +408,7 @@ public class ReviewedAnnotationService extends ModelService {
             throw new WrongArgumentException("Cannot reject annotation, enable image review mode!");
         } else if (imageInstance.getReviewUser() != null && !Objects.equals(
             imageInstance.getReviewUser().getId(),
-            currentUserService.getCurrentUser().getId()
+            currentUserService.getCurrentUser().id()
         )) {
             throw new WrongArgumentException("You must be the image reviewer to reject annotation. Image reviewer is "
                 + imageInstance.getReviewUser().getUsername());

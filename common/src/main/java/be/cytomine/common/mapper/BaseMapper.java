@@ -2,7 +2,9 @@ package be.cytomine.common.mapper;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.Optional;
 
 import org.mapstruct.Mapper;
@@ -20,6 +22,11 @@ public interface BaseMapper {
 
     default <T> T map(Optional<T> t) {
         return t.orElse(null);
+    }
+
+    default Optional<LocalDateTime> map(Date maybeDate) {
+        return Optional.ofNullable(maybeDate)
+            .map(date -> LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
     }
 
     default LocalDateTime mapTimestamp(Timestamp value) {

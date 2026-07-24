@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.UrlApi;
@@ -66,9 +66,9 @@ public class TaskController extends RestCytomineController {
         } catch (Exception ignored) {
             // TODO
         }
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         boolean printInActivity = json.getJSONAttrBoolean("printInActivity", false);
-        Task task = taskService.createNewTask(project, user, printInActivity);
+        Task task = taskService.createNewTask(project, user.id(), printInActivity);
         JsonObject jsonObject = task.toJsonObject(urlApi);
         jsonObject.put("comments", taskService.getLastComments(task, 5));
         return responseSuccess(JsonObject.of("task", jsonObject));

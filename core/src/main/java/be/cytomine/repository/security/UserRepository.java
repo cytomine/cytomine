@@ -11,16 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.security.User;
 
-/**
- * Spring Data JPA repository for the user entity.
- */
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     @EntityGraph(attributePaths = "roles")
     Optional<User> findById(Long id);
-
-    @EntityGraph(attributePaths = "roles")
-    Optional<User> findByUsernameLikeIgnoreCase(String username);
 
     @EntityGraph(attributePaths = "roles")
     Optional<User> findByUsername(String username);
@@ -98,4 +93,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     List<User> findAllByReferenceIn(List<String> ids);
 
+    Optional<User> findByUsernameLikeIgnoreCase(String username);
 }
+

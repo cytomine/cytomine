@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -79,7 +80,7 @@ public class RestUserPositionController extends RestCytomineController {
         JsonObject json
     ) {
         Date date = new Date();
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
 
         Point topLeft = new Point(
             json.getJSONAttrDouble("topLeftX", 0d),
@@ -110,7 +111,7 @@ public class RestUserPositionController extends RestCytomineController {
         Boolean broadcast = json.getJSONAttrBoolean("broadcast", false);
 
         return responseSuccess(
-            userPositionService.add(date, user, sliceInstance, imageInstance, areaDTO, zoom, rotation, broadcast)
+            userPositionService.add(date, user.id(), sliceInstance, imageInstance, areaDTO, zoom, rotation, broadcast)
         );
     }
 
@@ -129,7 +130,7 @@ public class RestUserPositionController extends RestCytomineController {
             sliceInstance = sliceInstanceService.find(sliceId)
                 .orElseThrow(() -> new ObjectNotFoundException("SliceInstance", sliceId));
         }
-        userPositionService.addAsFollower(user, currentUserService.getCurrentUser(), imageInstance);
+        userPositionService.addAsFollower(user, currentUserService.getCurrentUserOld(), imageInstance);
         return responseSuccess(userPositionService.lastPositionByUser(
                 imageInstance, sliceInstance, user, broadcast).map(LastUserPosition::toJsonObjectSocial)
             .orElse(new JsonObject())
@@ -193,9 +194,7 @@ public class RestUserPositionController extends RestCytomineController {
         @PathVariable("user") Long userId
     ) {
         log.debug("REST request get list of followers");
-        User user = userService.find(userId)
-            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        securityACLService.checkIsSameUser(currentUserService.getCurrentUser(), user);
+        securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
 
         ImageInstance imageInstance =
             imageInstanceService.find(imageId).orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageId));

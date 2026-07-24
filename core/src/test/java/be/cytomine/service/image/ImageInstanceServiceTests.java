@@ -31,7 +31,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +47,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.NestedImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -87,11 +87,10 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class ImageInstanceServiceTests {
 
-    private static WireMockServer wireMockServer;
     @Autowired
     ImageInstanceService imageInstanceService;
     @Autowired
@@ -110,6 +109,8 @@ public class ImageInstanceServiceTests {
     ImageConsultationService imageConsultationService;
     @Autowired
     PersistentImageConsultationRepository persistentImageConsultationRepository;
+
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private UrlApi urlApi;
 
@@ -124,16 +125,9 @@ public class ImageInstanceServiceTests {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
         WireMock.configureFor("localhost", wireMockServer.port());
 
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach
@@ -302,7 +296,8 @@ public class ImageInstanceServiceTests {
         Date consultation = new Date();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
-        imageConsultationService.add(builder.givenSuperAdmin(), imageInstance1.getId(), "xxx", "view", consultation);
+        imageConsultationService.add(builder.givenSuperAdmin().getId(), imageInstance1.getId(), "xxx", "view",
+            consultation);
 
         ImageSearchExtension imageSearchExtension = new ImageSearchExtension();
         imageSearchExtension.setWithLastActivity(true);
@@ -769,7 +764,7 @@ public class ImageInstanceServiceTests {
         annotationActionService.add(userAnnotation, builder.givenSuperAdmin(), "view", new Date());
         userPositionService.add(
             new Date(),
-            builder.givenSuperAdmin(),
+            builder.givenSuperAdmin().getId(),
             sliceInstance,
             imageInstance,
             USER_VIEW,
@@ -777,7 +772,8 @@ public class ImageInstanceServiceTests {
             0d,
             false
         );
-        imageConsultationService.add(builder.givenSuperAdmin(), imageInstance.getId(), "xxx", "view", new Date());
+        imageConsultationService.add(builder.givenSuperAdmin().getId(), imageInstance.getId(), "xxx", "view",
+            new Date());
 
         AssertionsForClassTypes.assertThat(entityManager.find(ReviewedAnnotation.class, reviewedAnnotation.getId()))
             .isNotNull();

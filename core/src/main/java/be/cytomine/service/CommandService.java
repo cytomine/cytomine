@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.CommandHistory;
@@ -20,7 +21,6 @@ import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.RedoStackItem;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.command.UndoStackItem;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.command.CommandRepository;
@@ -97,12 +97,13 @@ public class CommandService {
     }
 
     public List<CommandResponse> undo(Long commandId) {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         Optional<UndoStackItem> lastUndoStackItem;
         if (commandId != null) {
-            lastUndoStackItem = commandRepository.findLastUndoStackItem(user, commandRepository.getById(commandId));
+            lastUndoStackItem =
+                commandRepository.findLastUndoStackItem(user.id(), commandRepository.getById(commandId));
         } else {
-            lastUndoStackItem = commandRepository.findLastUndoStackItem(user);
+            lastUndoStackItem = commandRepository.findLastUndoStackItem(user.id());
         }
 
         if (lastUndoStackItem.isEmpty()) {
@@ -113,11 +114,11 @@ public class CommandService {
             return List.of(commandResponse);
         } else {
             UndoStackItem firstUndoStack = lastUndoStackItem.get();
-            return this.undo(firstUndoStack, user);
+            return this.undo(firstUndoStack, user.id());
         }
     }
 
-    public List<CommandResponse> undo(UndoStackItem undoItem, User user) {
+    public List<CommandResponse> undo(UndoStackItem undoItem, long userId) {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
@@ -134,9 +135,9 @@ public class CommandService {
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user, transaction);
+            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(userId, transaction);
             for (UndoStackItem undoStack : undoStacks) {
-                //browse all command and undo it while its the same transaction
+                //browse all command and undo it while it's the same transaction
                 if (undoStack.getCommand().isRefuseUndo()) {
                     //undo delete project is not possible
                     //responseError(new ObjectNotFoundException("You cannot delete your last operation!"))
@@ -179,7 +180,7 @@ public class CommandService {
         return redo(null);
     }
 
-    public List<CommandResponse> redo(RedoStackItem redoItem, User user) {
+    public List<CommandResponse> redo(RedoStackItem redoItem, long userId) {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
@@ -196,7 +197,7 @@ public class CommandService {
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(user, transaction);
+            List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(userId, transaction);
             for (RedoStackItem redoStack : redoStacks) {
                 //Redo each command from the same transaction
                 result = performRedo(redoStack.getCommand());
@@ -208,12 +209,13 @@ public class CommandService {
     }
 
     public List<CommandResponse> redo(Long commandId) {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         Optional<RedoStackItem> lastRedoStackItem;
         if (commandId != null) {
-            lastRedoStackItem = commandRepository.findLastRedoStackItem(user, commandRepository.getById(commandId));
+            lastRedoStackItem =
+                commandRepository.findLastRedoStackItem(user.id(), commandRepository.getById(commandId));
         } else {
-            lastRedoStackItem = commandRepository.findLastRedoStackItem(user);
+            lastRedoStackItem = commandRepository.findLastRedoStackItem(user.id());
         }
 
         if (lastRedoStackItem.isEmpty()) {
@@ -224,7 +226,7 @@ public class CommandService {
             return List.of(commandResponse);
         } else {
             RedoStackItem redoStackItem = lastRedoStackItem.get();
-            return this.redo(redoStackItem, user);
+            return this.redo(redoStackItem, user.id());
         }
     }
 

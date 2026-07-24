@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -17,7 +18,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.processing.ImageFilter;
 import be.cytomine.domain.processing.ImageFilterProject;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.processing.ImageFilterProjectRepository;
@@ -84,14 +84,14 @@ public class ImageFilterProjectService extends ModelService {
 
         securityACLService.check(project, ADMINISTRATION);
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUser()), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), ADMINISTRATION);
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 

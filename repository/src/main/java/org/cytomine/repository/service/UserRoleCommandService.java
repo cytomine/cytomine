@@ -125,7 +125,6 @@ public class UserRoleCommandService implements
     }
 
 
-
     public Set<UserRoleResponse> define(long userId, long targetUserId, Role role) {
 
         if (!aclService.isAdmin(userId)) {

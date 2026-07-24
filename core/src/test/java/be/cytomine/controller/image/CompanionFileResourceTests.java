@@ -22,8 +22,6 @@ import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,6 +36,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.CompanionFile;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
@@ -61,27 +60,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class CompanionFileResourceTests {
 
-    private static final WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private BasicInstanceBuilder builder;
     @Autowired
     private MockMvc restCompanionFileControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
 
     @Test
     @Transactional
@@ -226,7 +215,7 @@ public class CompanionFileResourceTests {
         companionFile.getUploadedFile().setOriginalFilename("CMU-2.mrxs");
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/file/" + URLEncoder.encode(
                 companionFile.getPath(),
                 StandardCharsets.UTF_8

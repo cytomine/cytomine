@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -63,6 +65,8 @@ public class AnnotationTermService extends ModelService {
 
     private final UserRepository userRepository;
 
+    private final UserHttpContract userHttpContract;
+
     @Override
     public Class currentDomain() {
         return AnnotationTerm.class;
@@ -108,19 +112,19 @@ public class AnnotationTermService extends ModelService {
      */
     @Override
     public CommandResponse add(JsonObject jsonObject) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         //Check if user has a role that allows to associate terms with annotations
         securityACLService.checkGuest(currentUser);
-        User creator = userRepository.findById(jsonObject.getJSONAttrLong("user", -1L))
+        UserResponse creator = userHttpContract.get(jsonObject.getJSONAttrLong("user", -1L), currentUser.id())
             .orElse(currentUser);
-        jsonObject.put("user", creator.getId());
+        jsonObject.put("user", creator.id());
 
         UserAnnotation ua = userAnnotationRepository.findById(
             jsonObject.getJSONAttrLong("userannotation", -1L)
         ).orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", jsonObject.getJSONAttrStr("userannotation")));
         //Check if user has at least READ permission for the project
         securityACLService.check(ua.container(), READ, currentUser);
-        return executeCommand(new AddCommand(currentUser), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
     }
 
     /**
@@ -135,7 +139,7 @@ public class AnnotationTermService extends ModelService {
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         //Check if user has a role that allows to associate terms with annotations
         securityACLService.checkGuest(currentUser);
         //if term is added from a user, check if the user has permission for UserAnnotation domain
@@ -145,7 +149,7 @@ public class AnnotationTermService extends ModelService {
             domain,
             ((AnnotationTerm) domain).getUserAnnotation().getUser()
         );
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 
@@ -178,7 +182,7 @@ public class AnnotationTermService extends ModelService {
      * by this user
      */
     public CommandResponse addWithDeletingOldTerm(Long idAnnotation, Long idTerm, Boolean fromAllUser) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         AnnotationDomain annotation = AnnotationDomain.findAnnotationDomain(getEntityManager(), idAnnotation)
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));
         securityACLService.check(annotation.container(), READ, currentUser);
@@ -196,9 +200,10 @@ public class AnnotationTermService extends ModelService {
                 this.delete(annotationTerm, transaction, null, true);
             }
             //Add annotation term
-            return addAnnotationTerm(idAnnotation, idTerm, null, currentUser.getId(), currentUser, transaction);
+            return addAnnotationTerm(idAnnotation, idTerm, null, currentUser.id(),
+                currentUserService.getCurrentUserOld(), transaction);
         } else if (annotation instanceof ReviewedAnnotation) {
-            reviewedAnnotationHttpContract.replaceAllTermIds(idAnnotation, currentUser.getId(), Set.of(idTerm));
+            reviewedAnnotationHttpContract.replaceAllTermIds(idAnnotation, currentUser.id(), Set.of(idTerm));
             CommandResponse commandResponse = new CommandResponse();
             commandResponse.setStatus(200);
             return commandResponse;

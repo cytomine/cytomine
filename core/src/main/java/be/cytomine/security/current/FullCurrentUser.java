@@ -18,12 +18,12 @@ package be.cytomine.security.current;
 
 import lombok.Data;
 
-import be.cytomine.domain.security.User;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 
 @Data
 public class FullCurrentUser implements CurrentUser {
 
-    private User user;
+    private UserResponse user;
 
     @Override
     public boolean isFullObjectProvided() {

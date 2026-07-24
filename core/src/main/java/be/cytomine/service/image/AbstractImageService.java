@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -124,7 +125,7 @@ public class AbstractImageService extends ModelService {
         Optional<AbstractImage> abstractImage = abstractImageRepository.findById(id);
         String token = authHeader.replace("Bearer ", "");
         String username = TokenUtils.getUsernameFromToken(token);
-        User user = currentUserService.getCurrentUser(username);
+        UserResponse user = currentUserService.getCurrentUser(username);
         abstractImage.ifPresent(image -> securityACLService.check(image.container(), READ, user));
         return abstractImage;
     }
@@ -224,13 +225,13 @@ public class AbstractImageService extends ModelService {
      */
     public CommandResponse add(JsonObject json) {
         transactionService.start();
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
         if (!json.isMissing("uploadedFile")) {
             //TODO: ???
         }
-        return executeCommand(new AddCommand(currentUser), null, json);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
 
     }
 
@@ -244,13 +245,13 @@ public class AbstractImageService extends ModelService {
      */
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), WRITE);
 
         JsonObject versionBeforeUpdate = domain.toJsonObject(urlApi);
 
         CommandResponse commandResponse = executeCommand(
-            new EditCommand(currentUser, transaction),
+            new EditCommand(currentUserService.getCurrentUserOld(), transaction),
             domain,
             jsonNewData
         );
@@ -344,12 +345,12 @@ public class AbstractImageService extends ModelService {
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), WRITE);
 
         if (!isAbstractImageUsed(domain.getId())) {
-            Command c = new DeleteCommand(currentUser, transaction);
+            Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
             return executeCommand(c, domain, null);
         } else {
             List<ImageInstance> instances = imageInstanceRepository.findAllByBaseImage((AbstractImage) domain);

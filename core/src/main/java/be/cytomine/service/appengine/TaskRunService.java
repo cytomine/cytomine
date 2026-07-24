@@ -44,6 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.CropOffset;
 import be.cytomine.domain.appengine.TaskRun;
@@ -52,7 +53,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.UserSummary;
 import be.cytomine.dto.appengine.task.TaskRunDetail;
 import be.cytomine.dto.appengine.task.TaskRunOutputResponse;
@@ -125,7 +125,7 @@ public class TaskRunService {
 
     public String addTaskRun(Long projectId, String taskId, JsonNode body) {
         Project project = projectService.get(projectId);
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(project, READ);
         securityACLService.checkIsNotReadOnly(project);
@@ -145,7 +145,7 @@ public class TaskRunService {
         ImageInstance image = imageInstanceService.get(body.get("image").asLong());
 
         TaskRun taskRun = new TaskRun();
-        taskRun.setUser(currentUser);
+        taskRun.setUser(currentUserService.getCurrentUserOld());
         taskRun.setProject(project);
         taskRun.setTaskRunId(taskRunResponse.id());
         taskRun.setImage(image);
@@ -204,7 +204,7 @@ public class TaskRunService {
     }
 
     public List<TaskRunDetail> getTaskRuns(Long projectId) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
@@ -234,7 +234,7 @@ public class TaskRunService {
             throw new ObjectNotFoundException("TaskRun", taskRunId);
         }
 
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         Project project = projectService.get(projectId);
 
         securityACLService.checkUser(currentUser);
@@ -597,7 +597,7 @@ public class TaskRunService {
         }
 
         // pull the images and store them in the project
-        asyncService.launchImageAdditionJob(outputs, projectId, currentUserService.getCurrentUser());
+        asyncService.launchImageAdditionJob(outputs, projectId, currentUserService.getCurrentUserOld());
 
         String taskRunData = appEngineService.get("task-runs/" + taskRunId);
         TaskRunResponse taskRunResponse;

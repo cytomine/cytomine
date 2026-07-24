@@ -12,7 +12,6 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.image.server.Storage;
@@ -41,6 +42,8 @@ import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.domain.social.PersistentUserPosition;
 import be.cytomine.dto.auth.AuthInformation;
 import be.cytomine.dto.image.AreaDTO;
+import be.cytomine.mapper.UserMapper;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 import be.cytomine.repositorynosql.social.LastUserPositionRepository;
 import be.cytomine.repositorynosql.social.PersistentConnectionRepository;
@@ -73,11 +76,12 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
+@MockedUser
 @Transactional
 public class UserServiceTests {
 
-    private static final WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     UserService userService;
     @Autowired
@@ -108,6 +112,10 @@ public class UserServiceTests {
     private PermissionService permissionService;
     @Autowired
     private UserPositionService userPositionService;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private UserRepository userRepository;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -124,15 +132,9 @@ public class UserServiceTests {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer.start();
-        WireMock.configureFor("localhost", 8888);
+        WireMock.configureFor("localhost", wireMockServer.port());
 
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach
@@ -148,7 +150,7 @@ public class UserServiceTests {
 
     PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
         return projectConnectionService.add(
-            user,
+            user.getId(),
             project,
             "xxx",
             "linux",
@@ -163,7 +165,7 @@ public class UserServiceTests {
         ImageInstance imageInstance,
         Date created
     ) {
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
     PersistentConnection givenALastConnection(User user, Long idProject, Date date) {
@@ -213,7 +215,7 @@ public class UserServiceTests {
     @Test
     void getAuthRolesForUser() {
         User user = builder.givenAUser();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isFalse();
         assertThat(authInformation.getUser()).isTrue();
         assertThat(authInformation.getGuest()).isFalse();
@@ -226,7 +228,7 @@ public class UserServiceTests {
     @Test
     void getAuthRolesForGuest() {
         User user = builder.givenAGuest();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isFalse();
         assertThat(authInformation.getUser()).isFalse();
         assertThat(authInformation.getGuest()).isTrue();
@@ -239,7 +241,7 @@ public class UserServiceTests {
     @Test
     void getAuthRolesForSuperamdin() {
         User user = builder.givenSuperAdmin();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isTrue();
         assertThat(authInformation.getUser()).isFalse();
         assertThat(authInformation.getGuest()).isFalse();
@@ -252,7 +254,7 @@ public class UserServiceTests {
     @Test
     void getAuthRolesForAdmin() {
         User user = builder.givenAnAdmin();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isTrue();
         assertThat(authInformation.getUser()).isFalse();
         assertThat(authInformation.getGuest()).isFalse();
@@ -1050,7 +1052,7 @@ public class UserServiceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,
@@ -1079,7 +1081,7 @@ public class UserServiceTests {
 
         givenAPersistentImageConsultation(userOnline, builder.givenAnImageInstance(project), new Date());
 
-        JsonObject data = userService.getResumeActivities(project, userOnline);
+        JsonObject data = userService.getResumeActivities(project, userMapper.map(userOnline));
 
         assertThat(data.getJSONAttrDate("firstConnection")).isEqualTo(firstConnection.getCreated());
         assertThat(data.getJSONAttrDate("lastConnection")).isEqualTo(lastConnection.getCreated());

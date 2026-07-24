@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -50,10 +51,10 @@ public class RestImageConsultationController extends RestCytomineController {
         @RequestBody JsonObject json
     ) {
         log.info("add an image consultation for image {}", imageId);
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         String session = RequestContextHolder.currentRequestAttributes().getSessionId();
         String mode = json.getJSONAttrStr("mode");
-        return responseSuccess(imageConsultationService.add(user, imageId, session, mode, new Date()));
+        return responseSuccess(imageConsultationService.add(user.id(), imageId, session, mode, new Date()));
     }
 
     @GetMapping("/project/{project}/lastImages.json")

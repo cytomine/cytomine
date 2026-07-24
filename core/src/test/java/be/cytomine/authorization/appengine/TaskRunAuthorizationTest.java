@@ -7,8 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -22,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.service.appengine.TaskRunService;
@@ -37,22 +36,14 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
 
-    private static final WireMockServer wireMockServer = new WireMockServer(8888);
     @Autowired
     private BasicInstanceBuilder builder;
     @Autowired
     private TaskRunService taskRunService;
+
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
+
     private TaskRun taskRun = null;
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
 
     @BeforeEach
     public void before() throws Exception {
@@ -127,7 +118,7 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
               "state": "created"
             }""";
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(WireMock.post(urlEqualTo("/api/v1/tasks/" + taskId + "/runs"))
             .willReturn(
                 aResponse().withBody(mockResponse)

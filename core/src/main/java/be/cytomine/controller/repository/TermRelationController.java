@@ -39,7 +39,7 @@ public class TermRelationController {
 
     @PostMapping({"relation/term.json", "relation/parent/term.json"})
     public Optional<HttpCommandResponse> create(@RequestBody CreateTermRelationRequest request) {
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return termRelationHttpContract.create(userId,
             new CreateTermRelation(request.term1(), request.term2(), RelationTerm.PARENT));
     }
@@ -47,14 +47,14 @@ public class TermRelationController {
     @GetMapping("relation/term/{id}.json")
     public TermRelationResponse termRelation(@PathVariable long id) {
         log.debug("REST request to get term relation {}", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return termRelationHttpContract.findTermRelationByID(id, userId)
                    .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
     }
 
     @PutMapping("relation/term/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateTermRelation updateTermRelation) {
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return termRelationHttpContract.update(id, userId, updateTermRelation)
                    .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
     }
@@ -62,13 +62,13 @@ public class TermRelationController {
     @DeleteMapping("relation/term/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("REST request to delete term relation {}", id);
-        return termRelationHttpContract.delete(id, currentUserService.getCurrentUser().getId())
+        return termRelationHttpContract.delete(id, currentUserService.getCurrentUser().id())
                    .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
     }
 
     @DeleteMapping("relation/parent/term1/{idTerm1}/term2/{idTerm2}.json")
     public HttpCommandResponse deleteByTerms(@PathVariable Long idTerm1, @PathVariable Long idTerm2) {
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return termRelationHttpContract.deleteByTerms(idTerm1, idTerm2, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND,
                 format("Unable to find term relation for term1=%s term2=%s", idTerm1, idTerm2)));

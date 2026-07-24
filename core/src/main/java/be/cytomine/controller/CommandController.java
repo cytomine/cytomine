@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.RedoStackItem;
 import be.cytomine.domain.command.UndoStackItem;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.command.CommandRepository;
 import be.cytomine.service.CommandService;
@@ -43,7 +43,7 @@ public class CommandController extends RestCytomineController {
     @GetMapping({"/command/undo.json", "/command/{id}/undo.json"})
     public ResponseEntity<String> undo(@PathVariable(required = false) Long id) {
         log.debug("REST request to undo command {}", id);
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         Command command = null;
         if (id != null) {
             command = commandRepository.findById(id)
@@ -54,9 +54,9 @@ public class CommandController extends RestCytomineController {
 
         Optional<UndoStackItem> lastCommand;
         if (command != null) {
-            lastCommand = commandRepository.findLastUndoStackItem(user, command);
+            lastCommand = commandRepository.findLastUndoStackItem(user.id(), command);
         } else {
-            lastCommand = commandRepository.findLastUndoStackItem(user);
+            lastCommand = commandRepository.findLastUndoStackItem(user.id());
         }
 
         //There is no command, so nothing to undo
@@ -76,7 +76,7 @@ public class CommandController extends RestCytomineController {
 
         //Last command done
         UndoStackItem firstUndoStack = lastCommand.get();
-        List<CommandResponse> results = commandService.undo(firstUndoStack, user);
+        List<CommandResponse> results = commandService.undo(firstUndoStack, user.id());
 
         if (results.stream().anyMatch(x -> x.getStatus() != 200 && x.getStatus() != 201)) {
             response.setStatus(400);
@@ -89,7 +89,7 @@ public class CommandController extends RestCytomineController {
     @GetMapping({"/command/redo.json", "/command/{id}/redo.json"})
     public ResponseEntity<String> redo(@PathVariable(required = false) Long id) {
         log.debug("REST request to redo command {}", id);
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         Command command = null;
         if (id != null) {
             command = commandRepository.findById(id)
@@ -100,9 +100,9 @@ public class CommandController extends RestCytomineController {
 
         Optional<RedoStackItem> lastCommand;
         if (command != null) {
-            lastCommand = commandRepository.findLastRedoStackItem(user, command);
+            lastCommand = commandRepository.findLastRedoStackItem(user.id(), command);
         } else {
-            lastCommand = commandRepository.findLastRedoStackItem(user);
+            lastCommand = commandRepository.findLastRedoStackItem(user.id());
         }
 
         //There is no command, so nothing to undo
@@ -122,7 +122,7 @@ public class CommandController extends RestCytomineController {
 
         //Last command done
         RedoStackItem firstRedoStack = lastCommand.get();
-        List<CommandResponse> results = commandService.redo(firstRedoStack, user);
+        List<CommandResponse> results = commandService.redo(firstRedoStack, user.id());
 
         if (results.stream().anyMatch(x -> x.getStatus() != 200 && x.getStatus() != 201)) {
             response.setStatus(400);

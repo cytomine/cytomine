@@ -83,12 +83,9 @@ public class ApplyCommandService {
                     ontologyCommandService.undoDelete(commandEntity.getId(), deleteOntologyCommand, userId, now);
                 case UpdateOntologyCommand updateOntologyCommand ->
                     ontologyCommandService.undoUpdate(commandEntity.getId(), updateOntologyCommand, userId, now);
-                case CreateRoleCommand crc ->
-                    roleCommandService.undoCreate(commandEntity.getId(), crc, userId, now);
-                case UpdateRoleCommand urc ->
-                    roleCommandService.undoUpdate(commandEntity.getId(), urc, userId, now);
-                case DeleteRoleCommand drc ->
-                    roleCommandService.undoDelete(commandEntity.getId(), drc, userId, now);
+                case CreateRoleCommand crc -> roleCommandService.undoCreate(commandEntity.getId(), crc, userId, now);
+                case UpdateRoleCommand urc -> roleCommandService.undoUpdate(commandEntity.getId(), urc, userId, now);
+                case DeleteRoleCommand drc -> roleCommandService.undoDelete(commandEntity.getId(), drc, userId, now);
                 case CreateStorageCommand csc ->
                     storageCommandService.undoCreate(commandEntity.getId(), csc, userId, now);
                 case UpdateStorageCommand usc ->
@@ -116,12 +113,9 @@ public class ApplyCommandService {
                     userRoleCommandService.undoUpdate(commandEntity.getId(), uurc, userId, now);
                 case DeleteUserRoleCommand durc ->
                     userRoleCommandService.undoDelete(commandEntity.getId(), durc, userId, now);
-                case CreateUserCommand cuc ->
-                    userCommandService.undoCreate(commandEntity.getId(), cuc, userId, now);
-                case UpdateUserCommand uuc ->
-                    userCommandService.undoUpdate(commandEntity.getId(), uuc, userId, now);
-                case DeleteUserCommand duc ->
-                    userCommandService.undoDelete(commandEntity.getId(), duc, userId, now);
+                case CreateUserCommand cuc -> userCommandService.undoCreate(commandEntity.getId(), cuc, userId, now);
+                case UpdateUserCommand uuc -> userCommandService.undoUpdate(commandEntity.getId(), uuc, userId, now);
+                case DeleteUserCommand duc -> userCommandService.undoDelete(commandEntity.getId(), duc, userId, now);
 
                 // Actually we undo an undo target here
                 case UndoCreateCommand<?> v -> switch (v.target()) {

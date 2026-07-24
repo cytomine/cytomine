@@ -1,6 +1,7 @@
 package be.cytomine.service.image.server;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.image.server.StorageRepository;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.utils.JsonObject;
@@ -25,9 +27,13 @@ public class StorageService extends ModelService {
 
     private final StorageRepository storageRepository;
 
+    private final UserRepository userRepository;
+
     private final PermissionService permissionService;
 
-    public void initUserStorage(final User user) {
+    public void initUserStorage(final Long userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
         log.info("Initialize storage for {}", user.getUsername());
 
         Storage storage = new Storage();
@@ -37,13 +43,13 @@ public class StorageService extends ModelService {
 
         String username = user.getUsername();
         if (!permissionService.hasACLPermission(storage, username, READ)) {
-            permissionService.addPermission(storage, storage.getUser().getUsername(), READ, user);
+            permissionService.addPermission(storage, storage.getUser().getUsername(), READ, username);
         }
         if (!permissionService.hasACLPermission(storage, username, WRITE)) {
-            permissionService.addPermission(storage, storage.getUser().getUsername(), WRITE, user);
+            permissionService.addPermission(storage, storage.getUser().getUsername(), WRITE, username);
         }
         if (!permissionService.hasACLPermission(storage, username, ADMINISTRATION)) {
-            permissionService.addPermission(storage, storage.getUser().getUsername(), ADMINISTRATION, user);
+            permissionService.addPermission(storage, storage.getUser().getUsername(), ADMINISTRATION, username);
         }
     }
 

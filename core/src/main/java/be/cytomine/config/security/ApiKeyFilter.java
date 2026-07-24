@@ -1,20 +1,5 @@
 package be.cytomine.config.security;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -56,17 +41,12 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         this.secUserRepository = secUserRepository;
     }
 
-    public static String generateKeys(
-        String method,
-        String contentMd5,
-        String contentType,
-        String date,
-        User user
-    ) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
+    public static String generateKeys(String method, String contentMd5, String contentType, String date,
+        String privatekey) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
         String canonicalHeaders = method + "\n" + contentMd5 + "\n" + contentType + "\n" + date;
 
-        String key = user.getPrivateKey();
-        SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
+
+        SecretKeySpec signingKey = new SecretKeySpec(privatekey.getBytes(), "HmacSHA1");
         // get an hmac_sha1 Mac instance and initialize with the signing key
         Mac mac = Mac.getInstance("HmacSHA1");
         mac.init(signingKey);
@@ -80,11 +60,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
         tryAPIAuthentification(request);
         filterChain.doFilter(request, response);
     }
@@ -106,10 +83,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         }
         try {
             String contentMd5 = Objects.requireNonNullElse(request.getHeader("content-MD5"), "");
-            String contentType = Objects.requireNonNullElse(
-                request.getHeader("Content-Type"),
-                Objects.requireNonNullElse(request.getHeader("content-type"), "")
-            );
+            String contentType = Objects.requireNonNullElse(request.getHeader("Content-Type"),
+                Objects.requireNonNullElse(request.getHeader("content-type"), ""));
             String date = (request.getHeader("date") != null) ? request.getHeader("date") : "";
 
             String accessKey = authorization.substring(authorization.indexOf(" ") + 1, authorization.indexOf(":"));
@@ -121,7 +96,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                 log.debug("User cannot be extracted with accessKey {}", accessKey);
                 throw new AuthenticationException("User cannot be extracted with accessKey " + accessKey);
             } else {
-                String signature = generateKeys(request.getMethod(), contentMd5, contentType, date, user.get());
+                String signature =
+                    generateKeys(request.getMethod(), contentMd5, contentType, date, user.get().getPrivateKey());
                 if (authorizationSign.equals(signature)) {
                     this.reauthenticate(user.get());
                     return true;
@@ -131,13 +107,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                     // So the client thinks content-type is "" while spring boot set it to application/json.
                     // In order to match the client signature, we generate it with an empty value.
                     // => it would be better to improve the java client to set a valid content type.
-                    String signatureWithEmptyContentType = generateKeys(
-                        request.getMethod(),
-                        contentMd5,
-                        "",
-                        date,
-                        user.get()
-                    );
+                    String signatureWithEmptyContentType =
+                        generateKeys(request.getMethod(), contentMd5, "", date, user.get().getPrivateKey());
                     if (authorizationSign.equals(signatureWithEmptyContentType)) {
                         this.reauthenticate(user.get());
                         return true;
@@ -160,11 +131,9 @@ public class ApiKeyFilter extends OncePerRequestFilter {
      */
     private void reauthenticate(final User secUser) {
         UserDetails userDetails = createSpringSecurityUser(secUser);
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            userDetails,
-            userDetails.getPassword(),
-            userDetails.getAuthorities()
-        );
+        UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(),
+                userDetails.getAuthorities());
         authenticationToken.setDetails(secUser);
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
@@ -174,13 +143,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         if (!user.getEnabled()) {
             throw new ForbiddenException("User with access key " + user.getPublicKey() + "is not enabled.");
         }
-        return new org.springframework.security.core.userdetails.User(
-            user.getUsername(),
-            "null",
-            user.getRoles()
-                .stream()
-                .map(x -> new SimpleGrantedAuthority(x.getAuthority()))
-                .collect(Collectors.toList())
-        );
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), "null",
+            user.getRoles().stream().map(x -> new SimpleGrantedAuthority(x.getAuthority()))
+                .collect(Collectors.toList()));
     }
 }

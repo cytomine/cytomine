@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -17,7 +18,6 @@ import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.meta.Description;
 import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.meta.DescriptionRepository;
@@ -79,7 +79,7 @@ public class DescriptionService extends ModelService {
     }
 
     public CommandResponse add(JsonObject jsonObject) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         //Get the associated domain
         CytomineDomain domain = getCytomineDomain(
             jsonObject.getJSONAttrStr("domainClassName"),
@@ -104,30 +104,31 @@ public class DescriptionService extends ModelService {
         } else {
             securityACLService.checkUserAccessRightsForMeta(domain, currentUser);
         }
-        Command command = new AddCommand(currentUser, null);
+        Command command = new AddCommand(currentUserService.getCurrentUserOld(), null);
         return executeCommand(command, null, jsonObject);
     }
 
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         CytomineDomain parentDomain = getCytomineDomain(
             ((Description) domain).getDomainClassName(),
             ((Description) domain).getDomainIdent()
         );
         securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
-        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain,
+            jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         CytomineDomain parentDomain = getCytomineDomain(
             ((Description) domain).getDomainClassName(),
             ((Description) domain).getDomainIdent()
         );
         securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
         return executeCommand(c, domain, null);
     }
 

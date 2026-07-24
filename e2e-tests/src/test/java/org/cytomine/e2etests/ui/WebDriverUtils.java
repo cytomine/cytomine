@@ -7,7 +7,6 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.springframework.stereotype.Component;
 
@@ -55,18 +54,6 @@ public class WebDriverUtils {
         wait.until(d -> {
             try {
                 d.findElement(by).sendKeys(keys);
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-        });
-    }
-
-    void bySelectByValue(Wait<WebDriver> wait, By by, String value) {
-        byIsDisplayed(wait, by);
-        wait.until(d -> {
-            try {
-                new Select(d.findElement(by)).selectByValue(value);
                 return true;
             } catch (Exception e) {
                 return false;

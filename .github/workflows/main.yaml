@@ -20,6 +20,7 @@ jobs:
     uses: ./.github/workflows/cbir.yaml
   ims:
     uses: ./.github/workflows/ims.yaml
+    secrets: inherit
   sam:
     uses: ./.github/workflows/sam.yaml
   web-ui:

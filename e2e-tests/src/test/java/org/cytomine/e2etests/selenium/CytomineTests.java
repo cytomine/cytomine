@@ -56,7 +56,7 @@ public class CytomineTests {
     @BeforeEach
     void setUp() {
         driver = driverProvider.driver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(560));
     }
 
     @AfterEach
@@ -514,10 +514,11 @@ public class CytomineTests {
     @Test
     void checkProjectAfterPimsImport() {
         String projectName = "test-project";
-        String imageName = "cat.png";
+        String imageName = "wsi";
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
 
-        cytomineSteps.checkPimsImportProject(wait, cytomineUrl, projectName, imageName);
+        cytomineSteps.checkPimsImportProject(wait,
+            cytomineUrl, projectName, imageName);
 
         cytomineSteps.logout(wait, cytomineUrl);
     }

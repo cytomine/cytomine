@@ -168,21 +168,6 @@ public class WiremockRepository {
         );
     }
 
-    @Bean
-    public WireMockServer wireMockServer() {
-        return SERVER;
-    }
-
-    @Bean
-    public DynamicPropertyRegistrar wiremockProperties() {
-        return registry -> {
-            registry.add("application.appEngine.apiUrl", () -> "http://localhost:" + SERVER.port());
-            registry.add("application.cbirURL", () -> "http://localhost:" + SERVER.port());
-            registry.add("application.pimsURL", () -> "http://localhost:" + SERVER.port());
-            registry.add("application.repositoryURL", () -> "http://localhost:" + SERVER.port());
-        };
-    }
-
     private static void stubTestUser(String username, long id, String role) {
         SERVER.stubFor(WireMock.get(urlPathEqualTo("/users/search/" + username))
             .atPriority(2)
@@ -206,11 +191,31 @@ public class WiremockRepository {
                       "created": "2024-01-01T00:00:00",
                       "privateKey": null,
                       "publicKey": null,
-                      "roles": [{"dataType": "ROLE", "id": 1, "authority": "%s", "created": "2024-01-01T00:00:00", "updated": null, "deleted": null}]
+                      "roles": [
+                         {
+                            "dataType": "ROLE", "id": 1, "authority": "%s", "created": "2024-01-01T00:00:00", 
+                            "updated": null, "deleted": null
+                         }
+                      ]
                     }
                     """.formatted(id, username, username.toLowerCase(), role))
             )
         );
+    }
+
+    @Bean
+    public WireMockServer wireMockServer() {
+        return SERVER;
+    }
+
+    @Bean
+    public DynamicPropertyRegistrar wiremockProperties() {
+        return registry -> {
+            registry.add("application.appEngine.apiUrl", () -> "http://localhost:" + SERVER.port());
+            registry.add("application.cbirURL", () -> "http://localhost:" + SERVER.port());
+            registry.add("application.pimsURL", () -> "http://localhost:" + SERVER.port());
+            registry.add("application.repositoryURL", () -> "http://localhost:" + SERVER.port());
+        };
     }
 
     @SneakyThrows

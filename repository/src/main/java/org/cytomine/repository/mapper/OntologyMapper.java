@@ -14,7 +14,6 @@ import be.cytomine.common.repository.model.command.payload.response.RelationResp
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.ontology.payload.OntologyUser;
-import be.cytomine.common.mapper.BaseMapper;
 
 @Mapper(componentModel = "spring", uses = {TermMapper.class, be.cytomine.common.mapper.BaseMapper.class})
 public interface OntologyMapper {

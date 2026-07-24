@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
-import be.cytomine.common.mapper.BaseMapper;
 
 @Mapper(componentModel = "spring", uses = be.cytomine.common.mapper.BaseMapper.class)
 public interface TermRelationMapper {

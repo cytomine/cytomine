@@ -64,14 +64,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class CompanionFileResourceTests {
 
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private BasicInstanceBuilder builder;
     @Autowired
     private MockMvc restCompanionFileControllerMockMvc;
-
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private UrlApi urlApi;
+
     @Test
     @Transactional
     public void listCompanionFileByAbstractImage() throws Exception {

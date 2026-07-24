@@ -9,8 +9,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import be.cytomine.domain.CytomineDomain;
+
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
@@ -165,7 +166,7 @@ public class ProjectMemberService {
                 pru.setUser(currentUserService.getCurrentUserOld());
                 projectRepresentativeUserService.add(pru.toJsonObject(urlApi));
 
-                projectRepresentativeUserService.find(project,  user)
+                projectRepresentativeUserService.find(project, user)
                     .ifPresent(x -> projectRepresentativeUserService.delete(x, null, null, false));
 
             }

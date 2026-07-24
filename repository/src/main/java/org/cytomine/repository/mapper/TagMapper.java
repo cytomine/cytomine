@@ -7,7 +7,6 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.mapper.BaseMapper;
 import be.cytomine.common.repository.model.command.payload.request.TagCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.TagResponse;
 import be.cytomine.common.repository.model.tag.payload.CreateTag;

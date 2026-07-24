@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.request.TagDomainAssociationCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
 import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
-import be.cytomine.common.mapper.BaseMapper;
 
 @Mapper(componentModel = "spring", uses = be.cytomine.common.mapper.BaseMapper.class)
 public interface TagDomainAssociationMapper {

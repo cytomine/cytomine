@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.cytomine.e2etests.utils.ReportType;
+import org.cytomine.e2etests.utils.Role;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -630,6 +631,19 @@ public class CytomineSteps {
         String email,
         String password
     ) {
+        createUser(wait, cytomineUrl, username, firstname, lastname, email, password, Role.ADMIN);
+    }
+
+    public void createUser(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String username,
+        String firstname,
+        String lastname,
+        String email,
+        String password,
+        Role role
+    ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New user')]");
@@ -639,9 +653,25 @@ public class CytomineSteps {
         webDriverUtils.bySendKeys(wait, By.name("lastname"), lastname);
         webDriverUtils.bySendKeys(wait, By.name("email"), email);
         webDriverUtils.bySendKeys(wait, By.name("password"), password);
+        webDriverUtils.bySelectByValue(
+            wait,
+            By.xpath("//div[contains(@class, 'field') and .//label[normalize-space(text())='Role']]//select"),
+            role.getValue()
+        );
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully created')]"));
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[normalize-space(text())='" + username + "']"));
+    }
+
+    public void verifyAccountRole(Wait<WebDriver> wait, URL cytomineUrl, Role role) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/account");
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath(
+                "//div[contains(@class, 'field') and .//label[normalize-space(text())='Role']]"
+                    + "//span[contains(@class, 'tag') and normalize-space(text())='" + role.getLabel() + "']"
+            )
+        );
     }
 
     public void editUser(

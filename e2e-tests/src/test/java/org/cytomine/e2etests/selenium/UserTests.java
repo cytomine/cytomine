@@ -9,11 +9,14 @@ import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.AnnotationTools;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.cytomine.e2etests.ui.WebDriverUtils;
+import org.cytomine.e2etests.utils.Role;
 import org.cytomine.e2etests.utils.Screenshots;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -75,6 +78,26 @@ public class UserTests {
         cytomineSteps.logout(wait, cytomineUrl);
 
         cytomineSteps.login(wait, cytomineUrl, username, password);
+        cytomineSteps.logout(wait, cytomineUrl);
+
+        keycloakClient.deleteUser(username);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Role.class)
+    void createUserWithRole(Role role) {
+        String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
+        String firstname = "Selenium";
+        String lastname = "User-" + randomUUID().toString().substring(0, 8);
+        String email = username + "@selenium.test";
+        String password = "Selenium1!";
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password, role);
+        cytomineSteps.logout(wait, cytomineUrl);
+
+        cytomineSteps.login(wait, cytomineUrl, username, password);
+        cytomineSteps.verifyAccountRole(wait, cytomineUrl, role);
         cytomineSteps.logout(wait, cytomineUrl);
 
         keycloakClient.deleteUser(username);

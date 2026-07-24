@@ -16,6 +16,8 @@
 
 import {Bar} from 'vue-chartjs';
 
+import {formatMomentDate} from '@/utils/date';
+
 export default {
   name: 'activity-overview-chart',
   extends: Bar,
@@ -80,9 +82,8 @@ export default {
     },
     updateLabels() {
       this.chartData.labels = this.projectConnections.map(item => {
-        let moment = this.$options.filters.moment;
-        return this.daysRange === 1 ? moment(Number(item.date), 'll')
-          : [moment(Number(item.date), 'll') + ' - ',  moment(Number(item.endDate), 'll')];
+        return this.daysRange === 1 ? formatMomentDate(Number(item.date), 'll')
+          : [formatMomentDate(Number(item.date), 'll') + ' - ',  formatMomentDate(Number(item.endDate), 'll')];
       });
     },
     async updateChart() {

@@ -63,6 +63,7 @@ spring:
 
   data:
     mongodb:
+      auto-index-creation: false
       authentication-database: admin
       username: ${MONGO_USER:admin}
       password: ${MONGO_PASS:password}

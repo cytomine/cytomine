@@ -53,7 +53,7 @@ export default {
 </script>
 
 <style scoped>
->>> .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }
@@ -64,12 +64,12 @@ export default {
   width: 10rem;
 }
 
->>> .carousel-arrow .icon.has-icons-right {
+:deep(.carousel-arrow .icon.has-icons-right) {
   color: #3273dc;
   right: 0.5rem;
 }
 
->>> .carousel-arrow .icon.has-icons-left {
+:deep(.carousel-arrow .icon.has-icons-left) {
   color: #3273dc;
   left: 0.5rem;
 }

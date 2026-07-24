@@ -205,7 +205,7 @@
         <template v-if="!isReviewedAnnotation">
           <tr>
             <td><strong>{{ $t('created-on') }}</strong></td>
-              <td> {{ Number(annotation.created) | moment('ll') }} </td>
+              <td> {{ formatMomentDate(Number(annotation.created), 'll') }} </td>
           </tr>
           <tr v-if="isImageInReviewMode">
             <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
@@ -225,7 +225,7 @@
           </tr>
           <tr>
             <td><strong>{{$t('reviewed-on')}}</strong></td>
-            <td> {{ Number(annotation.created) | moment('ll') }} </td>
+            <td> {{ formatMomentDate(Number(annotation.created), 'll') }} </td>
           </tr>
           <tr v-if="isImageInReviewMode">
             <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
@@ -303,6 +303,7 @@ import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPrev
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import ChannelName from '@/components/viewer/ChannelName.vue';
 import constants from '@/utils/constants.js';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'annotations-details',
@@ -441,6 +442,7 @@ export default {
   },
   methods: {
     appendShortTermToken,
+    formatMomentDate,
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];
     },
@@ -660,17 +662,11 @@ a.is-fullwidth {
   margin-top: 4px;
 }
 
-/**
-* https://stackoverflow.com/a/55368933
-* Since the project is using Sass and Vue 2.6.10, use `::v-deep` instead of `>>>` so it doesn't break validation.
-* Note that it's deprecated but will in Vue 3.
-* TODO: update >>> and ::v-deep using the unified :deep() selector when using the latest Vue.
-*/
-::v-deep .sl-vue-tree-node-item {
+:deep(.sl-vue-tree-node-item) {
   font-size: 0.9em;
 }
 
-::v-deep .tag {
+:deep(.tag) {
     margin-right: 5px;
     margin-bottom: 5px !important;
     background-color: rgba(0, 0, 0, 0.04);

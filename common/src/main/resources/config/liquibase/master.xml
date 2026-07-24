@@ -136,4 +136,7 @@
 
     <include file="/config/liquibase/changelog/2026-07-20-seed-test-users.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-07-20-configuration-id-sequence.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

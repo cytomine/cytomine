@@ -217,7 +217,7 @@ td:first-child {
   position: relative;
 }
 
->>> .chart {
+:deep(.chart) {
   position: absolute;
   height: 100%;
   width: 100%;

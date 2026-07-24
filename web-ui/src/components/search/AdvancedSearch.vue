@@ -126,7 +126,7 @@
             </b-table-column>
 
             <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-              {{ Number(project.lastActivity) | moment('ll') }}
+              {{ formatMomentDate(Number(project.lastActivity), 'll') }}
             </b-table-column>
 
             <b-table-column label=" " centered width="150">
@@ -266,6 +266,7 @@ import {ImageInstanceCollection, ProjectCollection, TagCollection} from '@/api';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 import {appendShortTermToken} from '@/utils/token-utils.js';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'advanced-search',
@@ -298,6 +299,7 @@ export default {
   },
   methods: {
     appendShortTermToken,
+    formatMomentDate,
     debounceSearchString: _.debounce(async function (value) {
       this.searchString = value;
     }, 500),
@@ -435,7 +437,7 @@ export default {
   margin-bottom: 0.4em;
 }
 
->>> .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }

@@ -366,11 +366,11 @@ th, td {
   padding: 0.5em 2em !important;
 }
 
->>> .message-body {
+:deep(.message-body) {
   padding: 1em !important;
 }
 
->>> select, >>> input[type=text] {
+:deep(select), :deep(input[type=text]) {
   width: 26em;
 }
 </style>

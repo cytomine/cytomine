@@ -1,6 +1,5 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
-import moment from 'moment';
 
 import ActivityLogs from '@/components/utils/ActivityLogs';
 import ActivityLogsItem from '@/components/utils/ActivityLogsItem';
@@ -25,10 +24,6 @@ describe('ActivityLogs.vue', () => {
   };
 
   let wrapper;
-
-  beforeAll(() => {
-    localVue.filter('moment', vi.fn((value, format) => moment(Number(value)).format(format)));
-  });
 
   beforeEach(() => {
     Project.fetchCommandHistory.mockResolvedValue([]);

@@ -71,7 +71,7 @@ export default {
 </script>
 
 <style scoped>
->>> input[type=text] {
+:deep(input[type=text]) {
   width: 26em;
 }
 </style>

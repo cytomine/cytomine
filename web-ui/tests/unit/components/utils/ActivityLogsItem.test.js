@@ -13,7 +13,6 @@ vi.mock('@/utils/store-helpers', () => ({
 }));
 
 vi.mock('@/utils/date', () => ({
-  // Formats in UTC so the assertion is deterministic regardless of the test runner's local timezone
   formatMomentDate: vi.fn((value, format) => moment.utc(Number(value)).format(format))
 }));
 
@@ -21,7 +20,7 @@ describe('ActivityLogsItem.vue', () => {
   let wrapper;
   const action = {
     id: 1,
-    created: '1626874800000', // Timestamp for 07/21/2021
+    created: '1626874800000',
     serviceName: 'userAnnotationService',
     className: 'be.cytomine.command.AddCommand',
     data: JSON.stringify({
@@ -73,12 +72,10 @@ describe('ActivityLogsItem.vue', () => {
   it('should toggle preview when hovering over', async () => {
     expect(wrapper.vm.showPreview).toBe(false);
 
-    // Simulate mouse enter (hover)
     wrapper.vm.enter();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.showPreview).toBe(true);
 
-    // Simulate mouse leave
     wrapper.vm.leave();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.showPreview).toBe(false);

@@ -1,5 +1,6 @@
 package be.cytomine.controller.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,9 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.common.repository.model.user.payload.UpdateUser;
+import be.cytomine.dto.Account;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.security.AccountService;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -32,8 +35,9 @@ public class UserController {
 
     public static final String UNABLE_TO_FIND_USER = "Unable to find user with id: %s";
 
-    private final UserHttpContract userHttpContract;
+    private final AccountService accountService;
     private final CurrentUserService currentUserService;
+    private final UserHttpContract userHttpContract;
 
     @GetMapping("/user/{id}.json")
     public UserResponse show(@PathVariable long id) {
@@ -47,7 +51,22 @@ public class UserController {
     public Optional<HttpCommandResponse> create(@RequestBody CreateUser createUser) {
         log.debug("REST request to save User");
         long userId = currentUserService.getCurrentUser().getId();
+        accountService.createAccount(toAccount(createUser));
         return userHttpContract.create(userId, createUser);
+    }
+
+    private Account toAccount(CreateUser createUser) {
+        return new Account(
+            createUser.username(),
+            createUser.lastname().orElse(""),
+            createUser.firstname().orElse(""),
+            createUser.password(),
+            createUser.email(),
+            true,
+            createUser.developer(),
+            createUser.language().toLowerCase(),
+            List.of(createUser.role().substring(5))
+        );
     }
 
     @PutMapping("/user/{id}.json")

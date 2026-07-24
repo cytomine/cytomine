@@ -31,7 +31,7 @@ public interface UserMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", source = "now")
     @Mapping(target = "developer", source = "entity.developer")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"role"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"role", "password"})
     UserEntity mapToUserEntity(CreateUser entity, long userId, Timestamp now, Set<RoleEntity> roles);
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted"})

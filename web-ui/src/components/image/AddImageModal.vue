@@ -38,7 +38,7 @@
           </b-table-column>
 
           <b-table-column field="created" :label="$t('created-on')" sortable>
-            {{ Number(image.created) | moment('ll LT') }}
+            {{ formatMomentDate(Number(image.created), 'll LT') }}
           </b-table-column>
 
           <b-table-column label=" " centered>
@@ -71,6 +71,7 @@ import {AbstractImageCollection, ImageInstance} from '@/api';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 import CytomineTable from '@/components/utils/CytomineTable.vue';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'add-image-modal',
@@ -117,6 +118,7 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
     async addImage(abstractImage) {
       let propsTranslation = {imageName: abstractImage.originalFilename, projectName: this.project.name};
       try {

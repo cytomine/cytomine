@@ -22,7 +22,7 @@
       <div class="columns">
         <h2 class="column is-marginless">{{$t('members-activity')}}</h2>
         <p class="column has-text-right is-size-7 has-text-grey">
-          {{$t('data-last-updated-on', {time: $options.filters.moment(lastUpdate, 'LTS')})}}
+          {{$t('data-last-updated-on', {time: formatMomentDate(lastUpdate, 'LTS')})}}
         </p>
       </div>
 
@@ -96,7 +96,7 @@
 
           <b-table-column field="lastConnection" :label="$t('last-connection')" sortable width="100">
             <template v-if="member.lastConnection">
-              {{Number(member.lastConnection) | moment('ll LT')}}
+              {{formatMomentDate(Number(member.lastConnection), 'll LT')}}
             </template>
             <em v-else class="has-text-grey">{{$t('no-record')}}</em>
           </b-table-column>
@@ -154,6 +154,7 @@ import Username from '@/components/user/Username.vue';
 import constants from '@/utils/constants.js';
 import {getWildcardRegexp} from '@/utils/string-utils';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'members-activity',
@@ -211,6 +212,7 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
     async fetchData() {
       try {
         await Promise.all([

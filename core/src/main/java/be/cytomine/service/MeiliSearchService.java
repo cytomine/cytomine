@@ -36,7 +36,6 @@ public class MeiliSearchService {
         try {
             Index index = meiliSearchClient.index(indexId);
 
-            // Build the filter string exactly as in the original
             String meiliFilter = null;
             if (filters != null && !filters.isEmpty()) {
                 String joined = filters.stream()
@@ -47,7 +46,6 @@ public class MeiliSearchService {
                 }
             }
 
-            // Build and execute the search request
             SearchRequest searchRequest = new SearchRequest(query != null ? query : "")
                 .setLimit(limit)
                 .setOffset(offset);
@@ -58,7 +56,6 @@ public class MeiliSearchService {
 
             Searchable result = index.search(searchRequest);
 
-            // Extract hits
             return result.getHits();
 
         } catch (Exception e) {
@@ -68,14 +65,11 @@ public class MeiliSearchService {
 
     public Map getImage(String imageId) {
         try {
-            Index index = meiliSearchClient.index(indexId); // 'client' and 'indexId' are class fields
 
-            // Fetch the document as a Map (raw JSON structure)
-            // The SDK automatically deserializes the JSON into the provided class type
+            Index index = meiliSearchClient.index(indexId);
             return index.getDocument(imageId, Map.class);
 
         } catch (Exception e) {
-            // Catch-all for network timeouts, serialization issues, etc.
             throw new SearchException("MeiliSearch getDocument failed", 500, e.getMessage());
         }
     }
@@ -86,15 +80,12 @@ public class MeiliSearchService {
         Index index = meiliSearchClient.index(indexId);
 
         String[] attributes = index.getFilterableAttributesSettings();
-        // Build the search request
         SearchRequest searchRequest = new SearchRequest("")
             .setFacets(attributes)
             .setLimit(0); // Only facet distribution, no hits
 
-        // Execute the search
         SearchResult result = (SearchResult) index.search(searchRequest);
 
-        // Extract facet distribution
         return result.getFacetDistribution();
     }
 }

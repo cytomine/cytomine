@@ -154,7 +154,7 @@ def run_import_datasets(
                 project = get_project(parent_dataset, projects)
 
                 image_summary = ImageImporter(
-                    bucket, # Pass the individual dataset folder as the base_path
+                    bucket,
                     cytomine_auth,
                     c.current_user,
                     storage_id,
@@ -215,19 +215,14 @@ def dataclass_to_dict(obj: Any):
     """
     if obj is None:
         return None
-    # Primitives
     if isinstance(obj, (str, int, float, bool)):
         return obj
-    # Enums
     if isinstance(obj, Enum):
         return obj.value
-    # Datetime
     if isinstance(obj, datetime):
         return obj.isoformat()
-    # UUID
     if isinstance(obj, uuid.UUID):
         return str(obj)
-    # Code object
     if isinstance(obj, Code):
         return {
             "code": obj.code,
@@ -235,24 +230,18 @@ def dataclass_to_dict(obj: Any):
             "meaning": obj.meaning,
             "scheme_version": obj.scheme_version,
         }
-    # CodeAttributes (which is a dict-like mapping from str to Code)
     if isinstance(obj, CodeAttributes):
         return {key: dataclass_to_dict(value) for key, value in obj.items()}
-    # Attributes / CustomAttributes (dict of str -> any)
     if isinstance(obj, Attributes):
         return {key: dataclass_to_dict(value) for key, value in obj.items()}
-    # List or tuple
     if isinstance(obj, (list, tuple)):
         return [dataclass_to_dict(item) for item in obj]
-    # Dict (handles any mapping, including from other libraries)
     if isinstance(obj, dict):
         return {key: dataclass_to_dict(value) for key, value in obj.items()}
-    # Any other dataclass
     if is_dataclass(obj):
         result = {}
         for field in fields(obj):
             value = getattr(obj, field.name)
-            # Skip internal/private fields (optional, adjust as needed)
             if field.name.startswith("_"):
                 continue
             result[field.name] = dataclass_to_dict(value)
@@ -280,21 +269,16 @@ def flatten_image(image: Image, dataset: Dataset, slide_to_block: Mapping[Slide,
     if block is None:
         raise ValueError(f"Block not found for slide {slide.identifier}")
 
-    # Find all observations that refer to any specimen in this block
     observations_by_specimen = {}
     for obs in dataset.observations.values():
-        # Observation.item can be a Specimen (or other)
         if isinstance(obs.item, Specimen):
             alias = obs.item.reference.alias
             observations_by_specimen.setdefault(alias, []).append(obs)
 
-    # Build list of specimens with their full context
     specimens_list = []
-    # Better: iterate over all specimens in the dataset and check if the block is in specimen.blocks
     for being in dataset.biological_beings.values():
         for specimen in being.specimens.values():
             if block in specimen.blocks.values():
-                # Build specimen dict
                 specimen_dict = {
                     "alias": specimen.reference.alias if specimen.reference else None,
                     "identifier": specimen.identifier,
@@ -315,7 +299,6 @@ def flatten_image(image: Image, dataset: Dataset, slide_to_block: Mapping[Slide,
                     },
                     "observations": []
                 }
-                # Add observations for this specimen
                 for obs in observations_by_specimen.get(specimen.reference.alias, []):
                     observer_list = []
                     for observer in obs.observers:
@@ -336,7 +319,6 @@ def flatten_image(image: Image, dataset: Dataset, slide_to_block: Mapping[Slide,
                     })
                 specimens_list.append(specimen_dict)
 
-    # Build flat structure
     flat = {
         "image": dataclass_to_dict(image),
         "slide": {
@@ -366,17 +348,17 @@ def _extract_staining_info(staining):
     """Extract staining details from StainingProcedure or StainingList."""
     if staining is None:
         return None
-    if hasattr(staining, "procedure"):  # StainingProcedure
+    if hasattr(staining, "procedure"):
         return {"procedure": dataclass_to_dict(staining.procedure)}
-    elif hasattr(staining, "stains"):   # StainingList
+    elif hasattr(staining, "stains"):
         stains_list = []
         for stain in staining.stains:
-            if hasattr(stain, "compound"):  # ChemicalStain
+            if hasattr(stain, "compound"):
                 stains_list.append({
                     "type": "chemical",
                     "compound": dataclass_to_dict(stain.compound),
                 })
-            elif hasattr(stain, "target"):  # TargetedStain (Immunogenic, InSituHybridisation)
+            elif hasattr(stain, "target"):
                 stain_dict = {
                     "type": "targeted",
                     "compound": stain.compound.value if isinstance(stain.compound, Enum) else stain.compound,
@@ -396,52 +378,43 @@ def _extract_staining_info(staining):
 def _configure_index(index) -> None:
     """Configure searchable and filterable attributes on the MeiliSearch index."""
     searchable_attributes = [
-        # Image identifiers
         "image.identifier",
         "image.uid",
         "image.reference.alias",
 
-        # Slide identifiers
         "slide.identifier",
         "slide.alias",
 
-        # Block identifiers
         "block.identifier",
         "block.alias",
 
-        # Specimen & biological being identifiers
         "specimens.identifier",
         "specimens.alias",
         "specimens.biological_being.identifier",
         "specimens.biological_being.alias",
-        "specimens.biological_being.strain.meaning",        # e.g., "WISTAR HAN"
-        "specimens.biological_being.animal_species.meaning", # e.g., "RAT"
-        "specimens.biological_being.sex",                   # "Male"/"Female"
-        "specimens.biological_being.control_status.meaning", # "Controlled"/"Treated"
-        "specimens.biological_being.disposition.meaning",    # e.g., "TERMINAL SACRIFICE"
+        "specimens.biological_being.strain.meaning",
+        "specimens.biological_being.animal_species.meaning",
+        "specimens.biological_being.sex",
+        "specimens.biological_being.control_status.meaning",
+        "specimens.biological_being.disposition.meaning",
 
-        # Anatomical site
-        "specimens.anatomical_site.meaning",                # e.g., "KIDNEY", "BONE MARROW"
+        "specimens.anatomical_site.meaning",
 
-        # Observations
         "specimens.observations.identifier",
         "specimens.observations.observation_alias",
-        "specimens.observations.code_attributes.MISTRESC.meaning",  # e.g., "UNREMARKABLE"
-        "specimens.observations.code_attributes.MITEST.meaning",    # e.g., "General Histopathologic Exam, Qual"
-        "specimens.observations.custom_attributes.MIORRES",         # free text: "No Abnormalities Detected"
+        "specimens.observations.code_attributes.MISTRESC.meaning",
+        "specimens.observations.code_attributes.MITEST.meaning",
+        "specimens.observations.custom_attributes.MIORRES",
 
-        # Observers
         "specimens.observations.observers.identifier",
         "specimens.observations.observers.alias",
-        "specimens.observations.observers.observer_type",           # "Human"
+        "specimens.observations.observers.observer_type",
 
-        # Dataset
         "dataset.title",
         "dataset.description",
         "dataset.accession",
         "dataset.alias",
 
-        # Policy (if you want users to search by policy terms)
         "policy.identifier",
         "policy.type_of_dataset",
         "policy.allowed_geographical_distribution",

@@ -3,8 +3,9 @@ import ChartZoom from 'chartjs-plugin-zoom';
 
 export default {
   name: 'annotation-profile-projection-chart',
-  extends: Line,
+  components: {Line},
   props: {
+    cssClasses: {type: String, default: ''},
     annotation: Object,
     data: Array,
     spatialAxis: Boolean,
@@ -13,7 +14,7 @@ export default {
   },
   data() {
     return {
-      chartData: null
+      chartData: {labels: [], datasets: []},
     };
   },
   computed: {
@@ -41,22 +42,53 @@ export default {
       } else {
         return this.sortedData.map(item => `(${item.x}, ${item.y})`);
       }
-    }
+    },
+    chartOptions() {
+      return {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true
+          },
+          zoom: {
+            pan: {
+              enabled: true,
+              mode: 'xy',
+            },
+            zoom: {
+              wheel: {enabled: true},
+              drag: {enabled: false},
+              mode: 'xy',
+            }
+          }
+        },
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: this.$t('pixel-intensity')
+            },
+            beginAtZero: true,
+          }
+        },
+      };
+    },
   },
   watch: {
     async queryParams() {
-      this.doRenderChart();
+      this.updateData();
     }
   },
   methods: {
     resetZoom() {
-      this.$data._chart.resetZoom();
+      this.$refs.chartRef.chart.resetZoom();
     },
-    async doRenderChart() {
+    async updateData() {
       try {
         let data = this.sortedData;
 
-        this.renderChart({
+        this.chartData = {
           labels: this.labels,
           datasets: [
             {
@@ -67,38 +99,7 @@ export default {
               backgroundColor: '#61b2e8'
             },
           ]
-        }, {
-          maintainAspectRatio: false,
-          responsive: true,
-          legend: {
-            display: true
-          },
-          scales: {
-            yAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: this.$t('pixel-intensity')
-              },
-              ticks: {
-                beginAtZero: true,
-              }
-            }]
-          },
-          plugins: {
-            zoom: {
-              pan: {
-                enabled: true,
-                mode: 'xy',
-              },
-
-              zoom: {
-                enabled: true,
-                drag: false,
-                mode: 'xy',
-              }
-            }
-          }
-        });
+        };
       } catch (error) {
         console.log(error);
         this.$emit('error', true);
@@ -118,7 +119,18 @@ export default {
     },
   },
   async mounted() {
-    this.addPlugin(ChartZoom);
-    this.doRenderChart();
-  }
+    await this.updateData();
+  },
+  render(h) {
+    return h('div', {class: this.cssClasses}, [
+      h(Line, {
+        ref: 'chartRef',
+        props: {
+          data: this.chartData,
+          options: this.chartOptions,
+          plugins: [ChartZoom],
+        },
+      }),
+    ]);
+  },
 };

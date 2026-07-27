@@ -20,8 +20,9 @@ import {AnnotationType} from '@/api';
 import {formatMomentDate} from '@/utils/date';
 export default {
   name: 'number-annotations-chart',
-  extends: Bar,
+  components: {Bar},
   props: {
+    cssClasses: {type: String, default: ''},
     project: Object,
     term: Number,
     startDate: Number,
@@ -34,7 +35,25 @@ export default {
         [AnnotationType.USER]: [],
         [AnnotationType.REVIEWED]: []
       },
-      chartData: null
+      chartData: {
+        labels: [],
+        datasets: [
+          {
+            label: this.$t('user-annotations'),
+            data: [],
+            backgroundColor: '#4480c4',
+            borderWidth: 0,
+            categoryPercentage: 0.6,
+          },
+          {
+            label: this.$t('reviewed-annotations'),
+            data: [],
+            backgroundColor: '#42ce77',
+            borderWidth: 0,
+            categoryPercentage: 0.6,
+          }
+        ]
+      },
     };
   },
   computed: {
@@ -50,16 +69,29 @@ export default {
         reverseOrder: false,
         term: this.term
       };
-    }
+    },
+    chartOptions() {
+      return {
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            min: 0
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      };
+    },
   },
   watch: {
     async queryParams() {
       await this.fetchData();
-      this.updateChart();
     },
     locale() {
       this.updateLabels();
-      this.updateChart();
     }
   },
   methods: {
@@ -82,46 +114,18 @@ export default {
           : [formatMomentDate(Number(item.date), 'll') + ' - ',  formatMomentDate(Number(item.endDate), 'll')];
       });
     },
-    updateChart() {
-      this.$data._chart.update();
-    }
   },
   async mounted() {
-    this.chartData = {
-      labels: [],
-      datasets: [
-        {
-          label: this.$t('user-annotations'),
-          data: [],
-          backgroundColor: '#4480c4',
-          borderWidth: 0
-        },
-        {
-          label: this.$t('reviewed-annotations'),
-          data: [],
-          backgroundColor: '#42ce77',
-          borderWidth: 0
-        }
-      ]
-    };
-
     await this.fetchData();
-
-    this.renderChart(this.chartData, {
-      maintainAspectRatio: false,
-      scales: {
-        yAxes: [{
-          ticks: {
-            min: 0
-          }
-        }],
-        xAxes: [{
-          categoryPercentage: 0.6,
-          gridLines: {
-            display: false
-          }
-        }]
-      }
-    });
-  }
+  },
+  render(h) {
+    return h('div', {class: this.cssClasses}, [
+      h(Bar, {
+        props: {
+          data: this.chartData,
+          options: this.chartOptions,
+        },
+      }),
+    ]);
+  },
 };

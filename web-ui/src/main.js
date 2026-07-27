@@ -61,17 +61,7 @@ Vue.use(RotateInteraction);
 Vue.use(ModifyInteraction);
 Vue.use(RescaleInteraction);
 
-import Chart from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
-import ChartZoom from 'chartjs-plugin-zoom';
-Chart.plugins.unregister(ChartZoom);
-Chart.plugins.unregister(ChartDataLabels);
-Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
-  anchor: 'end',
-  align: 'end',
-  offset: 5,
-  clamp: true
-});
+import 'chart.js/auto';
 
 import App from './App.vue';
 

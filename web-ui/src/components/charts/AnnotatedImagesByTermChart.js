@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {HorizontalBar} from 'vue-chartjs';
+import {Bar} from 'vue-chartjs';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import {asArray as hexToRgb} from 'ol/color';
@@ -23,15 +23,16 @@ const defaultColor = '#eee';
 
 export default {
   name: 'annotated-images-by-term-chart',
-  extends: HorizontalBar,
+  components: {Bar},
   props: {
+    cssClasses: {type: String, default: ''},
     project: Object,
     startDate: Number,
     endDate: Number
   },
   data() {
     return {
-      chartData: null
+      chartData: {labels: [], datasets: []},
     };
   },
   computed: {
@@ -40,15 +41,42 @@ export default {
         startDate: this.startDate,
         endDate: this.endDate
       };
-    }
+    },
+    chartOptions() {
+      let data = this.chartData.datasets[0] ? this.chartData.datasets[0].data : [];
+      return {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {display: false},
+          datalabels: {
+            anchor: 'end',
+            align: 'end',
+            offset: 5,
+            clamp: true,
+          },
+        },
+        scales: {
+          x: {
+            min: 0,
+            suggestedMax: data.length ? Math.round(Math.max(...data) * 1.2) + 1 : undefined
+          },
+          y: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      };
+    },
   },
   watch: {
     async queryParams() {
-      this.doRenderChart();
+      this.updateData();
     }
   },
   methods: {
-    async doRenderChart() {
+    async updateData() {
       let terms = await this.project.fetchStatsAnnotatedImagesByTerm(this.queryParams);
       let data = terms.map(term => term.value);
       let borderColors = terms.map(term => {
@@ -59,7 +87,7 @@ export default {
 
       this.$emit('nbElems', data.length);
 
-      this.renderChart({
+      this.chartData = {
         labels: terms.map(term => term.key || this.$t('no-term')),
         datasets: [
           {
@@ -68,30 +96,23 @@ export default {
             borderColor: borderColors,
             borderWidth: 1,
             hoverBorderColor: borderColors,
+            categoryPercentage: 0.6,
           }
         ]
-      }, {
-        maintainAspectRatio: false,
-        legend: {display: false},
-        scales: {
-          xAxes: [{
-            ticks: {
-              min: 0,
-              suggestedMax: Math.round(Math.max(...data) * 1.2) + 1
-            }
-          }],
-          yAxes: [{
-            gridLines: {
-              display: false
-            },
-            categoryPercentage: 0.6
-          }]
-        }
-      });
+      };
     }
   },
   async mounted() {
-    this.addPlugin(ChartDataLabels);
-    this.doRenderChart();
-  }
+    await this.updateData();
+  },
+  render(h) {
+    return h(Bar, {
+      props: {
+        chartData: this.chartData,
+        chartOptions: this.chartOptions,
+        cssClasses: this.cssClasses,
+        plugins: [ChartDataLabels],
+      },
+    });
+  },
 };

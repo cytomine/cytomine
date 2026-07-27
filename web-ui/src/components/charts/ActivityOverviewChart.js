@@ -20,8 +20,9 @@ import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'activity-overview-chart',
-  extends: Bar,
+  components: {Bar},
   props: {
+    cssClasses: {type: String, default: ''},
     project: Object,
     startDate: Number,
     endDate: Number,
@@ -32,7 +33,32 @@ export default {
       projectConnections: [],
       imageConsultations: [],
       annotationSelections: [],
-      chartData: null
+      chartData: {
+        labels: [],
+        datasets: [
+          {
+            label: this.$t('project-connections'),
+            data: [],
+            backgroundColor: '#4480c4',
+            borderWidth: 0,
+            categoryPercentage: 0.6,
+          },
+          {
+            label: this.$t('image-consultations'),
+            data: [],
+            backgroundColor: '#f2418e',
+            borderWidth: 0,
+            categoryPercentage: 0.6,
+          },
+          {
+            label: this.$t('annotation-selections'),
+            data: [],
+            backgroundColor: '#ffa500',
+            borderWidth: 0,
+            categoryPercentage: 0.6,
+          }
+        ]
+      },
     };
   },
   computed: {
@@ -46,16 +72,23 @@ export default {
         endDate: this.endDate,
         accumulate: false
       };
-    }
+    },
+    chartOptions() {
+      return {
+        maintainAspectRatio: false,
+        scales: {
+          y: {min: 0},
+          x: {grid: {display: false}},
+        }
+      };
+    },
   },
   watch: {
     async queryParams() {
       await this.fetchData();
-      this.updateChart();
     },
     locale() {
       this.updateLabels();
-      this.updateChart();
     }
   },
   methods: {
@@ -86,52 +119,17 @@ export default {
           : [formatMomentDate(Number(item.date), 'll') + ' - ',  formatMomentDate(Number(item.endDate), 'll')];
       });
     },
-    async updateChart() {
-      this.$data._chart.update();
-    }
   },
   async mounted() {
-    this.chartData = {
-      labels: [],
-      datasets: [
-        {
-          label: this.$t('project-connections'),
-          data: [],
-          backgroundColor: '#4480c4',
-          borderWidth: 0
-        },
-        {
-          label: this.$t('image-consultations'),
-          data: [],
-          backgroundColor: '#f2418e',
-          borderWidth: 0
-        },
-        {
-          label: this.$t('annotation-selections'),
-          data: [],
-          backgroundColor: '#ffa500',
-          borderWidth: 0
-        }
-      ]
-    };
-
     await this.fetchData();
-
-    this.renderChart(this.chartData, {
-      maintainAspectRatio: false,
-      scales: {
-        yAxes: [{
-          ticks: {
-            min: 0,
-          }
-        }],
-        xAxes: [{
-          categoryPercentage: 0.6,
-          gridLines: {
-            display: false // TODO when possible in chart.js: display all grid lines, even when ticks hidden (see https://stackoverflow.com/questions/44361991/show-only-nth-tick-line-on-x-axis-for-chart-js-diagram and https://stackoverflow.com/questions/43604396/how-do-i-persist-the-gridlines-for-ticks-that-are-not-displayed-chart-js and )
-          }
-        }]
-      }
+  },
+  render(h) {
+    return h(Bar, {
+      props: {
+        chartData: this.chartData,
+        chartOptions: this.chartOptions,
+        cssClasses: this.cssClasses,
+      },
     });
-  }
+  },
 };

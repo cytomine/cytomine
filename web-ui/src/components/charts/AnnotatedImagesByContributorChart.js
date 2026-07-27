@@ -14,20 +14,21 @@
 * limitations under the License.
 */
 
-import {HorizontalBar} from 'vue-chartjs';
+import {Bar} from 'vue-chartjs';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 export default {
   name: 'annotated-images-by-contributor-chart',
-  extends: HorizontalBar,
+  components: {Bar},
   props: {
+    cssClasses: {type: String, default: ''},
     project: Object,
     startDate: Number,
     endDate: Number
   },
   data() {
     return {
-      chartData: null
+      chartData: {labels: [], datasets: []},
     };
   },
   computed: {
@@ -36,50 +37,70 @@ export default {
         startDate: this.startDate,
         endDate: this.endDate
       };
-    }
+    },
+    chartOptions() {
+      let data = this.chartData.datasets[0] ? this.chartData.datasets[0].data : [];
+      return {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {display: false},
+          datalabels: {
+            anchor: 'end',
+            align: 'end',
+            offset: 5,
+            clamp: true,
+          },
+        },
+        scales: {
+          x: {
+            min: 0,
+            suggestedMax: data.length ? Math.round(Math.max(...data) * 1.2) + 1 : undefined
+          },
+          y: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      };
+    },
   },
   watch: {
     queryParams() {
-      this.doRenderChart();
+      this.updateData();
     }
   },
   methods: {
-    async doRenderChart() {
+    async updateData() {
       let contribs = await this.project.fetchStatsAnnotatedImagesByCreator(this.queryParams);
       let data = contribs.map(c => c.value);
       this.$emit('nbElems', data.length);
 
-      this.renderChart({
+      this.chartData = {
         labels: contribs.map(c => c.key),
         datasets: [
           {
             data,
             backgroundColor: '#4480c4',
-            borderWidth: 0
+            borderWidth: 0,
+            categoryPercentage: 0.6,
           }
         ]
-      }, {
-        maintainAspectRatio: false,
-        legend: {display: false},
-        scales: {
-          xAxes: [{
-            ticks: {
-              min: 0,
-              suggestedMax: Math.round(Math.max(...data) * 1.2) + 1
-            }
-          }],
-          yAxes: [{
-            gridLines: {
-              display: false
-            },
-            categoryPercentage: 0.6
-          }]
-        }
-      });
+      };
     }
   },
   async mounted() {
-    this.addPlugin(ChartDataLabels);
-    this.doRenderChart();
-  }
+    await this.updateData();
+  },
+  render(h) {
+    return h(Bar, {
+      props: {
+        chartData: this.chartData,
+        chartOptions: this.chartOptions,
+        cssClasses: this.cssClasses,
+        plugins: [ChartDataLabels],
+      },
+    });
+  },
 };

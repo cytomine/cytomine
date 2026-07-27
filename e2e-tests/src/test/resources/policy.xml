@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <POLICY_SET>
-	<POLICY alias="POLICY_uwnxUKIsKp">
+	<POLICY alias="POLICY_a">
 		<DATASET_REF alias="test-project"></DATASET_REF>
 		<ATTRIBUTES>
 			<STRING_ATTRIBUTE>
@@ -17,7 +17,7 @@
 			</STRING_ATTRIBUTE>
 			<STRING_ATTRIBUTE>
 				<TAG>terms_of_use_version</TAG>
-				<VALUE>2025-04-16T22:32:34.054613</VALUE>
+				<VALUE>2021-04-16T22:32:34.054613</VALUE>
 			</STRING_ATTRIBUTE>
 			<STRING_ATTRIBUTE>
 				<TAG>allowed_geographical_distribution</TAG>
@@ -37,7 +37,7 @@
 			</STRING_ATTRIBUTE>
 			<STRING_ATTRIBUTE>
 				<TAG>required_bigpicture_acknowledgements</TAG>
-				<VALUE>”This project has received funding from the Innovative Medicines Initiative 2 Joint Undertaking under grant agreement No 945358. This Joint Undertaking receives support from the European Union’s Horizon 2020 research and innovation program and EFPIA”</VALUE>
+				<VALUE>”some data”</VALUE>
 			</STRING_ATTRIBUTE>
 			<STRING_ATTRIBUTE>
 				<TAG>legal_basis_for_sharing_the_data</TAG>
@@ -56,7 +56,7 @@
 				<VALUE>
 					<STRING_ATTRIBUTE>
 						<TAG>allowed_use</TAG>
-						<VALUE>Implementation of Bigpicture Project (IMI2-945358)</VALUE>
+						<VALUE>testing</VALUE>
 					</STRING_ATTRIBUTE>
 				</VALUE>
 			</SET_ATTRIBUTE>

@@ -21,10 +21,6 @@ describe('AnnotationLayer.vue', () => {
         layer: {id: 1, visible: true},
       },
       mocks: {
-        $eventBus: {
-          $on: vi.fn(),
-          $off: vi.fn(),
-        },
         $store: {
           getters: {
             'currentProject/currentViewer': {

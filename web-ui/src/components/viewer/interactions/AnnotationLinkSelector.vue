@@ -37,6 +37,8 @@
 
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName.vue';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
@@ -218,7 +220,7 @@ export default {
         }
 
         (await listAnnotationsInGroup(this.image.project, group)).forEach(annot => {
-          this.$eventBus.$emit('editAnnotation', annot);
+          eventBus.emit('editAnnotation', annot);
           if (this.copiedAnnot && annot.id === this.copiedAnnot.id) {
             let copiedAnnot = this.copiedAnnot.clone();
             copiedAnnot.annotationLink = annot.annotationLink;

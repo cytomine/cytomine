@@ -48,6 +48,8 @@ limitations under the License.-->
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
@@ -157,12 +159,12 @@ export default {
   },
   mounted() {
     if (this.index !== null) {
-      this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+      eventBus.on('shortkeyEvent', this.shortkeyHandler);
     }
   },
   beforeDestroy() {
     if (this.index !== null) {
-      this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+      eventBus.off('shortkeyEvent', this.shortkeyHandler);
     }
   }
 };

@@ -83,6 +83,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import VueDraggableResizable from 'vue-draggable-resizable';
 import {Cytomine, UserCollection} from '@/api';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails.vue';
@@ -234,11 +236,11 @@ export default {
   },
   mounted() {
     window.addEventListener('resize', this.handleResize);
-    this.$eventBus.$on('updateMapSize', this.handleResize);
+    eventBus.on('updateMapSize', this.handleResize);
   },
   destroyed() {
     window.removeEventListener('resize', this.handleResize);
-    this.$eventBus.$off('updateMapSize', this.handleResize);
+    eventBus.off('updateMapSize', this.handleResize);
   }
 };
 </script>

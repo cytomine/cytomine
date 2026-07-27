@@ -75,6 +75,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {UserCollection} from '@/api';
 
 import {get} from '@/utils/store-helpers';
@@ -298,19 +300,19 @@ export default {
     await this.fetchUsers();
   },
   mounted() {
-    this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$on('editAnnotation', this.editAnnotationHandler);
-    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationHandler);
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('addAnnotation', this.addAnnotationHandler);
+    eventBus.on('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.on('editAnnotation', this.editAnnotationHandler);
+    eventBus.on('deleteAnnotation', this.deleteAnnotationHandler);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
     // unsubscribe from all events
-    this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$off('editAnnotation', this.editAnnotationHandler);
-    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationHandler);
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('addAnnotation', this.addAnnotationHandler);
+    eventBus.off('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.off('editAnnotation', this.editAnnotationHandler);
+    eventBus.off('deleteAnnotation', this.deleteAnnotationHandler);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>

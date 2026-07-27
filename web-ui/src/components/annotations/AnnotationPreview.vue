@@ -62,6 +62,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {Cytomine} from '@/api';
 
 export default {
@@ -171,11 +173,11 @@ export default {
   },
   async mounted() {
     await this.fetchThumbnail();
-    this.$eventBus.$on('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
+    eventBus.on('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   },
   beforeDestroy() {
     // unsubscribe from all events
-    this.$eventBus.$off('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
+    eventBus.off('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   }
 };
 </script>

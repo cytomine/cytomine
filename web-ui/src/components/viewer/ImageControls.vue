@@ -158,6 +158,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import CytomineSlider from '@/components/form/CytomineSlider.vue';
 import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons.vue';
 
@@ -310,11 +312,11 @@ export default {
 
     async goToRank(rank) {
       await this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', rank);
-      this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
+      eventBus.emit('reloadAnnotations', {idImage: this.image.id});
     },
     async seek(channels, zStack, time) {
       await this.$store.dispatch(this.imageModule + 'setActiveSlicesByPosition', {channels, zStack, time});
-      this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
+      eventBus.emit('reloadAnnotations', {idImage: this.image.id});
     },
     async shift(dimension, increment) {
       let time = (dimension === 'time') ? this.currentTimeIndex + increment : this.currentTimeIndex;
@@ -425,10 +427,10 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>

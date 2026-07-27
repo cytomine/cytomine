@@ -69,6 +69,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import _ from 'lodash';
 import {get} from '@/utils/store-helpers';
 import {Cytomine, ProjectDefaultLayerCollection} from '@/api';
@@ -356,18 +358,18 @@ export default {
     layersToAdd.map(layer => this.addLayerById(layer.id, layer.visible));
   },
   mounted() {
-    this.$eventBus.$on('addAnnotation', this.addAnnotationEventHandler);
-    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationEventHandler);
-    this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
-    this.$eventBus.$on('annotation-layers:refresh', this.fetchLayers);
+    eventBus.on('addAnnotation', this.addAnnotationEventHandler);
+    eventBus.on('deleteAnnotation', this.deleteAnnotationEventHandler);
+    eventBus.on('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('annotation-layers:refresh', this.fetchLayers);
   },
   beforeDestroy() {
-    this.$eventBus.$off('addAnnotation', this.addAnnotationEventHandler);
-    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationEventHandler);
-    this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
-    this.$eventBus.$off('annotation-layers:refresh', this.fetchLayers);
+    eventBus.off('addAnnotation', this.addAnnotationEventHandler);
+    eventBus.off('deleteAnnotation', this.deleteAnnotationEventHandler);
+    eventBus.off('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('annotation-layers:refresh', this.fetchLayers);
   }
 };
 </script>

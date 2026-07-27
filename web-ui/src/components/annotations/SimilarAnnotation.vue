@@ -73,6 +73,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {Annotation, AnnotationTerm} from '@/api';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
@@ -179,13 +181,13 @@ export default {
     }
   },
   async created() {
-    this.$eventBus.$on('update-suggested-terms', this.countTerm);
+    eventBus.on('update-suggested-terms', this.countTerm);
     await this.fetchAnnotations();
     this.countTerm();
     this.loading = false;
   },
   beforeDestroy() {
-    this.$eventBus.$off('update-suggested-terms', this.countTerm);
+    eventBus.off('update-suggested-terms', this.countTerm);
   }
 };
 </script>

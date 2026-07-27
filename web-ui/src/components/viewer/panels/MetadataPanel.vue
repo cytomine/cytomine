@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {Cytomine} from '@/api';
 
 import {getWildcardRegexp} from '@/utils/string-utils';
@@ -71,7 +73,7 @@ export default {
       this.metadata.sort((a, b) => a.fullKey.localeCompare(b.fullKey));
     },
     closeMetadata() {
-      this.$eventBus.$emit('close-metadata');
+      eventBus.emit('close-metadata');
     }
   },
   async created() {

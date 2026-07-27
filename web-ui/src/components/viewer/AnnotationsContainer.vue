@@ -36,6 +36,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annotation-utils.js';
 
@@ -115,7 +117,7 @@ export default {
       await updateTrackProperties(updatedAnnot);
       await updateAnnotationLinkProperties(updatedAnnot);
 
-      this.$eventBus.$emit('editAnnotation', updatedAnnot);
+      eventBus.emit('editAnnotation', updatedAnnot);
       this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {indexFeature: 0, annot: updatedAnnot});
     },
 
@@ -142,7 +144,7 @@ export default {
           editedAnnots = await listAnnotationsInGroup(annot.project, annot.group);
         }
         editedAnnots.forEach(a => {
-          this.$eventBus.$emit('editAnnotation', a);
+          eventBus.emit('editAnnotation', a);
           if (this.copiedAnnot && a.id === this.copiedAnnot.id) {
             let copiedAnnot = this.copiedAnnot.clone();
             copiedAnnot.annotationLink = a.annotationLink;
@@ -152,12 +154,12 @@ export default {
         });
       }
 
-      this.$eventBus.$emit('deleteAnnotation', annot);
+      eventBus.emit('deleteAnnotation', annot);
     },
 
     selectAnnotation({annot, options}) {
       let index = (options.trySameView) ? this.index : null;
-      this.$eventBus.$emit('selectAnnotation', {index, annot, center: true});
+      eventBus.emit('selectAnnotation', {index, annot, center: true});
 
       if (this.image.id !== annot.image) {
         this.$store.commit(this.imageModule + 'clearSimilarAnnotations');
@@ -168,7 +170,7 @@ export default {
       if (sameView) {
         this.$emit('centerView', annot);
       } else {
-        this.$eventBus.$emit('selectAnnotation', {index: null, annot, center: true});
+        eventBus.emit('selectAnnotation', {index: null, annot, center: true});
       }
     }
   },

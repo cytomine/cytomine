@@ -96,6 +96,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get,syncMultiselectFilter} from '@/utils/store-helpers';
 import {IMAGE_FORMAT} from '@/utils/image-utils';
 
@@ -273,10 +275,10 @@ export default {
     this.loading = false;
   },
   mounted() {
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>

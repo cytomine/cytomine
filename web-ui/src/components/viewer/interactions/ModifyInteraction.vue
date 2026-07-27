@@ -48,6 +48,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import WKT from 'ol/format/WKT';
 import {Action} from '@/utils/annotation-utils.js';
 import {singleClick} from 'ol/events/condition';
@@ -116,8 +118,8 @@ export default {
           annot.location = this.format.writeFeature(feature);
           annot.terms = annot.term; // HACK for reviewed annotation (unconsistent behaviour)
           await annot.save();
-          this.$eventBus.$emit('editAnnotation', annot);
-          this.$eventBus.$emit('reloadAnnotationCrop', annot);
+          eventBus.emit('editAnnotation', annot);
+          eventBus.emit('reloadAnnotationCrop', annot);
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
         } catch (err) {
           console.log(err);

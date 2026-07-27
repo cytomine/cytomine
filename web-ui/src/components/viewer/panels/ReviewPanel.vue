@@ -101,6 +101,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 import Username from '@/components/user/Username.vue';
 import ListUsernames from '@/components/user/ListUsernames.vue';
@@ -214,7 +216,7 @@ export default {
           users: this.visibleUserLayerIds,
           task: this.taskReviewAll.id
         });
-        this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, clear: true});
+        eventBus.emit('reloadAnnotations', {idImage: this.image.id, clear: true});
       } catch (error) {
         console.log(error);
         this.taskReviewAll = null;

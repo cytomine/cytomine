@@ -189,6 +189,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 import _ from 'lodash';
 
@@ -558,6 +560,10 @@ export default {
       this.$store.commit(this.imageModule + 'togglePanel', panel);
     },
 
+    closeMetadataHandler() {
+      this.togglePanel('info');
+    },
+
     savePosition: _.debounce(async function () {
       if (this.$refs.view) {
         let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
@@ -634,7 +640,7 @@ export default {
           if (!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
-            this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
+            eventBus.emit('reloadAnnotations', {idImage: this.image.id, hard: true});
             sliceChange = true;
           }
 
@@ -644,7 +650,7 @@ export default {
 
           this.selectedAnnotation = annot; // used to pre-load annot layer
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
-          this.$eventBus.$emit('selectAnnotationInLayer', {index, annot});
+          eventBus.emit('selectAnnotationInLayer', {index, annot});
 
           if (center) {
             await this.viewMounted();
@@ -815,17 +821,17 @@ export default {
     this.loading = false;
   },
   mounted() {
-    this.$eventBus.$on('updateMapSize', this.updateMapSize);
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
-    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
-    this.$eventBus.$on('close-metadata', () => this.$store.commit(this.imageModule + 'togglePanel', 'info'));
+    eventBus.on('updateMapSize', this.updateMapSize);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('selectAnnotation', this.selectAnnotationHandler);
+    eventBus.on('close-metadata', this.closeMetadataHandler);
     this.setInitialZoom();
   },
   beforeDestroy() {
-    this.$eventBus.$off('updateMapSize', this.updateMapSize);
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
-    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
-    this.$eventBus.$off('close-metadata');
+    eventBus.off('updateMapSize', this.updateMapSize);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('selectAnnotation', this.selectAnnotationHandler);
+    eventBus.off('close-metadata', this.closeMetadataHandler);
     clearTimeout(this.timeoutSavePosition);
   }
 };

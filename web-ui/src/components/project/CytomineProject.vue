@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 import ProjectSidebar from './ProjectSidebar.vue';
 import projectModuleModel from '@/store/modules/project';
@@ -96,10 +98,10 @@ export default {
     await this.loadProject();
   },
   mounted() {
-    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationEventHandler);
+    eventBus.on('deleteAnnotation', this.deleteAnnotationEventHandler);
   },
   beforeDestroy() {
-    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationEventHandler);
+    eventBus.off('deleteAnnotation', this.deleteAnnotationEventHandler);
   }
 };
 </script>

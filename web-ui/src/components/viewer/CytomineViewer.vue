@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 
 import CytomineImage from './CytomineImage.vue';
@@ -155,7 +157,7 @@ export default {
       }
     },
     nbImages() {
-      this.$eventBus.$emit('updateMapSize');
+      eventBus.emit('updateMapSize');
     },
   },
   methods: {
@@ -277,7 +279,7 @@ export default {
           annot = await Annotation.fetch(annot.id);
           if (this.idImages.includes(String(annot.image))) {
             let index = this.cells.find(cell => cell.image.id === annot.image).index;
-            this.$eventBus.$emit('selectAnnotation', {index, annot, center});
+            eventBus.emit('selectAnnotation', {index, annot, center});
           } else {
             let [image, slice] = await Promise.all([
               ImageInstance.fetch(annot.image),
@@ -293,22 +295,22 @@ export default {
     },
 
     shortkeyEvent(event) {
-      this.$eventBus.$emit('shortkeyEvent', event.srcKey);
+      eventBus.emit('shortkeyEvent', event.srcKey);
     },
   },
   async created() {
     this.findIdViewer();
     await this.loadViewer();
     this.reloadInterval = setInterval(
-      () => this.$eventBus.$emit('reloadAnnotations'),
+      () => eventBus.emit('reloadAnnotations'),
       constants.VIEWER_ANNOTATIONS_REFRESH_INTERVAL
     );
   },
   mounted() {
-    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
+    eventBus.on('selectAnnotation', this.selectAnnotationHandler);
   },
   beforeDestroy() {
-    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
+    eventBus.off('selectAnnotation', this.selectAnnotationHandler);
     clearInterval(this.reloadInterval);
   }
 };

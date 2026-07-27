@@ -129,9 +129,6 @@ describe('AnnotationDetails.vue', () => {
         showComments: false,
       },
       mocks: {
-        $eventBus: {
-          $emit: vi.fn(),
-        },
         $notify: vi.fn(),
         $store: mockStore,
         $t: (key) => key,

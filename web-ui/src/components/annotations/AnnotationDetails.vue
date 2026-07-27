@@ -284,6 +284,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 
 import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack, PropertyCollection} from '@/api';
@@ -601,10 +603,10 @@ export default {
       console.log(error);
     }
 
-    this.$eventBus.$emit('hide-similar-annotations');
+    eventBus.emit('hide-similar-annotations');
   },
   destroyed() {
-    this.$eventBus.$emit('hide-similar-annotations');
+    eventBus.emit('hide-similar-annotations');
   },
 };
 </script>

@@ -37,6 +37,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {AnnotationCollection} from '@/api';
 import {get} from '@/utils/store-helpers';
 
@@ -136,10 +138,10 @@ export default {
     this.loading = false;
   },
   async mounted() {
-    this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
+    eventBus.on('addAnnotation', this.addAnnotationHandler);
   },
   async beforeDestroy() {
-    this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
+    eventBus.off('addAnnotation', this.addAnnotationHandler);
   },
 };
 </script>

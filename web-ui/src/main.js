@@ -76,7 +76,6 @@ Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
 import App from './App.vue';
 
 Vue.config.productionTip = false;
-Vue.prototype.$eventBus = new Vue();
 
 // Load configuration before initializing Keycloak
 axios.get('configuration.json').then(response => {

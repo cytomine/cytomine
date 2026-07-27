@@ -76,6 +76,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import Task from '@/utils/appengine/task';
 import TaskInputForm from '@/components/appengine/forms/TaskInputForm.vue';
 import TaskRun from '@/utils/appengine/task-run';
@@ -130,7 +132,7 @@ export default {
       this.isCollapsed = !this.isCollapsed;
       this.$emit('collapse', this.isCollapsed);
       this.$nextTick(() => {
-        this.$eventBus.$emit('updateMapSize');
+        eventBus.emit('updateMapSize');
       });
     },
     resetInputs() {
@@ -209,7 +211,7 @@ export default {
 
         if (taskRun.isTerminalState() && this.getTask(taskRun).hasGeometryOutput()) {
           await taskRun.fetchOutputs();
-          this.$eventBus.$emit('annotation-layers:refresh');
+          eventBus.emit('annotation-layers:refresh');
         }
       }
 

@@ -1,9 +1,6 @@
 package be.cytomine.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.dto.meilisearch.MeiliSearchFacetsResponse;
+import be.cytomine.dto.meilisearch.MeiliSearchImageResponse;
 import be.cytomine.service.MeiliSearchService;
 
 
@@ -24,23 +23,23 @@ public class MeiliSearchController {
     private final MeiliSearchService meiliSearchService;
 
     @GetMapping("/search")
-    public ResponseEntity<ArrayList<HashMap<String, Object>>> search(
+    public ResponseEntity<List<MeiliSearchImageResponse>> search(
             @RequestParam String query,
             @RequestParam(required = false) List<String> filters,
             @RequestParam(required = false, defaultValue = "20") int limit,
             @RequestParam(required = false, defaultValue = "0") int offset) {
 
-        ArrayList<HashMap<String, Object>>
+        List<MeiliSearchImageResponse>
             results = meiliSearchService.search(query, filters, limit, offset);
         return ResponseEntity.ok(results);
 
     }
 
     @GetMapping("/image/{imageid}")
-    public ResponseEntity<Map<String, Object>> getDocument(
+    public ResponseEntity<MeiliSearchImageResponse> getDocument(
             @PathVariable String imageid) {
 
-        Map document = meiliSearchService.getImage(imageid);
+        MeiliSearchImageResponse document = meiliSearchService.getImage(imageid);
         if (document != null) {
             return ResponseEntity.ok(document);
         } else {
@@ -50,9 +49,9 @@ public class MeiliSearchController {
     }
 
     @GetMapping("/facets")
-    public ResponseEntity<Object> getFacets() {
+    public ResponseEntity<MeiliSearchFacetsResponse> getFacets() {
 
-        Object facets =  meiliSearchService.getFacetDistribution();
+        MeiliSearchFacetsResponse facets = meiliSearchService.getFacetDistribution();
         return ResponseEntity.ok(facets);
 
     }

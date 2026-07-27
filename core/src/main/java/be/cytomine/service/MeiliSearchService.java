@@ -1,11 +1,9 @@
 package be.cytomine.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.Index;
 import com.meilisearch.sdk.SearchRequest;
@@ -15,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.dto.meilisearch.MeiliSearchFacetsResponse;
+import be.cytomine.dto.meilisearch.MeiliSearchImageResponse;
 import be.cytomine.exceptions.SearchException;
 
 
@@ -26,8 +26,9 @@ public class MeiliSearchService {
     private String indexId;
 
     private final Client meiliSearchClient;
+    private final ObjectMapper objectMapper;
 
-    public ArrayList<HashMap<String, Object>> search(
+    public List<MeiliSearchImageResponse> search(
         String query,
         List<String> filters,
         int limit,
@@ -55,19 +56,21 @@ public class MeiliSearchService {
             }
 
             Searchable result = index.search(searchRequest);
-
-            return result.getHits();
+            return result.getHits().stream()
+                .map(hit -> objectMapper.convertValue(hit, MeiliSearchImageResponse.class))
+                .collect(Collectors.toList());
 
         } catch (Exception e) {
             throw new SearchException("search failed", 500, e.getMessage());
         }
     }
 
-    public Map getImage(String imageId) {
+    public MeiliSearchImageResponse getImage(String imageId) {
         try {
 
             Index index = meiliSearchClient.index(indexId);
-            return index.getDocument(imageId, Map.class);
+            Object document = index.getDocument(imageId, Object.class);
+            return objectMapper.convertValue(document, MeiliSearchImageResponse.class);
 
         } catch (Exception e) {
             throw new SearchException("MeiliSearch getDocument failed", 500, e.getMessage());
@@ -75,17 +78,19 @@ public class MeiliSearchService {
     }
 
 
-    public Object getFacetDistribution() {
+    public MeiliSearchFacetsResponse getFacetDistribution() {
+        try {
+            Index index = meiliSearchClient.index(indexId);
 
-        Index index = meiliSearchClient.index(indexId);
+            String[] attributes = index.getFilterableAttributesSettings();
+            SearchRequest searchRequest = new SearchRequest("")
+                .setFacets(attributes)
+                .setLimit(0);
 
-        String[] attributes = index.getFilterableAttributesSettings();
-        SearchRequest searchRequest = new SearchRequest("")
-            .setFacets(attributes)
-            .setLimit(0); // Only facet distribution, no hits
-
-        SearchResult result = (SearchResult) index.search(searchRequest);
-
-        return result.getFacetDistribution();
+            SearchResult result = (SearchResult) index.search(searchRequest);
+            return objectMapper.convertValue(result.getFacetDistribution(), MeiliSearchFacetsResponse.class);
+        } catch (Exception e) {
+            throw new SearchException("MeiliSearch getFacetDistribution failed", 500, e.getMessage());
+        }
     }
 }

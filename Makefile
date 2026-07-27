@@ -84,6 +84,7 @@ run-e2e:
 	sudo cp ./e2e-tests/src/test/resources/sample.xml ./data/dataset/test-project/METADATA/sample.xml
 
 	sudo cp -r ./e2e-tests/src/test/resources/wsi ./data/dataset/test-project/IMAGES/wsi
+	sudo cp ./e2e-tests/src/test/resources/cat.png ./data/dataset/test-project/IMAGES/cat.png
 
 	kubectl --kubeconfig=./.kube/shared/config -n cytomine-local create job --from=cronjob/pims-import pims-import-local
 	kubectl --kubeconfig=./.kube/shared/config -n cytomine-local wait --for=condition=complete job/pims-import-local --timeout=120s

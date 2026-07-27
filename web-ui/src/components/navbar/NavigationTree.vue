@@ -88,7 +88,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import 'bulma/sass/utilities/mixins.sass';
+@import 'bulma/sass/utilities/mixins';
 
 .project-item {
   color: #333;

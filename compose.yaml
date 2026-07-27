@@ -319,6 +319,7 @@ services:
     volumes:
       - meilisearch-data:/meili_data
     environment:
+      MEILI_ENV: production
       MEILI_MASTER_KEY: *MEILI_MASTER_KEY
     networks:
       host_network:

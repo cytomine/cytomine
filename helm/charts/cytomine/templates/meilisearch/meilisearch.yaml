@@ -54,6 +54,8 @@ spec:
               containerPort: {{ .Values.meilisearch.port }}
               protocol: TCP
           env:
+            - name: MEILI_ENV
+              value: production
             - name: MEILI_MASTER_KEY
               valueFrom:
                 secretKeyRef:

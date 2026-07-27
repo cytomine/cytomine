@@ -219,12 +219,13 @@ export default {
     },
   },
   render(h) {
-    return h(Line, {
-      props: {
-        chartData: this.chartData,
-        chartOptions: this.chartOptions,
-        cssClasses: this.cssClasses,
-      },
-    });
+    return h('div', {class: this.cssClasses}, [
+      h(Line, {
+        props: {
+          data: this.chartData,
+          options: this.chartOptions,
+        },
+      }),
+    ]);
   },
 };

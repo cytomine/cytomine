@@ -132,12 +132,13 @@ export default {
     await this.fetchData();
   },
   render(h) {
-    return h(Bar, {
-      props: {
-        chartData: this.chartData,
-        chartOptions: this.chartOptions,
-        cssClasses: this.cssClasses,
-      },
-    });
+    return h('div', {class: this.cssClasses}, [
+      h(Bar, {
+        props: {
+          data: this.chartData,
+          options: this.chartOptions,
+        },
+      }),
+    ]);
   },
 };

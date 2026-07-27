@@ -106,13 +106,14 @@ export default {
     await this.updateData();
   },
   render(h) {
-    return h(Bar, {
-      props: {
-        chartData: this.chartData,
-        chartOptions: this.chartOptions,
-        cssClasses: this.cssClasses,
-        plugins: [ChartDataLabels],
-      },
-    });
+    return h('div', {class: this.cssClasses}, [
+      h(Bar, {
+        props: {
+          data: this.chartData,
+          options: this.chartOptions,
+          plugins: [ChartDataLabels],
+        },
+      }),
+    ]);
   },
 };

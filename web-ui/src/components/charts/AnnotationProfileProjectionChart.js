@@ -122,14 +122,15 @@ export default {
     await this.updateData();
   },
   render(h) {
-    return h(Line, {
-      ref: 'chartRef',
-      props: {
-        chartData: this.chartData,
-        chartOptions: this.chartOptions,
-        cssClasses: this.cssClasses,
-        plugins: [ChartZoom],
-      },
-    });
+    return h('div', {class: this.cssClasses}, [
+      h(Line, {
+        ref: 'chartRef',
+        props: {
+          data: this.chartData,
+          options: this.chartOptions,
+          plugins: [ChartZoom],
+        },
+      }),
+    ]);
   },
 };

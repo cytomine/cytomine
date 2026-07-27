@@ -2,11 +2,11 @@ import {shallowMount} from '@vue/test-utils';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(() => Promise.resolve({
+        get: vi.fn(() => Promise.resolve({
           data: new Blob(['test image data'], {type: 'image/jpeg'})
         })),
       },
@@ -30,18 +30,18 @@ describe('AnnotationPreview.vue', () => {
   let mockEventBus;
 
   beforeEach(() => {
-    global.URL.createObjectURL = jest.fn(() => mockBlobUrl);
-    global.URL.revokeObjectURL = jest.fn();
+    global.URL.createObjectURL = vi.fn(() => mockBlobUrl);
+    global.URL.revokeObjectURL = vi.fn();
 
     mockEventBus = {
-      $on: jest.fn(),
-      $off: jest.fn(),
-      $emit: jest.fn()
+      $on: vi.fn(),
+      $off: vi.fn(),
+      $emit: vi.fn()
     };
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('annotation thumbnail', () => {
@@ -49,7 +49,7 @@ describe('AnnotationPreview.vue', () => {
       const wrapper = createWrapper({
         propsData: {
           annot: {
-            annotationCropURL: jest.fn(() => 'http://cytomine.org/crop.jpg'),
+            annotationCropURL: vi.fn(() => 'http://cytomine.org/crop.jpg'),
           },
         }
       });
@@ -64,7 +64,7 @@ describe('AnnotationPreview.vue', () => {
       const wrapper = createWrapper({
         propsData: {
           annot: {
-            annotationCropURL: jest.fn(() => 'http://cytomine.org/crop.jpg'),
+            annotationCropURL: vi.fn(() => 'http://cytomine.org/crop.jpg'),
           },
         }
       });

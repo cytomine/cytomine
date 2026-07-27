@@ -204,7 +204,7 @@ export default {
   display: none;
 }
 
->>> .modal-card, >>> .modal-card-body {
+:deep(.modal-card), :deep(.modal-card-body) {
   width: 100vw;
   max-width: 800px;
 }

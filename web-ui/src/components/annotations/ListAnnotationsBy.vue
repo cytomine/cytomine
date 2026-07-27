@@ -412,11 +412,11 @@ export default {
 /**
  * TODO: use :deep(.class) when moving to Vue3
  */
-::v-deep ul.pagination-list {
+:deep(ul.pagination-list) {
   justify-content: flex-end;
 }
 
-::v-deep .active .annot-preview {
+:deep(.active .annot-preview) {
   box-shadow: 0 2px 3px rgba(39, 120, 173, 0.75), 0 0 0 1px rgba(39, 120, 173, 0.75);
   font-weight: 600;
 }
@@ -426,24 +426,24 @@ export default {
   padding: 6px;
 }
 
->>> .annot-preview {
+:deep(.annot-preview) {
   margin: 0;
   padding: 0;
 }
 
->>> .group-first, .group-in, .group-last {
+:deep(.group-first), .group-in, .group-last {
   padding-top: 4px !important;
   padding-bottom: 4px !important;
   border-top: 2px dashed rgb(100,100,100);
   border-bottom: 2px dashed rgb(100,100,100);
 }
 
->>> .group-first.group-complete, .group-in.group-complete, .group-last.group-complete {
+:deep(.group-first.group-complete), .group-in.group-complete, .group-last.group-complete {
   border-top-style: solid;
   border-bottom-style: solid;
 }
 
->>> .group-first {
+:deep(.group-first) {
   padding-left: 4px !important;
   border-left: 2px dashed rgb(100,100,100);
   margin-right: 0 !important;
@@ -452,11 +452,11 @@ export default {
   border-bottom-left-radius: 6px;
 }
 
->>> .group-first.group-complete {
+:deep(.group-first.group-complete) {
   border-left-style: solid;
 }
 
->>> .group-last {
+:deep(.group-last) {
   padding-right: 4px !important;
   border-right: 2px dashed rgb(100,100,100);
   margin-left: 0 !important;
@@ -465,16 +465,16 @@ export default {
   border-bottom-right-radius: 6px;
 }
 
->>> .group-last.group-complete {
+:deep(.group-last.group-complete) {
   border-right-style: solid;
 }
 
->>> .group-first.group-last {
+:deep(.group-first.group-last) {
   margin: 4px !important;
   padding: 4px !important;
 }
 
->>> .group-in {
+:deep(.group-in) {
   margin-left: 0 !important;
   padding-left: 10px !important;
   margin-right: 0 !important;

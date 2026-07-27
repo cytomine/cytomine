@@ -4,19 +4,19 @@ import Buefy from 'buefy';
 import CytomineProperties from '@/components/property/CytomineProperties';
 import {Property} from '@/api';
 
-jest.mock('@/api', () => {
+vi.mock('@/api', () => {
   return {
-    Property: jest.fn().mockImplementation(() => {
+    Property: vi.fn().mockImplementation(function () {
       return {
         id: Date.now(),
         key: '',
         value: '',
-        isNew: jest.fn().mockReturnValue(true),
-        save: jest.fn().mockResolvedValue(true),
+        isNew: vi.fn().mockReturnValue(true),
+        save: vi.fn().mockResolvedValue(true),
       };
     }),
     PropertyCollection: {
-      fetchAll: jest.fn().mockResolvedValue({
+      fetchAll: vi.fn().mockResolvedValue({
         array: [
           {id: 1, key: 'Property 1', value: 'Value 1'},
         ],
@@ -27,7 +27,7 @@ jest.mock('@/api', () => {
 
 describe('CytomineProperties.vue', () => {
   const mocks = {
-    $notify: jest.fn(),
+    $notify: vi.fn(),
     $t: message => message,
   };
 
@@ -83,7 +83,7 @@ describe('CytomineProperties.vue', () => {
   });
 
   it('Clicking on delete button should delete a property correctly', async () => {
-    Property.delete = jest.fn().mockResolvedValue(true);
+    Property.delete = vi.fn().mockResolvedValue(true);
 
     expect(wrapper.vm.properties.length).toBe(1);
 

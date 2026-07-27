@@ -171,7 +171,7 @@
           </b-table-column>
 
           <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-            {{ Number(project.lastActivity) | moment('ll') }}
+            {{ formatMomentDate(Number(project.lastActivity), 'll') }}
           </b-table-column>
 
           <b-table-column label=" " centered width="150">
@@ -222,6 +222,7 @@ import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-
 
 import {ProjectCollection, OntologyCollection, TagCollection} from '@/api';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
+import {formatMomentDate} from '@/utils/date';
 export default {
   name: 'list-projects',
   components: {
@@ -370,6 +371,7 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
     async fetchOntologies() {
       let ontologies = (await OntologyCollection.fetchAll({light: true})).array;
       ontologies.sort((a, b) => a.name.localeCompare(b.name));

@@ -19,9 +19,9 @@
 </b-message>
 <div class="list-actions" @scroll="scrollHandler" ref="listActions" v-else-if="actions.length > 0">
   <div v-for="(month, idx) in formattedActions" :key="idx">
-    <h3>{{month.refDate | moment('MMMM YYYY')}}</h3>
+    <h3>{{formatMomentDate(month.refDate, 'MMMM YYYY')}}</h3>
     <div v-for="(day, idx) in month.days" :key="idx">
-      <h4>{{day.refDate | moment('ll')}}</h4>
+      <h4>{{formatMomentDate(day.refDate, 'll')}}</h4>
       <ul>
         <activity-logs-item v-for="action in day.actions" :action="action" :key="action.id" />
       </ul>
@@ -43,6 +43,7 @@ import moment from 'moment';
 import _ from 'lodash';
 
 import ActivityLogsItem from './ActivityLogsItem.vue';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'activity-logs',
@@ -110,6 +111,7 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
     scrollHandler: _.debounce(function () {
       let scrollBlock = this.$refs.listActions;
       let bottom = (scrollBlock.scrollTop + scrollBlock.clientHeight === scrollBlock.scrollHeight);

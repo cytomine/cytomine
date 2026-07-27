@@ -5,18 +5,20 @@ import AppInfoPage from '@/components/appengine/AppInfoPage.vue';
 import Task from '@/utils/appengine/task';
 import {flushPromises} from '../../../utils';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        post: jest.fn(),
+        post: vi.fn(),
       },
     },
   },
 }));
 
-jest.mock('@/utils/appengine/task', () => ({
-  fetchNamespaceVersion: jest.fn(),
+vi.mock('@/utils/appengine/task', () => ({
+  default: {
+    fetchNamespaceVersion: vi.fn(),
+  }
 }));
 
 const localVue = createLocalVue();
@@ -42,7 +44,7 @@ describe('AppInfoPage.vue', () => {
       localVue,
       router,
       mocks: {
-        $notify: jest.fn(),
+        $notify: vi.fn(),
         $t: (key) => key,
       },
       stubs: {

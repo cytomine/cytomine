@@ -101,7 +101,7 @@ export default {
   margin-right: 0.5em;
 }
 
->>> .upload-draggable {
+:deep(.upload-draggable) {
   margin-left: 10%;
   width: 80%;
 }

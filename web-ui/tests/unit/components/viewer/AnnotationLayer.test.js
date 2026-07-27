@@ -2,11 +2,13 @@ import {shallowMount} from '@vue/test-utils';
 
 import AnnotationLayer from '@/components/viewer/AnnotationLayer.vue';
 
-jest.mock('ol/format/WKT', () => {
-  const WKT = jest.fn().mockImplementation(() => ({
-    readFeature: jest.fn(),
-    readGeometry: jest.fn(),
-  }));
+vi.mock('ol/format/WKT', () => {
+  const WKT = vi.fn().mockImplementation(function () {
+    return {
+      readFeature: vi.fn(),
+      readGeometry: vi.fn(),
+    };
+  });
   return {__esModule: true, default: WKT};
 });
 
@@ -20,8 +22,8 @@ describe('AnnotationLayer.vue', () => {
       },
       mocks: {
         $eventBus: {
-          $on: jest.fn(),
-          $off: jest.fn(),
+          $on: vi.fn(),
+          $off: vi.fn(),
         },
         $store: {
           getters: {
@@ -49,7 +51,7 @@ describe('AnnotationLayer.vue', () => {
                 }
               },
             },
-            'currentProject/imageModule': jest.fn(() => 'mock-module/'),
+            'currentProject/imageModule': vi.fn(() => 'mock-module/'),
           },
         },
       },
@@ -65,9 +67,9 @@ describe('AnnotationLayer.vue', () => {
     it('should add feature when annotation belongs to layer', () => {
       const wrapper = createWrapper();
       const feature = {id: 1};
-      wrapper.vm.$refs.olSource = {addFeature: jest.fn()};
-      wrapper.vm.annotBelongsToLayer = jest.fn().mockReturnValue(true);
-      wrapper.vm.createFeature = jest.fn().mockReturnValue(feature);
+      wrapper.vm.$refs.olSource = {addFeature: vi.fn()};
+      wrapper.vm.annotBelongsToLayer = vi.fn().mockReturnValue(true);
+      wrapper.vm.createFeature = vi.fn().mockReturnValue(feature);
 
       wrapper.vm.addAnnotationHandler({id: 1});
 
@@ -79,9 +81,9 @@ describe('AnnotationLayer.vue', () => {
 
     it('should not add feature when annotation does not belong to layer', () => {
       const wrapper = createWrapper();
-      wrapper.vm.$refs.olSource = {addFeature: jest.fn()};
+      wrapper.vm.$refs.olSource = {addFeature: vi.fn()};
 
-      wrapper.vm.annotBelongsToLayer = jest.fn().mockReturnValue(false);
+      wrapper.vm.annotBelongsToLayer = vi.fn().mockReturnValue(false);
       wrapper.vm.addAnnotationHandler({id: 1});
 
       expect(wrapper.vm.$refs.olSource.addFeature).not.toHaveBeenCalled();

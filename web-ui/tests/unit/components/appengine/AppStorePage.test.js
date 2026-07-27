@@ -6,11 +6,11 @@ import AppStorePage from '@/components/appengine/AppStorePage';
 import {Cytomine} from '@/api';
 import {flushPromises} from '../../../utils';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(),
+        get: vi.fn(),
       },
     },
   },

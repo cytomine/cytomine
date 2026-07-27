@@ -39,7 +39,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
->>> .modal-card, >>> .modal-card-body {
+:deep(.modal-card), :deep(.modal-card-body) {
   width: 800px;
   max-width: 100%;
 }

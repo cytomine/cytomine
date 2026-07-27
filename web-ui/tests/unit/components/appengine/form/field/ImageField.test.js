@@ -3,18 +3,18 @@ import Buefy from 'buefy';
 
 import ImageField from '@/components/appengine/forms/fields/ImageField';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(),
+        get: vi.fn(),
       },
     },
   },
 }));
 
-jest.mock('@/utils/image-utils', () => ({
-  isWebPSupported: jest.fn(() => true)
+vi.mock('@/utils/image-utils', () => ({
+  isWebPSupported: vi.fn(() => true)
 }));
 
 describe('ImageField.vue', () => {

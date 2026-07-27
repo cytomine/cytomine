@@ -11,7 +11,7 @@
         </tr>
         <tr>
           <td><strong>{{ $t('created-on') }}</strong></td>
-          <td> {{ Number(annotation.created) | moment('ll') }}</td>
+          <td> {{ formatMomentDate(Number(annotation.created), 'll') }}</td>
         </tr>
       </template>
 
@@ -39,6 +39,7 @@
 <script>
 import copyToClipboard from 'copy-to-clipboard';
 import {get} from '@/utils/store-helpers';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'AnnotationSimpleDetails',
@@ -59,6 +60,7 @@ export default {
     },
   },
   methods: {
+    formatMomentDate,
     copyURL() {
       copyToClipboard(window.location.origin + '/#' + this.annotationURL);
       this.$notify({type: 'success', text: this.$t('notif-success-annot-URL-copied')});

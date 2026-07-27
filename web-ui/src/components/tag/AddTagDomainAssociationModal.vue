@@ -78,7 +78,7 @@ export default {
 </script>
 
 <style scoped>
->>> .modal-card, >>> .modal-card-body {
+:deep(.modal-card), :deep(.modal-card-body) {
   overflow: visible !important;
 }
 

@@ -4,30 +4,34 @@ import AppBottomDrawer from '@/components/appengine/AppBottomDrawer.vue';
 import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
 
-jest.mock('@/utils/appengine/task', () => ({
-  fetchAll: jest.fn(),
-  fetchTaskRunStatus: jest.fn(),
-  createTaskRun: jest.fn(),
-  batchProvisionTask: jest.fn(),
-  singleProvisionTask: jest.fn(),
-  runTask: jest.fn(),
+vi.mock('@/utils/appengine/task', () => ({
+  default: {
+    fetchAll: vi.fn(),
+    fetchTaskRunStatus: vi.fn(),
+    createTaskRun: vi.fn(),
+    batchProvisionTask: vi.fn(),
+    singleProvisionTask: vi.fn(),
+    runTask: vi.fn(),
+  }
 }));
 
-jest.mock('@/utils/appengine/task-run', () => {
-  const mockConstructor = jest.fn().mockImplementation((resource) => ({
-    ...resource,
-    fetch: jest.fn(),
-    isTerminalState: jest.fn(() => false),
-    project: null,
-  }));
+vi.mock('@/utils/appengine/task-run', () => {
+  const mockConstructor = vi.fn().mockImplementation(function (resource) {
+    return {
+      ...resource,
+      fetch: vi.fn(),
+      isTerminalState: vi.fn(() => false),
+      project: null,
+    };
+  });
 
-  mockConstructor.fetchByProject = jest.fn();
+  mockConstructor.fetchByProject = vi.fn();
 
-  return mockConstructor;
+  return {default: mockConstructor};
 });
 
-jest.mock('@/utils/app', () => ({
-  formatTaskName: jest.fn(() => 'Mocked Task Run'),
+vi.mock('@/utils/app', () => ({
+  formatTaskName: vi.fn(() => 'Mocked Task Run'),
 }));
 
 describe('AppBottomDrawer.vue', () => {
@@ -66,14 +70,14 @@ describe('AppBottomDrawer.vue', () => {
       mocks: {
         $buefy: {
           toast: {
-            open: jest.fn(),
+            open: vi.fn(),
           },
         },
         $eventBus: {
-          $emit: jest.fn(),
+          $emit: vi.fn(),
         },
         $router: {
-          push: jest.fn(),
+          push: vi.fn(),
         },
         $store: mockStore,
         $t: (key) => key,
@@ -110,7 +114,7 @@ describe('AppBottomDrawer.vue', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     Task.fetchAll.mockResolvedValue(mockTasks);
     TaskRun.fetchByProject.mockResolvedValue(mockTaskRuns);
   });

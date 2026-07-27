@@ -94,7 +94,7 @@
     <tr v-if="isPropDisplayed('created')">
       <td class="prop-label">{{$t('created-on')}}</td>
       <td class="prop-content">
-        {{ Number(project.created) | moment('ll') }}
+        {{ formatMomentDate(Number(project.created), 'll') }}
       </td>
     </tr>
     <tr v-if="isPropDisplayed('creator')">
@@ -147,6 +147,7 @@ import CytomineDescription from '@/components/description/CytomineDescription.vu
 import CytomineProperties from '@/components/property/CytomineProperties.vue';
 import CytomineTags from '@/components/tag/CytomineTags.vue';
 import AttachedFiles from '@/components/attached-file/AttachedFiles.vue';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'project-details',
@@ -193,6 +194,7 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
     async fetchCreator() {
       this.creator = await this.project.fetchCreator();
     },

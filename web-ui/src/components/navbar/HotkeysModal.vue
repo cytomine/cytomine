@@ -129,12 +129,12 @@ export default {
   margin-bottom: 2em;
 }
 
->>> td, >>> th {
+:deep(td), :deep(th) {
   vertical-align: middle !important;
   width: 50%;
 }
 
->>> input {
+:deep(input) {
   max-width: 30em;
   margin-bottom: 1em;
 }

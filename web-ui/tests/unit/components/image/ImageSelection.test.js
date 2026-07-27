@@ -4,13 +4,13 @@ import Buefy from 'buefy';
 import CytomineModal from '@/components/utils/CytomineModal';
 import ImageSelection from '@/components/image/ImageSelection';
 
-jest.mock('@/utils/image-utils', () => ({
-  isWebPSupported: jest.fn(() => true)
+vi.mock('@/utils/image-utils', () => ({
+  isWebPSupported: vi.fn(() => true)
 }));
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   ImageInstanceCollection: {
-    fetchAll: jest.fn().mockResolvedValue({
+    fetchAll: vi.fn().mockResolvedValue({
       array: [
         {id: 1, name: 'Image 1'},
         {id: 2, name: 'Image 2'},

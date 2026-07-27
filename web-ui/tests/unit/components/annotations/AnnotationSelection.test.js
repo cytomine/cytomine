@@ -2,16 +2,19 @@ import {shallowMount} from '@vue/test-utils';
 
 import AnnotationSelection from '@/components/annotations/AnnotationSelection';
 import CytomineModal from '@/components/utils/CytomineModal';
+import {flushPromises} from '../../../utils';
 
-jest.mock('@/api', () => ({
-  AnnotationCollection: jest.fn().mockImplementation(() => ({
-    fetchPage: jest.fn().mockResolvedValue({
-      array: [
-        {id: 1, name: 'Annotation 1'},
-        {id: 2, name: 'Annotation 2'},
-      ]
-    }),
-  })),
+vi.mock('@/api', () => ({
+  AnnotationCollection: vi.fn().mockImplementation(function () {
+    return {
+      fetchPage: vi.fn().mockResolvedValue({
+        array: [
+          {id: 1, name: 'Annotation 1'},
+          {id: 2, name: 'Annotation 2'},
+        ]
+      }),
+    };
+  }),
 }));
 
 describe('AnnotationSelection.vue', () => {
@@ -37,9 +40,9 @@ describe('AnnotationSelection.vue', () => {
       },
       mocks: {
         $eventBus: {
-          $on: jest.fn(),
-          $off: jest.fn(),
-          $emit: jest.fn(),
+          $on: vi.fn(),
+          $off: vi.fn(),
+          $emit: vi.fn(),
         },
         $store: {
           getters: {
@@ -74,6 +77,7 @@ describe('AnnotationSelection.vue', () => {
 
   it('should render the loading when the data is fetched', async () => {
     const wrapper = createWrapper();
+    await flushPromises();
 
     await wrapper.setData({loading: true});
 

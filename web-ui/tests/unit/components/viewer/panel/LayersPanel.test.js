@@ -2,13 +2,13 @@ import {shallowMount} from '@vue/test-utils';
 
 import LayersPanel from '@/components/viewer/panels/LayersPanel.vue';
 
-const mockNotify = jest.fn();
+const mockNotify = vi.fn();
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(() => Promise.resolve({
+        get: vi.fn(() => Promise.resolve({
           data: [
             {'id': 142, 'name': 'task-run-f3e78101-d123-4c0c-8c05-4ca64232023c'},
             {'id': 283, 'name': 'task-run-f3e78101-d123-4c0c-8c05-4ca64232023c'},
@@ -25,7 +25,7 @@ describe('LayersPanel.vue', () => {
     activeSlices: [
       {
         id: 1,
-        fetchAnnotationsIndex: jest.fn(() =>
+        fetchAnnotationsIndex: vi.fn(() =>
           Promise.resolve([
             {id: 'a1', user: 10, name: 'annotation-1'},
             {id: 'a2', user: 11, name: 'annotation-2'},
@@ -34,7 +34,7 @@ describe('LayersPanel.vue', () => {
       },
       {
         id: 2,
-        fetchAnnotationsIndex: jest.fn(() =>
+        fetchAnnotationsIndex: vi.fn(() =>
           Promise.resolve([
             {id: 'b1', user: 10, name: 'annotation-3'},
             {id: 'b2', user: 12, name: 'annotation-4'},
@@ -58,23 +58,23 @@ describe('LayersPanel.vue', () => {
   const mockProject = {
     id: 999,
     name: 'Mock Project',
-    clone: jest.fn(() => ({
+    clone: vi.fn(() => ({
       id: 1000,
       name: 'Cloned Project',
     })),
-    fetchUserLayers: jest.fn(() => ({array: []})),
+    fetchUserLayers: vi.fn(() => ({array: []})),
   };
 
   const createWrapper = (options = {}) => {
     const {imageWrapper = mockImageWrapper} = options;
 
     const defaultStore = {
-      commit: jest.fn(),
+      commit: vi.fn(),
       getters: {
         'currentProject/canEditLayer': () => () => true,
         'currentProject/project': mockProject,
         'currentProject/currentViewer': {images: [imageWrapper]},
-        'currentProject/imageModule': jest.fn(() => 'mock-module/'),
+        'currentProject/imageModule': vi.fn(() => 'mock-module/'),
       },
       state: {
         currentProject: {
@@ -89,8 +89,8 @@ describe('LayersPanel.vue', () => {
       },
       mocks: {
         $eventBus: {
-          $on: jest.fn(),
-          $off: jest.fn(),
+          $on: vi.fn(),
+          $off: vi.fn(),
         },
         $notify: mockNotify,
         $store: defaultStore,

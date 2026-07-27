@@ -4,7 +4,7 @@ import AppLocalPage from '@/components/appengine/AppLocalPage.vue';
 import Task from '@/utils/appengine/task';
 import {flushPromises} from '../../../utils';
 
-jest.mock('@/utils/appengine/task');
+vi.mock('@/utils/appengine/task');
 
 const BLoading = {
   name: 'BLoading',

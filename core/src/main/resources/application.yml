@@ -57,13 +57,13 @@ spring:
           batch_size: 50
 
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
-  #liquibase:
-  #  contexts: prod
   liquibase:
     change-log: classpath:config/liquibase/master.xml
+    contexts: prod
 
   data:
     mongodb:
+      auto-index-creation: false
       authentication-database: admin
       username: ${MONGO_USER:admin}
       password: ${MONGO_PASS:password}

@@ -13,7 +13,7 @@ import be.cytomine.common.repository.model.command.payload.request.TermCommandPa
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
 
-@Mapper(componentModel = "spring", uses = {BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
 public interface TermMapper {
 
     @Mapping(target = "name", source = "replace.name")

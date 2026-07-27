@@ -4,11 +4,11 @@ import VueRouter from 'vue-router';
 
 import AppCard from '@/components/appengine/AppCard';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        post: jest.fn(),
+        post: vi.fn(),
       },
     },
   },

@@ -35,7 +35,7 @@
               <div class="details">
                 <p>
                   <strong>{{$t('duration')}}:</strong>
-                  {{ consultation.time | duration('humanize') }}
+                  {{ formatMomentDuration(consultation.time, 'humanize') }}
                   <br>
                   <strong>{{$t('annotation-creations')}}:</strong>
                   {{consultation.countCreatedAnnotations || 0}}
@@ -54,6 +54,7 @@
 <script>
 import {ImageConsultationCollection} from '@/api';
 import ImagePreview from '@/components/image/ImagePreview.vue';
+import {formatMomentDuration} from '@/utils/date';
 
 export default {
   name: 'project-connection-details',
@@ -71,6 +72,9 @@ export default {
     blindMode() {
       return this.$store.state.currentProject.project.blindMode;
     }
+  },
+  methods: {
+    formatMomentDuration
   },
   async created() {
     try {

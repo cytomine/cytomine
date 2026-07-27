@@ -5,11 +5,11 @@ import {Cytomine} from '@/api';
 
 import MetadataPanel from '@/components/viewer/panels/MetadataPanel';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(() => Promise.resolve({
+        get: vi.fn(() => Promise.resolve({
           data: {
             collection: [
               {namespace: 'ns1', key: 'key1', value: 'value1'},
@@ -22,8 +22,8 @@ jest.mock('@/api', () => ({
   }
 }));
 
-jest.mock('@/utils/string-utils', () => ({
-  getWildcardRegexp: jest.fn((str) => new RegExp(str, 'i'))
+vi.mock('@/utils/string-utils', () => ({
+  getWildcardRegexp: vi.fn((str) => new RegExp(str, 'i'))
 }));
 
 describe('MetadataPanel.vue', () => {
@@ -46,7 +46,7 @@ describe('MetadataPanel.vue', () => {
             }
           }
         },
-        $eventBus: {$emit: jest.fn()}
+        $eventBus: {$emit: vi.fn()}
       }
     });
 

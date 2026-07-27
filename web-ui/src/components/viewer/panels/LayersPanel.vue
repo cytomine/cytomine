@@ -373,7 +373,7 @@ export default {
 </script>
 
 <style scoped>
->>> select {
+:deep(select) {
   width: 21em;
 }
 
@@ -413,11 +413,11 @@ td .button {
   width: 100%;
 }
 
->>> .checkbox .control-label {
+:deep(.checkbox .control-label) {
   padding: 0 !important;
 }
 
->>> input[type="range"].slider {
+:deep(input[type="range"].slider) {
   margin: 0;
   padding: 0;
 }

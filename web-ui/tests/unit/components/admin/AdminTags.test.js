@@ -5,19 +5,19 @@ import AdminTags from '@/components/admin/AdminTags';
 import {Cytomine} from '@/api';
 import {flushPromises} from '../../../utils';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(),
-        delete: jest.fn(),
+        get: vi.fn(),
+        delete: vi.fn(),
       },
     },
   },
 }));
 
-jest.mock('@/utils/date', () => ({
-  formatDate: jest.fn((date) => date),
+vi.mock('@/utils/date', () => ({
+  formatDate: vi.fn((date) => date),
 }));
 
 const createTag = (id, name, creatorName) => ({
@@ -39,10 +39,10 @@ const createWrapper = async (options = {}) => {
     mocks: {
       $t: (message) => message,
       $i18n: {locale: 'en'},
-      $notify: jest.fn(),
+      $notify: vi.fn(),
       $buefy: {
         dialog: {
-          confirm: jest.fn((params) => params.onConfirm()),
+          confirm: vi.fn((params) => params.onConfirm()),
         },
       },
     },
@@ -64,7 +64,7 @@ describe('AdminTags.vue', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should have a default page size available in the per-page options', async () => {

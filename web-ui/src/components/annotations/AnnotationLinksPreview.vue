@@ -169,7 +169,7 @@ export default {
 </script>
 
 <style scoped>
->>> .annot-preview {
+:deep(.annot-preview) {
   margin: 3px;
 }
 

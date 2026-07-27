@@ -87,8 +87,6 @@ public class BasicInstanceBuilder {
 
     UserRepository userRepository;
 
-    ApplicationBootstrap applicationBootstrap;
-
     private User aUser;
     private User anAdmin;
     private User aGuest;
@@ -98,12 +96,8 @@ public class BasicInstanceBuilder {
         TransactionTemplate transactionTemplate,
         UserRepository userRepository,
         PermissionService permissionService,
-        SecRoleRepository secRoleRepository,
-        ApplicationBootstrap applicationBootstrap
+        SecRoleRepository secRoleRepository
     ) {
-        if (secRoleRepository.count() == 0) {
-            applicationBootstrap.init();
-        }
         this.em = em;
         this.userRepository = userRepository;
         this.permissionService = permissionService;

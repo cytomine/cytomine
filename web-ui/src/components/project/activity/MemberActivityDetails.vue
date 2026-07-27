@@ -32,15 +32,15 @@
 
       <template v-else>
         <p class="last-update is-size-7 has-text-grey">
-          {{$t('data-last-updated-on', {time: $options.filters.moment(lastUpdate, 'LTS')})}}
+          {{$t('data-last-updated-on', {time: formatMomentDate(lastUpdate, 'LTS')})}}
         </p>
 
         <h1>{{$t('activity-of-user', {username: user.fullName})}}</h1>
 
         <ul>
-          <li><strong>{{$t('registration-date')}}:</strong> {{Number(user.created) | moment('ll LTS')}}</li>
-          <li><strong>{{$t('first-project-connection')}}:</strong> {{Number(resumeActivity.firstConnection) | moment('ll LTS')}}</li>
-          <li><strong>{{$t('last-project-connection')}}:</strong> {{Number(resumeActivity.lastConnection) | moment('ll LTS')}}</li>
+          <li><strong>{{$t('registration-date')}}:</strong> {{formatMomentDate(Number(user.created), 'll LTS')}}</li>
+          <li><strong>{{$t('first-project-connection')}}:</strong> {{formatMomentDate(Number(resumeActivity.firstConnection), 'll LTS')}}</li>
+          <li><strong>{{$t('last-project-connection')}}:</strong> {{formatMomentDate(Number(resumeActivity.lastConnection), 'll LTS')}}</li>
         </ul>
 
         <hr>
@@ -87,11 +87,11 @@
         >
           <template #default="{row: connection}">
             <b-table-column :label="$t('date')" field="created" sortable>
-              {{ Number(connection.created) | moment('ll LT') }}
+              {{ formatMomentDate(Number(connection.created), 'll LT') }}
             </b-table-column>
 
             <b-table-column :label="$t('duration')" field="time" sortable>
-              {{ connection.time | duration('humanize') }}
+              {{ formatMomentDuration(connection.time, 'humanize') }}
               <span class="tag is-success" v-if="connection.online">{{$t('ongoing')}}</span>
             </b-table-column>
 
@@ -190,7 +190,7 @@
             </b-table-column>
 
             <b-table-column :label="$t('duration')" field="time" sortable>
-              {{ consultation.time | duration('humanize') }}
+              {{ formatMomentDuration(consultation.time, 'humanize') }}
             </b-table-column>
 
             <b-table-column :label="$t('number-consultations')" field="frequency" centered sortable>
@@ -198,11 +198,11 @@
             </b-table-column>
 
             <b-table-column :label="$t('first-consultation')" field="first" centered sortable>
-              {{ Number(consultation.first) | moment('ll LT')}}
+              {{ formatMomentDate(Number(consultation.first), 'll LT') }}
             </b-table-column>
 
             <b-table-column :label="$t('last-consultation')" field="last" centered sortable>
-              {{ Number(consultation.last) | moment('ll LT')}}
+              {{ formatMomentDate(Number(consultation.last), 'll LT') }}
             </b-table-column>
 
             <b-table-column :label="$t('number-annotation-creations')" field="countCreatedAnnotations" centered sortable>
@@ -253,6 +253,7 @@ import constants from '@/utils/constants.js';
 import moment from 'moment';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 import {appendShortTermToken} from '@/utils/token-utils.js';
+import {formatMomentDate, formatMomentDuration} from '@/utils/date';
 
 
 export default {
@@ -295,6 +296,8 @@ export default {
   },
   methods: {
     appendShortTermToken,
+    formatMomentDate,
+    formatMomentDuration,
     async fetchData() {
       try {
         await Promise.all([

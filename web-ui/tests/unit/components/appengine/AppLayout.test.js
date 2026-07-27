@@ -7,15 +7,17 @@ import store from '@/store/store';
 import {Cytomine} from '@/api';
 import {flushPromises} from '../../../utils';
 
-jest.mock('@/utils/constants.js', () => ({
-  APPENGINE_ENABLED: true,
+vi.mock('@/utils/constants.js', () => ({
+  default: {
+    APPENGINE_ENABLED: true,
+  }
 }));
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn().mockResolvedValue({data: []}),
+        get: vi.fn().mockResolvedValue({data: []}),
       },
     },
   },

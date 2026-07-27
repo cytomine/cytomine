@@ -6,19 +6,19 @@ import {Cytomine} from '@/api';
 import {UploadedFileStatus} from '@/constants/UploadedFileStatus';
 import {flushPromises} from '../../../utils';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(),
-        post: jest.fn(),
+        get: vi.fn(),
+        post: vi.fn(),
       },
     },
   },
 }));
 
-jest.mock('@/utils/date', () => ({
-  formatDate: jest.fn((date) => date),
+vi.mock('@/utils/date', () => ({
+  formatDate: vi.fn((date) => date),
 }));
 
 const insertCommand = {
@@ -67,7 +67,7 @@ const createWrapper = async (options = {}) => {
     mocks: {
       $t: (message) => message,
       $i18n: {locale: 'en'},
-      $notify: jest.fn(),
+      $notify: vi.fn(),
     },
     ...options,
   });

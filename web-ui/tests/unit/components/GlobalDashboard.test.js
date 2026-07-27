@@ -5,24 +5,24 @@ import VTooltip from 'v-tooltip';
 import GlobalDashboard from '@/components/GlobalDashboard';
 import {ImageInstanceCollection, ProjectCollection} from '@/api';
 
-jest.mock('@/utils/image-utils', () => ({
-  isWebPSupported: jest.fn(() => true)
+vi.mock('@/utils/image-utils', () => ({
+  isWebPSupported: vi.fn(() => true)
 }));
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   ImageInstanceCollection: {
-    fetchLastOpened: jest.fn().mockResolvedValue([
+    fetchLastOpened: vi.fn().mockResolvedValue([
       {id: 1, project: 1}
     ])
   },
   ProjectCollection: {
-    fetchAll: jest.fn().mockResolvedValue({
+    fetchAll: vi.fn().mockResolvedValue({
       array: [
         {id: 1, name: 'Project 1', numberOfImages: 10, blindMode: false},
         {id: 2, name: 'Project 2', numberOfImages: 5, blindMode: true}
       ]
     }),
-    fetchLastOpened: jest.fn().mockResolvedValue([
+    fetchLastOpened: vi.fn().mockResolvedValue([
       {id: 1},
       {id: 2}
     ])
@@ -45,7 +45,7 @@ describe('GlobalDashboard.vue', () => {
       },
       computed: {
         currentUser: () => ({
-          fetchNbAnnotations: jest.fn().mockResolvedValue(5),
+          fetchNbAnnotations: vi.fn().mockResolvedValue(5),
         })
       },
       propsData: {

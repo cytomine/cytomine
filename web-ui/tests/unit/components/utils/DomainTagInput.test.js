@@ -4,8 +4,8 @@ import Buefy from 'buefy';
 import DomainTagInput from '@/components/utils/DomainTagInput.vue';
 import {getWildcardRegexp} from '@/utils/string-utils';
 
-jest.mock('@/utils/string-utils', () => ({
-  getWildcardRegexp: jest.fn().mockImplementation(search => new RegExp(search, 'i'))
+vi.mock('@/utils/string-utils', () => ({
+  getWildcardRegexp: vi.fn().mockImplementation(search => new RegExp(search, 'i'))
 }));
 
 describe('DomainTagInput.vue', () => {

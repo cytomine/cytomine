@@ -7,9 +7,9 @@ import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import SimilarAnnotation from '@/components/annotations/SimilarAnnotation';
 import {Annotation} from '@/api';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Annotation: {
-    fetch: jest.fn(),
+    fetch: vi.fn(),
   },
 }));
 
@@ -50,7 +50,7 @@ describe('SimilarAnnotation.vue', () => {
 
     state = {
       currentProject: {
-        imageModule: jest.fn().mockReturnValue('testModule/'),
+        imageModule: vi.fn().mockReturnValue('testModule/'),
         currentViewer: {
           images: {
             '0': {
@@ -103,17 +103,17 @@ describe('SimilarAnnotation.vue', () => {
       mocks: {
         $t: (msg) => msg,
         $store: store,
-        $notify: jest.fn(),
+        $notify: vi.fn(),
         $eventBus: {
-          $on: jest.fn(),
-          $off: jest.fn(),
+          $on: vi.fn(),
+          $off: vi.fn(),
         },
       },
     });
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render correctly', () => {

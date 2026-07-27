@@ -4,14 +4,16 @@ import Vuex from 'vuex';
 
 import CytomineDescription from '@/components/description/CytomineDescription';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Description: {
-    fetch: jest.fn()
+    fetch: vi.fn()
   }
 }));
 
-jest.mock('@/utils/constants.js', () => ({
-  STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW'
+vi.mock('@/utils/constants.js', () => ({
+  default: {
+    STOP_PREVIEW_KEYWORD: 'STOP_PREVIEW'
+  }
 }));
 
 describe('CytomineDescription.vue', () => {
@@ -25,7 +27,7 @@ describe('CytomineDescription.vue', () => {
 
   beforeEach(() => {
     actions = {
-      fetchDescription: jest.fn()
+      fetchDescription: vi.fn()
     };
     store = new Vuex.Store({
       actions

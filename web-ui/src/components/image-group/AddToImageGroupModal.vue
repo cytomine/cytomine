@@ -43,7 +43,7 @@
             </b-table-column>
 
             <b-table-column field="created" :label="$t('created-on')" sortable>
-              {{ Number(image.created) | moment('ll LT') }}
+              {{ formatMomentDate(Number(image.created), 'll LT') }}
             </b-table-column>
 
             <b-table-column label=" " centered>
@@ -79,6 +79,7 @@ import {ImageInstanceCollection, ImageGroupImageInstance} from '@/api';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 import CytomineTable from '@/components/utils/CytomineTable.vue';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
+import {formatMomentDate} from '@/utils/date';
 
 export default {
   name: 'add-to-image-group-modal',
@@ -131,6 +132,7 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
     close() {
       if (!this.programmatic) {
         this.$emit('update:active', false);
@@ -172,17 +174,17 @@ export default {
 </script>
 
 <style scoped>
->>> .animation-content {
+:deep(.animation-content) {
   max-width: 60% !important;
   width: 60%;
 }
 
->>> .modal-card {
+:deep(.modal-card) {
   width: 100%;
   height: 80vh;
 }
 
->>> .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }

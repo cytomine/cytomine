@@ -3,10 +3,10 @@ import Vuex from 'vuex';
 
 import CytomineNavbar from '@/components/navbar/CytomineNavbar';
 
-jest.mock('@/lang.js', () => ({
+vi.mock('@/lang.js', () => ({
   changeLanguageMixin: {
     methods: {
-      changeLanguage: jest.fn()
+      changeLanguage: vi.fn()
     }
   }
 }));
@@ -17,12 +17,12 @@ describe('CytomineNavbar.vue', () => {
   localVue.directive('shortkey', {});
 
   const actions = {
-    logout: jest.fn()
+    logout: vi.fn()
   };
 
   const keycloak = {
-    hasResourceRole: jest.fn(() => false),
-    logout: jest.fn().mockResolvedValue()
+    hasResourceRole: vi.fn(() => false),
+    logout: vi.fn().mockResolvedValue()
   };
 
   const createWrapper = ({user = {}, projects = {}} = {}) => {
@@ -48,7 +48,7 @@ describe('CytomineNavbar.vue', () => {
       mocks: {
         $t: (message) => message,
         $keycloak: keycloak,
-        $notify: jest.fn()
+        $notify: vi.fn()
       },
       stubs: {
         'router-link': true

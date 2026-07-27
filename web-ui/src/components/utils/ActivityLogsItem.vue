@@ -14,7 +14,7 @@
 
 <template>
 <li :key="action.id">
-  <strong>{{Number(action.created) | moment('l LTS')}}:</strong>
+  <strong>{{formatMomentDate(Number(action.created), 'l LTS')}}:</strong>
   <span class="content" @mouseenter="enter" @mouseleave="leave">
     <router-link v-if="route" :to="route">
       {{action.message}}
@@ -34,6 +34,7 @@
 
 import {appendShortTermToken} from '@/utils/token-utils.js';
 import {get} from '@/utils/store-helpers.js';
+import {formatMomentDate} from '@/utils/date';
 
 const ANNOT = 1;
 const IMAGE = 2;
@@ -73,6 +74,7 @@ export default {
   },
   methods: {
     appendShortTermToken,
+    formatMomentDate,
     enter() {
       this.showPreview = true;
     },

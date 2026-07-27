@@ -9,7 +9,6 @@ import java.util.UUID;
 import lombok.Getter;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
-import org.cytomine.repository.mapper.BaseMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.TermRepository;
@@ -23,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.mapper.BaseMapper;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;

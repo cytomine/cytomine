@@ -247,7 +247,7 @@ def dataclass_to_dict(obj: Any):
             result[field.name] = dataclass_to_dict(value)
         return result
 
-    raise TypeError(f"Unsupported type for dataclass serialization: {type(obj).__name__}")
+    return str(obj)
 
 
 

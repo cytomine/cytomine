@@ -44,9 +44,7 @@ RUN apt-get update && \
         libtiff-dev \
         libvips-dev \
         libvips42 \
-        libwebp-dev \
-        openssh-client \
-        git # Ensure git is installed for cloning
+        libwebp-dev
 
 COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.10.12 /uv /uvx /bin/
 

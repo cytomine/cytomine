@@ -29,13 +29,11 @@
       <em class="no-result">{{ $t('no-annotation') }}</em>
     </template>
     <template v-else>
-      <template v-for="(annot, index) in annotations">
+      <template v-for="(annot, index) in annotations" :key="((isInViewer) ? index : '') + title + annot.id">
         <div class="break"
              v-if="regroupPerLine && annotationInGroupDetails[index].first"
-             :key="((isInViewer) ? index : '') + title + annot.id + 'break-in'"
         ></div>
         <annotation-preview
-            :key="((isInViewer) ? index : '') + title + annot.id"
             :class="annotStyles(annot, index)"
             class="annot-preview-block"
             :annot="annot"

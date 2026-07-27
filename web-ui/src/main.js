@@ -2,6 +2,9 @@ import Vue from 'vue';
 import axios from 'axios';
 import constants from '@/utils/constants.js';
 
+// Keep Vue 2 runtime behavior by default while migrating incrementally.
+Vue.configureCompat({MODE: 2});
+
 import VueRouter from 'vue-router';
 import router from './routes.js';
 Vue.use(VueRouter);

@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 
 import Polygon, {fromCircle as polygonFromCircle} from 'ol/geom/Polygon';
@@ -192,9 +194,9 @@ export default {
           annot.userByTerm = this.termsToAssociate.map(term => ({term, user: [this.currentUser.id]}));
           annot.imageGroup = this.imageGroupId;
           updateAnnotationLinkProperties(annot);
-          this.$eventBus.$emit('addAnnotation', annot);
+          eventBus.emit('addAnnotation', annot);
           if (idx === this.nbActiveLayers - 1) {
-            this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
+            eventBus.emit('selectAnnotation', {index: this.index, annot});
           }
 
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
@@ -208,8 +210,8 @@ export default {
             const annotationId = annot.id;
             const annotation = (await Cytomine.instance.api.post(`annotations/${annotationId}/refine`)).data;
 
-            this.$eventBus.$emit('editAnnotation', annotation);
-            this.$eventBus.$emit('reloadAnnotationCrop', annotation);
+            eventBus.emit('editAnnotation', annotation);
+            eventBus.emit('reloadAnnotationCrop', annotation);
             this.$notify({type: 'success', text: 'Successful SAM Processing !'});
           } catch (error) {
             console.error(error);
@@ -240,8 +242,8 @@ export default {
           correctedAnnot.annotationLink = annot.annotationLink;
           correctedAnnot.imageGroup = annot.imageGroup;
           this.$store.commit(this.imageModule + 'addAction', {annot: correctedAnnot, type: Action.UPDATE});
-          this.$eventBus.$emit('editAnnotation', correctedAnnot);
-          this.$eventBus.$emit('reloadAnnotationCrop', annot);
+          eventBus.emit('editAnnotation', correctedAnnot);
+          eventBus.emit('reloadAnnotationCrop', annot);
         }
       } catch (err) {
         console.log(err);

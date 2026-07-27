@@ -1,8 +1,17 @@
 import {shallowMount} from '@vue/test-utils';
 
 import AppBottomDrawer from '@/components/appengine/AppBottomDrawer.vue';
+import eventBus from '@/utils/event-bus';
 import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
+
+vi.mock('@/utils/event-bus', () => ({
+  default: {
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
+  }
+}));
 
 vi.mock('@/utils/appengine/task', () => ({
   default: {
@@ -73,9 +82,6 @@ describe('AppBottomDrawer.vue', () => {
             open: vi.fn(),
           },
         },
-        $eventBus: {
-          $emit: vi.fn(),
-        },
         $router: {
           push: vi.fn(),
         },
@@ -139,7 +145,7 @@ describe('AppBottomDrawer.vue', () => {
 
     expect(wrapper.vm.isCollapsed).toBe(false);
     expect(wrapper.emitted().collapse).toEqual([[false]]);
-    expect(wrapper.vm.$eventBus.$emit).toHaveBeenCalledWith('updateMapSize');
+    expect(eventBus.emit).toHaveBeenCalledWith('updateMapSize');
   });
 
   it('should reset inputs', () => {

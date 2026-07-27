@@ -56,6 +56,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get, sync} from '@/utils/store-helpers';
 
 export default {
@@ -79,7 +81,7 @@ export default {
       return this.configUI[`project-${tab}-tab`];
     },
     transitionEndHandler() { // led to a change of the size of the content div => need to reload OL map
-      this.$eventBus.$emit('updateMapSize');
+      eventBus.emit('updateMapSize');
     }
   },
   mounted() {

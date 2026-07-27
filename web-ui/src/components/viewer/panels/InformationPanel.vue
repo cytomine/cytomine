@@ -133,6 +133,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName.vue';
 import CalibrationModal from '@/components/image/CalibrationModal.vue';
@@ -196,7 +198,7 @@ export default {
     appendShortTermToken,
     setResolution(resolution) {
       this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
-      this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area
+      eventBus.emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area
     },
     download(image) {
       window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken));
@@ -285,10 +287,10 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>

@@ -39,11 +39,6 @@ describe('AnnotationSelection.vue', () => {
         ]
       },
       mocks: {
-        $eventBus: {
-          $on: vi.fn(),
-          $off: vi.fn(),
-          $emit: vi.fn(),
-        },
         $store: {
           getters: {
             'currentProject/currentViewer': {images: mockImages},

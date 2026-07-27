@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import WKT from 'ol/format/WKT';
 import {AnnotationCollection, Cytomine} from '@/api';
 import {annotBelongsToLayer} from '@/utils/annotation-utils';
@@ -355,21 +357,21 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$on('selectAnnotationInLayer', this.selectAnnotationHandler);
-    this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$on('reviewAnnotation', this.reviewAnnotationHandler);
-    this.$eventBus.$on('editAnnotation', this.editAnnotationHandler);
-    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationHandler);
+    eventBus.on('addAnnotation', this.addAnnotationHandler);
+    eventBus.on('selectAnnotationInLayer', this.selectAnnotationHandler);
+    eventBus.on('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.on('reviewAnnotation', this.reviewAnnotationHandler);
+    eventBus.on('editAnnotation', this.editAnnotationHandler);
+    eventBus.on('deleteAnnotation', this.deleteAnnotationHandler);
   },
   beforeDestroy() {
     // unsubscribe from all events
-    this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$off('selectAnnotationInLayer', this.selectAnnotationHandler);
-    this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$off('reviewAnnotation', this.reviewAnnotationHandler);
-    this.$eventBus.$off('editAnnotation', this.editAnnotationHandler);
-    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationHandler);
+    eventBus.off('addAnnotation', this.addAnnotationHandler);
+    eventBus.off('selectAnnotationInLayer', this.selectAnnotationHandler);
+    eventBus.off('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.off('reviewAnnotation', this.reviewAnnotationHandler);
+    eventBus.off('editAnnotation', this.editAnnotationHandler);
+    eventBus.off('deleteAnnotation', this.deleteAnnotationHandler);
   }
 };
 </script>

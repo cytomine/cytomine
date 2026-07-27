@@ -448,6 +448,8 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import {get} from '@/utils/store-helpers';
 
 import OntologyTree from '@/components/ontology/OntologyTree.vue';
@@ -728,8 +730,8 @@ export default {
 
       try {
         await annot.fill();
-        this.$eventBus.$emit('editAnnotation', annot);
-        this.$eventBus.$emit('reloadAnnotationCrop', annot);
+        eventBus.emit('editAnnotation', annot);
+        eventBus.emit('reloadAnnotationCrop', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
       } catch (err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-fill')});
@@ -763,7 +765,7 @@ export default {
             editedAnnots = await listAnnotationsInGroup(annot.project, annot.group);
           }
           editedAnnots.forEach(a => {
-            this.$eventBus.$emit('editAnnotation', a);
+            eventBus.emit('editAnnotation', a);
             if (this.copiedAnnot && a.id === this.copiedAnnot.id) {
               let copiedAnnot = this.copiedAnnot.clone();
               copiedAnnot.annotationLink = a.annotationLink;
@@ -772,7 +774,7 @@ export default {
             }
           });
         }
-        this.$eventBus.$emit('deleteAnnotation', annot);
+        eventBus.emit('deleteAnnotation', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
       } catch (err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
@@ -905,8 +907,8 @@ export default {
         annot.imageGroup = this.imageGroupId;
         // ----
 
-        this.$eventBus.$emit('addAnnotation', annot);
-        this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
+        eventBus.emit('addAnnotation', annot);
+        eventBus.emit('selectAnnotation', {index: this.index, annot});
         this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
       } catch (err) {
         console.log(err);
@@ -920,7 +922,7 @@ export default {
 
       try {
         await this.copiedAnnot.repeat(this.slice.id, this.nbRepeats);
-        this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id});
+        eventBus.emit('reloadAnnotations', {idImage: this.image.id});
         this.$notify({type: 'success', text: this.$t('notif-success-annotation-repeat')});
       } catch (err) {
         console.log(err);
@@ -975,7 +977,7 @@ export default {
         }
 
         editedAnnots.forEach(annot => {
-          this.$eventBus.$emit('editAnnotation', annot);
+          eventBus.emit('editAnnotation', annot);
           if (this.copiedAnnot && annot.id === this.copiedAnnot.id) {
             let copiedAnnot = this.copiedAnnot.clone();
             copiedAnnot.annotationLink = annot.annotationLink;
@@ -1024,13 +1026,13 @@ export default {
 
       if (type === Action.CREATE) {
         await Annotation.delete(annot.id);
-        this.$eventBus.$emit('deleteAnnotation', annot);
+        eventBus.emit('deleteAnnotation', annot);
         newType = Action.DELETE;
         command = Cytomine.instance.lastCommand;
       } else if (type === Action.DELETE) {
         let collection = await Cytomine.instance.undo(command); // always undo if annotation was deleted
         let newAnnot = await this.getUpdatedAnnotation(collection);
-        this.$eventBus.$emit('addAnnotation', newAnnot);
+        eventBus.emit('addAnnotation', newAnnot);
         newType = Action.CREATE;
       } else { // annotation was updated
         let collection;
@@ -1040,7 +1042,7 @@ export default {
           collection = await Cytomine.instance.redo(command);
         }
         let newAnnot = await this.getUpdatedAnnotation(collection);
-        this.$eventBus.$emit('editAnnotation', newAnnot);
+        eventBus.emit('editAnnotation', newAnnot);
       }
 
       return {annot, command, type: newType};
@@ -1074,9 +1076,9 @@ export default {
       try {
         let reviewedAnnot = await annot.review();
         reviewedAnnot.userByTerm = annot.userByTerm; // copy terms from initial annot
-        this.$eventBus.$emit('reviewAnnotation', annot);
-        this.$eventBus.$emit('addAnnotation', reviewedAnnot);
-        this.$eventBus.$emit('selectAnnotation', {index: this.index, annot: reviewedAnnot});
+        eventBus.emit('reviewAnnotation', annot);
+        eventBus.emit('addAnnotation', reviewedAnnot);
+        eventBus.emit('selectAnnotation', {index: this.index, annot: reviewedAnnot});
       } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-validation')});
@@ -1098,9 +1100,9 @@ export default {
         let annot = await Annotation.fetch(reviewedAnnot.parentIdent);
         annot.userByTerm = reviewedAnnot.userByTerm; // copy terms from reviewed annot
         await annot.cancelReview();
-        this.$eventBus.$emit('deleteAnnotation', reviewedAnnot);
-        this.$eventBus.$emit('addAnnotation', annot, false);
-        this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
+        eventBus.emit('deleteAnnotation', reviewedAnnot);
+        eventBus.emit('addAnnotation', annot, false);
+        eventBus.emit('selectAnnotation', {index: this.index, annot});
       } catch (error) {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-rejection')});
@@ -1246,10 +1248,10 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>

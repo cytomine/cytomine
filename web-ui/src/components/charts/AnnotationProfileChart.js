@@ -3,14 +3,15 @@ import ChartZoom from 'chartjs-plugin-zoom';
 
 export default {
   name: 'annotation-profile-chart',
-  extends: Line,
+  components: {Line},
   props: {
+    cssClasses: {type: String, default: ''},
     annotation: Object,
     bpc: {type: Number, default: 8},
   },
   data() {
     return {
-      chartData: null
+      chartData: {labels: [], datasets: []},
     };
   },
   computed: {
@@ -21,22 +22,60 @@ export default {
     },
     label() {
       return `(${Math.round(this.annotation.centroid.x)}, ${Math.round(this.annotation.centroid.y)})`;
-    }
+    },
+    chartOptions() {
+      return {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          zoom: {
+            pan: {
+              enabled: true,
+              mode: 'xy',
+            },
+            zoom: {
+              wheel: {enabled: true},
+              drag: {enabled: false},
+              mode: 'xy',
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: this.$t('slice')
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: this.$t('pixel-intensity')
+            },
+            beginAtZero: true,
+            max: Math.pow(2, this.bpc) - 1
+          }
+        },
+      };
+    },
   },
   watch: {
     async queryParams() {
-      this.doRenderChart();
+      this.updateData();
     }
   },
   methods: {
     resetZoom() {
-      this.$data._chart.resetZoom();
+      this.$refs.chartRef.chart.resetZoom();
     },
-    async doRenderChart() {
+    async updateData() {
       try {
         let data = (await this.annotation.fetchProfile())['profile'];
 
-        this.renderChart({
+        this.chartData = {
           labels: [...Array(data.length).keys()],
           datasets: [
             {
@@ -47,45 +86,7 @@ export default {
               backgroundColor: '#61b2e8'
             }
           ]
-        }, {
-          maintainAspectRatio: false,
-          responsive: true,
-          legend: {
-            display: false
-          },
-          scales: {
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: this.$t('slice')
-              }
-            }],
-            yAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: this.$t('pixel-intensity')
-              },
-              ticks: {
-                beginAtZero: true,
-                max: Math.pow(2, this.bpc) - 1
-              }
-            }]
-          },
-          plugins: {
-            zoom: {
-              pan: {
-                enabled: true,
-                mode: 'xy',
-              },
-
-              zoom: {
-                enabled: true,
-                drag: false,
-                mode: 'xy',
-              }
-            }
-          }
-        });
+        };
       } catch (error) {
         console.log(error);
         this.$emit('error', true);
@@ -93,7 +94,18 @@ export default {
     }
   },
   async mounted() {
-    this.addPlugin(ChartZoom);
-    this.doRenderChart();
-  }
+    await this.updateData();
+  },
+  render(h) {
+    return h('div', {class: this.cssClasses}, [
+      h(Line, {
+        ref: 'chartRef',
+        props: {
+          data: this.chartData,
+          options: this.chartOptions,
+          plugins: [ChartZoom],
+        },
+      }),
+    ]);
+  },
 };

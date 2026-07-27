@@ -88,10 +88,6 @@ describe('LayersPanel.vue', () => {
         index: '0',
       },
       mocks: {
-        $eventBus: {
-          $on: vi.fn(),
-          $off: vi.fn(),
-        },
         $notify: mockNotify,
         $store: defaultStore,
         $t: (key) => key,

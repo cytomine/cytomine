@@ -18,26 +18,15 @@ const mockBlobUrl = 'blob:mock-url-12345';
 
 describe('AnnotationPreview.vue', () => {
   const createWrapper = (options) => shallowMount(AnnotationPreview, {
-    mocks: {
-      $eventBus: mockEventBus,
-    },
     stubs: {
       'v-popover': true,
     },
     ...options,
   });
 
-  let mockEventBus;
-
   beforeEach(() => {
     global.URL.createObjectURL = vi.fn(() => mockBlobUrl);
     global.URL.revokeObjectURL = vi.fn();
-
-    mockEventBus = {
-      $on: vi.fn(),
-      $off: vi.fn(),
-      $emit: vi.fn()
-    };
   });
 
   afterEach(() => {

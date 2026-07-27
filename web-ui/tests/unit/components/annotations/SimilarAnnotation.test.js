@@ -104,10 +104,6 @@ describe('SimilarAnnotation.vue', () => {
         $t: (msg) => msg,
         $store: store,
         $notify: vi.fn(),
-        $eventBus: {
-          $on: vi.fn(),
-          $off: vi.fn(),
-        },
       },
     });
   });

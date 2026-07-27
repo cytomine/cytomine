@@ -2,8 +2,17 @@ import {createLocalVue, shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import {Cytomine} from '@/api';
+import eventBus from '@/utils/event-bus';
 
 import MetadataPanel from '@/components/viewer/panels/MetadataPanel';
+
+vi.mock('@/utils/event-bus', () => ({
+  default: {
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
+  }
+}));
 
 vi.mock('@/api', () => ({
   Cytomine: {
@@ -45,8 +54,7 @@ describe('MetadataPanel.vue', () => {
               images: [{imageInstance: {id: 123}}]
             }
           }
-        },
-        $eventBus: {$emit: vi.fn()}
+        }
       }
     });
 
@@ -70,6 +78,6 @@ describe('MetadataPanel.vue', () => {
   it('should emit close event when closeMetadata is called', () => {
     wrapper.vm.closeMetadata();
 
-    expect(wrapper.vm.$eventBus.$emit).toHaveBeenCalledWith('close-metadata');
+    expect(eventBus.emit).toHaveBeenCalledWith('close-metadata');
   });
 });

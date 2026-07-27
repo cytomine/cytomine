@@ -2,6 +2,7 @@
   "title": "Cytomine Documentation",
   "description": "Official Cytomine documentation",
   "email": "uliege@cytomine.org",
+  "infoemail": "info@cytomine.org",
   "icon": "/images/cytomine-org-icon.png",
   "logo": "/images/cytomine-uliege-logo.png",
   "footer": "Made by ULiège Cytomine R&D team.",
@@ -30,7 +31,7 @@
     "actionText": "Get Started",
     "actionLink": "/user-guide/getting-started",
     "title": "Cytomine Documentation portal",
-    "tagline": "<p style=\"text-align: justify !important; margin-top:2rem; font-size: 1.2rem;\">Cytomine software is a web platform for collaborative analysis of very large bio-medical images and semi-automatic processing of large image collections using machine learning algorithms.  The software provides a very fast access to high-resolution images allowing users to annotate regions of interest and add semantic information to images and to annotations. Additionally, users have the possibility to run algorithms for semi-automated image analysis and share all their work with teammates using synchro- or asynchronous tools.\n</p>",
+    "tagline": "<p style=\"text-align: justify !important; margin-top:2rem; font-size: 1.2rem;\">Cytomine software is an open-source web platform for collaborative analysis of very large bio-medical images and semi-automatic processing of large image collections using machine/deep learning algorithms.  The software provides a very fast access to high-resolution images allowing users to annotate regions of interest and add semantic information to images and to annotations. Additionally, users have the possibility to run algorithms for semi-automated image analysis and share all their work with teammates using synchro- or asynchronous tools.\n</p>",
     "image": "/images/cytomine-uliege-scheme.png",
     "imageAlt": "Cytomine ULiège R&D overview",
     "targets": [
@@ -40,7 +41,7 @@
       },
       {
         "title": "For data and computer scientists",
-        "details": "We are improving the Cytomine software execution architecture to support multiple types of algorithms and execution environments, and to perform benchmarking (see <a href=\"https://neubias-wg5.github.io/\">Biaflows project</a>). We are also extending Cytomine internal data models and its RESTful API to support various types of data import/export."
+        "details": "We are improving the Cytomine software App engine to support multiple types of algorithms and execution environments, and to perform benchmarking (see also the <a href=\"https://neubias-wg5.github.io/\">Biaflows project</a>). We are also extending Cytomine internal data models and its RESTful API to support various types of data import/export."
       },
       {
         "title": "For bioimage analysts and pathologists",
@@ -48,7 +49,7 @@
       },
       {
         "title": "For other (non-biomedical) researchers",
-        "details": "Through collaborations, our team is applying and extending some Cytomine features on large image sets from other fields such as digital collections of works of art, industrial quality control, remote sensing, ..."
+        "details": "Through collaborations, our team applied and extended some Cytomine features on large image sets from other fields such as digital collections of works of art, industrial quality control, remote sensing, ..."
       }
     ]
   }

@@ -9,7 +9,7 @@ title: Getting started
 There are three main ways to get a personal account:
 
 - If you have Cytomine installed at your institution, ask an account from your local administrator.
-- Ask for an account on our demo instance via email at <a :href="'mailto:'+$cytomine.email">{{$cytomine.email}}</a>.
+- Ask for an account on our demo instance via email at <a :href="'mailto:'+$cytomine.infoemail">{{$cytomine.infoemail}}</a>.
 - [Install Cytomine on your laptop or your server](/admin-guide/docker/installation.md) (for Linux users only).
 
 When you have a username and a password, go to the login page and ... Welcome to Cytomine!

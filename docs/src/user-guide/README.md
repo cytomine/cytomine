@@ -6,7 +6,7 @@ redirectFrom:
 
 # Introduction
 
-In this section, we will explore the various features of this new ergonomic version of Cytomine, the solution for your projects in research, education or diagnostics.
+In this section, we present the various features of Cytomine, the solution for your projects in research, education or diagnostics.
 
 ## Where to start
 
@@ -29,5 +29,7 @@ Images can be multidimensional (2D+C+Z+T) and multispectral (such as in hyperspe
 With the concept of **[Annotations](./annotations.md)**, we will be able to draw, save _Regions Of Interest_ inside the images of a project and associate semantic values to them.
 
 Images and annotations can be grouped into **[Image Groups](./image-group.md)** and **[Annotation Links](annotation-link.md)**, respectively, to handle multimodal datasets where a sample is described by multiple images.
+
+The **[App Engine](./appengine.md)** allows to execute algorithms (AI apps or others) to generate results.
 
 The **[Administrator Panel](./administration.md)** allows the administrator of a Cytomine instance to modify some global configurations and to have some global metrics.

@@ -137,11 +137,11 @@
       <cytomine-table
         :collection="imageCollection"
         :is-empty="nbEmptyFilters > 0"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :openedDetailed.sync="openedDetails"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
+        v-model:currentPage="currentPage"
+        v-model:perPage="perPage"
+        v-model:openedDetailed="openedDetails"
+        v-model:sort="sortField"
+        v-model:order="sortOrder"
         :revision="revision"
       >
         <template #default="{row: image}">
@@ -204,7 +204,7 @@
       </cytomine-table>
     </div>
 
-    <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
+    <add-image-modal v-model:active="addImageModal" @addImage="refreshData" />
   </div>
 </div>
 </template>

@@ -92,16 +92,6 @@ describe('User', () => {
       expect(activity.totalConnections).toEqual(0);
     });
 
-    it('Lock', async () => {
-      await user.lock();
-      expect(user.enabled).toBe(false);
-    });
-
-    it('Unlock', async () => {
-      await user.unlock();
-      expect(user.enabled).toBe(true);
-    });
-
     it('Define role', async () => {
       let roles = await user.defineRole(role);
       expect(roles).toBeInstanceOf(RoleCollection);

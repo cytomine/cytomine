@@ -127,36 +127,6 @@ export default class User extends Model {
   }
 
   /**
-   * Lock the user
-   *
-   * @returns {this} The updated user
-   */
-  async lock() {
-    if (this.isNew()) {
-      throw new Error('Cannot lock a user with no ID.');
-    }
-
-    let {data} = await Cytomine.instance.api.post(`user/${this.id}/lock.json`);
-    this.populate(data.user);
-    return this;
-  }
-
-  /**
-   * Unlock the user
-   *
-   * @returns {this} The updated user
-   */
-  async unlock() {
-    if (this.isNew()) {
-      throw new Error('Cannot unlock a user with no ID.');
-    }
-
-    let {data} = await Cytomine.instance.api.delete(`user/${this.id}/lock.json`);
-    this.populate(data.user);
-    return this;
-  }
-
-  /**
    * Define the role of the user
    *
    * @param {string} role  The authority name of the role to assign (e.g. "ROLE_ADMIN")

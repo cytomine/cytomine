@@ -69,6 +69,7 @@ RUN python plugins.py \
 RUN rm -rf /var/lib/apt/lists/*
 
 COPY ./clients/python /clients/python
+COPY ./pims/resources/ ./resources/
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=./pims/uv.lock,target=uv.lock \
@@ -87,7 +88,6 @@ COPY ./pims/docker/start-reload.sh /start-reload.sh
 RUN chmod +x /start-reload.sh
 
 COPY ./pims/pims /app/pims
-COPY ./pims/resources/ ./resources/
 
 COPY ./pims/pyproject.toml ./pims/uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -119,7 +119,7 @@ EXPOSE ${PORT}
 FROM base-pims AS dev-server
 
 RUN apt-get -y update && \
-    apt-get -y install --no-install-recommends --no-install-suggests openssh-server rsync
+    apt-get -y install --no-install-recommends --no-install-suggests rsync
 
 #######################################################################################
 ## Stage: production

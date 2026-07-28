@@ -1,6 +1,8 @@
 package be.cytomine.service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +12,7 @@ import com.meilisearch.sdk.SearchRequest;
 import com.meilisearch.sdk.model.SearchResult;
 import com.meilisearch.sdk.model.Searchable;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +20,7 @@ import be.cytomine.dto.meilisearch.MeiliSearchFacetsResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchImageResponse;
 import be.cytomine.exceptions.SearchException;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MeiliSearchService {
@@ -34,8 +37,9 @@ public class MeiliSearchService {
         int limit,
         int offset) {
 
+        Index index = doesIndexExist(indexId);
+
         try {
-            Index index = meiliSearchClient.index(indexId);
 
             String meiliFilter = null;
             if (filters != null && !filters.isEmpty()) {
@@ -66,9 +70,10 @@ public class MeiliSearchService {
     }
 
     public MeiliSearchImageResponse getImage(String imageId) {
+
+        Index index = doesIndexExist(indexId);
         try {
 
-            Index index = meiliSearchClient.index(indexId);
             Object document = index.getDocument(imageId, Object.class);
             return objectMapper.convertValue(document, MeiliSearchImageResponse.class);
 
@@ -79,9 +84,9 @@ public class MeiliSearchService {
 
 
     public MeiliSearchFacetsResponse getFacetDistribution() {
-        try {
-            Index index = meiliSearchClient.index(indexId);
 
+        Index index = doesIndexExist(indexId);
+        try {
             String[] attributes = index.getFilterableAttributesSettings();
             SearchRequest searchRequest = new SearchRequest("")
                 .setFacets(attributes)
@@ -93,4 +98,17 @@ public class MeiliSearchService {
             throw new SearchException("MeiliSearch getFacetDistribution failed", 500, e.getMessage());
         }
     }
+
+    public Index doesIndexExist(String indexUid) {
+
+        Index[] indexes = meiliSearchClient.getIndexes().getResults();
+        for (Index index : indexes) {
+            if (indexUid.equals(index.getUid())) {
+                return index;
+            }
+        }
+        throw new SearchException("MeiliSearch index not found", 404, "index not found");
+
+    }
+
 }

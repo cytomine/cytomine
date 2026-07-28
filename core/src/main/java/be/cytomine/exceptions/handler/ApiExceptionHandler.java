@@ -27,6 +27,7 @@ import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.MiddlewareException;
 import be.cytomine.exceptions.NotModifiedException;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.exceptions.SearchException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.utils.JsonObject;
 
@@ -211,5 +212,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             headers,
             HttpStatus.valueOf(exception.code)
         );
+    }
+
+    @ExceptionHandler(SearchException.class)
+    public ResponseEntity<?> handleException(SearchException exception) {
+        log.debug("SearchException");
+        JsonObject jsonObject = JsonObject.of("errors", Map.of("message", exception.getMessage()));
+        return JsonResponseEntity
+            .status(HttpStatus.valueOf(exception.code))
+            .body(jsonObject);
     }
 }

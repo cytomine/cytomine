@@ -79,12 +79,12 @@ limitations under the License.-->
       <b-table
           :data="filteredImageGroups"
           :paginated="true"
-          :current-page.sync="currentPage"
+          v-model:currentPage="currentPage"
           :per-page="perPage"
           pagination-size="is-small"
           detailed
           detail-key="id"
-          :opened-detailed.sync="openedDetails"
+          v-model:openedDetailed="openedDetails"
           :default-sort="sort.field"
           :default-sort-direction="sort.order"
           @sort="updateSort"
@@ -160,7 +160,7 @@ limitations under the License.-->
       </b-table>
     </div>
 
-    <add-image-group-modal :active.sync="addImageGroupModal" @newImageGroup="newImageGroup" />
+    <add-image-group-modal v-model:active="addImageGroupModal" @newImageGroup="newImageGroup" />
   </div>
 </div>
 </template>

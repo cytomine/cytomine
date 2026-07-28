@@ -14,7 +14,7 @@
 
 <template>
 <table class="table">
-  <b-loading :is-full-page="false" :active.sync="loading" />
+  <b-loading :is-full-page="false" v-model="loading" />
   <tbody v-if="!loading">
     <tr>
       <td>{{$t('operating-system')}}</td>

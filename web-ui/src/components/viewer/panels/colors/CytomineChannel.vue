@@ -17,7 +17,7 @@
   <v-popover
     placement="right"
     :popover-inner-class="'color-selector'"
-    :open.sync="showColorSelector"
+    v-model:open="showColorSelector"
     :delay="0"
   >
     <div

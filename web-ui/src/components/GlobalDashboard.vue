@@ -1,6 +1,6 @@
 <template>
 <div class="content-wrapper">
-  <b-loading :is-full-page="false" :active.sync="loading" />
+  <b-loading :is-full-page="false" v-model="loading" />
 
   <template v-if="!loading">
     <div class="columns">

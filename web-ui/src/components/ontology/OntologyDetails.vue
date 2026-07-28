@@ -72,7 +72,7 @@
       <rename-modal
           :title="$t('rename-ontology')"
           :currentName="ontology.name"
-          :active.sync="isRenameModalActive"
+          v-model:active="isRenameModalActive"
           @rename="rename"
       />
 

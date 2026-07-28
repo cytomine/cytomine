@@ -89,7 +89,7 @@
     </div>
   </template>
 
-  <add-ontology-modal :active.sync="creationModal" @newOntology="addOntology" />
+  <add-ontology-modal v-model:active="creationModal" @newOntology="addOntology" />
 </div>
 </template>
 

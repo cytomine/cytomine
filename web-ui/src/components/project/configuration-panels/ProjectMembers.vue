@@ -48,14 +48,14 @@
     <cytomine-table
       :collection="MemberCollection"
       :is-empty="this.selectedRoles.length === 0"
-      :currentPage.sync="currentPage"
-      :perPage.sync="perPage"
-      :sort.sync="sortField"
-      :order.sync="sortOrder"
+      v-model:currentPage="currentPage"
+      v-model:perPage="perPage"
+      v-model:sort="sortField"
+      v-model:order="sortOrder"
       :detailed=false
       :checkable=true
       :isRowCheckable="(row) => row.id !== currentUser.id"
-      :checkedRows.sync="selectedMembers"
+      v-model:checkedRows="selectedMembers"
       :revision="revision"
     >
 
@@ -105,7 +105,7 @@
       <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('project-representative')}}</p>
     </div>
 
-    <add-member-modal :active.sync="addMemberModal" @addMembers="refreshMembers()" />
+    <add-member-modal v-model:active="addMemberModal" @addMembers="refreshMembers()" />
   </template>
 </div>
 </template>

@@ -112,12 +112,12 @@ limitations under the License.-->
   <rename-modal
       :title="$t('rename-image-group')"
       :currentName="imageGroup.name"
-      :active.sync="isRenameModalActive"
+      v-model:active="isRenameModalActive"
       @rename="rename"
   />
 
   <add-to-image-group-modal
-    :active.sync="isAddToModalActive"
+    v-model:active="isAddToModalActive"
     :image-group="imageGroup"
     @addToImageGroup="$emit('addToImageGroup', $event)"
   />

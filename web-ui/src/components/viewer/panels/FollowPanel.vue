@@ -376,7 +376,7 @@ export default {
     this.fetchOnline();
     this.track();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     clearTimeout(this.timeoutTracking);
     clearTimeout(this.timeoutOnlineUsers);
     if (this.wsConnected) {

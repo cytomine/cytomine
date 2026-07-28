@@ -148,7 +148,7 @@ export default {
       eventBus.on('shortkeyEvent', this.shortkeyHandler);
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.index !== null) {
       eventBus.off('shortkeyEvent', this.shortkeyHandler);
     }

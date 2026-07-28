@@ -87,7 +87,7 @@ export default {
   mounted() {
     this.$refs.sidebar.addEventListener('transitionend', this.transitionEndHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$refs.sidebar.removeEventListener('transitionend', this.transitionEndHandler);
   }
 };

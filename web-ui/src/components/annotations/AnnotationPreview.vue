@@ -161,7 +161,7 @@ export default {
     await this.fetchThumbnail();
     eventBus.on('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // unsubscribe from all events
     eventBus.off('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   }

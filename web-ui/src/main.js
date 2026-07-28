@@ -27,7 +27,7 @@ Vue.use(VeeValidate, {
   inject: false
 });
 
-import Notifications from 'vue-notification';
+import Notifications from '@kyvg/vue3-notification';
 Vue.use(Notifications);
 
 import VTooltip from 'v-tooltip';

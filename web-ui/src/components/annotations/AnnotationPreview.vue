@@ -155,7 +155,7 @@ export default {
 
       let el = event.target;
       while (el) {
-        if (el.classList.contains('modal') || el.classList.contains('notifications') || el.isSameNode(this.$refs.previewButton)) {
+        if (el.classList.contains('modal') || el.classList.contains('vue-notification-group') || el.isSameNode(this.$refs.previewButton)) {
           // do not close the popover if click was performed in modal or in notification
           // if click performed on previewButton, handled in @click
           return;

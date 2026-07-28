@@ -27,16 +27,16 @@
       </tr>
       <tr v-if="image.depth > 1">
         <td><strong>{{$t('image-depth')}}</strong></td>
-        <td>{{$tc("count-slices", image.depth, {count: image.depth})}}</td>
+        <td>{{$t("count-slices", image.depth, {count: image.depth})}}</td>
       </tr>
       <tr v-if="image.duration > 1">
         <td><strong>{{$t('image-time')}}</strong></td>
-        <td>{{$tc("count-frames", image.duration, {count: image.duration})}}</td>
+        <td>{{$t("count-frames", image.duration, {count: image.duration})}}</td>
       </tr>
       <tr v-if="image.channels > 1">
         <td><strong>{{$t('image-channels')}}</strong></td>
         <td>
-          {{$tc("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
+          {{$t("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
           ({{image.channels}} x {{image.samplePerPixel}})
         </td>
       </tr>

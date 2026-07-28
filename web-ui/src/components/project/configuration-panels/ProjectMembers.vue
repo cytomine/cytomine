@@ -200,7 +200,7 @@ export default {
     confirmMembersRemoval() {
       this.$buefy.dialog.confirm({
         title: this.$t('remove-members'),
-        message: this.$tc('remove-members-confirmation-message', this.selectedMembers.length, {
+        message: this.$t('remove-members-confirmation-message', this.selectedMembers.length, {
           count: this.selectedMembers.length,
           username: this.selectedMembers[0].fullName
         }),
@@ -225,7 +225,7 @@ export default {
       if (member.id === this.currentUser.id && member.role !== this.contributorRole.value) {
         this.$buefy.dialog.confirm({
           title: this.$t('remove-yourself-from-manager'),
-          message: this.$tc('remove-yourself-from-manager-confirmation-message'),
+          message: this.$t('remove-yourself-from-manager-confirmation-message'),
           type: 'is-danger',
           confirmText: this.$t('button-confirm'),
           cancelText: this.$t('button-cancel'),

@@ -49,7 +49,7 @@
           {{label ? option[label] : option}}<template v-if="index < displayedOptions.length - 1">,</template>
         </span>
         <strong v-if="countNotDisplayed > 0">
-          {{ $tc("and-count-others", countNotDisplayed, {count: countNotDisplayed}) }}
+          {{ $t("and-count-others", countNotDisplayed, {count: countNotDisplayed}) }}
         </strong>
       </template>
     </div>

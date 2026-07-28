@@ -99,9 +99,9 @@ describe('AppLayout.vue', () => {
       const wrapper = createDisabledWrapper();
 
       const message = wrapper.findComponent(BMessage);
-      expect(message.props('title')).toBe('appengine-not-enabled-title');
+      expect(message.props('title')).toBe('app-engine-not-enabled-title');
       expect(message.props('type')).toBe('is-info');
-      expect(message.text()).toBe('appengine-not-enabled-description');
+      expect(message.text()).toBe('app-engine-not-enabled-description');
     });
   });
 });

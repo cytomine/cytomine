@@ -1,5 +1,4 @@
 import {shallowMount} from '@vue/test-utils';
-import VueI18n from 'vue-i18n';
 
 import CytomineDescriptionModal from '@/components/description/CytomineDescriptionModal';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
@@ -30,7 +29,6 @@ describe('CytomineDescriptionModal', () => {
         edit: false
       },
       global: {
-        plugins: [VueI18n],
         mocks: {
           $t: (message) => message,
           $notify: vi.fn()

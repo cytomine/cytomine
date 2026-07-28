@@ -10,6 +10,7 @@ import router from './routes.js';
 Vue.use(VueRouter);
 
 import i18n from './lang.js';
+Vue.use(i18n);
 
 import store from './store/store.js';
 
@@ -95,8 +96,7 @@ axios.get('configuration.json').then(response => {
         new Vue({
           render: h => h(App),
           router,
-          store,
-          i18n
+          store
         }).$mount('#app');
       });
   });

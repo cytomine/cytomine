@@ -29,7 +29,7 @@
           <span class="comma" v-if="index < displayedSelectedTracks.length - 1">,</span>
         </span>
         <strong v-if="countNotDisplayed > 0">
-          {{ $tc("and-count-others", countNotDisplayed, {count: countNotDisplayed}) }}
+          {{ $t("and-count-others", countNotDisplayed, {count: countNotDisplayed}) }}
         </strong>
       </template>
     </div>

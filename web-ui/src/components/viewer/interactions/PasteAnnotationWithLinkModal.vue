@@ -8,7 +8,7 @@
       </b-message>
       <template v-else>
         <div class="info" v-if="copiedAnnot.group"
-             v-html="$tc('count-copied-annot-links', nbAlreadyLinkedAnnotations, {count: nbAlreadyLinkedAnnotations})"></div>
+             v-html="$t('count-copied-annot-links', nbAlreadyLinkedAnnotations, {count: nbAlreadyLinkedAnnotations})"></div>
         <annotation-links-preview
             :size="64"
             :main-color="mainColor"

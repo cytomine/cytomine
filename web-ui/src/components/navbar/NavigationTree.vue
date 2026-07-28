@@ -80,7 +80,7 @@ export default {
           title: this.$t('confirm-close-project'),
           message: this.$t(
             'confirm-close-project-message',
-            {viewers: this.$tc('count-viewers', nbViewers, {count: nbViewers})}
+            {viewers: this.$t('count-viewers', nbViewers, {count: nbViewers})}
           ),
           type: 'is-danger',
           confirmText: this.$t('button-confirm'),

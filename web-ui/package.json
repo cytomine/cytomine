@@ -4,13 +4,14 @@
   "version": "3.2.0",
   "homepage": "https://uliege.cytomine.org/",
   "license": "Apache-2.0",
+  "type": "module",
   "scripts": {
     "serve": "npm run watch-translations & vite",
     "build": "npm run translations-csv2json && vite build",
     "preview": "vite preview",
-    "lint": "eslint -c .eslintrc.js --ext .js,.vue --ignore-path .gitignore .",
+    "lint": "eslint .",
     "test": "vitest run",
-    "translations-csv2json": "node scripts/export_i18n_csv.mjs src/locales/translations.csv src/locales/json",
+    "translations-csv2json": "node scripts/export_i18n_csv.js src/locales/translations.csv src/locales/json",
     "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json",
     "watch": "npm-watch"
   },
@@ -56,13 +57,15 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitest/coverage-v8": "^4.1.10",
     "@vue/test-utils": "^2.4.11",
     "autoprefixer": "^10.5.4",
-    "eslint": "^8.57.1",
+    "eslint": "^9.39.5",
     "eslint-plugin-vitest": "^0.5.4",
     "eslint-plugin-vue": "^10.10.0",
+    "globals": "^17.8.0",
     "jsdom": "^29.1.1",
     "onchange": "^7.1.0",
     "randomstring": "^1.1.5",

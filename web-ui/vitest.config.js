@@ -1,17 +1,17 @@
 import fs from 'node:fs';
-import {createRequire} from 'node:module';
 import {fileURLToPath, URL} from 'node:url';
 
 import {defineConfig, mergeConfig} from 'vitest/config';
 
-import viteConfig from './vite.config.mjs';
+import viteConfig from './vite.config.js';
 
-const require = createRequire(import.meta.url);
-const pkg = require('./package.json');
+const pkg = JSON.parse(
+  fs.readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf8')
+);
 
 // Node condition resolution picks the CommonJS build of most Vue libraries, and
 // the require('vue') inside it bypasses the `vue` -> `@vue/compat` alias set in
-// vite.config.mjs: the library then runs against a second, plain Vue 3 runtime
+// vite.config.js: the library then runs against a second, plain Vue 3 runtime
 // while the components under test run on the compat one, which blows up as soon
 // as the two exchange component instances. Point every Vue-consuming dependency
 // that ships an ESM build at that build instead, so Vite rewrites its `vue`

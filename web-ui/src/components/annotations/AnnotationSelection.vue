@@ -140,7 +140,7 @@ export default {
   async mounted() {
     eventBus.on('addAnnotation', this.addAnnotationHandler);
   },
-  async beforeDestroy() {
+  async beforeUnmount() {
     eventBus.off('addAnnotation', this.addAnnotationHandler);
   },
 };

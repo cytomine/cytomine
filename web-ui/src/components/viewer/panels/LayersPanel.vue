@@ -364,7 +364,7 @@ export default {
     eventBus.on('shortkeyEvent', this.shortkeyHandler);
     eventBus.on('annotation-layers:refresh', this.fetchLayers);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('addAnnotation', this.addAnnotationEventHandler);
     eventBus.off('deleteAnnotation', this.deleteAnnotationEventHandler);
     eventBus.off('reloadAnnotations', this.reloadAnnotationsHandler);

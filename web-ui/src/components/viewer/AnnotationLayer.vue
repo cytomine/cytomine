@@ -364,7 +364,7 @@ export default {
     eventBus.on('editAnnotation', this.editAnnotationHandler);
     eventBus.on('deleteAnnotation', this.deleteAnnotationHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // unsubscribe from all events
     eventBus.off('addAnnotation', this.addAnnotationHandler);
     eventBus.off('selectAnnotationInLayer', this.selectAnnotationHandler);

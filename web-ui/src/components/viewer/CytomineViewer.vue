@@ -309,7 +309,7 @@ export default {
   mounted() {
     eventBus.on('selectAnnotation', this.selectAnnotationHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('selectAnnotation', this.selectAnnotationHandler);
     clearInterval(this.reloadInterval);
   }

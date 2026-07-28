@@ -63,6 +63,11 @@ spec:
                 secretKeyRef:
                   name: admin-iam-secret
                   key: password
+            - name: MEILISEARCH_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: meilisearch-secret
+                  key: masterKey
           envFrom:
             - configMapRef:
                 name: core-env

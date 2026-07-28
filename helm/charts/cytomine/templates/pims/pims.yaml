@@ -92,6 +92,11 @@ spec:
                 secretKeyRef:
                   name: core-secret
                   key: IMAGE_SERVER_PRIVATE_KEY
+            - name: MEILISEARCH_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: meilisearch-secret
+                  key: masterKey
             {{- if .Values.pims.datasetImportStorage }}
             - name: DATASET_PATH
               value: "/data/dataset"

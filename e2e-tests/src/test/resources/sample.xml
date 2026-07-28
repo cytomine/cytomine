@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SAMPLE_SET>
+	<BIOLOGICAL_BEING alias="BIOLOGICAL_BEING_a">
+		<ATTRIBUTES>
+			<STRING_ATTRIBUTE>
+				<TAG>sex</TAG>
+				<VALUE>Male</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>animal_species</TAG>
+				<VALUE>
+					<CODE>C160998</CODE>
+					<SCHEME>SEND</SCHEME>
+					<MEANING>RAT</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>STRAIN</TAG>
+				<VALUE>
+					<CODE>C76191</CODE>
+					<SCHEME>SEND</SCHEME>
+					<MEANING>WISTAR HAN</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>DSDECOD</TAG>
+				<VALUE>
+					<CODE>C90465</CODE>
+					<SCHEME>SEND</SCHEME>
+					<MEANING>TERMINAL SACRIFICE</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>control_terminology</TAG>
+				<VALUE>
+					<CODE>N/A</CODE>
+					<SCHEME>SEND</SCHEME>
+					<MEANING>Controlled</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</ATTRIBUTES>
+	</BIOLOGICAL_BEING>
+	<SPECIMEN alias="SPECIMEN_a">
+		<EXTRACTED_FROM_REF alias="BIOLOGICAL_BEING_a"></EXTRACTED_FROM_REF>
+		<ATTRIBUTES>
+			<CODE_ATTRIBUTE>
+				<TAG>specimen_type</TAG>
+				<VALUE>
+					<CODE>119376003</CODE>
+					<SCHEME>SNOMED</SCHEME>
+					<MEANING>Tissue specimen (specimen)</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>extraction_method</TAG>
+				<VALUE>
+					<CODE>128304007</CODE>
+					<SCHEME>SNOMED</SCHEME>
+					<MEANING>Surgical extraction (procedure)</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>fixation_type</TAG>
+				<VALUE>
+					<CODE>430864009</CODE>
+					<SCHEME>SNOMED</SCHEME>
+					<MEANING>Tissue fixative</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>anatomical_site</TAG>
+				<VALUE>
+					<CODE>C12431</CODE>
+					<SCHEME>SEND</SCHEME>
+					<MEANING>BONE MARROW</MEANING>
+					<SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+			<SET_ATTRIBUTE>
+				<TAG>age_at_extraction</TAG>
+				<VALUE>
+					<STRING_ATTRIBUTE>
+						<TAG>interval_start</TAG>
+						<VALUE>P63D</VALUE>
+					</STRING_ATTRIBUTE>
+					<STRING_ATTRIBUTE>
+						<TAG>interval_length</TAG>
+						<VALUE>P7D</VALUE>
+					</STRING_ATTRIBUTE>
+				</VALUE>
+			</SET_ATTRIBUTE>
+			<SET_ATTRIBUTE>
+				<TAG>anatomical_site_list</TAG>
+				<VALUE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></VALUE>
+			</SET_ATTRIBUTE>
+		</ATTRIBUTES>
+	</SPECIMEN>
+	<BLOCK alias="BLOCK_a">
+		<SAMPLED_FROM_REF alias="SPECIMEN_a"></SAMPLED_FROM_REF>
+		<ATTRIBUTES>
+			<CODE_ATTRIBUTE>
+				<TAG>block_preparation</TAG>
+				<VALUE>
+					<CODE>311731000</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>Paraffin wax (substance)</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</ATTRIBUTES>
+	</BLOCK>
+	<SLIDE alias="SLIDE_a">
+		<CREATED_FROM_REF alias="BLOCK_a"></CREATED_FROM_REF>
+		<STAINING_INFORMATION_REF alias="STAINING_LIST_a"></STAINING_INFORMATION_REF>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</SLIDE>
+</SAMPLE_SET>

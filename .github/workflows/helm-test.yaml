@@ -94,6 +94,12 @@ jobs:
 
           kubectl -n $NS apply -f .github/workflows/tests/test-dataset-pvc.yaml
           kubectl -n $NS create configmap test-dataset-metadata --from-file=dataset.xml=e2e-tests/src/test/resources/dataset.xml
+          kubectl -n $NS create configmap test-dataset-metadata-image --from-file=image.xml=e2e-tests/src/test/resources/image.xml
+          kubectl -n $NS create configmap test-dataset-metadata-observation --from-file=observation.xml=e2e-tests/src/test/resources/observation.xml
+          kubectl -n $NS create configmap test-dataset-metadata-observer --from-file=observer.xml=e2e-tests/src/test/resources/observer.xml
+          kubectl -n $NS create configmap test-dataset-metadata-policy --from-file=policy.xml=e2e-tests/src/test/resources/policy.xml
+          kubectl -n $NS create configmap test-dataset-metadata-sample --from-file=sample.xml=e2e-tests/src/test/resources/sample.xml
+          kubectl -n $NS create configmap test-dataset-metadata-staining --from-file=staining.xml=e2e-tests/src/test/resources/staining.xml
 
       - name: Populate test dataset PVC with real image
         run: |
@@ -112,8 +118,11 @@ jobs:
             echo "Waiting for init container to be running..."
             sleep 2
           done
-
-          kubectl cp e2e-tests/src/test/resources/cat.png $NS/$POD:/tmp/images/cat.png -c wait-for-image
+          kubectl -n $NS exec $POD -c wait-for-image -- mkdir -p /tmp/images/wsi
+          kubectl cp e2e-tests/src/test/resources/wsi/1.2.826.0.1.3680043.8.498.19892419232914172529737438501532904243.dcm $NS/$POD:/tmp/images/wsi/1.2.826.0.1.3680043.8.498.19892419232914172529737438501532904243.dcm -c wait-for-image
+          kubectl cp e2e-tests/src/test/resources/wsi/1.2.826.0.1.3680043.8.498.25547727731242830391830454722824599650.dcm $NS/$POD:/tmp/images/wsi/1.2.826.0.1.3680043.8.498.25547727731242830391830454722824599650.dcm -c wait-for-image
+          kubectl cp e2e-tests/src/test/resources/wsi/1.2.826.0.1.3680043.8.498.48407760015771729984593744789552618416.dcm $NS/$POD:/tmp/images/wsi/1.2.826.0.1.3680043.8.498.48407760015771729984593744789552618416.dcm -c wait-for-image
+          kubectl cp e2e-tests/src/test/resources/wsi/1.2.826.0.1.3680043.8.498.68297860750526126870974958290035028993.dcm $NS/$POD:/tmp/images/wsi/1.2.826.0.1.3680043.8.498.68297860750526126870974958290035028993.dcm -c wait-for-image
           kubectl -n $NS wait --for=condition=complete job/test-dataset-loader --timeout=120s
 
       - name: Install chart
@@ -140,6 +149,7 @@ jobs:
             --set images.pims_cache=registry.cytomine.org/docker/library/redis:7 \
             --set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ env.DEPLOYMENT_NAME }} \
             --set images.postgis=registry.cytomine.org/docker/postgis/postgis:15-3.5 \
+            --set images.meilisearch=registry.cytomine.org/docker/getmeili/meilisearch:v1.43.0 \
             --set images.postgresql=registry.cytomine.org/docker/library/postgres:15 \
             --set images.redis=registry.cytomine.org/docker/library/redis:7 \
             --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \

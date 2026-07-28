@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 import Vuex from 'vuex';
 
@@ -17,9 +17,6 @@ vi.mock('@/utils/constants.js', () => ({
 }));
 
 describe('CytomineDescription.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
-  localVue.use(Vuex);
 
   let actions;
   let store;
@@ -34,21 +31,22 @@ describe('CytomineDescription.vue', () => {
     });
 
     wrapper = shallowMount(CytomineDescription, {
-      localVue,
-      store,
-      mocks: {
-        $t: (message) => message
-      },
-      propsData: {
+      props: {
         object: {id: 1},
         canEdit: true,
         maxPreviewLength: 100
+      },
+      global: {
+        plugins: [Buefy, store],
+        mocks: {
+          $t: (message) => message
+        }
       }
     });
   });
 
   afterEach(() => {
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('should render the component correctly', () => {

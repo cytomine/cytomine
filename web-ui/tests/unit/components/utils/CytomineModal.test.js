@@ -1,12 +1,10 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
 describe('CytomineModal.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
 
   const mocks = {
     $t: message => message,
@@ -15,14 +13,16 @@ describe('CytomineModal.vue', () => {
   it('should render correctly when active is true', () => {
     const title = 'Test Title';
     const wrapper = shallowMount(CytomineModal, {
-      localVue,
-      mocks: mocks,
-      propsData: {
+      props: {
         active: true,
         title
       },
-      stubs: {
-        'cytomine-modal-card': CytomineModalCard
+      global: {
+        plugins: [Buefy],
+        mocks: mocks,
+        stubs: {
+          'cytomine-modal-card': CytomineModalCard
+        }
       }
     });
 
@@ -35,12 +35,14 @@ describe('CytomineModal.vue', () => {
 
   it('should render slot content correctly', () => {
     const wrapper = shallowMount(CytomineModal, {
-      localVue,
-      propsData: {
+      props: {
         active: true
       },
       slots: {
         default: '<div class="modal-content">Content</div>'
+      },
+      global: {
+        plugins: [Buefy]
       }
     });
 
@@ -49,9 +51,11 @@ describe('CytomineModal.vue', () => {
 
   it('should emit "close" and "update:active" events when close method is called', async () => {
     const wrapper = shallowMount(CytomineModal, {
-      localVue,
-      propsData: {
+      props: {
         active: true
+      },
+      global: {
+        plugins: [Buefy]
       }
     });
 

@@ -1,31 +1,28 @@
-import {shallowMount, createLocalVue} from '@vue/test-utils';
-import VueRouter from 'vue-router';
+import {shallowMount} from '@vue/test-utils';
 
 import OpenImageGroupButton from '@/components/image-group/OpenImageGroupButton';
-
-const localVue = createLocalVue();
-localVue.use(VueRouter);
-const router = new VueRouter();
 
 const mockImages = (count) => Array.from({length: count}, (_, i) => ({id: i + 1, name: `image-${i + 1}.tif`}));
 
 const createWrapper = (imageGroup = {}) =>
   shallowMount(OpenImageGroupButton, {
-    localVue,
-    router,
-    propsData: {
+    props: {
       imageGroup: {
         project: 'project-1',
         imageInstances: mockImages(4),
         ...imageGroup,
       },
     },
-    mocks: {$t: (key) => key},
-    stubs: {
-      'b-dropdown-item': true,
-      'b-dropdown': true,
-      ImageName: true,
-    },
+    global: {
+      mocks: {$t: (key) => key},
+      stubs: {
+        'b-dropdown-item': true,
+        'b-dropdown': true,
+        ImageName: true,
+        // vue-router is not installed here, so router-link needs an explicit stub.
+        'router-link': {name: 'router-link', props: ['to'], template: '<a><slot/></a>'},
+      }
+    }
   });
 
 describe('OpenImageGroupButton', () => {

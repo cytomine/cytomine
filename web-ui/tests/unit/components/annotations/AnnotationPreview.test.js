@@ -18,10 +18,12 @@ const mockBlobUrl = 'blob:mock-url-12345';
 
 describe('AnnotationPreview.vue', () => {
   const createWrapper = (options) => shallowMount(AnnotationPreview, {
-    stubs: {
-      'v-popover': true,
-    },
     ...options,
+    global: {
+      stubs: {
+        'v-popover': true,
+      }
+    }
   });
 
   beforeEach(() => {
@@ -36,7 +38,7 @@ describe('AnnotationPreview.vue', () => {
   describe('annotation thumbnail', () => {
     it('should fetch and display the annotation thumbnail', async () => {
       const wrapper = createWrapper({
-        propsData: {
+        props: {
           annot: {
             annotationCropURL: vi.fn(() => 'http://cytomine.org/crop.jpg'),
           },
@@ -51,7 +53,7 @@ describe('AnnotationPreview.vue', () => {
 
     it('should revoke old URL when fetching new thumbnail', async () => {
       const wrapper = createWrapper({
-        propsData: {
+        props: {
           annot: {
             annotationCropURL: vi.fn(() => 'http://cytomine.org/crop.jpg'),
           },
@@ -69,18 +71,18 @@ describe('AnnotationPreview.vue', () => {
     it('should display preview button is showDetails is true', () => {
       const wrapper = createWrapper();
 
-      const buttonWrapper = wrapper.findComponent({ref: 'previewButton'});
+      const buttonWrapper = wrapper.find({ref: 'previewButton'});
       expect(buttonWrapper.exists()).toBe(true);
     });
 
     it('should not display preview button is showDetails is false', () => {
       const wrapper = createWrapper({
-        propsData: {
+        props: {
           showDetails: false,
         }
       });
 
-      const buttonWrapper = wrapper.findComponent({ref: 'previewButton'});
+      const buttonWrapper = wrapper.find({ref: 'previewButton'});
       expect(buttonWrapper.exists()).toBe(false);
     });
   });

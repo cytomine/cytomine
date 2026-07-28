@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ImageMultiSelect from '@/components/appengine/forms/fields/array/ImageMultiSelect';
@@ -20,29 +20,32 @@ vi.mock('@/api', () => ({
 }));
 
 describe('ImageMultiSelect.vue', () => {
-  let localVue;
   let wrapper;
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(ImageMultiSelect, {
-      localVue,
-      computed: {
-        project: () => ({
-          id: 42,
-        }),
-      },
       data() {
         return {
           loading: false,
           selectedImages: [],
         };
       },
-      stubs: {
-        SelectableImage: true,
-      },
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          // The `computed` mounting option is gone in Vue Test Utils v2, so the
+          // store the `get()` helper reads from has to be mocked instead.
+          $store: {
+            state: {
+              currentProject: {project: {id: 42}},
+            },
+          },
+        },
+        stubs: {
+          SelectableImage: true,
+        }
+      }
     });
   });
 

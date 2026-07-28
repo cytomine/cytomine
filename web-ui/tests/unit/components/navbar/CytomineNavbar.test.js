@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import Vuex from 'vuex';
 
 import CytomineNavbar from '@/components/navbar/CytomineNavbar';
@@ -12,10 +12,6 @@ vi.mock('@/lang.js', () => ({
 }));
 
 describe('CytomineNavbar.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(Vuex);
-  localVue.directive('shortkey', {});
-
   const actions = {
     logout: vi.fn()
   };
@@ -43,15 +39,19 @@ describe('CytomineNavbar.vue', () => {
     });
 
     return shallowMount(CytomineNavbar, {
-      localVue,
-      store,
-      mocks: {
-        $t: (message) => message,
-        $keycloak: keycloak,
-        $notify: vi.fn()
-      },
-      stubs: {
-        'router-link': true
+      global: {
+        plugins: [store],
+        directives: {
+          shortkey: {}
+        },
+        mocks: {
+          $t: (message) => message,
+          $keycloak: keycloak,
+          $notify: vi.fn()
+        },
+        stubs: {
+          'router-link': true
+        }
       }
     });
   };

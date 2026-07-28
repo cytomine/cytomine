@@ -63,6 +63,10 @@ describe('AppBottomDrawer.vue', () => {
 
   const createWrapper = ({data = {}, storeOverrides = {}} = {}) => {
     const mockStore = {
+      // `currentProject` reads through the `get()` helper, which goes to state.
+      state: {
+        currentProject: {project: {id: 99}},
+      },
       getters: {
         'currentProject/project': {
           id: 99,
@@ -76,34 +80,6 @@ describe('AppBottomDrawer.vue', () => {
     };
 
     return shallowMount(AppBottomDrawer, {
-      mocks: {
-        $buefy: {
-          toast: {
-            open: vi.fn(),
-          },
-        },
-        $router: {
-          push: vi.fn(),
-        },
-        $store: mockStore,
-        $t: (key) => key,
-      },
-      stubs: {
-        'b-button': {
-          template: '<button @click="$emit(\'click\')"><slot /></button>',
-        },
-        'b-select': {
-          props: ['value'],
-          template: '<select><slot /></select>',
-        },
-        TaskInputForm: true,
-        TaskRunStateIcon: true,
-      },
-      computed: {
-        currentProject() {
-          return mockStore.getters['currentProject/project'];
-        },
-      },
       data() {
         return {
           isCollapsed: true,
@@ -116,6 +92,31 @@ describe('AppBottomDrawer.vue', () => {
           ...data,
         };
       },
+      global: {
+        mocks: {
+          $buefy: {
+            toast: {
+              open: vi.fn(),
+            },
+          },
+          $router: {
+            push: vi.fn(),
+          },
+          $store: mockStore,
+          $t: (key) => key,
+        },
+        stubs: {
+          'b-button': {
+            template: '<button @click="$emit(\'click\')"><slot /></button>',
+          },
+          'b-select': {
+            props: ['value'],
+            template: '<select><slot /></select>',
+          },
+          TaskInputForm: true,
+          TaskRunStateIcon: true,
+        }
+      }
     });
   };
 

@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import DomainTagInput from '@/components/utils/DomainTagInput.vue';
@@ -9,8 +9,6 @@ vi.mock('@/utils/string-utils', () => ({
 }));
 
 describe('DomainTagInput.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
 
   const mocks = {
     $t: message => message
@@ -27,11 +25,13 @@ describe('DomainTagInput.vue', () => {
   let wrapper;
   beforeEach(() => {
     wrapper = shallowMount(DomainTagInput, {
-      localVue,
-      mocks,
-      propsData: {
+      props: {
         value,
         domains
+      },
+      global: {
+        plugins: [Buefy],
+        mocks
       }
     });
   });

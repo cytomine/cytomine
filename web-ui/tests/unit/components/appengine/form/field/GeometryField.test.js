@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import GeometryField from '@/components/appengine/forms/fields/GeometryField';
@@ -14,7 +14,6 @@ vi.mock('@/api', () => ({
 }));
 
 describe('GeometryField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -24,20 +23,20 @@ describe('GeometryField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(GeometryField, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
-      propsData: {
+      props: {
         parameter: mockParameter,
         value: null,
       },
-      stubs: {
-        AnnotationSelection: true,
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (message) => message,
+        },
+        stubs: {
+          AnnotationSelection: true,
+        }
       }
     });
   });
@@ -66,7 +65,8 @@ describe('GeometryField.vue', () => {
   });
 
   it('should emit an event when the value is changed', async () => {
-    await wrapper.setData({input: 42});
+    wrapper.vm.input = 42;
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input.at(0)).toEqual([42]);

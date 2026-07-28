@@ -15,17 +15,19 @@ describe('NumberAnnotationsChart.js', () => {
   };
 
   const createWrapper = () => shallowMount(NumberAnnotationsChart, {
-    propsData: {
+    props: {
       project: mockProject,
       term: null,
       startDate: 0,
       endDate: 1,
       daysRange: 1,
     },
-    mocks: {
-      $t: (key) => key,
-      $i18n: {locale: 'en'},
-    },
+    global: {
+      mocks: {
+        $t: (key) => key,
+        $i18n: {locale: 'en'},
+      }
+    }
   });
 
   it('should fetch user and reviewed annotation counts into separate datasets', async () => {

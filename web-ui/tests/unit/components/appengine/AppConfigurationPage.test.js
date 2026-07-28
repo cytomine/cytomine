@@ -1,6 +1,5 @@
-import {shallowMount, createLocalVue} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
-import Vuex from 'vuex';
 
 import AppConfigurationPage from '@/components/appengine/AppConfigurationPage.vue';
 import AppStoreAddModal from '@/components/appengine/AppStoreAddModal.vue';
@@ -8,9 +7,6 @@ import store from '@/store/store';
 import {Cytomine} from '@/api';
 import {flushPromises} from '../../../utils';
 
-const localVue = createLocalVue();
-localVue.use(Buefy);
-localVue.use(Vuex);
 
 const mockNotify = vi.fn();
 const mockDialog = {confirm: vi.fn()};
@@ -30,16 +26,20 @@ vi.mock('@/api', () => ({
 describe('AppConfigurationPage.vue', () => {
   const createWrapper = () => {
     return shallowMount(AppConfigurationPage, {
-      localVue,
-      store,
-      mocks: {
-        $notify: mockNotify,
-        $buefy: {dialog: mockDialog},
-        $t: (key) => key,
-      },
-      stubs: {
-        AppStoreAddModal,
-      },
+      global: {
+        // b-table's default slot is a scoped slot: rendering it against a stub
+        // would evaluate `{row}` with no slot props at all.
+        renderStubDefaultSlot: false,
+        plugins: [Buefy, store],
+        mocks: {
+          $notify: mockNotify,
+          $buefy: {dialog: mockDialog},
+          $t: (key) => key,
+        },
+        stubs: {
+          AppStoreAddModal,
+        }
+      }
     });
   };
 

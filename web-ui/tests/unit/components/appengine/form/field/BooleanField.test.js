@@ -1,10 +1,9 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
 
 describe('BooleanField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -15,15 +14,15 @@ describe('BooleanField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(BooleanField, {
-      localVue,
-      propsData: {
+      props: {
         parameter: mockParameter,
         value: mockParameter.default,
       },
+      global: {
+        plugins: [Buefy]
+      }
     });
   });
 

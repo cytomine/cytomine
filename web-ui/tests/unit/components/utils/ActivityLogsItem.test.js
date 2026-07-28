@@ -1,15 +1,15 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import moment from 'moment';
 
 import ActivityLogsItem from '@/components/utils/ActivityLogsItem';
-import VueRouter from 'vue-router';
 
 vi.mock('@/utils/token-utils', () => ({
   appendShortTermToken: vi.fn((url, token) => `${url}?token=${token}`)
 }));
 
 vi.mock('@/utils/store-helpers', () => ({
-  get: vi.fn(() => 'mock-token')
+  // `get` builds a computed getter, so the mock has to return one too.
+  get: vi.fn(() => () => 'mock-token')
 }));
 
 vi.mock('@/utils/date', () => ({
@@ -32,20 +32,19 @@ describe('ActivityLogsItem.vue', () => {
     message: 'Added a new annotation'
   };
 
-  const localVue = createLocalVue();
-  localVue.use(VueRouter);
-  localVue.component('router-link', {template: '<a><slot></slot></a>'});
-  localVue.component('router-view', {template: '<div><slot></slot></div>'});
-
   beforeEach(() => {
     wrapper = shallowMount(ActivityLogsItem, {
-      localVue,
-      propsData: {
+      props: {
         action
       },
-      computed: {
-        shortTermToken: () => 'mock-token'
-      },
+      global: {
+        // Real stubs rather than the default ones: the assertions read the text
+        // rendered inside the router-link slot.
+        stubs: {
+          'router-link': {template: '<a><slot></slot></a>'},
+          'router-view': {template: '<div><slot></slot></div>'}
+        }
+      }
     });
   });
 
@@ -62,7 +61,8 @@ describe('ActivityLogsItem.vue', () => {
   });
 
   it('should create the correct annotation route and preview', async () => {
-    wrapper.vm.$options.created[0].call(wrapper.vm);
+    // `created` already ran at mount time; Vue 3 does not expose the hook as an
+    // array on $options for it to be re-invoked.
     await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.route).toBe('/project/123/image/456/annotation/1');

@@ -22,15 +22,17 @@ describe('AppLocalPage.vue', () => {
   const createWrapper = (options = {}) => shallowMount(
     AppLocalPage,
     {
-      mocks: {
-        $t: (key) => key,
-      },
-      stubs: {
-        'b-icon': true,
-        'b-loading': BLoading,
-        'b-message': true,
-      },
       ...options,
+      global: {
+        mocks: {
+          $t: (key) => key,
+        },
+        stubs: {
+          'b-icon': true,
+          'b-loading': BLoading,
+          'b-message': true,
+        }
+      }
     },
   );
 

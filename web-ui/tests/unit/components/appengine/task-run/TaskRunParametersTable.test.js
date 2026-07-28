@@ -4,27 +4,29 @@ import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParam
 
 describe('TaskRunParametersTable.vue', () => {
   const createWrapper = (options = {}) => shallowMount(TaskRunParametersTable, {
-    propsData: {
+    props: {
       parameters: options.parameters || [],
       projectId: 42,
       type: 'input',
     },
-    mocks: {
-      $t: (key) => key,
-    },
-    stubs: {
-      'b-table': {
-        name: 'b-table',
-        template: '<div><slot v-for="row in data" :row="row"></slot></div>',
-        props: ['data'],
-      },
-      'b-table-column': {
-        name: 'b-table-column',
-        template: '<div><slot></slot></div>',
-        props: ['field', 'label'],
-      },
-    },
     ...options,
+    global: {
+      mocks: {
+        $t: (key) => key,
+      },
+      stubs: {
+        'b-table': {
+          name: 'b-table',
+          template: '<div><slot v-for="row in data" :row="row"></slot></div>',
+          props: ['data'],
+        },
+        'b-table-column': {
+          name: 'b-table-column',
+          template: '<div><slot></slot></div>',
+          props: ['field', 'label'],
+        },
+      }
+    }
   });
 
   describe('Rendering', () => {

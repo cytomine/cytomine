@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ImageField from '@/components/appengine/forms/fields/ImageField';
@@ -18,7 +18,6 @@ vi.mock('@/utils/image-utils', () => ({
 }));
 
 describe('ImageField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -28,21 +27,21 @@ describe('ImageField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(ImageField, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
-      propsData: {
+      props: {
         parameter: mockParameter,
         value: null,
       },
-      stubs: {
-        AnnotationSelection: true,
-        ImageSelection: true,
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (message) => message,
+        },
+        stubs: {
+          AnnotationSelection: true,
+          ImageSelection: true,
+        }
       }
     });
   });
@@ -67,7 +66,7 @@ describe('ImageField.vue', () => {
     await wrapper.setProps({value: mockedData});
     await wrapper.setData({type: mockedData.type});
 
-    expect(wrapper.vm.value).toBe(mockedData);
+    expect(wrapper.vm.value).toEqual(mockedData);
     expect(wrapper.find('.value-container').exists()).toBe(true);
     expect(wrapper.find('.value-container').text()).toBe('annotation 42');
   });
@@ -77,14 +76,15 @@ describe('ImageField.vue', () => {
     await wrapper.setProps({value: mockedData});
     await wrapper.setData({type: mockedData.type});
 
-    expect(wrapper.vm.value).toBe(mockedData);
+    expect(wrapper.vm.value).toEqual(mockedData);
     expect(wrapper.find('.value-container').exists()).toBe(true);
     expect(wrapper.find('.value-container').text()).toBe('image 42');
   });
 
   it('should emit an event when the value is changed', async () => {
     const mockedData = {type: 'image', id: 42};
-    await wrapper.setData({input: mockedData});
+    wrapper.vm.input = mockedData;
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input.at(0)).toEqual([mockedData]);

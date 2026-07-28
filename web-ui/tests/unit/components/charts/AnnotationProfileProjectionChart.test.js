@@ -4,8 +4,8 @@ import AnnotationProfileProjectionChart from '@/components/charts/AnnotationProf
 import {flushPromises} from '../../../utils';
 
 describe('AnnotationProfileProjectionChart.js', () => {
-  const createWrapper = (propsData = {}) => shallowMount(AnnotationProfileProjectionChart, {
-    propsData: {
+  const createWrapper = (props = {}) => shallowMount(AnnotationProfileProjectionChart, {
+    props: {
       annotation: {},
       data: [
         {x: 2, y: 0, average: 20},
@@ -14,11 +14,13 @@ describe('AnnotationProfileProjectionChart.js', () => {
       spatialAxis: false,
       dimension: 'channels',
       slices: [],
-      ...propsData,
+      ...props,
     },
-    mocks: {
-      $t: (key) => key,
-    },
+    global: {
+      mocks: {
+        $t: (key) => key,
+      }
+    }
   });
 
   it('should sort non-spatial data by x/y and build the average dataset', async () => {
@@ -65,7 +67,8 @@ describe('AnnotationProfileProjectionChart.js', () => {
   it('should delegate resetZoom to the underlying chart instance exposed by vue-chartjs', () => {
     const wrapper = createWrapper();
     const resetZoom = vi.fn();
-    wrapper.vm.$refs.chartRef = {chart: {resetZoom}};
+    // `$refs` is shallow-readonly in Vue 3; the raw refs object is not.
+    wrapper.vm.$.refs.chartRef = {chart: {resetZoom}};
 
     wrapper.vm.resetZoom();
 

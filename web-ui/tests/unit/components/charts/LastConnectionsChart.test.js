@@ -10,19 +10,21 @@ vi.mock('@/api', () => ({
 }));
 
 describe('LastConnectionsChart.js', () => {
-  const createWrapper = (propsData = {}) => shallowMount(LastConnectionsChart, {
-    propsData: {
+  const createWrapper = (props = {}) => shallowMount(LastConnectionsChart, {
+    props: {
       startDate: new Date('2024-01-01T00:00:00Z').getTime(),
       endDate: new Date('2024-01-02T00:00:00Z').getTime(),
       period: 'day',
       project: 1,
       user: 1,
-      ...propsData,
+      ...props,
     },
-    mocks: {
-      $t: (key) => key,
-      $i18n: {locale: 'en'},
-    },
+    global: {
+      mocks: {
+        $t: (key) => key,
+        $i18n: {locale: 'en'},
+      }
+    }
   });
 
   it('should fill in zero-frequency days when there is no connection data', async () => {

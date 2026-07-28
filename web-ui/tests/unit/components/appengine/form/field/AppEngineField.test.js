@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField.vue';
 
@@ -17,13 +17,11 @@ vi.mock('@/utils/image-utils', () => ({
 }));
 
 describe('AppEngineField.vue', () => {
-  const localVue = createLocalVue();
   let wrapper;
 
   beforeEach(() => {
     wrapper = shallowMount(AppEngineField, {
-      localVue,
-      propsData: {
+      props: {
         parameter: {type: {id: 'array'}},
         value: null,
       },
@@ -33,27 +31,26 @@ describe('AppEngineField.vue', () => {
           selectImage: null,
         };
       },
-      computed: {
-        project: () => ({id: 42}),
-      },
-      mocks: {
-        $t: (message) => message,
-      },
-      stubs: {
-        ArrayField: {
-          name: 'ArrayField',
-          props: ['value', 'parameter'],
-          template: '<input class="array-field" @input="$emit(\'input\', $event.target.value)" />'
+      global: {
+        mocks: {
+          $t: (message) => message,
         },
-        BooleanField: true,
-        EnumerationField: true,
-        FileField: true,
-        GeometryField: true,
-        ImageField: true,
-        IntegerField: true,
-        NumberField: true,
-        StringField: true,
-      },
+        stubs: {
+          ArrayField: {
+            name: 'ArrayField',
+            props: ['value', 'parameter'],
+            template: '<input class="array-field" @input="$emit(\'input\', $event.target.value)" />'
+          },
+          BooleanField: true,
+          EnumerationField: true,
+          FileField: true,
+          GeometryField: true,
+          ImageField: true,
+          IntegerField: true,
+          NumberField: true,
+          StringField: true,
+        }
+      }
     });
   });
 

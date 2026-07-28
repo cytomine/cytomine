@@ -92,17 +92,26 @@ describe('AppDashboardPage.vue', () => {
   const createWrapper = (options = {}) => shallowMount(
     AppDashboardPage,
     {
-      mocks: {
-        $i18n: {locale: 'en-GB'},
-        $t: (key) => key,
-      },
-      computed: {
-        currentProject: () => ({id: '999'}),
-      },
-      stubs: {
-        'b-table': true,
-      },
       ...options,
+      global: {
+        // b-table's default slot is a scoped slot: rendering it against a stub
+        // would evaluate `{row}` with no slot props at all.
+        renderStubDefaultSlot: false,
+        mocks: {
+          $i18n: {locale: 'en-GB'},
+          $t: (key) => key,
+          // The `computed` mounting option is gone in Vue Test Utils v2, so the
+          // store the `get()` helper reads from has to be mocked instead.
+          $store: {
+            state: {
+              currentProject: {project: {id: '999'}},
+            },
+          },
+        },
+        stubs: {
+          'b-table': true,
+        }
+      }
     },
   );
 

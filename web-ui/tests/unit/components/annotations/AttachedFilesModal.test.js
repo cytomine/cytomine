@@ -1,9 +1,9 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
-import VeeValidate from 'vee-validate';
 
 import AttachedFileModal from '@/components/attached-file/AttachedFileModal';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
+import {veeValidateDirectives, veeValidateMocks} from '../../../vee-validate';
 
 vi.mock('@/api', () => ({
   AttachedFile: vi.fn().mockImplementation(function () {
@@ -17,24 +17,25 @@ describe('AttachedFileModal.vue', () => {
   let wrapper;
 
   beforeEach(() => {
-    let localVue = createLocalVue();
-    localVue.use(Buefy);
-    localVue.use(VeeValidate);
 
     wrapper = shallowMount(AttachedFileModal, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
-      propsData: {object: {id: 1}},
-      stubs: {
-        CytomineModalCard: true,
-      },
+      props: {object: {id: 1}},
+      global: {
+        plugins: [Buefy],
+        directives: veeValidateDirectives,
+        mocks: {
+          $t: (message) => message,
+          ...veeValidateMocks(),
+        },
+        stubs: {
+          CytomineModalCard: true,
+        }
+      }
     });
   });
 
   afterEach(() => {
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('should render the component correctly', () => {

@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import {Cytomine} from '@/api';
@@ -36,22 +36,21 @@ vi.mock('@/utils/string-utils', () => ({
 }));
 
 describe('MetadataPanel.vue', () => {
-  let localVue;
   let wrapper;
 
   beforeEach(async () => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = shallowMount(MetadataPanel, {
-      localVue,
-      propsData: {index: '0'},
-      mocks: {
-        $t: (message) => message,
-        $store: {
-          getters: {
-            'currentProject/currentViewer': {
-              images: [{imageInstance: {id: 123}}]
+      props: {index: '0'},
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (message) => message,
+          $store: {
+            getters: {
+              'currentProject/currentViewer': {
+                images: [{imageInstance: {id: 123}}]
+              }
             }
           }
         }

@@ -1,10 +1,9 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
 
 describe('EnumerationField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -16,15 +15,15 @@ describe('EnumerationField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(EnumerationField, {
-      localVue,
-      propsData: {
+      props: {
         parameter: mockParameter,
         value: mockParameter.default,
       },
+      global: {
+        plugins: [Buefy]
+      }
     });
   });
 

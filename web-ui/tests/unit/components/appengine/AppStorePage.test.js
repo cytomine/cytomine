@@ -1,6 +1,5 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
-import Vuex from 'vuex';
 
 import AppStorePage from '@/components/appengine/AppStorePage';
 import {Cytomine} from '@/api';
@@ -17,9 +16,6 @@ vi.mock('@/api', () => ({
 }));
 
 describe('AppStorePage.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
-  localVue.use(Vuex);
 
   const mockStores = [
     {host: 'http://test.cytomine.org', name: 'Test Store'},
@@ -29,16 +25,18 @@ describe('AppStorePage.vue', () => {
   const createWrapper = (options = {}) => shallowMount(
     AppStorePage,
     {
-      localVue,
-      mocks: {
-        $store: {
-          getters: {
-            'appStores/stores': mockStores,
-          },
-        },
-        $t: (key) => key,
-      },
       ...options,
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $store: {
+            getters: {
+              'appStores/stores': mockStores,
+            },
+          },
+          $t: (key) => key,
+        }
+      }
     },
   );
 

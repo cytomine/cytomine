@@ -45,25 +45,27 @@ describe('OntologyDetails.vue', () => {
     };
 
     return shallowMount(OntologyDetails, {
-      propsData: {
+      props: {
         ontology,
       },
-      mocks: {
-        $buefy: {
-          dialog: {
-            confirm: vi.fn(({onConfirm}) => onConfirm())
-          }
+      global: {
+        mocks: {
+          $buefy: {
+            dialog: {
+              confirm: vi.fn(({onConfirm}) => onConfirm())
+            }
+          },
+          $notify: vi.fn(),
+          $store: mockStore,
+          $t: (key) => key,
         },
-        $notify: vi.fn(),
-        $store: mockStore,
-        $t: (key) => key,
-      },
-      stubs: {
-        OntologyTree: true,
-        RenameModal: true,
-        'router-link': true,
-        'b-loading': true,
-        'b-message': true
+        stubs: {
+          OntologyTree: true,
+          RenameModal: true,
+          'router-link': true,
+          'b-loading': true,
+          'b-message': true
+        }
       }
     });
   };

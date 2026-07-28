@@ -1,10 +1,9 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import StringField from '@/components/appengine/forms/fields/StringField';
 
 describe('StringField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -16,15 +15,15 @@ describe('StringField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(StringField, {
-      localVue,
-      propsData: {
+      props: {
         parameter: mockParameter,
         value: mockParameter.default,
       },
+      global: {
+        plugins: [Buefy]
+      }
     });
   });
 
@@ -64,7 +63,8 @@ describe('StringField.vue', () => {
   });
 
   it('Changing the value should emit an event', async () => {
-    await wrapper.setData({input: 'Changing'});
+    wrapper.vm.input = 'Changing';
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input.at(0)).toEqual(['Changing']);

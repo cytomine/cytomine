@@ -1,10 +1,9 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import FileField from '@/components/appengine/forms/fields/FileField';
 
 describe('FileField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -14,18 +13,18 @@ describe('FileField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(FileField, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
-      propsData: {
+      props: {
         parameter: mockParameter,
         value: null,
       },
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (message) => message,
+        }
+      }
     });
   });
 
@@ -62,7 +61,8 @@ describe('FileField.vue', () => {
   });
 
   it('Changing the value should emit an event', async () => {
-    await wrapper.setData({input: {id: 42}});
+    wrapper.vm.input = {id: 42};
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input.at(0)).toEqual([{id: 42}]);

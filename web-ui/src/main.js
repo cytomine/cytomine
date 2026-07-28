@@ -14,7 +14,9 @@ import i18n from './lang.js';
 import store from './store/store.js';
 
 import Buefy from 'buefy';
+import optOutBuefyFromVModelCompat from '@/utils/buefy-compat.js';
 Vue.use(Buefy, {defaultIconPack: 'fas'});
+optOutBuefyFromVModelCompat();
 
 import VeeValidate, {Validator} from 'vee-validate';
 Validator.extend('positive', value => Number(value) > 0);

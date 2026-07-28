@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 
 import CytomineTask from '@/components/utils/CytomineTask';
 import {Task} from '@/api';
@@ -11,7 +11,6 @@ vi.mock('@/api', () => ({
 }));
 
 describe('CytomineTask.vue', () => {
-  const localVue = createLocalVue();
 
   let wrapper;
 
@@ -25,8 +24,7 @@ describe('CytomineTask.vue', () => {
     });
 
     wrapper = shallowMount(CytomineTask, {
-      localVue,
-      propsData: {
+      props: {
         task: {
           id: 1,
           progress: 50,

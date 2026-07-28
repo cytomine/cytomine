@@ -1,10 +1,9 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
 
 describe('IntegerField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -16,15 +15,15 @@ describe('IntegerField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(IntegerField, {
-      localVue,
-      propsData: {
+      props: {
         parameter: mockParameter,
         value: mockParameter.default,
       },
+      global: {
+        plugins: [Buefy]
+      }
     });
   });
 
@@ -64,7 +63,8 @@ describe('IntegerField.vue', () => {
   });
 
   it('Changing the value should emit an event', async () => {
-    await wrapper.setData({input: 12});
+    wrapper.vm.input = 12;
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input.at(0)).toEqual([12]);

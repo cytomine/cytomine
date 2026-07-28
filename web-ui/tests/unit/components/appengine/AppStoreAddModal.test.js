@@ -1,27 +1,27 @@
-import {shallowMount, createLocalVue} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AppStoreAddModal from '@/components/appengine/AppStoreAddModal.vue';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 
-const localVue = createLocalVue();
-localVue.use(Buefy);
 
 describe('AppStoreAddModal.vue', () => {
   const createWrapper = () => shallowMount(
     AppStoreAddModal,
     {
-      localVue,
-      propsData: {
+      props: {
         active: true,
       },
-      mocks: {
-        $notify: vi.fn(),
-        $t: (key) => key,
-      },
-      stubs: {
-        CytomineModal,
-      },
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $notify: vi.fn(),
+          $t: (key) => key,
+        },
+        stubs: {
+          CytomineModal,
+        }
+      }
     },
   );
 

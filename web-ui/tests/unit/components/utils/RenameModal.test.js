@@ -1,27 +1,28 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
-import VeeValidate from 'vee-validate';
+import {shallowMount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineModal from '@/components/utils/CytomineModal';
 import RenameModal from '@/components/utils/RenameModal';
+import {veeValidateDirectives, veeValidateMocks} from '../../../vee-validate';
 
 describe('RenameModal.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(VeeValidate);
-  localVue.use(Buefy);
 
   const mocks = {
     $t: message => message,
+    ...veeValidateMocks(),
   };
 
   it('should render the modal with the correct title', () => {
     const wrapper = shallowMount(RenameModal, {
-      localVue,
-      mocks,
-      propsData: {
+      props: {
         active: true,
         title: 'Rename',
         currentName: 'Old Name'
+      },
+      global: {
+        plugins: [Buefy],
+        directives: veeValidateDirectives,
+        mocks
       }
     });
 
@@ -34,9 +35,11 @@ describe('RenameModal.vue', () => {
 
   it('should emit "close" and "update:active" events when close method is called', async () => {
     const wrapper = shallowMount(CytomineModal, {
-      localVue,
-      propsData: {
+      props: {
         active: true
+      },
+      global: {
+        plugins: [Buefy]
       }
     });
 

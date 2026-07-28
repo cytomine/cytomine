@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 import VTooltip from 'v-tooltip';
 
@@ -30,31 +30,33 @@ vi.mock('@/api', () => ({
 }));
 
 describe('GlobalDashboard.vue', () => {
-  let localVue;
   let wrapper;
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
-    localVue.use(VTooltip);
 
     wrapper = mount(GlobalDashboard, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
-      computed: {
-        currentUser: () => ({
-          fetchNbAnnotations: vi.fn().mockResolvedValue(5),
-        })
-      },
-      propsData: {
+      props: {
         nbRecent: 3
       },
-      stubs: {
-        'image-preview': true,
-        'list-images-preview': true,
-        'router-link': true,
+      global: {
+        plugins: [Buefy, VTooltip],
+        mocks: {
+          $t: (message) => message,
+          // The `computed` mounting option is gone in Vue Test Utils v2, so the
+          // store the `get()` helper reads from has to be mocked instead.
+          $store: {
+            state: {
+              currentUser: {
+                user: {fetchNbAnnotations: vi.fn().mockResolvedValue(5)},
+              },
+            },
+          },
+        },
+        stubs: {
+          'image-preview': true,
+          'list-images-preview': true,
+          'router-link': true,
+        }
       }
     });
   });

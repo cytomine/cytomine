@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ArrayField from '@/components/appengine/forms/fields/ArrayField';
@@ -19,7 +19,6 @@ vi.mock('@/utils/image-utils', () => ({
 }));
 
 describe('ArrayField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -30,15 +29,9 @@ describe('ArrayField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(ArrayField, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
-      propsData: {
+      props: {
         parameter: mockParameter,
         value: null,
       },
@@ -47,8 +40,14 @@ describe('ArrayField.vue', () => {
           selectParameters: false,
         };
       },
-      stubs: {
-        ArrayModal: true,
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (message) => message,
+        },
+        stubs: {
+          ArrayModal: true,
+        }
       }
     });
   });

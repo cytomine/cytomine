@@ -151,7 +151,6 @@ button-hide,Hide,Masquer,Ocultar,Verbergen
 button-kill,Kill,Arrêter,Abortar,Stoppen
 button-less,Less,Moins,Menos,Minder
 button-load-more,Load more,Plus,Cargar más,Meer loaden knop
-button-lock,Lock,Verrouiller,Bloquear,blokkeren
 button-manage-members,Manage members,Gestion des membres,Administrar miembros,Leden managen
 button-metadata,Metadata,Métadonnées,Metadatos,Metagegevens
 button-more-info,More information,Plus d'informations,Más información,Meer informatie
@@ -189,7 +188,6 @@ button-start,Start,Uploader,Comenzar,Uploaden
 button-switch-histogram-scale-to-linear,Switch to linear histogram,Utiliser un histogramme linéaire,Cambiar a histograma lineal,Schakel over naar lineair histogram
 button-unlink,Unlink,Séparer,Desconectar,Scheiden
 button-switch-histogram-scale-to-log,Switch to log histogram,Utiliser un histogramme log,Cambiar a histograma de registro,Schakel over naar loghistogram
-button-unlock,Unlock,Déverrouiller,Desbloquear,Unlock
 button-unvalidate-and-continue-review,Unvalidate and continue my review,Annuler la validation,Anular y continuar mi reseña,Validatie annuleren
 button-unvalidate-review,Unvalidate my review,Annuler la validation,Anular mi reseña,Validatie annuleren knop
 button-validate-review,Validate my review,Valider l'image,Validar mi reseña,Review valideren
@@ -704,8 +702,6 @@ notif-error-unvalidate-review,Failed to unvalidate the image review,Une erreur a
 notif-error-update-description,Failed to update description,Une erreur a empêché de sauvegarder la description,Error al actualizar la descripción,Een fout verhinderde het opslaan van de beschrijving
 notif-error-user-creation,Failed to create the user,Une erreur a empêché la création de l'utilisateur,Error al crear el usuario,Een fout verhinderde het aanmaken van de user
 notif-error-user-details-not-saved,Error during update of user details,Une erreur a empêché la mise à jour du profil,A ocurrido un error durante la actualización de los detalles del usuario,Door een fout kon het profiel niet worden bijgewerkt
-notif-error-user-lock,Failed to lock the user,Une erreur a empêché de verrouiler l'utilisateur,Error al bloquear el usuario,Een fout verhinderde het uitsluiten van de user
-notif-error-user-unlock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur,Error al desbloquear el usuario,Door een fout kon de user niet worden ontgrendeld
 notif-error-user-update,Failed to update the user,Une erreur a empêché la modification de l'utilisateur,Error al actualizar al usuario,Een fout verhinderde de wijziging van de user
 notif-error-validate-review,Failed to validate the image,Une erreur a empêché la validation de l'image,Error al validar la imagen,Een fout verhinderde de review van de afbeelding
 notif-success-add-image,Image {imageName} was successfully added to project {projectName},L'image {imageName} a été ajoutée au projet {projectName},La imagen {imageName} se agregó correctamente al proyecto {projectName},De afbeelding {imageName} is toegevoegd aan het project {projectName}

@@ -14,6 +14,7 @@ export default mergeConfig(
       coverage: {
         provider: 'v8',
         enabled: true,
+        reportOnFailure: true,
         reportsDirectory: './coverage',
         reporter: ['html-spa', 'text-summary'],
         include: ['src/**/*.vue']

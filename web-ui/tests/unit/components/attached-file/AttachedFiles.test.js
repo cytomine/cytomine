@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import attachedFiles from '@/components/attached-file/AttachedFiles';
@@ -15,27 +15,26 @@ vi.mock('@/api', () => ({
 
 describe('attached-files.vue', () => {
   let wrapper;
-  let localVue;
 
   beforeEach(async () => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = shallowMount(attachedFiles, {
-      localVue,
-      propsData: {
+      props: {
         object: {},
         canEdit: true
       },
-      mocks: {
-        $t: (message) => message,
-        $notify: vi.fn(),
-        $buefy: {
-          modal: {
-            open: vi.fn()
-          },
-          dialog: {
-            confirm: vi.fn((options) => options.onConfirm())
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (message) => message,
+          $notify: vi.fn(),
+          $buefy: {
+            modal: {
+              open: vi.fn()
+            },
+            dialog: {
+              confirm: vi.fn((options) => options.onConfirm())
+            }
           }
         }
       }

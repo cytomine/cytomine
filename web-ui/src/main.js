@@ -1,31 +1,22 @@
-import Vue from 'vue';
+import Vue, { createApp } from 'vue';
 import axios from 'axios';
 import constants from '@/utils/constants.js';
 
 // Keep Vue 2 runtime behavior by default while migrating incrementally.
-Vue.configureCompat({MODE: 2});
-
-import VueRouter from 'vue-router';
-import router from './routes.js';
-Vue.use(VueRouter);
+// COMPONENT_V_MODEL is off: the app's own components use the Vue 3
+// `modelValue` / `update:modelValue` v-model contract (issue 15), so compat
+// must not rewrite it back to the Vue 2 `value` / `input` pair.
+Vue.configureCompat({ MODE: 2, COMPONENT_V_MODEL: false });
 
 import i18n from './lang.js';
-
+import router from './routes.js';
 import store from './store/store.js';
 
 import Buefy from 'buefy';
-Vue.use(Buefy, { defaultIconPack: 'fas' });
+import optOutBuefyFromVue2Compat from '@/utils/buefy-compat.js';
+optOutBuefyFromVue2Compat();
 
-import VeeValidate, { Validator } from 'vee-validate';
-Validator.extend('positive', value => Number(value) > 0);
-Vue.use(VeeValidate, {
-  i18nRootKey: 'validations',
-  i18n,
-  inject: false
-});
-
-import Notifications from 'vue-notification';
-Vue.use(Notifications);
+import Notifications from '@kyvg/vue3-notification';
 
 import VTooltip from 'v-tooltip';
 Vue.use(VTooltip);
@@ -42,27 +33,11 @@ Vue.use(VueShortKey, {
   ]
 });
 
-import VueHtml2Canvas from 'vue-html2canvas';
-
-Vue.use(VueHtml2Canvas);
-
 import * as vClickOutside from 'v-click-outside-x';
 Vue.use(vClickOutside);
 
-import VueLayers from 'vuelayers';
-import CytomineSource from './vuelayers-suppl/cytomine-source';
-import RasterSource from './vuelayers-suppl/raster-source';
-import TranslateInteraction from './vuelayers-suppl/translate-interaction';
-import RotateInteraction from './vuelayers-suppl/rotate-interaction';
-import ModifyInteraction from './vuelayers-suppl/modify-interaction';
-import RescaleInteraction from './vuelayers-suppl/rescale-interaction';
-Vue.use(VueLayers);
-Vue.use(CytomineSource);
-Vue.use(RasterSource);
-Vue.use(TranslateInteraction);
-Vue.use(RotateInteraction);
-Vue.use(ModifyInteraction);
-Vue.use(RescaleInteraction);
+import ViewerOpenLayers from './viewer-ol';
+Vue.use(ViewerOpenLayers);
 
 import 'chart.js/auto';
 
@@ -90,12 +65,13 @@ axios.get('configuration.json').then(response => {
         onLoad: 'login-required'
       })
       .then(() => {
-        new Vue({
-          render: h => h(App),
-          router,
-          store,
-          i18n
-        }).$mount('#app');
+        const app = createApp(App);
+        app.use(i18n);
+        app.use(router);
+        app.use(store);
+        app.use(Buefy, { defaultIconPack: 'fas' });
+        app.use(Notifications);
+        app.mount('#app');
       });
   });
 });

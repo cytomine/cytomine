@@ -1,6 +1,7 @@
 package be.cytomine.service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +43,7 @@ public class MeiliSearchService {
             String meiliFilter = null;
             if (filters != null && !filters.isEmpty()) {
                 String joined = filters.stream()
+                    .map(this::normalizeFilter)
                     .filter(f -> f != null && !f.trim().isEmpty())
                     .collect(Collectors.joining(" AND "));
                 if (!joined.isEmpty()) {
@@ -107,6 +109,35 @@ public class MeiliSearchService {
         }
         throw new SearchException("MeiliSearch index not found", 404, "index not found");
 
+    }
+
+    private String normalizeFilter(String filter) {
+        if (filter == null) {
+            return null;
+        }
+
+        String trimmed = filter.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+
+        String lowered = trimmed.toLowerCase(Locale.ROOT);
+        if (trimmed.contains("=") || lowered.contains(" != ") || lowered.contains(" > ")
+            || lowered.contains(" < ") || lowered.contains(" >= ") || lowered.contains(" <= ")) {
+            return trimmed;
+        }
+
+        int separatorIndex = trimmed.indexOf(':');
+        if (separatorIndex > 0 && separatorIndex < trimmed.length() - 1) {
+            String field = trimmed.substring(0, separatorIndex).trim();
+            String value = trimmed.substring(separatorIndex + 1).trim();
+            if (!value.startsWith("\"") && !value.endsWith("\"")) {
+                value = "\"" + value.replace("\"", "\\\"") + "\"";
+            }
+            return field + " = " + value;
+        }
+
+        return trimmed;
     }
 
 }

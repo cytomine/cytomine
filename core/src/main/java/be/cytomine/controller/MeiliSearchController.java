@@ -1,6 +1,7 @@
 package be.cytomine.controller;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +25,19 @@ public class MeiliSearchController {
 
     @GetMapping("/search")
     public ResponseEntity<List<MeiliSearchImageResponse>> search(
-            @RequestParam String query,
-            @RequestParam(required = false) List<String> filters,
+            @RequestParam(required = false) String query,
+            @RequestParam(name = "filters", required = false) List<String> filters,
+            @RequestParam(name = "filter", required = false) List<String> filter,
             @RequestParam(required = false, defaultValue = "20") int limit,
             @RequestParam(required = false, defaultValue = "0") int offset) {
 
+        List<String> allFilters = Stream.of(filters, filter)
+            .filter(list -> list != null && !list.isEmpty())
+            .flatMap(List::stream)
+            .toList();
+
         List<MeiliSearchImageResponse>
-            results = meiliSearchService.search(query, filters, limit, offset);
+            results = meiliSearchService.search(query, allFilters, limit, offset);
         return ResponseEntity.ok(results);
 
     }

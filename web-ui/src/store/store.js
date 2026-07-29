@@ -10,7 +10,7 @@ import listProjects from './modules/list-projects.js';
 Vue.use(Vuex);
 let store = new Vuex.Store({
   actions: {
-    logout({state, commit}) {
+    logout({ state, commit }) {
       commit('appStores/reset');
       commit('currentUser/resetState');
       commit('currentProject/resetState');

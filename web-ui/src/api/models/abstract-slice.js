@@ -37,7 +37,7 @@ export default class AbstractSlice extends Model {
     }
 
     if (!this._uploader) {
-      let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/user.json`);
+      let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/user.json`);
       this._uploader = new User(data);
     }
 

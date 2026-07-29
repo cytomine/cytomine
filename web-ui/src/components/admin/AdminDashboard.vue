@@ -117,13 +117,13 @@
 </template>
 
 <script>
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 import moment from 'moment';
 
 export default {
   name: 'admin-dashboard',
-  components: {LastConnectionsChart},
+  components: { LastConnectionsChart },
   data() {
     return {
       loading: true,
@@ -150,10 +150,10 @@ export default {
   },
   created() {
     let chartOptions = [
-      {interval: 'day', period: 'hour'},
-      {interval: 'week', period: 'day'},
-      {interval: 'month', period: 'week'},
-      {interval: 'year', period: 'week'}
+      { interval: 'day', period: 'hour' },
+      { interval: 'week', period: 'day' },
+      { interval: 'month', period: 'week' },
+      { interval: 'year', period: 'week' }
     ];
     this.chartOptions = chartOptions.map(option => {
       let startDate = moment()
@@ -161,7 +161,7 @@ export default {
         .subtract(1, option.interval + 's')
         .startOf(option.period)
         .valueOf();
-      return {label: this.$t(`last-${option.interval}`), period: option.period, startDate};
+      return { label: this.$t(`last-${option.interval}`), period: option.period, startDate };
     });
     this.selectedChartOption = this.chartOptions[0];
   },

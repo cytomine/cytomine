@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ArrayModal from '@/components/appengine/forms/fields/array/ArrayModal';
@@ -40,7 +40,7 @@ describe('ArrayModal.vue', () => {
         ImageMultiSelect: true,
       },
       propsData: {
-        type: {id: 'boolean'},
+        type: { id: 'boolean' },
         active: true,
       }
     });
@@ -64,7 +64,7 @@ describe('ArrayModal.vue', () => {
     ['geometry', GeometryArrayField],
     ['image', ImageArrayField],
   ])('should render the correct complex field when type is %s', async (typeId, expectedComponent) => {
-    await wrapper.setProps({type: {id: typeId}});
+    await wrapper.setProps({ type: { id: typeId } });
 
     expect(wrapper.findComponent(expectedComponent).exists()).toBe(true);
   });
@@ -95,8 +95,8 @@ describe('ArrayModal.vue', () => {
   });
 
   it('should show an error when selecting with not enough items', async () => {
-    await wrapper.setProps({minSize: 2});
-    await wrapper.setData({items: [true]});
+    await wrapper.setProps({ minSize: 2 });
+    await wrapper.setData({ items: [true] });
 
     wrapper.vm.select();
 
@@ -107,7 +107,7 @@ describe('ArrayModal.vue', () => {
   });
 
   it('should emit events and reset when selecting with valid items', async () => {
-    await wrapper.setData({items: [true]});
+    await wrapper.setData({ items: [true] });
 
     wrapper.vm.select();
 

@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import {sync} from '@/utils/store-helpers';
+import { sync } from '@/utils/store-helpers';
 
 export default {
   name: 'AppSidebar',

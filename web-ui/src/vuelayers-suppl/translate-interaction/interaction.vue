@@ -3,10 +3,10 @@
 import TranslateInteraction from 'ol/interaction/Translate';
 import observableFromOlEvent from 'vuelayers/lib/rx-ext/from-ol-event';
 import interaction from 'vuelayers/lib/mixin/interaction';
-import {isCollection} from 'vuelayers/lib/ol-ext/util';
-import {isFunction} from 'vuelayers/lib/util/minilo';
-import {hasInteraction} from 'vuelayers/lib/util/assert';
-import {makeWatchers} from 'vuelayers/lib/util/vue-helpers';
+import { isCollection } from 'vuelayers/lib/ol-ext/util';
+import { isFunction } from 'vuelayers/lib/util/minilo';
+import { hasInteraction } from 'vuelayers/lib/util/assert';
+import { makeWatchers } from 'vuelayers/lib/util/vue-helpers';
 
 /**
  * @vueProps

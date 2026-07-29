@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import ActivityLogs from '@/components/utils/ActivityLogs.vue';
 
@@ -24,7 +24,7 @@ export default {
     startDate: Number,
     endDate: Number
   },
-  components: {ActivityLogs},
+  components: { ActivityLogs },
   data() {
     return {
       selectedUser: null,

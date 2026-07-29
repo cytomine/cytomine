@@ -32,7 +32,7 @@ import CytomineSlider from '@/components/form/CytomineSlider.vue';
 
 export default {
   name: 'rotation-selector',
-  components: {CytomineSlider},
+  components: { CytomineSlider },
   props: {
     index: String
   },

@@ -24,12 +24,12 @@ export default {
   name: 'cytomine-date-picker',
   props: {
     value: Date,
-    resetButton: {type: Boolean, default: true},
+    resetButton: { type: Boolean, default: true },
     maxDate: Date,
     minDate: Date,
     placeholder: String,
-    styles: {type: Array, default: () => []}, // accept "multiselect", "bold-placeholder",
-    position: {type: String, default: null}
+    styles: { type: Array, default: () => [] }, // accept "multiselect", "bold-placeholder",
+    position: { type: String, default: null }
   },
   computed: {
     moment() {

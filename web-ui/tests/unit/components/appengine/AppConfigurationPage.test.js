@@ -1,19 +1,19 @@
-import {shallowMount, createLocalVue} from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Buefy from 'buefy';
 import Vuex from 'vuex';
 
 import AppConfigurationPage from '@/components/appengine/AppConfigurationPage.vue';
 import AppStoreAddModal from '@/components/appengine/AppStoreAddModal.vue';
 import store from '@/store/store';
-import {Cytomine} from '@/api';
-import {flushPromises} from '../../../utils';
+import { Cytomine } from '@/api';
+import { flushPromises } from '../../../utils';
 
 const localVue = createLocalVue();
 localVue.use(Buefy);
 localVue.use(Vuex);
 
 const mockNotify = vi.fn();
-const mockDialog = {confirm: vi.fn()};
+const mockDialog = { confirm: vi.fn() };
 
 vi.mock('@/api', () => ({
   Cytomine: {
@@ -34,7 +34,7 @@ describe('AppConfigurationPage.vue', () => {
       store,
       mocks: {
         $notify: mockNotify,
-        $buefy: {dialog: mockDialog},
+        $buefy: { dialog: mockDialog },
         $t: (key) => key,
       },
       stubs: {
@@ -48,8 +48,8 @@ describe('AppConfigurationPage.vue', () => {
   });
 
   it('should add a store correctly', async () => {
-    const newStore = {id: 2, name: 'Store2', host: 'http://host2.com', default: false};
-    Cytomine.instance.api.post.mockResolvedValue({data: newStore});
+    const newStore = { id: 2, name: 'Store2', host: 'http://host2.com', default: false };
+    Cytomine.instance.api.post.mockResolvedValue({ data: newStore });
 
     const wrapper = createWrapper();
     await wrapper.vm.handleAdd(newStore);
@@ -59,11 +59,11 @@ describe('AppConfigurationPage.vue', () => {
   });
 
   it('should delete a store correctly', async () => {
-    const store = {id: 3, name: 'Store3', host: 'http://host3.com', default: false};
+    const store = { id: 3, name: 'Store3', host: 'http://host3.com', default: false };
     const wrapper = createWrapper();
 
     Cytomine.instance.api.delete.mockResolvedValue({});
-    mockDialog.confirm.mockImplementation(({onConfirm}) => onConfirm());
+    mockDialog.confirm.mockImplementation(({ onConfirm }) => onConfirm());
 
     await wrapper.vm.handleDelete(store);
     await flushPromises();
@@ -80,7 +80,7 @@ describe('AppConfigurationPage.vue', () => {
     const wrapper = createWrapper();
     expect(wrapper.vm.showModal).toBe(false);
 
-    wrapper.setData({showModal: true});
+    wrapper.setData({ showModal: true });
     expect(wrapper.vm.showModal).toBe(true);
   });
 });

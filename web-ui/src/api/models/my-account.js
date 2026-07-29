@@ -54,7 +54,7 @@ export default class MyAccount {
         }
       }
     }
-    props['attributes'] = {...props['attributes'], ...attributes};
+    props['attributes'] = { ...props['attributes'], ...attributes };
     return props;
   }
 
@@ -63,7 +63,7 @@ export default class MyAccount {
   }
 
   static async fetch() {
-    let {data} = await Cytomine.instance.iam.get('account');
+    let { data } = await Cytomine.instance.iam.get('account');
     return new this(data);
   }
 
@@ -73,7 +73,7 @@ export default class MyAccount {
   }
 
   static async fetchCredentials() {
-    let {data} = await Cytomine.instance.iam.get('account/credentials');
+    let { data } = await Cytomine.instance.iam.get('account/credentials');
     return data;
   }
 }

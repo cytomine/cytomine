@@ -1,9 +1,9 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 import VTooltip from 'v-tooltip';
 
 import GlobalDashboard from '@/components/GlobalDashboard';
-import {ImageInstanceCollection, ProjectCollection} from '@/api';
+import { ImageInstanceCollection, ProjectCollection } from '@/api';
 
 vi.mock('@/utils/image-utils', () => ({
   isWebPSupported: vi.fn(() => true)
@@ -12,19 +12,19 @@ vi.mock('@/utils/image-utils', () => ({
 vi.mock('@/api', () => ({
   ImageInstanceCollection: {
     fetchLastOpened: vi.fn().mockResolvedValue([
-      {id: 1, project: 1}
+      { id: 1, project: 1 }
     ])
   },
   ProjectCollection: {
     fetchAll: vi.fn().mockResolvedValue({
       array: [
-        {id: 1, name: 'Project 1', numberOfImages: 10, blindMode: false},
-        {id: 2, name: 'Project 2', numberOfImages: 5, blindMode: true}
+        { id: 1, name: 'Project 1', numberOfImages: 10, blindMode: false },
+        { id: 2, name: 'Project 2', numberOfImages: 5, blindMode: true }
       ]
     }),
     fetchLastOpened: vi.fn().mockResolvedValue([
-      {id: 1},
-      {id: 2}
+      { id: 1 },
+      { id: 2 }
     ])
   }
 }));

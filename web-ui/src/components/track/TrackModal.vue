@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import {Track} from '@/api';
-import {Sketch} from 'vue-color';
+import { Track } from '@/api';
+import { Sketch } from 'vue-color';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
@@ -34,7 +34,7 @@ export default {
     'sketch-picker': Sketch,
     CytomineModalCard
   },
-  $_veeValidate: {validator: 'new'},
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       name: '',
@@ -76,13 +76,13 @@ export default {
     },
     async create() {
       try {
-        let track = await new Track({name: this.name, color: this.color.hex, image: this.image.id}).save();
-        this.$notify({type: 'success', text: this.$t('notif-success-track-creation')});
+        let track = await new Track({ name: this.name, color: this.color.hex, image: this.image.id }).save();
+        this.$notify({ type: 'success', text: this.$t('notif-success-track-creation') });
         this.$emit('newTrack', track);
         this.$parent.close();
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-track-creation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-track-creation') });
       }
     },
     async update() {
@@ -91,18 +91,18 @@ export default {
       track.name = this.name;
       try {
         await track.save();
-        this.$notify({type: 'success', text: this.$t('notif-success-track-update')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-track-update') });
         this.$emit('updateTrack', track);
         this.$parent.close();
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-track-update')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-track-update') });
       }
     }
   },
   created() {
     this.name = this.track ? this.track.name : '';
-    this.color = {hex: this.track ? this.track.color : this.randomColor()};
+    this.color = { hex: this.track ? this.track.color : this.randomColor() };
   }
 };
 </script>

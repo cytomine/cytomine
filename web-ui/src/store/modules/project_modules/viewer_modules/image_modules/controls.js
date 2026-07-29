@@ -12,7 +12,7 @@ export default {
   },
 
   mutations: {
-    setStep(state, {dimension, value}) {
+    setStep(state, { dimension, value }) {
       state.step[dimension] = value;
     }
   },

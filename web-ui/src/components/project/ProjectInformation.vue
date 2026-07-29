@@ -17,13 +17,13 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import ProjectDetails from './ProjectDetails.vue';
-import {Project} from '@/api';
+import { Project } from '@/api';
 export default {
   name: 'project-information',
-  components: {ProjectDetails},
+  components: { ProjectDetails },
   data() {
     return {
       excludedProperties: [
@@ -44,14 +44,14 @@ export default {
         await Project.delete(this.project.id);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-project-deletion', {projectName: this.project.name})
+          text: this.$t('notif-success-project-deletion', { projectName: this.project.name })
         });
         this.$router.push('/projects');
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-project-deletion', {projectName: this.project.name})
+          text: this.$t('notif-error-project-deletion', { projectName: this.project.name })
         });
       }
     }

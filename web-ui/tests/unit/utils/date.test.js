@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import {formatDate, formatMomentDate, formatMomentDuration} from '@/utils/date';
+import { formatDate, formatMomentDate, formatMomentDuration } from '@/utils/date';
 
 const OPTIONS = {
   day: '2-digit',

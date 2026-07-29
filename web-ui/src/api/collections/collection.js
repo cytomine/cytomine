@@ -9,7 +9,7 @@ export default class Collection {
    * @param {Object}  [props]         Properties of the collection to set (the allowed props are model-dependent and
    *                                  defined in _initProperties())
    */
-  constructor({nbPerPage = 0, filterKey, filterValue, ...props} = {}) {
+  constructor({ nbPerPage = 0, filterKey, filterValue, ...props } = {}) {
     if (new.target === Collection) {
       throw new Error('Collection is an abstract class and cannot be constructed directly.');
     }
@@ -103,7 +103,7 @@ export default class Collection {
   }
 
   async _doFetch() {
-    let {data} = await Cytomine.instance.api.get(this.uri, {params: this.getParameters()});
+    let { data } = await Cytomine.instance.api.get(this.uri, { params: this.getParameters() });
     return data;
   }
 
@@ -181,8 +181,8 @@ export default class Collection {
    *
    * @returns {this} collection containing all available items
    */
-  static async fetchAll({nbPerPage, filterKey, filterValue, ...props} = {}) {
-    return new this({nbPerPage, filterKey, filterValue, ...props}).fetchAll();
+  static async fetchAll({ nbPerPage, filterKey, filterValue, ...props } = {}) {
+    return new this({ nbPerPage, filterKey, filterValue, ...props }).fetchAll();
   }
 
   /**

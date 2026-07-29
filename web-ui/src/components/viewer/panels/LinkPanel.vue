@@ -71,7 +71,7 @@ export default {
   props: {
     index: String
   },
-  components: {ImageName},
+  components: { ImageName },
   data() {
     return {
       revisionNumber: 0
@@ -80,8 +80,8 @@ export default {
   computed: {
     modeOptions: function () {
       return [
-        {key: 'ABSOLUTE', label: this.$t('absolute-link-mode')},
-        {key: 'RELATIVE', label: this.$t('relative-link-mode')}
+        { key: 'ABSOLUTE', label: this.$t('absolute-link-mode') },
+        { key: 'RELATIVE', label: this.$t('relative-link-mode') }
       ];
     },
     viewerModule() {
@@ -181,11 +181,11 @@ export default {
         if (indexGroup !== null) {
           this.$store.commit(this.viewerModule + 'mergeLinkGroups', [this.indexCurrentGroup, indexGroup]);
         } else {
-          this.$store.commit(this.viewerModule + 'linkImageToGroup', {indexGroup: this.indexCurrentGroup, indexImage});
+          this.$store.commit(this.viewerModule + 'linkImageToGroup', { indexGroup: this.indexCurrentGroup, indexImage });
         }
       } else {
         if (indexGroup !== null) {
-          this.$store.commit(this.viewerModule + 'linkImageToGroup', {indexGroup, indexImage: this.index});
+          this.$store.commit(this.viewerModule + 'linkImageToGroup', { indexGroup, indexImage: this.index });
         } else {
           this.$store.commit(this.viewerModule + 'createLinkGroup', [this.index, indexImage]);
         }
@@ -193,7 +193,7 @@ export default {
     },
 
     unlink() {
-      this.$store.commit(this.viewerModule + 'unlinkImage', {indexGroup: this.indexCurrentGroup, indexImage: this.index});
+      this.$store.commit(this.viewerModule + 'unlinkImage', { indexGroup: this.indexCurrentGroup, indexImage: this.index });
     }
   }
 };

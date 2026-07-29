@@ -16,16 +16,16 @@
 </template>
 
 <script>
-import {Cytomine, AttachedFileCollection} from '@/api';
+import { Cytomine, AttachedFileCollection } from '@/api';
 import AttachedFileModal from './AttachedFileModal.vue';
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {get} from '@/utils/store-helpers.js';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { get } from '@/utils/store-helpers.js';
 
 export default {
   name: 'attached-files',
   props: {
-    object: {type: Object},
-    canEdit: {type: Boolean, default: true}
+    object: { type: Object },
+    canEdit: { type: Boolean, default: true }
   },
   data() {
     return {
@@ -50,9 +50,9 @@ export default {
       this.$buefy.modal.open({
         parent: this,
         component: AttachedFileModal,
-        props: {object: this.object},
+        props: { object: this.object },
         hasModalCard: true,
-        events: {'addAttachedFile': this.addAttachedFile}
+        events: { 'addAttachedFile': this.addAttachedFile }
       });
     },
     downloadAttachedFile(host, attachedFile) {
@@ -64,7 +64,7 @@ export default {
     confirmDeletion(attachedFile, idx) {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
-        message: this.$t('confirm-deletion-attached-file', {filename: attachedFile.filename}),
+        message: this.$t('confirm-deletion-attached-file', { filename: attachedFile.filename }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -77,20 +77,20 @@ export default {
         this.attachedFiles.splice(idx, 1);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-attached-file-deletion', {filename: attachedFile.filename})
+          text: this.$t('notif-success-attached-file-deletion', { filename: attachedFile.filename })
         });
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-attached-file-deletion', {filename: attachedFile.filename})
+          text: this.$t('notif-error-attached-file-deletion', { filename: attachedFile.filename })
         });
       }
     }
   },
   async created() {
     try {
-      this.attachedFiles = (await AttachedFileCollection.fetchAll({object: this.object})).array;
+      this.attachedFiles = (await AttachedFileCollection.fetchAll({ object: this.object })).array;
     } catch (error) {
       console.log(error);
       this.error = true;

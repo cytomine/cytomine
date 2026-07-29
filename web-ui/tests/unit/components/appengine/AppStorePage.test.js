@@ -1,10 +1,10 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 import Vuex from 'vuex';
 
 import AppStorePage from '@/components/appengine/AppStorePage';
-import {Cytomine} from '@/api';
-import {flushPromises} from '../../../utils';
+import { Cytomine } from '@/api';
+import { flushPromises } from '../../../utils';
 
 vi.mock('@/api', () => ({
   Cytomine: {
@@ -22,8 +22,8 @@ describe('AppStorePage.vue', () => {
   localVue.use(Vuex);
 
   const mockStores = [
-    {host: 'http://test.cytomine.org', name: 'Test Store'},
-    {host: 'http://store.cytomine.org', name: 'Cytomine Store'},
+    { host: 'http://test.cytomine.org', name: 'Test Store' },
+    { host: 'http://store.cytomine.org', name: 'Cytomine Store' },
   ];
 
   const createWrapper = (options = {}) => shallowMount(
@@ -51,18 +51,18 @@ describe('AppStorePage.vue', () => {
       date: '2025-04-11',
       description: 'This is a test app description.'
     }];
-    Cytomine.instance.api.get.mockResolvedValue({data: tasks});
+    Cytomine.instance.api.get.mockResolvedValue({ data: tasks });
 
     const wrapper = createWrapper();
     await flushPromises();
 
     const expectedParams = wrapper.vm.stores.map(store => ({
-      params: {host: encodeURIComponent(store.host)}
+      params: { host: encodeURIComponent(store.host) }
     }));
 
     const expectedApplications = [];
     wrapper.vm.stores.forEach((store) => {
-      tasks.forEach(task => expectedApplications.push({...task, host: store.host}));
+      tasks.forEach(task => expectedApplications.push({ ...task, host: store.host }));
     });
 
     Cytomine.instance.api.get.mock.calls.forEach((call, i) => {

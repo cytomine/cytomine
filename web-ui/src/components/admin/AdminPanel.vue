@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {KeycloakRole} from '@/constants/UserRole.js';
+import { get } from '@/utils/store-helpers';
+import { KeycloakRole } from '@/constants/UserRole.js';
 
 import AdminDashboard from './AdminDashboard.vue';
 import AdminUsers from './AdminUsers.vue';
@@ -56,7 +56,6 @@ export default {
     isAdmin() {
       return this.$keycloak.hasResourceRole(KeycloakRole.ADMIN);
     },
-    // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {
       switch (this.activeTab) {
         case 'dashboard':

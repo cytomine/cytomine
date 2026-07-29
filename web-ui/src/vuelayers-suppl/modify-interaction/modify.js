@@ -1,9 +1,9 @@
 import ModifyInteractionBase from 'ol/interaction/Modify';
 import GeometryType from 'ol/geom/GeometryType';
-import {equals as coordinatesEqual, distance as coordinateDistance, closestOnSegment} from 'ol/coordinate';
-import {getUid} from 'ol/util';
-import {boundingExtent} from 'ol/extent';
-import {isRectangle} from '@/utils/geometry-utils';
+import { equals as coordinatesEqual, distance as coordinateDistance, closestOnSegment } from 'ol/coordinate';
+import { getUid } from 'ol/util';
+import { boundingExtent } from 'ol/extent';
+import { isRectangle } from '@/utils/geometry-utils';
 
 function getSegmentDataUid(segmentData) {
   let uid = getUid(segmentData.feature);

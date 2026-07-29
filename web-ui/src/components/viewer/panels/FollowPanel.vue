@@ -48,17 +48,17 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import Username from '@/components/user/Username.vue';
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {UserPosition} from '@/api';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { UserPosition } from '@/api';
 
 import constants from '@/utils/constants.js';
 
 export default {
   name: 'follow-panel',
-  components: {Username},
+  components: { Username },
   props: {
     index: String,
     view: Object
@@ -148,10 +148,10 @@ export default {
       }
     },
     onlineManagers() {
-      return this.projectManagers.filter(({id}) => this.onlineUsers.includes(id));
+      return this.projectManagers.filter(({ id }) => this.onlineUsers.includes(id));
     },
     onlineContributors() {
-      return this.projectContributors.filter(({id}) => this.onlineUsers.includes(id));
+      return this.projectContributors.filter(({ id }) => this.onlineUsers.includes(id));
     },
     trackedUserFullName() {
       let trackedUser = this.projectMembers.find(user => user.id === this.trackedUser);
@@ -192,7 +192,7 @@ export default {
 
     broadcastModel(value) {
       if (value && this.alreadyBroadcastingImage) {
-        this.$notify({type: 'error', text: this.$t('notif-error-already-broadcasting-this-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-already-broadcasting-this-image') });
         this.disabledBroadcast = true;
         this.$nextTick(() => this.broadcastModel = false);
         return;
@@ -209,7 +209,7 @@ export default {
           confirmText: this.$t('button-confirm'),
           cancelText: this.$t('button-cancel'),
           onConfirm: () => {
-            this.$store.commit(this.viewerModule + 'unlinkImage', {indexImage: this.index});
+            this.$store.commit(this.viewerModule + 'unlinkImage', { indexImage: this.index });
             this.trackedUser = value;
           },
           onCancel: () => {
@@ -338,7 +338,7 @@ export default {
         this.moveView(pos);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-tracked-user-position')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-tracked-user-position') });
       }
 
       clearTimeout(this.timeoutTracking);
@@ -357,7 +357,7 @@ export default {
 
       if (this.broadcast) {
         this.followers = [];
-        let followersIds = await this.$store.dispatch('currentProject/fetchFollowers', {userId: this.currentUser.id, imageId: this.image.id});
+        let followersIds = await this.$store.dispatch('currentProject/fetchFollowers', { userId: this.currentUser.id, imageId: this.image.id });
 
         this.projectMembers.forEach(member => {
           if (followersIds.includes('' + member.id)) {

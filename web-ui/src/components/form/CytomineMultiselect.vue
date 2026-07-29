@@ -58,21 +58,21 @@ import Multiselect from 'vue-multiselect';
 
 export default {
   name: 'cytomine-multiselect',
-  components: {Multiselect},
+  components: { Multiselect },
   props: {
-    value: {type: null},
-    options: {type: null},
-    label: {type: String},
-    trackBy: {type: String},
-    groupLabel: {type: String},
-    groupValues: {type: String},
-    multiple: {type: Boolean, default: false},
-    closeOnSelect: {type: Boolean, default: null},
-    selectAllAvailable: {type: Boolean, default: true},
-    searchable: {type: Boolean, default: true},
-    allowEmpty: {type: Boolean, default: true},
-    disabled: {type: Boolean, default: false},
-    allPlaceholder: {type: String}
+    value: { type: null },
+    options: { type: null },
+    label: { type: String },
+    trackBy: { type: String },
+    groupLabel: { type: String },
+    groupValues: { type: String },
+    multiple: { type: Boolean, default: false },
+    closeOnSelect: { type: Boolean, default: null },
+    selectAllAvailable: { type: Boolean, default: true },
+    searchable: { type: Boolean, default: true },
+    allowEmpty: { type: Boolean, default: true },
+    disabled: { type: Boolean, default: false },
+    allPlaceholder: { type: String }
   },
   data() {
     return {

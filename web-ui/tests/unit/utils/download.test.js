@@ -1,4 +1,4 @@
-import {getFilename, triggerBlobDownload} from '@/utils/download';
+import { getFilename, triggerBlobDownload } from '@/utils/download';
 
 describe('getFilename()', () => {
   it('should parse a plain filename', () => {
@@ -61,7 +61,7 @@ describe('triggerBlobDownload()', () => {
   });
 
   it('should create an object URL from the blob', () => {
-    const blob = new Blob(['{}'], {type: 'application/geo+json'});
+    const blob = new Blob(['{}'], { type: 'application/geo+json' });
     triggerBlobDownload(blob, 'export.geojson');
 
     expect(createObjectURLMock).toHaveBeenCalledWith(blob);
@@ -69,7 +69,7 @@ describe('triggerBlobDownload()', () => {
 
   it('should set href and download on the anchor', () => {
     const filename = 'export.geojson';
-    const blob = new Blob(['{}'], {type: 'application/geo+json'});
+    const blob = new Blob(['{}'], { type: 'application/geo+json' });
     triggerBlobDownload(blob, filename);
 
     expect(anchorMock.href).toBe(mockUrl);

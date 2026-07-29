@@ -60,11 +60,11 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import AnnotationPreview from './AnnotationPreview.vue';
 
-import {AnnotationCollection} from '@/api';
+import { AnnotationCollection } from '@/api';
 import constants from '@/utils/constants';
 import _ from 'lodash';
 
@@ -75,7 +75,7 @@ export default {
     nbPerPage: Number,
     size: Number,
     color: String,
-    bundling: {type: String, default: 'NO'},
+    bundling: { type: String, default: 'NO' },
 
     prop: Object,
 
@@ -91,10 +91,10 @@ export default {
     imagesIds: Array,
     usersIds: Array,
     reviewed: Boolean,
-    reviewUsersIds: {type: Array, default: null},
-    afterThan: {type: Number, default: null},
-    beforeThan: {type: Number, default: null},
-    slicesIds: {type: Array, default: null},
+    reviewUsersIds: { type: Array, default: null },
+    afterThan: { type: Number, default: null },
+    beforeThan: { type: Number, default: null },
+    slicesIds: { type: Array, default: null },
 
     allTerms: Array,
     allUsers: Array,
@@ -103,11 +103,11 @@ export default {
     allTags: Array,
 
     revision: Number,
-    visible: {type: Boolean, default: true},
-    showDetails: {type: Boolean, default: true},
+    visible: { type: Boolean, default: true },
+    showDetails: { type: Boolean, default: true },
     index: String
   },
-  components: {AnnotationPreview},
+  components: { AnnotationPreview },
   data() {
     return {
       loading: true,
@@ -258,9 +258,9 @@ export default {
       },
       set(page) {
         if (this.isInViewer) {
-          this.$store.commit(this.imageModule + 'setCurrentPage', {prop: this.prop.id, page});
+          this.$store.commit(this.imageModule + 'setCurrentPage', { prop: this.prop.id, page });
         }
-        this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', {prop: this.prop.id, page});
+        this.$store.commit(this.projectModule + 'listAnnotations/setCurrentPage', { prop: this.prop.id, page });
       }
     },
     activeSlices() {

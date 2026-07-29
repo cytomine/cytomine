@@ -6,9 +6,9 @@ import RasterSource from 'ol/source/Raster';
 import tileSource from 'vuelayers/lib/mixin/image-source';
 
 const props = {
-  sources: {type: Array},
-  operation: {type: Function},
-  lib: {type: Object},
+  sources: { type: Array },
+  operation: { type: Function },
+  lib: { type: Object },
 };
 
 const methods = {

@@ -30,7 +30,7 @@ export default class Term extends Model {
     }
 
     if (idNewParent) {
-      await Cytomine.instance.api.post('relation/parent/term.json', {term1: idNewParent, term2: this.id});
+      await Cytomine.instance.api.post('relation/parent/term.json', { term1: idNewParent, term2: this.id });
       this.parent = idNewParent;
     }
   }

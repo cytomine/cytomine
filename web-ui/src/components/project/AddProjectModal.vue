@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import {Project, Ontology} from '@/api';
+import { Project, Ontology } from '@/api';
 
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 
@@ -64,8 +64,8 @@ export default {
     active: Boolean,
     ontologies: Array
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       loading: false,
@@ -93,23 +93,23 @@ export default {
       try {
         let idOntology;
         if (this.ontology === 'NEW') {
-          let ontology = await new Ontology({name: this.name}).save();
+          let ontology = await new Ontology({ name: this.name }).save();
           idOntology = ontology.id;
         } else if (this.ontology === 'EXISTING') {
           idOntology = this.selectedOntology;
         }
 
-        let project = await new Project({name: this.name, ontology: idOntology}).save();
+        let project = await new Project({ name: this.name, ontology: idOntology }).save();
 
         this.loading = false;
-        this.$notify({type: 'success', text: this.$t('notif-success-project-creation')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-project-creation') });
         this.$emit('update:active', false);
         await this.$router.push(`/project/${project.id}/configuration`);
       } catch (error) {
         if (error.response.status === 409) {
-          this.$notify({type: 'error', text: this.$t('notif-error-project-already-exists')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-project-already-exists') });
         } else {
-          this.$notify({type: 'error', text: this.$t('notif-error-project-creation')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-project-creation') });
         }
       }
     }

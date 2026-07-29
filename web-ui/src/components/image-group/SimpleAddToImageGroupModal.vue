@@ -54,16 +54,16 @@
 <script>
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 
-import {ImageGroupCollection, ImageGroup, ImageGroupImageInstance} from '@/api';
+import { ImageGroupCollection, ImageGroup, ImageGroupImageInstance } from '@/api';
 
 export default {
   name: 'add-to-image-group-modal',
   props: {
-    active: {type: Boolean},
-    image: {type: Object}
+    active: { type: Boolean },
+    image: { type: Object }
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       name: '',
@@ -101,18 +101,18 @@ export default {
       try {
         let idImageGroup;
         if (this.imageGroup === 'NEW') {
-          let imageGroup = await new ImageGroup({name: this.name, project: this.image.project}).save();
+          let imageGroup = await new ImageGroup({ name: this.name, project: this.image.project }).save();
           idImageGroup = imageGroup.id;
         } else if (this.imageGroup === 'EXISTING') {
           idImageGroup = this.selectedImageGroup;
         }
 
-        let link = await new ImageGroupImageInstance({image: this.image.id, group: idImageGroup}).save();
+        let link = await new ImageGroupImageInstance({ image: this.image.id, group: idImageGroup }).save();
         this.$emit('addToImageGroup', link);
-        this.$notify({type: 'success', text: this.$t('notif-success-image-group-link-creation', {imageName: this.imageNameNotif})});
+        this.$notify({ type: 'success', text: this.$t('notif-success-image-group-link-creation', { imageName: this.imageNameNotif }) });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-image-group-link-creation', {imageName: this.imageNameNotif})});
+        this.$notify({ type: 'error', text: this.$t('notif-error-image-group-link-creation', { imageName: this.imageNameNotif }) });
       }
       this.$emit('update:active', false);
     },

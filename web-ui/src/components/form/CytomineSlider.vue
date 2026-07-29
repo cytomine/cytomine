@@ -51,18 +51,18 @@ import VueSlider from 'vue-slider-component';
 
 export default {
   name: 'cytomine-slider',
-  components: {VueSlider},
+  components: { VueSlider },
   props: {
-    value: {type: null},
-    min: {type: Number, default: 0},
-    max: {type: Number, default: 100},
-    interval: {type: Number},
-    integerOnly: {type: Boolean, default: true},
-    lazy: {type: Boolean, default: true},
-    tooltip: {type: Boolean, default: true},
-    size: {type: String, default: 'is-normal'}, // is-small, is-normal
-    contained: {type: Boolean, default: false}, // Whether the slider should be fully contained within its containing element.
-    smartTooltipPosition: {type: Boolean, default: false}
+    value: { type: null },
+    min: { type: Number, default: 0 },
+    max: { type: Number, default: 100 },
+    interval: { type: Number },
+    integerOnly: { type: Boolean, default: true },
+    lazy: { type: Boolean, default: true },
+    tooltip: { type: Boolean, default: true },
+    size: { type: String, default: 'is-normal' }, // is-small, is-normal
+    contained: { type: Boolean, default: false }, // Whether the slider should be fully contained within its containing element.
+    smartTooltipPosition: { type: Boolean, default: false }
   },
   data() {
     return {

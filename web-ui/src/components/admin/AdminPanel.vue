@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {KeycloakRole} from '@/constants/UserRole.js';
+import { get } from '@/utils/store-helpers';
+import { KeycloakRole } from '@/constants/UserRole.js';
 
 import AdminDashboard from './AdminDashboard.vue';
 import AdminUsers from './AdminUsers.vue';

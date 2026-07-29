@@ -18,7 +18,7 @@ export default {
     active: Boolean,
     title: String
   },
-  components: {CytomineModalCard},
+  components: { CytomineModalCard },
   methods: {
     close() {
       this.$emit('close');

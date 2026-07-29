@@ -36,12 +36,12 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 import constants from '@/utils/constants';
 
-import {Annotation} from '@/api';
+import { Annotation } from '@/api';
 
 export default {
   name: 'annotation-links-preview',
@@ -49,15 +49,15 @@ export default {
     'annotation-preview': AnnotationPreview,
   },
   props: {
-    index: {type: String, default: null},
-    annotation: {type: Object},
-    images: {type: Array},
-    allowAnnotationSelection: {type: Boolean, default: false},
-    showSelectAllButton: {type: Boolean, default: false},
-    showMainAnnotation: {type: Boolean, default: false},
-    size: {type: Number, default: 64},
-    mainColor: {type: String, default: null},
-    linkColor: {type: String, default: null},
+    index: { type: String, default: null },
+    annotation: { type: Object },
+    images: { type: Array },
+    allowAnnotationSelection: { type: Boolean, default: false },
+    showSelectAllButton: { type: Boolean, default: false },
+    showMainAnnotation: { type: Boolean, default: false },
+    size: { type: Number, default: 64 },
+    mainColor: { type: String, default: null },
+    linkColor: { type: String, default: null },
   },
   data() {
     return {};
@@ -68,7 +68,7 @@ export default {
 
     image() {
       return this.images.find(image => image.id === this.annotation.image) ||
-        {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
+        { 'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename };
     },
 
     annotationURL() {
@@ -115,21 +115,21 @@ export default {
   methods: {
     showLinkedAnnotations() {
       this.filteredLinks.forEach(link => {
-        this.$emit('select', {annot: link, options:{}});
+        this.$emit('select', { annot: link, options:{} });
       });
     },
-    selectAnnotation({annot, options}) {
+    selectAnnotation({ annot, options }) {
       if (this.allowAnnotationSelection) {
-        this.$emit('select', {annot, options});
+        this.$emit('select', { annot, options });
       }
     },
     selectNext() {
       let annot = this.orderedLinks[1];
-      this.selectAnnotation({annot, options:{trySameView: true}});
+      this.selectAnnotation({ annot, options:{ trySameView: true } });
     },
     selectPrevious() {
       let annot = this.orderedLinks[this.orderedLinks.length - 1];
-      this.selectAnnotation({annot, options:{trySameView: true}});
+      this.selectAnnotation({ annot, options:{ trySameView: true } });
     },
     shortkeyHandler(key) {
       if (!this.isActiveImage) {

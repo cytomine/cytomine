@@ -84,16 +84,16 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get,syncMultiselectFilter} from '@/utils/store-helpers';
-import {IMAGE_FORMAT} from '@/utils/image-utils';
+import { get,syncMultiselectFilter } from '@/utils/store-helpers';
+import { IMAGE_FORMAT } from '@/utils/image-utils';
 
 import ImageName from '@/components/image/ImageName.vue';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
-import {ImageGroupCollection, ImageInstanceCollection, TagCollection} from '@/api';
+import { ImageGroupCollection, ImageInstanceCollection, TagCollection } from '@/api';
 import _ from 'lodash';
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import { appendShortTermToken } from '@/utils/token-utils.js';
 
-const storeOptions = {rootModuleProp: 'storeModule'};
+const storeOptions = { rootModuleProp: 'storeModule' };
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 
 export default {
@@ -137,7 +137,7 @@ export default {
       return Object.values(this.$store.getters['currentProject/currentViewer'].images).map(image => image.imageInstance.id);
     },
     availableImageGroups() {
-      return [{id: 'null', name: this.$t('no-image-group')}, ...this.imageGroups];
+      return [{ id: 'null', name: this.$t('no-image-group') }, ...this.imageGroups];
     }
   },
   watch: {
@@ -167,10 +167,10 @@ export default {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
         let slice = await image.fetchReferenceSlice();
-        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice]});
+        await this.$store.dispatch(this.viewerModule + 'addImage', { image, slices: [slice] });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-add-viewer-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-add-viewer-image') });
       }
     },
     async fetchImages(loading = true) {
@@ -226,7 +226,7 @@ export default {
       })).array.filter(group => group.numberOfImages > 0);
     },
     async fetchTags() {
-      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+      this.availableTags = [{ id: 'null', name: this.$t('no-tag') }, ...(await TagCollection.fetchAll()).array];
     },
 
     more() {

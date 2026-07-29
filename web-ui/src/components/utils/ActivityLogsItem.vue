@@ -18,9 +18,9 @@
 <script>
 
 
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {get} from '@/utils/store-helpers.js';
-import {formatMomentDate} from '@/utils/date';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { get } from '@/utils/store-helpers.js';
+import { formatMomentDate } from '@/utils/date';
 
 const ANNOT = 1;
 const IMAGE = 2;

@@ -8,12 +8,12 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import ActivityLogs from '@/components/utils/ActivityLogs.vue';
 
 export default {
   name: 'user-activity',
-  components: {ActivityLogs},
+  components: { ActivityLogs },
   computed: {
     currentUser: get('currentUser/user')
   }

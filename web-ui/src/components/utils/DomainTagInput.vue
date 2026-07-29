@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { getWildcardRegexp } from '@/utils/string-utils';
 
 export default {
   name: 'domain-tag-input',

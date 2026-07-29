@@ -10,7 +10,7 @@ export default {
       if (!state.selectedLayers) {
         state.selectedLayers = [];
       }
-      state.selectedLayers.push({...layer});
+      state.selectedLayers.push({ ...layer });
     },
 
     removeLayer(state, indexLayer) {
@@ -36,22 +36,22 @@ export default {
   },
 
   actions: {
-    async addLayer({commit}, layer) {
+    async addLayer({ commit }, layer) {
       commit('addLayer', layer);
     },
 
-    toggleLayerVisibility({state, commit}, indexLayer) {
+    toggleLayerVisibility({ state, commit }, indexLayer) {
       commit('toggleLayerVisibility', indexLayer);
       let layer = state.selectedLayers[indexLayer];
       if (!layer.visible) {
-        commit('removeLayerFromSelectedFeatures', {layer});
+        commit('removeLayerFromSelectedFeatures', { layer });
       }
     },
 
-    removeLayer({state, commit}, indexLayer) {
+    removeLayer({ state, commit }, indexLayer) {
       let layer = state.selectedLayers[indexLayer];
       commit('removeLayer', indexLayer);
-      commit('removeLayerFromSelectedFeatures', {layer});
+      commit('removeLayerFromSelectedFeatures', { layer });
     }
   },
 

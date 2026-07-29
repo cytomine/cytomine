@@ -299,7 +299,7 @@
 </template>
 
 <script>
-import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
+import { get, sync, syncMultiselectFilter } from '@/utils/store-helpers';
 import constants from '@/utils/constants.js';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
@@ -308,19 +308,19 @@ import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsBy from './ListAnnotationsBy.vue';
 
-import {Cytomine, ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection} from '@/api';
+import { Cytomine, ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection } from '@/api';
 
-import {defaultColors} from '@/utils/style-utils.js';
+import { defaultColors } from '@/utils/style-utils.js';
 import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect.vue';
-import {getFilename, triggerBlobDownload} from '@/utils/download';
+import { getFilename, triggerBlobDownload } from '@/utils/download';
 
 import _ from 'lodash';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
-const storeOptions = {rootModuleProp: 'storeModule'};
+const storeOptions = { rootModuleProp: 'storeModule' };
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import { appendShortTermToken } from '@/utils/token-utils.js';
 const categoryBatch = constants.CATEGORY_ITEMS_PER_BATCH;
 
 export default {
@@ -343,16 +343,16 @@ export default {
       tracks: [],
 
       allowedSizes: [
-        {label: this.$t('small'), size: 85},
-        {label: this.$t('medium'), size: 125},
-        {label: this.$t('large'), size: 200},
-        {label: this.$t('huge'), size: 400},
+        { label: this.$t('small'), size: 85 },
+        { label: this.$t('medium'), size: 125 },
+        { label: this.$t('large'), size: 200 },
+        { label: this.$t('huge'), size: 400 },
       ],
 
       groupBundling: [
-        {label: this.$t('yes-one-group-per-line'), bundling: 'ONE_PER_LINE'},
-        {label: this.$t('yes'), bundling: 'YES'},
-        {label: this.$t('no'), bundling: 'NO'}
+        { label: this.$t('yes-one-group-per-line'), bundling: 'ONE_PER_LINE' },
+        { label: this.$t('yes'), bundling: 'YES' },
+        { label: this.$t('no'), bundling: 'NO' }
       ],
 
       userAnnotationOption: this.$t('user-annotations'),
@@ -363,15 +363,15 @@ export default {
       imageGroups: [],
       tags:[],
 
-      noTermOption: {id: 0, name: this.$t('no-term')},
-      multipleTermsOption: {id: -1, name: this.$t('multiple-terms')},
+      noTermOption: { id: 0, name: this.$t('no-term') },
+      multipleTermsOption: { id: -1, name: this.$t('multiple-terms') },
 
-      noTrackOption: {id: 0, name: this.$t('no-track')},
-      multipleTracksOption: {id: -1, name: this.$t('multiple-tracks')},
+      noTrackOption: { id: 0, name: this.$t('no-track') },
+      multipleTracksOption: { id: -1, name: this.$t('multiple-tracks') },
 
-      noTagOption: {id: 0, name: this.$t('no-tag')},
+      noTagOption: { id: 0, name: this.$t('no-tag') },
 
-      uncategorizedOption: {id: 0, name: this.$t('uncategorized')},
+      uncategorizedOption: { id: 0, name: this.$t('uncategorized') },
 
       nLoadedOptionsPerCategory: {
         'TERM': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
@@ -385,18 +385,18 @@ export default {
   computed: {
     allowedCategorizations() {
       let categorizations = [
-        {label: this.$t('per-term'), categorization: 'TERM'},
-        {label: this.$t('per-track'), categorization: 'TRACK'},
-        {label: this.$t('per-user'), categorization: 'USER'},
-        {label: this.$t('per-image-group'), categorization: 'IMAGEGROUP'},
+        { label: this.$t('per-term'), categorization: 'TERM' },
+        { label: this.$t('per-track'), categorization: 'TRACK' },
+        { label: this.$t('per-user'), categorization: 'USER' },
+        { label: this.$t('per-image-group'), categorization: 'IMAGEGROUP' },
       ];
 
       if (!this.tooManyImages) {
-        categorizations.push({label: this.$t('per-image'), categorization: 'IMAGE'});
+        categorizations.push({ label: this.$t('per-image'), categorization: 'IMAGE' });
       }
 
       // Adding an uncategorized option at the end of the array
-      categorizations.push({label: this.$t('uncategorized'), categorization: 'UNCATEGORIZED'});
+      categorizations.push({ label: this.$t('uncategorized'), categorization: 'UNCATEGORIZED' });
 
       return categorizations;
     },
@@ -417,8 +417,8 @@ export default {
     },
 
     colors() {
-      let colors = defaultColors.map(color => ({label: this.$t(color.name), ...color}));
-      colors.push({label: this.$t('no-outline'), hexaCode: ''});
+      let colors = defaultColors.map(color => ({ label: this.$t(color.name), ...color }));
+      colors.push({ label: this.$t('no-outline'), hexaCode: '' });
       return colors;
     },
 
@@ -683,7 +683,7 @@ export default {
       this.projectUsers = (await collection.fetchAll()).array;
     },
     async fetchTracks() {
-      this.tracks = (await TrackCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+      this.tracks = (await TrackCollection.fetchAll({ filterKey: 'project', filterValue: this.project.id })).array;
     },
     async fetchTags() {
       this.tags = (await TagCollection.fetchAll()).array;
@@ -695,7 +695,7 @@ export default {
       try {
         const response = await Cytomine.instance.api.get(
           `/project/${this.project.id}/annotations/export`,
-          {responseType: 'blob'},
+          { responseType: 'blob' },
         );
 
         const defaultFilename = `project-${this.project.id}-annotations.geojson`;

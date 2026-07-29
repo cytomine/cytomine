@@ -95,7 +95,7 @@ export default class Cytomine {
    * @returns {{alive, authenticated, version, serverURL, serverID, user}} The data returned by the server
    */
   async ping(project) {
-    let {data} = await this.api.post('server/ping.json', {project});
+    let { data } = await this.api.post('server/ping.json', { project });
 
     return data;
   }
@@ -105,7 +105,7 @@ export default class Cytomine {
    * @returns {boolean} True if the current user is now connected as admin
    */
   async openAdminSession() {
-    let {data} = await this.api.get('session/admin/open.json');
+    let { data } = await this.api.get('session/admin/open.json');
     return data.adminByNow;
   }
 
@@ -114,7 +114,7 @@ export default class Cytomine {
    * @returns {boolean} True if the current user is no longer connected as admin
    */
   async closeAdminSession() {
-    let {data} = await this.api.get('session/admin/close.json');
+    let { data } = await this.api.get('session/admin/close.json');
     return !data.adminByNow;
   }
 
@@ -130,7 +130,7 @@ export default class Cytomine {
       params.project = project;
     }
 
-    let {data} = await this.api.get('custom-ui/config.json', {params});
+    let { data } = await this.api.get('custom-ui/config.json', { params });
     return data;
   }
 
@@ -144,10 +144,10 @@ export default class Cytomine {
    * @param {string} [contentType] The request content type
    * @returns {string} The generated signature
    */
-  async fetchSignature({method, uri, queryString, date, contentMD5, contentType} = {}) {
-    let params = {method, forwardURI: uri, queryString, date, 'content-MD5': contentMD5, 'content-type': contentType};
+  async fetchSignature({ method, uri, queryString, date, contentMD5, contentType } = {}) {
+    let params = { method, forwardURI: uri, queryString, date, 'content-MD5': contentMD5, 'content-type': contentType };
 
-    let {data} = await this.api.get('signature.json', {params});
+    let { data } = await this.api.get('signature.json', { params });
     return data.signature;
   }
 
@@ -158,7 +158,7 @@ export default class Cytomine {
    *          The total count for each model
    */
   async fetchTotalCounts() {
-    let {data} = await this.api.get('stats/all.json');
+    let { data } = await this.api.get('stats/all.json');
     return data;
   }
 
@@ -168,7 +168,7 @@ export default class Cytomine {
    * @returns {{users, projects, mostActiveProject}} Stats related to current activity
    */
   async fetchCurrentStats() {
-    let {data} = await this.api.get('stats/currentStats.json');
+    let { data } = await this.api.get('stats/currentStats.json');
     return data;
   }
 
@@ -178,7 +178,7 @@ export default class Cytomine {
    * @returns {{total, available, used, usedP}} Stats related to the storage
    */
   async fetchStorageStats() {
-    let {data} = await this.api.get('stats/imageserver/total.json');
+    let { data } = await this.api.get('stats/imageserver/total.json');
     return data;
   }
 
@@ -190,7 +190,7 @@ export default class Cytomine {
    * @returns {Array<Object>} The collection of affected models
    */
   async undo(command = null) {
-    let {data} = await this.api.get(`command/${command ? command + '/' : ''}undo.json`);
+    let { data } = await this.api.get(`command/${command ? command + '/' : ''}undo.json`);
     return data.collection;
   }
 
@@ -202,7 +202,7 @@ export default class Cytomine {
    * @returns {Array<Object>} The collection of affected models
    */
   async redo(command = null) {
-    let {data} = await this.api.get(`command/${command ? command + '/' : ''}redo.json`);
+    let { data } = await this.api.get(`command/${command ? command + '/' : ''}redo.json`);
     return data.collection;
   }
 }

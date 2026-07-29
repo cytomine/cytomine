@@ -24,7 +24,7 @@
 export default {
   name: 'StringField',
   props: {
-    parameter: {type: Object, required: true},
+    parameter: { type: Object, required: true },
     value: {},
   },
   computed: {
@@ -40,11 +40,11 @@ export default {
       return this.parameter.type;
     },
     hasConstraints() {
-      let {minLength, maxLength} = this.type;
+      let { minLength, maxLength } = this.type;
       return minLength !== null || maxLength !== null;
     },
     constraintsSummary() {
-      let {minLength, maxLength} = this.type;
+      let { minLength, maxLength } = this.type;
       let summary = '';
       if (!!minLength || minLength === 0) {
         summary += `${minLength} ≤ `;
@@ -68,7 +68,7 @@ export default {
       return this.parameter.description;
     },
     min() {
-      let {minLength} = this.type;
+      let { minLength } = this.type;
       if (!!minLength || minLength === 0) {
         return minLength;
       }
@@ -76,7 +76,7 @@ export default {
       return 0;
     },
     max() {
-      let {maxLength} = this.type;
+      let { maxLength } = this.type;
       if (!!maxLength || maxLength === 0) {
         return maxLength;
       }

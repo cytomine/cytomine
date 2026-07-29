@@ -4,7 +4,7 @@
   {{displayFullName ? resolvedUser.fullName : resolvedUser.username}}</span></template>
 
 <script>
-import {User} from '@/api';
+import { User } from '@/api';
 
 export default {
   // eslint-disable-next-line
@@ -12,8 +12,8 @@ export default {
   props: {
     user: Object,
     id: Number, // if user not set, the user corresponding to the provided id will be fetched
-    online: {type: Boolean, default: null},
-    displayFullName: {type: Boolean, default: true}
+    online: { type: Boolean, default: null },
+    displayFullName: { type: Boolean, default: true }
   },
   data() {
     return {

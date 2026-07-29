@@ -1,8 +1,8 @@
-import {ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance,
-  CompanionFileCollection, ImageGroupImageInstanceCollection, ImageGroup} from '@/api';
+import { ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance,
+  CompanionFileCollection, ImageGroupImageInstanceCollection, ImageGroup } from '@/api';
 
 import constants from '@/utils/constants';
-import {slicePositionToRank} from '@/utils/slice-utils';
+import { slicePositionToRank } from '@/utils/slice-utils';
 
 import colors from './image_modules/colors';
 import draw from './image_modules/draw';
@@ -72,7 +72,7 @@ export default {
 
     setSliceInstances(state, slices) {
       state.sliceInstances = Object.assign(
-        {}, state.sliceInstances, slices.reduce((acc, v) => ({...acc, [v.rank]: v}), {})
+        {}, state.sliceInstances, slices.reduce((acc, v) => ({ ...acc, [v.rank]: v }), {})
       );
     },
 
@@ -109,7 +109,7 @@ export default {
   },
 
   actions: {
-    async initialize({commit, dispatch}, {image, slices}) {
+    async initialize({ commit, dispatch }, { image, slices }) {
       let clone = image.clone();
       commit('setImageInstance', clone);
 
@@ -119,32 +119,32 @@ export default {
       await Promise.all([
         dispatch('fetchProfile'),
         dispatch('fetchImageGroup'),
-        dispatch('fetchSliceInstancesAround', {rank: clone[0].rank})
+        dispatch('fetchSliceInstancesAround', { rank: clone[0].rank })
       ]);
     },
-    async setImageInstance({dispatch, rootState}, {image, slices}) {
-      await dispatch('initialize', {image, slices});
+    async setImageInstance({ dispatch, rootState }, { image, slices }) {
+      await dispatch('initialize', { image, slices });
       let idProject = rootState.currentProject.project.id;
       let idViewer = rootState.currentProject.currentViewer;
-      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
+      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, { root: true });
     },
 
-    async setActiveSlice({commit, dispatch, rootState}, slice) {
+    async setActiveSlice({ commit, dispatch, rootState }, slice) {
       let idProject = rootState.currentProject.project.id;
       let idViewer = rootState.currentProject.currentViewer;
       commit('setActiveSlice', slice);
-      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
-      await dispatch('fetchSliceInstancesAround', {rank: slice.rank});
+      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, { root: true });
+      await dispatch('fetchSliceInstancesAround', { rank: slice.rank });
     },
-    async setActiveSliceByPosition({state, dispatch}, {channel, zStack, time}) {
-      let rank = slicePositionToRank({channel, zStack, time}, state.imageInstance);
+    async setActiveSliceByPosition({ state, dispatch }, { channel, zStack, time }) {
+      let rank = slicePositionToRank({ channel, zStack, time }, state.imageInstance);
       await dispatch('setActiveSliceByRank', rank);
     },
-    async setActiveSlicesByPosition({state, dispatch}, {channels, zStack, time}) {
-      let ranks = channels.map(channel => slicePositionToRank({channel, zStack, time}, state.imageInstance));
+    async setActiveSlicesByPosition({ state, dispatch }, { channels, zStack, time }) {
+      let ranks = channels.map(channel => slicePositionToRank({ channel, zStack, time }, state.imageInstance));
       await dispatch('setActiveSlicesByRank', ranks);
     },
-    async addActiveSliceChannel({state, dispatch}, {channel}) {
+    async addActiveSliceChannel({ state, dispatch }, { channel }) {
       let activeSlice = state.activeSlices[0];
       let ranks = state.activeSlices.map(s => s.rank);
       ranks.push(slicePositionToRank({
@@ -152,7 +152,7 @@ export default {
       }, state.imageInstance));
       await dispatch('setActiveSlicesByRank', ranks);
     },
-    async removeActiveSliceChannel({state, dispatch}, {channel}) {
+    async removeActiveSliceChannel({ state, dispatch }, { channel }) {
       let channels = state.activeSlices.map(s => s.channel).filter(c => c !== channel);
       let activeSlice = state.activeSlices[0];
       let ranks = channels.map(channel => slicePositionToRank({
@@ -160,23 +160,23 @@ export default {
       }, state.imageInstance));
       await dispatch('setActiveSlicesByRank', ranks);
     },
-    async setActiveSliceByRank({state, commit, dispatch, rootState}, rank) {
+    async setActiveSliceByRank({ state, commit, dispatch, rootState }, rank) {
       let slice = state.sliceInstances[rank];
       if (!slice) {
-        await dispatch('fetchSliceInstancesAround', {rank, setActive: true});
+        await dispatch('fetchSliceInstancesAround', { rank, setActive: true });
       } else {
         commit('setActiveSlice', slice);
       }
 
       let idProject = rootState.currentProject.project.id;
       let idViewer = rootState.currentProject.currentViewer;
-      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
+      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, { root: true });
     },
-    async setActiveSlicesByRank({state, commit, dispatch, rootState}, ranks) {
+    async setActiveSlicesByRank({ state, commit, dispatch, rootState }, ranks) {
       let slices = await Promise.all(ranks.map(async rank => {
         let slice = state.sliceInstances[rank];
         if (!slice) {
-          await dispatch('fetchSliceInstancesAround', {rank, setActive: false});
+          await dispatch('fetchSliceInstancesAround', { rank, setActive: false });
           slice = state.sliceInstances[rank];
         }
         return slice;
@@ -185,10 +185,10 @@ export default {
 
       let idProject = rootState.currentProject.project.id;
       let idViewer = rootState.currentProject.currentViewer;
-      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, {root: true});
+      dispatch(`projects/${idProject}/viewers/${idViewer}/changePath`, null, { root: true });
     },
 
-    async refreshData({state, commit, dispatch}) {
+    async refreshData({ state, commit, dispatch }) {
       await Promise.all([
         ImageInstance.fetch(state.imageInstance.id).then(
           image => commit('setImageInstance', image)
@@ -203,11 +203,11 @@ export default {
       await Promise.all([
         dispatch('fetchProfile'),
         dispatch('fetchImageGroup'),
-        dispatch('fetchSliceInstancesAround', {rank: state.activeSlices[0].rank})
+        dispatch('fetchSliceInstancesAround', { rank: state.activeSlices[0].rank })
       ]);
     },
 
-    async fetchProfile({state, commit}) {
+    async fetchProfile({ state, commit }) {
       let image = state.imageInstance;
       let profile = (await CompanionFileCollection.fetchAll({
         filterKey: 'abstractimage',
@@ -216,7 +216,7 @@ export default {
       commit('setProfile', profile);
     },
 
-    async fetchImageGroup({state, commit}) {
+    async fetchImageGroup({ state, commit }) {
       let image = state.imageInstance;
       let groupLinks = (await ImageGroupImageInstanceCollection.fetchAll({
         filterKey: 'imageinstance',
@@ -231,9 +231,9 @@ export default {
       }
     },
 
-    async fetchSliceInstancesAround({state, commit}, {rank, setActive = false}) {
+    async fetchSliceInstancesAround({ state, commit }, { rank, setActive = false }) {
       let promises = [];
-      let props = {filterKey: 'imageinstance', filterValue: state.imageInstance.id, max: constants.PRELOADED_SLICES};
+      let props = { filterKey: 'imageinstance', filterValue: state.imageInstance.id, max: constants.PRELOADED_SLICES };
 
       let page = findRankPage(rank);
       if (!state.loadedSlicePages.includes(page)) {

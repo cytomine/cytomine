@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import GeneralConfiguration from './configuration-panels/GeneralConfiguration.vue';
 import ProjectMembers from './configuration-panels/ProjectMembers.vue';

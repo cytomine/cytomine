@@ -33,15 +33,15 @@
 </template>
 
 <script>
-import {Cytomine} from '@/api';
-import {updateToken} from '@/utils/token-utils';
+import { Cytomine } from '@/api';
+import { updateToken } from '@/utils/token-utils';
 
 export default {
   name: 'TaskRunParametersTable',
   props: {
-    parameters: {type: Array, default: () => []},
-    projectId: {type: Number, required: true},
-    type: {type: String, required: true}
+    parameters: { type: Array, default: () => [] },
+    projectId: { type: Number, required: true },
+    type: { type: String, required: true }
   },
   methods: {
     async download(data, name) {

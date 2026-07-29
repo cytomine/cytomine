@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Model from './model';
 import Task from './task';
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 
 export default class TaskRun extends Model {
   static get STATES() {
@@ -53,7 +53,7 @@ export default class TaskRun extends Model {
   }
 
   static async fetchByProject(projectId) {
-    let {data} = await Cytomine.instance.api.get(`project/${projectId}/task-runs`);
+    let { data } = await Cytomine.instance.api.get(`project/${projectId}/task-runs`);
     return data;
   }
 
@@ -71,18 +71,18 @@ export default class TaskRun extends Model {
 
   // Step-2: Provision task / user inputs
   async batchProvisionTask(params) {
-    let {data} = await Cytomine.instance.api.put(`${this.uri}/input-provisions`, params);
+    let { data } = await Cytomine.instance.api.put(`${this.uri}/input-provisions`, params);
     return data;
   }
 
   async singleProvisionTask(paramName, param) {
-    let {data} = Cytomine.instance.api.put(`${this.uri}/input-provisions/${paramName}`, param);
+    let { data } = Cytomine.instance.api.put(`${this.uri}/input-provisions/${paramName}`, param);
     return data;
   }
 
   // Step-3 Run/Execute the Provisioned Task
   async start() {
-    let {data} = await Cytomine.instance.api.post(`${this.uri}/state-actions`, {'desired': 'RUNNING'});
+    let { data } = await Cytomine.instance.api.post(`${this.uri}/state-actions`, { 'desired': 'RUNNING' });
     return data;
   }
 
@@ -109,7 +109,7 @@ export default class TaskRun extends Model {
   }
 
   async fetchSingleIO(parameterName, type) {
-    let {data} = await Cytomine.instance.api.get(`${this.uri}/${type}/${parameterName}`, {responseType: 'arraybuffer'});
+    let { data } = await Cytomine.instance.api.get(`${this.uri}/${type}/${parameterName}`, { responseType: 'arraybuffer' });
     return data;
   }
 

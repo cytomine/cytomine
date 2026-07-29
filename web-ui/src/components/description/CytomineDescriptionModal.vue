@@ -77,7 +77,7 @@ export default {
         this.$parent.close();
       } catch (error) {
         this.descriptionContent = this.description.data;
-        this.$notify({type: 'error', text: this.$t('notif-error-update-description')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-update-description') });
       }
     }
   },

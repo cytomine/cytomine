@@ -1,5 +1,5 @@
-import {createGeoJsonFmt} from 'vuelayers/lib/ol-ext/format';
-import {annotBelongsToLayer} from '@/utils/annotation-utils';
+import { createGeoJsonFmt } from 'vuelayers/lib/ol-ext/format';
+import { annotBelongsToLayer } from '@/utils/annotation-utils';
 
 export default {
   state() {
@@ -9,7 +9,7 @@ export default {
       annotsToSelect: [],
       showComments: null, // set to the identifier of an annotation to automatically open comments modal if this annotation if the first to be selected
       displayAnnotDetails: true,
-      positionAnnotDetails: {x: 0, y: 0},
+      positionAnnotDetails: { x: 0, y: 0 },
       showSimilarAnnotations: false,
       similarAnnotations: null,
       queryAnnotation: null,
@@ -44,13 +44,13 @@ export default {
       state.selectedFeatures.push(createGeoJsonFmt().writeFeatureObject(feature));
     },
 
-    changeAnnotSelectedFeature(state, {indexFeature, annot}) {
+    changeAnnotSelectedFeature(state, { indexFeature, annot }) {
       if (state.selectedFeatures[indexFeature]) {
         state.selectedFeatures[indexFeature].properties.annot = annot;
       }
     },
 
-    removeLayerFromSelectedFeatures(state, {layer, cache = false}) {
+    removeLayerFromSelectedFeatures(state, { layer, cache = false }) {
       let selectedFeatures = state.selectedFeatures;
       for (let index = selectedFeatures.length - 1; index >= 0; index--) {
         let feature = selectedFeatures[index];
@@ -68,7 +68,7 @@ export default {
       }
     },
 
-    removeTermFromSelectedFeatures(state, {idTerm, terms}) { // idTerm: id of the term no longer displayed
+    removeTermFromSelectedFeatures(state, { idTerm, terms }) { // idTerm: id of the term no longer displayed
       state.selectedFeatures = state.selectedFeatures.filter(feature => {
         let annot = feature.properties.annot;
         if (!annot.term.includes(idTerm)) {
@@ -116,20 +116,20 @@ export default {
   },
 
   actions: {
-    selectFeature({commit}, feature) {
+    selectFeature({ commit }, feature) {
       commit('clearSelectedFeatures');
       commit('selectFeature', feature);
     },
 
-    setImageInstance({commit}) {
+    setImageInstance({ commit }) {
       commit('clearSelectedFeatures');
     },
 
-    setActiveSlice({commit}) {
+    setActiveSlice({ commit }) {
       commit('clearSelectedFeatures');
     },
 
-    setActiveSlices({commit}) {
+    setActiveSlices({ commit }) {
       commit('clearSelectedFeatures');
     },
   },

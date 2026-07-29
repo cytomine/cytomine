@@ -58,8 +58,8 @@
 import eventBus from '@/utils/event-bus';
 
 import _ from 'lodash';
-import {get} from '@/utils/store-helpers';
-import {Cytomine, ProjectDefaultLayerCollection} from '@/api';
+import { get } from '@/utils/store-helpers';
+import { Cytomine, ProjectDefaultLayerCollection } from '@/api';
 
 export default {
   name: 'layers-panel',
@@ -125,7 +125,7 @@ export default {
       return this.image.inReview || this.image.reviewed;
     },
     reviewLayer() {
-      return {id: -1, isReview: true};
+      return { id: -1, isReview: true };
     },
     reviewMode() {
       return this.imageWrapper.review.reviewMode;
@@ -195,7 +195,7 @@ export default {
         this.fetchIndexLayers();
       }
     },
-    reloadAnnotationsHandler({idImage} = {}) {
+    reloadAnnotationsHandler({ idImage } = {}) {
       if (!idImage || idImage === this.image.id) {
         this.fetchIndexLayers();
       }
@@ -279,7 +279,7 @@ export default {
           countAnnotation: a.countAnnotation + b.countAnnotation,
           countReviewedAnnotation: a.countReviewedAnnotation + b.countReviewedAnnotation
         };
-      }, {user: userIndexLayers[0].user, countAnnotation: 0, countReviewedAnnotation: 0}));
+      }, { user: userIndexLayers[0].user, countAnnotation: 0, countReviewedAnnotation: 0 }));
       // ----
     },
 
@@ -313,15 +313,15 @@ export default {
     } catch (error) {
       console.log(error);
       this.error = true;
-      this.$notify({type: 'error', text: this.$t('notif-error-loading-annotation-layers')});
+      this.$notify({ type: 'error', text: this.$t('notif-error-loading-annotation-layers') });
       return;
     }
 
-    let layersToAdd = this.layersToPreload.map(id => ({id, visible: true}));
+    let layersToAdd = this.layersToPreload.map(id => ({ id, visible: true }));
 
     if (!this.imageWrapper.layers.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
       if (!this.layersToPreload.includes(this.currentUser.id)) {
-        layersToAdd.push({id: this.currentUser.id, visible: true});
+        layersToAdd.push({ id: this.currentUser.id, visible: true });
       }
 
       try {
@@ -332,9 +332,9 @@ export default {
 
         let addedIds = layersToAdd.map(layer => layer.id);
 
-        defaultLayers.array.forEach(({user, hideByDefault}) => {
+        defaultLayers.array.forEach(({ user, hideByDefault }) => {
           if (!addedIds.includes(user)) {
-            layersToAdd.push({id: user, visible: !hideByDefault});
+            layersToAdd.push({ id: user, visible: !hideByDefault });
           }
         });
       } catch (error) {

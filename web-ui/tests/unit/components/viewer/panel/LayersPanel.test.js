@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import LayersPanel from '@/components/viewer/panels/LayersPanel.vue';
 
@@ -10,8 +10,8 @@ vi.mock('@/api', () => ({
       api: {
         get: vi.fn(() => Promise.resolve({
           data: [
-            {'id': 142, 'name': 'task-run-f3e78101-d123-4c0c-8c05-4ca64232023c'},
-            {'id': 283, 'name': 'task-run-f3e78101-d123-4c0c-8c05-4ca64232023c'},
+            { 'id': 142, 'name': 'task-run-f3e78101-d123-4c0c-8c05-4ca64232023c' },
+            { 'id': 283, 'name': 'task-run-f3e78101-d123-4c0c-8c05-4ca64232023c' },
           ]
         }))
       }
@@ -21,14 +21,14 @@ vi.mock('@/api', () => ({
 
 describe('LayersPanel.vue', () => {
   const mockImageWrapper = {
-    imageInstance: {id: 42, name: 'mock-image'},
+    imageInstance: { id: 42, name: 'mock-image' },
     activeSlices: [
       {
         id: 1,
         fetchAnnotationsIndex: vi.fn(() =>
           Promise.resolve([
-            {id: 'a1', user: 10, name: 'annotation-1'},
-            {id: 'a2', user: 11, name: 'annotation-2'},
+            { id: 'a1', user: 10, name: 'annotation-1' },
+            { id: 'a2', user: 11, name: 'annotation-2' },
           ])
         ),
       },
@@ -36,8 +36,8 @@ describe('LayersPanel.vue', () => {
         id: 2,
         fetchAnnotationsIndex: vi.fn(() =>
           Promise.resolve([
-            {id: 'b1', user: 10, name: 'annotation-3'},
-            {id: 'b2', user: 12, name: 'annotation-4'},
+            { id: 'b1', user: 10, name: 'annotation-3' },
+            { id: 'b2', user: 12, name: 'annotation-4' },
           ])
         ),
       },
@@ -47,7 +47,7 @@ describe('LayersPanel.vue', () => {
       layersOpacity: 0.7,
     },
     layers: {
-      selectedLayers: [{id: 10, fullName: 'User A'}],
+      selectedLayers: [{ id: 10, fullName: 'User A' }],
     },
     review: {
       reviewMode: false,
@@ -62,18 +62,18 @@ describe('LayersPanel.vue', () => {
       id: 1000,
       name: 'Cloned Project',
     })),
-    fetchUserLayers: vi.fn(() => ({array: []})),
+    fetchUserLayers: vi.fn(() => ({ array: [] })),
   };
 
   const createWrapper = (options = {}) => {
-    const {imageWrapper = mockImageWrapper} = options;
+    const { imageWrapper = mockImageWrapper } = options;
 
     const defaultStore = {
       commit: vi.fn(),
       getters: {
         'currentProject/canEditLayer': () => () => true,
         'currentProject/project': mockProject,
-        'currentProject/currentViewer': {images: [imageWrapper]},
+        'currentProject/currentViewer': { images: [imageWrapper] },
         'currentProject/imageModule': vi.fn(() => 'mock-module/'),
       },
       state: {
@@ -122,7 +122,7 @@ describe('LayersPanel.vue', () => {
     const wrapper = createWrapper({
       imageWrapper: {
         ...mockImageWrapper,
-        layers: {selectedLayers: []},
+        layers: { selectedLayers: [] },
       },
     });
 

@@ -1,5 +1,5 @@
 import * as utils from './utils.js';
-import {Ontology, OntologyCollection, TermCollection} from '@/index.js';
+import { Ontology, OntologyCollection, TermCollection } from '@/index.js';
 
 describe('Ontology', () => {
 
@@ -14,7 +14,7 @@ describe('Ontology', () => {
 
   describe('Create', () => {
     it('Create', async () => {
-      ontology = new Ontology({name});
+      ontology = new Ontology({ name });
       ontology = await ontology.save();
       id = ontology.id;
       expect(id).toBeDefined();
@@ -49,7 +49,7 @@ describe('Ontology', () => {
     });
 
     it('Fetch with instance method', async () => {
-      let fetchedOntology = await new Ontology({id}).fetch();
+      let fetchedOntology = await new Ontology({ id }).fetch();
       expect(fetchedOntology).toBeInstanceOf(Ontology);
       expect(fetchedOntology.name).toEqual(name);
     });
@@ -90,7 +90,7 @@ describe('Ontology', () => {
     beforeAll(async () => {
       let ontologyPromises = [];
       for (let i = 0; i < nbOntologies; i++) {
-        ontologyPromises.push(new Ontology({name: utils.randomString()}).save());
+        ontologyPromises.push(new Ontology({ name: utils.randomString() }).save());
       }
       ontologies = await Promise.all(ontologyPromises);
     });
@@ -115,7 +115,7 @@ describe('Ontology', () => {
       });
 
       it('Fetch light version', async () => {
-        let collection = await OntologyCollection.fetchAll({light: true});
+        let collection = await OntologyCollection.fetchAll({ light: true });
         expect(collection).toBeInstanceOf(OntologyCollection);
         expect(collection).toHaveLength(totalNb);
         let model = collection.get(0);
@@ -125,7 +125,7 @@ describe('Ontology', () => {
       });
 
       it('Fetch with several requests', async () => {
-        let collection = await OntologyCollection.fetchAll({nbPerPage: Math.ceil(totalNb / 3)});
+        let collection = await OntologyCollection.fetchAll({ nbPerPage: Math.ceil(totalNb / 3) });
         expect(collection).toBeInstanceOf(OntologyCollection);
         expect(collection).toHaveLength(totalNb);
       });
@@ -156,19 +156,19 @@ describe('Ontology', () => {
       let nbPerPage = 1;
 
       it('Fetch arbitrary page', async () => {
-        let collection = new OntologyCollection({nbPerPage});
+        let collection = new OntologyCollection({ nbPerPage });
         await collection.fetchPage(2);
         expect(collection).toHaveLength(nbPerPage);
       });
 
       it('Fetch next page', async () => {
-        let collection = new OntologyCollection({nbPerPage});
+        let collection = new OntologyCollection({ nbPerPage });
         await collection.fetchNextPage();
         expect(collection).toHaveLength(nbPerPage);
       });
 
       it('Fetch previous page', async () => {
-        let collection = new OntologyCollection({nbPerPage});
+        let collection = new OntologyCollection({ nbPerPage });
         collection.curPage = 2;
         await collection.fetchPreviousPage();
         expect(collection).toHaveLength(nbPerPage);

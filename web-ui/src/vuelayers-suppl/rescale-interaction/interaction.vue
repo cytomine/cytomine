@@ -4,12 +4,12 @@ import RescaleFeatureInteraction from 'ol-rescale-feature';
 import observableFromOlEvent from 'vuelayers/lib/rx-ext/from-ol-event';
 import interaction from 'vuelayers/lib/mixin/interaction';
 import stylesContainer from 'vuelayers/lib/mixin/styles-container';
-import {defaultEditStyle, createStyle} from 'vuelayers/lib/ol-ext/style';
-import {isCollection, isVectorSource} from 'vuelayers/lib/ol-ext/util';
-import {mapValues, isFunction} from 'vuelayers/lib/util/minilo';
+import { defaultEditStyle, createStyle } from 'vuelayers/lib/ol-ext/style';
+import { isCollection, isVectorSource } from 'vuelayers/lib/ol-ext/util';
+import { mapValues, isFunction } from 'vuelayers/lib/util/minilo';
 import mergeDescriptors from 'vuelayers/lib/util/multi-merge-descriptors';
-import {hasInteraction} from 'vuelayers/lib/util/assert';
-import {makeWatchers} from 'vuelayers/lib/util/vue-helpers';
+import { hasInteraction } from 'vuelayers/lib/util/assert';
+import { makeWatchers } from 'vuelayers/lib/util/vue-helpers';
 
 /**
  * @vueProps

@@ -31,19 +31,19 @@ export default [
     rules: {
       'array-bracket-spacing': ['error', 'never'],
       'brace-style': ['error', '1tbs'],
-      'camelcase': ['error', {allow: ['$_veeValidate']}],
+      'camelcase': ['error', { allow: ['$_veeValidate'] }],
       'curly': ['error', 'all'],
       'eqeqeq': ['error', 'smart'],
-      'indent': ['error', 2, {'SwitchCase': 1, 'ignoredNodes': ['TemplateLiteral']}],
+      'indent': ['error', 2, { 'SwitchCase': 1, 'ignoredNodes': ['TemplateLiteral'] }],
       'keyword-spacing': ['error'],
       'no-console': ['off'],
       'no-redeclare': ['error'],
       'no-undef': ['error'],
-      'no-unused-vars': ['error', {caughtErrors: 'none'}],
+      'no-unused-vars': ['error', { caughtErrors: 'none' }],
       'no-useless-assignment': ['off'],
       'no-var': ['error'],
-      'object-curly-spacing': ['error'],
-      'quotes': ['error', 'single', {'avoidEscape': true}],
+      'object-curly-spacing': ['error', 'always'],
+      'quotes': ['error', 'single', { 'avoidEscape': true }],
       'semi': ['error', 'always'],
       'space-before-blocks': ['error', 'always'],
       'space-before-function-paren': ['error', {
@@ -58,7 +58,7 @@ export default [
   },
   {
     files: ['tests/**/*.js', 'tests/**/*.vue'],
-    plugins: {vitest},
+    plugins: { vitest },
     rules: {
       ...vitest.configs.recommended.rules,
       'vitest/expect-expect': 'off',

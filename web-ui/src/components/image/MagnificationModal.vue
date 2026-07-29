@@ -27,11 +27,11 @@ import CytomineModal from '@/components/utils/CytomineModal.vue';
 export default {
   name: 'magnification-modal',
   props: {
-    active: {type: Boolean},
-    image: {type: Object}
+    active: { type: Boolean },
+    image: { type: Object }
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       newMagnification: ''
@@ -42,7 +42,7 @@ export default {
       return this.$store.state.currentProject.project.blindMode;
     },
     fieldType() {
-      return {'is-danger': this.errors.has('magnification')};
+      return { 'is-danger': this.errors.has('magnification') };
     }
   },
   watch: {
@@ -69,13 +69,13 @@ export default {
 
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-magnification-update', {imageName})
+          text: this.$t('notif-success-magnification-update', { imageName })
         });
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-magnification-update', {imageName})
+          text: this.$t('notif-error-magnification-update', { imageName })
         });
       }
       this.$emit('update:active', false);

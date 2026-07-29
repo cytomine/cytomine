@@ -64,8 +64,8 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {ProjectCollection} from '@/api';
+import { get } from '@/utils/store-helpers';
+import { ProjectCollection } from '@/api';
 
 export default {
   props: {

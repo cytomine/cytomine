@@ -18,7 +18,7 @@ export default {
     setDisplayType(state, value) {
       state.displayType = value;
     },
-    setCurrentPage(state, {prop, page}) {
+    setCurrentPage(state, { prop, page }) {
       Vue.set(state.currentPages, prop, page);
     },
     setSelectedTermsIds(state, termsIds) {

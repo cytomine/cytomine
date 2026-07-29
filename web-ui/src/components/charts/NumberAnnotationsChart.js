@@ -1,12 +1,12 @@
-import {Bar} from 'vue-chartjs';
+import { Bar } from 'vue-chartjs';
 
-import {AnnotationType} from '@/api';
-import {formatMomentDate} from '@/utils/date';
+import { AnnotationType } from '@/api';
+import { formatMomentDate } from '@/utils/date';
 export default {
   name: 'number-annotations-chart',
-  components: {Bar},
+  components: { Bar },
   props: {
-    cssClasses: {type: String, default: ''},
+    cssClasses: { type: String, default: '' },
     project: Object,
     term: Number,
     startDate: Number,
@@ -80,7 +80,7 @@ export default {
   },
   methods: {
     async fetchAnnotationsEvolution(type) {
-      this.annotationsEvolution[type] = await this.project.fetchAnnotationsEvolution({annotationType: type, ...this.queryParams});
+      this.annotationsEvolution[type] = await this.project.fetchAnnotationsEvolution({ annotationType: type, ...this.queryParams });
     },
     async fetchData() {
       await Promise.all([
@@ -103,7 +103,7 @@ export default {
     await this.fetchData();
   },
   render(h) {
-    return h('div', {class: this.cssClasses}, [
+    return h('div', { class: this.cssClasses }, [
       h(Bar, {
         props: {
           data: this.chartData,

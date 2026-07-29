@@ -44,7 +44,7 @@ export default class UserPosition extends Model {
    */
   static async fetchLastPosition(imageInstance, user, broadcast = false) {
     let uri = `imageinstance/${imageInstance}/position/${user}.json${broadcast ? '?broadcast=true' : ''}`;
-    let {data} = await Cytomine.instance.api.get(uri);
+    let { data } = await Cytomine.instance.api.get(uri);
     return new this(data);
   }
 
@@ -67,11 +67,11 @@ export default class UserPosition extends Model {
 
     if (position.slice) {
       let slice = position.slice;
-      let {data} = await Cytomine.instance.api.post(`sliceinstance/${slice}/position.json`, position);
+      let { data } = await Cytomine.instance.api.post(`sliceinstance/${slice}/position.json`, position);
       return new this(data);
     } else {
       let image = position.image;
-      let {data} = await Cytomine.instance.api.post(`imageinstance/${image}/position.json`, position);
+      let { data } = await Cytomine.instance.api.post(`imageinstance/${image}/position.json`, position);
       return new this(data);
     }
   }

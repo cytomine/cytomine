@@ -149,18 +149,18 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {changeLanguageMixin} from '@/lang.js';
-import {MyAccount, User} from '@/api';
-import {rolesMapping} from '@/utils/role-utils';
-import {KeycloakRole, UserRole} from '@/constants/UserRole.js';
+import { get } from '@/utils/store-helpers';
+import { changeLanguageMixin } from '@/lang.js';
+import { MyAccount, User } from '@/api';
+import { rolesMapping } from '@/utils/role-utils';
+import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
 import copyToClipboard from 'copy-to-clipboard';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   // eslint-disable-next-line
   name: 'Account',
-  $_veeValidate: {validator: 'new'},
+  $_veeValidate: { validator: 'new' },
   mixins: [changeLanguageMixin],
   data() {
     return {
@@ -171,10 +171,10 @@ export default {
       apiKeysError: null,
       loading: true,
       languages: [
-        {value: 'en', name:'English'},
-        {value: 'fr', name:'Français'},
-        {value: 'es', name:'Español'},
-        {value: 'nl', name:'Nederlands'},
+        { value: 'en', name:'English' },
+        { value: 'fr', name:'Français' },
+        { value: 'es', name:'Español' },
+        { value: 'nl', name:'Nederlands' },
       ],
     };
   },
@@ -213,29 +213,29 @@ export default {
       try {
         await this.$store.dispatch('currentUser/updateAccount', this.updatedAccount);
         this.changeLanguage(this.currentAccount.locale);
-        this.$notify({type: 'success', text: this.$t('notif-success-user-details-saved')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-user-details-saved') });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-user-details-not-saved')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-user-details-not-saved') });
       }
     },
 
     updatePassword() {
-      this.$keycloak.login({action: this.passwordCredentials.updateAction});
+      this.$keycloak.login({ action: this.passwordCredentials.updateAction });
     },
 
 
     copy(value) {
       copyToClipboard(value);
-      this.$notify({type: 'success', text: this.$t('notif-success-key-copied')});
+      this.$notify({ type: 'success', text: this.$t('notif-success-key-copied') });
     },
 
     async regenerateKeys() {
       try {
         this.apiKeys = await User.regenerateKeys();
-        this.$notify({type: 'success', text: this.$t('notif-success-keys-regenerated')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-keys-regenerated') });
       } catch (err) {
-        this.$notify({type: 'error', text: this.$t('notif-error-keys-not-regenerated')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-keys-not-regenerated') });
       }
     }
   },

@@ -149,14 +149,14 @@ import eventBus from '@/utils/event-bus';
 import CytomineSlider from '@/components/form/CytomineSlider.vue';
 import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons.vue';
 
-import {formatMinutesSeconds, slicePositionToRank} from '@/utils/slice-utils.js';
+import { formatMinutesSeconds, slicePositionToRank } from '@/utils/slice-utils.js';
 import constants from '@/utils/constants';
 import _ from 'lodash';
 import ChannelName from '@/components/viewer/ChannelName.vue';
 
 export default {
   name: 'image-controls',
-  components: {ChannelName, ImageControlsShiftButtons, CytomineSlider},
+  components: { ChannelName, ImageControlsShiftButtons, CytomineSlider },
   props: {
     index: String
   },
@@ -249,7 +249,7 @@ export default {
       return true; // TODO [EXPERIMENTAL - large set of merged channels]
     },
     channelOptions() {
-      return this.channels.map(channel => ({value: [channel.index], ...channel}));
+      return this.channels.map(channel => ({ value: [channel.index], ...channel }));
     },
     orderedCurrentChannels() {
       return [...this.currentChannelsIndexes].sort((a, b) => a - b).map(channelIndex =>
@@ -298,11 +298,11 @@ export default {
 
     async goToRank(rank) {
       await this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', rank);
-      eventBus.emit('reloadAnnotations', {idImage: this.image.id});
+      eventBus.emit('reloadAnnotations', { idImage: this.image.id });
     },
     async seek(channels, zStack, time) {
-      await this.$store.dispatch(this.imageModule + 'setActiveSlicesByPosition', {channels, zStack, time});
-      eventBus.emit('reloadAnnotations', {idImage: this.image.id});
+      await this.$store.dispatch(this.imageModule + 'setActiveSlicesByPosition', { channels, zStack, time });
+      eventBus.emit('reloadAnnotations', { idImage: this.image.id });
     },
     async shift(dimension, increment) {
       let time = (dimension === 'time') ? this.currentTimeIndex + increment : this.currentTimeIndex;

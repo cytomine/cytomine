@@ -22,15 +22,15 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 
 export default {
   name: 'image-group-preview',
-  components: {ImageThumbnail},
+  components: { ImageThumbnail },
   props: {
-    imageGroup: {type: Object},
+    imageGroup: { type: Object },
   },
   computed: {
     shortTermToken: get('currentUser/shortTermToken'),

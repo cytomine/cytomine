@@ -109,11 +109,11 @@
 </template>
 
 <script>
-import {quillEditor} from 'vue-quill-editor';
+import { quillEditor } from 'vue-quill-editor';
 
 export default {
   name: 'cytomine-quill-editor',
-  components: {quillEditor},
+  components: { quillEditor },
   props: {
     value: String,
     placeholder: String

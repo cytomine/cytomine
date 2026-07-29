@@ -19,7 +19,7 @@ export default {
   name: 'image-name',
   props: {
     image: Object,
-    showBothNames: {type: Boolean, default: false}
+    showBothNames: { type: Boolean, default: false }
   }
 };
 </script>

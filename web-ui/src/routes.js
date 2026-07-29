@@ -156,35 +156,35 @@ const routes = [
   },
 
   // redirections for old URLS
-  {path: '/userdashboard', redirect: '/'},
-  {path: '/project', redirect: '/projects'},
-  {path: '/explorer', redirect: '/'},
-  {path: '/upload', redirect: '/storage'},
+  { path: '/userdashboard', redirect: '/' },
+  { path: '/project', redirect: '/projects' },
+  { path: '/explorer', redirect: '/' },
+  { path: '/upload', redirect: '/storage' },
 
-  {path: '/activity', redirect: '/'},
-  {path: '/activity-:idProject-', redirect: '/project/:idProject/activity'},
-  {path: '/activity-:idProject-:idUser', redirect: '/project/:idProject/activity/user/:idUser'},
+  { path: '/activity', redirect: '/' },
+  { path: '/activity-:idProject-', redirect: '/project/:idProject/activity' },
+  { path: '/activity-:idProject-:idUser', redirect: '/project/:idProject/activity/user/:idUser' },
 
-  {path: '/search-', redirect: '/advanced-search'},
+  { path: '/search-', redirect: '/advanced-search' },
 
-  {path: '/admin-tabs-dashboard', redirect: '/admin?tab=dashboard'},
-  {path: '/admin-tabs-users', redirect: '/admin?tab=users'},
-  {path: '/admin-tabs-groups', redirect: '/'}, // TODO
-  {path: '/admin-tabs-permissions', redirect: '/'}, // TODO
-  {path: '/admin-tabs-configuration', redirect: '/admin?tab=configuration'},
+  { path: '/admin-tabs-dashboard', redirect: '/admin?tab=dashboard' },
+  { path: '/admin-tabs-users', redirect: '/admin?tab=users' },
+  { path: '/admin-tabs-groups', redirect: '/' }, // TODO
+  { path: '/admin-tabs-permissions', redirect: '/' }, // TODO
+  { path: '/admin-tabs-configuration', redirect: '/admin?tab=configuration' },
 
-  {path: '/tabs-dashboard-:idProject', redirect: '/project/:idProject/information'},
-  {path: '/tabs-images-:idProject', redirect: '/project/:idProject/images'},
-  {path: '/tabs-annotations-:idProject', redirect: '/project/:idProject/annotations'},
-  {path: '/tabs-annotationproperties-:idProject-:idAnnot', redirect: '/project/:idProject'},
-  {path: '/tabs-imageproperties-:idProject-:idImage', redirect: '/project/:idProject'},
-  {path: '/tabs-imageproperties-:idProject-:idImage', redirect: '/project/:idProject'},
-  {path: '/tabs-config-:idProject', redirect: '/project/:idProject/configuration'},
-  {path: '/tabs-usersconfig-:idProject', redirect: '/project/:idProject/configuration?tab=members'},
-  {path: '/tabs-#tabs-useractivity-:idProject-:idUser', redirect: '/project/:idProject/activity/user/:idUser'},
-  {path: '/tabs-image-:idProject-:idImage-0', redirect: '/project/:idProject/image/:idImage'},
-  {path: '/tabs-image-:idProject-:idImage-:idAnnotation', redirect: '/project/:idProject/image/:idImage/annotation/:idAnnotation'},
-  {path: '/tabs-image-:idProject-:idImage-', redirect: '/project/:idProject/image/:idImage'},
+  { path: '/tabs-dashboard-:idProject', redirect: '/project/:idProject/information' },
+  { path: '/tabs-images-:idProject', redirect: '/project/:idProject/images' },
+  { path: '/tabs-annotations-:idProject', redirect: '/project/:idProject/annotations' },
+  { path: '/tabs-annotationproperties-:idProject-:idAnnot', redirect: '/project/:idProject' },
+  { path: '/tabs-imageproperties-:idProject-:idImage', redirect: '/project/:idProject' },
+  { path: '/tabs-imageproperties-:idProject-:idImage', redirect: '/project/:idProject' },
+  { path: '/tabs-config-:idProject', redirect: '/project/:idProject/configuration' },
+  { path: '/tabs-usersconfig-:idProject', redirect: '/project/:idProject/configuration?tab=members' },
+  { path: '/tabs-#tabs-useractivity-:idProject-:idUser', redirect: '/project/:idProject/activity/user/:idUser' },
+  { path: '/tabs-image-:idProject-:idImage-0', redirect: '/project/:idProject/image/:idImage' },
+  { path: '/tabs-image-:idProject-:idImage-:idAnnotation', redirect: '/project/:idProject/image/:idImage/annotation/:idAnnotation' },
+  { path: '/tabs-image-:idProject-:idImage-', redirect: '/project/:idProject/image/:idImage' },
   // -----
 
   {

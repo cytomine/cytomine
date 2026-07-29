@@ -41,14 +41,14 @@
 </template>
 
 <script>
-import {Property, PropertyCollection} from '@/api';
+import { Property, PropertyCollection } from '@/api';
 import constants from '@/utils/constants.js';
 
 export default {
   name: 'cytomine-properties',
   props: {
-    object: {type: Object},
-    canEdit: {type: Boolean, default: true},
+    object: { type: Object },
+    canEdit: { type: Boolean, default: true },
   },
   data() {
     return {
@@ -70,7 +70,7 @@ export default {
   },
   methods: {
     addNewProp() {
-      let newProp = new Property({object: this.object});
+      let newProp = new Property({ object: this.object });
       this.editedProperties.push(newProp);
     },
     async removeProp(idx) {
@@ -81,7 +81,7 @@ export default {
         this.$emit('update');
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-remove-prop')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-remove-prop') });
       }
     },
     startPropEdition(prop) {
@@ -97,7 +97,7 @@ export default {
       if (prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY)) {
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-invalid-key-prefix', {prefix: constants.PREFIX_HIDDEN_PROPERTY_KEY})
+          text: this.$t('notif-error-invalid-key-prefix', { prefix: constants.PREFIX_HIDDEN_PROPERTY_KEY })
         });
         return;
       }
@@ -112,7 +112,7 @@ export default {
         this.$emit('update');
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-save-prop')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-save-prop') });
       }
     },
     cancelPropEdition(idx) {
@@ -124,7 +124,7 @@ export default {
   },
   async created() {
     try {
-      let props = (await PropertyCollection.fetchAll({object: this.object})).array;
+      let props = (await PropertyCollection.fetchAll({ object: this.object })).array;
       this.properties = props.filter(prop => !prop.key.startsWith(constants.PREFIX_HIDDEN_PROPERTY_KEY)); // filter the properties used internally
     } catch (error) {
       console.log(error);

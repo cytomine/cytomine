@@ -32,7 +32,7 @@ export default class ImageGroupImageInstance extends Model {
    * @returns {this} The fetched object
    */
   static async fetch(group, image) {
-    return new this({id: 0, group, image}).fetch(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0, group, image }).fetch(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @inheritdoc */
@@ -49,7 +49,7 @@ export default class ImageGroupImageInstance extends Model {
    * @param {number} image       The identifier of the image
    */
   static async delete(group, image) {
-    return new this({id: 0, group, image}).delete(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0, group, image }).delete(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @inheritdoc */
@@ -71,7 +71,7 @@ export default class ImageGroupImageInstance extends Model {
       throw new Error('Cannot fetch next image of an image instance with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`imagegroup/${this.group}/imageinstance/${this.image}/next.json?circular=${circular}`);
+    let { data } = await Cytomine.instance.api.get(`imagegroup/${this.group}/imageinstance/${this.image}/next.json?circular=${circular}`);
     return new ImageInstance(data);
   }
 
@@ -85,7 +85,7 @@ export default class ImageGroupImageInstance extends Model {
       throw new Error('Cannot fetch next image of an image instance with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`imagegroup/${this.group}/imageinstance/${this.image}/previous.json?circular=${circular}`);
+    let { data } = await Cytomine.instance.api.get(`imagegroup/${this.group}/imageinstance/${this.image}/previous.json?circular=${circular}`);
     return new ImageInstance(data);
   }
 

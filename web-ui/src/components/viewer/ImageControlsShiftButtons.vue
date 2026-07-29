@@ -78,7 +78,7 @@ export default {
       },
       set(value) {
         this.$store.commit(this.imageModule + 'setStep',
-          {dimension: this.dimension, value: Number(value)});
+          { dimension: this.dimension, value: Number(value) });
       }
     },
     canShift() {

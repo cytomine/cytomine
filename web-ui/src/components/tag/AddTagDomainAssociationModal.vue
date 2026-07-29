@@ -20,7 +20,7 @@
 
 <script>
 
-import {TagCollection} from '@/api';
+import { TagCollection } from '@/api';
 import DomainTagInput from '@/components/utils/DomainTagInput.vue';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 

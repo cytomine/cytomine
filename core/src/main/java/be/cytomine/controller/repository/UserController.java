@@ -80,7 +80,7 @@ public class UserController {
             true,
             updatedUser.developer().orElse(false),
             updatedUser.language().orElse("").toLowerCase(),
-            List.of(updatedUser.role().substring(5))
+            List.of(updatedUser.role().orElse("").substring(5))
         );
     }
 

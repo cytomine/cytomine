@@ -37,11 +37,11 @@ import axios from 'axios';
 import ifvisible from 'ifvisible';
 ifvisible.setIdleDuration(constants.IDLE_DURATION);
 
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 import constants from '@/utils/constants.js';
-import {get} from '@/utils/store-helpers';
-import {updateToken} from '@/utils/token-utils';
-import {changeLanguageMixin} from '@/lang.js';
+import { get } from '@/utils/store-helpers';
+import { updateToken } from '@/utils/token-utils';
+import { changeLanguageMixin } from '@/lang.js';
 
 import CytomineNavbar from '@/components/navbar/CytomineNavbar.vue';
 

@@ -254,7 +254,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import NumberAnnotationsChart from '@/components/charts/NumberAnnotationsChart.js';
 import AnnotationTermChart from '@/components/charts/AnnotationTermChart.js';
@@ -264,7 +264,7 @@ import AnnotatedImagesByContributorChart from '@/components/charts/AnnotatedImag
 import ActivityOverviewChart from '@/components/charts/ActivityOverviewChart.js';
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect.vue';
 
-import {AnnotationType} from '@/api';
+import { AnnotationType } from '@/api';
 
 export default {
   name: 'project-activity-charts',
@@ -355,11 +355,11 @@ export default {
     },
     async fetchNbAnnotationSelections() {
       this.nbAnnotationSelections = null;
-      this.nbAnnotationSelections = await this.project.fetchNbAnnotationActions({type: 'select', ...this.queryParams});
+      this.nbAnnotationSelections = await this.project.fetchNbAnnotationActions({ type: 'select', ...this.queryParams });
     },
     async fetchNbAnnotations(type) {
       this.nbAnnotations[type] = null;
-      this.nbAnnotations[type] = await this.project.fetchNbAnnotations({annotationType: type, ...this.queryParams});
+      this.nbAnnotations[type] = await this.project.fetchNbAnnotations({ annotationType: type, ...this.queryParams });
     },
     async loadData() {
       await Promise.all([

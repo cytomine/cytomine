@@ -64,7 +64,7 @@
 <script>
 import OntologyTree from './OntologyTree.vue';
 import CytomineTerm from './CytomineTerm.vue';
-import {getAllTerms} from '@/utils/ontology-utils';
+import { getAllTerms } from '@/utils/ontology-utils';
 
 export default {
   name: 'ontology-tree-multiselect',
@@ -77,11 +77,11 @@ export default {
     event: 'setSelectedNodes'
   },
   props: {
-    ontology: {type: Object},
-    additionalNodes: {type: Array, default: () => []},
-    startWithAdditionalNodes: {type: Boolean, default: false},
-    selectedNodes: {type: Array, default: () => []},
-    multiple: {type: Boolean, default: true}
+    ontology: { type: Object },
+    additionalNodes: { type: Array, default: () => [] },
+    startWithAdditionalNodes: { type: Boolean, default: false },
+    selectedNodes: { type: Array, default: () => [] },
+    multiple: { type: Boolean, default: true }
   },
   data() {
     return {

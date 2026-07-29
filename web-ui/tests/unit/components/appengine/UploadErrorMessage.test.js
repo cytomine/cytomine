@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import UploadErrorMessage from '@/components/appengine/UploadErrorMessage.vue';
 
@@ -7,8 +7,8 @@ describe('UploadErrorMessage.vue', () => {
     message: 'Schema validation failed for the descriptor file',
     details: {
       errors: [
-        {message: 'namespace is missing but it is required'},
-        {message: 'version is missing but it is required'},
+        { message: 'namespace is missing but it is required' },
+        { message: 'version is missing but it is required' },
       ],
     },
   };

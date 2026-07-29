@@ -12,7 +12,7 @@ Vue.use(VueI18n);
 export default new VueI18n({
   locale: 'en',
   fallbackLocale: 'en',
-  messages: {en, es, fr, nl}
+  messages: { en, es, fr, nl }
 });
 
 export const changeLanguageMixin = {

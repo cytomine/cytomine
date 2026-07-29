@@ -1,9 +1,9 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AppDashboardPage from '@/components/appengine/AppDashboardPage.vue';
 import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
 const mockTask = {
   id: 1,
@@ -30,10 +30,10 @@ const makeTaskRun = (overrides = {}) => ({
   id: '42',
   taskRunId: 'c6e418dd-b315-49fe-8a02-ee8e4684ef61',
   project: '999',
-  user: {username: 'admin', name: 'Admin User'},
+  user: { username: 'admin', name: 'Admin User' },
   createdAt: '1775649424070',
   state: 'FINISHED',
-  task: {name: 'Test App', version: '1.0.0', namespace: 'namespace'},
+  task: { name: 'Test App', version: '1.0.0', namespace: 'namespace' },
   inputs: null,
   outputs: null,
   isTerminalState: vi.fn(() => true),
@@ -93,11 +93,11 @@ describe('AppDashboardPage.vue', () => {
     AppDashboardPage,
     {
       mocks: {
-        $i18n: {locale: 'en-GB'},
+        $i18n: { locale: 'en-GB' },
         $t: (key) => key,
       },
       computed: {
-        currentProject: () => ({id: '999'}),
+        currentProject: () => ({ id: '999' }),
       },
       stubs: {
         'b-table': true,
@@ -140,14 +140,14 @@ describe('AppDashboardPage.vue', () => {
     });
 
     it('should sort taskRuns by created date', async () => {
-      const older = makeTaskRun({id: 'run-1', taskRunId: 'run-1', createdAt: '1704067200000'});
-      const newer = makeTaskRun({id: 'run-2', taskRunId: 'run-2', createdAt: '1717200000000'});
+      const older = makeTaskRun({ id: 'run-1', taskRunId: 'run-1', createdAt: '1704067200000' });
+      const newer = makeTaskRun({ id: 'run-2', taskRunId: 'run-2', createdAt: '1717200000000' });
 
       TaskRun.fetchByProject.mockResolvedValue([newer, older]);
 
       Task.fetchTaskRunStatus.mockImplementation(async (_pid, taskRunId) => {
         const run = taskRunId === 'run-1' ? older : newer;
-        return {id: run.id, taskRunId: run.taskRunId, state: run.state, createdAt: run.createdAt, task: run.task};
+        return { id: run.id, taskRunId: run.taskRunId, state: run.state, createdAt: run.createdAt, task: run.task };
       });
 
       const wrapper = createWrapper();
@@ -160,7 +160,7 @@ describe('AppDashboardPage.vue', () => {
 
   describe('opening task run detail', () => {
     it('should fetch inputs when inputs are null on details open', async () => {
-      const run = makeTaskRun({inputs: null, outputs: []});
+      const run = makeTaskRun({ inputs: null, outputs: [] });
       const wrapper = createWrapper();
 
       await wrapper.vm.onDetailsOpen(run);
@@ -169,7 +169,7 @@ describe('AppDashboardPage.vue', () => {
     });
 
     it('should fetch outputs when outputs are null on details open', async () => {
-      const run = makeTaskRun({inputs: [], outputs: null});
+      const run = makeTaskRun({ inputs: [], outputs: null });
       const wrapper = createWrapper();
 
       await wrapper.vm.onDetailsOpen(run);
@@ -178,7 +178,7 @@ describe('AppDashboardPage.vue', () => {
     });
 
     it('should not fetch inputs when inputs are already loaded on details open', async () => {
-      const run = makeTaskRun({inputs: [{key: 'param1', value: 'val1'}], outputs: null});
+      const run = makeTaskRun({ inputs: [{ key: 'param1', value: 'val1' }], outputs: null });
       const wrapper = createWrapper();
 
       await wrapper.vm.onDetailsOpen(run);
@@ -187,7 +187,7 @@ describe('AppDashboardPage.vue', () => {
     });
 
     it('should not fetch outputs when outputs are already loaded on details open', async () => {
-      const run = makeTaskRun({inputs: null, outputs: [{key: 'result', value: '42'}]});
+      const run = makeTaskRun({ inputs: null, outputs: [{ key: 'result', value: '42' }] });
       const wrapper = createWrapper();
 
       await wrapper.vm.onDetailsOpen(run);
@@ -196,7 +196,7 @@ describe('AppDashboardPage.vue', () => {
     });
 
     it('should fetch logs when logs are null on details open', async () => {
-      const run = makeTaskRun({inputs: [], outputs: [], logs: null});
+      const run = makeTaskRun({ inputs: [], outputs: [], logs: null });
       const wrapper = createWrapper();
 
       await wrapper.vm.onDetailsOpen(run);
@@ -205,7 +205,7 @@ describe('AppDashboardPage.vue', () => {
     });
 
     it('should not fetch logs when logs are already loaded on details open', async () => {
-      const run = makeTaskRun({inputs: [], outputs: [], logs: 'Test logs'});
+      const run = makeTaskRun({ inputs: [], outputs: [], logs: 'Test logs' });
       const wrapper = createWrapper();
 
       await wrapper.vm.onDetailsOpen(run);

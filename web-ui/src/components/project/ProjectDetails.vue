@@ -124,7 +124,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import ListImagesPreview from '@/components/image/ListImagesPreview.vue';
 import ListUsernames from '@/components/user/ListUsernames.vue';
@@ -133,7 +133,7 @@ import CytomineDescription from '@/components/description/CytomineDescription.vu
 import CytomineProperties from '@/components/property/CytomineProperties.vue';
 import CytomineTags from '@/components/tag/CytomineTags.vue';
 import AttachedFiles from '@/components/attached-file/AttachedFiles.vue';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'project-details',
@@ -147,9 +147,9 @@ export default {
     AttachedFiles
   },
   props: {
-    project: {type: Object},
-    excludedProperties: {type: Array, default: () => []},
-    editable: {type: Boolean, default: false}
+    project: { type: Object },
+    excludedProperties: { type: Array, default: () => [] },
+    editable: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -204,7 +204,7 @@ export default {
     deleteProject() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-project'),
-        message: this.$t('delete-project-confirmation-message', {projectName: this.project.name}),
+        message: this.$t('delete-project-confirmation-message', { projectName: this.project.name }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),

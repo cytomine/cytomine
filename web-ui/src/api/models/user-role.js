@@ -26,7 +26,7 @@ export default class UserRole extends Model {
    * @returns {this} The fetched object
    */
   static async fetch(user, role) {
-    return new this({id: 0, user, role}).fetch(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0, user, role }).fetch(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @inheritdoc */
@@ -43,7 +43,7 @@ export default class UserRole extends Model {
    * @param {number} role  The identifier of the role
    */
   static async delete(user, role) {
-    return new this({id: 0, user, role}).delete(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0, user, role }).delete(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @override */

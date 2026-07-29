@@ -4,7 +4,7 @@
 
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 export default {
   computed: {

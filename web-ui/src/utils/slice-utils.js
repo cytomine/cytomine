@@ -10,6 +10,6 @@ export function formatMinutesSeconds(time) {
   ].join(':');
 }
 
-export function slicePositionToRank({channel, zStack, time}, image) {
+export function slicePositionToRank({ channel, zStack, time }, image) {
   return channel + image.channels * (zStack + image.depth * time);
 }

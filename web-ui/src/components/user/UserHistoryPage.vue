@@ -64,8 +64,8 @@
 </template>
 
 <script>
-import {Cytomine} from '@/api';
-import {formatDate} from '@/utils/date';
+import { Cytomine } from '@/api';
+import { formatDate } from '@/utils/date';
 
 const OPERATION_TAGS = {
   INSERT: 'is-success',
@@ -105,15 +105,15 @@ export default {
     async fetchCommands() {
       this.loading = true;
       try {
-        const {data} = await Cytomine.instance.api.get(
+        const { data } = await Cytomine.instance.api.get(
           '/commands',
-          {params: {page: this.currentPage - 1, size: this.perPage, sort: `${this.sortField},${this.sortOrder}`}},
+          { params: { page: this.currentPage - 1, size: this.perPage, sort: `${this.sortField},${this.sortOrder}` } },
         );
         this.commands = data.collection;
         this.total = data.size;
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('unexpected-error-info-message')});
+        this.$notify({ type: 'error', text: this.$t('unexpected-error-info-message') });
       }
       this.loading = false;
     },
@@ -130,29 +130,29 @@ export default {
       this.undoing = command.id;
       try {
         await Cytomine.instance.api.post(`/commands/undo/${command.id}`);
-        this.$notify({type: 'success', text: this.$t('notify-success-undo')});
+        this.$notify({ type: 'success', text: this.$t('notify-success-undo') });
         await this.fetchCommands();
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notify-error-undo')});
+        this.$notify({ type: 'error', text: this.$t('notify-error-undo') });
       }
       this.undoing = null;
     },
     parseType(commandType) {
       const tokens = commandType.replace(/_COMMAND$/, '').split('_');
-      return {operation: tokens[0], domain: tokens.slice(1)};
+      return { operation: tokens[0], domain: tokens.slice(1) };
     },
     operationTag(command) {
-      const {operation} = this.parseType(command.commandRequest.commandType);
+      const { operation } = this.parseType(command.commandRequest.commandType);
       return OPERATION_TAGS[operation] || 'is-light';
     },
     operationLabel(command) {
-      const {operation} = this.parseType(command.commandRequest.commandType);
+      const { operation } = this.parseType(command.commandRequest.commandType);
       return this.humanize([operation]);
     },
     domainLabel(command) {
       const request = command.commandRequest;
-      let {operation, domain} = this.parseType(request.commandType);
+      let { operation, domain } = this.parseType(request.commandType);
       if (operation === 'UNDO' && request.target) {
         domain = this.parseType(request.target.commandType).domain;
       }

@@ -11,7 +11,7 @@
 
 <script>
 import AppCard from '@/components/appengine/AppCard.vue';
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 
 export default {
   name: 'AppStorePage',
@@ -25,8 +25,8 @@ export default {
   },
   async created() {
     this.stores.forEach(async (store) => {
-      const {data} = await Cytomine.instance.api.get('/stores/tasks', {
-        params: {host: encodeURIComponent(store.host)},
+      const { data } = await Cytomine.instance.api.get('/stores/tasks', {
+        params: { host: encodeURIComponent(store.host) },
       });
 
       const tasks = data.map(task => ({

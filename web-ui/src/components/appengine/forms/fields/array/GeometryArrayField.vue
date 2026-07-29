@@ -12,7 +12,7 @@ export default {
   },
   methods: {
     onSelect(ids) {
-      this.$emit('input', {ids, type: 'annotation'});
+      this.$emit('input', { ids, type: 'annotation' });
     }
   },
 };

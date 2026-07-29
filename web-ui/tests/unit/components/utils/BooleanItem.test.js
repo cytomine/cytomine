@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import BooleanItem from '@/components/utils/BooleanItem';
 

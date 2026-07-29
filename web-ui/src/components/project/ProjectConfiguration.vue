@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import GeneralConfiguration from './configuration-panels/GeneralConfiguration.vue';
 import ProjectMembers from './configuration-panels/ProjectMembers.vue';
@@ -52,7 +52,6 @@ export default {
     queriedTab() {
       return this.$route.query.tab;
     },
-    // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {
       switch (this.activeTab) {
         case 'general':

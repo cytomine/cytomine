@@ -15,7 +15,7 @@ export default {
   name: 'navbar-dropdown',
   props: {
     icon: String,
-    iconPack: {type: String, default: 'fas'},
+    iconPack: { type: String, default: 'fas' },
     title: String,
     classes: Array,
     linkClasses: Object,

@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import {Description} from '@/api';
+import { Description } from '@/api';
 import DescriptionModal from './CytomineDescriptionModal.vue';
 
 import constants from '@/utils/constants.js';
@@ -34,9 +34,9 @@ import constants from '@/utils/constants.js';
 export default {
   name: 'cytomine-description',
   props: {
-    object: {type: Object},
-    canEdit: {type: Boolean, default: true},
-    maxPreviewLength: {type: Number, default: 0} // if set to 0, the description preview is not limited unless stop preview keyword is present
+    object: { type: Object },
+    canEdit: { type: Boolean, default: true },
+    maxPreviewLength: { type: Number, default: 0 } // if set to 0, the description preview is not limited unless stop preview keyword is present
   },
   data() {
     return {
@@ -70,7 +70,7 @@ export default {
         parent: this,
         component: DescriptionModal,
         props: {
-          description: this.description || new Description({data: '', object: this.object}),
+          description: this.description || new Description({ data: '', object: this.object }),
           edit
         },
         hasModalCard: true,

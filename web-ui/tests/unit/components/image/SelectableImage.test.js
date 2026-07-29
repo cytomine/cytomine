@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import ImageThumbnail from '@/components/image/ImageThumbnail';
 import SelectableImage from '@/components/image/SelectableImage';
 
@@ -9,7 +9,7 @@ vi.mock('@/utils/image-utils', () => ({
 describe('SelectableImage.vue', () => {
   let wrapper;
 
-  const mockImage = {id: 101, name: 'Image 1'};
+  const mockImage = { id: 101, name: 'Image 1' };
 
   beforeEach(() => {
     wrapper = shallowMount(SelectableImage, {
@@ -28,7 +28,7 @@ describe('SelectableImage.vue', () => {
   });
 
   it('The component should render the selected class when isSelected is true', async () => {
-    await wrapper.setProps({isSelected: true});
+    await wrapper.setProps({ isSelected: true });
 
     expect(wrapper.classes()).toContain('selected');
   });

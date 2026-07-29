@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
-import {Property, PropertyCollection} from '@/api';
+import { Property, PropertyCollection } from '@/api';
 import constants from '@/utils/constants.js';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { getWildcardRegexp } from '@/utils/string-utils';
 
 export default {
   data() {
@@ -62,14 +62,14 @@ export default {
 
     async fetchDefaultPropertyProp() {
       try {
-        let projectProps = (await PropertyCollection.fetchAll({object: this.project})).array;
+        let projectProps = (await PropertyCollection.fetchAll({ object: this.project })).array;
         this.defaultPropertyProp = projectProps.find(prop => prop.key === constants.DEFAULT_PROPERTY_KEY);
       } catch (error) {
         console.log(error);
       }
 
       if (!this.defaultPropertyProp) {
-        this.defaultPropertyProp = new Property({key: constants.DEFAULT_PROPERTY_KEY, value: ''}, this.project);
+        this.defaultPropertyProp = new Property({ key: constants.DEFAULT_PROPERTY_KEY, value: '' }, this.project);
       }
 
       this.searchString = this.defaultPropertyProp.value;
@@ -84,7 +84,7 @@ export default {
       // if user entered value that is not yet used as key for an annotation property, ask confirmation
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-default-property'),
-        message: this.$t('confirm-default-property-not-used-in-project', {key: this.searchString}),
+        message: this.$t('confirm-default-property-not-used-in-project', { key: this.searchString }),
         type: 'is-info',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -99,15 +99,15 @@ export default {
         if (!this.defaultPropertyProp.value.length) { // empty property
           if (!this.defaultPropertyProp.isNew()) { // property exists
             await this.defaultPropertyProp.delete();
-            this.defaultPropertyProp = new Property({key: constants.DEFAULT_PROPERTY_KEY, value: ''}, this.project);
+            this.defaultPropertyProp = new Property({ key: constants.DEFAULT_PROPERTY_KEY, value: '' }, this.project);
           }
         } else {
           await this.defaultPropertyProp.save();
         }
-        this.$notify({type: 'success', text: this.$t('notif-success-default-property-update')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-default-property-update') });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-default-property-update')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-default-property-update') });
       }
     }
   },

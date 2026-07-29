@@ -436,7 +436,7 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import OntologyTree from '@/components/ontology/OntologyTree.vue';
 import TrackTree from '@/components/track/TrackTree.vue';
@@ -447,9 +447,9 @@ import PasteAnnotationWithLinkModal from '@/components/viewer/interactions/Paste
 import AnnotationLinkSelector from '@/components/viewer/interactions/AnnotationLinkSelector.vue';
 
 import WKT from 'ol/format/WKT';
-import {containsExtent, getCenter, getIntersection} from 'ol/extent';
+import { containsExtent, getCenter, getIntersection } from 'ol/extent';
 
-import {Cytomine, Annotation, AnnotationType, AnnotationLink} from '@/api';
+import { Cytomine, Annotation, AnnotationType, AnnotationLink } from '@/api';
 import {
   Action, updateTermProperties, updateTrackProperties, updateAnnotationLinkProperties,
   listAnnotationsInGroup
@@ -718,9 +718,9 @@ export default {
         await annot.fill();
         eventBus.emit('editAnnotation', annot);
         eventBus.emit('reloadAnnotationCrop', annot);
-        this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
+        this.$store.commit(this.imageModule + 'addAction', { annot, type: Action.UPDATE });
       } catch (err) {
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-fill')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-fill') });
       }
     },
 
@@ -761,9 +761,9 @@ export default {
           });
         }
         eventBus.emit('deleteAnnotation', annot);
-        this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
+        this.$store.commit(this.imageModule + 'addAction', { annot: annot, type: Action.DELETE });
       } catch (err) {
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-deletion') });
       }
     },
     confirmDeletion() {
@@ -800,7 +800,7 @@ export default {
 
       this.copiedAnnotImageInstance = this.image;
       this.copiedAnnot = feature.properties.annot.clone();
-      this.$notify({type: 'success', text: this.$t('notif-success-annotation-copy')});
+      this.$notify({ type: 'success', text: this.$t('notif-success-annotation-copy') });
     },
     convertLocation(copiedAnnot, destImage) {
       /* If we want to paste in the same image but in another slice */
@@ -869,7 +869,7 @@ export default {
       /* Convert the location if it is needed */
       let location = this.convertLocation(this.copiedAnnot, this.image);
       if (!location) {
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-paste')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-paste') });
         return;
       }
 
@@ -888,17 +888,17 @@ export default {
         // (https://github.com/cytomine/Cytomine-core/issues/1143)
         annot.term = this.copiedAnnot.term.slice();
         annot.userByTerm = this.copiedAnnot.term.map(term => {
-          return {term, user: [this.currentUser.id]};
+          return { term, user: [this.currentUser.id] };
         });
         annot.imageGroup = this.imageGroupId;
         // ----
 
         eventBus.emit('addAnnotation', annot);
-        eventBus.emit('selectAnnotation', {index: this.index, annot});
-        this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
+        eventBus.emit('selectAnnotation', { index: this.index, annot });
+        this.$store.commit(this.imageModule + 'addAction', { annot, type: Action.CREATE });
       } catch (err) {
         console.log(err);
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-creation') });
       }
     },
     async repeat() {
@@ -908,11 +908,11 @@ export default {
 
       try {
         await this.copiedAnnot.repeat(this.slice.id, this.nbRepeats);
-        eventBus.emit('reloadAnnotations', {idImage: this.image.id});
-        this.$notify({type: 'success', text: this.$t('notif-success-annotation-repeat')});
+        eventBus.emit('reloadAnnotations', { idImage: this.image.id });
+        this.$notify({ type: 'success', text: this.$t('notif-success-annotation-repeat') });
       } catch (err) {
         console.log(err);
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-repeat')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-repeat') });
       }
     },
 
@@ -971,10 +971,10 @@ export default {
             this.copiedAnnot = copiedAnnot;
           }
         });
-        this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-deletion')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-annotation-link-deletion') });
       } catch (err) {
         console.log(err);
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-link-deletion')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-link-deletion') });
       }
     },
 
@@ -990,7 +990,7 @@ export default {
         this.$store.commit(this.imageModule + 'undoAction', opposedAction);
       } catch (err) {
         console.log(err);
-        this.$notify({type: 'error', text: this.$t('notify-error-undo')});
+        this.$notify({ type: 'error', text: this.$t('notify-error-undo') });
       }
     },
     async redo() {
@@ -1004,10 +1004,10 @@ export default {
         this.$store.commit(this.imageModule + 'redoAction', opposedAction);
       } catch (err) {
         console.log(err);
-        this.$notify({type: 'error', text: this.$t('notif-error-redo')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-redo') });
       }
     },
-    async reverseAction({annot, type, command}, undo) {
+    async reverseAction({ annot, type, command }, undo) {
       let newType = type;
 
       if (type === Action.CREATE) {
@@ -1031,7 +1031,7 @@ export default {
         eventBus.emit('editAnnotation', newAnnot);
       }
 
-      return {annot, command, type: newType};
+      return { annot, command, type: newType };
     },
     async getUpdatedAnnotation(collection) {
       for (let model of collection) {
@@ -1064,10 +1064,10 @@ export default {
         reviewedAnnot.userByTerm = annot.userByTerm; // copy terms from initial annot
         eventBus.emit('reviewAnnotation', annot);
         eventBus.emit('addAnnotation', reviewedAnnot);
-        eventBus.emit('selectAnnotation', {index: this.index, annot: reviewedAnnot});
+        eventBus.emit('selectAnnotation', { index: this.index, annot: reviewedAnnot });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-validation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-validation') });
       }
     },
     async reject() {
@@ -1088,15 +1088,15 @@ export default {
         await annot.cancelReview();
         eventBus.emit('deleteAnnotation', reviewedAnnot);
         eventBus.emit('addAnnotation', annot, false);
-        eventBus.emit('selectAnnotation', {index: this.index, annot});
+        eventBus.emit('selectAnnotation', { index: this.index, annot });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-rejection')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-rejection') });
       }
     },
 
     refreshTracks() {
-      this.$store.dispatch(this.viewerModule + 'refreshTracks', {idImage: this.image.id});
+      this.$store.dispatch(this.viewerModule + 'refreshTracks', { idImage: this.image.id });
     },
 
     takeScreenshot() {

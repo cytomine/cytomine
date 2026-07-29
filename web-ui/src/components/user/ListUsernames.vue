@@ -16,7 +16,7 @@
 import Username from './Username.vue';
 export default {
   name: 'list-usernames',
-  components: {Username},
+  components: { Username },
   props: {
     users: Array,
     onlines: Array,

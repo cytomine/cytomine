@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import {Term} from '@/api';
-import {Sketch} from 'vue-color';
+import { Term } from '@/api';
+import { Sketch } from 'vue-color';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
@@ -34,7 +34,7 @@ export default {
     'sketch-picker': Sketch,
     CytomineModalCard
   },
-  $_veeValidate: {validator: 'new'},
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       name: '',
@@ -76,13 +76,13 @@ export default {
     },
     async create() {
       try {
-        let term = await new Term({name: this.name, color: this.color.hex, ontology: this.ontology.id}).save();
-        this.$notify({type: 'success', text: this.$t('notif-success-term-creation')});
+        let term = await new Term({ name: this.name, color: this.color.hex, ontology: this.ontology.id }).save();
+        this.$notify({ type: 'success', text: this.$t('notif-success-term-creation') });
         this.$emit('newTerm', term);
         this.$parent.close();
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-term-creation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-term-creation') });
       }
     },
     async update() {
@@ -91,18 +91,18 @@ export default {
       term.name = this.name;
       try {
         await term.save();
-        this.$notify({type: 'success', text: this.$t('notif-success-term-update')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-term-update') });
         this.$emit('updateTerm', term);
         this.$parent.close();
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-term-update')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-term-update') });
       }
     }
   },
   created() {
     this.name = this.term ? this.term.name : '';
-    this.color = {hex: this.term ? this.term.color : this.randomColor()};
+    this.color = { hex: this.term ? this.term.color : this.randomColor() };
   }
 };
 </script>

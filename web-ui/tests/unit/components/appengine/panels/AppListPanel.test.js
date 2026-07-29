@@ -1,13 +1,13 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AppListPanel from '@/components/appengine/panels/AppListPanel.vue';
 import AppCard from '@/components/appengine/AppCard.vue';
 
 describe('AppListPanel.vue', () => {
   const mockApplications = [
-    {id: 1, name: 'App 1', version: '1.0.0'},
-    {id: 2, name: 'App 2', version: '2.0.0'},
-    {id: 3, name: 'App 3', version: '1.5.0'},
+    { id: 1, name: 'App 1', version: '1.0.0' },
+    { id: 2, name: 'App 2', version: '2.0.0' },
+    { id: 3, name: 'App 3', version: '1.5.0' },
   ];
 
   const createWrapper = (options = {}) => shallowMount(

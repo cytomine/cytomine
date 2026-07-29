@@ -55,9 +55,9 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {ImageInstanceCollection, ProjectCollection} from '@/api';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { get } from '@/utils/store-helpers';
+import { ImageInstanceCollection, ProjectCollection } from '@/api';
+import { getWildcardRegexp } from '@/utils/string-utils';
 
 export default {
   name: 'cytomine-searcher',
@@ -152,7 +152,7 @@ export default {
     },
     htmlImageName(img) {
       let blindIndication = img.blindedName ? `<span class="blind">[${this.$t('blinded-name-indication')}] </span>` : '';
-      let inProject = `<span class="in-project">(${this.$t('in-project', {projectName: img.projectName})})</span>`;
+      let inProject = `<span class="in-project">(${this.$t('in-project', { projectName: img.projectName })})</span>`;
       return `${blindIndication}${this.highlightedName(this.imageName(img))}&nbsp;${inProject}`;
     }
   }

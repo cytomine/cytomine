@@ -80,10 +80,10 @@
 </template>
 
 <script>
-import {get, sync} from '@/utils/store-helpers';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { get, sync } from '@/utils/store-helpers';
+import { getWildcardRegexp } from '@/utils/string-utils';
 
-import {OntologyCollection} from '@/api';
+import { OntologyCollection } from '@/api';
 import OntologyDetails from './OntologyDetails.vue';
 import AddOntologyModal from './AddOntologyModal.vue';
 
@@ -162,18 +162,18 @@ export default {
         this.ontologies.splice(index, 1);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-ontology-deletion', {name: this.selectedOntology.name})
+          text: this.$t('notif-success-ontology-deletion', { name: this.selectedOntology.name })
         });
         this.selectedOntology = this.ontologies[0];
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-ontology-deletion')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-ontology-deletion') });
       }
     }
   },
   async created() {
     try {
-      this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+      this.ontologies = (await OntologyCollection.fetchAll({ light: true })).array;
     } catch (error) {
       console.log(error);
       this.loading = false;

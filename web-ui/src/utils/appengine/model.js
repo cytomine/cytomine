@@ -1,4 +1,4 @@
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 
 export default class Model {
 
@@ -110,7 +110,7 @@ export default class Model {
    * @returns {this} The fetched object
    */
   static async fetch(id) {
-    return new this({id}).fetch();
+    return new this({ id }).fetch();
   }
 
   /**
@@ -123,7 +123,7 @@ export default class Model {
       throw new Error('Cannot fetch a model with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(this.uri);
+    let { data } = await Cytomine.instance.api.get(this.uri);
 
     this.populate(data);
     return this;
@@ -136,7 +136,7 @@ export default class Model {
    */
   async save() {
     if (this.isNew()) {
-      let {data} = await Cytomine.instance.api.post(this.uri, this.getPublicProperties());
+      let { data } = await Cytomine.instance.api.post(this.uri, this.getPublicProperties());
       this.populate(data[this.callbackIdentifier]);
       Cytomine.instance.lastCommand = data.command;
       return this;
@@ -155,7 +155,7 @@ export default class Model {
       throw new Error('Cannot update a model with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.put(this.uri, this.getPublicProperties());
+    let { data } = await Cytomine.instance.api.put(this.uri, this.getPublicProperties());
     this.populate(data[this.callbackIdentifier]);
     Cytomine.instance.lastCommand = data.command;
     return this;
@@ -167,7 +167,7 @@ export default class Model {
    * @param {number} id The identifier of the object to delete
    */
   static async delete(id) {
-    return new this({id}).delete();
+    return new this({ id }).delete();
   }
 
   /**
@@ -178,7 +178,7 @@ export default class Model {
       throw new Error('Cannot delete a model with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.delete(this.uri);
+    let { data } = await Cytomine.instance.api.delete(this.uri);
     Cytomine.instance.lastCommand = data.command;
   }
 

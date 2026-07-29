@@ -34,8 +34,8 @@
 <script>
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 import SelectableImage from '@/components/image/SelectableImage.vue';
-import {get} from '@/utils/store-helpers';
-import {ImageInstanceCollection} from '@/api';
+import { get } from '@/utils/store-helpers';
+import { ImageInstanceCollection } from '@/api';
 
 export default {
   name: 'ImageSelection',
@@ -44,7 +44,7 @@ export default {
     SelectableImage,
   },
   props: {
-    active: {type: Boolean, required: true},
+    active: { type: Boolean, required: true },
   },
   data() {
     return {
@@ -67,7 +67,7 @@ export default {
     },
     select() {
       if (!this.selectedImage) {
-        this.$notify({type: 'error', text: this.$t('notif-error-image-selection')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-image-selection') });
         return;
       }
       this.$emit('select-image', this.selectedImage);

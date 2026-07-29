@@ -1,9 +1,9 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AdminTags from '@/components/admin/AdminTags';
-import {Cytomine} from '@/api';
-import {flushPromises} from '../../../utils';
+import { Cytomine } from '@/api';
+import { flushPromises } from '../../../utils';
 
 vi.mock('@/api', () => ({
   Cytomine: {
@@ -35,10 +35,10 @@ const createWrapper = async (options = {}) => {
 
   const wrapper = mount(AdminTags, {
     localVue,
-    stubs: {'tag-modal': true},
+    stubs: { 'tag-modal': true },
     mocks: {
       $t: (message) => message,
-      $i18n: {locale: 'en'},
+      $i18n: { locale: 'en' },
       $notify: vi.fn(),
       $buefy: {
         dialog: {
@@ -59,8 +59,8 @@ describe('AdminTags.vue', () => {
       createTag(2, 'lung', 'john'),
       createTag(3, 'kidney', 'jane'),
     ];
-    Cytomine.instance.api.get.mockResolvedValue({data: {collection: tags, size: tags.length}});
-    Cytomine.instance.api.delete.mockResolvedValue({data: {}});
+    Cytomine.instance.api.get.mockResolvedValue({ data: { collection: tags, size: tags.length } });
+    Cytomine.instance.api.delete.mockResolvedValue({ data: {} });
   });
 
   afterEach(() => {
@@ -78,7 +78,7 @@ describe('AdminTags.vue', () => {
 
     expect(Cytomine.instance.api.get).toHaveBeenCalledWith(
       '/tag.json',
-      {params: {page: 0, size: 20, sort: 'created,desc'}},
+      { params: { page: 0, size: 20, sort: 'created,desc' } },
     );
     expect(wrapper.vm.tags).toEqual(tags);
     expect(wrapper.vm.total).toBe(3);
@@ -106,14 +106,14 @@ describe('AdminTags.vue', () => {
     expect(wrapper.vm.loading).toBe(false);
     expect(wrapper.text()).toContain('unexpected-error-info-message');
     expect(wrapper.vm.$notify).toHaveBeenCalledWith(
-      {type: 'error', text: 'notify-error-fetch-tag'},
+      { type: 'error', text: 'notify-error-fetch-tag' },
     );
   });
 
   it('should filter the tags by name from the search string', async () => {
     const wrapper = await createWrapper();
 
-    await wrapper.setData({searchString: 'br*'});
+    await wrapper.setData({ searchString: 'br*' });
 
     expect(wrapper.vm.filteredTags).toEqual([tags[0]]);
     const rows = wrapper.findAll('tbody tr');
@@ -124,7 +124,7 @@ describe('AdminTags.vue', () => {
   it('should display an empty message when no tag matches the search string', async () => {
     const wrapper = await createWrapper();
 
-    await wrapper.setData({searchString: 'unknown'});
+    await wrapper.setData({ searchString: 'unknown' });
 
     expect(wrapper.vm.filteredTags).toEqual([]);
     expect(wrapper.text()).toContain('no-tag-fitting-criteria');
@@ -162,9 +162,9 @@ describe('AdminTags.vue', () => {
     const wrapper = await createWrapper();
 
     wrapper.vm.startTagEdition(wrapper.vm.tags[0]);
-    wrapper.vm.updateTag({name: 'renamed'});
+    wrapper.vm.updateTag({ name: 'renamed' });
 
-    expect(wrapper.vm.tags[0]).toEqual({...tags[0], name: 'renamed'});
+    expect(wrapper.vm.tags[0]).toEqual({ ...tags[0], name: 'renamed' });
   });
 
   it('should delete the tag and remove it from the list on confirmation', async () => {
@@ -179,7 +179,7 @@ describe('AdminTags.vue', () => {
     expect(wrapper.vm.tags.length).toBe(2);
     expect(wrapper.vm.tags).not.toContain(deletedTag);
     expect(wrapper.vm.$notify).toHaveBeenCalledWith(
-      {type: 'success', text: 'notif-success-tag-delete'},
+      { type: 'success', text: 'notif-success-tag-delete' },
     );
   });
 });

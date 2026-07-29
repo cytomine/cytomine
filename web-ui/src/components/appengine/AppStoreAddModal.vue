@@ -37,7 +37,7 @@ export default {
     CytomineModal,
   },
   props: {
-    active: {type: Boolean, default: false},
+    active: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -66,7 +66,7 @@ export default {
       this.$emit('update:active', false);
       this.resetForm();
 
-      this.$notify({type: 'success', text: this.$t('notify-success-app-store-addition')});
+      this.$notify({ type: 'success', text: this.$t('notify-success-app-store-addition') });
     },
     cancel() {
       this.$emit('update:active', false);

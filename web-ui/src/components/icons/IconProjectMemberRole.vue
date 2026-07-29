@@ -20,9 +20,9 @@
 export default {
   name: 'IconProjectMemberRole',
   props: {
-    isManager: {type: Boolean, default: false},
-    isRepresentative: {type: Boolean, default: false},
-    editable: {type: Boolean, default: false}
+    isManager: { type: Boolean, default: false },
+    isRepresentative: { type: Boolean, default: false },
+    editable: { type: Boolean, default: false }
   },
   computed: {
     label() {

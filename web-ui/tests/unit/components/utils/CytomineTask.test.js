@@ -1,7 +1,7 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 
 import CytomineTask from '@/components/utils/CytomineTask';
-import {Task} from '@/api';
+import { Task } from '@/api';
 
 
 vi.mock('@/api', () => ({

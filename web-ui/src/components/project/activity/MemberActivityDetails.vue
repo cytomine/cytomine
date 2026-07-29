@@ -226,9 +226,9 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
-import {User, ProjectConnectionCollection, ImageConsultationCollection} from '@/api';
+import { User, ProjectConnectionCollection, ImageConsultationCollection } from '@/api';
 
 import CytomineDatepicker from '@/components/form/CytomineDatepicker.vue';
 import ProjectConnectionDetails from '@/components/project/ProjectConnectionDetails.vue';
@@ -238,8 +238,8 @@ import constants from '@/utils/constants.js';
 
 import moment from 'moment';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {formatMomentDate, formatMomentDuration} from '@/utils/date';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { formatMomentDate, formatMomentDuration } from '@/utils/date';
 
 
 export default {
@@ -310,17 +310,17 @@ export default {
       this.resumeActivity = await this.user.fetchResumeActivity(this.project.id);
     },
     async fetchConnections() {
-      this.connections = await ProjectConnectionCollection.fetchAll({project: this.project.id, user: this.idUser});
+      this.connections = await ProjectConnectionCollection.fetchAll({ project: this.project.id, user: this.idUser });
     },
     async fetchConsultations() {
-      this.consultations = await ImageConsultationCollection.fetchAll({project: this.project.id, user: this.idUser, resume: true});
+      this.consultations = await ImageConsultationCollection.fetchAll({ project: this.project.id, user: this.idUser, resume: true });
     },
     downloadConnections(connections) {
       window.location.assign(appendShortTermToken(connections.downloadURL, this.shortTermToken), '_blank');
     }
   },
   async created() {
-    this.user = new User({id: this.idUser});
+    this.user = new User({ id: this.idUser });
     await this.fetchData();
     this.loading = false;
   },

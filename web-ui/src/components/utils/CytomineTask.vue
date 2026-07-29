@@ -9,7 +9,7 @@
 
 <script>
 import constants from '@/utils/constants.js';
-import {Task} from '@/api';
+import { Task } from '@/api';
 
 export default {
   name: 'cytomine-task',

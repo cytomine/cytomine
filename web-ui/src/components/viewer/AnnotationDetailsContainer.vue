@@ -72,7 +72,7 @@
 import eventBus from '@/utils/event-bus';
 
 import VueDraggableResizable from 'vue-draggable-resizable';
-import {Cytomine, UserCollection} from '@/api';
+import { Cytomine, UserCollection } from '@/api';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails.vue';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
 import AnnotationSimpleDetails from '@/components/viewer/annotations/AnnotationSimpleDetails.vue';
@@ -179,7 +179,7 @@ export default {
     },
 
     dragStop(x, y) {
-      this.positionAnnotDetails = {x, y};
+      this.positionAnnotDetails = { x, y };
     },
 
     async handleResize() {
@@ -194,7 +194,7 @@ export default {
         let maxY = Math.max(this.$refs.playground.clientHeight - height, 0);
         let x = Math.min(this.positionAnnotDetails.x, maxX);
         let y = Math.min(this.positionAnnotDetails.y, maxY);
-        this.positionAnnotDetails = {x, y};
+        this.positionAnnotDetails = { x, y };
 
         // HACK to force the component to recreate and take into account new (x,y) ; should no longer be
         // necessary with version 2 of vue-draggable-resizable

@@ -82,7 +82,7 @@ import Task from '@/utils/appengine/task';
 import TaskInputForm from '@/components/appengine/forms/TaskInputForm.vue';
 import TaskRun from '@/utils/appengine/task-run';
 import TaskRunTable from '@/components/appengine/task-run/TaskRunTable.vue';
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'AppBottomDrawer',
@@ -119,9 +119,9 @@ export default {
       taskRuns = taskRuns.slice(0, 5);
 
       this.allTaskRuns = await Promise.all(
-        taskRuns.map(async ({project, taskRunId}) => {
+        taskRuns.map(async ({ project, taskRunId }) => {
           let taskRun = await Task.fetchTaskRunStatus(this.currentProject.id, taskRunId);
-          return new TaskRun({...taskRun, project});
+          return new TaskRun({ ...taskRun, project });
         })
       );
     },
@@ -139,7 +139,7 @@ export default {
       this.inputs = {};
     },
     getInputProvisions() {
-      return Object.entries(this.inputs).map(([parameterName, {type, value}]) => ({parameterName, type, value}));
+      return Object.entries(this.inputs).map(([parameterName, { type, value }]) => ({ parameterName, type, value }));
     },
     async runTask() {
       try {
@@ -171,7 +171,7 @@ export default {
         }
 
         await Task.runTask(this.currentProject.id, taskRun.id).then(async (event) => {
-          this.$buefy.toast.open({message: this.$t('app-engine.run.started'), type: 'is-success'});
+          this.$buefy.toast.open({ message: this.$t('app-engine.run.started'), type: 'is-success' });
 
           let taskRun = new TaskRun(event.resource);
           taskRun.project = this.currentProject.id;
@@ -185,7 +185,7 @@ export default {
         const serverError = e.response && e.response.data
           ? (e.response.data.message || e.response.data.errorCode)
           : e.message;
-        this.$buefy.toast.open({message: `Error : ${serverError}`, type: 'is-danger', indefinite: true});
+        this.$buefy.toast.open({ message: `Error : ${serverError}`, type: 'is-danger', indefinite: true });
       }
 
       this.isRunning = false;

@@ -1,15 +1,15 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AnnotationProfileProjectionChart from '@/components/charts/AnnotationProfileProjectionChart.js';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
 describe('AnnotationProfileProjectionChart.js', () => {
   const createWrapper = (propsData = {}) => shallowMount(AnnotationProfileProjectionChart, {
     propsData: {
       annotation: {},
       data: [
-        {x: 2, y: 0, average: 20},
-        {x: 1, y: 0, average: 10},
+        { x: 2, y: 0, average: 20 },
+        { x: 1, y: 0, average: 10 },
       ],
       spatialAxis: false,
       dimension: 'channels',
@@ -34,8 +34,8 @@ describe('AnnotationProfileProjectionChart.js', () => {
     const wrapper = createWrapper({
       spatialAxis: true,
       dimension: 'channels',
-      data: [{channel: 1, average: 5}],
-      slices: [{channel: 1, channelName: 'DAPI'}],
+      data: [{ channel: 1, average: 5 }],
+      slices: [{ channel: 1, channelName: 'DAPI' }],
     });
 
     await flushPromises();
@@ -44,7 +44,7 @@ describe('AnnotationProfileProjectionChart.js', () => {
   });
 
   it('should emit error when building the chart data throws', async () => {
-    const wrapper = createWrapper({data: undefined});
+    const wrapper = createWrapper({ data: undefined });
 
     await flushPromises();
 
@@ -54,18 +54,18 @@ describe('AnnotationProfileProjectionChart.js', () => {
   it('should configure the zoom plugin with the v2+ nested wheel/drag schema', () => {
     const wrapper = createWrapper();
 
-    const {zoom} = wrapper.vm.chartOptions.plugins;
+    const { zoom } = wrapper.vm.chartOptions.plugins;
 
-    expect(zoom.pan).toEqual({enabled: true, mode: 'xy'});
-    expect(zoom.zoom.wheel).toEqual({enabled: true});
-    expect(zoom.zoom.drag).toEqual({enabled: false});
+    expect(zoom.pan).toEqual({ enabled: true, mode: 'xy' });
+    expect(zoom.zoom.wheel).toEqual({ enabled: true });
+    expect(zoom.zoom.drag).toEqual({ enabled: false });
     expect(zoom.zoom.mode).toBe('xy');
   });
 
   it('should delegate resetZoom to the underlying chart instance exposed by vue-chartjs', () => {
     const wrapper = createWrapper();
     const resetZoom = vi.fn();
-    wrapper.vm.$refs.chartRef = {chart: {resetZoom}};
+    wrapper.vm.$refs.chartRef = { chart: { resetZoom } };
 
     wrapper.vm.resetZoom();
 

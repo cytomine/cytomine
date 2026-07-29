@@ -38,13 +38,13 @@
 
 <script>
 import copyToClipboard from 'copy-to-clipboard';
-import {get} from '@/utils/store-helpers';
-import {formatMomentDate} from '@/utils/date';
+import { get } from '@/utils/store-helpers';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'AnnotationSimpleDetails',
   props: {
-    annotation: {type: Object, required: true},
+    annotation: { type: Object, required: true },
   },
   computed: {
     configUI: get('currentProject/configUI'),
@@ -63,7 +63,7 @@ export default {
     formatMomentDate,
     copyURL() {
       copyToClipboard(window.location.origin + '/#' + this.annotationURL);
-      this.$notify({type: 'success', text: this.$t('notif-success-annot-URL-copied')});
+      this.$notify({ type: 'success', text: this.$t('notif-success-annot-URL-copied') });
     },
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];

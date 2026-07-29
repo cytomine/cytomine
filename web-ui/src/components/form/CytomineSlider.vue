@@ -39,6 +39,7 @@
         ]"
       @mousedown.stop
       @click.stop="startEdition(index)"
+      @keyup.enter="stopEdition(index)"
     >
         <template v-if="indexEdited !== index">
           <slot name="default" :value="value" >
@@ -52,7 +53,6 @@
           v-model="editedValue"
           @hook:mounted="focus()"
           @blur="stopEdition(index)"
-          @keyup.enter.native="stopEdition(index)"
           :size="size"
         />
     </div>

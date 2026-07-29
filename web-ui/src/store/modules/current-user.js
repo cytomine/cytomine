@@ -1,5 +1,5 @@
-import {Cytomine, MyAccount, User} from '@/api';
-import {updateToken} from '@/utils/token-utils';
+import { Cytomine, MyAccount, User } from '@/api';
+import { updateToken } from '@/utils/token-utils';
 
 function getDefaultState() {
   return {
@@ -38,7 +38,7 @@ export default {
   },
 
   actions: {
-    async fetchUser({commit}) {
+    async fetchUser({ commit }) {
       const [user, account] = await Promise.all([
         User.fetchCurrent(), MyAccount.fetch()
       ]);
@@ -56,18 +56,18 @@ export default {
       }
     },
 
-    async updateAccount({dispatch}, account) {
+    async updateAccount({ dispatch }, account) {
       // Need to be sequential because the token needs to be refreshed to send updated claims to core.
       await account.update();
       await updateToken(-1);
       await dispatch('fetchUser');
     },
 
-    async openAdminSession({commit}) {
+    async openAdminSession({ commit }) {
       await Cytomine.instance.openAdminSession();
       commit('setAdminByNow', true);
     },
-    async closeAdminSession({dispatch}) {
+    async closeAdminSession({ dispatch }) {
       await Cytomine.instance.closeAdminSession();
       await dispatch('fetchUser');
     },

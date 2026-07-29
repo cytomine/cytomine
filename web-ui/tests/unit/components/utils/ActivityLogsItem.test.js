@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import moment from 'moment';
 
 import ActivityLogsItem from '@/components/utils/ActivityLogsItem';
@@ -34,8 +34,8 @@ describe('ActivityLogsItem.vue', () => {
 
   const localVue = createLocalVue();
   localVue.use(VueRouter);
-  localVue.component('router-link', {template: '<a><slot></slot></a>'});
-  localVue.component('router-view', {template: '<div><slot></slot></div>'});
+  localVue.component('router-link', { template: '<a><slot></slot></a>' });
+  localVue.component('router-view', { template: '<div><slot></slot></div>' });
 
   beforeEach(() => {
     wrapper = shallowMount(ActivityLogsItem, {

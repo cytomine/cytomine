@@ -52,7 +52,7 @@
 import SlVueTree from 'sl-vue-tree';
 import CytomineTrack from './CytomineTrack.vue';
 import TrackModal from './TrackModal.vue';
-import {Track} from '@/api';
+import { Track } from '@/api';
 
 export default {
   name: 'track-tree',
@@ -61,17 +61,17 @@ export default {
     event: 'setSelectedNodes'
   },
   props: {
-    tracks: {type: Array},
-    additionalNodes: {type: Array, default: () => []},
-    startWithAdditionalNodes: {type: Boolean, default: false},
-    searchString: {type: String, default: ''},
-    selectedNodes: {type: Array, default: () => []},
-    allowSelection: {type: Boolean, default: true},
-    multipleSelection: {type: Boolean, default: true},
-    allowDrag: {type: Boolean, default: false},
-    allowEdition: {type: Boolean, default: false},
-    allowNew: {type: Boolean, default: false},
-    image: {type: Object, default: null} //Cannot be null if allowNew
+    tracks: { type: Array },
+    additionalNodes: { type: Array, default: () => [] },
+    startWithAdditionalNodes: { type: Boolean, default: false },
+    searchString: { type: String, default: '' },
+    selectedNodes: { type: Array, default: () => [] },
+    allowSelection: { type: Boolean, default: true },
+    multipleSelection: { type: Boolean, default: true },
+    allowDrag: { type: Boolean, default: false },
+    allowEdition: { type: Boolean, default: false },
+    allowNew: { type: Boolean, default: false },
+    image: { type: Object, default: null } //Cannot be null if allowNew
   },
   components: {
     SlVueTree,
@@ -229,7 +229,7 @@ export default {
       this.openModal();
     },
     updateTrack(track) {
-      this.$refs.tree.updateNode(this.editedNode.path, {data: {...track}});
+      this.$refs.tree.updateNode(this.editedNode.path, { data: { ...track } });
       this.$emit('updatedTrack', track);
     },
 
@@ -262,10 +262,10 @@ export default {
             });
           } catch (error) {
             console.log(error);
-            this.$notify({type: 'error', text: this.$t('notif-error-track-tree-update')});
+            this.$notify({ type: 'error', text: this.$t('notif-error-track-tree-update') });
           }
         } else {
-          this.$notify({type: 'warn', text: this.$t('notif-warn-track-tree-order-not-persisted')});
+          this.$notify({ type: 'warn', text: this.$t('notif-warn-track-tree-order-not-persisted') });
         }
       });
     },
@@ -273,7 +273,7 @@ export default {
     confirmTrackDeletion(node) {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
-        message: this.$t('confirm-deletion-track', {name: node.data.name}),
+        message: this.$t('confirm-deletion-track', { name: node.data.name }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -287,7 +287,7 @@ export default {
         this.$emit('deletedTrack', node.data.id);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-track-deletion')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-track-deletion') });
       }
     }
   },

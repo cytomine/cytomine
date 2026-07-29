@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import {Ontology} from '@/api';
+import { Ontology } from '@/api';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 
 export default {
@@ -26,8 +26,8 @@ export default {
   props: {
     active: Boolean
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       name: ''
@@ -48,13 +48,13 @@ export default {
       }
 
       try {
-        let ontology = await new Ontology({name: this.name}).save();
-        this.$notify({type: 'success', text: this.$t('notif-success-ontology-creation')});
+        let ontology = await new Ontology({ name: this.name }).save();
+        this.$notify({ type: 'success', text: this.$t('notif-success-ontology-creation') });
         this.$emit('newOntology', ontology);
         this.$emit('update:active', false);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-ontology-creation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-ontology-creation') });
       }
     }
   }

@@ -33,7 +33,7 @@ export default class User extends Model {
    * @returns {User} The current user
    */
   static async fetchCurrent() { // specific class fot current user?
-    let {data} = await Cytomine.instance.api.get('user/current.json');
+    let { data } = await Cytomine.instance.api.get('user/current.json');
     let currentUser = new this(data);
     return currentUser;
   }
@@ -60,7 +60,7 @@ export default class User extends Model {
       params.offline = offline;
     }
 
-    let {data} = await Cytomine.instance.api.get(`user/${this.id}/friends.json`, {params});
+    let { data } = await Cytomine.instance.api.get(`user/${this.id}/friends.json`, { params });
     let collection = new UserCollection();
     data.collection.forEach(item => collection.push(new User(item)));
     return collection;
@@ -79,7 +79,7 @@ export default class User extends Model {
       throw new Error('Cannot fetch a resume of activity for a user with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`project/${idProject}/resumeActivity/${this.id}.json`);
+    let { data } = await Cytomine.instance.api.get(`project/${idProject}/resumeActivity/${this.id}.json`);
     return data;
   }
 
@@ -107,12 +107,12 @@ export default class User extends Model {
       annotationPath = 'reviewedannotation';
     }
 
-    let {data} = await Cytomine.instance.api.get(`user/${this.id}/${annotationPath}/count.json`, {params});
+    let { data } = await Cytomine.instance.api.get(`user/${this.id}/${annotationPath}/count.json`, { params });
     return data.total;
   }
 
   static async fetchCurrentUserKeys() {
-    const {data} = await Cytomine.instance.api.get('user/current/keys');
+    const { data } = await Cytomine.instance.api.get('user/current/keys');
     return data;
   }
 
@@ -122,7 +122,7 @@ export default class User extends Model {
    * @returns {this} The updated user (with new API keys)
    */
   static async regenerateKeys() {
-    const {data} = await Cytomine.instance.api.post('user/current/keys');
+    const { data } = await Cytomine.instance.api.post('user/current/keys');
     return data;
   }
 

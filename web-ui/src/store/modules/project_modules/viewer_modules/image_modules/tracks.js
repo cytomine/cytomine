@@ -1,4 +1,4 @@
-import {TrackCollection} from '@/api';
+import { TrackCollection } from '@/api';
 
 export default {
   state() {
@@ -19,7 +19,7 @@ export default {
   },
 
   actions: {
-    async initialize({commit}, {image}) {
+    async initialize({ commit }, { image }) {
       commit('setIdImage', image.id);
 
       let [tracks] = await Promise.all([
@@ -30,19 +30,19 @@ export default {
       commit('setWrappedTracks', tracks);
     },
 
-    async setImageInstance({commit, dispatch}, {image}) {
+    async setImageInstance({ commit, dispatch }, { image }) {
       commit('setIdImage', image.id);
       await dispatch('refreshTracks');
     },
 
-    async refreshTracks({state, commit}) {
+    async refreshTracks({ state, commit }) {
       let tracks = await fetchTracks(state.idImage);
       commit('filterTracksNewAnnots', tracks || []);
       commit('setTracks', tracks);
       commit('setWrappedTracks', tracks);
     },
 
-    async refreshData({dispatch}) {
+    async refreshData({ dispatch }) {
       await dispatch('refreshTracks');
     }
   },
@@ -53,6 +53,6 @@ export default {
 };
 
 async function fetchTracks(idImage) {
-  let data = (await TrackCollection.fetchAll({filterKey: 'imageinstance', filterValue: idImage})).array;
+  let data = (await TrackCollection.fetchAll({ filterKey: 'imageinstance', filterValue: idImage })).array;
   return data;
 }

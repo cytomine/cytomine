@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineModal from '@/components/utils/CytomineModal';
@@ -12,8 +12,8 @@ vi.mock('@/api', () => ({
   ImageInstanceCollection: {
     fetchAll: vi.fn().mockResolvedValue({
       array: [
-        {id: 1, name: 'Image 1'},
-        {id: 2, name: 'Image 2'},
+        { id: 1, name: 'Image 1' },
+        { id: 2, name: 'Image 2' },
       ]
     }),
   },
@@ -24,8 +24,8 @@ describe('ImageSelection.vue', () => {
   let wrapper;
 
   const mockImages = [
-    {id: 1, name: 'Image 1'},
-    {id: 2, name: 'Image 2'},
+    { id: 1, name: 'Image 1' },
+    { id: 2, name: 'Image 2' },
   ];
 
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('ImageSelection.vue', () => {
         };
       },
       computed: {
-        project: () => ({id: 42}),
+        project: () => ({ id: 42 }),
       },
       mocks: {
         $t: (message) => message,
@@ -62,7 +62,7 @@ describe('ImageSelection.vue', () => {
   });
 
   it('The component should render the loading when the data is fetched', async () => {
-    await wrapper.setData({loading: true});
+    await wrapper.setData({ loading: true });
 
     expect(wrapper.exists()).toBe(true);
     expect(wrapper.findComponent(CytomineModal).exists()).toBe(true);
@@ -70,7 +70,7 @@ describe('ImageSelection.vue', () => {
   });
 
   it('Selecting an image should emit the select-image event', async () => {
-    wrapper.setData({selectedImage: mockImages[0]});
+    wrapper.setData({ selectedImage: mockImages[0] });
     await wrapper.vm.select();
 
     expect(wrapper.emitted('select-image')).toBeTruthy();
@@ -78,7 +78,7 @@ describe('ImageSelection.vue', () => {
   });
 
   it('Clicking on cancel should reset selectedImage', async () => {
-    wrapper.setData({selectedImage: mockImages[1]});
+    wrapper.setData({ selectedImage: mockImages[1] });
 
     expect(wrapper.vm.selectedImage).toBe(mockImages[1]);
 

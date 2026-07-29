@@ -17,7 +17,7 @@ export default {
     AppCard,
   },
   props: {
-    applications: {type: Array, default: () => []},
+    applications: { type: Array, default: () => [] },
   },
 };
 </script>

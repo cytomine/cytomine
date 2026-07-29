@@ -1,4 +1,4 @@
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 
 export default {
   state() {
@@ -14,8 +14,8 @@ export default {
       state.undoneActions = [];
     },
 
-    addAction(state, {annot, type}) {
-      let action = {annot, type, command: Cytomine.instance.lastCommand};
+    addAction(state, { annot, type }) {
+      let action = { annot, type, command: Cytomine.instance.lastCommand };
       state.actions.push(action);
       state.undoneActions = [];
     },
@@ -32,7 +32,7 @@ export default {
   },
 
   actions: {
-    setImageInstance({commit}) {
+    setImageInstance({ commit }) {
       commit('resetActions');
     }
   }

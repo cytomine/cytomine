@@ -183,12 +183,12 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import constants from '@/utils/constants';
-import {getWildcardRegexp} from '@/utils/string-utils';
-import {sameHistogramBounds} from '@/utils/histogram-utils';
+import { getWildcardRegexp } from '@/utils/string-utils';
+import { sameHistogramBounds } from '@/utils/histogram-utils';
 
-import {ImageFilterProjectCollection} from '@/api';
+import { ImageFilterProjectCollection } from '@/api';
 
 import CytomineChannel from '@/components/viewer/panels/colors/CytomineChannel.vue';
 import AdjustableLookUpTable from '@/components/viewer/panels/colors/AdjustableLookUpTable.vue';
@@ -256,7 +256,7 @@ export default {
       return this.$t('button-adjust');
     },
     defaultBounds() {
-      return {min: 0, max: 2 ** this.image.bitPerSample - 1};
+      return { min: 0, max: 2 ** this.image.bitPerSample - 1 };
     },
 
     manipulableChannels() {
@@ -296,7 +296,7 @@ export default {
         if (!histogram) {
           return false;
         }
-        return sameHistogramBounds(mc.bounds, {min: histogram.minimum, max: histogram.maximum});
+        return sameHistogramBounds(mc.bounds, { min: histogram.minimum, max: histogram.maximum });
       }).length ?? 0;
       return count === this.nbVisibleManipulableChannels;
     },
@@ -341,27 +341,27 @@ export default {
     /* Apparent channels manipulation */
     setApparentChannelVisibility(indexApparentChannel, visible) {
       this.$store.dispatch(this.imageModule + 'setApparentChannelVisibility',
-        {indexApparentChannel, visible}
+        { indexApparentChannel, visible }
       );
     },
     setApparentChannelColor(indexApparentChannel, color) {
       this.$store.commit(this.imageModule + 'setApparentChannelColor',
-        {indexApparentChannel, color, isColormap: false}
+        { indexApparentChannel, color, isColormap: false }
       );
     },
     setApparentChannelGamma(indexApparentChannel, gamma) {
       this.$store.commit(this.imageModule + 'setApparentChannelGamma',
-        {indexApparentChannel, gamma}
+        { indexApparentChannel, gamma }
       );
     },
     setApparentChannelInverted(indexApparentChannel, inverted) {
       this.$store.commit(this.imageModule + 'setApparentChannelInverted',
-        {indexApparentChannel, inverted}
+        { indexApparentChannel, inverted }
       );
     },
     setApparentChannelBounds(indexApparentChannel, bounds) {
       this.$store.commit(this.imageModule + 'setApparentChannelBounds',
-        {indexApparentChannel, bounds}
+        { indexApparentChannel, bounds }
       );
     },
     reset(indexApparentChannel) {
@@ -382,9 +382,9 @@ export default {
     },
     adjustToSlice(indexApparentChannel) {
       const mc = this.manipulableChannels[indexApparentChannel];
-      const bounds = {min: mc.histogram.minimum, max: mc.histogram.maximum};
+      const bounds = { min: mc.histogram.minimum, max: mc.histogram.maximum };
       this.$store.commit(this.imageModule + 'adjustToSlice',
-        {indexApparentChannel, bounds}
+        { indexApparentChannel, bounds }
       );
     },
     adjustAllToSlice() {
@@ -432,7 +432,7 @@ export default {
         // As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
 
 
-        this.histograms = (await this.slices[0].fetchChannelHistograms({nBins: 256}));
+        this.histograms = (await this.slices[0].fetchChannelHistograms({ nBins: 256 }));
         // if (this.image.apparentChannels <= constants.MAX_MERGEABLE_CHANNELS) {
         //   // As for now we only allow multiple slices with varying C and fixed Z,T, this request is OK.
         //   this.histograms = (await this.slices[0].fetchChannelHistograms({nBins: this.histogramNBins}));
@@ -448,7 +448,7 @@ export default {
   },
   async created() {
     try {
-      let filters = (await ImageFilterProjectCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+      let filters = (await ImageFilterProjectCollection.fetchAll({ filterKey: 'project', filterValue: this.project.id })).array;
       filters.forEach(filter => filter.prefix = filter.imagingServer + filter.baseUrl);
       let prefixes = filters.map(filter => filter.prefix);
       if (this.selectedFilter && !prefixes.includes(this.selectedFilter)) {

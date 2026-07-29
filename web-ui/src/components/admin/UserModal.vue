@@ -80,13 +80,13 @@
 </template>
 
 <script>
-import {User} from '@/api';
-import {rolesMapping} from '@/utils/role-utils';
-import {UserRole} from '@/constants/UserRole.js';
+import { User } from '@/api';
+import { rolesMapping } from '@/utils/role-utils';
+import { UserRole } from '@/constants/UserRole.js';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 
 const defaultRole = UserRole.GUEST;
-const defaultLanguage = {value: 'EN', name:'English'};
+const defaultLanguage = { value: 'EN', name:'English' };
 
 export default {
   name: 'user-modal',
@@ -94,8 +94,8 @@ export default {
     active: Boolean,
     user: Object
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       internalUser: {},
@@ -103,10 +103,10 @@ export default {
       displayErrors: false,
       adminConfirm: false,
       languages: [
-        {value: 'EN', name:'English'},
-        {value: 'FR', name:'Français'},
-        {value: 'ES', name:'Español'},
-        {value: 'NL', name:'Nederlands'}
+        { value: 'EN', name:'English' },
+        { value: 'FR', name:'Français' },
+        { value: 'ES', name:'Español' },
+        { value: 'NL', name:'Nederlands' }
       ]
     };
   },
@@ -122,10 +122,10 @@ export default {
     },
     editableFields() {
       return [
-        {field: 'firstname', validationRules: 'required'},
-        {field: 'lastname', validationRules: 'required'},
-        {field: 'email', validationRules: 'required|email'},
-        {field: 'password', validationRules: this.editionMode ? 'min:8' : 'required|min:8'}
+        { field: 'firstname', validationRules: 'required' },
+        { field: 'lastname', validationRules: 'required' },
+        { field: 'email', validationRules: 'required|email' },
+        { field: 'password', validationRules: this.editionMode ? 'min:8' : 'required|min:8' }
       ];
     },
   },
@@ -173,12 +173,12 @@ export default {
         }
 
         this.internalUser.password = ''; // reinitialize password so that if modal reopened, field empty
-        this.$notify({type: 'success', text: this.$t('notif-success-user-' + labelTranslation)});
+        this.$notify({ type: 'success', text: this.$t('notif-success-user-' + labelTranslation) });
         this.$emit('update:active', false);
         this.$emit(this.editionMode ? 'updateUser' : 'addUser', this.internalUser);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-user-' + labelTranslation)});
+        this.$notify({ type: 'error', text: this.$t('notif-error-user-' + labelTranslation) });
       }
     },
   },

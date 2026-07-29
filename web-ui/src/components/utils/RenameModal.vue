@@ -26,8 +26,8 @@ export default {
     currentName: String,
     title: String
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       newName: ''

@@ -69,7 +69,7 @@ export default class ImageInstance extends Model {
       return null;
     }
     let url = this.preview.split('?')[0].split('.').slice(0, -1).join('.');
-    let parameters = {maxSize, ...otherParameters};
+    let parameters = { maxSize, ...otherParameters };
     let query = new URLSearchParams(parameters).toString();
     return `${url}.${format}?${query}`;
   }
@@ -87,7 +87,7 @@ export default class ImageInstance extends Model {
       return null;
     }
     let url = this.thumb.split('?')[0].split('.').slice(0, -1).join('.');
-    let parameters = {maxSize, ...otherParameters};
+    let parameters = { maxSize, ...otherParameters };
     let query = new URLSearchParams(parameters).toString();
     return `${url}.${format}?${query}`;
   }
@@ -107,7 +107,7 @@ export default class ImageInstance extends Model {
     }
     let url = this.macroURL.split('?')[0].split('.').slice(0, -1).join('.');
     url = url.substring(0, url.lastIndexOf('/'));
-    let parameters = {maxSize, ...otherParameters};
+    let parameters = { maxSize, ...otherParameters };
     let query = new URLSearchParams(parameters).toString();
     return `${url}/${kind}.${format}?${query}`;
   }
@@ -129,7 +129,7 @@ export default class ImageInstance extends Model {
       throw new Error('Cannot fext next image of an image instance with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/next.json`);
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/next.json`);
     return new ImageInstance(data);
   }
 
@@ -143,7 +143,7 @@ export default class ImageInstance extends Model {
       throw new Error('Cannot fext next image of an image instance with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/previous.json`);
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/previous.json`);
     return new ImageInstance(data);
   }
 
@@ -160,7 +160,7 @@ export default class ImageInstance extends Model {
     }
 
     let uri = `${this.callbackIdentifier}/${this.id}/online.json${broadcast ? '?broadcast=true' : ''}`;
-    let {data} = await Cytomine.instance.api.get(uri);
+    let { data } = await Cytomine.instance.api.get(uri);
     return data.users;
   }
 
@@ -181,7 +181,7 @@ export default class ImageInstance extends Model {
       params.project = project;
     }
 
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/sameimagedata.json`, {params});
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/sameimagedata.json`, { params });
     return data.collection;
   }
 
@@ -195,7 +195,7 @@ export default class ImageInstance extends Model {
       throw new Error('Cannot fetch annotations index of image with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/annotationindex.json`);
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/annotationindex.json`);
     return data.collection;
   }
 
@@ -247,7 +247,7 @@ export default class ImageInstance extends Model {
       throw new Error('Cannot review animage with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.put(`${this.callbackIdentifier}/${this.id}/review.json`);
+    let { data } = await Cytomine.instance.api.put(`${this.callbackIdentifier}/${this.id}/review.json`);
     this.populate(data[this.callbackIdentifier]);
     Cytomine.instance.lastCommand = data.command;
     return this;
@@ -267,7 +267,7 @@ export default class ImageInstance extends Model {
       throw new Error('Cannot stop the review on an image with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.delete(`${this.callbackIdentifier}/${this.id}/review.json?cancel=${cancel}`);
+    let { data } = await Cytomine.instance.api.delete(`${this.callbackIdentifier}/${this.id}/review.json?cancel=${cancel}`);
     this.populate(data[this.callbackIdentifier]);
     return this;
   }
@@ -282,7 +282,7 @@ export default class ImageInstance extends Model {
       throw new Error('Cannot fetch review statistics on an image with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`imageinstance/${this.id}/reviewedannotation/stats.json`);
+    let { data } = await Cytomine.instance.api.get(`imageinstance/${this.id}/reviewedannotation/stats.json`);
     return data.collection;
   }
 
@@ -297,19 +297,19 @@ export default class ImageInstance extends Model {
     }
 
     if (!this._referenceSlice) {
-      let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/sliceinstance/reference.json`);
+      let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/sliceinstance/reference.json`);
       this._referenceSlice = new SliceInstance(data);
     }
 
     return this._referenceSlice;
   }
 
-  async fetchHistogram({nBins} = {}) {
+  async fetchHistogram({ nBins } = {}) {
     if (this.isNew()) {
       throw new Error('Cannot get histogram for an image with no ID.');
     }
-    let params = {nBins};
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/histogram.json`, {params});
+    let params = { nBins };
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/histogram.json`, { params });
     return data;
   }
 
@@ -318,16 +318,16 @@ export default class ImageInstance extends Model {
       throw new Error('Cannot get histogram bounds for an image with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/histogram/bounds.json`);
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/histogram/bounds.json`);
     return data;
   }
 
-  async fetchChannelHistograms({nBins} = {}) {
+  async fetchChannelHistograms({ nBins } = {}) {
     if (this.isNew()) {
       throw new Error('Cannot get channel histograms for an image with no ID.');
     }
-    let params = {nBins};
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/channelhistogram.json`, {params});
+    let params = { nBins };
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/channelhistogram.json`, { params });
     return data.collection;
   }
 
@@ -336,7 +336,7 @@ export default class ImageInstance extends Model {
       throw new Error('Cannot get channel histogram bounds for an image with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/channelhistogram/bounds.json`);
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/channelhistogram/bounds.json`);
     return data.collection;
   }
 }

@@ -1,22 +1,22 @@
-import {Bar} from 'vue-chartjs';
+import { Bar } from 'vue-chartjs';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import {asArray as hexToRgb} from 'ol/color';
+import { asArray as hexToRgb } from 'ol/color';
 
 const defaultColor = '#eee';
 
 export default {
   name: 'annotated-images-by-term-chart',
-  components: {Bar},
+  components: { Bar },
   props: {
-    cssClasses: {type: String, default: ''},
+    cssClasses: { type: String, default: '' },
     project: Object,
     startDate: Number,
     endDate: Number
   },
   data() {
     return {
-      chartData: {labels: [], datasets: []},
+      chartData: { labels: [], datasets: [] },
     };
   },
   computed: {
@@ -32,7 +32,7 @@ export default {
         indexAxis: 'y',
         maintainAspectRatio: false,
         plugins: {
-          legend: {display: false},
+          legend: { display: false },
           datalabels: {
             anchor: 'end',
             align: 'end',
@@ -90,7 +90,7 @@ export default {
     await this.updateData();
   },
   render(h) {
-    return h('div', {class: this.cssClasses}, [
+    return h('div', { class: this.cssClasses }, [
       h(Bar, {
         props: {
           data: this.chartData,

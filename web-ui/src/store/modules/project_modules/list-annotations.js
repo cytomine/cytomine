@@ -50,7 +50,7 @@ export default {
       state.annotationType = type;
     },
 
-    setFilter(state, {filterName, propValue}) {
+    setFilter(state, { filterName, propValue }) {
       state.filters[filterName] = propValue;
     },
 
@@ -76,7 +76,7 @@ export default {
       state.currentPages = {};
     },
 
-    setCurrentPage(state, {prop, page}) {
+    setCurrentPage(state, { prop, page }) {
       Vue.set(state.currentPages, prop, page);
     }
   }

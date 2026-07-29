@@ -23,7 +23,7 @@ export function splitImageUrl(rawUrl) {
   };
 }
 
-export function combineImageUrl({host, pathname, format, params}) {
+export function combineImageUrl({ host, pathname, format, params }) {
   if (!(params instanceof URLSearchParams)) {
     params = new URLSearchParams(params);
   }
@@ -34,5 +34,5 @@ export function combineImageUrl({host, pathname, format, params}) {
 
 
 export function changeImageUrlFormat(url, newFormat = IMAGE_FORMAT) {
-  return combineImageUrl({format: newFormat, ...splitImageUrl(url)});
+  return combineImageUrl({ format: newFormat, ...splitImageUrl(url) });
 }

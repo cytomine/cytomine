@@ -24,7 +24,7 @@ export default class ProjectRepresentative extends Model {
    * @returns {this} The fetched object
    */
   static async fetch(id, project) {
-    return new this({id, project}).fetch();
+    return new this({ id, project }).fetch();
   }
 
   /**
@@ -35,7 +35,7 @@ export default class ProjectRepresentative extends Model {
    * @param {number} project  The identifier of the project
    */
   static async delete(id, project, user) {
-    return new this({id, project, user}).delete();
+    return new this({ id, project, user }).delete();
   }
 
   /** @override */

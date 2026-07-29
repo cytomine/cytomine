@@ -97,14 +97,14 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import CytomineTable from '@/components/utils/CytomineTable.vue';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
 import AddMemberModal from './AddMemberModal.vue';
-import {Cytomine, UserCollection, ProjectRepresentative} from '@/api';
+import { Cytomine, UserCollection, ProjectRepresentative } from '@/api';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import { appendShortTermToken } from '@/utils/token-utils.js';
 
 export default {
   name: 'projet-members',
@@ -128,9 +128,9 @@ export default {
 
       searchString: '',
 
-      contributorRole: {label:this.$t('contributor'), value : 'contributor'},
-      managerRole: {label:this.$t('manager'), value: 'manager'},
-      representativeRole: {label:this.$t('representative'), value: 'representative'},
+      contributorRole: { label:this.$t('contributor'), value : 'contributor' },
+      managerRole: { label:this.$t('manager'), value: 'manager' },
+      representativeRole: { label:this.$t('representative'), value: 'representative' },
       availableRoles: [],
       selectedRoles: [],
       selectedMembers: [],
@@ -200,10 +200,10 @@ export default {
       try {
         await this.project.deleteUsers(this.selectedMembers.map(member => member.id));
         await this.refreshMembers();
-        this.$notify({type: 'success', text: this.$t('notif-success-remove-project-members')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-remove-project-members') });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-remove-project-members')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-remove-project-members') });
       }
     },
 
@@ -241,24 +241,24 @@ export default {
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: member.fullName})});
+        this.$notify({ type: 'error', text: this.$t('notif-error-change-role', { username: member.fullName }) });
       }
     },
     async toggleRepresentative(member) {
       try {
         if (member.role === this.representativeRole.value) {
           if ((await this.project.fetchRepresentatives()).array.length < 2) {
-            this.$notify({type: 'error', text: this.$t('notif-error-not-enough-representative')});
+            this.$notify({ type: 'error', text: this.$t('notif-error-not-enough-representative') });
           } else {
             await ProjectRepresentative.delete(0, this.project.id, member.id);
           }
         } else {
-          await new ProjectRepresentative({user: member.id, project: this.project.id}).save();
+          await new ProjectRepresentative({ user: member.id, project: this.project.id }).save();
         }
         this.revision++;
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-change-role', {username: member.fullName})});
+        this.$notify({ type: 'error', text: this.$t('notif-error-change-role', { username: member.fullName }) });
       }
     },
   },

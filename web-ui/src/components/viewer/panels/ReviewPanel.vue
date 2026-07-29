@@ -89,12 +89,12 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import Username from '@/components/user/Username.vue';
 import ListUsernames from '@/components/user/ListUsernames.vue';
 import CytomineTask from '@/components/utils/CytomineTask.vue';
-import {formatMomentDate} from '@/utils/date';
-import {User, Task, AnnotationCollection} from '@/api';
+import { formatMomentDate } from '@/utils/date';
+import { User, Task, AnnotationCollection } from '@/api';
 
 export default {
   name: 'review-panel',
@@ -160,7 +160,7 @@ export default {
         this.reviewMode = true;
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-start-review')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-start-review') });
       }
     },
     async cancelReview() {
@@ -170,7 +170,7 @@ export default {
         this.reviewMode = false;
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-cancel-review')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-cancel-review') });
       }
     },
     async validate() {
@@ -180,7 +180,7 @@ export default {
         this.reviewMode = false;
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-validate-review')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-validate-review') });
       }
     },
     async unvalidate() {
@@ -190,23 +190,23 @@ export default {
         this.reviewMode = false;
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-unvalidate-review')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-unvalidate-review') });
       }
     },
     async reviewAll(accept) {
       try {
-        this.taskReviewAll = await new Task({project: this.project.id}).save();
+        this.taskReviewAll = await new Task({ project: this.project.id }).save();
         await AnnotationCollection.reviewAll({
           accept,
           image: this.image.id,
           users: this.visibleUserLayerIds,
           task: this.taskReviewAll.id
         });
-        eventBus.emit('reloadAnnotations', {idImage: this.image.id, clear: true});
+        eventBus.emit('reloadAnnotations', { idImage: this.image.id, clear: true });
       } catch (error) {
         console.log(error);
         this.taskReviewAll = null;
-        this.$notify({type: 'error', text: this.$t('notif-error-review-' + (accept ? 'accept' : 'reject') + '-all')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-review-' + (accept ? 'accept' : 'reject') + '-all') });
       }
     },
   },

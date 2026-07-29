@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import {AttachedFile} from '@/api';
+import { AttachedFile } from '@/api';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
@@ -41,8 +41,8 @@ export default {
   props: {
     object: Object
   },
-  components: {CytomineModalCard},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModalCard },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       selectedFile: null,
@@ -64,13 +64,13 @@ export default {
       }
 
       try {
-        let attached = await new AttachedFile({file: this.selectedFile, filename: this.name}, this.object).save();
+        let attached = await new AttachedFile({ file: this.selectedFile, filename: this.name }, this.object).save();
         this.$emit('addAttachedFile', attached);
-        this.$notify({type: 'success', text: this.$t('notif-success-attached-file-creation')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-attached-file-creation') });
         this.$parent.close();
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-attached-file-creation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-attached-file-creation') });
       }
     },
   }

@@ -60,19 +60,19 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {ImageInstanceCollection, ImageGroupImageInstance} from '@/api';
+import { get } from '@/utils/store-helpers';
+import { ImageInstanceCollection, ImageGroupImageInstance } from '@/api';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 import CytomineTable from '@/components/utils/CytomineTable.vue';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'add-to-image-group-modal',
   props: {
     active: Boolean,
     imageGroup: Object,
-    programmatic: {type: Boolean, default: false}
+    programmatic: { type: Boolean, default: false }
   },
   components: {
     ImageThumbnail,
@@ -131,18 +131,18 @@ export default {
     },
     async addImage(imageInstance) {
       try {
-        let link = await new ImageGroupImageInstance({image: imageInstance.id, group: this.imageGroup.id}).save();
+        let link = await new ImageGroupImageInstance({ image: imageInstance.id, group: this.imageGroup.id }).save();
         this.idsAddedImages.push(imageInstance.id);
         this.$emit('addToImageGroup', link);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-group-link-creation', {imageName: this.imageNameNotif(imageInstance)})
+          text: this.$t('notif-success-image-group-link-creation', { imageName: this.imageNameNotif(imageInstance) })
         });
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-group-link-creation', {imageName: this.imageNameNotif(imageInstance)})
+          text: this.$t('notif-error-image-group-link-creation', { imageName: this.imageNameNotif(imageInstance) })
         });
       }
     },

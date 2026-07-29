@@ -13,15 +13,15 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
-import {ImageInstanceCollection} from '@/api';
+import { ImageInstanceCollection } from '@/api';
 
 import ImagePreview from './ImagePreview.vue';
 
 export default {
   name: 'list-images-preview',
-  components: {ImagePreview},
+  components: { ImagePreview },
   props: {
     project: Object,
     nbRecent: {

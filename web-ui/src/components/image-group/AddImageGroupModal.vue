@@ -18,17 +18,17 @@
 </template>
 
 <script>
-import {ImageGroup} from '@/api';
+import { ImageGroup } from '@/api';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'add-image-group-modal',
   props: {
     active: Boolean
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       name: ''
@@ -52,13 +52,13 @@ export default {
       }
 
       try {
-        let imageGroup = await new ImageGroup({name: this.name, project: this.project.id}).save();
-        this.$notify({type: 'success', text: this.$t('notif-success-image-group-creation')});
+        let imageGroup = await new ImageGroup({ name: this.name, project: this.project.id }).save();
+        this.$notify({ type: 'success', text: this.$t('notif-success-image-group-creation') });
         this.$emit('update:active', false);
         this.$emit('newImageGroup', imageGroup);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-image-group-creation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-image-group-creation') });
       }
     }
   }

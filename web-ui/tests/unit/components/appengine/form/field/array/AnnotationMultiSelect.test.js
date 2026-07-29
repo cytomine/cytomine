@@ -1,13 +1,13 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect';
 import SelectableAnnotation from '@/components/annotations/SelectableAnnotation';
-import {flushPromises} from '../../../../../../utils';
+import { flushPromises } from '../../../../../../utils';
 
 const mockedAnnotations = [
-  {id: 1, name: 'Annotation 1'},
-  {id: 2, name: 'Annotation 2'},
+  { id: 1, name: 'Annotation 1' },
+  { id: 2, name: 'Annotation 2' },
 ];
 
 vi.mock('@/api', () => ({
@@ -24,7 +24,7 @@ describe('AnnotationMultiSelect.vue', () => {
   const localVue = createLocalVue();
   localVue.use(Buefy);
 
-  const mockImages = [{imageInstance: {id: 1}}];
+  const mockImages = [{ imageInstance: { id: 1 } }];
 
   const createWrapper = () => {
     return mount(AnnotationMultiSelect, {
@@ -37,7 +37,7 @@ describe('AnnotationMultiSelect.vue', () => {
       mocks: {
         $store: {
           getters: {
-            'currentProject/currentViewer': {images: mockImages},
+            'currentProject/currentViewer': { images: mockImages },
           },
         },
       },
@@ -68,7 +68,7 @@ describe('AnnotationMultiSelect.vue', () => {
     const wrapper = createWrapper();
 
     const selectedAnnotationIds = [42, 1337];
-    await wrapper.setData({selectedAnnotationIds: selectedAnnotationIds});
+    await wrapper.setData({ selectedAnnotationIds: selectedAnnotationIds });
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input[0]).toEqual([selectedAnnotationIds]);

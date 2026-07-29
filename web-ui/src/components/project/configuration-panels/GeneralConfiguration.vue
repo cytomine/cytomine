@@ -143,11 +143,11 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import ProjectActions from '../ProjectActions.vue';
 import DefaultProperty from './DefaultProperty.vue';
-import {Project, ProjectDefaultLayer, ProjectDefaultLayerCollection} from '@/api';
+import { Project, ProjectDefaultLayer, ProjectDefaultLayerCollection } from '@/api';
 
 export default {
   name: 'general-configuration',
@@ -178,7 +178,7 @@ export default {
     selectedLayers() {
       return this.defaultLayers.map(defaultLayer => {
         let layer = this.layers.find(layer => layer.id === defaultLayer.user);
-        return {...defaultLayer, ...layer};
+        return { ...defaultLayer, ...layer };
       });
     },
     unselectedLayers() {
@@ -191,35 +191,35 @@ export default {
       if (mode === this.currentEditingMode) {
         return;
       }
-      this.updateProject({isReadOnly: mode === 'READ-ONLY', isRestricted: mode === 'RESTRICTED'});
+      this.updateProject({ isReadOnly: mode === 'READ-ONLY', isRestricted: mode === 'RESTRICTED' });
     },
 
     blindMode() {
       if (this.blindMode === this.project.blindMode) {
         return;
       }
-      this.updateProject({blindMode: this.blindMode});
+      this.updateProject({ blindMode: this.blindMode });
     },
 
     hideManagersLayers() {
       if (this.hideManagersLayers === this.project.hideAdminsLayers) {
         return;
       }
-      this.updateProject({hideAdminsLayers: this.hideManagersLayers});
+      this.updateProject({ hideAdminsLayers: this.hideManagersLayers });
     },
 
     hideContributorsLayers() {
       if (this.hideContributorsLayers === this.project.hideUsersLayers) {
         return;
       }
-      this.updateProject({hideUsersLayers: this.hideContributorsLayers});
+      this.updateProject({ hideUsersLayers: this.hideContributorsLayers });
     },
 
     imagesDownloadable() {
       if (this.imagesDownloadable === this.project.areImagesDownloadable) {
         return;
       }
-      this.updateProject({areImagesDownloadable: this.imagesDownloadable});
+      this.updateProject({ areImagesDownloadable: this.imagesDownloadable });
     }
   },
   methods: {
@@ -247,7 +247,7 @@ export default {
       } catch (error) {
         console.log(error);
         this.initData(); // reset data
-        this.$notify({type: 'error', text: this.$t('notif-error-general-config-update')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-general-config-update') });
       }
     },
 
@@ -266,7 +266,7 @@ export default {
         this.layerToAdd = null;
       }  catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-default-layer-add')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-default-layer-add') });
       }
     },
 
@@ -275,7 +275,7 @@ export default {
         await this.defaultLayers[idx].save();
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-default-layer-update')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-default-layer-update') });
       }
     },
 
@@ -285,7 +285,7 @@ export default {
         this.defaultLayers.splice(idx, 1);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-default-layer-delete')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-default-layer-delete') });
       }
     },
 
@@ -298,14 +298,14 @@ export default {
         await Project.delete(this.project.id);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-project-deletion', {projectName: this.project.name})
+          text: this.$t('notif-success-project-deletion', { projectName: this.project.name })
         });
         this.$router.push('/projects');
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-project-deletion', {projectName: this.project.name})
+          text: this.$t('notif-error-project-deletion', { projectName: this.project.name })
         });
       }
     }

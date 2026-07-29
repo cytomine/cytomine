@@ -36,16 +36,16 @@
 
 <script>
 
-import {getWildcardRegexp} from '@/utils/string-utils';
-import {get} from '@/utils/store-helpers';
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {Cytomine} from '@/api';
+import { getWildcardRegexp } from '@/utils/string-utils';
+import { get } from '@/utils/store-helpers';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { Cytomine } from '@/api';
 
 export default {
   name: 'image-metadata',
   props: {
     image: Object,
-    showMacro: {type: Boolean, default: true}
+    showMacro: { type: Boolean, default: true }
   },
   data() {
     return {
@@ -92,7 +92,7 @@ export default {
     async fetchMetadata() {
       this.metadata = (await Cytomine.instance.api.get(
         `${this.uriCytomineImageType}/${this.image.id}/metadata.json`
-      )).data.collection.map(md => ({fullKey: `${md.namespace}.${md.key}`, ...md}));
+      )).data.collection.map(md => ({ fullKey: `${md.namespace}.${md.key}`, ...md }));
       this.metadata.sort((a, b) => a.fullKey.localeCompare(b.fullKey));
     }
   },

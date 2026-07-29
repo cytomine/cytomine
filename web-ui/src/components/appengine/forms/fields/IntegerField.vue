@@ -24,7 +24,7 @@
 export default {
   name: 'IntegerField',
   props: {
-    parameter: {type: Object, required: true},
+    parameter: { type: Object, required: true },
     value: {}
   },
   computed: {
@@ -40,11 +40,11 @@ export default {
       return this.parameter.type;
     },
     hasConstraints() {
-      let {gt, lt, geq, leq} = this.type;
+      let { gt, lt, geq, leq } = this.type;
       return gt !== null || lt !== null || geq !== null || leq !== null;
     },
     constraintsSummary() {
-      let {gt, lt, geq, leq} = this.type;
+      let { gt, lt, geq, leq } = this.type;
       let summary = '';
       if (!!geq || geq === 0) {
         summary += `${geq} ≤ `;
@@ -70,7 +70,7 @@ export default {
     },
     min() {
       let min = null;
-      let {gt, geq} = this.type;
+      let { gt, geq } = this.type;
       if (!!geq || geq === 0) {
         min = geq;
       }
@@ -81,7 +81,7 @@ export default {
     },
     max() {
       let max = null;
-      let {lt, leq} = this.type;
+      let { lt, leq } = this.type;
       if (!!leq || leq === 0) {
         max = leq;
       }

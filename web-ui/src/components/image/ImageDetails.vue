@@ -283,11 +283,11 @@
 </template>
 
 <script>
-import {ImageInstance, ImageGroupImageInstanceCollection} from '@/api';
+import { ImageInstance, ImageGroupImageInstanceCollection } from '@/api';
 
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {formatMinutesSeconds} from '@/utils/slice-utils.js';
-import {get} from '@/utils/store-helpers';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { formatMinutesSeconds } from '@/utils/slice-utils.js';
+import { get } from '@/utils/store-helpers';
 import vendorFromFormat from '@/utils/vendor';
 
 import AttachedFiles from '@/components/attached-file/AttachedFiles.vue';
@@ -318,9 +318,9 @@ export default {
     SimpleAddToImageGroupModal,
   },
   props: {
-    image: {type: Object},
-    excludedProperties: {type: Array, default: () => []},
-    editable: {type: Boolean, default: false}
+    image: { type: Object },
+    excludedProperties: { type: Array, default: () => [] },
+    editable: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -394,7 +394,7 @@ export default {
         await this.image.stopReview(true);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t(errorLabel)});
+        this.$notify({ type: 'error', text: this.$t(errorLabel) });
       }
     },
 
@@ -406,13 +406,13 @@ export default {
         await this.image.save();
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-rename', {imageName: this.image.instanceFilename})
+          text: this.$t('notif-success-image-rename', { imageName: this.image.instanceFilename })
         });
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-rename', {imageName: oldName})
+          text: this.$t('notif-error-image-rename', { imageName: oldName })
         });
       }
       this.isRenameModalActive = false;
@@ -421,7 +421,7 @@ export default {
     confirmDeletion() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-image'),
-        message: this.$t('delete-image-confirmation-message', {imageName: this.imageNameNotif}),
+        message: this.$t('delete-image-confirmation-message', { imageName: this.imageNameNotif }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -433,7 +433,7 @@ export default {
         await ImageInstance.delete(this.image.id);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-deletion', {imageName: this.imageNameNotif})
+          text: this.$t('notif-success-image-deletion', { imageName: this.imageNameNotif })
         });
         this.$emit('delete');
 
@@ -444,14 +444,14 @@ export default {
         console.log(err);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-deletion', {imageName: this.imageNameNotif})
+          text: this.$t('notif-error-image-deletion', { imageName: this.imageNameNotif })
         });
       }
     },
     confirmImageGroupLinkDeletion() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-image-group-link'),
-        message: this.$t('delete-image-group-link-confirmation-message', {imageName: this.imageNameNotif}),
+        message: this.$t('delete-image-group-link-confirmation-message', { imageName: this.imageNameNotif }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -464,14 +464,14 @@ export default {
         await this.imageGroupLinks[0].delete();
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-group-link-deletion', {imageName: this.imageNameNotif})
+          text: this.$t('notif-success-image-group-link-deletion', { imageName: this.imageNameNotif })
         });
         this.imageGroupLinks.splice(0, 1);
       } catch (err) {
         console.log(err);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-group-link-deletion', {imageName: this.imageNameNotif})
+          text: this.$t('notif-error-image-group-link-deletion', { imageName: this.imageNameNotif })
         });
       }
     },

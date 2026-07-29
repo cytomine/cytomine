@@ -1,13 +1,13 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import SelectableAnnotation from '@/components/annotations/SelectableAnnotation';
 import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 
 describe('SelectableAnnotation.vue', () => {
   let wrapper;
 
-  const mockAnnotation = {id: 1};
-  const mockImages = [{id: 101, name: 'Image 1'}];
-  const mockUsers = [{id: 201, username: 'User1'}];
+  const mockAnnotation = { id: 1 };
+  const mockImages = [{ id: 101, name: 'Image 1' }];
+  const mockUsers = [{ id: 201, username: 'User1' }];
 
   beforeEach(() => {
     wrapper = shallowMount(SelectableAnnotation, {
@@ -25,7 +25,7 @@ describe('SelectableAnnotation.vue', () => {
   });
 
   it('The component should render the selected class when isSelected is true', async () => {
-    await wrapper.setProps({isSelected: true});
+    await wrapper.setProps({ isSelected: true });
 
     expect(wrapper.classes()).toContain('selected');
   });

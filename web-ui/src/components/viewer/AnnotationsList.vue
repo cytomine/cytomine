@@ -77,9 +77,9 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {UserCollection} from '@/api';
+import { UserCollection } from '@/api';
 
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy.vue';
 import OntologyTree from '@/components/ontology/OntologyTree.vue';
@@ -98,7 +98,7 @@ export default {
   data() {
     return {
       nbPerPage: 10,
-      noTermOption: {id: 0, name: this.$t('no-term')},
+      noTermOption: { id: 0, name: this.$t('no-term') },
 
       users: [],
 
@@ -275,8 +275,8 @@ export default {
     isSameView(annot) {
       return this.displayType === 'TERM' && this.sliceIds.includes(annot.slice);
     },
-    select({annot, options}) {
-      this.$emit('select', {annot, options: {trySameView: options.trySameView || this.isSameView(annot)}});
+    select({ annot, options }) {
+      this.$emit('select', { annot, options: { trySameView: options.trySameView || this.isSameView(annot) } });
     },
 
     shortkeyHandler(key) {

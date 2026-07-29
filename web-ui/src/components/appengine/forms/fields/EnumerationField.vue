@@ -32,7 +32,7 @@
 export default {
   name: 'EnumerationField',
   props: {
-    parameter: {type: Object, required: true},
+    parameter: { type: Object, required: true },
     value: {},
   },
   computed: {

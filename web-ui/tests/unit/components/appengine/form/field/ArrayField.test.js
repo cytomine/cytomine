@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ArrayField from '@/components/appengine/forms/fields/ArrayField';
@@ -26,7 +26,7 @@ describe('ArrayField.vue', () => {
     // eslint-disable-next-line
     display_name: 'Test Parameter',
     description: 'This is a test description',
-    type: {subType: {id: 'boolean'}},
+    type: { subType: { id: 'boolean' } },
   };
 
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe('ArrayField.vue', () => {
     expect(wrapper.find('button').text()).toBe('select');
     expect(wrapper.find('.state-container').exists()).toBe(false);
 
-    const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
+    const tooltips = wrapper.findAllComponents({ name: 'BTooltip' });
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
     expect(tooltips.at(0).props('label')).toBe(mockParameter.description + ', items');
@@ -71,7 +71,7 @@ describe('ArrayField.vue', () => {
   });
 
   it('The component should render provisioned text when there is a value', async () => {
-    await wrapper.setProps({value: [42]});
+    await wrapper.setProps({ value: [42] });
 
     expect(wrapper.find('.state-container').exists()).toBe(true);
     expect(wrapper.find('.state-container').text()).toBe('provisioned');

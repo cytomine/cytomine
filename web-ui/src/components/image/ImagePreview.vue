@@ -20,18 +20,18 @@
 </template>
 
 <script>
-import {changeImageUrlFormat} from '@/utils/image-utils';
-import {get} from '@/utils/store-helpers';
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import { changeImageUrlFormat } from '@/utils/image-utils';
+import { get } from '@/utils/store-helpers';
+import { appendShortTermToken } from '@/utils/token-utils.js';
 
 export default {
   name: 'image-preview',
   props: {
-    image: {type: Object},
-    project: {type: Object, default: null},
-    fullHeightCard: {type: Boolean, default: true},
-    showProject: {type: Boolean, default: false},
-    blindMode: {type: Boolean, default: false},
+    image: { type: Object },
+    project: { type: Object, default: null },
+    fullHeightCard: { type: Boolean, default: true },
+    showProject: { type: Boolean, default: false },
+    blindMode: { type: Boolean, default: false },
   },
   computed: {
     shortTermToken: get('currentUser/shortTermToken'),
@@ -51,7 +51,7 @@ export default {
       return changeImageUrlFormat(this.rawPreviewUrl);
     },
     figureStyle() {
-      return {backgroundImage: `url("${appendShortTermToken(this.previewUrl, this.shortTermToken)}")`};
+      return { backgroundImage: `url("${appendShortTermToken(this.previewUrl, this.shortTermToken)}")` };
     }
   },
 };

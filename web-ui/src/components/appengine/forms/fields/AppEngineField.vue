@@ -27,7 +27,7 @@ export default {
     StringField,
   },
   props: {
-    parameter: {type: Object, required: true},
+    parameter: { type: Object, required: true },
     value: {}
   },
   computed: {

@@ -24,12 +24,12 @@
 </template>
 
 <script>
-import {Project} from '@/api';
+import { Project } from '@/api';
 import moment from 'moment';
 import _ from 'lodash';
 
 import ActivityLogsItem from './ActivityLogsItem.vue';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'activity-logs',
@@ -39,7 +39,7 @@ export default {
     idUser: Number,
     project: Object
   },
-  components: {ActivityLogsItem},
+  components: { ActivityLogsItem },
   data() {
     return {
       loading: true,
@@ -80,7 +80,7 @@ export default {
             idxDays = -1;
           }
 
-          results[idxMonths].days.push({refDate: Number(action.created), actions: [action]});
+          results[idxMonths].days.push({ refDate: Number(action.created), actions: [action] });
           idxDays++;
         } else {
           results[idxMonths].days[idxDays].actions.push(action);

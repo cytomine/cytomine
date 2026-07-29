@@ -44,16 +44,16 @@ export default {
   },
 
   actions: {
-    activateTool({state, commit}, tool) {
+    activateTool({ state, commit }, tool) {
       let previousTool = state.activeTool;
       if (previousTool === 'select' && tool !== 'select') {
         commit('clearSelectedFeatures');
-        commit('activateEditTool', {tool: null});
+        commit('activateEditTool', { tool: null });
       }
       commit('activateTool', tool);
     },
 
-    refreshData({commit, getters, rootGetters}) {
+    refreshData({ commit, getters, rootGetters }) {
       commit('filterTermsNewAnnots', rootGetters['currentProject/terms'] || []);
       commit('filterTracksNewAnnots', getters.tracks || []);
     },

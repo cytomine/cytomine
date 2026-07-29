@@ -1,8 +1,8 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import TaskInputForm from '@/components/appengine/forms/TaskInputForm.vue';
 import Task from '@/utils/appengine/task';
-import {hasBinaryType} from '@/utils/app';
+import { hasBinaryType } from '@/utils/app';
 
 vi.mock('@/utils/appengine/task');
 vi.mock('@/utils/app', () => ({
@@ -36,8 +36,8 @@ describe('TaskInputForm.vue', () => {
       fetchOutputs: vi.fn(),
     };
     const expectedInputs = [
-      {id: 1, name: 'inputB', type: {id: 'string'}, default: 'hello'},
-      {id: 2, name: 'inputA', type: {id: 'number'}, default: 4.2},
+      { id: 1, name: 'inputB', type: { id: 'string' }, default: 'hello' },
+      { id: 2, name: 'inputA', type: { id: 'number' }, default: 4.2 },
     ];
     Task.fetchTaskInputs.mockResolvedValue(expectedInputs);
     const wrapper = createWrapper({
@@ -57,8 +57,8 @@ describe('TaskInputForm.vue', () => {
 
   it('should emit input with parsed default values', async () => {
     const expectedInputs = [
-      {id: 1, name: 'inputB', type: {id: 'string'}, default: 'hello'},
-      {id: 2, name: 'inputA', type: {id: 'number'}, default: 4.2},
+      { id: 1, name: 'inputB', type: { id: 'string' }, default: 'hello' },
+      { id: 2, name: 'inputA', type: { id: 'number' }, default: 4.2 },
     ];
     Task.fetchTaskInputs.mockResolvedValue(expectedInputs);
     const wrapper = createWrapper();
@@ -74,10 +74,10 @@ describe('TaskInputForm.vue', () => {
   });
 
   it('should set hasBinaryData to false when no input is binary', async () => {
-    const binaryInput = {id: 1, name: 'inputB', type: {id: 'image'}, default: null};
+    const binaryInput = { id: 1, name: 'inputB', type: { id: 'image' }, default: null };
     const expectedInputs = [
       binaryInput,
-      {id: 2, name: 'inputA', type: {id: 'number'}, default: 4.2},
+      { id: 2, name: 'inputA', type: { id: 'number' }, default: 4.2 },
     ];
     Task.fetchTaskInputs.mockResolvedValue(expectedInputs);
     hasBinaryType.mockImplementation((input) => input.name === binaryInput.name);
@@ -93,12 +93,12 @@ describe('TaskInputForm.vue', () => {
   it('should call resetForm when inputs prop becomes empty', async () => {
     const wrapper = createWrapper({
       propsData: {
-        inputs: {some: 'value'},
+        inputs: { some: 'value' },
       },
     });
     const spy = vi.spyOn(wrapper.vm, 'resetForm');
 
-    await wrapper.setProps({inputs: {}});
+    await wrapper.setProps({ inputs: {} });
 
     expect(spy).toHaveBeenCalled();
   });
@@ -114,7 +114,7 @@ describe('TaskInputForm.vue', () => {
       fetchOutputs: vi.fn(),
     };
 
-    await wrapper.setProps({task: newTask});
+    await wrapper.setProps({ task: newTask });
 
     expect(Task.fetchTaskInputs).toHaveBeenCalledWith(newTask.namespace, newTask.version);
   });
@@ -123,7 +123,7 @@ describe('TaskInputForm.vue', () => {
     const wrapper = createWrapper({
       propsData: {
         inputs: {
-          test: {value: 'old'},
+          test: { value: 'old' },
         },
       },
     });

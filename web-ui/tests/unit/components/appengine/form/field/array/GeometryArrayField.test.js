@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect';
 import GeometryArrayField from '@/components/appengine/forms/fields/array/GeometryArrayField';
@@ -19,6 +19,6 @@ describe('GeometryArrayField.vue', () => {
     await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted('input')).toBeTruthy();
-    expect(wrapper.emitted('input')[0]).toEqual([{ids, type: 'annotation'}]);
+    expect(wrapper.emitted('input')[0]).toEqual([{ ids, type: 'annotation' }]);
   });
 });

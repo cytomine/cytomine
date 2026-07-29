@@ -56,11 +56,11 @@ import CytomineModal from '@/components/utils/CytomineModal.vue';
 export default {
   name: 'calibration-modal',
   props: {
-    active: {type: Boolean},
-    image: {type: Object}
+    active: { type: Boolean },
+    image: { type: Object }
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       calibrationFieldX: '',
@@ -113,13 +113,13 @@ export default {
 
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-calibration', {imageName})
+          text: this.$t('notif-success-image-calibration', { imageName })
         });
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-calibration', {imageName})
+          text: this.$t('notif-error-image-calibration', { imageName })
         });
       }
       this.$emit('update:active', false);

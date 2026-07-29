@@ -58,12 +58,12 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import OntologyTree from '@/components/ontology/OntologyTree.vue';
 
 export default {
   name: 'ontology-panel',
-  components: {OntologyTree},
+  components: { OntologyTree },
   props: {
     index: String
   },
@@ -89,7 +89,7 @@ export default {
       return mapping;
     },
     additionalNodes() {
-      return [{id: 0, name: this.$t('no-term')}];
+      return [{ id: 0, name: this.$t('no-term') }];
     },
     displayNoTerm: {
       get() {
@@ -114,7 +114,7 @@ export default {
     },
     changeOpacity(index, event) {
       let opacity = Number(event.target.value);
-      this.$store.commit(this.imageModule + 'setTermOpacity', {indexTerm: index, opacity});
+      this.$store.commit(this.imageModule + 'setTermOpacity', { indexTerm: index, opacity });
     },
     resetOpacities() {
       this.$store.commit(this.imageModule + 'resetTermOpacities');

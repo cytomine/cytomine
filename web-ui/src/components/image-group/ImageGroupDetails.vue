@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import CytomineDescription from '@/components/description/CytomineDescription.vue';
 import CytomineProperties from '@/components/property/CytomineProperties.vue';
@@ -122,9 +122,9 @@ import ImagePreview from '../image/ImagePreview.vue';
 import ImageGroupPreview from '@/components/image-group/ImageGroupPreview.vue';
 import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal.vue';
 import constants from '@/utils/constants';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
-import {ImageGroup, ImageGroupImageInstance, PropertyCollection} from '@/api';
+import { ImageGroup, ImageGroupImageInstance, PropertyCollection } from '@/api';
 
 export default {
   name: 'image-group-details',
@@ -139,9 +139,9 @@ export default {
     AddToImageGroupModal
   },
   props: {
-    imageGroup: {type: Object},
-    excludedProperties: {type: Array, default: () => []},
-    editable: {type: Boolean, default: false}
+    imageGroup: { type: Object },
+    excludedProperties: { type: Array, default: () => [] },
+    editable: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -193,13 +193,13 @@ export default {
         await this.imageGroup.save();
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-group-rename', {imageName: this.imageGroup.name})
+          text: this.$t('notif-success-image-group-rename', { imageName: this.imageGroup.name })
         });
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-group-rename', {imageName: oldName})
+          text: this.$t('notif-error-image-group-rename', { imageName: oldName })
         });
       }
       this.isRenameModalActive = false;
@@ -208,7 +208,7 @@ export default {
     confirmDeletion() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-image-group'),
-        message: this.$t('delete-image-group-confirmation-message', {groupName: this.imageGroup.name}),
+        message: this.$t('delete-image-group-confirmation-message', { groupName: this.imageGroup.name }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -220,7 +220,7 @@ export default {
         await ImageGroup.delete(this.imageGroup.id);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-group-deletion', {groupName: this.imageGroup.name})
+          text: this.$t('notif-success-image-group-deletion', { groupName: this.imageGroup.name })
         });
         this.$emit('delete');
 
@@ -228,7 +228,7 @@ export default {
         console.log(err);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-group-deletion', {groupName: this.imageGroup.name})
+          text: this.$t('notif-error-image-group-deletion', { groupName: this.imageGroup.name })
         });
       }
     },
@@ -239,7 +239,7 @@ export default {
     confirmImageGroupLinkDeletion(image) {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-image-group-link'),
-        message: this.$t('delete-image-group-link-confirmation-message', {imageName: this.imageNameNotif(image)}),
+        message: this.$t('delete-image-group-link-confirmation-message', { imageName: this.imageNameNotif(image) }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -252,21 +252,21 @@ export default {
         await ImageGroupImageInstance.delete(this.imageGroup.id, image.id);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-group-link-deletion', {imageName: this.imageNameNotif(image)})
+          text: this.$t('notif-success-image-group-link-deletion', { imageName: this.imageNameNotif(image) })
         });
         this.$emit('deleteImage', image);
       } catch (err) {
         console.log(err);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-group-link-deletion', {imageName: this.imageNameNotif(image)})
+          text: this.$t('notif-error-image-group-link-deletion', { imageName: this.imageNameNotif(image) })
         });
       }
     },
   },
   async created() {
     try {
-      this.properties = (await PropertyCollection.fetchAll({object: this.imageGroup})).array;
+      this.properties = (await PropertyCollection.fetchAll({ object: this.imageGroup })).array;
     } catch (error) {
       this.loadPropertiesError = true;
       console.log(error);

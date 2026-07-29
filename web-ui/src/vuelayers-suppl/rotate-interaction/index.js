@@ -1,4 +1,4 @@
-import {pick} from 'vuelayers/lib/util/minilo';
+import { pick } from 'vuelayers/lib/util/minilo';
 import Interaction from './interaction.vue';
 
 function plugin(Vue, options = {}) {

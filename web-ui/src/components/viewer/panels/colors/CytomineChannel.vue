@@ -35,7 +35,7 @@
 <script>
 import _ from 'lodash';
 
-import {Sketch} from 'vue-color';
+import { Sketch } from 'vue-color';
 
 export default {
   name: 'cytomine-channel',
@@ -49,9 +49,9 @@ export default {
 
     channelIndex: Number,
     sampleIndex: Number,
-    nbSamplesPerChannel: {type: Number, default: 1},
+    nbSamplesPerChannel: { type: Number, default: 1 },
 
-    editableColor: {type: Boolean, default: false},
+    editableColor: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -100,7 +100,7 @@ export default {
     },
     setColor: _.debounce(function (color) {
       this.$emit('setColor', color.hex);
-    }, 500, {leading: true}),
+    }, 500, { leading: true }),
   }
 };
 </script>

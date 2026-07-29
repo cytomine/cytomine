@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ImageMultiSelect from '@/components/appengine/forms/fields/array/ImageMultiSelect';
@@ -12,8 +12,8 @@ vi.mock('@/api', () => ({
   ImageInstanceCollection: {
     fetchAll: vi.fn().mockResolvedValue({
       array: [
-        {id: 1, name: 'Image 1'},
-        {id: 2, name: 'Image 2'},
+        { id: 1, name: 'Image 1' },
+        { id: 2, name: 'Image 2' },
       ]
     }),
   },
@@ -53,7 +53,7 @@ describe('ImageMultiSelect.vue', () => {
   });
 
   it('The component should render the loading when the data is fetched', async () => {
-    await wrapper.setData({loading: true});
+    await wrapper.setData({ loading: true });
 
     expect(wrapper.exists()).toBe(true);
     expect(wrapper.findComponent(SelectableImage).exists()).toBe(false);
@@ -63,7 +63,7 @@ describe('ImageMultiSelect.vue', () => {
   it('The component should emit an input event when selecting images', async () => {
     const newImageIds = [42, 1337];
 
-    await wrapper.setData({selectedImages: newImageIds});
+    await wrapper.setData({ selectedImages: newImageIds });
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input[0]).toEqual([newImageIds]);

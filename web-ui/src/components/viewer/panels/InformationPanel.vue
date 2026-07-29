@@ -121,10 +121,10 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName.vue';
 import CalibrationModal from '@/components/image/CalibrationModal.vue';
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import { appendShortTermToken } from '@/utils/token-utils.js';
 
 export default {
   name: 'information-panel',
@@ -183,8 +183,8 @@ export default {
   methods: {
     appendShortTermToken,
     setResolution(resolution) {
-      this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
-      eventBus.emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area
+      this.$store.dispatch(this.viewerModule + 'setImageResolution', { idImage: this.image.id, resolution });
+      eventBus.emit('reloadAnnotations', { idImage: this.image.id }); // refresh the sources to update perimeter/area
     },
     download(image) {
       window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken));
@@ -193,30 +193,30 @@ export default {
       try {
         let prev = await this.image.fetchPrevious();
         if (!prev.id) {
-          this.$notify({type: 'error', text: this.$t('notif-error-first-image')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-first-image') });
           this.isFirstImage = true;
         } else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', { image: prev, slices: [slice] });
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-previous-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-previous-image') });
       }
     },
     async nextImage() {
       try {
         let next = await this.image.fetchNext();
         if (!next.id) {
-          this.$notify({type: 'error', text: this.$t('notif-error-last-image')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-last-image') });
           this.isLastImage = true;
         } else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', { image: next, slices: [slice] });
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-next-image') });
       }
     },
     async previousImageInGroup() {
@@ -227,14 +227,14 @@ export default {
       try {
         let prev = await this.imageGroupLink.fetchPrevious();
         if (!prev.id) {
-          this.$notify({type: 'error', text: this.$t('notif-error-first-image')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-first-image') });
         } else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', { image: prev, slices: [slice] });
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-previous-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-previous-image') });
       }
     },
     async nextImageInGroup() {
@@ -245,14 +245,14 @@ export default {
       try {
         let next = await this.imageGroupLink.fetchNext();
         if (!next.id) {
-          this.$notify({type: 'error', text: this.$t('notif-error-last-image')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-last-image') });
         } else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', { image: next, slices: [slice] });
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-next-image') });
       }
     },
 

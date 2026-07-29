@@ -210,9 +210,9 @@
 </template>
 
 <script>
-import {ImageInstanceCollection, TagCollection} from '@/api';
+import { ImageInstanceCollection, TagCollection } from '@/api';
 
-import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
+import { get, sync, syncMultiselectFilter, syncBoundsFilter } from '@/utils/store-helpers';
 import vendorFromFormat from '@/utils/vendor';
 
 import AddImageModal from '@/components/image/AddImageModal.vue';
@@ -224,7 +224,7 @@ import ImageName from '@/components/image/ImageName.vue';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
-const storeOptions = {rootModuleProp: 'storeModule'};
+const storeOptions = { rootModuleProp: 'storeModule' };
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, filterName, maxProp, storeOptions);
@@ -286,7 +286,7 @@ export default {
       return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
     },
 
-    searchString: sync('searchString', {...storeOptions, debounce: 500}),
+    searchString: sync('searchString', { ...storeOptions, debounce: 500 }),
     filtersOpened: sync('filtersOpened', storeOptions),
 
     querySearchTags() {
@@ -304,11 +304,11 @@ export default {
 
     multiSelectFilters() {
       return [
-        {prop: 'contentType', selected: this.selectedContentTypes, total: this.availableFormats.length},
-        {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
-        {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
-        {prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
-        {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
+        { prop: 'contentType', selected: this.selectedContentTypes, total: this.availableFormats.length },
+        { prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length },
+        { prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length },
+        { prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length },
+        { prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length }
       ];
     },
 
@@ -321,10 +321,10 @@ export default {
 
     boundsFilters() {
       return [
-        {prop: 'width', bounds: this.boundsWidth, max: this.maxWidth},
-        {prop: 'height', bounds: this.boundsHeight, max: this.maxHeight},
-        {prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations},
-        {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations},
+        { prop: 'width', bounds: this.boundsWidth, max: this.maxWidth },
+        { prop: 'height', bounds: this.boundsHeight, max: this.maxHeight },
+        { prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations },
+        { prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations },
       ];
     },
 
@@ -338,7 +338,7 @@ export default {
           ilike: encodeURIComponent(this.searchString)
         };
       }
-      for (let {prop, bounds, max} of this.boundsFilters) {
+      for (let { prop, bounds, max } of this.boundsFilters) {
         collection[prop] = {};
         if (bounds[1] !== max) {
           // if max bounds is the max possible value, do not set the filter in the request
@@ -352,7 +352,7 @@ export default {
           collection[prop]['gte'] = bounds[0];
         }
       }
-      for (let {prop, selected, total} of this.multiSelectFilters) {
+      for (let { prop, selected, total } of this.multiSelectFilters) {
         if (selected.length > 0 && selected.length < total) {
           collection[prop] = {
             in: selected.join()
@@ -379,7 +379,7 @@ export default {
   },
   methods: {
     async fetchFilters() {
-      let stats = await ImageInstanceCollection.fetchBounds({project: this.project.id});
+      let stats = await ImageInstanceCollection.fetchBounds({ project: this.project.id });
       this.maxWidth = Math.max(100, stats.width.max);
       this.maxHeight = Math.max(100, stats.height.max);
       this.maxNbUserAnnotations = Math.max(100, stats.countImageAnnotations.max);
@@ -414,7 +414,7 @@ export default {
       // });
     },
     async fetchTags() {
-      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+      this.availableTags = [{ id: 'null', name: this.$t('no-tag') }, ...(await TagCollection.fetchAll()).array];
     },
 
     async refreshData() {

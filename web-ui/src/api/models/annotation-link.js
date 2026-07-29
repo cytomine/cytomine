@@ -49,7 +49,7 @@ export default class AnnotationLink extends Model {
    * @returns {this} The fetched object
    */
   static async fetch(annotation, group) {
-    return new this({id: 0, annotation, group}).fetch(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0, annotation, group }).fetch(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @inheritdoc */
@@ -66,7 +66,7 @@ export default class AnnotationLink extends Model {
    * @param {number} group       The identifier of the group
    */
   static async delete(annotation, group) {
-    return new this({id: 0, annotation, group}).delete(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0, annotation, group }).delete(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @inheritdoc */

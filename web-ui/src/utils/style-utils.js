@@ -1,6 +1,6 @@
-import {Style, Stroke, Fill, Circle, Text} from 'ol/style';
-import {MultiPoint} from 'ol/geom';
-import {asArray as hexToRgb} from 'ol/color';
+import { Style, Stroke, Fill, Circle, Text } from 'ol/style';
+import { MultiPoint } from 'ol/geom';
+import { asArray as hexToRgb } from 'ol/color';
 import constants from '@/utils/constants';
 
 // -----
@@ -20,11 +20,11 @@ export function createStrokeStyle(color, opacity = 0.5) {
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
 
-  let stroke = new Stroke({color: colorWithOpacity, width: 2});
+  let stroke = new Stroke({ color: colorWithOpacity, width: 2 });
 
   return new Style({
     stroke,
-    image: new Circle({radius:5, stroke: stroke})
+    image: new Circle({ radius:5, stroke: stroke })
   });
 }
 
@@ -33,7 +33,7 @@ export function createLineStrokeStyle(color, opacity = 0.5) {
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
 
-  return new Style({stroke: new Stroke({color: colorWithOpacity, width: 5})});
+  return new Style({ stroke: new Stroke({ color: colorWithOpacity, width: 5 }) });
 }
 
 // -----
@@ -46,7 +46,7 @@ function colorWithOpacity(color, opacity) {
 
 function createStroke(opacity = 0.5) {
   let color = (constants.ANNOTATION_STROKE_COLOR) ? constants.ANNOTATION_STROKE_COLOR : black;
-  return new Stroke({color: colorWithOpacity(color, opacity), width: 2});
+  return new Stroke({ color: colorWithOpacity(color, opacity), width: 2 });
 }
 
 export function createColorStyle(color, opacity = 0.5) {
@@ -54,11 +54,11 @@ export function createColorStyle(color, opacity = 0.5) {
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
 
-  let fill = new Fill({color: colorWithOpacity});
+  let fill = new Fill({ color: colorWithOpacity });
 
   let circleStyle = new Circle({
     radius: 5,
-    fill: new Fill({color: colorArray}),
+    fill: new Fill({ color: colorArray }),
     stroke: createStroke(1),
   });
   circleStyle.setOpacity(opacity);
@@ -77,13 +77,13 @@ export function createColorLineStyle(color, opacity = 0.5) {
   let colorWithOpacity = colorArray.slice();
   colorWithOpacity[3] = opacity;
 
-  return new Style({stroke: new Stroke({color: colorWithOpacity, width: 3})});
+  return new Style({ stroke: new Stroke({ color: colorWithOpacity, width: 3 }) });
 }
 
 // -----
 
-let textFill = new Fill({color: '#fff'});
-let textStroke = new Stroke({color: '#000', width: 3});
+let textFill = new Fill({ color: '#fff' });
+let textStroke = new Stroke({ color: '#000', width: 3 });
 
 export function createTextStyle(text, fontSize = '22px', fill = textFill, stroke = textStroke) {
   return new Style({
@@ -109,32 +109,32 @@ let lightRed = [255, 56, 56, 1];
 let white = [255, 255, 255, 1];
 let black = [0, 0, 0, 1];
 
-let blueStroke = new Stroke({color: blue, width: width});
-let greenStroke = new Stroke({color: green, width: width + 1});
-let lightGreenStroke = new Stroke({color: lightGreen, width: width});
-let redStroke = new Stroke({color: red, width: width + 1});
-let lightRedStroke = new Stroke({color: lightRed, width: width});
-let whiteStroke = new Stroke({color: white, width: width + 2});
+let blueStroke = new Stroke({ color: blue, width: width });
+let greenStroke = new Stroke({ color: green, width: width + 1 });
+let lightGreenStroke = new Stroke({ color: lightGreen, width: width });
+let redStroke = new Stroke({ color: red, width: width + 1 });
+let lightRedStroke = new Stroke({ color: lightRed, width: width });
+let whiteStroke = new Stroke({ color: white, width: width + 2 });
 
 let selectStroke = blueStroke;
 if (constants.ANNOTATION_STROKE_SELECT_COLOR) {
   let color = colorWithOpacity(constants.ANNOTATION_STROKE_SELECT_COLOR, 1);
-  selectStroke = new Stroke({color, width});
+  selectStroke = new Stroke({ color, width });
 }
 
 export let trackedSelectStyles = [
-  new Style({stroke: whiteStroke}),
-  new Style({image: new Circle({radius: 6, stroke: whiteStroke})})
+  new Style({ stroke: whiteStroke }),
+  new Style({ image: new Circle({ radius: 6, stroke: whiteStroke }) })
 ];
 
 export let selectStyles = [
-  new Style({stroke: whiteStroke}),
-  new Style({stroke: selectStroke}),
-  new Style({image: new Circle({radius: 6, stroke: selectStroke})})
+  new Style({ stroke: whiteStroke }),
+  new Style({ stroke: selectStroke }),
+  new Style({ image: new Circle({ radius: 6, stroke: selectStroke }) })
 ];
 
 export let verticesStyle = new Style({
-  image: new Circle({radius: width + 1, fill: new Fill({color: blue})}),
+  image: new Circle({ radius: width + 1, fill: new Fill({ color: blue }) }),
   geometry: function (feature) {
     // return the coordinates of the first ring of the polygon
     let coordinates = feature.getGeometry().getCoordinates()[0];
@@ -143,25 +143,25 @@ export let verticesStyle = new Style({
 });
 
 export let reviewedStyles = [
-  new Style({stroke: greenStroke}),
-  new Style({image: new Circle({radius: 6, stroke: greenStroke})})
+  new Style({ stroke: greenStroke }),
+  new Style({ image: new Circle({ radius: 6, stroke: greenStroke }) })
 ];
 
 export let reviewedSelectStyles = [
-  new Style({stroke: whiteStroke}),
-  new Style({stroke: lightGreenStroke}),
-  new Style({image: new Circle({radius: 6, stroke: lightGreenStroke})})
+  new Style({ stroke: whiteStroke }),
+  new Style({ stroke: lightGreenStroke }),
+  new Style({ image: new Circle({ radius: 6, stroke: lightGreenStroke }) })
 ];
 
 export let rejectedStyles = [
-  new Style({stroke: redStroke}),
-  new Style({image: new Circle({radius: 6, stroke: redStroke})})
+  new Style({ stroke: redStroke }),
+  new Style({ image: new Circle({ radius: 6, stroke: redStroke }) })
 ];
 
 export let rejectedSelectStyles = [
-  new Style({stroke: whiteStroke}),
-  new Style({stroke: lightRedStroke}),
-  new Style({image: new Circle({radius: 6, stroke: lightRedStroke})})
+  new Style({ stroke: whiteStroke }),
+  new Style({ stroke: lightRedStroke }),
+  new Style({ image: new Circle({ radius: 6, stroke: lightRedStroke }) })
 ];
 
 // -----
@@ -186,7 +186,7 @@ export function changeOpacity(style, opacity) {
 function createDefaultColor(name, hexaCode) {
   return {
     name,
-    fill: new Fill({color: '#' + hexaCode}),
+    fill: new Fill({ color: '#' + hexaCode }),
     hexaCode
   };
 }

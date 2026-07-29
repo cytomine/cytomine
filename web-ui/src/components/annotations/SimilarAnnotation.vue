@@ -75,7 +75,7 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {Annotation, AnnotationTerm} from '@/api';
+import { Annotation, AnnotationTerm } from '@/api';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 import CytomineTerm from '@/components/ontology/CytomineTerm.vue';
@@ -89,9 +89,9 @@ export default {
     VueDraggableResizable,
   },
   props: {
-    image: {type: Object},
-    index: {type: String, required: true},
-    size: {type: Number, default: 64},
+    image: { type: Object },
+    index: { type: String, required: true },
+    size: { type: Number, default: 64 },
   },
   data() {
     return {
@@ -143,10 +143,10 @@ export default {
   methods: {
     async addTerm(term) {
       try {
-        await new AnnotationTerm({annotation: this.annotation.id, term: term.id}).save();
+        await new AnnotationTerm({ annotation: this.annotation.id, term: term.id }).save();
         this.$emit('updateTermsOrTracks', this.annotation);
       } catch (error) {
-        this.$notify({type: 'error', text: this.$t('notif-error-add-term')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-add-term') });
       }
     },
     countTerm() {
@@ -177,7 +177,7 @@ export default {
       }));
     },
     returnToQueryAnnotation() {
-      this.$emit('select', {annot: this.queryAnnotation, options: {trySameView: true}});
+      this.$emit('select', { annot: this.queryAnnotation, options: { trySameView: true } });
     }
   },
   async created() {

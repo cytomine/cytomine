@@ -98,7 +98,7 @@ export function syncFilter(modulePath, filterName, options = {}) {
     },
     set(propValue) {
       let path = fullPath(modulePath, this, options);
-      this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
+      this.$store.commit(path.join('/') + '/setFilter', { filterName, propValue });
     }
   };
 }
@@ -145,7 +145,7 @@ export function syncBoundsFilter(modulePath, filterName, maxProp, options = {}) 
     set: debounce(function (bounds) {
       let path = fullPath(modulePath, this, options);
       let propValue = bounds[0] !== 0 || bounds[1] !== this[maxProp] ? bounds : null;
-      this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
+      this.$store.commit(path.join('/') + '/setFilter', { filterName, propValue });
     }, options)
   };
 }
@@ -191,7 +191,7 @@ export function syncMultiselectFilter(modulePath, filterName, optionsProp, optio
     set: debounce(function (selectedOptions) {
       let path = fullPath(modulePath, this, options);
       let propValue = (selectedOptions.length === this[optionsProp].length) ? null : selectedOptions;
-      this.$store.commit(path.join('/') + '/setFilter', {filterName, propValue});
+      this.$store.commit(path.join('/') + '/setFilter', { filterName, propValue });
     }, options)
   };
 }

@@ -1,5 +1,5 @@
 import router from '@/routes';
-import {getModuleNamespace} from '@/store/store';
+import { getModuleNamespace } from '@/store/store';
 import imageModule from './viewer_modules/image';
 
 export default {
@@ -55,7 +55,7 @@ export default {
       state.links.push(indexes);
     },
 
-    linkImageToGroup(state, {indexGroup, indexImage}) {
+    linkImageToGroup(state, { indexGroup, indexImage }) {
       state.links[indexGroup].push(indexImage);
     },
 
@@ -65,7 +65,7 @@ export default {
       state.links.splice(indexes[1], 1);
     },
 
-    unlinkImage(state, {indexGroup, indexImage}) {
+    unlinkImage(state, { indexGroup, indexImage }) {
       let links = state.links;
       if (!indexGroup) { // if group not specified, find the group of the provided image
         indexGroup = links.findIndex(group => group.includes(indexImage));
@@ -84,30 +84,30 @@ export default {
   },
 
   actions: {
-    changePath({getters}) {
+    changePath({ getters }) {
       let idAnnotation = router.currentRoute.params.idAnnotation;
       let action = router.currentRoute.query.action;
       // eslint-disable-next-line no-unused-vars
-      router.replace(getters.pathViewer({idAnnotation, action})).catch(_ => {});
+      router.replace(getters.pathViewer({ idAnnotation, action })).catch(_ => {});
     },
 
-    registerImage({state, commit, getters}) {
+    registerImage({ state, commit, getters }) {
       let index = state.indexNextImage;
       commit('registerImage');
       this.registerModule(getters.pathImageModule(index), imageModule);
     },
-    async addImage({state, commit, getters, dispatch}, {image, slices, annot = null}) {
+    async addImage({ state, commit, getters, dispatch }, { image, slices, annot = null }) {
       let index = state.indexNextImage;
       commit('addImage');
       this.registerModule(getters.pathImageModule(index), imageModule);
       if (annot) {
         commit(`images/${index}/setRoutedAnnotation`, annot);
       }
-      await dispatch(`images/${index}/initialize`, {image, slices});
+      await dispatch(`images/${index}/initialize`, { image, slices });
       dispatch('changePath');
     },
 
-    setImageResolution({state, commit}, {idImage, resolution}) {
+    setImageResolution({ state, commit }, { idImage, resolution }) {
       for (let index in state.images) {
         let image = state.images[index].imageInstance;
         if (image && image.id === idImage) {
@@ -116,13 +116,13 @@ export default {
       }
     },
 
-    addTerm({state, commit}, term) { // add term to all image wrappers (as all images belong to same project)
+    addTerm({ state, commit }, term) { // add term to all image wrappers (as all images belong to same project)
       for (let index in state.images) {
         commit(`images/${index}/addTerm`, term);
       }
     },
 
-    refreshTracks({state, dispatch}, {idImage}) {
+    refreshTracks({ state, dispatch }, { idImage }) {
       for (let index in state.images) {
         let image = state.images[index].imageInstance;
         if (image && image.id === idImage) {
@@ -131,7 +131,7 @@ export default {
       }
     },
 
-    setCenter({state, getters, commit}, {index, center}) {
+    setCenter({ state, getters, commit }, { index, center }) {
       let relative = state.linkMode === 'RELATIVE';
       let refImage = state.images[index];
       let increments = refImage.view.center.map((val, i) => center[i] - val);
@@ -165,7 +165,7 @@ export default {
       });
     },
 
-    setZoom({state, getters, commit}, {index, zoom}) {
+    setZoom({ state, getters, commit }, { index, zoom }) {
       let relative = state.linkMode === 'RELATIVE';
       let zoomIncrement = zoom - state.images[index].view.zoom;
       let indexesToUpdate = getters.getLinkedIndexes(index);
@@ -175,7 +175,7 @@ export default {
       });
     },
 
-    setRotation({state, getters, commit}, {index, rotation}) {
+    setRotation({ state, getters, commit }, { index, rotation }) {
       let relative = state.linkMode === 'RELATIVE';
       let rotationInc = rotation - state.images[index].view.rotation + 2 * Math.PI;
       let indexesToUpdate = getters.getLinkedIndexes(index);
@@ -185,19 +185,19 @@ export default {
       });
     },
 
-    setScaleLineCollapsed({commit}, {index, collapsed}) {
+    setScaleLineCollapsed({ commit }, { index, collapsed }) {
       commit(`images/${index}/setScaleLineCollapsed`, collapsed);
     },
 
-    async refreshData({state, dispatch}) {
+    async refreshData({ state, dispatch }) {
       await Promise.all(Object.keys(state.images).map(async index => {
         await dispatch(`images/${index}/refreshData`);
       }));
       dispatch('changePath');
     },
 
-    removeImage({commit, getters, dispatch}, index) {
-      commit('unlinkImage', {indexImage: index});
+    removeImage({ commit, getters, dispatch }, index) {
+      commit('unlinkImage', { indexImage: index });
       this.unregisterModule(getters.pathImageModule(index), imageModule);
       dispatch('changePath');
     },
@@ -212,7 +212,7 @@ export default {
       return [...getters.pathModule, 'images', index];
     },
 
-    pathViewer: (state, getters) => ({idAnnotation, action} = {}) => {
+    pathViewer: (state, getters) => ({ idAnnotation, action } = {}) => {
       // module path = ['projects', idProject, 'viewers', idViewer]
       let idProject = getters.pathModule[1];
       let idViewer = getters.pathModule[3];

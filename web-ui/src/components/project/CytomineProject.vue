@@ -16,13 +16,13 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import ProjectSidebar from './ProjectSidebar.vue';
 import projectModuleModel from '@/store/modules/project';
 
 export default {
   name: 'cytomine-project',
-  components: {ProjectSidebar},
+  components: { ProjectSidebar },
   data() {
     return {
       loading: true,

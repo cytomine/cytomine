@@ -242,17 +242,17 @@
 
 <script>
 import _ from 'lodash';
-import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
+import { get, sync, syncMultiselectFilter } from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName.vue';
 import CytomineTable from '@/components/utils/CytomineTable.vue';
 import ProjectDetails from '@/components/project/ProjectDetails.vue';
 import ImageDetails from '@/components/image/ImageDetails.vue';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
-import {ImageInstanceCollection, ProjectCollection, TagCollection} from '@/api';
+import { ImageInstanceCollection, ProjectCollection, TagCollection } from '@/api';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {formatMomentDate} from '@/utils/date';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'advanced-search',
@@ -306,7 +306,7 @@ export default {
     openedDetails: sync('advancedSearch/openedDetails'),
 
     filtersOpened: sync('advancedSearch/filtersOpened'),
-    searchString: sync('advancedSearch/searchString', {debounce: 500}),
+    searchString: sync('advancedSearch/searchString', { debounce: 500 }),
     selectedTags: syncMultiselectFilter('advancedSearch', 'selectedTags', 'availableTags'),
 
     nbActiveFilters() {
@@ -387,7 +387,7 @@ export default {
   async created() {
     this.searchString = this.pathSearchString || this.querySearchString || this.searchString || '';
     try {
-      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+      this.availableTags = [{ id: 'null', name: this.$t('no-tag') }, ...(await TagCollection.fetchAll()).array];
     } catch (error) {
       console.log(error);
       this.error = true;

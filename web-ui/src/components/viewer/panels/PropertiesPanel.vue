@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import {defaultColors} from '@/utils/style-utils.js';
+import { defaultColors } from '@/utils/style-utils.js';
 
 export default {
   name: 'properties-panel',

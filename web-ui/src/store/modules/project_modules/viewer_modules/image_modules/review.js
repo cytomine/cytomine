@@ -12,7 +12,7 @@ export default {
   },
 
   actions: {
-    setImageInstance({commit}) { // when image is changed, reset reviewMode value
+    setImageInstance({ commit }) { // when image is changed, reset reviewMode value
       commit('setReviewMode', false);
     },
   }

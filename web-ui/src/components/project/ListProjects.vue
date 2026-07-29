@@ -204,11 +204,11 @@ import CytomineSlider from '@/components/form/CytomineSlider.vue';
 import ProjectDetails from './ProjectDetails.vue';
 import AddProjectModal from './AddProjectModal.vue';
 
-import {get, sync, syncBoundsFilter, syncMultiselectFilter} from '@/utils/store-helpers';
+import { get, sync, syncBoundsFilter, syncMultiselectFilter } from '@/utils/store-helpers';
 
-import {ProjectCollection, OntologyCollection, TagCollection} from '@/api';
+import { ProjectCollection, OntologyCollection, TagCollection } from '@/api';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 export default {
   name: 'list-projects',
   components: {
@@ -252,14 +252,14 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
 
-    searchString: sync('listProjects/searchString', {debounce: 500}),
+    searchString: sync('listProjects/searchString', { debounce: 500 }),
     filtersOpened: sync('listProjects/filtersOpened'),
 
     availableRoles() {
       return [this.contributorLabel, this.managerLabel];
     },
     availableOntologies() {
-      return [{id: 'null', name: this.$t('no-ontology')}, ...this.ontologies];
+      return [{ id: 'null', name: this.$t('no-ontology') }, ...this.ontologies];
     },
 
     querySearchTags() {
@@ -286,10 +286,10 @@ export default {
 
     boundsFilters() {
       return [
-        {prop: 'numberOfImages', bounds: this.boundsImages, max: this.maxNbImages},
-        {prop: 'membersCount', bounds: this.boundsMembers, max: this.maxNbMembers},
-        {prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations},
-        {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations},
+        { prop: 'numberOfImages', bounds: this.boundsImages, max: this.maxNbImages },
+        { prop: 'membersCount', bounds: this.boundsMembers, max: this.maxNbMembers },
+        { prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations },
+        { prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations },
       ];
     },
 
@@ -319,7 +319,7 @@ export default {
           in: this.selectedTags.map(t => t.id).join()
         };
       }
-      for (let {prop, bounds, max} of this.boundsFilters) {
+      for (let { prop, bounds, max } of this.boundsFilters) {
         collection[prop] = {};
         if (bounds[1] !== max) {
           // if max bounds is the max possible value, do not set the filter in the request
@@ -359,12 +359,12 @@ export default {
   methods: {
     formatMomentDate,
     async fetchOntologies() {
-      let ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+      let ontologies = (await OntologyCollection.fetchAll({ light: true })).array;
       ontologies.sort((a, b) => a.name.localeCompare(b.name));
       this.ontologies = ontologies;
     },
     async fetchMaxFilters() {
-      let stats = await ProjectCollection.fetchBounds({withMembersCount:true});
+      let stats = await ProjectCollection.fetchBounds({ withMembersCount:true });
 
       this.maxNbMembers = Math.max(10, stats.members.max);
       this.maxNbImages = Math.max(10, stats.numberOfImages.max);
@@ -372,7 +372,7 @@ export default {
       this.maxNbReviewedAnnotations = Math.max(100, stats.numberOfReviewedAnnotations.max);
     },
     async fetchTags() {
-      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+      this.availableTags = [{ id: 'null', name: this.$t('no-tag') }, ...(await TagCollection.fetchAll()).array];
     },
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
@@ -386,12 +386,12 @@ export default {
         this.revision++;
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-project-deletion', {projectName: projectToDelete.name})
+          text: this.$t('notif-success-project-deletion', { projectName: projectToDelete.name })
         });
       } catch (error) {
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-project-deletion', {projectName: projectToDelete.name})
+          text: this.$t('notif-error-project-deletion', { projectName: projectToDelete.name })
         });
         return;
       }

@@ -38,13 +38,13 @@
 </template>
 
 <script>
-import {ImageConsultationCollection} from '@/api';
+import { ImageConsultationCollection } from '@/api';
 import ImagePreview from '@/components/image/ImagePreview.vue';
-import {formatMomentDuration} from '@/utils/date';
+import { formatMomentDuration } from '@/utils/date';
 
 export default {
   name: 'project-connection-details',
-  components: {ImagePreview},
+  components: { ImagePreview },
   props: {
     connection: Object
   },
@@ -64,10 +64,10 @@ export default {
   },
   async created() {
     try {
-      this.consultations = (await ImageConsultationCollection.fetchAll({projectConnection: this.connection.id})).array;
+      this.consultations = (await ImageConsultationCollection.fetchAll({ projectConnection: this.connection.id })).array;
     } catch (error) {
       console.log(error);
-      this.$notify({type: 'error', text: this.$t('error-failed-to-fetch-image-consultations')});
+      this.$notify({ type: 'error', text: this.$t('error-failed-to-fetch-image-consultations') });
     }
     this.loading = false;
   }

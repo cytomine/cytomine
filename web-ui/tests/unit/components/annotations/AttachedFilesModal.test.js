@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 import VeeValidate from 'vee-validate';
 
@@ -8,7 +8,7 @@ import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 vi.mock('@/api', () => ({
   AttachedFile: vi.fn().mockImplementation(function () {
     return {
-      save: vi.fn().mockResolvedValue({id: 1, filename: 'mockFile.pdf'}),
+      save: vi.fn().mockResolvedValue({ id: 1, filename: 'mockFile.pdf' }),
     };
   }),
 }));
@@ -26,7 +26,7 @@ describe('AttachedFileModal.vue', () => {
       mocks: {
         $t: (message) => message,
       },
-      propsData: {object: {id: 1}},
+      propsData: { object: { id: 1 } },
       stubs: {
         CytomineModalCard: true,
       },
@@ -47,8 +47,8 @@ describe('AttachedFileModal.vue', () => {
     expect(wrapper.vm.name).toBe('');
     expect(wrapper.find('.filename').exists()).toBe(false);
 
-    const mockFile = new File(['content'], 'mockFile.pdf', {type: 'application/pdf'});
-    wrapper.setData({selectedFile: mockFile});
+    const mockFile = new File(['content'], 'mockFile.pdf', { type: 'application/pdf' });
+    wrapper.setData({ selectedFile: mockFile });
 
     await wrapper.vm.$nextTick();
 

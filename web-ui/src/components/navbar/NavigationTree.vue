@@ -44,12 +44,12 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName.vue';
 
 export default {
   name: 'navigation-tree',
-  components: {ImageName},
+  components: { ImageName },
   computed: {
     projects: get('projects')
   },
@@ -67,7 +67,7 @@ export default {
           title: this.$t('confirm-close-project'),
           message: this.$t(
             'confirm-close-project-message',
-            {viewers: this.$tc('count-viewers', nbViewers, {count: nbViewers})}
+            { viewers: this.$tc('count-viewers', nbViewers, { count: nbViewers }) }
           ),
           type: 'is-danger',
           confirmText: this.$t('button-confirm'),

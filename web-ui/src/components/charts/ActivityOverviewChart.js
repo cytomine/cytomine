@@ -1,12 +1,12 @@
-import {Bar} from 'vue-chartjs';
+import { Bar } from 'vue-chartjs';
 
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'activity-overview-chart',
-  components: {Bar},
+  components: { Bar },
   props: {
-    cssClasses: {type: String, default: ''},
+    cssClasses: { type: String, default: '' },
     project: Object,
     startDate: Number,
     endDate: Number,
@@ -61,8 +61,8 @@ export default {
       return {
         maintainAspectRatio: false,
         scales: {
-          y: {min: 0},
-          x: {grid: {display: false}},
+          y: { min: 0 },
+          x: { grid: { display: false } },
         }
       };
     },
@@ -83,7 +83,7 @@ export default {
       this.imageConsultations = await this.project.fetchImageConsultationsEvolution(this.queryParams);
     },
     async fetchAnnotationSelections() {
-      this.annotationSelections = await this.project.fetchAnnotationActionsEvolution({action: 'select', ...this.queryParams});
+      this.annotationSelections = await this.project.fetchAnnotationActionsEvolution({ action: 'select', ...this.queryParams });
     },
     async fetchData() {
       await Promise.all([
@@ -108,7 +108,7 @@ export default {
     await this.fetchData();
   },
   render(h) {
-    return h('div', {class: this.cssClasses}, [
+    return h('div', { class: this.cssClasses }, [
       h(Bar, {
         props: {
           data: this.chartData,

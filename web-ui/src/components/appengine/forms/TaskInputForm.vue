@@ -15,7 +15,7 @@ import Vue from 'vue';
 
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField.vue';
 import Task from '@/utils/appengine/task';
-import {hasBinaryType} from '@/utils/app';
+import { hasBinaryType } from '@/utils/app';
 
 export default {
   name: 'TaskInputForm',
@@ -23,8 +23,8 @@ export default {
     AppEngineField,
   },
   props: {
-    inputs: {type: Object, required: true},
-    task: {type: Object, required: true},
+    inputs: { type: Object, required: true },
+    task: { type: Object, required: true },
   },
   data() {
     return {
@@ -73,7 +73,7 @@ export default {
           }
         })();
 
-        Vue.set(inputs, input.name, {value, type: input.type});
+        Vue.set(inputs, input.name, { value, type: input.type });
       };
 
       for (let input of this.taskInputs) {

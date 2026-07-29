@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import moment from 'moment';
 
 import ProjectActivityCharts from './activity/ProjectActivityCharts.vue';
@@ -64,7 +64,7 @@ const defaultTab = 'charts';
 
 export default {
   name: 'project-activity',
-  components: {CytomineDatepicker},
+  components: { CytomineDatepicker },
   data() {
     return {
       activeTab: defaultTab,

@@ -49,11 +49,11 @@
 <script>
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 import shortcuts from '@/utils/shortcuts.js';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { getWildcardRegexp } from '@/utils/string-utils';
 
 export default {
   name: 'hotkeys-modal',
-  components: {CytomineModalCard},
+  components: { CytomineModalCard },
   data() {
     return {
       categories: ['general', 'viewer-nav', 'viewer-tool', 'viewer-toggle', 'text-editor'],
@@ -63,7 +63,7 @@ export default {
   computed: {
     shortcuts() {
       return Object.entries(shortcuts).map(([name, key]) => {
-        return {name, key};
+        return { name, key };
       });
     },
     noResult() {

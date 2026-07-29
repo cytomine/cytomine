@@ -37,7 +37,7 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import CytomineImage from './CytomineImage.vue';
 import ImageSelector from './ImageSelector.vue';
@@ -48,7 +48,7 @@ import viewerModuleModel from '@/store/modules/project_modules/viewer';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
 
-import {ImageInstance, SliceInstance, Annotation} from '@/api';
+import { ImageInstance, SliceInstance, Annotation } from '@/api';
 
 export default {
   name: 'cytomine-viewer',
@@ -106,7 +106,7 @@ export default {
         let image = this.viewer.images[index].imageInstance;
         let slices = this.viewer.images[index].activeSlices;
         let highlighted = (this.viewer.images[index].view) ? this.viewer.images[index].view.highlighted : false;
-        cells[i] = {index, image, slices, highlighted};
+        cells[i] = { index, image, slices, highlighted };
       }
       return cells;
     },
@@ -240,7 +240,7 @@ export default {
             } else {
               slices = [await image.fetchReferenceSlice()];
             }
-            await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, {image, slices});
+            await this.$store.dispatch(`${this.viewerModule}images/${index}/initialize`, { image, slices });
           }));
 
           let images = {};
@@ -265,7 +265,7 @@ export default {
       }
     },
 
-    async selectAnnotationHandler({index, annot, center = false}) {
+    async selectAnnotationHandler({ index, annot, center = false }) {
       try {
         if (index && annot.image !== this.viewer.images[index].imageInstance.id) {
           annot = await Annotation.fetch(annot.id);
@@ -274,18 +274,18 @@ export default {
             SliceInstance.fetch(annot.slice)
           ]);
           this.$store.commit(`${this.viewerModule}images/${index}/setRoutedAnnotation`, annot);
-          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, {image, slices: [slice]});
+          await this.$store.dispatch(`${this.viewerModule}images/${index}/setImageInstance`, { image, slices: [slice] });
         } else if (index === null) {
           annot = await Annotation.fetch(annot.id);
           if (this.idImages.includes(String(annot.image))) {
             let index = this.cells.find(cell => cell.image.id === annot.image).index;
-            eventBus.emit('selectAnnotation', {index, annot, center});
+            eventBus.emit('selectAnnotation', { index, annot, center });
           } else {
             let [image, slice] = await Promise.all([
               ImageInstance.fetch(annot.image),
               SliceInstance.fetch(annot.slice)
             ]);
-            await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice], annot});
+            await this.$store.dispatch(this.viewerModule + 'addImage', { image, slices: [slice], annot });
           }
         }
       } catch (err) {

@@ -37,7 +37,7 @@ export default class DomainModel extends Model {
    * @returns {this} The fetched object
    */
   static async fetch(id, object) {
-    return new this({id}, object).fetch();
+    return new this({ id }, object).fetch();
   }
 
   /**
@@ -48,7 +48,7 @@ export default class DomainModel extends Model {
    * @param {Model} object    The reference object
    */
   static async delete(id, object) {
-    return new this({id}, object).delete();
+    return new this({ id }, object).delete();
   }
 
   /** @type {Model} */

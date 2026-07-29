@@ -47,6 +47,7 @@ public class UserController {
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
     }
 
+    // Create a new user account.
     @PostMapping("/user.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateUser createUser) {
         log.debug("REST request to save User");
@@ -69,10 +70,25 @@ public class UserController {
         );
     }
 
+    private Account toAccount(UpdateUser updatedUser) {
+        return new Account(
+            updatedUser.username(),
+            updatedUser.lastname().orElse(""),
+            updatedUser.firstname().orElse(""),
+            updatedUser.password().orElse(null),
+            updatedUser.email().orElse(""),
+            true,
+            updatedUser.developer().orElse(false),
+            updatedUser.language().orElse("").toLowerCase(),
+            List.of(updatedUser.role().substring(5))
+        );
+    }
+
     @PutMapping("/user/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateUser updateUser) {
-        log.debug("REST request to update User : {}", id);
+        log.debug("REST request to update User : {} with info {}", id, updateUser);
         long userId = currentUserService.getCurrentUser().getId();
+        accountService.update(toAccount(updateUser));
         return userHttpContract.update(id, userId, updateUser)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
     }

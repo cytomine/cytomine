@@ -8,4 +8,4 @@ import be.cytomine.common.repository.model.command.payload.response.RoleResponse
 public record UpdateUser(Optional<String> email, Optional<String> name, Optional<String> firstname,
                          Optional<String> lastname, Optional<String> language, Optional<String> origin,
                          Optional<Boolean> developer, Optional<String> privateKey, Optional<String> publicKey,
-                         Optional<Set<RoleResponse>> roles) {}
+                         String role, Optional<String> password, String username) {}

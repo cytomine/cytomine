@@ -543,7 +543,6 @@ export default {
       return this.selectedImageGroups.map(group => group.id);
     },
 
-    // eslint-disable-next-line vue/return-in-computed-property
     /**
      * This computed property returns an array.
      * The array will be either empty or will be multiple objects of the same type.

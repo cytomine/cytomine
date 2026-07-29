@@ -204,9 +204,7 @@ export default {
       }
       if (visibleApparentChannels.length > 0) {
         params.channels = [];
-        // eslint-disable-next-line camelcase
         params.minIntensities = [];
-        // eslint-disable-next-line camelcase
         params.maxIntensities = [];
         params.gammas = [];
         params.colormaps = [];

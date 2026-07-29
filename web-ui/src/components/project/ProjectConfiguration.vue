@@ -52,7 +52,6 @@ export default {
     queriedTab() {
       return this.$route.query.tab;
     },
-    // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {
       switch (this.activeTab) {
         case 'general':

@@ -56,7 +56,6 @@ export default {
     isAdmin() {
       return this.$keycloak.hasResourceRole(KeycloakRole.ADMIN);
     },
-    // eslint-disable-next-line vue/return-in-computed-property
     activeComponent() {
       switch (this.activeTab) {
         case 'dashboard':

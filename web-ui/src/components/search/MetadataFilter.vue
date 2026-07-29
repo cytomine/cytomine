@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="metadata-filter">
     <template v-if="facets.length">
       <h1>Metadata filters</h1>
 
@@ -59,10 +59,19 @@ export default {
 </script>
 
 <style>
+.metadata-filter {
+  margin: 1.5rem 0;
+}
+
+.metadata-filter h1 {
+  margin-bottom: 1rem;
+}
+
 .facet-filters {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
   gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
 }
 
 .facet-filters .field {

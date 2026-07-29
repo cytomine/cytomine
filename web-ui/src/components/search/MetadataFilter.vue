@@ -7,8 +7,7 @@
 </template>
 
 <script lang="js">
-
-import {Cytomine} from '@/api';
+import { fetchFacets } from '@/utils/search';
 
 export default {
   name: 'MetadataFilter',
@@ -19,13 +18,7 @@ export default {
   },
   methods: {
     async fetchFacets() {
-      try {
-        let {data} = await Cytomine.instance.api.get('meilisearch/facets');
-        this.facets = data || {};
-      } catch (error) {
-        console.log(error);
-        this.error = true;
-      }
+      this.facets = await fetchFacets() || {};
     },
   },
   created() {

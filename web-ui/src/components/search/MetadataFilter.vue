@@ -2,6 +2,18 @@
   <div>
     <h1>Filters</h1>
 
+    <div>Free text search</div>
+
+    <div>Biological species</div>
+
+    <div>Anatomical site</div>
+
+    <div>Diagnosis</div>
+
+    <div>Staining</div>
+
+    <b-button icon-left="times">{{ $t('button-clear') }}</b-button>
+
     <div>{{ facets }}</div>
   </div>
 </template>

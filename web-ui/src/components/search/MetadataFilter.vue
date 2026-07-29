@@ -1,6 +1,10 @@
 <template>
   <div>
-    <h1>Filters</h1>
+    <h1>Metadata filters</h1>
+
+    <b-field label="Search from metadata">
+      <b-input icon="search" :placeholder="$t('search-placeholder')"/>
+    </b-field>
 
     <div>Free text search</div>
 

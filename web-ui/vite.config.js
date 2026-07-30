@@ -1,9 +1,9 @@
-import {fileURLToPath, URL} from 'node:url';
+import { fileURLToPath, URL } from 'node:url';
 
 import vue2 from '@vitejs/plugin-vue2';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 
-export default defineConfig(({command}) => ({
+export default defineConfig(({ command }) => ({
   plugins: [vue2()],
   resolve: {
     alias: {
@@ -12,7 +12,7 @@ export default defineConfig(({command}) => ({
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.vue', '.json']
   },
   // Replaces babel-plugin-transform-remove-console (production only)
-  esbuild: command === 'build' ? {drop: ['console']} : undefined,
+  esbuild: command === 'build' ? { drop: ['console'] } : undefined,
   build: {
     commonjsOptions: {
       // UMD/CJS libraries (vue-slider-component, vue-draggable-resizable, ...) do

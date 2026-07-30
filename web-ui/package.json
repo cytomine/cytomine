@@ -2,6 +2,7 @@
   "name": "cytomine-web-ui",
   "description": "A web-based user interface for interacting with Cytomine.",
   "version": "3.2.0",
+  "type": "module",
   "homepage": "https://uliege.cytomine.org/",
   "license": "Apache-2.0",
   "scripts": {
@@ -10,9 +11,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",
-    "translations-csv2json": "node scripts/export_i18n_csv.mjs src/locales/translations.csv src/locales/json",
-    "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json",
-    "watch": "npm-watch"
+    "translations-csv2json": "node scripts/export_i18n_csv.js src/locales/translations.csv src/locales/json",
+    "watch-translations": "onchange -i 'src/locales/translations.csv' -- npm run translations-csv2json"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",

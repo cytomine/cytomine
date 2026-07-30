@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="tile is-ancestor is-vertical project-activity-charts-wrapper">
   <div class="tile">
@@ -268,7 +254,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import NumberAnnotationsChart from '@/components/charts/NumberAnnotationsChart.js';
 import AnnotationTermChart from '@/components/charts/AnnotationTermChart.js';
@@ -278,7 +264,7 @@ import AnnotatedImagesByContributorChart from '@/components/charts/AnnotatedImag
 import ActivityOverviewChart from '@/components/charts/ActivityOverviewChart.js';
 import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect.vue';
 
-import {AnnotationType} from '@/api';
+import { AnnotationType } from '@/api';
 
 export default {
   name: 'project-activity-charts',
@@ -369,11 +355,11 @@ export default {
     },
     async fetchNbAnnotationSelections() {
       this.nbAnnotationSelections = null;
-      this.nbAnnotationSelections = await this.project.fetchNbAnnotationActions({type: 'select', ...this.queryParams});
+      this.nbAnnotationSelections = await this.project.fetchNbAnnotationActions({ type: 'select', ...this.queryParams });
     },
     async fetchNbAnnotations(type) {
       this.nbAnnotations[type] = null;
-      this.nbAnnotations[type] = await this.project.fetchNbAnnotations({annotationType: type, ...this.queryParams});
+      this.nbAnnotations[type] = await this.project.fetchNbAnnotations({ annotationType: type, ...this.queryParams });
     },
     async loadData() {
       await Promise.all([

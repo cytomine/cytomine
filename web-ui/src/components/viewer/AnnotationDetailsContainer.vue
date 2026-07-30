@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
   <div class="annotation-details-playground" ref="playground">
     <vue-draggable-resizable
@@ -86,7 +72,7 @@
 import eventBus from '@/utils/event-bus';
 
 import VueDraggableResizable from 'vue-draggable-resizable';
-import {Cytomine, UserCollection} from '@/api';
+import { Cytomine, UserCollection } from '@/api';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails.vue';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
 import AnnotationSimpleDetails from '@/components/viewer/annotations/AnnotationSimpleDetails.vue';
@@ -193,7 +179,7 @@ export default {
     },
 
     dragStop(x, y) {
-      this.positionAnnotDetails = {x, y};
+      this.positionAnnotDetails = { x, y };
     },
 
     async handleResize() {
@@ -208,7 +194,7 @@ export default {
         let maxY = Math.max(this.$refs.playground.clientHeight - height, 0);
         let x = Math.min(this.positionAnnotDetails.x, maxX);
         let y = Math.min(this.positionAnnotDetails.y, maxY);
-        this.positionAnnotDetails = {x, y};
+        this.positionAnnotDetails = { x, y };
 
         // HACK to force the component to recreate and take into account new (x,y) ; should no longer be
         // necessary with version 2 of vue-draggable-resizable

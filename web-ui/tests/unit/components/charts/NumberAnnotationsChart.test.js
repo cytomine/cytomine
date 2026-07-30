@@ -1,16 +1,16 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import NumberAnnotationsChart from '@/components/charts/NumberAnnotationsChart.js';
-import {AnnotationType} from '@/api';
-import {flushPromises} from '../../../utils';
+import { AnnotationType } from '@/api';
+import { flushPromises } from '../../../utils';
 
 describe('NumberAnnotationsChart.js', () => {
   const mockProject = {
-    fetchAnnotationsEvolution: vi.fn(({annotationType}) => {
+    fetchAnnotationsEvolution: vi.fn(({ annotationType }) => {
       if (annotationType === AnnotationType.USER) {
-        return Promise.resolve([{date: 1, size: 4}]);
+        return Promise.resolve([{ date: 1, size: 4 }]);
       }
-      return Promise.resolve([{date: 1, size: 2}]);
+      return Promise.resolve([{ date: 1, size: 2 }]);
     }),
   };
 
@@ -25,7 +25,7 @@ describe('NumberAnnotationsChart.js', () => {
     global: {
       mocks: {
         $t: (key) => key,
-        $i18n: {locale: 'en'},
+        $i18n: { locale: 'en' },
       }
     }
   });
@@ -43,7 +43,7 @@ describe('NumberAnnotationsChart.js', () => {
   it('should set categoryPercentage on each dataset', () => {
     const wrapper = createWrapper();
 
-    const {datasets} = wrapper.vm.chartData;
+    const { datasets } = wrapper.vm.chartData;
 
     datasets.forEach(dataset => {
       expect(dataset.categoryPercentage).toBe(0.6);
@@ -53,7 +53,7 @@ describe('NumberAnnotationsChart.js', () => {
   it('should set min at the scale level, not under ticks', () => {
     const wrapper = createWrapper();
 
-    const {scales} = wrapper.vm.chartOptions;
+    const { scales } = wrapper.vm.chartOptions;
 
     expect(scales.y.min).toBe(0);
     expect(scales.y.ticks).toBeUndefined();

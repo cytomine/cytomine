@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import CytomineDescriptionModal from '@/components/description/CytomineDescriptionModal';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
@@ -25,7 +25,7 @@ describe('CytomineDescriptionModal', () => {
   beforeEach(() => {
     wrapper = shallowMount(CytomineDescriptionModal, {
       props: {
-        description: {data: 'Test description'},
+        description: { data: 'Test description' },
         edit: false
       },
       global: {

@@ -1,20 +1,4 @@
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
-import {createColorStyle, createColorLineStyle, changeOpacity, createStrokeStyle, createLineStrokeStyle} from '@/utils/style-utils.js';
+import { createColorStyle, createColorLineStyle, changeOpacity, createStrokeStyle, createLineStrokeStyle } from '@/utils/style-utils.js';
 
 let initialTermsOpacity = 1;
 let initialTracksOpacity = 1;
@@ -61,7 +45,7 @@ export default {
       state.displayNoTerm = value;
     },
 
-    setTermOpacity(state, {indexTerm, opacity}) {
+    setTermOpacity(state, { indexTerm, opacity }) {
       let term = state.terms[indexTerm];
       term.opacity = opacity;
       changeOpacity(term.olStyle, state.layersOpacity * opacity);
@@ -105,7 +89,7 @@ export default {
   },
 
   actions: {
-    initialize({commit, getters, rootGetters}) {
+    initialize({ commit, getters, rootGetters }) {
       let terms = formatTerms(rootGetters['currentProject/terms'], initialLayersOpacity);
       commit('setTerms', terms);
 
@@ -113,22 +97,22 @@ export default {
       commit('setWrappedTracks', tracks);
     },
 
-    toggleTermVisibility({state, commit}, indexTerm) {
+    toggleTermVisibility({ state, commit }, indexTerm) {
       commit('toggleTermVisibility', indexTerm);
       let toggledTerm = state.terms[indexTerm];
       if (!toggledTerm.visible) {
-        commit('removeTermFromSelectedFeatures', {idTerm: toggledTerm.id, terms: state.terms});
+        commit('removeTermFromSelectedFeatures', { idTerm: toggledTerm.id, terms: state.terms });
       }
     },
 
-    setDisplayNoTerm({commit}, value) {
+    setDisplayNoTerm({ commit }, value) {
       commit('setDisplayNoTerm', value);
       if (!value) {
         commit('removeNoTermFromSelectedFeatures');
       }
     },
 
-    async refreshData({state, commit, getters, rootGetters}) {
+    async refreshData({ state, commit, getters, rootGetters }) {
       let terms = formatTerms(rootGetters['currentProject/terms'], state.layersOpacity, state.terms);
       commit('setTerms', terms);
 
@@ -190,7 +174,7 @@ function formatTerms(terms, layersOpacity, previousTerms = []) {
 }
 
 function formatTerm(term, layersOpacity) {
-  let result = {id: term.id};
+  let result = { id: term.id };
   result.opacity = initialTermsOpacity;
   result.olStyle = createColorStyle(term.color, initialTermsOpacity * layersOpacity);
   result.olLineStyle = createColorLineStyle(term.color, initialTermsOpacity * layersOpacity);
@@ -215,7 +199,7 @@ function formatTracks(tracks, layersOpacity, previousTracks = []) {
 }
 
 function formatTrack(track, layersOpacity) {
-  let result = {id: track.id};
+  let result = { id: track.id };
   result.opacity = initialTracksOpacity;
   result.olStyle = createStrokeStyle(track.color, initialTracksOpacity * layersOpacity);
   result.olLineStyle = createLineStrokeStyle(track.color, initialTracksOpacity * layersOpacity);

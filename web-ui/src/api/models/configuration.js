@@ -23,7 +23,7 @@ export default class Configuration extends Model {
    * @returns {this} The fetched configuration
    */
   static async fetch(key) {
-    return new this({key}).fetch();
+    return new this({ key }).fetch();
   }
 
   /** @override */
@@ -38,7 +38,7 @@ export default class Configuration extends Model {
    * @param {string} key The key of the configuration item to delete
    */
   static async delete(key) {
-    return new this({key}).delete();
+    return new this({ key }).delete();
   }
 
   /** @override */

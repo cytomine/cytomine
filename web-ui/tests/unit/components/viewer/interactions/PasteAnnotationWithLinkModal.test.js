@@ -1,15 +1,15 @@
-import {flushPromises, mount} from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import PasteAnnotationWithLinkModal from '@/components/viewer/interactions/PasteAnnotationWithLinkModal.vue';
 
-vi.mock('ol/format/WKT', () => ({__esModule: true, default: vi.fn()}));
+vi.mock('ol/format/WKT', () => ({ __esModule: true, default: vi.fn() }));
 
 vi.mock('@/api', () => ({
   ImageGroup: {
     fetch: vi.fn(async () => ({
       name: 'group',
-      imageInstances: [{id: 1}, {id: 2}, {id: 3}],
+      imageInstances: [{ id: 1 }, { id: 2 }, { id: 3 }],
     })),
   },
   ImageInstanceCollection: vi.fn(),
@@ -25,25 +25,25 @@ vi.mock('@/api', () => ({
 describe('PasteAnnotationWithLinkModal.vue', () => {
   const createWrapper = async () => {
     const wrapper = mount(PasteAnnotationWithLinkModal, {
-      props: {index: '0'},
+      props: { index: '0' },
       global: {
         plugins: [Buefy],
-        stubs: {'annotation-links-preview': true, 'image-name': true},
+        stubs: { 'annotation-links-preview': true, 'image-name': true },
         mocks: {
           $t: key => key,
           $store: {
             commit: vi.fn(),
             getters: {
-              'currentUser/user': {id: 1},
+              'currentUser/user': { id: 1 },
               'currentProject/currentViewerModule': 'viewer/',
               'currentProject/imageModule': () => 'image/',
               'image/imageGroupId': 7,
               'currentProject/currentViewer': {
-                copiedAnnot: {id: 100, image: 1, group: null, annotationLink: []},
-                copiedAnnotImageInstance: {id: 1},
+                copiedAnnot: { id: 100, image: 1, group: null, annotationLink: [] },
+                copiedAnnotImageInstance: { id: 1 },
                 images: {
-                  0: {imageInstance: {id: 1}, imageGroupLink: {group: 7}, view: {}},
-                  1: {imageInstance: {id: 2}, imageGroupLink: {group: 7}, view: {}},
+                  0: { imageInstance: { id: 1 }, imageGroupLink: { group: 7 }, view: {} },
+                  1: { imageInstance: { id: 2 }, imageGroupLink: { group: 7 }, view: {} },
                 },
               },
             },

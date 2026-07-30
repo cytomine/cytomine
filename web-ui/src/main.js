@@ -3,7 +3,7 @@ import axios from 'axios';
 import constants from '@/utils/constants.js';
 
 // Keep Vue 2 runtime behavior by default while migrating incrementally.
-Vue.configureCompat({MODE: 2});
+Vue.configureCompat({ MODE: 2 });
 
 import VueRouter from 'vue-router';
 import router from './routes.js';
@@ -16,10 +16,10 @@ import store from './store/store.js';
 
 import Buefy from 'buefy';
 import optOutBuefyFromVModelCompat from '@/utils/buefy-compat.js';
-Vue.use(Buefy, {defaultIconPack: 'fas'});
+Vue.use(Buefy, { defaultIconPack: 'fas' });
 optOutBuefyFromVModelCompat();
 
-import VeeValidate, {Validator} from 'vee-validate';
+import VeeValidate, { Validator } from 'vee-validate';
 Validator.extend('positive', value => Number(value) > 0);
 Vue.use(VeeValidate, {
   i18nRootKey: 'validations',

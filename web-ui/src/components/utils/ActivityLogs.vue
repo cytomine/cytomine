@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
   <h2> {{ $t('error') }} </h2>
@@ -38,12 +24,12 @@
 </template>
 
 <script>
-import {Project} from '@/api';
+import { Project } from '@/api';
 import moment from 'moment';
 import _ from 'lodash';
 
 import ActivityLogsItem from './ActivityLogsItem.vue';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'activity-logs',
@@ -53,7 +39,7 @@ export default {
     idUser: Number,
     project: Object
   },
-  components: {ActivityLogsItem},
+  components: { ActivityLogsItem },
   data() {
     return {
       loading: true,
@@ -94,7 +80,7 @@ export default {
             idxDays = -1;
           }
 
-          results[idxMonths].days.push({refDate: Number(action.created), actions: [action]});
+          results[idxMonths].days.push({ refDate: Number(action.created), actions: [action] });
           idxDays++;
         } else {
           results[idxMonths].days[idxDays].actions.push(action);

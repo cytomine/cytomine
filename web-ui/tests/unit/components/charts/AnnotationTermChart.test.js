@@ -1,13 +1,13 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AnnotationTermChart from '@/components/charts/AnnotationTermChart.js';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
 describe('AnnotationTermChart.js', () => {
   const mockProject = {
     fetchStatsTerms: vi.fn().mockResolvedValue([
-      {key: 'tumour', value: 3, color: '#ff0000'},
-      {key: null, value: 1, color: null},
+      { key: 'tumour', value: 3, color: '#ff0000' },
+      { key: null, value: 1, color: null },
     ]),
   };
 
@@ -45,7 +45,7 @@ describe('AnnotationTermChart.js', () => {
   it('should render as a horizontal bar via indexAxis, not the removed HorizontalBar type', () => {
     const wrapper = createWrapper();
 
-    const {indexAxis} = wrapper.vm.chartOptions;
+    const { indexAxis } = wrapper.vm.chartOptions;
 
     expect(indexAxis).toBe('y');
   });
@@ -53,7 +53,7 @@ describe('AnnotationTermChart.js', () => {
   it('should pass the datalabels plugin with the anchor/align/offset/clamp config', () => {
     const wrapper = createWrapper();
 
-    const {datalabels} = wrapper.vm.chartOptions.plugins;
+    const { datalabels } = wrapper.vm.chartOptions.plugins;
 
     expect(datalabels).toEqual({
       anchor: 'end',

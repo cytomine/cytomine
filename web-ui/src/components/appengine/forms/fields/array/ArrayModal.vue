@@ -63,10 +63,10 @@ export default {
     CytomineModal,
   },
   props: {
-    active: {type: Boolean, default: false},
-    maxSize: {type: Number, default: null},
-    minSize: {type: Number, default: null},
-    type: {type: Object, required: true},
+    active: { type: Boolean, default: false },
+    maxSize: { type: Number, default: null },
+    minSize: { type: Number, default: null },
+    type: { type: Object, required: true },
   },
   data() {
     return {
@@ -79,7 +79,7 @@ export default {
       return PRIMITIVES.includes(this.type.id);
     },
     parameter() {
-      return {default: null, description: null, type: this.type};
+      return { default: null, description: null, type: this.type };
     },
     selectedPrimitiveField() {
       switch (this.type.id) {
@@ -114,12 +114,12 @@ export default {
     },
     select() {
       if (this.items.length === 0) {
-        this.$notify({type: 'error', text: this.$t('notify-error-empty-list')});
+        this.$notify({ type: 'error', text: this.$t('notify-error-empty-list') });
         return;
       }
 
       if (this.minSize !== null && this.items.length < this.minSize) {
-        this.$notify({type: 'error', text: this.$t('notify-error-not-enough-item')});
+        this.$notify({ type: 'error', text: this.$t('notify-error-not-enough-item') });
         return;
       }
 
@@ -128,7 +128,7 @@ export default {
 
       this.items = [];
 
-      this.$notify({type: 'success', text: this.$t('notify-success-create-array-inputs')});
+      this.$notify({ type: 'success', text: this.$t('notify-success-create-array-inputs') });
     },
     add() {
       this.items.push(null);

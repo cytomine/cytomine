@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 
@@ -7,7 +7,7 @@ vi.mock('@/api', () => ({
     instance: {
       api: {
         get: vi.fn(() => Promise.resolve({
-          data: new Blob(['test image data'], {type: 'image/jpeg'})
+          data: new Blob(['test image data'], { type: 'image/jpeg' })
         })),
       },
     },
@@ -71,7 +71,7 @@ describe('AnnotationPreview.vue', () => {
     it('should display preview button is showDetails is true', () => {
       const wrapper = createWrapper();
 
-      const buttonWrapper = wrapper.find({ref: 'previewButton'});
+      const buttonWrapper = wrapper.find({ ref: 'previewButton' });
       expect(buttonWrapper.exists()).toBe(true);
     });
 
@@ -82,7 +82,7 @@ describe('AnnotationPreview.vue', () => {
         }
       });
 
-      const buttonWrapper = wrapper.find({ref: 'previewButton'});
+      const buttonWrapper = wrapper.find({ ref: 'previewButton' });
       expect(buttonWrapper.exists()).toBe(false);
     });
   });

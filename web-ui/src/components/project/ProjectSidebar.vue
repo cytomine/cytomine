@@ -58,7 +58,7 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get, sync} from '@/utils/store-helpers';
+import { get, sync } from '@/utils/store-helpers';
 
 export default {
   name: 'project-sidebar',

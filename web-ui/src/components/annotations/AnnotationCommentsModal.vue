@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <cytomine-modal-card :title="$t('annotation-comments')" @close="$parent.close()">
   <div v-if="!comments || !comments.length">
@@ -69,13 +55,13 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
-import {AnnotationComment} from '@/api';
+import { AnnotationComment } from '@/api';
 import DomainTagInput from '@/components/utils/DomainTagInput.vue';
 
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'annotation-comments-modal',
@@ -83,7 +69,7 @@ export default {
     DomainTagInput,
     CytomineModalCard
   },
-  $_veeValidate: {validator: 'new'},
+  $_veeValidate: { validator: 'new' },
   props: {
     annotation: Object,
     comments: Array
@@ -139,11 +125,11 @@ export default {
           shareAnnotationURL: this.annotationURL + '?action=comments'
         }).save();
         this.$emit('addComment', newComment);
-        this.$notify({type: 'success', text: this.$t('notif-success-new-comment')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-new-comment') });
         this.addingComment = false;
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-new-comment')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-new-comment') });
       }
       this.loading = false;
     },

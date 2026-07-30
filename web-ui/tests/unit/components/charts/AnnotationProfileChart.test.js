@@ -1,12 +1,12 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AnnotationProfileChart from '@/components/charts/AnnotationProfileChart.js';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
 describe('AnnotationProfileChart.js', () => {
   const mockAnnotation = {
-    centroid: {x: 12.4, y: 7.6},
-    fetchProfile: vi.fn().mockResolvedValue({profile: [1, 2, 3]}),
+    centroid: { x: 12.4, y: 7.6 },
+    fetchProfile: vi.fn().mockResolvedValue({ profile: [1, 2, 3] }),
   };
 
   const createWrapper = (annotation = mockAnnotation) => shallowMount(AnnotationProfileChart, {
@@ -33,7 +33,7 @@ describe('AnnotationProfileChart.js', () => {
 
   it('should emit error when fetching the profile fails', async () => {
     const failingAnnotation = {
-      centroid: {x: 0, y: 0},
+      centroid: { x: 0, y: 0 },
       fetchProfile: vi.fn().mockRejectedValue(new Error('boom')),
     };
     const wrapper = createWrapper(failingAnnotation);
@@ -46,18 +46,18 @@ describe('AnnotationProfileChart.js', () => {
   it('should configure the zoom plugin with the v2+ nested wheel/drag schema', () => {
     const wrapper = createWrapper();
 
-    const {zoom} = wrapper.vm.chartOptions.plugins;
+    const { zoom } = wrapper.vm.chartOptions.plugins;
 
-    expect(zoom.pan).toEqual({enabled: true, mode: 'xy'});
-    expect(zoom.zoom.wheel).toEqual({enabled: true});
-    expect(zoom.zoom.drag).toEqual({enabled: false});
+    expect(zoom.pan).toEqual({ enabled: true, mode: 'xy' });
+    expect(zoom.zoom.wheel).toEqual({ enabled: true });
+    expect(zoom.zoom.drag).toEqual({ enabled: false });
     expect(zoom.zoom.mode).toBe('xy');
   });
 
   it('should cap the y scale using beginAtZero/max at scale level', () => {
     const wrapper = createWrapper();
 
-    const {y} = wrapper.vm.chartOptions.scales;
+    const { y } = wrapper.vm.chartOptions.scales;
 
     expect(y.beginAtZero).toBe(true);
     expect(y.max).toBe(255);
@@ -68,7 +68,7 @@ describe('AnnotationProfileChart.js', () => {
     const wrapper = createWrapper();
     const resetZoom = vi.fn();
     // `$refs` is shallow-readonly in Vue 3; the raw refs object is not.
-    wrapper.vm.$.refs.chartRef = {chart: {resetZoom}};
+    wrapper.vm.$.refs.chartRef = { chart: { resetZoom } };
 
     wrapper.vm.resetZoom();
 

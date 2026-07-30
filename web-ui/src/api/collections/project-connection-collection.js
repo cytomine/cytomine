@@ -59,9 +59,9 @@ export default class ProjectConnectionCollection extends Collection {
    * @returns {Array<{time, frequency}>} The timestamps defining the period (depends on the period parameter) and the
    *                                     associated relative frequency
    */
-  static async fetchAverageConnections({project, user, afterThan, beforeThan, period = 'hour'} = {}) {
-    let params = {project, user, afterThan, beforeThan, period};
-    let {data} = await Cytomine.instance.api.get('averageConnections.json', {params});
+  static async fetchAverageConnections({ project, user, afterThan, beforeThan, period = 'hour' } = {}) {
+    let params = { project, user, afterThan, beforeThan, period };
+    let { data } = await Cytomine.instance.api.get('averageConnections.json', { params });
     return data.collection;
   }
 
@@ -75,7 +75,7 @@ export default class ProjectConnectionCollection extends Collection {
    * @param {string}  [period=hour]   The periods to consider
    * @returns {Array<{time, frequency}>} The timestamps defining the period and the associated numbers of connections
    */
-  static async fetchConnectionsFrequency({project, user, afterThan, beforeThan, period = 'hour'} = {}) {
+  static async fetchConnectionsFrequency({ project, user, afterThan, beforeThan, period = 'hour' } = {}) {
     let uri = 'connectionFrequency.json';
     if (project) {
       if (user) {
@@ -84,8 +84,8 @@ export default class ProjectConnectionCollection extends Collection {
         uri = `project/${project}/connectionFrequency.json`;
       }
     }
-    let params = {project, user, afterThan, beforeThan, period};
-    let {data} = await Cytomine.instance.api.get(uri, {params});
+    let params = { project, user, afterThan, beforeThan, period };
+    let { data } = await Cytomine.instance.api.get(uri, { params });
     return data.collection;
   }
 

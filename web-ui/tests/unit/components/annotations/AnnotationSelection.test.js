@@ -1,16 +1,16 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AnnotationSelection from '@/components/annotations/AnnotationSelection';
 import CytomineModal from '@/components/utils/CytomineModal';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
 vi.mock('@/api', () => ({
   AnnotationCollection: vi.fn().mockImplementation(function () {
     return {
       fetchPage: vi.fn().mockResolvedValue({
         array: [
-          {id: 1, name: 'Annotation 1'},
-          {id: 2, name: 'Annotation 2'},
+          { id: 1, name: 'Annotation 1' },
+          { id: 2, name: 'Annotation 2' },
         ]
       }),
     };
@@ -19,12 +19,12 @@ vi.mock('@/api', () => ({
 
 describe('AnnotationSelection.vue', () => {
   const mockAnnotations = [
-    {id: 1, name: 'Annotation 1'},
-    {id: 2, name: 'Annotation 2'},
+    { id: 1, name: 'Annotation 1' },
+    { id: 2, name: 'Annotation 2' },
   ];
   const mockImages = [{
-    imageInstance: {id: 1},
-    layers: {selectedLayers: [{id: 101, name: 'Mock Layer 1'}, {id: 102, name: 'Mock Layer 2'}]},
+    imageInstance: { id: 1 },
+    layers: { selectedLayers: [{ id: 101, name: 'Mock Layer 1' }, { id: 102, name: 'Mock Layer 2' }] },
   }];
 
   const createWrapper = () => {
@@ -44,10 +44,10 @@ describe('AnnotationSelection.vue', () => {
           // store the `get()` helper reads from has to be mocked instead.
           $store: {
             state: {
-              currentProject: {project: {id: 42}},
+              currentProject: { project: { id: 42 } },
             },
             getters: {
-              'currentProject/currentViewer': {images: mockImages},
+              'currentProject/currentViewer': { images: mockImages },
             },
           },
           $t: (message) => message,

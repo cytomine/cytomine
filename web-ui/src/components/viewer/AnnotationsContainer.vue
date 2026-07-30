@@ -38,17 +38,17 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get} from '@/utils/store-helpers';
-import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annotation-utils.js';
+import { get } from '@/utils/store-helpers';
+import { Action, updateTermProperties, updateTrackProperties } from '@/utils/annotation-utils.js';
 
 import WKT from 'ol/format/WKT';
 
 import AnnotationsList from './AnnotationsList.vue';
 import AnnotationDetailsContainer from './AnnotationDetailsContainer.vue';
 import SimilarAnnotation from '@/components/annotations/SimilarAnnotation.vue';
-import {listAnnotationsInGroup, updateAnnotationLinkProperties} from '@/utils/annotation-utils';
+import { listAnnotationsInGroup, updateAnnotationLinkProperties } from '@/utils/annotation-utils';
 
-import {Annotation} from '@/api';
+import { Annotation } from '@/api';
 
 export default {
   name: 'AnnotationsContainer',
@@ -107,7 +107,7 @@ export default {
     },
 
     addTrack(track) {
-      this.$store.dispatch(this.viewerModule + 'refreshTracks', {idImage: track.image});
+      this.$store.dispatch(this.viewerModule + 'refreshTracks', { idImage: track.image });
     },
 
     async updateTermsOrTracks(annot) {
@@ -118,7 +118,7 @@ export default {
       await updateAnnotationLinkProperties(updatedAnnot);
 
       eventBus.emit('editAnnotation', updatedAnnot);
-      this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {indexFeature: 0, annot: updatedAnnot});
+      this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', { indexFeature: 0, annot: updatedAnnot });
     },
 
     updateProperties() {
@@ -126,7 +126,7 @@ export default {
     },
 
     async handleDeletion(annot) {
-      this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
+      this.$store.commit(this.imageModule + 'addAction', { annot: annot, type: Action.DELETE });
 
       if (annot.group) {
         let editedAnnots = [];
@@ -157,20 +157,20 @@ export default {
       eventBus.emit('deleteAnnotation', annot);
     },
 
-    selectAnnotation({annot, options}) {
+    selectAnnotation({ annot, options }) {
       let index = (options.trySameView) ? this.index : null;
-      eventBus.emit('selectAnnotation', {index, annot, center: true});
+      eventBus.emit('selectAnnotation', { index, annot, center: true });
 
       if (this.image.id !== annot.image) {
         this.$store.commit(this.imageModule + 'clearSimilarAnnotations');
       }
     },
 
-    centerView({annot, sameView = false}) {
+    centerView({ annot, sameView = false }) {
       if (sameView) {
         this.$emit('centerView', annot);
       } else {
-        eventBus.emit('selectAnnotation', {index: null, annot, center: true});
+        eventBus.emit('selectAnnotation', { index: null, annot, center: true });
       }
     }
   },

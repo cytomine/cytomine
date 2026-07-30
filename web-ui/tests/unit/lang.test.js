@@ -9,7 +9,7 @@ const LOCALES = ['en', 'fr', 'es', 'nl'];
 function mountText(template) {
   const el = document.createElement('div');
   document.body.appendChild(el);
-  return new Vue({render: h => h({template})}).$mount(el);
+  return new Vue({ render: h => h({ template }) }).$mount(el);
 }
 
 function flatten(messages, prefix = '') {
@@ -31,15 +31,15 @@ describe('lang.js', () => {
 
   it('should translate a plain key and interpolate named arguments', () => {
     expect(vm.$t('select-options')).toBe('Select options');
-    expect(vm.$t('activity-of-user', {username: 'bob'})).toBe('Activity of bob');
+    expect(vm.$t('activity-of-user', { username: 'bob' })).toBe('Activity of bob');
   });
 
   it('should pick the plural form from the count argument', () => {
     const key = 'and-count-others';
 
-    expect(vm.$t(key, 0, {count: 0})).toBe('-');
-    expect(vm.$t(key, 1, {count: 1})).toBe('and one other');
-    expect(vm.$t(key, 5, {count: 5})).toBe('and 5 others');
+    expect(vm.$t(key, 0, { count: 0 })).toBe('-');
+    expect(vm.$t(key, 1, { count: 1 })).toBe('and one other');
+    expect(vm.$t(key, 5, { count: 5 })).toBe('and 5 others');
   });
 
   it('should switch locale and fall back to the fallback locale', async () => {
@@ -65,7 +65,7 @@ describe('lang.js', () => {
       try {
         vm.$t(key);
         if (String(value).includes('|')) {
-          [0, 1, 2, 5].forEach(count => vm.$t(key, count, {count}));
+          [0, 1, 2, 5].forEach(count => vm.$t(key, count, { count }));
         }
       } catch (error) {
         failures.push(`${key}: ${error.message.split('\n')[0]}`);

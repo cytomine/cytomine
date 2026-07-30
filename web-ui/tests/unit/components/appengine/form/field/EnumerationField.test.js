@@ -1,4 +1,4 @@
-import {mount} from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
@@ -11,7 +11,7 @@ describe('EnumerationField.vue', () => {
     display_name: 'Test Parameter',
     default: 'A',
     description: 'This is a test description',
-    type: {values: ['A', 'B', 'C']},
+    type: { values: ['A', 'B', 'C'] },
   };
 
   beforeEach(() => {
@@ -36,7 +36,7 @@ describe('EnumerationField.vue', () => {
     expect(options.at(1).text()).toBe('B');
     expect(options.at(2).text()).toBe('C');
 
-    const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
+    const tooltips = wrapper.findAllComponents({ name: 'BTooltip' });
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
     expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
@@ -51,12 +51,12 @@ describe('EnumerationField.vue', () => {
       parameter: {
         default: 'B',
         description: null,
-        type: {values: ['A', 'B', 'C']},
+        type: { values: ['A', 'B', 'C'] },
       }
     });
 
     expect(wrapper.vm.tooltips).toBeUndefined();
-    expect(wrapper.findAllComponents({name: 'BTooltip'}).length).toBe(0);
+    expect(wrapper.findAllComponents({ name: 'BTooltip' }).length).toBe(0);
   });
 
   it('Changing the value should emit an event', async () => {

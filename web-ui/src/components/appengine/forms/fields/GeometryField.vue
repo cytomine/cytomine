@@ -34,7 +34,7 @@ export default {
     AnnotationSelection,
   },
   props: {
-    parameter: {type: Object, required: true},
+    parameter: { type: Object, required: true },
     value: {},
   },
   data() {

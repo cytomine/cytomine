@@ -76,9 +76,9 @@
 </template>
 
 <script>
-import {Cytomine} from '@/api';
-import {formatDate} from '@/utils/date';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { Cytomine } from '@/api';
+import { formatDate } from '@/utils/date';
+import { getWildcardRegexp } from '@/utils/string-utils';
 import TagModal from '@/components/tag/TagModal.vue';
 
 export default {
@@ -134,16 +134,16 @@ export default {
     async fetchTags() {
       this.loading = true;
       try {
-        const {data} = await Cytomine.instance.api.get(
+        const { data } = await Cytomine.instance.api.get(
           '/tag.json',
-          {params: {page: this.currentPage - 1, size: this.perPage, sort: `${this.sortField},${this.sortOrder}`}},
+          { params: { page: this.currentPage - 1, size: this.perPage, sort: `${this.sortField},${this.sortOrder}` } },
         );
         this.tags = data.collection;
         this.total = data.size;
       } catch (error) {
         console.log(error);
         this.error = true;
-        this.$notify({type: 'error', text: this.$t('notify-error-fetch-tag')});
+        this.$notify({ type: 'error', text: this.$t('notify-error-fetch-tag') });
       }
       this.loading = false;
     },
@@ -170,14 +170,14 @@ export default {
     updateTag(tag) {
       const index = this.tags.indexOf(this.editedTag);
       if (index !== -1) {
-        this.tags.splice(index, 1, {...this.editedTag, ...tag});
+        this.tags.splice(index, 1, { ...this.editedTag, ...tag });
       }
     },
 
     deleteTagDialog(tag) {
       this.$buefy.dialog.confirm({
         title: this.$t('delete'),
-        message: this.$t('delete-tag-confirmation-message', {tagName: tag.name}),
+        message: this.$t('delete-tag-confirmation-message', { tagName: tag.name }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -190,13 +190,13 @@ export default {
         this.tags.splice(this.tags.indexOf(tag), 1);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-tag-delete', {tagName: tag.name})
+          text: this.$t('notif-success-tag-delete', { tagName: tag.name })
         });
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-tag-delete', {tagName: tag.name})
+          text: this.$t('notif-error-tag-delete', { tagName: tag.name })
         });
       }
     },

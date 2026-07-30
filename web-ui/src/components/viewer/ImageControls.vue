@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
   <div class="image-controls-container" v-if="isImageMultidimensional">
 
@@ -163,14 +149,14 @@ import eventBus from '@/utils/event-bus';
 import CytomineSlider from '@/components/form/CytomineSlider.vue';
 import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons.vue';
 
-import {formatMinutesSeconds, slicePositionToRank} from '@/utils/slice-utils.js';
+import { formatMinutesSeconds, slicePositionToRank } from '@/utils/slice-utils.js';
 import constants from '@/utils/constants';
 import _ from 'lodash';
 import ChannelName from '@/components/viewer/ChannelName.vue';
 
 export default {
   name: 'image-controls',
-  components: {ChannelName, ImageControlsShiftButtons, CytomineSlider},
+  components: { ChannelName, ImageControlsShiftButtons, CytomineSlider },
   props: {
     index: String
   },
@@ -263,7 +249,7 @@ export default {
       return true; // TODO [EXPERIMENTAL - large set of merged channels]
     },
     channelOptions() {
-      return this.channels.map(channel => ({value: [channel.index], ...channel}));
+      return this.channels.map(channel => ({ value: [channel.index], ...channel }));
     },
     orderedCurrentChannels() {
       return [...this.currentChannelsIndexes].sort((a, b) => a - b).map(channelIndex =>
@@ -312,11 +298,11 @@ export default {
 
     async goToRank(rank) {
       await this.$store.dispatch(this.imageModule + 'setActiveSliceByRank', rank);
-      eventBus.emit('reloadAnnotations', {idImage: this.image.id});
+      eventBus.emit('reloadAnnotations', { idImage: this.image.id });
     },
     async seek(channels, zStack, time) {
-      await this.$store.dispatch(this.imageModule + 'setActiveSlicesByPosition', {channels, zStack, time});
-      eventBus.emit('reloadAnnotations', {idImage: this.image.id});
+      await this.$store.dispatch(this.imageModule + 'setActiveSlicesByPosition', { channels, zStack, time });
+      eventBus.emit('reloadAnnotations', { idImage: this.image.id });
     },
     async shift(dimension, increment) {
       let time = (dimension === 'time') ? this.currentTimeIndex + increment : this.currentTimeIndex;

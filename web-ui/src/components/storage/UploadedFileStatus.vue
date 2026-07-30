@@ -14,13 +14,13 @@
 </template>
 
 <script>
-import {UploadedFileStatus} from '@/constants/UploadedFileStatus';
+import { UploadedFileStatus } from '@/constants/UploadedFileStatus';
 
 export default {
   name: 'uploaded-file-status',
   props: {
     file: Object,
-    iconOnly: {type: Boolean, default: false}
+    iconOnly: { type: Boolean, default: false }
   },
   computed: {
     isSuccessful() {

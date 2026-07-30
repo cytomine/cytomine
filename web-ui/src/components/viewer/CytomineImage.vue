@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="map-container" @click="isActiveImage = true" ref="container">
   <template v-if="!loading && zoom !== null">
@@ -191,7 +177,7 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import _ from 'lodash';
 
 import ImageName from '@/components/image/ImageName.vue';
@@ -218,15 +204,15 @@ import DrawInteraction from './interactions/DrawInteraction.vue';
 import ModifyInteraction from './interactions/ModifyInteraction.vue';
 import ToggleScaleLine from './interactions/ToggleScaleLine.vue';
 
-import {addProj, createProj, getProj} from 'vuelayers/lib/ol-ext';
+import { addProj, createProj, getProj } from 'vuelayers/lib/ol-ext';
 
 import View from 'ol/View';
 import OverviewMap from 'ol/control/OverviewMap';
-import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
-import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
+import { KeyboardPan, KeyboardZoom } from 'ol/interaction';
+import { noModifierKeys, targetNotEditable } from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {Cytomine, ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from '@/api';
+import { Cytomine, ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance } from '@/api';
 
 // import {constLib, operation} from '@/utils/color-manipulation.js';
 
@@ -360,7 +346,7 @@ export default {
         return this.imageWrapper.view.center;
       },
       set(value) {
-        this.$store.dispatch(this.viewerModule + 'setCenter', {index: this.index, center: value});
+        this.$store.dispatch(this.viewerModule + 'setCenter', { index: this.index, center: value });
       }
     },
     zoom: {
@@ -368,7 +354,7 @@ export default {
         return this.imageWrapper.view.zoom;
       },
       set(value) {
-        this.$store.dispatch(this.viewerModule + 'setZoom', {index: this.index, zoom: Number(value)});
+        this.$store.dispatch(this.viewerModule + 'setZoom', { index: this.index, zoom: Number(value) });
       }
     },
     rotation: {
@@ -376,12 +362,12 @@ export default {
         return this.imageWrapper.view.rotation;
       },
       set(value) {
-        this.$store.dispatch(this.viewerModule + 'setRotation', {index: this.index, rotation: Number(value)});
+        this.$store.dispatch(this.viewerModule + 'setRotation', { index: this.index, rotation: Number(value) });
       }
     },
 
     viewState() {
-      return {center: this.center, zoom: this.zoom, rotation: this.rotation};
+      return { center: this.center, zoom: this.zoom, rotation: this.rotation };
     },
 
     extent() {
@@ -403,7 +389,7 @@ export default {
       };
     },
     baseLayerURLQuery() {
-      let query = new URLSearchParams({...this.baseLayerSliceParams, ...this.baseLayerProcessingParams}).toString();
+      let query = new URLSearchParams({ ...this.baseLayerSliceParams, ...this.baseLayerProcessingParams }).toString();
       if (query.length > 0) {
         return `?${query}`;
       }
@@ -536,7 +522,7 @@ export default {
       let map = this.$refs.map.$map;
 
       this.overview = new OverviewMap({
-        view: new View({projection: this.projectionName}),
+        view: new View({ projection: this.projectionName }),
         layers: [this.$refs.baseLayer.$layer],
         tipLabel: this.$t('overview'),
         target: this.$refs.overview,
@@ -585,7 +571,7 @@ export default {
           });
         } catch (error) {
           console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-save-user-position')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-save-user-position') });
         }
 
         clearTimeout(this.timeoutSavePosition);
@@ -615,7 +601,7 @@ export default {
         }
 
         let geometry = this.format.readGeometry(annot.location);
-        await this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
+        await this.$refs.view.fit(geometry, { duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom });
 
         if (!Object.prototype.hasOwnProperty.call(annot, 'centroid')) {
           return;
@@ -628,7 +614,7 @@ export default {
       }
     },
 
-    async selectAnnotationHandler({index, annot, center = false, showComments = false}) {
+    async selectAnnotationHandler({ index, annot, center = false, showComments = false }) {
       if (this.index === index && annot.image === this.image.id) {
         try {
           let sliceChange = false;
@@ -640,7 +626,7 @@ export default {
           if (!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
-            eventBus.emit('reloadAnnotations', {idImage: this.image.id, hard: true});
+            eventBus.emit('reloadAnnotations', { idImage: this.image.id, hard: true });
             sliceChange = true;
           }
 
@@ -650,7 +636,7 @@ export default {
 
           this.selectedAnnotation = annot; // used to pre-load annot layer
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
-          eventBus.emit('selectAnnotationInLayer', {index, annot});
+          eventBus.emit('selectAnnotationInLayer', { index, annot });
 
           if (center) {
             await this.viewMounted();
@@ -659,7 +645,7 @@ export default {
           }
         } catch (error) {
           console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-target-annotation') });
         }
       }
     },
@@ -733,7 +719,7 @@ export default {
       document.querySelector('.map-container').style.height = containerHeight + 'px';
 
       let a = document.createElement('a');
-      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
+      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), { type: 'dataURL' });
       let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
       a.download = imageName;
       a.click();
@@ -744,7 +730,7 @@ export default {
   },
   async created() {
     if (!getProj(this.projectionName)) { // if image opened for the first time
-      let projection = createProj({code: this.projectionName, units: 'pixels', extent: this.extent});
+      let projection = createProj({ code: this.projectionName, units: 'pixels', extent: this.extent });
       addProj(projection);
     }
 
@@ -756,7 +742,7 @@ export default {
           this.$store.commit(this.imageModule + 'setImageInstance', clone);
         } catch (error) {
           console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-start-review')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-start-review') });
         }
       }
       this.$store.commit(this.imageModule + 'setReviewMode', true);
@@ -765,7 +751,7 @@ export default {
     // remove all selected features in order to reselect them when they will be added to the map (otherwise,
     // issue with the select interaction)
     this.selectedLayers.forEach(layer => {
-      this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer, cache: true});
+      this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', { layer, cache: true });
     });
 
     let annot = this.imageWrapper.routedAnnotation;
@@ -779,7 +765,7 @@ export default {
           }
         } catch (error) {
           console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-target-annotation') });
         }
       }
     }
@@ -807,15 +793,15 @@ export default {
         this.$store.commit(this.imageModule + 'clearRoutedAnnotation');
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-target-annotation') });
       }
     }
 
     try {
-      await new ImageConsultation({image: this.image.id}).save();
+      await new ImageConsultation({ image: this.image.id }).save();
     } catch (error) {
       console.log(error);
-      this.$notify({type: 'error', text: this.$t('notif-error-save-image-consultation')});
+      this.$notify({ type: 'error', text: this.$t('notif-error-save-image-consultation') });
     }
 
     this.loading = false;

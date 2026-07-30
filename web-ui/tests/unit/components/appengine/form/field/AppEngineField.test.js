@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField.vue';
 
@@ -22,7 +22,7 @@ describe('AppEngineField.vue', () => {
   beforeEach(() => {
     wrapper = shallowMount(AppEngineField, {
       props: {
-        parameter: {type: {id: 'array'}},
+        parameter: { type: { id: 'array' } },
         value: null,
       },
       data() {
@@ -55,7 +55,7 @@ describe('AppEngineField.vue', () => {
   });
 
   it('The component should render the correct field based on the type', () => {
-    expect(wrapper.findComponent({name: 'ArrayField'}).exists()).toBe(true);
+    expect(wrapper.findComponent({ name: 'ArrayField' }).exists()).toBe(true);
   });
 
   it('The component should emit input when inner component emits input', async () => {
@@ -70,7 +70,7 @@ describe('AppEngineField.vue', () => {
   });
 
   it('The component should return correct value via computed input', async () => {
-    await wrapper.setProps({value: 'hello world'});
+    await wrapper.setProps({ value: 'hello world' });
 
     expect(wrapper.vm.input).toBe('hello world');
   });

@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.-->
-
 <template>
 <form @submit.prevent="addToImageGroup()">
   <cytomine-modal :active="active" :title="$t('add-to-image-group')" @close="$emit('update:active', false)">
@@ -68,16 +54,16 @@ limitations under the License.-->
 <script>
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 
-import {ImageGroupCollection, ImageGroup, ImageGroupImageInstance} from '@/api';
+import { ImageGroupCollection, ImageGroup, ImageGroupImageInstance } from '@/api';
 
 export default {
   name: 'add-to-image-group-modal',
   props: {
-    active: {type: Boolean},
-    image: {type: Object}
+    active: { type: Boolean },
+    image: { type: Object }
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       name: '',
@@ -115,18 +101,18 @@ export default {
       try {
         let idImageGroup;
         if (this.imageGroup === 'NEW') {
-          let imageGroup = await new ImageGroup({name: this.name, project: this.image.project}).save();
+          let imageGroup = await new ImageGroup({ name: this.name, project: this.image.project }).save();
           idImageGroup = imageGroup.id;
         } else if (this.imageGroup === 'EXISTING') {
           idImageGroup = this.selectedImageGroup;
         }
 
-        let link = await new ImageGroupImageInstance({image: this.image.id, group: idImageGroup}).save();
+        let link = await new ImageGroupImageInstance({ image: this.image.id, group: idImageGroup }).save();
         this.$emit('addToImageGroup', link);
-        this.$notify({type: 'success', text: this.$t('notif-success-image-group-link-creation', {imageName: this.imageNameNotif})});
+        this.$notify({ type: 'success', text: this.$t('notif-success-image-group-link-creation', { imageName: this.imageNameNotif }) });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-image-group-link-creation', {imageName: this.imageNameNotif})});
+        this.$notify({ type: 'error', text: this.$t('notif-error-image-group-link-creation', { imageName: this.imageNameNotif }) });
       }
       this.$emit('update:active', false);
     },

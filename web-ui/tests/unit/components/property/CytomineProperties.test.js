@@ -1,8 +1,8 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineProperties from '@/components/property/CytomineProperties';
-import {Property} from '@/api';
+import { Property } from '@/api';
 
 vi.mock('@/api', () => {
   return {
@@ -18,7 +18,7 @@ vi.mock('@/api', () => {
     PropertyCollection: {
       fetchAll: vi.fn().mockResolvedValue({
         array: [
-          {id: 1, key: 'Property 1', value: 'Value 1'},
+          { id: 1, key: 'Property 1', value: 'Value 1' },
         ],
       }),
     },
@@ -67,7 +67,7 @@ describe('CytomineProperties.vue', () => {
   });
 
   it('Clicking on add button should add a new property correctly', async () => {
-    const property = new Property({object: {}});
+    const property = new Property({ object: {} });
     property.id = 2;
     property.key = 'New Property';
     property.value = 'New Value';
@@ -95,7 +95,7 @@ describe('CytomineProperties.vue', () => {
   });
 
   it('Clicking on save button should save the modification correctly', async () => {
-    const property = new Property({object: {}});
+    const property = new Property({ object: {} });
     property.key = 'New Property';
     property.value = 'New Value';
 
@@ -109,7 +109,7 @@ describe('CytomineProperties.vue', () => {
   });
 
   it('Cancel an edition should handle property cancel correctly', async () => {
-    const property = new Property({object: {}});
+    const property = new Property({ object: {} });
     property.key = 'New Property';
     property.value = 'New Value';
 

@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div>
   <h1>{{$t('link-images')}}</h1>
@@ -85,7 +71,7 @@ export default {
   props: {
     index: String
   },
-  components: {ImageName},
+  components: { ImageName },
   data() {
     return {
       revisionNumber: 0
@@ -94,8 +80,8 @@ export default {
   computed: {
     modeOptions: function () {
       return [
-        {key: 'ABSOLUTE', label: this.$t('absolute-link-mode')},
-        {key: 'RELATIVE', label: this.$t('relative-link-mode')}
+        { key: 'ABSOLUTE', label: this.$t('absolute-link-mode') },
+        { key: 'RELATIVE', label: this.$t('relative-link-mode') }
       ];
     },
     viewerModule() {
@@ -195,11 +181,11 @@ export default {
         if (indexGroup !== null) {
           this.$store.commit(this.viewerModule + 'mergeLinkGroups', [this.indexCurrentGroup, indexGroup]);
         } else {
-          this.$store.commit(this.viewerModule + 'linkImageToGroup', {indexGroup: this.indexCurrentGroup, indexImage});
+          this.$store.commit(this.viewerModule + 'linkImageToGroup', { indexGroup: this.indexCurrentGroup, indexImage });
         }
       } else {
         if (indexGroup !== null) {
-          this.$store.commit(this.viewerModule + 'linkImageToGroup', {indexGroup, indexImage: this.index});
+          this.$store.commit(this.viewerModule + 'linkImageToGroup', { indexGroup, indexImage: this.index });
         } else {
           this.$store.commit(this.viewerModule + 'createLinkGroup', [this.index, indexImage]);
         }
@@ -207,7 +193,7 @@ export default {
     },
 
     unlink() {
-      this.$store.commit(this.viewerModule + 'unlinkImage', {indexGroup: this.indexCurrentGroup, indexImage: this.index});
+      this.$store.commit(this.viewerModule + 'unlinkImage', { indexGroup: this.indexCurrentGroup, indexImage: this.index });
     }
   }
 };

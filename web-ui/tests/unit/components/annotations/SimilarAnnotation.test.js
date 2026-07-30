@@ -1,11 +1,11 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 import VueDraggableResizable from 'vue-draggable-resizable';
 import Vuex from 'vuex';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview';
 import SimilarAnnotation from '@/components/annotations/SimilarAnnotation';
-import {Annotation} from '@/api';
+import { Annotation } from '@/api';
 
 vi.mock('@/api', () => ({
   Annotation: {
@@ -16,13 +16,13 @@ vi.mock('@/api', () => ({
 describe('SimilarAnnotation.vue', () => {
 
   const mockTerms = [
-    {id: 1, name: 'term1'},
-    {id: 2, name: 'term2'},
+    { id: 1, name: 'term1' },
+    { id: 2, name: 'term2' },
   ];
 
   const mockAnnotations = [
-    {id: 1, term: [1]},
-    {id: 2, term: [2]},
+    { id: 1, term: [1] },
+    { id: 2, term: [2] },
   ];
 
   const mockSimilarAnnotations = {
@@ -42,8 +42,8 @@ describe('SimilarAnnotation.vue', () => {
 
   beforeEach(() => {
     Annotation.fetch
-      .mockResolvedValueOnce({id: 1, term: [1]})
-      .mockResolvedValueOnce({id: 2, term: [2]});
+      .mockResolvedValueOnce({ id: 1, term: [1] })
+      .mockResolvedValueOnce({ id: 2, term: [2] });
 
     state = {
       currentProject: {
@@ -55,7 +55,7 @@ describe('SimilarAnnotation.vue', () => {
                 showSimilarAnnotations: true,
                 displayAnnotDetails: true,
                 similarAnnotations: mockSimilarAnnotations,
-                queryAnnotation: {id: 1, term: [1]}
+                queryAnnotation: { id: 1, term: [1] }
               },
             },
           },

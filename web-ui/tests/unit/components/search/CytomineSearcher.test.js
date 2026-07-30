@@ -1,15 +1,15 @@
-import {flushPromises, mount} from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineSearcher from '@/components/search/CytomineSearcher.vue';
 
-const fetchAllLight = vi.fn(async () => [{id: 3, instanceFilename: 'photo.tif', project: 9, projectName: 'p'}]);
-const fetchAll = vi.fn(async () => ({array: [{id: 9, name: 'project'}]}));
+const fetchAllLight = vi.fn(async () => [{ id: 3, instanceFilename: 'photo.tif', project: 9, projectName: 'p' }]);
+const fetchAll = vi.fn(async () => ({ array: [{ id: 9, name: 'project' }] }));
 
 vi.mock('@/api', () => ({
-  ImageInstanceCollection: {fetchAllLight: (...args) => fetchAllLight(...args)},
+  ImageInstanceCollection: { fetchAllLight: (...args) => fetchAllLight(...args) },
   ProjectCollection: vi.fn(function () {
-    return {fetchAll: (...args) => fetchAll(...args)};
+    return { fetchAll: (...args) => fetchAll(...args) };
   }),
 }));
 
@@ -21,11 +21,11 @@ describe('CytomineSearcher.vue', () => {
   const createWrapper = () => mount(CytomineSearcher, {
     global: {
       plugins: [Buefy],
-      stubs: {'router-link': {template: '<a><slot/></a>'}},
-      directives: {'click-outside': {}},
+      stubs: { 'router-link': { template: '<a><slot/></a>' } },
+      directives: { 'click-outside': {} },
       mocks: {
         $t: key => key,
-        $store: {state: {currentUser: {user: {id: 1}}}},
+        $store: { state: { currentUser: { user: { id: 1 } } } },
       },
     },
   });
@@ -33,7 +33,7 @@ describe('CytomineSearcher.vue', () => {
   const open = async (wrapper) => {
     await wrapper.find('input').trigger('focus');
     await flushPromises();
-    await wrapper.setData({searchString: 'p'});
+    await wrapper.setData({ searchString: 'p' });
   };
 
   it('loads the results when the search field takes focus', async () => {

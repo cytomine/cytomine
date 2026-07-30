@@ -1,8 +1,8 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AppLocalPage from '@/components/appengine/AppLocalPage.vue';
 import Task from '@/utils/appengine/task';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
 vi.mock('@/utils/appengine/task');
 
@@ -14,9 +14,9 @@ const BLoading = {
 
 describe('AppLocalPage.vue', () => {
   const mockApplications = [
-    {id: 1, name: 'App 1', version: '1.0.0'},
-    {id: 2, name: 'App 2', version: '2.0.0'},
-    {id: 3, name: 'App 3', version: '1.5.0'},
+    { id: 1, name: 'App 1', version: '1.0.0' },
+    { id: 2, name: 'App 2', version: '2.0.0' },
+    { id: 3, name: 'App 3', version: '1.5.0' },
   ];
 
   const createWrapper = (options = {}) => shallowMount(

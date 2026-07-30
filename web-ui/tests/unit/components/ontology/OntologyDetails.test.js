@@ -1,8 +1,8 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import OntologyDetails from '@/components/ontology/OntologyDetails.vue';
-import {Cytomine, Ontology, ProjectCollection, User} from '@/api';
-import {flushPromises} from '../../../utils';
+import { Cytomine, Ontology, ProjectCollection, User } from '@/api';
+import { flushPromises } from '../../../utils';
 
 vi.mock('@/api', () => ({
   Ontology: {
@@ -24,16 +24,16 @@ vi.mock('@/api', () => ({
 }));
 
 describe('OntologyDetails.vue', () => {
-  const propsOntology = {id: 1};
-  const fullOntology = {id: 1, name: 'Test Ontology', user: 10, projects: [1, 2], save: vi.fn()};
-  const defaultProjectCollection = [{id: 1}, {id: 2}];
-  const defaultUser = {id: 10, fullName: 'John Doe'};
+  const propsOntology = { id: 1 };
+  const fullOntology = { id: 1, name: 'Test Ontology', user: 10, projects: [1, 2], save: vi.fn() };
+  const defaultProjectCollection = [{ id: 1 }, { id: 2 }];
+  const defaultUser = { id: 10, fullName: 'John Doe' };
 
-  const createWrapper = ({ontology = propsOntology, currentUser} = {}) => {
+  const createWrapper = ({ ontology = propsOntology, currentUser } = {}) => {
     const mockStore = {
       state: {
         currentUser: {
-          account: {isDeveloper: true},
+          account: { isDeveloper: true },
           user: {
             id: null,
             adminByNow: false,
@@ -52,7 +52,7 @@ describe('OntologyDetails.vue', () => {
         mocks: {
           $buefy: {
             dialog: {
-              confirm: vi.fn(({onConfirm}) => onConfirm())
+              confirm: vi.fn(({ onConfirm }) => onConfirm())
             }
           },
           $notify: vi.fn(),
@@ -97,7 +97,7 @@ describe('OntologyDetails.vue', () => {
 
   it('should allow edit when user is admin', () => {
     const wrapper = createWrapper({
-      currentUser: {...defaultUser, adminByNow: true},
+      currentUser: { ...defaultUser, adminByNow: true },
     });
 
     expect(wrapper.vm.canEdit).toBe(true);
@@ -105,7 +105,7 @@ describe('OntologyDetails.vue', () => {
 
   it('should not allow edit for guest users', () => {
     const wrapper = createWrapper({
-      currentUser: {...defaultUser, adminByNow: false, guestByNow: true}
+      currentUser: { ...defaultUser, adminByNow: false, guestByNow: true }
     });
 
     expect(wrapper.vm.canEdit).toBe(false);
@@ -120,20 +120,20 @@ describe('OntologyDetails.vue', () => {
     expect(wrapper.vm.fullOntology.name).toBe('New Name');
     expect(wrapper.vm.fullOntology.save).toHaveBeenCalled();
     expect(wrapper.vm.$notify).toHaveBeenCalledWith(
-      expect.objectContaining({type: 'success'})
+      expect.objectContaining({ type: 'success' })
     );
   });
 
   it('should handle rename error', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    Ontology.fetch.mockResolvedValue({...fullOntology, save: vi.fn().mockRejectedValue(new Error('fail'))});
+    Ontology.fetch.mockResolvedValue({ ...fullOntology, save: vi.fn().mockRejectedValue(new Error('fail')) });
     const wrapper = createWrapper();
     await flushPromises();
 
     await wrapper.vm.rename('New Name');
 
     expect(wrapper.vm.$notify).toHaveBeenCalledWith(
-      expect.objectContaining({type: 'error'})
+      expect.objectContaining({ type: 'error' })
     );
   });
 
@@ -148,7 +148,7 @@ describe('OntologyDetails.vue', () => {
 
   it('should export ontology as blob', async () => {
     Cytomine.instance.api.get.mockResolvedValue({
-      data: new Blob(['{}'], {type: 'application/json'}),
+      data: new Blob(['{}'], { type: 'application/json' }),
       headers: {
         'content-disposition': 'attachment; filename="ontology.json"',
       }

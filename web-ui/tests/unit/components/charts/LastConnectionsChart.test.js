@@ -1,7 +1,7 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
 vi.mock('@/api', () => ({
   ProjectConnectionCollection: {
@@ -22,7 +22,7 @@ describe('LastConnectionsChart.js', () => {
     global: {
       mocks: {
         $t: (key) => key,
-        $i18n: {locale: 'en'},
+        $i18n: { locale: 'en' },
       }
     }
   });
@@ -48,7 +48,7 @@ describe('LastConnectionsChart.js', () => {
   it('should set min at the scale level, not under ticks', () => {
     const wrapper = createWrapper();
 
-    const {scales} = wrapper.vm.chartOptions;
+    const { scales } = wrapper.vm.chartOptions;
 
     expect(scales.y.min).toBe(0);
     expect(scales.y.ticks).toBeUndefined();

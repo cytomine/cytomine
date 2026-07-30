@@ -1,10 +1,10 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AppLayout from '@/components/appengine/AppLayout.vue';
 import AppSidebar from '@/components/appengine/AppSidebar.vue';
 import store from '@/store/store';
-import {Cytomine} from '@/api';
-import {flushPromises} from '../../../utils';
+import { Cytomine } from '@/api';
+import { flushPromises } from '../../../utils';
 
 vi.mock('@/utils/constants.js', () => ({
   default: {
@@ -16,7 +16,7 @@ vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: vi.fn().mockResolvedValue({data: []}),
+        get: vi.fn().mockResolvedValue({ data: [] }),
       },
     },
   },
@@ -67,8 +67,8 @@ describe('AppLayout.vue', () => {
     });
 
     it('should fetch stores on created hook', async () => {
-      const storesData = [{id: 1, name: 'Store1', host: 'http://example.com', default: true}];
-      Cytomine.instance.api.get.mockResolvedValue({data: storesData});
+      const storesData = [{ id: 1, name: 'Store1', host: 'http://example.com', default: true }];
+      Cytomine.instance.api.get.mockResolvedValue({ data: storesData });
 
       createWrapper();
       await flushPromises();

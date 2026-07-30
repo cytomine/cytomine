@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AnnotationLayer from '@/components/viewer/AnnotationLayer.vue';
 
@@ -9,7 +9,7 @@ vi.mock('ol/format/WKT', () => {
       readGeometry: vi.fn(),
     };
   });
-  return {__esModule: true, default: WKT};
+  return { __esModule: true, default: WKT };
 });
 
 describe('AnnotationLayer.vue', () => {
@@ -20,7 +20,7 @@ describe('AnnotationLayer.vue', () => {
     {
       props: {
         index: '0',
-        layer: {id: 1, visible: true},
+        layer: { id: 1, visible: true },
       },
       global: {
         mocks: {
@@ -29,7 +29,7 @@ describe('AnnotationLayer.vue', () => {
               'currentProject/currentViewer': {
                 images: {
                   0: {
-                    imageInstance: {id: 10, width: 1000, height: 1000},
+                    imageInstance: { id: 10, width: 1000, height: 1000 },
                     activeSlices: [],
                     selectedFeatures: {
                       annotsToSelect: [],
@@ -62,7 +62,7 @@ describe('AnnotationLayer.vue', () => {
           'vl-source-vector': {
             name: 'vl-source-vector',
             template: '<div></div>',
-            methods: {addFeature},
+            methods: { addFeature },
           },
           'vl-style-func': true,
         }
@@ -77,11 +77,11 @@ describe('AnnotationLayer.vue', () => {
 
     it('should add feature when annotation belongs to layer', () => {
       const wrapper = createWrapper();
-      const feature = {id: 1};
+      const feature = { id: 1 };
       wrapper.vm.annotBelongsToLayer = vi.fn().mockReturnValue(true);
       wrapper.vm.createFeature = vi.fn().mockReturnValue(feature);
 
-      wrapper.vm.addAnnotationHandler({id: 1});
+      wrapper.vm.addAnnotationHandler({ id: 1 });
 
       expect(wrapper.vm.createFeature).toHaveBeenCalled();
       expect(addFeature).toHaveBeenCalledWith(feature);
@@ -91,7 +91,7 @@ describe('AnnotationLayer.vue', () => {
       const wrapper = createWrapper();
       wrapper.vm.annotBelongsToLayer = vi.fn().mockReturnValue(false);
 
-      wrapper.vm.addAnnotationHandler({id: 1});
+      wrapper.vm.addAnnotationHandler({ id: 1 });
 
       expect(addFeature).not.toHaveBeenCalled();
     });

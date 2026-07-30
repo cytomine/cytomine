@@ -1,7 +1,7 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 import eventBus from '@/utils/event-bus';
 
 import MetadataPanel from '@/components/viewer/panels/MetadataPanel';
@@ -21,8 +21,8 @@ vi.mock('@/api', () => ({
         get: vi.fn(() => Promise.resolve({
           data: {
             collection: [
-              {namespace: 'ns1', key: 'key1', value: 'value1'},
-              {namespace: 'ns2', key: 'key2', value: 'value2'}
+              { namespace: 'ns1', key: 'key1', value: 'value1' },
+              { namespace: 'ns2', key: 'key2', value: 'value2' }
             ]
           }
         }))
@@ -41,7 +41,7 @@ describe('MetadataPanel.vue', () => {
   beforeEach(async () => {
 
     wrapper = shallowMount(MetadataPanel, {
-      props: {index: '0'},
+      props: { index: '0' },
       global: {
         plugins: [Buefy],
         mocks: {
@@ -49,7 +49,7 @@ describe('MetadataPanel.vue', () => {
           $store: {
             getters: {
               'currentProject/currentViewer': {
-                images: [{imageInstance: {id: 123}}]
+                images: [{ imageInstance: { id: 123 } }]
               }
             }
           }
@@ -66,7 +66,7 @@ describe('MetadataPanel.vue', () => {
   });
 
   it('should filter metadata based on search string', async () => {
-    wrapper.setData({searchString: 'key1'});
+    wrapper.setData({ searchString: 'key1' });
 
     await wrapper.vm.$nextTick();
 

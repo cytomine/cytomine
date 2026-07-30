@@ -57,13 +57,13 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
+    "@eslint/js": "^10.0.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/eslint-plugin": "^1.6.24",
     "@vue/test-utils": "^2.4.11",
     "autoprefixer": "^10.5.4",
-    "eslint": "^9.39.5",
-    "eslint-plugin-vitest": "^0.5.4",
+    "eslint": "^10.8.0",
     "eslint-plugin-vue": "^10.10.0",
     "globals": "^17.8.0",
     "jsdom": "^29.1.1",

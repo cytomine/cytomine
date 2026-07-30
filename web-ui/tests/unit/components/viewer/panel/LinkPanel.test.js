@@ -1,4 +1,4 @@
-import {mount} from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import LinkPanel from '@/components/viewer/panels/LinkPanel.vue';
@@ -12,13 +12,13 @@ describe('LinkPanel.vue', () => {
 
   // Two unlinked views besides the current one, so the "solo images" rows —
   // the ones carrying the checkbox — render.
-  const createWrapper = ({trackedUser = null} = {}) => mount(LinkPanel, {
-    props: {index: '0'},
+  const createWrapper = ({ trackedUser = null } = {}) => mount(LinkPanel, {
+    props: { index: '0' },
     global: {
       plugins: [Buefy],
       mocks: {
         $t: key => key,
-        $buefy: {dialog: {confirm}},
+        $buefy: { dialog: { confirm } },
         $store: {
           commit,
           getters: {
@@ -28,8 +28,8 @@ describe('LinkPanel.vue', () => {
               linkMode: 'ABSOLUTE',
               links: [],
               images: {
-                0: {imageInstance: {id: 10}, tracking: {trackedUser}},
-                1: {imageInstance: {id: 11}, tracking: {trackedUser: null}},
+                0: { imageInstance: { id: 10 }, tracking: { trackedUser } },
+                1: { imageInstance: { id: 11 }, tracking: { trackedUser: null } },
               },
             },
           },
@@ -47,7 +47,7 @@ describe('LinkPanel.vue', () => {
   });
 
   it('passes the native change event, so the checkbox can be reset on cancel', async () => {
-    const wrapper = createWrapper({trackedUser: 5});
+    const wrapper = createWrapper({ trackedUser: 5 });
 
     const checkbox = wrapper.find('td input[type="checkbox"]');
     await checkbox.setValue(true);

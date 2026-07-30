@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <form @submit.prevent="createOntology()">
   <cytomine-modal :active="active" :title="$t('create-ontology')" @close="$emit('update:active', false)">
@@ -32,7 +18,7 @@
 </template>
 
 <script>
-import {Ontology} from '@/api';
+import { Ontology } from '@/api';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 
 export default {
@@ -40,8 +26,8 @@ export default {
   props: {
     active: Boolean
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       name: ''
@@ -62,13 +48,13 @@ export default {
       }
 
       try {
-        let ontology = await new Ontology({name: this.name}).save();
-        this.$notify({type: 'success', text: this.$t('notif-success-ontology-creation')});
+        let ontology = await new Ontology({ name: this.name }).save();
+        this.$notify({ type: 'success', text: this.$t('notif-success-ontology-creation') });
         this.$emit('newOntology', ontology);
         this.$emit('update:active', false);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-ontology-creation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-ontology-creation') });
       }
     }
   }

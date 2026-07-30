@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {createI18n} from 'vue-i18n';
+import { createI18n } from 'vue-i18n';
 
 import en from './locales/json/en.i18n.json';
 import es from './locales/json/es.i18n.json';
@@ -11,7 +11,7 @@ export default createI18n({
   globalInjection: true,
   locale: 'en',
   fallbackLocale: 'en',
-  messages: {en, es, fr, nl}
+  messages: { en, es, fr, nl }
 });
 
 export const changeLanguageMixin = {

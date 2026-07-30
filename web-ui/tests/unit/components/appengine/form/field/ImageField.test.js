@@ -1,4 +1,4 @@
-import {mount} from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ImageField from '@/components/appengine/forms/fields/ImageField';
@@ -48,10 +48,10 @@ describe('ImageField.vue', () => {
 
   it('should render the component correctly', () => {
     expect(wrapper.find('.field label').text()).toBe(mockParameter.display_name);
-    expect(wrapper.findAllComponents({name: 'BButton'}).length).toBe(2);
+    expect(wrapper.findAllComponents({ name: 'BButton' }).length).toBe(2);
     expect(wrapper.find('.value-container').exists()).toBe(false);
 
-    const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
+    const tooltips = wrapper.findAllComponents({ name: 'BTooltip' });
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
     expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
@@ -62,9 +62,9 @@ describe('ImageField.vue', () => {
   });
 
   it('should render the annotation with id when selected', async () => {
-    const mockedData = {type: 'annotation', id: 42};
-    await wrapper.setProps({value: mockedData});
-    await wrapper.setData({type: mockedData.type});
+    const mockedData = { type: 'annotation', id: 42 };
+    await wrapper.setProps({ value: mockedData });
+    await wrapper.setData({ type: mockedData.type });
 
     expect(wrapper.vm.value).toEqual(mockedData);
     expect(wrapper.find('.value-container').exists()).toBe(true);
@@ -72,9 +72,9 @@ describe('ImageField.vue', () => {
   });
 
   it('should render the image with id when selected', async () => {
-    const mockedData = {type: 'image', id: 42};
-    await wrapper.setProps({value: mockedData});
-    await wrapper.setData({type: mockedData.type});
+    const mockedData = { type: 'image', id: 42 };
+    await wrapper.setProps({ value: mockedData });
+    await wrapper.setData({ type: mockedData.type });
 
     expect(wrapper.vm.value).toEqual(mockedData);
     expect(wrapper.find('.value-container').exists()).toBe(true);
@@ -82,7 +82,7 @@ describe('ImageField.vue', () => {
   });
 
   it('should emit an event when the value is changed', async () => {
-    const mockedData = {type: 'image', id: 42};
+    const mockedData = { type: 'image', id: 42 };
     wrapper.vm.input = mockedData;
     await wrapper.vm.$nextTick();
 

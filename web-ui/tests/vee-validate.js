@@ -8,7 +8,7 @@ export const veeValidateDirectives = {
   validate: {}
 };
 
-export function veeValidateMocks({valid = true, errors = {}} = {}) {
+export function veeValidateMocks({ valid = true, errors = {} } = {}) {
   return {
     errors: {
       has: field => field in errors,

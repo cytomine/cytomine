@@ -1,7 +1,7 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
-import {AnnotationType} from '@/api';
+import { AnnotationType } from '@/api';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 
 vi.mock('@/api', () => ({
@@ -16,10 +16,10 @@ vi.mock('@/api', () => ({
     save: vi.fn().mockResolvedValue({}),
   })),
   AnnotationCommentCollection: {
-    fetchAll: vi.fn().mockResolvedValue({array: []}),
+    fetchAll: vi.fn().mockResolvedValue({ array: [] }),
   },
   PropertyCollection: {
-    fetchAll: vi.fn().mockResolvedValue({array: []}),
+    fetchAll: vi.fn().mockResolvedValue({ array: [] }),
   },
 }));
 
@@ -42,11 +42,11 @@ const mockAnnotation = {
   created: 1234567890000,
   location: 'POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))',
   userByTerm: [
-    {term: 10, user: [1]},
-    {term: 11, user: [1]}
+    { term: 10, user: [1] },
+    { term: 11, user: [1] }
   ],
   annotationTrack: [
-    {track: 20}
+    { track: 20 }
   ],
   url: 'http://example.com/annotation/1'
 };
@@ -66,10 +66,10 @@ const mockStore = {
         'project-explore-annotation-creation-info': true,
         'project-explore-annotation-comments': true,
       },
-      ontology: {id: 1, name: 'Test Ontology'},
+      ontology: { id: 1, name: 'Test Ontology' },
     },
     currentUser: {
-      account: {isDeveloper: false},
+      account: { isDeveloper: false },
       shortTermToken: 'test-token',
     }
   },
@@ -86,15 +86,15 @@ describe('AnnotationDetails.vue', () => {
       props: {
         annotation: mockAnnotation,
         terms: [
-          {id: 10, name: 'Cell'},
-          {id: 11, name: 'Nucleus'},
+          { id: 10, name: 'Cell' },
+          { id: 11, name: 'Nucleus' },
         ],
         tracks: [
-          {id: 20, name: 'Track 1', image: 200},
+          { id: 20, name: 'Track 1', image: 200 },
         ],
         users: [
           mockAdminUser,
-          {id: 124, name: 'Test user'},
+          { id: 124, name: 'Test user' },
         ],
         images: [
           {
@@ -108,10 +108,10 @@ describe('AnnotationDetails.vue', () => {
           }
         ],
         slices: [
-          {id: 300, channel: 0},
+          { id: 300, channel: 0 },
         ],
         profiles: [
-          {image: 201},
+          { image: 201 },
         ],
         showImageInfo: false,
         showChannelInfo: false,

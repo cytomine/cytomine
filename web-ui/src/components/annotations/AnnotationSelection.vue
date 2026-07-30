@@ -39,8 +39,8 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {AnnotationCollection} from '@/api';
-import {get} from '@/utils/store-helpers';
+import { AnnotationCollection } from '@/api';
+import { get } from '@/utils/store-helpers';
 
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 import SelectableAnnotation from '@/components/annotations/SelectableAnnotation.vue';
@@ -48,7 +48,7 @@ import SelectableAnnotation from '@/components/annotations/SelectableAnnotation.
 export default {
   name: 'AnnotationSelection',
   props: {
-    active: {type: Boolean, default: false},
+    active: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -112,7 +112,7 @@ export default {
     },
     selectAnnotation() {
       if (!this.selectedAnnotation) {
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-select')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-select') });
         return;
       }
 

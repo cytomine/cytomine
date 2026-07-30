@@ -1,13 +1,13 @@
-import {mount} from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect';
 import SelectableAnnotation from '@/components/annotations/SelectableAnnotation';
-import {flushPromises} from '../../../../../../utils';
+import { flushPromises } from '../../../../../../utils';
 
 const mockedAnnotations = [
-  {id: 1, name: 'Annotation 1'},
-  {id: 2, name: 'Annotation 2'},
+  { id: 1, name: 'Annotation 1' },
+  { id: 2, name: 'Annotation 2' },
 ];
 
 vi.mock('@/api', () => ({
@@ -22,7 +22,7 @@ vi.mock('@/api', () => ({
 
 describe('AnnotationMultiSelect.vue', () => {
 
-  const mockImages = [{imageInstance: {id: 1}}];
+  const mockImages = [{ imageInstance: { id: 1 } }];
 
   const createWrapper = () => {
     return mount(AnnotationMultiSelect, {
@@ -33,10 +33,10 @@ describe('AnnotationMultiSelect.vue', () => {
           // store the `get()` helper reads from has to be mocked instead.
           $store: {
             state: {
-              currentProject: {project: {id: 42}},
+              currentProject: { project: { id: 42 } },
             },
             getters: {
-              'currentProject/currentViewer': {images: mockImages},
+              'currentProject/currentViewer': { images: mockImages },
             },
           },
         },
@@ -68,7 +68,7 @@ describe('AnnotationMultiSelect.vue', () => {
     const wrapper = createWrapper();
 
     const selectedAnnotationIds = [42, 1337];
-    await wrapper.setData({selectedAnnotationIds: selectedAnnotationIds});
+    await wrapper.setData({ selectedAnnotationIds: selectedAnnotationIds });
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input[0]).toEqual([selectedAnnotationIds]);

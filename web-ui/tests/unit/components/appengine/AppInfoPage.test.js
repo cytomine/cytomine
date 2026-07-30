@@ -1,8 +1,8 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AppInfoPage from '@/components/appengine/AppInfoPage.vue';
 import Task from '@/utils/appengine/task';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
 vi.mock('@/api', () => ({
   Cytomine: {
@@ -23,7 +23,7 @@ vi.mock('@/utils/appengine/task', () => ({
 describe('AppInfoPage.vue', () => {
   const mockTask = {
     name: 'Test App',
-    authors: [{firstName: 'John', lastName: 'Doe'}],
+    authors: [{ firstName: 'John', lastName: 'Doe' }],
     date: '2025-10-23',
     version: '1.0.0',
     imageUrl: 'https://example.com/image.png',
@@ -43,10 +43,10 @@ describe('AppInfoPage.vue', () => {
           // vue-router 3 cannot be installed on Vue 3, so the route the
           // component reads in `created` is mocked directly.
           $route: {
-            params: {namespace: 'mock-namespace', version: '1.0.0'},
+            params: { namespace: 'mock-namespace', version: '1.0.0' },
             query: {},
           },
-          $router: {push: vi.fn()},
+          $router: { push: vi.fn() },
         },
         stubs: {
           'b-button': {
@@ -100,7 +100,7 @@ describe('AppInfoPage.vue', () => {
   it('should render no description when description is missing', async () => {
     Task.fetchNamespaceVersion.mockResolvedValue({
       name: 'Test App',
-      authors: [{firstName: 'John', lastName: 'Doe'}],
+      authors: [{ firstName: 'John', lastName: 'Doe' }],
       date: '2025-10-23',
       version: '1.0.0',
       imageUrl: 'https://example.com/image.png',
@@ -115,7 +115,7 @@ describe('AppInfoPage.vue', () => {
   it('should render unknown when date is missing', async () => {
     Task.fetchNamespaceVersion.mockResolvedValue({
       name: 'Test App',
-      authors: [{firstName: 'John', lastName: 'Doe'}],
+      authors: [{ firstName: 'John', lastName: 'Doe' }],
       version: '1.0.0',
       imageUrl: 'https://example.com/image.png',
       description: 'App description here',

@@ -44,7 +44,7 @@ export default {
     ImageSelection,
   },
   props: {
-    parameter: {type: Object, required: true},
+    parameter: { type: Object, required: true },
     value: {},
   },
   data() {
@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     selectInput(input, type) {
-      this.input = {type, id: input};
+      this.input = { type, id: input };
       this.type = type;
     },
   },

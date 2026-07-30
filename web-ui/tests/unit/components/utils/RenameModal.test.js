@@ -1,9 +1,9 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineModal from '@/components/utils/CytomineModal';
 import RenameModal from '@/components/utils/RenameModal';
-import {veeValidateDirectives, veeValidateMocks} from '../../../vee-validate';
+import { veeValidateDirectives, veeValidateMocks } from '../../../vee-validate';
 
 describe('RenameModal.vue', () => {
 

@@ -13,9 +13,9 @@
 import eventBus from '@/utils/event-bus';
 
 import WKT from 'ol/format/WKT';
-import {AnnotationCollection, Cytomine} from '@/api';
-import {annotBelongsToLayer} from '@/utils/annotation-utils';
-import {get} from '@/utils/store-helpers';
+import { AnnotationCollection, Cytomine } from '@/api';
+import { annotBelongsToLayer } from '@/utils/annotation-utils';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'annotation-layer',
@@ -100,7 +100,7 @@ export default {
   methods: {
     clearFeatures(cache = true) {
       if (this.$refs.olSource) {
-        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache});
+        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', { layer: this.layer, cache });
         this.$refs.olSource.clearFeatures();
       }
     },
@@ -114,7 +114,7 @@ export default {
         this.$refs.olSource.addFeature(this.createFeature(annot));
       }
     },
-    selectAnnotationHandler({annot, index}) {
+    selectAnnotationHandler({ annot, index }) {
       if (index === this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
         let olFeature = this.$refs.olSource.getFeatureById(annot.id);
         if (!olFeature) {
@@ -124,7 +124,7 @@ export default {
         }
       }
     },
-    reloadAnnotationsHandler({idImage, clear = false, hard = false} = {}) {
+    reloadAnnotationsHandler({ idImage, clear = false, hard = false } = {}) {
       if (!idImage || idImage === this.image.id) {
         if (clear) {
           this.clearFeatures();
@@ -292,7 +292,7 @@ export default {
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-annotations-viewer')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-annotations-viewer') });
         return;
       }
 

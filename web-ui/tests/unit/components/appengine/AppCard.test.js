@@ -1,4 +1,4 @@
-import {RouterLinkStub, shallowMount} from '@vue/test-utils';
+import { RouterLinkStub, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AppCard from '@/components/appengine/AppCard';
@@ -65,7 +65,7 @@ describe('AppCard.vue', () => {
 
     const expected = {
       path: `/apps/${mockApp.namespace}/${mockApp.version}`,
-      query: {host: undefined},
+      query: { host: undefined },
     };
     expect(link.props('to')).toStrictEqual(expected);
   });
@@ -73,7 +73,7 @@ describe('AppCard.vue', () => {
   it('should fallback to placeholder image when imageUrl is not provided', () => {
     const wrapper = createWrapper({
       props: {
-        app: {...mockApp, imageUrl: ''},
+        app: { ...mockApp, imageUrl: '' },
       }
     });
 

@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <cytomine-modal :active="active" :title="$t('add-images')" @close="$emit('update:active', false)">
   <b-loading :is-full-page="false" :active="loading" class="small" />
@@ -66,12 +52,12 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {AbstractImageCollection, ImageInstance} from '@/api';
+import { get } from '@/utils/store-helpers';
+import { AbstractImageCollection, ImageInstance } from '@/api';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 import CytomineTable from '@/components/utils/CytomineTable.vue';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'add-image-modal',
@@ -120,9 +106,9 @@ export default {
   methods: {
     formatMomentDate,
     async addImage(abstractImage) {
-      let propsTranslation = {imageName: abstractImage.originalFilename, projectName: this.project.name};
+      let propsTranslation = { imageName: abstractImage.originalFilename, projectName: this.project.name };
       try {
-        let image = await new ImageInstance({baseImage: abstractImage.id, project: this.project.id}).save();
+        let image = await new ImageInstance({ baseImage: abstractImage.id, project: this.project.id }).save();
         this.idsAddedImages.push(abstractImage.id);
         this.$emit('addImage', image);
         this.$notify({

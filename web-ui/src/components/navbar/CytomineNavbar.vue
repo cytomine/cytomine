@@ -77,8 +77,8 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {changeLanguageMixin} from '@/lang.js';
+import { get } from '@/utils/store-helpers';
+import { changeLanguageMixin } from '@/lang.js';
 
 import NavbarDropdown from './NavbarDropdown.vue';
 import NavigationTree from './NavigationTree.vue';
@@ -87,7 +87,7 @@ import AboutCytomineModal from './AboutCytomineModal.vue';
 import CytomineSearcher from '@/components/search/CytomineSearcher.vue';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
-import {KeycloakRole} from '@/constants/UserRole.js';
+import { KeycloakRole } from '@/constants/UserRole.js';
 
 export default {
   name: 'cytomine-navbar',
@@ -147,7 +147,7 @@ export default {
         await this.$keycloak.logout();
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-logout')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-logout') });
       }
     }
   }

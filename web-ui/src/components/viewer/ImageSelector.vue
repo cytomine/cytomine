@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div>
   <div class="image-selector-wrapper" v-show="imageSelectorEnabled">
@@ -98,16 +84,16 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get,syncMultiselectFilter} from '@/utils/store-helpers';
-import {IMAGE_FORMAT} from '@/utils/image-utils';
+import { get,syncMultiselectFilter } from '@/utils/store-helpers';
+import { IMAGE_FORMAT } from '@/utils/image-utils';
 
 import ImageName from '@/components/image/ImageName.vue';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
-import {ImageGroupCollection, ImageInstanceCollection, TagCollection} from '@/api';
+import { ImageGroupCollection, ImageInstanceCollection, TagCollection } from '@/api';
 import _ from 'lodash';
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import { appendShortTermToken } from '@/utils/token-utils.js';
 
-const storeOptions = {rootModuleProp: 'storeModule'};
+const storeOptions = { rootModuleProp: 'storeModule' };
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 
 export default {
@@ -151,7 +137,7 @@ export default {
       return Object.values(this.$store.getters['currentProject/currentViewer'].images).map(image => image.imageInstance.id);
     },
     availableImageGroups() {
-      return [{id: 'null', name: this.$t('no-image-group')}, ...this.imageGroups];
+      return [{ id: 'null', name: this.$t('no-image-group') }, ...this.imageGroups];
     }
   },
   watch: {
@@ -181,10 +167,10 @@ export default {
       try {
         await image.fetch(); // refetch image to ensure we have latest version
         let slice = await image.fetchReferenceSlice();
-        await this.$store.dispatch(this.viewerModule + 'addImage', {image, slices: [slice]});
+        await this.$store.dispatch(this.viewerModule + 'addImage', { image, slices: [slice] });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-add-viewer-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-add-viewer-image') });
       }
     },
     async fetchImages(loading = true) {
@@ -240,7 +226,7 @@ export default {
       })).array.filter(group => group.numberOfImages > 0);
     },
     async fetchTags() {
-      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+      this.availableTags = [{ id: 'null', name: this.$t('no-tag') }, ...(await TagCollection.fetchAll()).array];
     },
 
     more() {

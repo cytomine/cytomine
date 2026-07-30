@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div>
   <vl-layer-vector>
@@ -34,14 +20,14 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
-import Polygon, {fromCircle as polygonFromCircle} from 'ol/geom/Polygon';
+import Polygon, { fromCircle as polygonFromCircle } from 'ol/geom/Polygon';
 import WKT from 'ol/format/WKT';
 
-import {Annotation, AnnotationType, Cytomine} from '@/api';
-import {Action} from '@/utils/annotation-utils.js';
-import {updateAnnotationLinkProperties} from '@/utils/annotation-utils';
+import { Annotation, AnnotationType, Cytomine } from '@/api';
+import { Action } from '@/utils/annotation-utils.js';
+import { updateAnnotationLinkProperties } from '@/utils/annotation-utils';
 
 export default {
   name: 'draw-interaction',
@@ -168,7 +154,7 @@ export default {
       this.$refs.olSourceDrawTarget.clear(true);
     },
 
-    async drawEndHandler({feature}) {
+    async drawEndHandler({ feature }) {
       if (this.drawCorrection) {
         await this.endCorrection(feature);
       } else if (this.nbActiveLayers > 0) {
@@ -191,18 +177,18 @@ export default {
 
         try {
           await annot.save();
-          annot.userByTerm = this.termsToAssociate.map(term => ({term, user: [this.currentUser.id]}));
+          annot.userByTerm = this.termsToAssociate.map(term => ({ term, user: [this.currentUser.id] }));
           annot.imageGroup = this.imageGroupId;
           updateAnnotationLinkProperties(annot);
           eventBus.emit('addAnnotation', annot);
           if (idx === this.nbActiveLayers - 1) {
-            eventBus.emit('selectAnnotation', {index: this.index, annot});
+            eventBus.emit('selectAnnotation', { index: this.index, annot });
           }
 
-          this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
+          this.$store.commit(this.imageModule + 'addAction', { annot, type: Action.CREATE });
         } catch (err) {
           console.log(err);
-          this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-annotation-creation') });
         }
 
         if (this.activeTool === 'magic-wand') {
@@ -212,10 +198,10 @@ export default {
 
             eventBus.emit('editAnnotation', annotation);
             eventBus.emit('reloadAnnotationCrop', annotation);
-            this.$notify({type: 'success', text: 'Successful SAM Processing !'});
+            this.$notify({ type: 'success', text: 'Successful SAM Processing !' });
           } catch (error) {
             console.error(error);
-            this.$notify({type: 'error', text: 'Error in SAM Processing.'});
+            this.$notify({ type: 'error', text: 'Error in SAM Processing.' });
           }
         }
       });
@@ -241,13 +227,13 @@ export default {
           correctedAnnot.group = annot.group;
           correctedAnnot.annotationLink = annot.annotationLink;
           correctedAnnot.imageGroup = annot.imageGroup;
-          this.$store.commit(this.imageModule + 'addAction', {annot: correctedAnnot, type: Action.UPDATE});
+          this.$store.commit(this.imageModule + 'addAction', { annot: correctedAnnot, type: Action.UPDATE });
           eventBus.emit('editAnnotation', correctedAnnot);
           eventBus.emit('reloadAnnotationCrop', annot);
         }
       } catch (err) {
         console.log(err);
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-correction')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-correction') });
       }
     },
 

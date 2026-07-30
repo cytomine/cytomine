@@ -1,4 +1,4 @@
-import {mount} from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import GeometryField from '@/components/appengine/forms/fields/GeometryField';
@@ -46,7 +46,7 @@ describe('GeometryField.vue', () => {
     expect(wrapper.find('button').text()).toBe('select');
     expect(wrapper.find('.annotation-container').exists()).toBe(false);
 
-    const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
+    const tooltips = wrapper.findAllComponents({ name: 'BTooltip' });
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
     expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
@@ -57,7 +57,7 @@ describe('GeometryField.vue', () => {
   });
 
   it('The id should be rendered when selected', async  () => {
-    await wrapper.setProps({value: 42});
+    await wrapper.setProps({ value: 42 });
 
     expect(wrapper.vm.value).toBe(42);
     expect(wrapper.find('.annotation-container').exists()).toBe(true);

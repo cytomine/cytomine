@@ -90,11 +90,11 @@
 <script>
 
 import CytomineTable from '@/components/utils/CytomineTable.vue';
-import {UserCollection} from '@/api';
+import { UserCollection } from '@/api';
 import UserModal from './UserModal.vue';
 import UserDetails from './UserDetails.vue';
-import {rolesMapping} from '@/utils/role-utils';
-import {formatMomentDate} from '@/utils/date';
+import { rolesMapping } from '@/utils/role-utils';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'admin-users',

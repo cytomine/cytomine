@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <multiselect
   :value="value" @input="$emit('input', $event)"
@@ -72,21 +58,21 @@ import Multiselect from 'vue-multiselect';
 
 export default {
   name: 'cytomine-multiselect',
-  components: {Multiselect},
+  components: { Multiselect },
   props: {
-    value: {type: null},
-    options: {type: null},
-    label: {type: String},
-    trackBy: {type: String},
-    groupLabel: {type: String},
-    groupValues: {type: String},
-    multiple: {type: Boolean, default: false},
-    closeOnSelect: {type: Boolean, default: null},
-    selectAllAvailable: {type: Boolean, default: true},
-    searchable: {type: Boolean, default: true},
-    allowEmpty: {type: Boolean, default: true},
-    disabled: {type: Boolean, default: false},
-    allPlaceholder: {type: String}
+    value: { type: null },
+    options: { type: null },
+    label: { type: String },
+    trackBy: { type: String },
+    groupLabel: { type: String },
+    groupValues: { type: String },
+    multiple: { type: Boolean, default: false },
+    closeOnSelect: { type: Boolean, default: null },
+    selectAllAvailable: { type: Boolean, default: true },
+    searchable: { type: Boolean, default: true },
+    allowEmpty: { type: Boolean, default: true },
+    disabled: { type: Boolean, default: false },
+    allPlaceholder: { type: String }
   },
   data() {
     return {

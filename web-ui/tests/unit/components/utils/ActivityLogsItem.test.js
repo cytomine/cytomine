@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import moment from 'moment';
 
 import ActivityLogsItem from '@/components/utils/ActivityLogsItem';
@@ -41,8 +41,8 @@ describe('ActivityLogsItem.vue', () => {
         // Real stubs rather than the default ones: the assertions read the text
         // rendered inside the router-link slot.
         stubs: {
-          'router-link': {template: '<a><slot></slot></a>'},
-          'router-view': {template: '<div><slot></slot></div>'}
+          'router-link': { template: '<a><slot></slot></a>' },
+          'router-view': { template: '<div><slot></slot></div>' }
         }
       }
     });

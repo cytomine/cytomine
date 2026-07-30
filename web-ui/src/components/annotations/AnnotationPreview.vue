@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <v-popover
   placement="right"
@@ -64,7 +50,7 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 
 export default {
   name: 'annotation-preview',
@@ -76,11 +62,11 @@ export default {
     users: Array,
     images: Array,
     tracks: Array,
-    showDetails: {type: Boolean, default: true},
-    showImageInfo: {type: Boolean, default: true},
-    showSliceInfo: {type: Boolean, default: false},
-    clickable: {type: Boolean, default: true},
-    sameViewOnClick: {type: Boolean, default: false}
+    showDetails: { type: Boolean, default: true },
+    showImageInfo: { type: Boolean, default: true },
+    showSliceInfo: { type: Boolean, default: false },
+    clickable: { type: Boolean, default: true },
+    sameViewOnClick: { type: Boolean, default: false }
   },
   components: {
     AnnotationDetails: () => import('./AnnotationDetails.vue') // To resolve circular reference
@@ -132,7 +118,7 @@ export default {
   methods: {
     async fetchThumbnail() {
       try {
-        const response = await Cytomine.instance.api.get(this.cropUrl, {responseType: 'blob'});
+        const response = await Cytomine.instance.api.get(this.cropUrl, { responseType: 'blob' });
 
         if (this.imageDataUrl) {
           URL.revokeObjectURL(this.imageDataUrl);
@@ -145,7 +131,7 @@ export default {
     },
     viewAnnot(trySameView = false) {
       if (this.clickable) {
-        this.$emit('select', {annot: this.annot, options:{trySameView}});
+        this.$emit('select', { annot: this.annot, options:{ trySameView } });
       }
     },
     close(event) {

@@ -1,10 +1,10 @@
-import {mount} from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import UserHistoryPage from '@/components/user/UserHistoryPage';
-import {Cytomine} from '@/api';
-import {UploadedFileStatus} from '@/constants/UploadedFileStatus';
-import {flushPromises} from '../../../utils';
+import { Cytomine } from '@/api';
+import { UploadedFileStatus } from '@/constants/UploadedFileStatus';
+import { flushPromises } from '../../../utils';
 
 vi.mock('@/api', () => ({
   Cytomine: {
@@ -27,7 +27,7 @@ const insertCommand = {
   commandRequest: {
     commandType: 'INSERT_UPLOADED_FILE_COMMAND',
     userId: 45,
-    after: {id: 2, filename: '/data/pims/tmp/abc', originalFilename: 'image', status: UploadedFileStatus.UPLOADED},
+    after: { id: 2, filename: '/data/pims/tmp/abc', originalFilename: 'image', status: UploadedFileStatus.UPLOADED },
   },
 };
 
@@ -37,8 +37,8 @@ const updateCommand = {
   commandRequest: {
     commandType: 'UPDATE_UPLOADED_FILE_COMMAND',
     userId: 45,
-    before: {id: 2, filename: 'upload-abc/image', originalFilename: 'image', status: UploadedFileStatus.CHECKING_INTEGRITY},
-    after: {id: 2, filename: 'upload-abc/image', originalFilename: 'image', status: UploadedFileStatus.DEPLOYED},
+    before: { id: 2, filename: 'upload-abc/image', originalFilename: 'image', status: UploadedFileStatus.CHECKING_INTEGRITY },
+    after: { id: 2, filename: 'upload-abc/image', originalFilename: 'image', status: UploadedFileStatus.DEPLOYED },
   },
 };
 
@@ -51,7 +51,7 @@ const undoCommand = {
     target: {
       commandType: 'INSERT_ONTOLOGY_COMMAND',
       userId: 45,
-      after: {id: 1, name: 'TEST-PROJECT'},
+      after: { id: 1, name: 'TEST-PROJECT' },
     },
   },
 };
@@ -66,7 +66,7 @@ const createWrapper = async (options = {}) => {
       plugins: [Buefy],
       mocks: {
         $t: (message) => message,
-        $i18n: {locale: 'en'},
+        $i18n: { locale: 'en' },
         $notify: vi.fn(),
       }
     }
@@ -77,7 +77,7 @@ const createWrapper = async (options = {}) => {
 
 describe('UserHistoryPage.vue', () => {
   beforeEach(() => {
-    Cytomine.instance.api.get.mockResolvedValue({data: {collection: commands, size: commands.length}});
+    Cytomine.instance.api.get.mockResolvedValue({ data: { collection: commands, size: commands.length } });
     Cytomine.instance.api.post.mockResolvedValue({});
   });
 
@@ -86,7 +86,7 @@ describe('UserHistoryPage.vue', () => {
 
     expect(Cytomine.instance.api.get).toHaveBeenCalledWith(
       '/commands',
-      {params: {page: 0, size: 20, sort: 'created,desc'}},
+      { params: { page: 0, size: 20, sort: 'created,desc' } },
     );
     expect(wrapper.vm.commands).toEqual(commands);
     expect(wrapper.vm.total).toBe(3);
@@ -119,7 +119,7 @@ describe('UserHistoryPage.vue', () => {
     const wrapper = await createWrapper();
 
     expect(wrapper.vm.$notify).toHaveBeenCalledWith(
-      {type: 'error', text: 'unexpected-error-info-message'},
+      { type: 'error', text: 'unexpected-error-info-message' },
     );
     expect(wrapper.vm.loading).toBe(false);
   });
@@ -132,14 +132,14 @@ describe('UserHistoryPage.vue', () => {
 
     expect(Cytomine.instance.api.get).toHaveBeenLastCalledWith(
       '/commands',
-      {params: {page: 0, size: 20, sort: 'created,asc'}},
+      { params: { page: 0, size: 20, sort: 'created,asc' } },
     );
   });
 
   it('should reset to the first page when sorted from another page', async () => {
     const wrapper = await createWrapper();
 
-    await wrapper.setData({currentPage: 3});
+    await wrapper.setData({ currentPage: 3 });
     await flushPromises();
 
     wrapper.vm.onSort('created', 'asc');
@@ -148,31 +148,31 @@ describe('UserHistoryPage.vue', () => {
     expect(wrapper.vm.currentPage).toBe(1);
     expect(Cytomine.instance.api.get).toHaveBeenLastCalledWith(
       '/commands',
-      {params: {page: 0, size: 20, sort: 'created,asc'}},
+      { params: { page: 0, size: 20, sort: 'created,asc' } },
     );
   });
 
   it('should refetch the requested page when the current page changes', async () => {
     const wrapper = await createWrapper();
 
-    await wrapper.setData({currentPage: 2});
+    await wrapper.setData({ currentPage: 2 });
     await flushPromises();
 
     expect(Cytomine.instance.api.get).toHaveBeenLastCalledWith(
       '/commands',
-      {params: {page: 1, size: 20, sort: 'created,desc'}},
+      { params: { page: 1, size: 20, sort: 'created,desc' } },
     );
   });
 
   it('should refetch with the new page size when it changes', async () => {
     const wrapper = await createWrapper();
 
-    await wrapper.setData({perPage: 50});
+    await wrapper.setData({ perPage: 50 });
     await flushPromises();
 
     expect(Cytomine.instance.api.get).toHaveBeenLastCalledWith(
       '/commands',
-      {params: {page: 0, size: 50, sort: 'created,desc'}},
+      { params: { page: 0, size: 50, sort: 'created,desc' } },
     );
   });
 
@@ -184,7 +184,7 @@ describe('UserHistoryPage.vue', () => {
     await flushPromises();
 
     expect(Cytomine.instance.api.post).toHaveBeenCalledWith(`/commands/undo/${undoCommand.id}`);
-    expect(wrapper.vm.$notify).toHaveBeenCalledWith({type: 'success', text: 'notify-success-undo'});
+    expect(wrapper.vm.$notify).toHaveBeenCalledWith({ type: 'success', text: 'notify-success-undo' });
     expect(Cytomine.instance.api.get).toHaveBeenCalled();
     expect(wrapper.vm.undoing).toBeNull();
   });
@@ -197,7 +197,7 @@ describe('UserHistoryPage.vue', () => {
     wrapper.vm.undo(insertCommand);
     await flushPromises();
 
-    expect(wrapper.vm.$notify).toHaveBeenCalledWith({type: 'error', text: 'notify-error-undo'});
+    expect(wrapper.vm.$notify).toHaveBeenCalledWith({ type: 'error', text: 'notify-error-undo' });
     expect(Cytomine.instance.api.get).not.toHaveBeenCalled();
     expect(wrapper.vm.undoing).toBeNull();
   });
@@ -206,9 +206,9 @@ describe('UserHistoryPage.vue', () => {
     const wrapper = await createWrapper();
 
     expect(wrapper.vm.parseType('INSERT_UPLOADED_FILE_COMMAND')).toEqual(
-      {operation: 'INSERT', domain: ['UPLOADED', 'FILE']}
+      { operation: 'INSERT', domain: ['UPLOADED', 'FILE'] }
     );
-    expect(wrapper.vm.parseType('UNDO_CREATE_COMMAND')).toEqual({operation: 'UNDO', domain: ['CREATE']});
+    expect(wrapper.vm.parseType('UNDO_CREATE_COMMAND')).toEqual({ operation: 'UNDO', domain: ['CREATE'] });
   });
 
   it('should map each operation to a tag type', async () => {
@@ -217,7 +217,7 @@ describe('UserHistoryPage.vue', () => {
     expect(wrapper.vm.operationTag(insertCommand)).toBe('is-success');
     expect(wrapper.vm.operationTag(updateCommand)).toBe('is-info');
     expect(wrapper.vm.operationTag(undoCommand)).toBe('is-warning');
-    expect(wrapper.vm.operationTag({commandRequest: {commandType: 'MERGE_TERM_COMMAND'}})).toBe('is-light');
+    expect(wrapper.vm.operationTag({ commandRequest: { commandType: 'MERGE_TERM_COMMAND' } })).toBe('is-light');
   });
 
   it('should resolve the domain of an undo command from its target', async () => {
@@ -233,13 +233,13 @@ describe('UserHistoryPage.vue', () => {
     expect(wrapper.vm.description(undoCommand)).toBe('TEST-PROJECT');
     expect(wrapper.vm.description(insertCommand)).toBe('image');
 
-    const withFilenameOnly = {commandRequest: {commandType: 'DELETE_UPLOADED_FILE_COMMAND', before: {id: 7, filename: 'a/b'}}};
+    const withFilenameOnly = { commandRequest: { commandType: 'DELETE_UPLOADED_FILE_COMMAND', before: { id: 7, filename: 'a/b' } } };
     expect(wrapper.vm.description(withFilenameOnly)).toBe('a/b');
 
-    const withIdOnly = {commandRequest: {commandType: 'DELETE_USER_ROLE_COMMAND', before: {id: 7}}};
+    const withIdOnly = { commandRequest: { commandType: 'DELETE_USER_ROLE_COMMAND', before: { id: 7 } } };
     expect(wrapper.vm.description(withIdOnly)).toBe('#7');
 
-    const withoutPayload = {commandRequest: {commandType: 'DELETE_USER_ROLE_COMMAND'}};
+    const withoutPayload = { commandRequest: { commandType: 'DELETE_USER_ROLE_COMMAND' } };
     expect(wrapper.vm.description(withoutPayload)).toBe('');
   });
 });

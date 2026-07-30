@@ -8,7 +8,7 @@
       {{ $t('profile') }}
     </p>
     <div class="panel-block">
-      <form @submit.prevent="editDetails()" data-vv-scope="profile">
+      <form @submit.prevent="editDetails()">
         <b-field :label="$t('id')" horizontal v-if="currentAccount.isDeveloper">
           {{currentUser.id}}
         </b-field>
@@ -21,32 +21,38 @@
           <span class="tag" :class="role.class">{{$t(role.label)}}</span>
         </b-field>
 
-        <b-field
-          :label="$t('lastname')"
-          horizontal
-          :type="{'is-danger': errors.has('profile.lastname')}"
-          :message="errors.first('profile.lastname')"
-        >
-          <b-input v-model="updatedAccount.lastName" name="lastname" v-validate="'required'" />
-        </b-field>
+        <field :form="form" name="lastName" :validators="requiredRule" v-slot="{field, state}">
+          <b-field
+            :label="$t('lastname')"
+            horizontal
+            :type="{'is-danger': !!state.meta.errors.length}"
+            :message="state.meta.errors[0]"
+          >
+            <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+          </b-field>
+        </field>
 
-        <b-field
-          :label="$t('firstname')"
-          horizontal
-          :type="{'is-danger': errors.has('profile.firstname')}"
-          :message="errors.first('profile.firstname')"
-        >
-          <b-input v-model="updatedAccount.firstName" name="firstname" v-validate="'required'" />
-        </b-field>
+        <field :form="form" name="firstName" :validators="requiredRule" v-slot="{field, state}">
+          <b-field
+            :label="$t('firstname')"
+            horizontal
+            :type="{'is-danger': !!state.meta.errors.length}"
+            :message="state.meta.errors[0]"
+          >
+            <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+          </b-field>
+        </field>
 
-        <b-field
-          :label="$t('email')"
-          horizontal
-          :type="{'is-danger': errors.has('profile.email')}"
-          :message="errors.first('profile.email')"
-        >
-          <b-input v-model="updatedAccount.email" name="email" v-validate="'required|email'" />
-        </b-field>
+        <field :form="form" name="email" :validators="emailRules" v-slot="{field, state}">
+          <b-field
+            :label="$t('email')"
+            horizontal
+            :type="{'is-danger': !!state.meta.errors.length}"
+            :message="state.meta.errors[0]"
+          >
+            <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+          </b-field>
+        </field>
 
         <b-field :label="$t('language')" horizontal>
           <b-select v-model="updatedAccount.locale">
@@ -65,7 +71,7 @@
 
         <b-field grouped position="is-right">
           <div class="control">
-            <button class="button is-link" :disabled="errors.any('profile')"> {{$t('button-save')}}</button>
+            <button class="button is-link" :disabled="!isValid"> {{$t('button-save')}}</button>
           </div>
         </b-field>
       </form>
@@ -149,9 +155,12 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+
 import { get } from '@/utils/store-helpers';
 import { changeLanguageMixin } from '@/lang.js';
 import { MyAccount, User } from '@/api';
+import { email, required, rules, validateForm } from '@/utils/form.js';
 import { rolesMapping } from '@/utils/role-utils';
 import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
 import copyToClipboard from 'copy-to-clipboard';
@@ -160,8 +169,18 @@ import { formatMomentDate } from '@/utils/date';
 export default {
   // eslint-disable-next-line
   name: 'Account',
-  $_veeValidate: { validator: 'new' },
+  components: { Field },
   mixins: [changeLanguageMixin],
+  setup() {
+    // Seeded from the account in `created()`: the store is not reachable here.
+    const form = useForm({ defaultValues: { lastName: '', firstName: '', email: '' } });
+    return {
+      form,
+      isValid: form.useStore(state => state.isValid),
+      requiredRule: { onChange: rules(required) },
+      emailRules: { onChange: rules(required, email) }
+    };
+  },
   data() {
     return {
       updatedAccount: this.$store.state.currentUser.account.clone(),
@@ -205,11 +224,11 @@ export default {
   methods: {
     formatMomentDate,
     async editDetails() {
-      let result = await this.$validator.validateAll('profile');
-      if (!result) {
+      if (!await validateForm(this.form)) {
         return;
       }
 
+      Object.assign(this.updatedAccount, this.form.state.values);
       try {
         await this.$store.dispatch('currentUser/updateAccount', this.updatedAccount);
         this.changeLanguage(this.currentAccount.locale);
@@ -240,6 +259,11 @@ export default {
     }
   },
   async created() {
+    this.form.reset({
+      lastName: this.updatedAccount.lastName,
+      firstName: this.updatedAccount.firstName,
+      email: this.updatedAccount.email
+    });
     try {
       this.credentials = await MyAccount.fetchCredentials();
     } catch (error) {

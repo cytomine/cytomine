@@ -1,16 +1,16 @@
-import {fileURLToPath, URL} from 'node:url';
+import { fileURLToPath, URL } from 'node:url';
 
 import vue from '@vitejs/plugin-vue';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 
-export default defineConfig(({command}) => ({
+export default defineConfig(({ command }) => ({
   plugins: [
     vue({
       template: {
         compilerOptions: {
           // MODE: 2 keeps Vue 2 runtime behavior by default across the board while
           // running on @vue/compat, so 188 SFCs keep working during the staged migration.
-          compatConfig: {MODE: 2}
+          compatConfig: { MODE: 2 }
         }
       }
     })
@@ -23,7 +23,7 @@ export default defineConfig(({command}) => ({
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.vue', '.json']
   },
   // Replaces babel-plugin-transform-remove-console (production only)
-  esbuild: command === 'build' ? {drop: ['console']} : undefined,
+  esbuild: command === 'build' ? { drop: ['console'] } : undefined,
   build: {
     commonjsOptions: {
       // UMD/CJS libraries (vue-slider-component, vue-draggable-resizable, ...) do

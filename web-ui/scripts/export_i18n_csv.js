@@ -1,5 +1,5 @@
-import {readFile, writeFile, existsSync, mkdirSync} from 'fs';
-import {join} from 'path';
+import { readFile, writeFile, existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
 
 function CSVToArray(strData, strDelim = ',') {
@@ -91,7 +91,7 @@ export function makeI18nJsons(csvPath, destPath) {
     }
 
     if (!existsSync(destPath)) {
-      mkdirSync(destPath, {recursive: true});
+      mkdirSync(destPath, { recursive: true });
     }
 
     for (let langIndex in languages) {

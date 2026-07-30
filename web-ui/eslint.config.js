@@ -11,8 +11,6 @@ export default [
       'reports/',
       'node_modules/',
       'src/locales/json/',
-      '**/*.mjs',
-      '**/*.cjs',
     ],
   },
   js.configs.recommended,

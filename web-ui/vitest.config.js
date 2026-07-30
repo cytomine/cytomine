@@ -1,7 +1,7 @@
 import fs from 'node:fs';
-import {fileURLToPath, URL} from 'node:url';
+import { fileURLToPath, URL } from 'node:url';
 
-import {defineConfig, mergeConfig} from 'vitest/config';
+import { defineConfig, mergeConfig } from 'vitest/config';
 
 import viteConfig from './vite.config.js';
 
@@ -53,7 +53,7 @@ function vueLibraryAliases() {
 const vueLibraries = vueLibraryAliases();
 
 export default mergeConfig(
-  viteConfig({command: 'serve', mode: 'test'}),
+  viteConfig({ command: 'serve', mode: 'test' }),
   defineConfig({
     resolve: {
       alias: vueLibraries

@@ -18,12 +18,21 @@ const pkg = JSON.parse(
 // import and a single compat runtime is used everywhere.
 const BUILD_TOOLING = ['@vitejs/plugin-vue', 'eslint-plugin-vue', 'vue-eslint-parser'];
 
+// A Vite alias matches the bare name *and* every subpath under it, but points
+// them all at the one file named here, so a package that is imported per
+// component cannot be aliased this way. `src/viewer-ol/` imports
+// `vue3-openlayers/map/OlMap` and friends rather than the barrel, to keep the
+// jspdf/proj4/ol-ext components it never renders out of the bundle; its
+// "exports" map already resolves those to ESM, so it only needs inlining.
+const SUBPATH_IMPORTED = ['vue3-openlayers'];
+
 function vueLibraryAliases() {
   const aliases = {};
   const names = [...Object.keys(pkg.dependencies), ...Object.keys(pkg.devDependencies)];
 
   for (const name of names) {
-    if (name === 'vue' || name === '@vue/compat' || BUILD_TOOLING.includes(name)) {
+    if (name === 'vue' || name === '@vue/compat'
+      || BUILD_TOOLING.includes(name) || SUBPATH_IMPORTED.includes(name)) {
       continue;
     }
 
@@ -69,7 +78,7 @@ export default mergeConfig(
         deps: {
           // Aliasing alone is not enough: the packages also have to go through
           // Vite's transform pipeline for the `vue` import to be rewritten.
-          inline: Object.keys(vueLibraries)
+          inline: [...Object.keys(vueLibraries), ...SUBPATH_IMPORTED]
         }
       },
       coverage: {

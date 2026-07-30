@@ -15,3 +15,14 @@ config.global.renderStubDefaultSlot = true;
 // Same opt-out src/main.js applies, so `v-model` on Buefy components behaves in
 // the tests the way it does in the app.
 optOutBuefyFromVModelCompat();
+
+// Since ol 6, `ol/Map` observes its target with a ResizeObserver, which jsdom
+// does not implement. Nothing measures anything in a test, so an inert stub is
+// enough to let the viewer components mount.
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}

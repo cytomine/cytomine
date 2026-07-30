@@ -14,6 +14,8 @@ vi.mock('ol/format/WKT', () => {
 
 describe('AnnotationLayer.vue', () => {
   const addFeature = vi.fn();
+  const refresh = vi.fn();
+  const setStyle = vi.fn();
 
   const createWrapper = () => shallowMount(
     AnnotationLayer,
@@ -25,6 +27,8 @@ describe('AnnotationLayer.vue', () => {
       global: {
         mocks: {
           $store: {
+            commit: vi.fn(),
+            dispatch: vi.fn(),
             getters: {
               'currentProject/currentViewer': {
                 images: {
@@ -51,20 +55,26 @@ describe('AnnotationLayer.vue', () => {
                 },
               },
               'currentProject/imageModule': vi.fn(() => 'mock-module/'),
+              'mock-module/genStyleFunction': vi.fn(),
             },
           },
         },
         stubs: {
-          'vl-layer-vector': true,
-          // `$refs` is shallow-readonly in Vue 3, so the source the component
-          // calls into has to be a real stub rather than something assigned
-          // onto `$refs` after mounting.
-          'vl-source-vector': {
-            name: 'vl-source-vector',
-            template: '<div></div>',
-            methods: { addFeature },
+          // The layer stub has to render its slot, otherwise the source below
+          // never mounts and `$refs.olSource` stays empty.
+          'ol-vector-layer': {
+            name: 'ol-vector-layer',
+            template: '<div><slot /></div>',
+            data: () => ({ vectorLayer: { setStyle } }),
           },
-          'vl-style-func': true,
+          // `$refs` is shallow-readonly in Vue 3, so the ol source the
+          // component reaches for has to come from a real stub rather than
+          // being assigned onto `$refs` after mounting.
+          'ol-source-vector': {
+            name: 'ol-source-vector',
+            template: '<div></div>',
+            data: () => ({ source: { addFeature, refresh } }),
+          },
         }
       }
     },
@@ -94,6 +104,29 @@ describe('AnnotationLayer.vue', () => {
       wrapper.vm.addAnnotationHandler({ id: 1 });
 
       expect(addFeature).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('clearFeatures', () => {
+    it('should refresh the source so that the loader runs again', () => {
+      refresh.mockClear();
+      const wrapper = createWrapper();
+
+      wrapper.vm.clearFeatures();
+
+      // A bare `clear()` empties the source without emptying its loaded
+      // extents since ol 6, so the annotations would never come back.
+      expect(refresh).toHaveBeenCalled();
+    });
+  });
+
+  describe('styling', () => {
+    it('should set the style on the ol layer, which a prop would not reach', () => {
+      setStyle.mockClear();
+
+      createWrapper();
+
+      expect(setStyle).toHaveBeenCalledWith(expect.any(Function));
     });
   });
 });

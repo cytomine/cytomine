@@ -88,4 +88,39 @@ describe('PasteAnnotationWithLinkModal.vue', () => {
 
     expect(wrapper.vm.checkedInViewer).toEqual([]);
   });
+
+  // Issue 12 replaced the `this.$set(imageInstance, 'inViewerPosition', …)` pair
+  // in `created()` with plain assignment, which carries reactivity only because
+  // the images are read back out of `this.imageGroup` and so arrive as proxies.
+  // Checked by breaking it both ways: dropping the two assignments fails the
+  // seeding test, and marking the images raw fails the other two.
+  describe('the position fields added after the images are fetched', () => {
+    it('seeds each select with the default for its section', async () => {
+      const wrapper = await createWrapper();
+
+      const selects = wrapper.findAll('.field:not(.header) select');
+      expect(selects).toHaveLength(2);
+      expect(selects[0].element.value).toBe('viewer');
+      expect(selects[1].element.value).toBe('image');
+    });
+
+    it('re-renders the select when the position changes after mount', async () => {
+      const wrapper = await createWrapper();
+
+      wrapper.vm.imagesInGroupInViewer[0].inViewerPosition = 'annotation';
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.find('.field:not(.header) select').element.value).toBe('annotation');
+    });
+
+    it('carries the chosen position into the selection', async () => {
+      const wrapper = await createWrapper();
+
+      await wrapper.findAll('.field.header input[type="checkbox"]')[0].setValue(true);
+      await wrapper.findAll('.field:not(.header) select')[0].setValue('annotation');
+
+      expect(wrapper.vm.selectedImagesAndOptions)
+        .toEqual([{ image: 2, position: 'annotation' }]);
+    });
+  });
 });

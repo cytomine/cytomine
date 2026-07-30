@@ -19,14 +19,6 @@ import optOutBuefyFromVModelCompat from '@/utils/buefy-compat.js';
 Vue.use(Buefy, { defaultIconPack: 'fas' });
 optOutBuefyFromVModelCompat();
 
-import VeeValidate, { Validator } from 'vee-validate';
-Validator.extend('positive', value => Number(value) > 0);
-Vue.use(VeeValidate, {
-  i18nRootKey: 'validations',
-  i18n,
-  inject: false
-});
-
 import Notifications from '@kyvg/vue3-notification';
 Vue.use(Notifications);
 

@@ -17,6 +17,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@kyvg/vue3-notification": "^3.4.2",
+    "@tanstack/vue-form": "^1.33.2",
     "@vue/compat": "^3.5.40",
     "axios": "^1.18.0",
     "buefy": "^3.0.8",
@@ -42,7 +43,6 @@
     "sl-vue-tree": "1.8.3",
     "v-click-outside-x": "^4.0.1",
     "v-tooltip": "^2.0.0-rc.33",
-    "vee-validate": "^2.2.4",
     "vue": "^3.5.40",
     "vue-chartjs": "^5.3.4",
     "vue-color": "^2.7.0",

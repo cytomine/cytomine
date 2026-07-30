@@ -35,18 +35,22 @@
         {{$t('send-to-some-members')}}
       </b-radio>
     </b-field>
-    <b-field v-if="!sendToAllMembers" :type="{'is-danger': errors.has('members')}" :message="errors.first('members')">
-      <domain-tag-input v-model="selectedMembers" :domains="members" placeholder="search-user" name="members" v-validate="'required'" searchedProperty="fullName" displayedProperty="fullName" />
-    </b-field>
-    <b-field :type="{'is-danger': errors.has('comment')}" :message="errors.first('comment')">
-      <b-input v-model="text" type="textarea" :placeholder="$t('enter-comment')" rows="2" name="comment" v-validate="'required'" />
-    </b-field>
+    <field v-if="!sendToAllMembers" :form="form" name="members" :validators="requiredRule" v-slot="{field, state}">
+      <b-field :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+        <domain-tag-input :value="state.value" @input="field.handleChange" :domains="members" placeholder="search-user" searchedProperty="fullName" displayedProperty="fullName" />
+      </b-field>
+    </field>
+    <field :form="form" name="comment" :validators="requiredRule" v-slot="{field, state}">
+      <b-field :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+        <b-input :model-value="state.value" @update:model-value="field.handleChange" type="textarea" :placeholder="$t('enter-comment')" rows="2" />
+      </b-field>
+    </field>
     <p class="buttons is-right are-small">
       <button class="button" @click="addingComment = false" :disabled="loading">
         {{$t('button-cancel')}}
       </button>
       <button class="button is-link" :class="{'is-loading': loading}"
-        :disabled="loading || members.length == 0 || errors.any()" @click="share()">
+        :disabled="loading || members.length == 0 || !isValid" @click="share()">
         {{$t('button-share')}}
       </button>
     </p>
@@ -55,9 +59,12 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+
 import { get } from '@/utils/store-helpers';
 
 import { AnnotationComment } from '@/api';
+import { required, rules, validateForm } from '@/utils/form.js';
 import DomainTagInput from '@/components/utils/DomainTagInput.vue';
 
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
@@ -67,19 +74,28 @@ export default {
   name: 'annotation-comments-modal',
   components: {
     DomainTagInput,
-    CytomineModalCard
+    CytomineModalCard,
+    Field
   },
-  $_veeValidate: { validator: 'new' },
   props: {
     annotation: Object,
     comments: Array
+  },
+  setup() {
+    // The recipients field is only mounted when the author picked specific
+    // members, and unmounting a `Field` deregisters it, so 'send to all' leaves
+    // it out of validation.
+    const form = useForm({ defaultValues: { members: [], comment: '' } });
+    return {
+      form,
+      isValid: form.useStore(state => state.isValid),
+      requiredRule: { onChange: rules(required) }
+    };
   },
   data() {
     return {
       addingComment: false,
       sendToAllMembers: true,
-      selectedMembers: [],
-      text: '',
       loading: false
     };
   },
@@ -96,19 +112,16 @@ export default {
   },
   watch: {
     addingComment() {
-      this.text = '';
-      this.selectedMembers = [];
+      this.form.reset({ members: [], comment: '' });
       this.$nextTick(() => {
         this.sendToAllMembers = true;
-        this.$validator.reset();
       });
     }
   },
   methods: {
     formatMomentDate,
     async share() {
-      let result = await this.$validator.validateAll();
-      if (!result) {
+      if (!await validateForm(this.form)) {
         return;
       }
 
@@ -119,8 +132,8 @@ export default {
           annotation: this.annotation,
           subject: `Cytomine: ${sender} commented an annotation`, // not translated because the content of the mail will be in english
           from: sender,
-          receivers: (this.sendToAllMembers ? this.members : this.selectedMembers).map(m => m.id),
-          comment: this.text,
+          receivers: (this.sendToAllMembers ? this.members : this.form.state.values.members).map(m => m.id),
+          comment: this.form.state.values.comment,
           annotationURL: this.annotationURL,
           shareAnnotationURL: this.annotationURL + '?action=comments'
         }).save();

@@ -69,15 +69,11 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         if (userByUsername.isPresent() && userByReference.isEmpty()) {
             User user = userByUsername.get();
             user.setReference(sub.toString());
-            user.setFirstname(
-                Objects.nonNull(tokenAttributes.get("given_name")) ? tokenAttributes.get("given_name").toString() : ""
-            );
-            user.setLastname(
-                Objects.nonNull(tokenAttributes.get("family_name")) ? tokenAttributes.get("family_name").toString() : ""
-            );
-            user.setEmail(
-                Objects.nonNull(tokenAttributes.get("email")) ? tokenAttributes.get("email").toString() : ""
-            );
+            user.setFirstname(tokenAttributes.get("given_name") != null
+                ? tokenAttributes.get("given_name").toString() : "");
+            user.setLastname(tokenAttributes.get("family_name") != null
+                ? tokenAttributes.get("family_name").toString() : "");
+            user.setEmail(tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "");
             userRepository.save(user);
 
             self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
@@ -89,15 +85,11 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             newUser.setUsername(jwtAuthenticationToken.getName());
             newUser.setReference(sub.toString());
             newUser.setName(tokenAttributes.get("name").toString());
-            newUser.setFirstname(
-                Objects.nonNull(tokenAttributes.get("given_name")) ? tokenAttributes.get("given_name").toString() : ""
-            );
-            newUser.setLastname(
-                Objects.nonNull(tokenAttributes.get("family_name")) ? tokenAttributes.get("family_name").toString() : ""
-            );
-            newUser.setEmail(
-                Objects.nonNull(tokenAttributes.get("email")) ? tokenAttributes.get("email").toString() : ""
-            );
+            newUser.setFirstname(tokenAttributes.get("given_name") != null
+                ? tokenAttributes.get("given_name").toString() : "");
+            newUser.setLastname(tokenAttributes.get("family_name") != null
+                ? tokenAttributes.get("family_name").toString() : "");
+            newUser.setEmail(tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "");
             // generate keys for public/private keys authentication
             newUser.generateKeys();
 

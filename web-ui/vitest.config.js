@@ -1,9 +1,9 @@
-import {defineConfig, mergeConfig} from 'vitest/config';
+import { defineConfig, mergeConfig } from 'vitest/config';
 
-import viteConfig from './vite.config.mjs';
+import viteConfig from './vite.config.js';
 
 export default mergeConfig(
-  viteConfig({command: 'serve', mode: 'test'}),
+  viteConfig({ command: 'serve', mode: 'test' }),
   defineConfig({
     test: {
       environment: 'jsdom',

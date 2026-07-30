@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 export default {
   state() {
     return {
@@ -19,7 +17,7 @@ export default {
       state.displayType = value;
     },
     setCurrentPage(state, { prop, page }) {
-      Vue.set(state.currentPages, prop, page);
+      state.currentPages[prop] = page;
     },
     setSelectedTermsIds(state, termsIds) {
       state.selectedTermsIds = termsIds;

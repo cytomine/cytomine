@@ -104,10 +104,7 @@ export default {
     users: get('currentStorage/users'),
     shortTermToken: get('currentUser/shortTermToken'),
     uploadedFileCollection() {
-      return new UploadedFileCollection({
-        onlyRootsWithDetails: true,
-        originalFilename: { ilike: encodeURIComponent(this.searchString) }
-      });
+      return new UploadedFileCollection({ originalFilename: { ilike: encodeURIComponent(this.searchString) } });
     }
   },
   methods: {

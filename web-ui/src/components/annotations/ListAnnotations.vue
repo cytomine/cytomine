@@ -115,7 +115,7 @@
               <ontology-tree-multiselect
                 :ontology="ontology"
                 :additionalNodes="additionalTermNodes"
-                v-model="selectedTermsIds"
+                v-model:selectedNodes="selectedTermsIds"
               />
             </div>
           </div>
@@ -128,7 +128,7 @@
               <track-tree-multiselect
                 :tracks="filteredTracks"
                 :additional-nodes="additionalTrackNodes"
-                v-model="selectedTracksIds"
+                v-model:selectedNodes="selectedTracksIds"
               />
             </div>
           </div>

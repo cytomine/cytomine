@@ -57,10 +57,7 @@ import { getWildcardRegexp } from '@/utils/string-utils';
 
 export default {
   name: 'ontology-tree',
-  model: {
-    prop: 'selectedNodes',
-    event: 'setSelectedNodes'
-  },
+  emits: ['update:selectedNodes', 'select', 'unselect', 'newTerm'],
   props: {
     ontology: { type: Object },
     additionalNodes: { type: Array, default: () => [] },
@@ -189,7 +186,7 @@ export default {
             this.$emit('select', node.data.id);
           }
         });
-        this.$emit('setSelectedNodes', this.internalSelectedNodes);
+        this.$emit('update:selectedNodes', this.internalSelectedNodes);
       }
 
       this.refreshNodeSelection();

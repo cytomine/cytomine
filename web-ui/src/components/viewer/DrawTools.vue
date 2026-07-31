@@ -36,7 +36,7 @@
         <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small" />
         <ontology-tree
           class="ontology-tree"
-          v-model="termsToAssociate"
+          v-model:selectedNodes="termsToAssociate"
           :ontology="ontology"
           :searchString="searchStringTerm"
         />
@@ -66,7 +66,7 @@
         <b-input v-model="searchStringTrack" :placeholder="$t('search-placeholder')" size="is-small" />
         <track-tree
           class="track-tree"
-          v-model="tracksToAssociate"
+          v-model:selectedNodes="tracksToAssociate"
           :tracks="tracks"
           :searchString="searchStringTrack"
           :allow-new="true"

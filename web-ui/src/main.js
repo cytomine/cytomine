@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import Vue, { createApp, h } from 'vue';
 import axios from 'axios';
 import constants from '@/utils/constants.js';
 
@@ -16,11 +16,9 @@ import store from './store/store.js';
 
 import Buefy from 'buefy';
 import optOutBuefyFromVModelCompat from '@/utils/buefy-compat.js';
-Vue.use(Buefy, { defaultIconPack: 'fas' });
 optOutBuefyFromVModelCompat();
 
 import Notifications from '@kyvg/vue3-notification';
-Vue.use(Notifications);
 
 import VTooltip from 'v-tooltip';
 Vue.use(VTooltip);
@@ -69,11 +67,14 @@ axios.get('configuration.json').then(response => {
         onLoad: 'login-required'
       })
       .then(() => {
-        new Vue({
-          render: h => h(App),
+        const app = createApp({
+          render: () => h(App),
           router,
-          store
-        }).$mount('#app');
+        });
+        app.use(store);
+        app.use(Buefy, { defaultIconPack: 'fas' });
+        app.use(Notifications);
+        app.mount('#app');
       });
   });
 });

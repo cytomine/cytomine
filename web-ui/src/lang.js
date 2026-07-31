@@ -8,6 +8,7 @@ import nl from './locales/json/nl.i18n.json';
 
 export default createI18n({
   legacy: true,
+  globalInjection: false,
   locale: 'en',
   fallbackLocale: 'en',
   messages: { en, es, fr, nl }

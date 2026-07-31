@@ -1,6 +1,6 @@
 <template>
 <div class="list-members-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
     <h2> {{ $t('error') }} </h2>
     <p> {{ $t('unexpected-error-info-message') }} </p>
@@ -45,31 +45,29 @@
       :revision="revision"
     >
 
-      <template #default="{row: member}">
-        <b-table-column field="username" :label="$t('username')" sortable width="100">
-          {{member.username}}
-        </b-table-column>
+      <b-table-column v-slot="{row: member}" field="username" :label="$t('username')" sortable width="100">
+        {{member.username}}
+      </b-table-column>
 
-        <b-table-column field="fullName" :label="$t('name')" sortable width="150">
-          {{member.name}}
-        </b-table-column>
+      <b-table-column v-slot="{row: member}" field="fullName" :label="$t('name')" sortable width="150">
+        {{member.name}}
+      </b-table-column>
 
-        <b-table-column field="projectRole" :label="$t('role')" sortable width="50">
-          <icon-project-member-role
-            :is-manager="member.role !== contributorRole.value"
-            :is-representative="member.role === representativeRole.value"
-            editable
-            @toggleManager="confirmToggleManager(member)"
-            @toggleRepresentative="toggleRepresentative(member)"
-          />
-        </b-table-column>
+      <b-table-column v-slot="{row: member}" field="projectRole" :label="$t('role')" sortable width="50">
+        <icon-project-member-role
+          :is-manager="member.role !== contributorRole.value"
+          :is-representative="member.role === representativeRole.value"
+          editable
+          @toggleManager="confirmToggleManager(member)"
+          @toggleRepresentative="toggleRepresentative(member)"
+        />
+      </b-table-column>
 
-        <b-table-column label="" centered width="50">
-          <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link">
-            {{$t('button-view-activity')}}
-          </router-link>
-        </b-table-column>
-      </template>
+      <b-table-column v-slot="{row: member}" label="" centered width="50">
+        <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link">
+          {{$t('button-view-activity')}}
+        </router-link>
+      </b-table-column>
 
       <template #empty>
         <div class="content has-text-grey has-text-centered">

@@ -1,6 +1,6 @@
 <template>
 <div class="content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <template v-if="!loading">
   <div class="panel">
     <p class="panel-heading">
@@ -14,7 +14,7 @@
         </b-field>
 
         <b-field :label="$t('username')" horizontal>
-          <b-input :value="updatedAccount.username" disabled />
+          <b-input :model-value="updatedAccount.username" disabled />
         </b-field>
 
         <b-field :label="$t('role')" horizontal>
@@ -120,7 +120,7 @@
       <template v-else>
         <b-field :label="$t('public-key')" horizontal>
           <b-field>
-            <b-input :value="apiKeys.primaryKey" readonly expanded />
+            <b-input :model-value="apiKeys.primaryKey" readonly expanded />
             <p class="control">
               <button class="button" @click="copy(apiKeys.primaryKey)">
                 <span class="icon"><i class="far fa-clipboard"></i></span>
@@ -132,7 +132,7 @@
 
         <b-field :label="$t('private-key')" horizontal>
           <b-field>
-            <b-input :value="apiKeys.secondaryKey" readonly expanded />
+            <b-input :model-value="apiKeys.secondaryKey" readonly expanded />
             <p class="control">
               <button class="button" @click="copy(apiKeys.secondaryKey)">
                 <span class="icon"><i class="far fa-clipboard"></i></span>

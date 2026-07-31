@@ -1,6 +1,6 @@
 <template>
 <div class="tags-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <template v-if="!loading">
     <b-field grouped group-multiline>
       <em v-if="error">{{$t('error-fetch-tags')}}</em>

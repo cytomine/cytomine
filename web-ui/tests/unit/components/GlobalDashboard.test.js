@@ -86,4 +86,18 @@ describe('GlobalDashboard.vue', () => {
     expect(ImageInstanceCollection.fetchLastOpened).toHaveBeenCalled();
     expect(wrapper.vm.lastOpenedImage.projectName).toBe('Project 1');
   });
+
+  it('The recent projects table should render a row per project', () => {
+    const rows = wrapper.findAll('.b-table tbody tr');
+
+    expect(rows.length).toBe(2);
+    expect(rows.at(0).text()).toContain('Project 1');
+    expect(rows.at(1).text()).toContain('Project 2');
+  });
+
+  it('The recent projects table should render both column headers', () => {
+    const headers = wrapper.findAll('.b-table thead th').map((th) => th.text());
+
+    expect(headers).toEqual(['project', 'images']);
+  });
 });

@@ -14,38 +14,36 @@
           detailed
           @details-open="onDetailsOpen"
         >
-          <template #default="{ row: run }">
-            <b-table-column :label="$t('app-name')">
-              <router-link :to="`/apps/${run.task.namespace}/${run.task.version}`">
-                {{ run.task.name }} ({{ run.task.version }})
-              </router-link>
-            </b-table-column>
+          <b-table-column v-slot="{ row: run }" :label="$t('app-name')">
+            <router-link :to="`/apps/${run.task.namespace}/${run.task.version}`">
+              {{ run.task.name }} ({{ run.task.version }})
+            </router-link>
+          </b-table-column>
 
-            <b-table-column :label="$t('launched-by')" field="user.username" sortable>
-              {{ run.user.username }}
-            </b-table-column>
+          <b-table-column v-slot="{ row: run }" :label="$t('launched-by')" field="user.username" sortable>
+            {{ run.user.username }}
+          </b-table-column>
 
-            <b-table-column :label="$t('execution-date')" field="createdAt" sortable>
-              {{ formatDate(run.createdAt) }}
-            </b-table-column>
+          <b-table-column v-slot="{ row: run }" :label="$t('execution-date')" field="createdAt" sortable>
+            {{ formatDate(run.createdAt) }}
+          </b-table-column>
 
-            <b-table-column :label="$t('status')" field="state" centered sortable>
-              <span class="tag" :class="stateClass(run.state)">
-                {{ run.state }}
-              </span>
-            </b-table-column>
+          <b-table-column v-slot="{ row: run }" :label="$t('status')" field="state" centered sortable>
+            <span class="tag" :class="stateClass(run.state)">
+              {{ run.state }}
+            </span>
+          </b-table-column>
 
-            <b-table-column :label="$t('actions')" centered>
-              <div class="buttons is-centered">
-                <button class="button is-small is-info is-light" @click="handleViewLogs(run)">
-                  {{ $t('view-logs') }}
-                </button>
-                <button v-if="currentUser.username == 'admin'" class="button is-small is-danger is-light" @click="handleDelete(run)">
-                  <b-icon icon="trash" class="has-text-white" />
-                </button>
-              </div>
-            </b-table-column>
-          </template>
+          <b-table-column v-slot="{ row: run }" :label="$t('actions')" centered>
+            <div class="buttons is-centered">
+              <button class="button is-small is-info is-light" @click="handleViewLogs(run)">
+                {{ $t('view-logs') }}
+              </button>
+              <button v-if="currentUser.username == 'admin'" class="button is-small is-danger is-light" @click="handleDelete(run)">
+                <b-icon icon="trash" class="has-text-white" />
+              </button>
+            </div>
+          </b-table-column>
 
           <template #detail="{ row: run }">
             <b-tabs v-model="run._activeTab" type="is-boxed" size="is-small">
@@ -54,7 +52,7 @@
                 <div class="columns">
                   <div class="column">
                     <h2>{{ $t('app-engine.inputs.title') }}</h2>
-                    <b-loading :is-full-page="false" :active="run.inputs === null" />
+                    <b-loading :is-full-page="false" :model-value="run.inputs === null" />
                     <task-run-parameters-table
                       v-if="run.inputs !== null"
                       :parameters="run.inputs"
@@ -64,7 +62,7 @@
                   </div>
                   <div class="column">
                     <h2>{{ $t('app-engine.outputs.title') }}</h2>
-                    <b-loading :is-full-page="false" :active="run.outputs === null" />
+                    <b-loading :is-full-page="false" :model-value="run.outputs === null" />
                     <task-run-parameters-table
                       v-if="run.outputs !== null"
                       :parameters="run.outputs"
@@ -76,7 +74,7 @@
               </b-tab-item>
 
               <b-tab-item :label="$t('logs')">
-                <b-loading :is-full-page="false" :active="run.logs === null" />
+                <b-loading :is-full-page="false" :model-value="run.logs === null" />
                 <pre v-if="run.logs !== null" class="logs">{{ run.logs }}</pre>
                 <p v-else>{{ $t('no-log-to-display') }}</p>
               </b-tab-item>

@@ -8,7 +8,7 @@
   <p>{{ $t('unexpected-error-info-message') }}</p>
 </div>
 <div v-else class="content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('image-groups')}}
@@ -37,7 +37,7 @@
         </button>
       </div>
 
-      <b-collapse :open="filtersOpened">
+      <b-collapse :model-value="filtersOpened">
         <div class="filters">
           <div class="columns">
             <div class="column filter is-half">
@@ -75,48 +75,49 @@
           :default-sort-direction="sort.order"
           @sort="updateSort"
       >
-        <template #default="{row: imageGroup}">
-          <b-table-column :label="$t('overview')" width="100">
-            <router-link
-                v-if="imageGroup.imageInstances.length > 0"
-                :to="viewerURL(imageGroup)"
-            >
-              <image-group-preview :image-group="imageGroup" :key="`preview-${imageGroup.id}`"/>
-            </router-link>
-          </b-table-column>
-
-          <b-table-column
-              field="name"
-              :label="$t('name')"
-              sortable
-              width="400"
+        <b-table-column v-slot="{row: imageGroup}" :label="$t('overview')" width="100">
+          <router-link
+              v-if="imageGroup.imageInstances.length > 0"
+              :to="viewerURL(imageGroup)"
           >
-            <template v-if="imageGroup.imageInstances.length === 0">
-              {{ imageGroup.name }}
-            </template>
-            <router-link v-else :to="viewerURL(imageGroup)">
-              {{ imageGroup.name }}
-            </router-link>
-          </b-table-column>
+            <image-group-preview :image-group="imageGroup" :key="`preview-${imageGroup.id}`"/>
+          </router-link>
+        </b-table-column>
 
-          <b-table-column
-            field="numberOfImages"
-            :label="$t('images')" centered sortable width="150"
-          >
-            {{ imageGroup.numberOfImages }}
-          </b-table-column>
+        <b-table-column
+            v-slot="{row: imageGroup}"
+            field="name"
+            :label="$t('name')"
+            sortable
+            width="400"
+        >
+          <template v-if="imageGroup.imageInstances.length === 0">
+            {{ imageGroup.name }}
+          </template>
+          <router-link v-else :to="viewerURL(imageGroup)">
+            {{ imageGroup.name }}
+          </router-link>
+        </b-table-column>
 
-<!--          <b-table-column-->
-<!--            field="numberOfAnnotationLinks"-->
-<!--            :label="$t('annotation-links')" centered sortable width="150"-->
-<!--          >-->
-<!--            {{ imageGroup.numberOfAnnotationLinks }}-->
-<!--          </b-table-column>-->
+        <b-table-column
+          v-slot="{row: imageGroup}"
+          field="numberOfImages"
+          :label="$t('images')" centered sortable width="150"
+        >
+          {{ imageGroup.numberOfImages }}
+        </b-table-column>
 
-          <b-table-column label=" " centered width="150">
-            <open-image-group-button :image-group="imageGroup" :key="`open-ig-${imageGroup.id}`"/>
-          </b-table-column>
-        </template>
+<!--        <b-table-column-->
+<!--          v-slot="{row: imageGroup}"-->
+<!--          field="numberOfAnnotationLinks"-->
+<!--          :label="$t('annotation-links')" centered sortable width="150"-->
+<!--        >-->
+<!--          {{ imageGroup.numberOfAnnotationLinks }}-->
+<!--        </b-table-column>-->
+
+        <b-table-column v-slot="{row: imageGroup}" label=" " centered width="150">
+          <open-image-group-button :image-group="imageGroup" :key="`open-ig-${imageGroup.id}`"/>
+        </b-table-column>
 
         <template #detail="{row: imageGroup}">
           <image-group-details

@@ -1,7 +1,7 @@
 <template>
 <form @submit.prevent="addToImageGroup()">
   <cytomine-modal :active="active" :title="$t('add-to-image-group')" @close="$emit('update:active', false)">
-    <b-loading :is-full-page="false" :active="loading" />
+    <b-loading :is-full-page="false" :model-value="loading" />
     <template v-if="!loading">
       <b-field :label="$t('image-group')">
         <b-radio v-model="imageGroup" native-value="NEW">

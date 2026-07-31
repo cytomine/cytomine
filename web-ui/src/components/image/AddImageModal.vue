@@ -1,6 +1,6 @@
 <template>
 <cytomine-modal :active="active" :title="$t('add-images')" @close="$emit('update:active', false)">
-  <b-loading :is-full-page="false" :active="loading" class="small" />
+  <b-loading :is-full-page="false" :model-value="loading" class="small" />
   <template v-if="!loading">
     <template>
       <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
@@ -14,31 +14,29 @@
         v-model:order="sortOrder"
         :detailed="false"
       >
-        <template #default="{row: image}">
-          <b-table-column :label="$t('overview')">
-            <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
-          </b-table-column>
+        <b-table-column v-slot="{row: image}" :label="$t('overview')">
+          <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
+        </b-table-column>
 
-          <b-table-column field="originalFilename" :label="$t('name')" sortable>
-            {{ image.originalFilename }}
-          </b-table-column>
+        <b-table-column v-slot="{row: image}" field="originalFilename" :label="$t('name')" sortable>
+          {{ image.originalFilename }}
+        </b-table-column>
 
-          <b-table-column field="created" :label="$t('created-on')" sortable>
-            {{ formatMomentDate(Number(image.created), 'll LT') }}
-          </b-table-column>
+        <b-table-column v-slot="{row: image}" field="created" :label="$t('created-on')" sortable>
+          {{ formatMomentDate(Number(image.created), 'll LT') }}
+        </b-table-column>
 
-          <b-table-column label=" " centered>
-            <button v-if="wasAdded(image)" class="button is-small is-link" disabled>
-              {{$t('button-added')}}
-            </button>
-            <span v-else-if="isInProject(image)">
-              {{$t('already-in-project')}}
-            </span>
-            <button v-else class="button is-small is-link" @click="addImage(image)">
-              {{$t('button-add')}}
-            </button>
-          </b-table-column>
-        </template>
+        <b-table-column v-slot="{row: image}" label=" " centered>
+          <button v-if="wasAdded(image)" class="button is-small is-link" disabled>
+            {{$t('button-added')}}
+          </button>
+          <span v-else-if="isInProject(image)">
+            {{$t('already-in-project')}}
+          </span>
+          <button v-else class="button is-small is-link" @click="addImage(image)">
+            {{$t('button-add')}}
+          </button>
+        </b-table-column>
 
         <template #empty>
           <div class="content has-text-grey has-text-centered">

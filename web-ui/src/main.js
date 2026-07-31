@@ -8,10 +8,7 @@ Vue.configureCompat({ MODE: 2 });
 import i18n from './lang.js';
 Vue.use(i18n);
 
-import VueRouter from 'vue-router';
 import router from './routes.js';
-Vue.use(VueRouter);
-
 import store from './store/store.js';
 
 import Buefy from 'buefy';
@@ -69,8 +66,8 @@ axios.get('configuration.json').then(response => {
       .then(() => {
         const app = createApp({
           render: () => h(App),
-          router,
         });
+        app.use(router);
         app.use(store);
         app.use(Buefy, { defaultIconPack: 'fas' });
         app.use(Notifications);

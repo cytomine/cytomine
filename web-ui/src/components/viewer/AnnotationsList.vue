@@ -15,7 +15,7 @@
 
         <ontology-tree
           v-if="isDisplayedByTerm"
-          v-model="selectedTermsIds"
+          v-model:selectedNodes="selectedTermsIds"
           :ontology="ontology"
           :multiple-selection="false"
           :hidden-nodes="hiddenTermsIds"
@@ -24,7 +24,7 @@
 
         <track-tree
           v-if="!isDisplayedByTerm"
-          v-model="selectedTracksIds"
+          v-model:selectedNodes="selectedTracksIds"
           :tracks="tracks"
           :multiple-selection="false"
         />

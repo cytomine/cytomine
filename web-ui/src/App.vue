@@ -23,15 +23,11 @@
     <template v-else-if="currentUser">
       <cytomine-navbar />
       <div class="bottom">
-        <!-- TODO: add keep alive for storage again
-          No <keep-alive> here: vue-router 3's <router-view> reads
-          `parent.$createElement`, which @vue/compat does not expose on built-in
-          components, so wrapping it throws "h is not a function". Caching the
-          storage page has to come back with vue-router 4 (issue 8), through
-          <router-view v-slot="{Component}"> — under Vue 3 <router-view> is a
-          stateful component, so <keep-alive> would cache it instead of the page.
-        -->
-        <router-view v-if="currentUser" />
+        <router-view v-if="currentUser" v-slot="{ Component }">
+          <keep-alive include="cytomine-storage">
+            <component :is="Component" v-if="Component" />
+          </keep-alive>
+        </router-view>
       </div>
     </template>
   </template>

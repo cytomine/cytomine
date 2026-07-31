@@ -17,7 +17,7 @@ COPY ./src /app/src
 COPY ./public /app/public
 COPY ./scripts /app/scripts
 COPY ./index.html /app/index.html
-COPY ./vite.config.mjs /app/vite.config.mjs
+COPY ./vite.config.js /app/vite.config.js
 
 RUN npm install && npm run build
 

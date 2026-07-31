@@ -5,12 +5,12 @@ import constants from '@/utils/constants.js';
 // Keep Vue 2 runtime behavior by default while migrating incrementally.
 Vue.configureCompat({ MODE: 2 });
 
+import i18n from './lang.js';
+Vue.use(i18n);
+
 import VueRouter from 'vue-router';
 import router from './routes.js';
 Vue.use(VueRouter);
-
-import i18n from './lang.js';
-Vue.use(i18n);
 
 import store from './store/store.js';
 

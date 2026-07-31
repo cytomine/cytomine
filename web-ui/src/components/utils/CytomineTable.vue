@@ -6,7 +6,7 @@
   </slot>
 </b-message>
 <div v-else class="cytomine-table-wrapper">
-  <b-loading :is-full-page="false" :active="!data" />
+  <b-loading :is-full-page="false" :model-value="!data" />
   <b-table
     v-if="data"
     :data="data"
@@ -28,15 +28,13 @@
     :is-row-checkable="isRowCheckable"
     @sort="updateSort"
   >
-    <template #header="{column}">
-      <slot name="header" :column="column" :index="index">
-        {{ column.label }}
-      </slot>
-    </template>
-
-    <template #default="{row, index}">
-      <slot :row="row" :index="index"></slot>
-    </template>
+    <!--
+      Buefy 3 renders the default slot once, with no row, to discover the
+      columns: each <b-table-column> carries its own scoped slot instead. So
+      this forwards the columns as-is and the row scope reaches them directly
+      from <b-table>.
+    -->
+    <slot></slot>
 
     <template #detail="{row, index}">
       <slot name="detail" :row="row" :index="index"></slot>
@@ -44,7 +42,7 @@
 
     <template #empty>
       <div class="content has-text-grey has-text-centered">
-        <slot name="empty" :row="row" :index="index">
+        <slot name="empty">
           {{$t('no-result')}}
         </slot>
       </div>
@@ -87,9 +85,6 @@ export default {
   },
   data() {
     return {
-      index: 0,
-      row: null,
-
       data: null,
       error: false,
       loading: true,

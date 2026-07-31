@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-loading :is-full-page="false" :active="loading" />
+    <b-loading :is-full-page="false" :model-value="loading" />
     <template v-if="!loading">
       <annotation-profile-projection-chart
           v-if="isLine || spatialAxis"
@@ -20,42 +20,58 @@
           :per-page="perPage"
           pagination-size="is-small"
       >
-        <template #default="{row: item}">
-          <b-table-column field="x" :label="'X'" sortable :visible="!spatialAxis">
-            {{item.x}}
-          </b-table-column>
-          <b-table-column field="y" :label="'Y'" sortable :visible="!spatialAxis">
-            {{item.y}}
-          </b-table-column>
-          <b-table-column field="channel" label="C" sortable :visible="spatialAxis && dimension === 'channels'">
-            <template v-if="hasChannelName">
-              {{channelName(item.channel) || "?"}}
-            </template>
-            <template v-else>
-              {{item.channel}}
-            </template>
-          </b-table-column>
-          <b-table-column field="zStack" label="Z" sortable :visible="spatialAxis && dimension === 'depth'">
-            {{item.zStack}}
-          </b-table-column>
-          <b-table-column field="time" label="T" sortable :visible="spatialAxis && dimension === 'duration'">
-            <template v-if="image.fps">
-              {{formatMinutesSeconds(item.time / image.fps)}} | {{item.time}}
-            </template>
-            <template v-else>
-              {{item.time}}
-            </template>
-          </b-table-column>
-          <b-table-column field="average" :label="$t('average')" sortable>
-            {{item.average}}
-          </b-table-column>
-          <b-table-column field="min" :label="$t('minimum')" sortable>
-            {{item.min}}
-          </b-table-column>
-          <b-table-column field="max" :label="$t('maximum')" sortable>
-            {{item.max}}
-          </b-table-column>
-        </template>
+        <b-table-column v-slot="{row: item}" field="x" :label="'X'" sortable :visible="!spatialAxis">
+          {{item.x}}
+        </b-table-column>
+        <b-table-column v-slot="{row: item}" field="y" :label="'Y'" sortable :visible="!spatialAxis">
+          {{item.y}}
+        </b-table-column>
+        <b-table-column
+          v-slot="{row: item}"
+          field="channel"
+          label="C"
+          sortable
+          :visible="spatialAxis && dimension === 'channels'"
+        >
+          <template v-if="hasChannelName">
+            {{channelName(item.channel) || "?"}}
+          </template>
+          <template v-else>
+            {{item.channel}}
+          </template>
+        </b-table-column>
+        <b-table-column
+          v-slot="{row: item}"
+          field="zStack"
+          label="Z"
+          sortable
+          :visible="spatialAxis && dimension === 'depth'"
+        >
+          {{item.zStack}}
+        </b-table-column>
+        <b-table-column
+          v-slot="{row: item}"
+          field="time"
+          label="T"
+          sortable
+          :visible="spatialAxis && dimension === 'duration'"
+        >
+          <template v-if="image.fps">
+            {{formatMinutesSeconds(item.time / image.fps)}} | {{item.time}}
+          </template>
+          <template v-else>
+            {{item.time}}
+          </template>
+        </b-table-column>
+        <b-table-column v-slot="{row: item}" field="average" :label="$t('average')" sortable>
+          {{item.average}}
+        </b-table-column>
+        <b-table-column v-slot="{row: item}" field="min" :label="$t('minimum')" sortable>
+          {{item.min}}
+        </b-table-column>
+        <b-table-column v-slot="{row: item}" field="max" :label="$t('maximum')" sortable>
+          {{item.max}}
+        </b-table-column>
 
         <template #footer>
           <p class="has-text-centered">

@@ -123,7 +123,7 @@
           </progress>
 
           <div class="buttons">
-            <b-upload :value="plainFiles" type="is-link" multiple drag-drop @input="filesChange">
+            <b-upload :model-value="plainFiles" type="is-link" multiple drag-drop @update:model-value="filesChange">
               <a class="button is-success">{{$t('add-files')}}</a>
             </b-upload>
             <button class="button is-link" @click="startAll()" :disabled="!filesPendingUpload">

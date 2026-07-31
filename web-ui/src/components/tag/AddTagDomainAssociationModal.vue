@@ -1,6 +1,6 @@
 <template>
 <cytomine-modal-card :title="$t('associate-tags')" active>
-  <b-loading :is-full-page="false" :active="loading" class="small" />
+  <b-loading :is-full-page="false" :model-value="loading" class="small" />
   <template v-if="!loading">
     <b-field>
       <domain-tag-input v-model="selectedTags" :domains="notAssociatedTags" placeholder="search-or-create-tag" allowNew />

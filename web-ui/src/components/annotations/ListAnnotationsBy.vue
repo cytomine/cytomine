@@ -1,6 +1,6 @@
 <template>
 <div class="box">
-  <b-loading :is-full-page="false" class="small" :active="loading"  />
+  <b-loading :is-full-page="false" class="small" :model-value="loading"  />
   <div v-if="!isInViewer || (isInViewer && !loading)">
     <h2>
       <template v-if="titlePrefix">{{titlePrefix}} </template>

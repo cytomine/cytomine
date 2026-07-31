@@ -7,34 +7,32 @@
       </div>
       <section class="panel-block">
         <b-table :data="stores" v-if="stores.length > 0">
-          <template #default="{ row: store }">
-            <b-table-column :label="$t('id')" width="40">
-              {{ store.id }}
-            </b-table-column>
+          <b-table-column v-slot="{ row: store }" :label="$t('id')" width="40">
+            {{ store.id }}
+          </b-table-column>
 
-            <b-table-column :label="$t('name')" width="40">
-              {{ store.name }}
-            </b-table-column>
+          <b-table-column v-slot="{ row: store }" :label="$t('name')" width="40">
+            {{ store.name }}
+          </b-table-column>
 
-            <b-table-column :label="$t('hostname')" width="40">
-              <a :href="store.host" rel="noopener" target="_blank">
-                {{ store.host }}
-              </a>
-            </b-table-column>
+          <b-table-column v-slot="{ row: store }" :label="$t('hostname')" width="40">
+            <a :href="store.host" rel="noopener" target="_blank">
+              {{ store.host }}
+            </a>
+          </b-table-column>
 
-            <b-table-column :label="$t('default-store')" width="40" centered>
-              <i class="fas fa-check-square" v-if="store.defaultStore"></i>
-              <i class="fas fa-times-circle" v-else></i>
-            </b-table-column>
+          <b-table-column v-slot="{ row: store }" :label="$t('default-store')" width="40" centered>
+            <i class="fas fa-check-square" v-if="store.defaultStore"></i>
+            <i class="fas fa-times-circle" v-else></i>
+          </b-table-column>
 
-            <b-table-column label="" width="40">
-              <div class="buttons is-right">
-                <button class="button is-small is-danger" @click="handleDelete(store)">
-                  {{ $t('button-delete') }}
-                </button>
-              </div>
-            </b-table-column>
-          </template>
+          <b-table-column v-slot="{ row: store }" label="" width="40">
+            <div class="buttons is-right">
+              <button class="button is-small is-danger" @click="handleDelete(store)">
+                {{ $t('button-delete') }}
+              </button>
+            </div>
+          </b-table-column>
         </b-table>
 
         <p v-else class="has-text-centered">

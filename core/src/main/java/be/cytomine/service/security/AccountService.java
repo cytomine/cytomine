@@ -373,7 +373,8 @@ public class AccountService {
         }
         UsersResource users = keycloak.realm(realm).users();
         try {
-            users.delete(username);
+            UserRepresentation userRep = users.searchByUsername(username, true).get(0);
+            users.delete(userRep.getId());
         } catch (NotFoundException e) {
             log.info("deleted account {} not found in IAM", username);
         }

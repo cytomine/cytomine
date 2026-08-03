@@ -62,7 +62,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = GUEST)
     public void everyBodyListUser() {
-        userService.list(new ArrayList<>(), "created", "desc", 0L, 0L);
+        userService.list(new ArrayList<>(), "created", "desc", 0L, 0L, false);
     }
 
     @Test

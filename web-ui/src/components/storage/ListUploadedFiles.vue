@@ -25,7 +25,7 @@
           <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
         </b-table-column>
 
-        <b-table-column v-slot="{row: uFile}" field="originalFilename" :label="$t('filename')" sortable width="200" :data-filename="uFile.originalFilename">
+        <b-table-column v-slot="{row: uFile}" field="originalFilename" :label="$t('filename')" sortable width="200">
           <span :data-filename="uFile.originalFilename">{{ uFile.originalFilename }}</span>
         </b-table-column>
 
@@ -51,7 +51,6 @@
             </button>
           </div>
         </b-table-column>
-
 
         <template #empty>
           <p>{{$t('no-uploaded-file')}}</p>

@@ -1,4 +1,4 @@
-import Vue, { createApp, h } from 'vue';
+import Vue, { createApp } from 'vue';
 import axios from 'axios';
 import constants from '@/utils/constants.js';
 
@@ -6,8 +6,6 @@ import constants from '@/utils/constants.js';
 Vue.configureCompat({ MODE: 2 });
 
 import i18n from './lang.js';
-Vue.use(i18n);
-
 import router from './routes.js';
 import store from './store/store.js';
 
@@ -64,9 +62,8 @@ axios.get('configuration.json').then(response => {
         onLoad: 'login-required'
       })
       .then(() => {
-        const app = createApp({
-          render: () => h(App),
-        });
+        const app = createApp(App);
+        app.use(i18n);
         app.use(router);
         app.use(store);
         app.use(Buefy, { defaultIconPack: 'fas' });

@@ -66,7 +66,7 @@
               <button class="button is-link is-small" @click="startUserEdition(user)">
                 {{$t('button-edit')}}
               </button>
-              <button class="button is-link is-danger is-small" @click="deleteUser(user)">
+              <button class="button is-link is-danger is-small" @click="deleteUser(user)" v-if="canDelete(user)">
                 {{$t('button-delete')}}
               </button>
             </div>
@@ -141,6 +141,10 @@ export default {
   },
   methods: {
     formatMomentDate,
+    canDelete(user) {
+      const protectedUsers = ['admin', 'ImageServer1'];
+      return !protectedUsers.includes(user.username);
+    },
     displayMemberOrigin(member) {
       let key;
       if (member.origin === 'BOOTSTRAP') {
@@ -170,6 +174,9 @@ export default {
       this.editedUser.populate(user);
     },
     async deleteUser(user) {
+      if (!this.canDelete(user)) {
+        return;
+      }
       this.$buefy.dialog.confirm({
         title: this.$t('delete-user'),
         message: this.$t('delete-user-confirmation', { username: user.username }),

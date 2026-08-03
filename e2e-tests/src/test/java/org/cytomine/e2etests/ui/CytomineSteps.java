@@ -684,7 +684,8 @@ public class CytomineSteps {
         );
         webDriverUtils.xpathClick(
             wait,
-            "//div[contains(@class, 'modal')]//footer//button[contains(@class, 'is-danger') and contains(text(), 'Delete')]"
+            "//div[contains(@class, 'modal')]//footer//button[contains(@class, 'is-danger') "
+            + "and contains(text(), 'Delete')]"
         );
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully deleted')]"));
         wait.until(ExpectedConditions.invisibilityOfElementLocated(

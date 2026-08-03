@@ -97,6 +97,9 @@ public class UserController {
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("REST request to delete User : {}", id);
         long userId = currentUserService.getCurrentUser().getId();
+        UserResponse response = userHttpContract.get(id, userId)
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
+        accountService.delete(response.username());
         return userHttpContract.delete(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
     }

@@ -859,6 +859,7 @@ public class UserService extends ModelService {
         securityACLService.checkAdmin(currentUser);
         securityACLService.checkIsSameUser((User) domain, currentUser);
         Command c = new DeleteCommand(currentUser, transaction);
+        accountService.delete(((User) domain).getUsername());
         return executeCommand(c, domain, null);
     }
 

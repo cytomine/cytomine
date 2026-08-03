@@ -375,7 +375,6 @@ public class AccountService {
         try {
             users.delete(username);
         } catch (NotFoundException e) {
-            // create the account if it doesn't exist in IAM
             log.info("deleted account {} not found in IAM", username);
         }
         log.info("deleted account {} successfully", username);

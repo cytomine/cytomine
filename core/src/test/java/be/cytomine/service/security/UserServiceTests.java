@@ -58,6 +58,7 @@ import be.cytomine.service.social.UserPositionService;
 import be.cytomine.service.social.UserPositionServiceTests;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.filters.SearchOperation;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
@@ -264,7 +265,7 @@ public class UserServiceTests {
 
     @Test
     void listUsersWithNoFiltersNoExtension() {
-        Page<Map<String, Object>> list = userService.list(new ArrayList<>(), "created", "desc", 0L, 0L);
+        Page<Map<String, Object>> list = userService.list(new ArrayList<>(), "created", "desc", 0L, 0L, false);
 
         assertThat(list.getTotalElements()).isGreaterThanOrEqualTo(1);
         assertThat(list.getContent().stream()
@@ -278,7 +279,8 @@ public class UserServiceTests {
             "created",
             "desc",
             0L,
-            0L
+            0L,
+            false
         );
 
         assertThat(list.getContent().stream()
@@ -289,7 +291,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 builder.givenSuperAdmin().getName()
-            ))), "created", "desc", 0L, 0L
+            ))), "created", "desc", 0L, 0L, false
         );
 
         assertThat(list.getContent().stream()
@@ -300,7 +302,8 @@ public class UserServiceTests {
             "created",
             "desc",
             0L,
-            0L
+            0L,
+            false
         );
 
         assertThat(list.getContent().stream()
@@ -317,7 +320,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_sort_username"
-            ))), "username", "asc", 0L, 0L
+            ))), "username", "asc", 0L, 0L, false
         );
         assertThat(list.getContent()).hasSize(2);
         assertThat(list.getContent().get(0).get("username")).isEqualTo(user1.getUsername());
@@ -328,7 +331,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_sort_username"
-            ))), "username", "desc", 0L, 0L
+            ))), "username", "desc", 0L, 0L, false
         );
         assertThat(list.getContent()).hasSize(2);
         assertThat(list.getContent().get(0).get("username")).isEqualTo(user2.getUsername());
@@ -348,7 +351,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_page"
-            ))), "username", "asc", 0L, 0L
+            ))), "username", "asc", 0L, 0L, false
         );
         assertThat(list.getContent()).hasSize(5);
         assertThat(list.getTotalElements()).isEqualTo(5);
@@ -363,7 +366,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_page"
-            ))), "username", "asc", 3L, 0L
+            ))), "username", "asc", 3L, 0L, false
         );
         assertThat(list.getContent()).hasSize(3);
         assertThat(list.getTotalElements()).isEqualTo(5);
@@ -376,7 +379,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_page"
-            ))), "username", "asc", 4L, 2L
+            ))), "username", "asc", 4L, 2L, false
         );
         assertThat(list.getContent()).hasSize(3);
         assertThat(list.getTotalElements()).isEqualTo(5);
@@ -389,7 +392,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_page"
-            ))), "username", "asc", 4L, 4L
+            ))), "username", "asc", 4L, 4L, false
         );
         assertThat(list.getContent()).hasSize(1);
         assertThat(list.getTotalElements()).isEqualTo(5);
@@ -400,7 +403,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_page"
-            ))), "username", "asc", 5L, 6L
+            ))), "username", "asc", 5L, 6L, false
         );
         assertThat(list.getContent()).hasSize(0);
         assertThat(list.getTotalElements()).isEqualTo(5);
@@ -1168,5 +1171,105 @@ public class UserServiceTests {
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
+    }
+
+    @Test
+    void listUsersExcludesDeletedUsersWhenShowDeletedIsFalse() {
+        User activeUser = builder.givenAUser();
+        User userToDelete = builder.givenAUser();
+
+        Page<Map<String, Object>> listBeforeDelete = userService.list(
+            new ArrayList<>(), "created", "desc", 0L, 0L, false
+        );
+
+        assertThat(listBeforeDelete.getContent().stream()
+            .map(x -> x.get("id"))).contains(activeUser.getId(), userToDelete.getId());
+
+        userToDelete.setDeleted(new Date());
+
+        Page<Map<String, Object>> listAfterDelete = userService.list(
+            new ArrayList<>(), "created", "desc", 0L, 0L, false
+        );
+
+        assertThat(listAfterDelete.getContent().stream()
+            .map(x -> x.get("id"))).contains(activeUser.getId());
+        assertThat(listAfterDelete.getContent().stream()
+            .map(x -> x.get("id"))).doesNotContain(userToDelete.getId());
+    }
+
+    @Test
+    void listUsersIncludesDeletedUsersWhenShowDeletedIsTrue() {
+        User activeUser = builder.givenAUser();
+        User userToDelete = builder.givenAUser();
+
+        userToDelete.setDeleted(new Date());
+
+        Page<Map<String, Object>> list = userService.list(
+            new ArrayList<>(), "created", "desc", 0L, 0L, true
+        );
+
+        assertThat(list.getContent().stream()
+            .map(x -> x.get("id"))).contains(activeUser.getId(), userToDelete.getId());
+    }
+
+    @Test
+    void listUsersDefaultShowDeletedIsTrue() {
+        User activeUser = builder.givenAUser();
+        User userToDelete = builder.givenAUser();
+
+        userToDelete.setDeleted(new Date());
+
+        Page<Map<String, Object>> list = userService.list(
+            new ArrayList<>(), "created", "desc", 0L, 0L, true
+        );
+
+        assertThat(list.getContent().stream()
+            .map(x -> x.get("id"))).contains(activeUser.getId(), userToDelete.getId());
+    }
+
+    @Test
+    void listUsersExcludesDeletedUsersInSearch() {
+        User activeUser = builder.givenAUser();
+        activeUser.setName("John Doe");
+        
+        User userToDelete = builder.givenAUser();
+        userToDelete.setName("Jane Doe");
+        userToDelete.setDeleted(new Date());
+
+        Page<Map<String, Object>> list = userService.list(
+            new ArrayList<>(List.of(new SearchParameterEntry("fullName", SearchOperation.like, "Doe"))),
+            "created",
+            "desc",
+            0L,
+            0L,
+            false
+        );
+
+        assertThat(list.getContent().stream()
+            .map(x -> x.get("id"))).contains(activeUser.getId());
+        assertThat(list.getContent().stream()
+            .map(x -> x.get("id"))).doesNotContain(userToDelete.getId());
+    }
+
+    @Test
+    void listUsersIncludesDeletedUsersInSearchWhenShowDeletedTrue() {
+        User activeUser = builder.givenAUser();
+        activeUser.setName("John Doe");
+        
+        User userToDelete = builder.givenAUser();
+        userToDelete.setName("Jane Doe");
+        userToDelete.setDeleted(new Date());
+
+        Page<Map<String, Object>> list = userService.list(
+            new ArrayList<>(List.of(new SearchParameterEntry("fullName", SearchOperation.like, "Doe"))),
+            "created",
+            "desc",
+            0L,
+            0L,
+            true
+        );
+
+        assertThat(list.getContent().stream()
+            .map(x -> x.get("id"))).contains(activeUser.getId(), userToDelete.getId());
     }
 }

@@ -1,5 +1,5 @@
 <template>
-<div id="app" class="wrapper">
+<div class="wrapper">
   <notifications position="top center" width="30%" :max="5">
     <template #body="props">
       <div class="notification vue-notification" :class="props.item.type">
@@ -149,6 +149,10 @@ export default {
 @font-face {
   font-family: 'cytomine';
   src: url('assets/cytomine-font.woff') format('woff');
+}
+
+#app {
+  height: 100%;
 }
 
 html, body {

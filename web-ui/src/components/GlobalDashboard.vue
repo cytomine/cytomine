@@ -214,7 +214,7 @@ export default {
 </script>
 
 <style scoped>
-td {
+:deep(td) {
   vertical-align: middle !important;
 }
 

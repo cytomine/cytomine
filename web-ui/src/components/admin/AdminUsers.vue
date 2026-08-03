@@ -172,7 +172,7 @@ export default {
     async deleteUser(user) {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-user'),
-        message: this.$t('delete-user-confirmation', {username: user.username}),
+        message: this.$t('delete-user-confirmation', { username: user.username }),
         confirmText: this.$t('button-delete'),
         type: 'is-danger',
         hasIcon: true,

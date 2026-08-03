@@ -263,7 +263,7 @@ public class UserService extends ModelService {
 
     // TODO 2024.2
     public Page<Map<String, Object>> list(List<SearchParameterEntry> searchParameters, String sortColumn,
-        String sortDirection, Long max, Long offset) {
+        String sortDirection, Long max, Long offset, Boolean showDeleted) {
 
         securityACLService.checkGuest(currentUserService.getCurrentUser());
 
@@ -291,6 +291,10 @@ public class UserService extends ModelService {
         String sort;
 
         Map<String, Object> mapParams = new HashMap<>();
+
+        if (!showDeleted) {
+            where += " AND u.deleted IS NULL ";
+        }
 
         if (multiSearch.isPresent()) {
             String value = ((String) multiSearch.get().getValue()).toLowerCase();

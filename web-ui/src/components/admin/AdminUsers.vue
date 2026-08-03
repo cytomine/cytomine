@@ -127,7 +127,8 @@ export default {
     },
     userCollection() {
       let collection = new UserCollection({
-        withRoles: true
+        withRoles: true,
+        showDeleted: false
       });
       if (this.searchString) {
         collection['fullName'] = {

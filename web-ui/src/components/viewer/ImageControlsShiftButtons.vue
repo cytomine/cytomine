@@ -37,7 +37,7 @@
           <b-input :placeholder="$t('step')" size="is-small"
              v-model="editedValue"
              ref="inputStepSelector"
-             @hook:mounted="focus()"
+             @vue:mounted="focus()"
              @blur="stopEdition()"
           />
         </div>

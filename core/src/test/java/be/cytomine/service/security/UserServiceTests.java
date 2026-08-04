@@ -264,7 +264,7 @@ public class UserServiceTests {
 
     @Test
     void listUsersWithNoFiltersNoExtension() {
-        Page<Map<String, Object>> list = userService.list(new ArrayList<>(), "created", "desc", 0L, 0L, false);
+        Page<Map<String, Object>> list = userService.list(new ArrayList<>(), "created", "desc", 0L, 0L);
 
         assertThat(list.getTotalElements()).isGreaterThanOrEqualTo(1);
         assertThat(list.getContent().stream()
@@ -278,8 +278,7 @@ public class UserServiceTests {
             "created",
             "desc",
             0L,
-            0L,
-            false
+            0L
         );
 
         assertThat(list.getContent().stream()
@@ -290,7 +289,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 builder.givenSuperAdmin().getName()
-            ))), "created", "desc", 0L, 0L, false
+            ))), "created", "desc", 0L, 0L
         );
 
         assertThat(list.getContent().stream()
@@ -301,8 +300,7 @@ public class UserServiceTests {
             "created",
             "desc",
             0L,
-            0L,
-            false
+            0L
         );
 
         assertThat(list.getContent().stream()
@@ -319,7 +317,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_sort_username"
-            ))), "username", "asc", 0L, 0L, false
+            ))), "username", "asc", 0L, 0L
         );
         assertThat(list.getContent()).hasSize(2);
         assertThat(list.getContent().get(0).get("username")).isEqualTo(user1.getUsername());
@@ -330,7 +328,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_sort_username"
-            ))), "username", "desc", 0L, 0L, false
+            ))), "username", "desc", 0L, 0L
         );
         assertThat(list.getContent()).hasSize(2);
         assertThat(list.getContent().get(0).get("username")).isEqualTo(user2.getUsername());
@@ -350,7 +348,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_page"
-            ))), "username", "asc", 0L, 0L, false
+            ))), "username", "asc", 0L, 0L
         );
         assertThat(list.getContent()).hasSize(5);
         assertThat(list.getTotalElements()).isEqualTo(5);
@@ -365,7 +363,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_page"
-            ))), "username", "asc", 3L, 0L, false
+            ))), "username", "asc", 3L, 0L
         );
         assertThat(list.getContent()).hasSize(3);
         assertThat(list.getTotalElements()).isEqualTo(5);
@@ -378,7 +376,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_page"
-            ))), "username", "asc", 4L, 2L, false
+            ))), "username", "asc", 4L, 2L
         );
         assertThat(list.getContent()).hasSize(3);
         assertThat(list.getTotalElements()).isEqualTo(5);
@@ -391,7 +389,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_page"
-            ))), "username", "asc", 4L, 4L, false
+            ))), "username", "asc", 4L, 4L
         );
         assertThat(list.getContent()).hasSize(1);
         assertThat(list.getTotalElements()).isEqualTo(5);
@@ -402,7 +400,7 @@ public class UserServiceTests {
                 "fullName",
                 SearchOperation.like,
                 "list_users_with_page"
-            ))), "username", "asc", 5L, 6L, false
+            ))), "username", "asc", 5L, 6L
         );
         assertThat(list.getContent()).hasSize(0);
         assertThat(list.getTotalElements()).isEqualTo(5);
@@ -1178,7 +1176,7 @@ public class UserServiceTests {
         User userToDelete = builder.givenAUser();
 
         Page<Map<String, Object>> listBeforeDelete = userService.list(
-            new ArrayList<>(), "created", "desc", 0L, 0L, false
+            new ArrayList<>(), "created", "desc", 0L, 0L
         );
 
         assertThat(listBeforeDelete.getContent().stream()
@@ -1187,7 +1185,7 @@ public class UserServiceTests {
         userToDelete.setDeleted(new Date());
 
         Page<Map<String, Object>> listAfterDelete = userService.list(
-            new ArrayList<>(), "created", "desc", 0L, 0L, false
+            new ArrayList<>(), "created", "desc", 0L, 0L
         );
 
         assertThat(listAfterDelete.getContent().stream()
@@ -1204,7 +1202,7 @@ public class UserServiceTests {
         userToDelete.setDeleted(new Date());
 
         Page<Map<String, Object>> list = userService.list(
-            new ArrayList<>(), "created", "desc", 0L, 0L, true
+            new ArrayList<>(), "created", "desc", 0L, 0L
         );
 
         assertThat(list.getContent().stream()
@@ -1219,7 +1217,7 @@ public class UserServiceTests {
         userToDelete.setDeleted(new Date());
 
         Page<Map<String, Object>> list = userService.list(
-            new ArrayList<>(), "created", "desc", 0L, 0L, true
+            new ArrayList<>(), "created", "desc", 0L, 0L
         );
 
         assertThat(list.getContent().stream()
@@ -1240,8 +1238,7 @@ public class UserServiceTests {
             "created",
             "desc",
             0L,
-            0L,
-            false
+            0L
         );
 
         assertThat(list.getContent().stream()
@@ -1264,8 +1261,7 @@ public class UserServiceTests {
             "created",
             "desc",
             0L,
-            0L,
-            true
+            0L
         );
 
         assertThat(list.getContent().stream()

@@ -81,4 +81,16 @@ describe('CytomineSearcher.vue', () => {
 
     expect(wrapper.vm.isActive).toBe(false);
   });
+
+  // Issue 14: the highlighted-match markup is rendered with v-html. In Vue 3
+  // v-html on a component (the old `<router-link v-html>`) is dropped, so the
+  // directive now sits on a plain <span> inside the link's slot.
+  it('renders the highlighted match markup inside the result links', async () => {
+    const wrapper = createWrapper();
+    await open(wrapper);
+
+    const links = wrapper.findAll('.search-results a');
+    expect(links[0].find('span').html()).toContain('<strong>p</strong>roject');
+    expect(links[1].find('span').html()).toContain('<strong>p</strong>hoto.tif');
+  });
 });

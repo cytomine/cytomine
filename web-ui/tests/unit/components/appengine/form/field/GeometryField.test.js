@@ -27,7 +27,7 @@ describe('GeometryField.vue', () => {
     wrapper = mount(GeometryField, {
       props: {
         parameter: mockParameter,
-        value: null,
+        modelValue: null,
       },
       global: {
         plugins: [Buefy],
@@ -57,9 +57,9 @@ describe('GeometryField.vue', () => {
   });
 
   it('The id should be rendered when selected', async  () => {
-    await wrapper.setProps({ value: 42 });
+    await wrapper.setProps({ modelValue: 42 });
 
-    expect(wrapper.vm.value).toBe(42);
+    expect(wrapper.vm.modelValue).toBe(42);
     expect(wrapper.find('.annotation-container').exists()).toBe(true);
     expect(wrapper.find('.annotation-container').text()).toBe('annotation 42');
   });
@@ -68,7 +68,7 @@ describe('GeometryField.vue', () => {
     wrapper.vm.input = 42;
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input.at(0)).toEqual([42]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'].at(0)).toEqual([42]);
   });
 });

@@ -19,7 +19,7 @@ describe('StringField.vue', () => {
     wrapper = mount(StringField, {
       props: {
         parameter: mockParameter,
-        value: mockParameter.default,
+        modelValue: mockParameter.default,
       },
       global: {
         plugins: [Buefy]
@@ -66,7 +66,7 @@ describe('StringField.vue', () => {
     wrapper.vm.input = 'Changing';
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input.at(0)).toEqual(['Changing']);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'].at(0)).toEqual(['Changing']);
   });
 });

@@ -27,7 +27,7 @@ vi.mock('vue-slider-component', () => ({
 // test, so it is asserted directly here.
 describe('CytomineSlider.vue', () => {
   const createWrapper = (props = {}) => mount(CytomineSlider, {
-    props: { value: 20, min: 0, max: 100, ...props },
+    props: { modelValue: 20, min: 0, max: 100, ...props },
     global: { plugins: [Buefy] },
   });
 
@@ -37,8 +37,9 @@ describe('CytomineSlider.vue', () => {
   };
 
   // `emitted()` also collects the native `input` events that bubble out of the
-  // text field, so keep only what the component itself emitted.
-  const committed = (wrapper) => (wrapper.emitted('input') ?? [])
+  // text field, but those land on the `input` channel; the component commits on
+  // `update:modelValue`, so read that. Filter out any stray Event payloads.
+  const committed = (wrapper) => (wrapper.emitted('update:modelValue') ?? [])
     .filter(([payload]) => !(payload instanceof Event));
 
   it('commits the edited value when Enter is pressed', async () => {
@@ -64,7 +65,7 @@ describe('CytomineSlider.vue', () => {
   });
 
   it('commits the right bound of a range slider', async () => {
-    const wrapper = createWrapper({ value: [10, 80] });
+    const wrapper = createWrapper({ modelValue: [10, 80] });
 
     const input = await edit(wrapper, 1);
     await input.setValue('90');

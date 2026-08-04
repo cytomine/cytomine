@@ -31,7 +31,7 @@ describe('ImageField.vue', () => {
     wrapper = mount(ImageField, {
       props: {
         parameter: mockParameter,
-        value: null,
+        modelValue: null,
       },
       global: {
         plugins: [Buefy],
@@ -63,20 +63,20 @@ describe('ImageField.vue', () => {
 
   it('should render the annotation with id when selected', async () => {
     const mockedData = { type: 'annotation', id: 42 };
-    await wrapper.setProps({ value: mockedData });
+    await wrapper.setProps({ modelValue: mockedData });
     await wrapper.setData({ type: mockedData.type });
 
-    expect(wrapper.vm.value).toEqual(mockedData);
+    expect(wrapper.vm.modelValue).toEqual(mockedData);
     expect(wrapper.find('.value-container').exists()).toBe(true);
     expect(wrapper.find('.value-container').text()).toBe('annotation 42');
   });
 
   it('should render the image with id when selected', async () => {
     const mockedData = { type: 'image', id: 42 };
-    await wrapper.setProps({ value: mockedData });
+    await wrapper.setProps({ modelValue: mockedData });
     await wrapper.setData({ type: mockedData.type });
 
-    expect(wrapper.vm.value).toEqual(mockedData);
+    expect(wrapper.vm.modelValue).toEqual(mockedData);
     expect(wrapper.find('.value-container').exists()).toBe(true);
     expect(wrapper.find('.value-container').text()).toBe('image 42');
   });
@@ -86,7 +86,7 @@ describe('ImageField.vue', () => {
     wrapper.vm.input = mockedData;
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input.at(0)).toEqual([mockedData]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'].at(0)).toEqual([mockedData]);
   });
 });

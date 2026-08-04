@@ -37,7 +37,7 @@
     </b-field>
     <field v-if="!sendToAllMembers" :form="form" name="members" :validators="requiredRule" v-slot="{field, state}">
       <b-field :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
-        <domain-tag-input :value="state.value" @input="field.handleChange" :domains="members" placeholder="search-user" searchedProperty="fullName" displayedProperty="fullName" />
+        <domain-tag-input :model-value="state.value" @update:model-value="field.handleChange" :domains="members" placeholder="search-user" searchedProperty="fullName" displayedProperty="fullName" />
       </b-field>
     </field>
     <field :form="form" name="comment" :validators="requiredRule" v-slot="{field, state}">

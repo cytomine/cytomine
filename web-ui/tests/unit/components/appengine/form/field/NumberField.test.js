@@ -19,7 +19,7 @@ describe('NumberField.vue', () => {
     wrapper = mount(NumberField, {
       props: {
         parameter: mockParameter,
-        value: mockParameter.default,
+        modelValue: mockParameter.default,
       },
       global: {
         plugins: [Buefy]
@@ -66,7 +66,7 @@ describe('NumberField.vue', () => {
     wrapper.vm.input = 12;
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input.at(0)).toEqual([12]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'].at(0)).toEqual([12]);
   });
 });

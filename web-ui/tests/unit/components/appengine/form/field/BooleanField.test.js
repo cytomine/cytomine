@@ -18,7 +18,7 @@ describe('BooleanField.vue', () => {
     wrapper = mount(BooleanField, {
       props: {
         parameter: mockParameter,
-        value: mockParameter.default,
+        modelValue: mockParameter.default,
       },
       global: {
         plugins: [Buefy]
@@ -44,7 +44,7 @@ describe('BooleanField.vue', () => {
   });
 
   it('The "False" radio button should be checked when the input is false', async () => {
-    await wrapper.setProps({ value: null });
+    await wrapper.setProps({ modelValue: null });
 
     const radioTrue = wrapper.find('input[type="radio"][value="true"]');
     expect(radioTrue.element.checked).toBe(false);
@@ -52,14 +52,14 @@ describe('BooleanField.vue', () => {
     const radioFalse = wrapper.find('input[type="radio"][value="false"]');
     expect(radioFalse.element.checked).toBe(false);
 
-    await wrapper.setProps({ value: false });
+    await wrapper.setProps({ modelValue: false });
 
     expect(radioTrue.element.checked).toBe(false);
     expect(radioFalse.element.checked).toBe(true);
   });
 
   it('The "True" radio button should be checked when the input is true', async () => {
-    await wrapper.setProps({ value: null });
+    await wrapper.setProps({ modelValue: null });
 
     const radioTrue = wrapper.find('input[type="radio"][value="true"]');
     expect(radioTrue.element.checked).toBe(false);
@@ -67,14 +67,14 @@ describe('BooleanField.vue', () => {
     const radioFalse = wrapper.find('input[type="radio"][value="false"]');
     expect(radioFalse.element.checked).toBe(false);
 
-    await wrapper.setProps({ value: true });
+    await wrapper.setProps({ modelValue: true });
 
     expect(radioTrue.element.checked).toBe(true);
     expect(radioFalse.element.checked).toBe(false);
   });
 
   it('Selecting the radio button should emit an event', async () => {
-    await wrapper.setProps({ value: null });
+    await wrapper.setProps({ modelValue: null });
     expect(wrapper.vm.input).toBe(null);
 
     const radioFalse = wrapper.find('input[type="radio"][value="false"]');
@@ -83,7 +83,7 @@ describe('BooleanField.vue', () => {
     await radioFalse.setChecked();
 
     expect(radioFalse.element.checked).toBe(true);
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input[0]).toEqual([false]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'][0]).toEqual([false]);
   });
 });

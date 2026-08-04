@@ -38,8 +38,8 @@ describe('AppEngineField.vue', () => {
         stubs: {
           ArrayField: {
             name: 'ArrayField',
-            props: ['value', 'parameter'],
-            template: '<input class="array-field" @input="$emit(\'input\', $event.target.value)" />'
+            props: ['modelValue', 'parameter'],
+            template: '<input class="array-field" @input="$emit(\'update:modelValue\', $event.target.value)" />'
           },
           BooleanField: true,
           EnumerationField: true,

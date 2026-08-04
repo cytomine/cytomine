@@ -33,7 +33,7 @@ describe('ArrayField.vue', () => {
     wrapper = mount(ArrayField, {
       props: {
         parameter: mockParameter,
-        value: null,
+        modelValue: null,
       },
       data() {
         return {
@@ -70,7 +70,7 @@ describe('ArrayField.vue', () => {
   });
 
   it('The component should render provisioned text when there is a value', async () => {
-    await wrapper.setProps({ value: [42] });
+    await wrapper.setProps({ modelValue: [42] });
 
     expect(wrapper.find('.state-container').exists()).toBe(true);
     expect(wrapper.find('.state-container').text()).toBe('provisioned');

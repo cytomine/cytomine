@@ -174,9 +174,6 @@ export default {
       this.editedUser.populate(user);
     },
     async deleteUser(user) {
-      if (!this.canDelete(user)) {
-        return;
-      }
       this.$buefy.dialog.confirm({
         title: this.$t('delete-user'),
         message: this.$t('delete-user-confirmation', { username: user.username }),

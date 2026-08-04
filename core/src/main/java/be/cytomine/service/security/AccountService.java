@@ -375,10 +375,10 @@ public class AccountService {
         try {
             UserRepresentation userRep = users.searchByUsername(username, true).get(0);
             users.delete(userRep.getId());
+            log.info("deleted account {} successfully", username);
         } catch (NotFoundException e) {
             log.info("deleted account {} not found in IAM", username);
         }
-        log.info("deleted account {} successfully", username);
 
     }
 }

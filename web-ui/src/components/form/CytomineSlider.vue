@@ -37,7 +37,7 @@
           type="text"
           ref="inputSlider"
           v-model="editedValue"
-          @hook:mounted="focus()"
+          @vue:mounted="focus()"
           @blur="stopEdition(index)"
           :size="size"
         />

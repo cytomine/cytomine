@@ -59,4 +59,17 @@ describe('ImageControlsShiftButtons.vue', () => {
 
     expect(commit).not.toHaveBeenCalled();
   });
+
+  // Issue 17: `@hook:mounted` → `@vue:mounted` on the step-selector `b-input`.
+  // Both fire under compat, so this guards against the hook silently going dead
+  // once compat is dropped — the field mounts eagerly here, so `focus()` runs
+  // on mount.
+  it('focuses the step field on mount', () => {
+    const focus = vi.spyOn(ImageControlsShiftButtons.methods, 'focus').mockImplementation(() => {});
+
+    createWrapper();
+
+    expect(focus).toHaveBeenCalled();
+    focus.mockRestore();
+  });
 });

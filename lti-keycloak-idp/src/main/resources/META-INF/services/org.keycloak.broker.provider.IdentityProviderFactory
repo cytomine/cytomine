@@ -1,0 +1,2 @@
+io.example.keycloak.lti.LTIIdentityProviderFactory
+io.example.keycloak.lti.LTI11IdentityProviderFactory

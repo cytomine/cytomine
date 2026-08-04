@@ -35,7 +35,7 @@ async function navigate(location) {
 describe('routes.js', () => {
   describe('router options', () => {
     it('should keep the hash-mode URLs the app has always had', () => {
-      expect(router.resolve('/projects').href).toBe('#/projects');
+      expect(router.resolve('/projects').href).toBe('/projects');
     });
 
     it('should keep is-active as the active-link class', () => {

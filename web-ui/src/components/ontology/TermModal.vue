@@ -7,7 +7,7 @@
       </b-field>
     </field>
 
-    <sketch-picker v-model="color" :presetColors="presetColors" />
+    <sketch-picker :value="color" @input="color = $event" :presetColors="presetColors" />
 
     <template #footer>
       <button class="button" type="button" @click="$parent.close()">

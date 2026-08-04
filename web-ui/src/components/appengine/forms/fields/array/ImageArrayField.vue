@@ -20,6 +20,10 @@ export default {
     AnnotationMultiSelect,
     ImageMultiSelect,
   },
+  props: {
+    modelValue: {},
+  },
+  emits: ['update:modelValue'],
   data() {
     return {
       activeTab: 0,
@@ -27,7 +31,7 @@ export default {
   },
   methods: {
     onMultiSelect(ids, type) {
-      this.$emit('input', { ids, type });
+      this.$emit('update:modelValue', { ids, type });
     }
   },
 };

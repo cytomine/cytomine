@@ -1,11 +1,12 @@
-import {config} from '@vue/test-utils';
-import {configureCompat} from 'vue';
+import { config } from '@vue/test-utils';
+import { configureCompat } from 'vue';
 
 import optOutBuefyFromVue2Compat from '@/utils/buefy-compat.js';
 
 // Mirror the runtime compat configuration applied in src/main.js. Without it the
 // tests would run against Vue 3 semantics while the app runs in Vue 2 mode.
-configureCompat({MODE: 2});
+// COMPONENT_V_MODEL is off for the same reason it is in main.js (issue 15).
+configureCompat({ MODE: 2, COMPONENT_V_MODEL: false });
 
 // Vue Test Utils v2 stopped rendering the default slot of stubbed components.
 // The suite was written against v1, where it was rendered, and many assertions

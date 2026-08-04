@@ -33,16 +33,16 @@ export default {
   name: 'EnumerationField',
   props: {
     parameter: { type: Object, required: true },
-    value: {},
+    modelValue: {},
   },
-  emits: ['input'],
+  emits: ['update:modelValue'],
   computed: {
     input: {
       get() {
-        return this.value;
+        return this.modelValue;
       },
       set(value) {
-        this.$emit('input', value);
+        this.$emit('update:modelValue', value);
       }
     },
     tooltip() {

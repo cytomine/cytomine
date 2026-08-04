@@ -1,6 +1,6 @@
 <template>
 <div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
-  <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
+  <sl-vue-tree :value="treeNodes" @input="treeNodes = $event" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
     <template #toggle="{node}">
       <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
         <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>

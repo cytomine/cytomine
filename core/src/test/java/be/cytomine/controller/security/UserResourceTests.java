@@ -311,7 +311,6 @@ public class UserResourceTests {
         restUserControllerMockMvc.perform(get("/api/user.json")
                 .param("sortColumn", "created")
                 .param("sortDirection", "desc")
-                .param("showDeleted", "false")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.username=='" + simpleUser.getUsername() + "')].name")

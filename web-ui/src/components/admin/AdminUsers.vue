@@ -66,6 +66,9 @@
               <button class="button is-link is-small" @click="startUserEdition(user)">
                 {{$t('button-edit')}}
               </button>
+              <button class="button is-link is-danger is-small" @click="deleteUser(user)" v-if="canDelete(user)">
+                {{$t('button-delete')}}
+              </button>
             </div>
           </b-table-column>
         </template>
@@ -137,6 +140,10 @@ export default {
   },
   methods: {
     formatMomentDate,
+    canDelete(user) {
+      const protectedUsers = ['admin', 'ImageServer1'];
+      return !protectedUsers.includes(user.username);
+    },
     displayMemberOrigin(member) {
       let key;
       if (member.origin === 'BOOTSTRAP') {
@@ -164,6 +171,25 @@ export default {
     updateUser(user) {
       this.revision++;
       this.editedUser.populate(user);
+    },
+    async deleteUser(user) {
+      this.$buefy.dialog.confirm({
+        title: this.$t('delete-user'),
+        message: this.$t('delete-user-confirmation', { username: user.username }),
+        confirmText: this.$t('button-delete'),
+        type: 'is-danger',
+        hasIcon: true,
+        onConfirm: async () => {
+          try {
+            await user.delete();
+            this.$notify({ type: 'success', text: this.$t('notif-success-user-deletion') });
+            this.refreshUsers();
+          } catch (error) {
+            console.log(error);
+            this.$notify({ type: 'error', text: this.$t('notif-error-user-deletion') });
+          }
+        }
+      });
     }
   },
   async created() {

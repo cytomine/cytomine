@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +35,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class UserController {
 
     public static final String UNABLE_TO_FIND_USER = "Unable to find user with id: %s";
+    public static final String ILLEGAL_DELETE_OPERATION = "should NOT delete \'admin\' or \'ImageServer1\' users";
 
     private final AccountService accountService;
     private final CurrentUserService currentUserService;
@@ -97,6 +99,14 @@ public class UserController {
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("REST request to delete User : {}", id);
         long userId = currentUserService.getCurrentUser().getId();
+        UserResponse response = userHttpContract.get(id, userId)
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
+        String userName = response.username();
+        if (userName.equalsIgnoreCase("admin")
+            || userName.equalsIgnoreCase("ImageServer1")) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, format(ILLEGAL_DELETE_OPERATION));
+        }
+        accountService.delete(response.username());
         return userHttpContract.delete(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
     }

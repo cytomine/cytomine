@@ -1162,3 +1162,7 @@ you-are-reviewing-image-since,You are reviewing this image since {date},Cette im
 you-have-validated-image-on,You have validated this image on {date},Vous avez validé cette image le {date},Usted ha validado esta imagen el {fecha},U hebt deze afbeelding gevalideerd op {date}
 z-resolution,Z resolution,Résolution Z,,Z-resolutie
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
+delete-user,Delete User,Supprimer l'utilisateur,Eliminar usuario,Gebruiker verwijderen
+delete-user-confirmation,Are you sure you want to delete user {username}?,Êtes-vous sûr de vouloir supprimer l'utilisateur {username} ?,¿Está seguro de que desea eliminar el usuario {username}?,Weet u zeker dat u gebruiker {username} wilt verwijderen?
+notif-success-user-deletion,User successfully deleted,L'utilisateur a été supprimé avec succès,El usuario fue eliminado exitosamente,Gebruiker met succes verwijderd
+notif-error-user-deletion,Error deleting user,Erreur lors de la suppression de l'utilisateur,Error al eliminar el usuario,Fout bij het verwijderen van gebruiker

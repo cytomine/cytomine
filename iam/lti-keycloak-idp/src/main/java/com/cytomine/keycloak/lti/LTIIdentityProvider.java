@@ -1,5 +1,4 @@
-package io.example.keycloak.lti;
-
+package com.cytomine.keycloak.lti;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.core.MediaType;
@@ -16,6 +15,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.util.JsonSerialization;
+import org.keycloak.models.FederatedIdentityModel;
 
 import java.util.List;
 import java.util.Map;
@@ -55,6 +55,11 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
 
     public LTIIdentityProvider(KeycloakSession session, LTIIdentityProviderConfig config) {
         super(session, config);
+    }
+
+    @Override
+    public Response retrieveToken(KeycloakSession session, FederatedIdentityModel identity) {
+        return Response.ok(identity.getToken()).build();
     }
 
     // ---------------------------------------------------------------
@@ -115,18 +120,20 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
 
     @Override
     public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
-        return new Endpoint(realm, callback, event);
+        return new Endpoint(this, realm, callback, event);
     }
 
-    public class Endpoint {
+    public static class Endpoint {
         private final RealmModel realm;
         private final AuthenticationCallback callback;
         private final EventBuilder event;
+        private final LTIIdentityProvider provider;
 
-        public Endpoint(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
+        public Endpoint(LTIIdentityProvider provider, RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
             this.realm = realm;
             this.callback = callback;
             this.event = event;
+            this.provider = provider;
         }
 
         @POST
@@ -143,10 +150,9 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             }
 
             try {
-                BrokeredIdentityContext identity = validateAndExtract(idToken);
-                identity.setIdpConfig(getConfig());
-                identity.setIdp(LTIIdentityProvider.this);
-                identity.setCode(state);
+                BrokeredIdentityContext identity = provider.validateAndExtract(idToken);
+                identity.setIdpConfig(provider.getConfig());
+                identity.setIdp(provider);
                 return callback.authenticated(identity);
             } catch (Exception e) {
                 log.warn("LTI launch validation failed", e);
@@ -160,7 +166,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     // ---------------------------------------------------------------
 
     @SuppressWarnings("unchecked")
-    private BrokeredIdentityContext validateAndExtract(String rawIdToken) throws Exception {
+    BrokeredIdentityContext validateAndExtract(String rawIdToken) throws Exception {
         JWSInput jws = jwtValidator.verify(rawIdToken, getConfig().getPlatformJwksUrl());
         Map<String, Object> claims = JsonSerialization.readValue(jws.readContentAsString(), Map.class);
 
@@ -203,7 +209,9 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             throw new IllegalArgumentException("Missing subject claim");
         }
 
-        BrokeredIdentityContext identity = new BrokeredIdentityContext(subject, getConfig());
+        BrokeredIdentityContext identity = new BrokeredIdentityContext(subject);
+        identity.setIdpConfig(getConfig());
+
         identity.setUsername(subject);
         if (claims.get("email") != null) {
             identity.setEmail((String) claims.get("email"));

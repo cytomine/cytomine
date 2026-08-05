@@ -1,5 +1,4 @@
-package io.example.keycloak.lti;
-
+package com.cytomine.keycloak.lti;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;

@@ -1,5 +1,4 @@
-package io.example.keycloak.lti;
-
+package com.cytomine.keycloak.lti;
 import org.keycloak.broker.provider.AbstractIdentityProviderMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.models.IdentityProviderMapperModel;
@@ -7,7 +6,10 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.provider.ProviderConfigProperty;
 
+import java.util.List;
+import java.util.Collections;
 import java.util.Collection;
 
 /**
@@ -30,6 +32,11 @@ public class LTIInstructorRoleMapper extends AbstractIdentityProviderMapper {
     @Override
     public String[] getCompatibleProviders() {
         return new String[]{LTIIdentityProviderFactory.PROVIDER_ID};
+    }
+
+    @Override
+    public List<ProviderConfigProperty> getConfigProperties() {
+        return Collections.emptyList(); // Or return your custom configProperties list if defined
     }
 
     @Override

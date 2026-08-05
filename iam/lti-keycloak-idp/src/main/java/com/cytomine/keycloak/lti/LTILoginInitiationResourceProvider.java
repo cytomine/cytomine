@@ -1,5 +1,4 @@
-package io.example.keycloak.lti;
-
+package com.cytomine.keycloak.lti;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Consumes;

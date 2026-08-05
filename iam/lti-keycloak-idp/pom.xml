@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.example.keycloak</groupId>
+    <groupId>com.cytomine.keycloak</groupId>
     <artifactId>lti-identity-provider</artifactId>
     <version>0.1.0</version>
     <packaging>jar</packaging>
@@ -27,7 +27,7 @@
             between major versions, so this scaffold should be compiled and
             smoke-tested against your target version before deploying.
         -->
-        <keycloak.version>25.0.6</keycloak.version>
+        <keycloak.version>24.0.2</keycloak.version>
     </properties>
 
     <dependencies>

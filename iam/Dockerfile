@@ -16,6 +16,8 @@ ENV KC_DB=postgres \
 
 WORKDIR /opt/keycloak
 
+COPY lti-keycloak-idp/target/*.jar /opt/keycloak/providers/
+
 RUN /opt/keycloak/bin/kc.sh build
 
 #######################################################################################

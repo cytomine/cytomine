@@ -1,5 +1,4 @@
-package io.example.keycloak.lti;
-
+package com.cytomine.keycloak.lti;
 import org.keycloak.models.IdentityProviderModel;
 
 /**

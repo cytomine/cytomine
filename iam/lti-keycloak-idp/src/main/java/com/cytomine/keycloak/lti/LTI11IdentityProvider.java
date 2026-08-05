@@ -1,4 +1,4 @@
-package io.example.keycloak.lti;
+package com.cytomine.keycloak.lti;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.QueryParam;
@@ -16,6 +16,9 @@ import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
 import java.util.Map;
+import jakarta.ws.rs.core.Response;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.FederatedIdentityModel;
 
 /**
  * Unlike LTI 1.3, there's no external platform to redirect to: verification
@@ -28,6 +31,11 @@ import java.util.Map;
 public class LTI11IdentityProvider extends AbstractIdentityProvider<LTI11IdentityProviderConfig> {
 
     private static final Logger log = Logger.getLogger(LTI11IdentityProvider.class);
+
+    @Override
+    public Response retrieveToken(KeycloakSession session, FederatedIdentityModel identity) {
+        return Response.ok(identity.getToken()).build();
+    }
 
     public LTI11IdentityProvider(KeycloakSession session, LTI11IdentityProviderConfig config) {
         super(session, config);
@@ -49,14 +57,16 @@ public class LTI11IdentityProvider extends AbstractIdentityProvider<LTI11Identit
 
     @Override
     public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
-        return new Endpoint(callback);
+        return new Endpoint(this, callback);
     }
 
-    public class Endpoint {
+    public static class Endpoint {
         private final AuthenticationCallback callback;
+        private final LTI11IdentityProvider provider;
 
-        public Endpoint(AuthenticationCallback callback) {
+        public Endpoint(LTI11IdentityProvider provider,AuthenticationCallback callback) {
             this.callback = callback;
+            this.provider = provider;
         }
 
         @GET
@@ -65,7 +75,7 @@ public class LTI11IdentityProvider extends AbstractIdentityProvider<LTI11Identit
                 return callback.error("missing_ticket");
             }
 
-            Map<String, String> data = session.singleUseObjects()
+            Map<String, String> data = provider.session.singleUseObjects()
                     .remove(LTI11LaunchResourceProvider.ticketKey(ticket));
 
             if (data == null) {
@@ -75,7 +85,7 @@ public class LTI11IdentityProvider extends AbstractIdentityProvider<LTI11Identit
             }
 
             try {
-                BrokeredIdentityContext identity = buildIdentity(data);
+                BrokeredIdentityContext identity = provider.buildIdentity(data);
                 return callback.authenticated(identity);
             } catch (Exception e) {
                 log.warn("Failed to build identity from LTI 1.1 launch data", e);
@@ -84,13 +94,14 @@ public class LTI11IdentityProvider extends AbstractIdentityProvider<LTI11Identit
         }
     }
 
-    private BrokeredIdentityContext buildIdentity(Map<String, String> data) {
+    BrokeredIdentityContext buildIdentity(Map<String, String> data) {
         String subject = data.get("sub");
         if (subject == null || subject.isBlank()) {
             throw new IllegalArgumentException("Launch ticket missing subject");
         }
 
-        BrokeredIdentityContext identity = new BrokeredIdentityContext(subject, getConfig());
+        BrokeredIdentityContext identity = new BrokeredIdentityContext(subject);
+        identity.setIdpConfig(getConfig());
         identity.setUsername(subject);
         if (data.get("email") != null) identity.setEmail(data.get("email"));
         if (data.get("given_name") != null) identity.setFirstName(data.get("given_name"));

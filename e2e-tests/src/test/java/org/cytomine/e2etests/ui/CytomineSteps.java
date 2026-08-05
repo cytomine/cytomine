@@ -16,6 +16,7 @@ import org.cytomine.e2etests.utils.ReportType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -668,6 +669,28 @@ public class CytomineSteps {
             wait,
             By.xpath("//td[contains(normalize-space(text()), '" + newFirstname + " " + newLastname + "')]")
         );
+    }
+
+    public void deleteUser(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String username
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/admin?tab=users");
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.xpathClick(
+            wait,
+            "//tr[.//td[normalize-space(text())='" + username + "']]//button[contains(text(), 'Delete')]"
+        );
+        webDriverUtils.xpathClick(
+            wait,
+            "//div[contains(@class, 'modal')]//footer//button[contains(@class, 'is-danger') "
+            + "and contains(text(), 'Delete')]"
+        );
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully deleted')]"));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(
+            By.xpath("//td[contains(normalize-space(text()), '" + username + "')]")
+        ));
     }
 
     public void createTag(Wait<WebDriver> wait, URL cytomineUrl, String tagName) {

@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.cytomine.e2etests.utils.ReportType;
-import org.cytomine.e2etests.utils.Screenshots;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -64,19 +63,11 @@ public class CytomineSteps {
     }
 
     public void deleteProject(Wait<WebDriver> wait, String projectURL) {
-        WebDriver driver = wait.until(d -> d);
-        String prefix = "deleteProject-" + projectURL.replaceAll("[^a-zA-Z0-9]", "_");
-
         webDriverUtils.goTo(wait, projectURL);
-        Screenshots.save(driver, prefix + "-01-project-loaded");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
-        Screenshots.save(driver, prefix + "-02-delete-clicked");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
-        Screenshots.save(driver, prefix + "-03-confirm-clicked");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
-        Screenshots.save(driver, prefix + "-04-success-displayed");
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
-        Screenshots.save(driver, prefix + "-05-success-gone");
     }
 
     public void listProjects(Wait<WebDriver> wait, URL cytomineUrl, Set<String> projectNames) {

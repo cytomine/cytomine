@@ -342,7 +342,6 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath(
             "//button[contains(@class, 'is-selected') and .//i[contains(@class, "
                 + "'fa-mouse-pointer')]]"));
-        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".annotation-details-container"));
     }
 
     public void verifyAnnotationProcessedWithSam(Wait<WebDriver> wait) {

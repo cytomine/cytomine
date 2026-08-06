@@ -106,20 +106,10 @@ public class RetrievalService {
         parameters.setLocation(annotation.getWktLocation());
         parameters.setMaxSize(256);
 
-        long start = System.currentTimeMillis();
         try {
             ResponseEntity<byte[]> response = imageServerService.crop(annotation, parameters, null, null);
-            byte[] body = response.getBody();
-            log.info(
-                "CBIR index annotation {}: crop fetch took {} ms ({} bytes)",
-                annotation.getId(), System.currentTimeMillis() - start, body != null ? body.length : 0
-            );
-            return body;
+            return response.getBody();
         } catch (Exception e) {
-            log.warn(
-                "CBIR index annotation {}: crop fetch failed after {} ms: {}",
-                annotation.getId(), System.currentTimeMillis() - start, e.getMessage()
-            );
             return null;
         }
     }
@@ -143,7 +133,6 @@ public class RetrievalService {
     }
 
     public ResponseEntity<String> indexAnnotation(AnnotationDomain annotation) {
-        long start = System.currentTimeMillis();
         String storageName = annotation.getProject().getId().toString();
         URI url = UriComponentsBuilder
             .fromUriString(getInternalCbirURL())
@@ -154,17 +143,9 @@ public class RetrievalService {
             .toUri();
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = createEntity(annotation);
-        long afterEntity = System.currentTimeMillis();
-        log.info("CBIR index annotation {}: crop+payload build took {} ms", annotation.getId(), afterEntity - start);
+        log.debug("Create index for annotation {}", annotation.getId());
 
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-        long end = System.currentTimeMillis();
-        log.info(
-            "CBIR index annotation {}: POST to {} took {} ms (total {} ms), status {}",
-            annotation.getId(), url, end - afterEntity, end - start, response.getStatusCode()
-        );
-
-        return response;
+        return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
     }
 
     public ResponseEntity<String> deleteIndex(AnnotationDomain annotation) {

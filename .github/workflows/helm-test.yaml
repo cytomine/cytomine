@@ -220,10 +220,6 @@ jobs:
         if: always()
         run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs deployment/repository --all-containers=true --prefix --tail=-1
 
-      - name: Logs e2e tests results - cbir
-        if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs statefulset/cbir --all-containers=true --prefix --tail=-1
-
       - name: Export test results
         if: always()
         run: |

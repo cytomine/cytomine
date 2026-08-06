@@ -155,7 +155,7 @@ jobs:
             --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \
             --set images.repository=registry.cytomine.org/cytomine/repository:${{ env.DEPLOYMENT_NAME }} \
             --set images.sam=registry.cytomine.org/cytomine/sam:${{ env.DEPLOYMENT_NAME }} \
-            --set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox:151.0 \
+            --set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox:152.0 \
             --set images.tasks_runner_image=registry.cytomine.org/cytomine/app-engine-tasks-runner:${{ env.DEPLOYMENT_NAME }} \
             --set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ env.DEPLOYMENT_NAME }} \
             --set images.pullPolicy=Always \
@@ -211,14 +211,6 @@ jobs:
       - name: Logs e2e tests results - selenium pod
         if: always()
         run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c selenium
-
-      - name: Logs e2e tests results - core
-        if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs deployment/core --all-containers=true --prefix --tail=-1
-
-      - name: Logs e2e tests results - repository
-        if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs deployment/repository --all-containers=true --prefix --tail=-1
 
       - name: Export test results
         if: always()

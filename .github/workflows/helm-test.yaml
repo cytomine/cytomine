@@ -155,7 +155,7 @@ jobs:
             --set images.registry=registry.cytomine.org/docker/library/registry:2.8.3 \
             --set images.repository=registry.cytomine.org/cytomine/repository:${{ env.DEPLOYMENT_NAME }} \
             --set images.sam=registry.cytomine.org/cytomine/sam:${{ env.DEPLOYMENT_NAME }} \
-            --set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox:152.0 \
+            --set images.selenium=registry.cytomine.org/docker/selenium/standalone-firefox \
             --set images.tasks_runner_image=registry.cytomine.org/cytomine/app-engine-tasks-runner:${{ env.DEPLOYMENT_NAME }} \
             --set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ env.DEPLOYMENT_NAME }} \
             --set images.pullPolicy=Always \

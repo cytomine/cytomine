@@ -105,7 +105,7 @@ images:
   meilisearch: getmeili/meilisearch:v1.43.0
   iam: keycloak/keycloak:26.3
   e2e_tests: cytomine/e2e-tests:latest
-  selenium: selenium/standalone-firefox:152.0
+  selenium: selenium/standalone-firefox
   pullPolicy: Always
   # array of image secrets names
   imagePullSecretsNames:

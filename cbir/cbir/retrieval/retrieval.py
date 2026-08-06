@@ -1,7 +1,5 @@
 """Image retrieval methods."""
 
-import logging
-import time
 from io import BytesIO
 
 import torch
@@ -12,8 +10,6 @@ from cbir.models.model import Model
 from cbir.models.utils import run_inference
 from cbir.retrieval.indexer import Indexer
 from cbir.retrieval.store import Store
-
-logger = logging.getLogger("uvicorn.error")
 
 
 class ImageRetrieval:
@@ -54,16 +50,11 @@ class ImageRetrieval:
         )
 
         # Create a dataset of one image
-        decode_start = time.perf_counter()
         inputs = features_extraction(Image.open(BytesIO(image)).convert("RGB"))
         inputs = torch.unsqueeze(inputs, dim=0)
-        decode_ms = (time.perf_counter() - decode_start) * 1000
 
-        inference_start = time.perf_counter()
         outputs = run_inference(model, inputs)
-        inference_ms = (time.perf_counter() - inference_start) * 1000
 
-        index_start = time.perf_counter()
         last_id = self.store.last()
         ids = self.indexer.add(last_id, outputs)
 
@@ -73,17 +64,6 @@ class ImageRetrieval:
             self.store.set(label, filename)
 
         self.store.set("last_id", str(ids[-1] + 1))
-        index_ms = (time.perf_counter() - index_start) * 1000
-
-        logger.info(
-            "index_image %s: decode=%.0fms inference=%.0fms store+faiss=%.0fms "
-            "(torch_threads=%d)",
-            filename,
-            decode_ms,
-            inference_ms,
-            index_ms,
-            torch.get_num_threads(),
-        )
 
         return ids
 

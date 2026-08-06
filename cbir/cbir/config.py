@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     extractor: str = "resnet"
     weights: str = "/app/weights/resnet"
+    num_threads: int = 4
 
 
 def get_settings() -> Settings:

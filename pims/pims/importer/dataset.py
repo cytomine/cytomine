@@ -1,14 +1,18 @@
 import logging
 import os
+import uuid
 from collections import defaultdict
 from collections.abc import Mapping
-from lxml import etree
-from typing import Any
 from dataclasses import fields, is_dataclass
 from datetime import datetime
 from enum import Enum
-import uuid
+from typing import Any
 
+from bigpicture_metadata_interface import BPInterface
+from bigpicture_metadata_interface.model.common import Attributes, Code, CodeAttributes
+from bigpicture_metadata_interface.model.dataset import Dataset
+from bigpicture_metadata_interface.model.image import Image
+from bigpicture_metadata_interface.model.sample import Block, Slide, Specimen
 from cytomine import Cytomine
 from cytomine.models import (
     ImageInstanceCollection,
@@ -16,29 +20,19 @@ from cytomine.models import (
     ProjectCollection,
     Storage,
 )
-
+from lxml import etree
 
 from pims.api.exceptions import AuthenticationException, CytomineProblem
 from pims.api.utils.cytomine_auth import sign_token
 from pims.config import get_settings
 from pims.files.file import Path
 from pims.importer.annotation import AnnotationImporter
-from pims.importer.ontology import OntologyImporter
 from pims.importer.image import ImageImporter
 from pims.importer.metadata import MetadataValidator
+from pims.importer.ontology import OntologyImporter
 from pims.importer.utils import get_project
 from pims.schemas.auth import ApiCredentials, CytomineAuth
 from pims.schemas.operations import ImportResponse, ImportSummary
-
-from bigpicture_metadata_interface import BPInterface
-from bigpicture_metadata_interface.model.dataset import Dataset
-from bigpicture_metadata_interface.model.image import Image
-from bigpicture_metadata_interface.model.sample import (
-    Block,
-    Slide,
-    Specimen,
-)
-from bigpicture_metadata_interface.model.common import Code, CodeAttributes, Attributes
 
 logger = logging.getLogger("pims.app")
 
@@ -161,6 +155,9 @@ def run_import_datasets(
                 ).run(projects=[project])
 
                 images = ImageInstanceCollection().fetch_with_filter("project", project.id)
+                abstract_image_by_alias = {
+                    image.originalFilename: image.baseImage for image in images
+                }
                 ontologies = OntologyCollection().fetch()
 
                 for child in parser.children:
@@ -186,6 +183,8 @@ def run_import_datasets(
                     for image in parsed_dataset.images.values():
                         flat_dict = flatten_image(image, parsed_dataset, slide_to_block)
                         flat_dict["id"] = flat_dict["image"]["identifier"] # MeiliSearch requires a unique 'id'
+                        alias = image.reference.alias if image.reference else None
+                        flat_dict["image"]["abstract_image_id"] = abstract_image_by_alias.get(alias)
                         indexing_payload.append(flat_dict)
 
                     logger.info(f"[{parent_dataset}] Prepared {len(indexing_payload)} images for indexing.")
@@ -420,6 +419,7 @@ def _configure_index(index) -> None:
         "policy.allowed_geographical_distribution",
     ]
     filterable_attributes = [
+        "image.abstract_image_id",
         "specimens.biological_being.animal_species.meaning",
         "specimens.anatomical_site.meaning",
         "specimens.biological_being.sex",

@@ -62,7 +62,7 @@ spec:
                   name: meilisearch-secret
                   key: masterKey
             - name: MEILI_NO_ANALYTICS
-              value: true
+              value: "true"
           startupProbe:
             httpGet:
               path: /health

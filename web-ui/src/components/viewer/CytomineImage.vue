@@ -1,51 +1,39 @@
 <template>
 <div class="map-container" @click="isActiveImage = true" ref="container">
-  <template v-if="!loading && zoom !== null">
-    <vl-map
-      :data-projection="projectionName"
-      :load-tiles-while-animating="true"
-      :load-tiles-while-interacting="true"
+  <template v-if="mapVisible">
+    <ol-map
+      class="map"
       :keyboard-event-target="document"
       @pointermove="projectedMousePosition = $event.coordinate"
-      @mounted="updateKeyboardInteractions"
       ref="map"
     >
 
-      <vl-view
-        v-model:center="center"
-        v-model:zoom="zoom"
-        v-model:rotation="rotation"
+      <ol-view
+        :center="initialView.center"
+        :zoom="initialView.zoom"
+        :rotation="initialView.rotation"
         :max-zoom="maxZoom"
         :max-resolution="Math.pow(2, image.zoom)"
         :extent="extent"
         :projection="projectionName"
-        @mounted="viewMounted()"
+        @change:center="viewChanged"
+        @change:resolution="viewChanged"
+        @change:rotation="viewChanged"
         ref="view"
       />
 
-      <vl-layer-tile :extent="extent" @mounted="addOverviewMap" ref="baseLayer">
-        <vl-source-cytomine
+      <ol-tile-layer :extent="extent" ref="baseLayer">
+        <ol-source-cytomine
           :projection="projectionName"
           :url="baseLayerURL"
           :tile-load-function="tileLoadFunction"
-          :size="imageSize"
           :extent="extent"
           :nb-resolutions="image.zoom"
-          ref="baseSource"
-          @mounted="setBaseSource()"
           :transition="0"
           :tile-size="[tileSize, tileSize]"
+          @ready="setBaseSource"
         />
-      </vl-layer-tile>
-
-<!--      <vl-layer-image>-->
-<!--        <vl-source-raster-->
-<!--          v-if="baseSource && colorManipulationOn"-->
-<!--          :sources="[baseSource]"-->
-<!--          :operation="operation"-->
-<!--          :lib="lib"-->
-<!--        />-->
-<!--      </vl-layer-image>-->
+      </ol-tile-layer>
 
       <annotation-layer
         v-for="layer in selectedLayers"
@@ -58,7 +46,7 @@
       <draw-interaction v-if="activeDrawInteraction" :index="index" />
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
-    </vl-map>
+    </ol-map>
 
     <div v-if="configUI['project-tools-main']" class="draw-tools">
       <draw-tools :index="index" @screenshot="takeScreenshot()"/>
@@ -93,7 +81,7 @@
               <i class="fas fa-search"></i>
             </a>
             <digital-zoom class="panel-options" v-show="activePanel === 'digital-zoom'" :index="index"
-                          @resetZoom="$refs.view.animate({zoom: image.zoom})"
+                          @resetZoom="olView.animate({zoom: image.zoom})"
                           @fitZoom="fitZoom" />
           </li>
 
@@ -138,7 +126,7 @@
             <a @click="togglePanel('follow')" :class="{active: activePanel === 'follow'}">
               <i class="fas fa-street-view"></i>
             </a>
-            <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="$refs.view"/>
+            <follow-panel class="panel-options" v-show="activePanel === 'follow'" :index="index" :view="olView"/>
           </li>
 
           <li v-if="isPanelDisplayed('review') && canEdit">
@@ -179,6 +167,7 @@ import eventBus from '@/utils/event-bus';
 
 import { get } from '@/utils/store-helpers';
 import _ from 'lodash';
+import domToImage from 'dom-to-image-more';
 
 import ImageName from '@/components/image/ImageName.vue';
 import AnnotationLayer from './AnnotationLayer.vue';
@@ -204,9 +193,13 @@ import DrawInteraction from './interactions/DrawInteraction.vue';
 import ModifyInteraction from './interactions/ModifyInteraction.vue';
 import ToggleScaleLine from './interactions/ToggleScaleLine.vue';
 
-import { addProj, createProj, getProj } from 'vuelayers/lib/ol-ext';
+import { markRaw } from 'vue';
+
+import { addProj, createProj, getProj } from '@/viewer-ol/projection.js';
+import { createViewerContext, VIEWER_CONTEXT } from '@/viewer-ol/context.js';
 
 import View from 'ol/View';
+import TileLayer from 'ol/layer/Tile';
 import OverviewMap from 'ol/control/OverviewMap';
 import { KeyboardPan, KeyboardZoom } from 'ol/interaction';
 import { noModifierKeys, targetNotEditable } from 'ol/events/condition';
@@ -250,6 +243,11 @@ export default {
     ModifyInteraction,
     ToggleScaleLine
   },
+  provide() {
+    return {
+      [VIEWER_CONTEXT]: this.viewerContext
+    };
+  },
   data() {
     return {
       minZoom: 0,
@@ -265,6 +263,13 @@ export default {
       loading: true,
 
       overview: null,
+      overviewCollapsedState: false,
+
+      initialView: null,
+      applyingStoreView: false,
+
+      viewerContext: markRaw(createViewerContext()),
+      olView: null,
 
       format: new WKT(),
     };
@@ -427,8 +432,12 @@ export default {
       return layers;
     },
 
+    mapVisible() {
+      return !this.loading && this.zoom !== null;
+    },
+
     overviewCollapsed() {
-      return this.overview ? this.overview.getCollapsed() : this.imageWrapper.view.overviewCollapsed;
+      return this.overview ? this.overviewCollapsedState : this.imageWrapper.view.overviewCollapsed;
     },
     scaleLineCollapsed() {
       return !this.imageWrapper.view.scaleLineCollapsed;
@@ -463,9 +472,23 @@ export default {
   watch: {
     viewState() {
       this.savePosition();
+      this.syncViewFromStore();
     },
     overviewCollapsed(value) {
       this.$store.commit(this.imageModule + 'setOverviewCollapsed', value);
+    },
+    mapVisible: {
+      immediate: true,
+      handler(visible) {
+        if (visible && !this.initialView) {
+          this.initialView = markRaw({
+            center: [...this.center],
+            zoom: this.zoom,
+            rotation: this.rotation
+          });
+          this.$nextTick(this.mapMounted);
+        }
+      }
     }
   },
   methods: {
@@ -483,10 +506,23 @@ export default {
       }
     },
 
-    async updateKeyboardInteractions() {
-      await this.$refs.map.$createPromise; // wait for ol.Map to be created
+    mapMounted() {
+      if (!this.$refs.view || !this.$refs.map) {
+        return;
+      }
 
-      this.$refs.map.$map.getInteractions().forEach(interaction => {
+      this.olView = markRaw(this.$refs.view.view);
+      this.updateKeyboardInteractions();
+      this.addOverviewMap();
+
+      if (this.routedAnnotation) {
+        this.centerViewOnAnnot(this.routedAnnotation, 500);
+      }
+      this.savePosition();
+    },
+
+    updateKeyboardInteractions() {
+      this.$refs.map.map.getInteractions().forEach(interaction => {
         if (interaction instanceof KeyboardPan || interaction instanceof KeyboardZoom) {
           interaction.condition_ = (mapBrowserEvent) => {
             return noModifierKeys(mapBrowserEvent)
@@ -498,37 +534,78 @@ export default {
       });
     },
 
-    async viewMounted() {
-      await this.$refs.view.$createPromise; // wait for ol.View to be created
-      if (this.routedAnnotation) {
-        this.centerViewOnAnnot(this.routedAnnotation, 500);
-      }
-      this.savePosition();
-    },
-
-    async setBaseSource() {
-      await this.$refs.baseSource.$createPromise;
-      this.baseSource = this.$refs.baseSource.$source;
-    },
-
-    async addOverviewMap() {
-      if (!this.isPanelDisplayed('overview')) {
+    viewChanged() {
+      if (this.applyingStoreView || !this.olView) {
         return;
       }
 
-      await this.$refs.map.$createPromise; // wait for ol.Map to be created
-      await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
+      let center = this.olView.getCenter();
+      if (center && (center[0] !== this.center[0] || center[1] !== this.center[1])) {
+        this.center = [...center];
+      }
 
-      let map = this.$refs.map.$map;
+      let zoom = this.olView.getZoom();
+      if (zoom !== undefined && Math.round(zoom) !== this.zoom) {
+        this.zoom = Math.round(zoom);
+      }
 
-      this.overview = new OverviewMap({
+      let rotation = this.olView.getRotation();
+      if (rotation !== this.rotation) {
+        this.rotation = rotation;
+      }
+    },
+
+    /** store -> ol, for linked viewers and for tracking another user. */
+    syncViewFromStore() {
+      if (!this.olView || this.olView.getAnimating()) {
+        return;
+      }
+
+      this.applyingStoreView = true;
+      try {
+        let center = this.olView.getCenter();
+        if (this.center && (!center || center[0] !== this.center[0] || center[1] !== this.center[1])) {
+          this.olView.setCenter(this.center);
+        }
+        if (this.zoom !== null && Math.round(this.olView.getZoom()) !== this.zoom) {
+          this.olView.setZoom(this.zoom);
+        }
+        if (this.olView.getRotation() !== this.rotation) {
+          this.olView.setRotation(this.rotation);
+        }
+      } finally {
+        this.applyingStoreView = false;
+      }
+    },
+
+    setBaseSource(source) {
+      this.baseSource = markRaw(source);
+    },
+
+    addOverviewMap() {
+      if (!this.isPanelDisplayed('overview') || !this.baseSource) {
+        return;
+      }
+
+      let map = this.$refs.map.map;
+
+      this.overviewCollapsedState = this.imageWrapper.view.overviewCollapsed;
+      this.overview = markRaw(new OverviewMap({
         view: new View({ projection: this.projectionName }),
-        layers: [this.$refs.baseLayer.$layer],
+        layers: [new TileLayer({ source: this.baseSource })],
         tipLabel: this.$t('overview'),
         target: this.$refs.overview,
         collapsed: this.imageWrapper.view.overviewCollapsed
-      });
+      }));
       map.addControl(this.overview);
+
+      // `OverviewMap` has no event for its toggle button, so mirror the state.
+      let button = this.$refs.overview.querySelector('.ol-overviewmap button');
+      if (button) {
+        button.addEventListener('click', () => {
+          this.overviewCollapsedState = this.overview.getCollapsed();
+        });
+      }
 
       this.overview.getOverviewMap().on(('click'), (evt) => {
         let size = map.getSize();
@@ -539,6 +616,7 @@ export default {
     toggleOverview() {
       if (this.overview) {
         this.overview.setCollapsed(!this.imageWrapper.view.overviewCollapsed);
+        this.overviewCollapsedState = this.overview.getCollapsed();
       }
     },
 
@@ -551,8 +629,8 @@ export default {
     },
 
     savePosition: _.debounce(async function () {
-      if (this.$refs.view) {
-        let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
+      if (this.olView) {
+        let extent = this.olView.calculateExtent(); // [minX, minY, maxX, maxY]
         try {
           await UserPosition.create({
             image: this.image.id,
@@ -580,7 +658,7 @@ export default {
     }, 500),
 
     fitZoom() {
-      this.$refs.view.animate({
+      this.olView.animate({
         zoom: this.idealZoom,
         center: [this.image.width / 2, this.image.height / 2]
       });
@@ -601,7 +679,7 @@ export default {
         }
 
         let geometry = this.format.readGeometry(annot.location);
-        await this.$refs.view.fit(geometry, { duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom });
+        await this.olView.fit(geometry, { duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom });
 
         if (!Object.prototype.hasOwnProperty.call(annot, 'centroid')) {
           return;
@@ -639,7 +717,7 @@ export default {
           eventBus.emit('selectAnnotationInLayer', { index, annot });
 
           if (center) {
-            await this.viewMounted();
+            await this.$nextTick();
             let duration = (sliceChange) ? undefined : 500;
             this.centerViewOnAnnot(annot, duration);
           }
@@ -713,19 +791,25 @@ export default {
       }
     },
     async takeScreenshot() {
-      // Use of css percent values and html2canvas results in strange behavior
+      // Use of css percent values and DOM rasterization results in strange behavior
       // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
-      let containerHeight = document.querySelector('.map-container').clientHeight;
-      document.querySelector('.map-container').style.height = containerHeight + 'px';
+      let container = document.querySelector('.map-container');
+      let containerHeight = container.clientHeight;
+      container.style.height = containerHeight + 'px';
 
-      let a = document.createElement('a');
-      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), { type: 'dataURL' });
-      let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
-      a.download = imageName;
-      a.click();
-
-      // Reset container css values as previous
-      document.querySelector('.map-container').style.height = '';
+      try {
+        let a = document.createElement('a');
+        a.href = await domToImage.toPng(document.querySelector('.ol-unselectable'));
+        let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
+        a.download = imageName;
+        a.click();
+      } catch (error) {
+        console.log(error);
+        this.$notify({ type: 'error', text: this.$t('notif-error-screenshot') });
+      } finally {
+        // Reset container css values as previous
+        container.style.height = '';
+      }
     },
   },
   async created() {
@@ -824,7 +908,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import 'vuelayers/lib/style.css';
+@import 'ol/ol.css';
 
 $backgroundPanelBar: #555;
 $widthPanelBar: 2.8rem;
@@ -841,8 +925,12 @@ $colorOpenedPanelLink: #6c95c8;
   height: 100%;
 }
 
+/* `<ol-map>` sets this element as the ol map target, so it has to have a size
+   of its own. vuelayers' own stylesheet did that with width/height: 100%. */
 .map {
   flex-grow: 1;
+  min-width: 0;
+  height: 100%;
 }
 
 .draw-tools {

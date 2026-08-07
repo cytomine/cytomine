@@ -375,8 +375,8 @@ export default {
     try {
       this.imageGroup = await ImageGroup.fetch(this.imageGroupId);
       for (let imageInstance of this.imageGroup.imageInstances) {
-        this.$set(imageInstance, 'inViewerPosition', this.viewerCenterPosition.value);
-        this.$set(imageInstance, 'notInViewerPosition', this.imageCenterPosition.value);
+        imageInstance.inViewerPosition = this.viewerCenterPosition.value;
+        imageInstance.notInViewerPosition = this.imageCenterPosition.value;
       }
       this.loading = false;
     } catch (error) {

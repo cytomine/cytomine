@@ -1,15 +1,17 @@
 <template>
   <form @submit.prevent="createImageGroup()">
     <cytomine-modal :active="active" :title="$t('create-image-group')" @close="$emit('update:active', false)">
-      <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-        <b-input v-model="name" name="name" v-validate="'required'" />
-      </b-field>
+      <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
+        <b-field :label="$t('name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+          <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+        </b-field>
+      </field>
 
       <template #footer>
         <button class="button" type="button" @click="$emit('update:active', false)">
           {{$t('button-cancel')}}
         </button>
-        <button class="button is-link" :disabled="errors.any()">
+        <button class="button is-link" :disabled="!isValid">
           {{$t('button-save')}}
         </button>
       </template>
@@ -18,7 +20,10 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+
 import { ImageGroup } from '@/api';
+import { required, rules, validateForm } from '@/utils/form.js';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 import { get } from '@/utils/store-helpers';
 
@@ -27,11 +32,13 @@ export default {
   props: {
     active: Boolean
   },
-  components: { CytomineModal },
-  $_veeValidate: { validator: 'new' },
-  data() {
+  components: { CytomineModal, Field },
+  setup() {
+    const form = useForm({ defaultValues: { name: '' } });
     return {
-      name: ''
+      form,
+      isValid: form.useStore(state => state.isValid),
+      nameRules: { onChange: rules(required) }
     };
   },
   computed: {
@@ -40,19 +47,21 @@ export default {
   watch: {
     active(val) {
       if (val) {
-        this.name = '';
+        this.form.reset({ name: '' });
       }
     }
   },
   methods: {
     async createImageGroup() {
-      let result = await this.$validator.validateAll();
-      if (!result) {
+      if (!await validateForm(this.form)) {
         return;
       }
 
       try {
-        let imageGroup = await new ImageGroup({ name: this.name, project: this.project.id }).save();
+        let imageGroup = await new ImageGroup({
+          name: this.form.state.values.name,
+          project: this.project.id
+        }).save();
         this.$notify({ type: 'success', text: this.$t('notif-success-image-group-creation') });
         this.$emit('update:active', false);
         this.$emit('newImageGroup', imageGroup);

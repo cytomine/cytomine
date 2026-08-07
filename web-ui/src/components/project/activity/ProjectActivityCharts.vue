@@ -6,14 +6,14 @@
         <div class="columns">
           <h2 class="column">{{$t("activity")}}</h2>
           <div class="column is-narrow is-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("activity-chart-info-message")}}</p>
                 <p>{{$t("barchart-hover-mouse-for-details")}}</p>
                 <p>{{$t("barchart-click-label-to-toggle-visibility")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
         </div>
         <div class="chart-container big">
@@ -31,12 +31,12 @@
       <div class="tile is-parent">
         <div class="tile is-child box single-metric">
           <div class="absolute-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("project-connections-info-message")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
           <strong class="metric">{{nbProjectVisits != null ? nbProjectVisits : "?"}}</strong>
           <strong>{{$t("project-connections")}}</strong>
@@ -45,12 +45,12 @@
       <div class="tile is-parent">
         <div class="tile is-child box single-metric">
           <div class="absolute-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("image-consultations-info-message")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
           <strong class="metric">{{nbImageConsultations != null ? nbImageConsultations : "?"}}</strong>
           <strong>{{$t("image-consultations")}}</strong>
@@ -59,12 +59,12 @@
       <div class="tile is-parent">
         <div class="tile is-child box single-metric">
           <div class="absolute-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("annotation-selections-info-message")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
           <strong class="metric">{{nbAnnotationSelections != null ? nbAnnotationSelections : "?"}}</strong>
           <strong>{{$t("annotation-selections")}}</strong>
@@ -78,12 +78,12 @@
       <div class="tile is-parent">
         <div class="tile is-child box single-metric">
           <div class="absolute-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("manual-annotations-info-message")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
           <strong class="metric">
             {{ nbAnnotations[annotationTypes.USER] != null ? nbAnnotations[annotationTypes.USER] : "?" }}
@@ -94,12 +94,12 @@
       <div class="tile is-parent">
         <div class="tile is-child box single-metric">
           <div class="absolute-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("reviewed-annotations-info-message")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
           <strong class="metric">
             {{ nbAnnotations[annotationTypes.REVIEWED] != null ? nbAnnotations[annotationTypes.REVIEWED] : "?" }}
@@ -128,14 +128,14 @@
             </div>
           </template>
           <div class="column is-narrow is-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("number-annotations-chart-info-message")}}</p>
                 <p>{{$t("barchart-hover-mouse-for-details")}}</p>
                 <p>{{$t("barchart-click-label-to-toggle-visibility")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
         </div>
         <div class="chart-container big">
@@ -157,12 +157,12 @@
         <div class="columns">
           <h2 class="column">{{$t("manual-annotations-vs-term")}}</h2>
           <div class="column is-narrow is-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("annotations-vs-terms-chart-info-message")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
         </div>
         <div class="chart-container" :style="styleAnnotationTermChart">
@@ -181,12 +181,12 @@
         <div class="columns">
           <h2 class="column">{{$t("annotated-images-vs-term")}}</h2>
           <div class="column is-narrow is-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("annotated-images-vs-terms-chart-info-message")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
         </div>
         <div class="chart-container" :style="styleAnnotationTermChart">
@@ -207,12 +207,12 @@
         <div class="columns">
           <h2 class="column">{{$t("manual-annotations-vs-contributor")}}</h2>
           <div class="column is-narrow is-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("annotations-vs-contributors-chart-info-message")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
         </div>
         <div class="chart-container" :style="styleAnnotationContributorChart">
@@ -231,12 +231,12 @@
         <div class="columns">
           <h2 class="column">{{$t("annotated-images-vs-contributor")}}</h2>
           <div class="column is-narrow is-info-circle">
-            <v-popover>
+            <VDropdown>
               <i class="fas fa-info-circle"></i>
-              <template #popover>
+              <template #popper>
                 <p>{{$t("annotated-images-vs-contributors-chart-info-message")}}</p>
               </template>
-            </v-popover>
+            </VDropdown>
           </div>
         </div>
         <div class="chart-container" :style="styleAnnotationContributorChart">

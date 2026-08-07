@@ -1,9 +1,9 @@
 <template>
 <div>
-  <v-popover
+  <VDropdown
     placement="right"
-    :popover-inner-class="'color-selector'"
-    v-model:open="showColorSelector"
+    popper-class="color-selector"
+    v-model:shown="showColorSelector"
     :delay="0"
   >
     <div
@@ -12,7 +12,7 @@
       :class="{'is-selected': showColorSelector, 'is-clickable': editableColor}"
       @click="openColorSelector"
     ></div>
-    <template #popover v-if="showColorSelector">
+    <template #popper v-if="showColorSelector">
       <sketch-picker
         :value="formattedColor"
         @input="setColor"
@@ -21,14 +21,10 @@
       />
     </template>
 
-  </v-popover>
-  <a
-    role="button"
-    @click.stop="$emit('click')"
-  >
+  </VDropdown>
+  <a role="button" @click.stop="$emit('click')">
     {{formattedName}}
   </a>
-
 </div>
 </template>
 

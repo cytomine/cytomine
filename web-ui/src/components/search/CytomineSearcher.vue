@@ -7,46 +7,44 @@
       :placeholder="$t('search-placeholder')"
       type="search"
       icon="search"
-      @click.native="activate()"
+      @focus="activate()"
       :loading="loading"
       :disabled="error"
     />
-    <p class="control">
-      <router-link class="button" to="/advanced-search" active-class="router-link-active" @click.native="deactivate">+</router-link>
+    <p class="control" @click="deactivate">
+      <router-link class="button" to="/advanced-search" active-class="router-link-active">+</router-link>
     </p>
   </b-field>
 
   <div class="navbar-dropdown search-results" v-show="true">
     <h2>{{$t('project')}} ({{filteredProjects.length}})</h2>
-    <p v-if="filteredProjects.length > 0">
+    <p v-if="filteredProjects.length > 0" @click="deactivate">
       <router-link
         v-for="project in subsetProjects"
         :key="project.id"
         :to="`/project/${project.id}`"
         class="navbar-item"
         v-html="highlightedName(project.name)"
-        @click.native="deactivate"
       />
       <a v-if="moreProjects" class="navbar-item">...</a>
     </p>
     <span v-else class="navbar-item no-result">{{$t('no-project')}}</span>
 
     <h2>{{$t('images')}} ({{filteredImages.length}})</h2>
-    <p v-if="filteredImages.length > 0">
+    <p v-if="filteredImages.length > 0" @click="deactivate">
       <router-link
         v-for="img in subsetImages"
         :key="img.id"
         :to="`/project/${img.project}/image/${img.id}`"
         class="navbar-item"
-        @click.native="deactivate"
         v-html="htmlImageName(img)"
       />
       <a v-if="moreImages" class="navbar-item">...</a>
     </p>
     <span v-else class="navbar-item no-result">{{$t('no-image')}}</span>
 
-    <div v-if="moreImages || moreProjects" class="search-view-all">
-      <router-link class="button is-small" :to="`/advanced-search/${searchString}`" @click.native="deactivate">
+    <div v-if="moreImages || moreProjects" class="search-view-all" @click="deactivate">
+      <router-link class="button is-small" :to="`/advanced-search/${searchString}`">
         {{$t('button-view-all')}} ({{totalNbResults}})
       </router-link>
     </div>

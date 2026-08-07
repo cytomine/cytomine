@@ -34,14 +34,14 @@
     <cytomine-table
       :collection="MemberCollection"
       :is-empty="this.selectedRoles.length === 0"
-      :currentPage.sync="currentPage"
-      :perPage.sync="perPage"
-      :sort.sync="sortField"
-      :order.sync="sortOrder"
+      v-model:currentPage="currentPage"
+      v-model:perPage="perPage"
+      v-model:sort="sortField"
+      v-model:order="sortOrder"
       :detailed=false
       :checkable=true
       :isRowCheckable="(row) => row.id !== currentUser.id"
-      :checkedRows.sync="selectedMembers"
+      v-model:checkedRows="selectedMembers"
       :revision="revision"
     >
 
@@ -91,7 +91,7 @@
       <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('project-representative')}}</p>
     </div>
 
-    <add-member-modal :active.sync="addMemberModal" @addMembers="refreshMembers()" />
+    <add-member-modal v-model:active="addMemberModal" @addMembers="refreshMembers()" />
   </template>
 </div>
 </template>
@@ -186,7 +186,7 @@ export default {
     confirmMembersRemoval() {
       this.$buefy.dialog.confirm({
         title: this.$t('remove-members'),
-        message: this.$tc('remove-members-confirmation-message', this.selectedMembers.length, {
+        message: this.$t('remove-members-confirmation-message', this.selectedMembers.length, {
           count: this.selectedMembers.length,
           username: this.selectedMembers[0].fullName
         }),
@@ -211,7 +211,7 @@ export default {
       if (member.id === this.currentUser.id && member.role !== this.contributorRole.value) {
         this.$buefy.dialog.confirm({
           title: this.$t('remove-yourself-from-manager'),
-          message: this.$tc('remove-yourself-from-manager-confirmation-message'),
+          message: this.$t('remove-yourself-from-manager-confirmation-message'),
           type: 'is-danger',
           confirmText: this.$t('button-confirm'),
           cancelText: this.$t('button-cancel'),

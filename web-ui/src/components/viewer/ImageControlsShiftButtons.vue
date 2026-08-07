@@ -32,13 +32,13 @@
           v-click-outside="() => stopEdition()"
           v-click-outside:contextmenu.capture="() => stopEdition()"
           class="step-selector"
+          @keyup.enter="stopEdition()"
         >
           <b-input :placeholder="$t('step')" size="is-small"
              v-model="editedValue"
              ref="inputStepSelector"
              @hook:mounted="focus()"
              @blur="stopEdition()"
-             @keyup.enter.native="stopEdition()"
           />
         </div>
       </template>

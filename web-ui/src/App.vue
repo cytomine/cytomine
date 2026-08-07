@@ -178,7 +178,7 @@ body {
   margin-top: 3rem;
 }
 
-.notifications {
+.vue-notification-group {
   margin-top: 1em;
 }
 

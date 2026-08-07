@@ -17,7 +17,7 @@
         sort="created" order="desc"
         :revision="revision"
         :refreshInterval="tableRefreshInterval"
-        :openedDetailed.sync="openedDetails"
+        v-model:openedDetailed="openedDetails"
         :detailed="false"
       >
         <template #default="{row: uFile}">

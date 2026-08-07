@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 import AppConfigurationPage from '@/components/appengine/AppConfigurationPage.vue';
 import AppDashboardPage from '@/components/appengine/AppDashboardPage.vue';
@@ -161,7 +161,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes: routes,
   linkActiveClass: 'is-active'
 });

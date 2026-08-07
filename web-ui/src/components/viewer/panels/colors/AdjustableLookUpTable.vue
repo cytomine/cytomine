@@ -37,8 +37,8 @@
         </div>
         <cytomine-slider
           class="adjustment-body"
-          :value="arrayBounds"
-          @input="setBounds"
+          :model-value="arrayBounds"
+          @update:model-value="setBounds"
           :min="defaultBounds.min"
           :max="defaultBounds.max"
           :contained="true"
@@ -53,8 +53,8 @@
         </div>
         <cytomine-slider
           class="adjustment-body"
-          :value="brightness"
-          @input="setBrightness"
+          :model-value="brightness"
+          @update:model-value="setBrightness"
           :min="defaultBounds.min"
           :max="defaultBounds.max"
           :tooltip="false"
@@ -68,8 +68,8 @@
         </div>
         <cytomine-slider
           class="adjustment-body"
-          :value="contrast"
-          @input="setContrast"
+          :model-value="contrast"
+          @update:model-value="setContrast"
           :min="defaultBounds.min"
           :max="defaultBounds.max"
           :tooltip="false"
@@ -84,8 +84,8 @@
         </div>
         <cytomine-slider
           class="adjustment-body"
-          :value="gamma"
-          @input="$emit('setGamma', $event)"
+          :model-value="gamma"
+          @update:model-value="$emit('setGamma', $event)"
           :min="0.1"
           :max="4"
           :interval="0.1"

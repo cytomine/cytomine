@@ -174,9 +174,5 @@ export default {
 .navbar {
   font-weight: 600;
   z-index: 500 !important;
-
-  .fas, .far {
-    padding-right: 0.5rem;
-  }
 }
 </style>

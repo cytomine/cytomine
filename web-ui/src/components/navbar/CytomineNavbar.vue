@@ -88,6 +88,7 @@ import CytomineSearcher from '@/components/search/CytomineSearcher.vue';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
 import { KeycloakRole } from '@/constants/UserRole.js';
+import { getKeycloak } from '@/keycloak.js';
 
 export default {
   name: 'cytomine-navbar',
@@ -107,7 +108,7 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     isAdmin() {
-      return this.$keycloak.hasResourceRole(KeycloakRole.ADMIN);
+      return getKeycloak().hasResourceRole(KeycloakRole.ADMIN);
     },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
@@ -144,7 +145,7 @@ export default {
       try {
         this.$store.dispatch('logout');
         this.changeLanguage();
-        await this.$keycloak.logout();
+        await getKeycloak().logout();
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-logout') });

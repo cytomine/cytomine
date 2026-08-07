@@ -10,34 +10,32 @@
   <div v-for="category in filteredCategories" :key="category">
     <h2>{{$t(`shortcut-${category}`)}}</h2>
     <b-table :data="filteredShortcuts(category)" class="shortcut-list">
-      <template #default="{row: shortcut}">
-        <b-table-column field="name" :label="$t('description')">
-          {{$t(`shortcut-${shortcut.name}`)}}
-        </b-table-column>
+      <b-table-column v-slot="{row: shortcut}" field="name" :label="$t('description')">
+        {{$t(`shortcut-${shortcut.name}`)}}
+      </b-table-column>
 
-        <b-table-column field="val" :label="$t('shortcut')">
-          <span v-for="(k, index) in shortcut.key" :key="`${category}${shortcut.name}${k}`">
-            <span class="key">
-              <i v-if="k === 'click'" class="fas fa-mouse-pointer"></i>
-              <i v-else-if="k === 'drag'" class="fas fa-hand-pointer"></i>
-              <i v-else-if="k === '+'" class="fas fa-plus"></i>
-              <i v-else-if="k === '-'" class="fas fa-minus"></i>
-              <i v-else-if="k === 'arrowleft'" class="fas fa-arrow-left"></i>
-              <i v-else-if="k === 'arrowright'" class="fas fa-arrow-right"></i>
-              <i v-else-if="k === 'arrowup'" class="fas fa-arrow-up"></i>
-              <i v-else-if="k === 'arrowdown'" class="fas fa-arrow-down"></i>
-              <span v-else-if="k === 'meta'">&#8984; Cmd</span>
-              <span v-else-if="k === 'shift'">&#8679; Shift</span>
-              <span v-else-if="k === 'alt'">&#8997; Alt</span>
-              <span v-else-if="k === 'pageup'">Page Up</span>
-              <span v-else-if="k === 'pagedown'">Page Down</span>
-              <span v-else-if="k === 'del'">Delete</span>
-              <span v-else>{{k}}</span>
-            </span>
-            <template v-if="index < shortcut.key.length - 1">+</template>
+      <b-table-column v-slot="{row: shortcut}" field="val" :label="$t('shortcut')">
+        <span v-for="(k, index) in shortcut.key" :key="`${category}${shortcut.name}${k}`">
+          <span class="key">
+            <i v-if="k === 'click'" class="fas fa-mouse-pointer"></i>
+            <i v-else-if="k === 'drag'" class="fas fa-hand-pointer"></i>
+            <i v-else-if="k === '+'" class="fas fa-plus"></i>
+            <i v-else-if="k === '-'" class="fas fa-minus"></i>
+            <i v-else-if="k === 'arrowleft'" class="fas fa-arrow-left"></i>
+            <i v-else-if="k === 'arrowright'" class="fas fa-arrow-right"></i>
+            <i v-else-if="k === 'arrowup'" class="fas fa-arrow-up"></i>
+            <i v-else-if="k === 'arrowdown'" class="fas fa-arrow-down"></i>
+            <span v-else-if="k === 'meta'">&#8984; Cmd</span>
+            <span v-else-if="k === 'shift'">&#8679; Shift</span>
+            <span v-else-if="k === 'alt'">&#8997; Alt</span>
+            <span v-else-if="k === 'pageup'">Page Up</span>
+            <span v-else-if="k === 'pagedown'">Page Down</span>
+            <span v-else-if="k === 'del'">Delete</span>
+            <span v-else>{{k}}</span>
           </span>
-        </b-table-column>
-      </template>
+          <template v-if="index < shortcut.key.length - 1">+</template>
+        </span>
+      </b-table-column>
     </b-table>
   </div>
   <div class="content has-text-grey has-text-centered" v-if="noResult">

@@ -1,17 +1,19 @@
 <template>
   <form @submit.prevent="save()">
     <cytomine-modal-card :title="$t(track ? 'update-track' : 'create-track')" class="track-modal">
-      <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-        <b-input v-model="name" name="name" v-validate="'required'" />
-      </b-field>
+      <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
+        <b-field :label="$t('name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+          <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+        </b-field>
+      </field>
 
-      <sketch-picker v-model="color" :presetColors="presetColors" />
+      <sketch-picker :value="color" @input="color = $event" :presetColors="presetColors" />
 
       <template #footer>
         <button class="button" type="button" @click="$parent.close()">
           {{$t('button-cancel')}}
         </button>
-        <button class="button is-link" :disabled="errors.any()">
+        <button class="button is-link" :disabled="!isValid">
           {{$t('button-save')}}
         </button>
       </template>
@@ -20,8 +22,11 @@
 </template>
 
 <script>
-import { Track } from '@/api';
+import { Field, useForm } from '@tanstack/vue-form';
 import { Sketch } from 'vue-color';
+
+import { Track } from '@/api';
+import { required, rules, validateForm } from '@/utils/form.js';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
@@ -32,12 +37,19 @@ export default {
   },
   components: {
     'sketch-picker': Sketch,
-    CytomineModalCard
+    CytomineModalCard,
+    Field
   },
-  $_veeValidate: { validator: 'new' },
+  setup(props) {
+    const form = useForm({ defaultValues: { name: props.track ? props.track.name : '' } });
+    return {
+      form,
+      isValid: form.useStore(state => state.isValid),
+      nameRules: { onChange: rules(required) }
+    };
+  },
   data() {
     return {
-      name: '',
       color: null
     };
   },
@@ -63,8 +75,7 @@ export default {
       return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
     },
     async save() {
-      let result = await this.$validator.validateAll();
-      if (!result) {
+      if (!await validateForm(this.form)) {
         return;
       }
 
@@ -76,7 +87,11 @@ export default {
     },
     async create() {
       try {
-        let track = await new Track({ name: this.name, color: this.color.hex, image: this.image.id }).save();
+        let track = await new Track({
+          name: this.form.state.values.name,
+          color: this.color.hex,
+          image: this.image.id
+        }).save();
         this.$notify({ type: 'success', text: this.$t('notif-success-track-creation') });
         this.$emit('newTrack', track);
         this.$parent.close();
@@ -88,7 +103,7 @@ export default {
     async update() {
       let track = new Track(this.track);
       track.color = this.color.hex;
-      track.name = this.name;
+      track.name = this.form.state.values.name;
       try {
         await track.save();
         this.$notify({ type: 'success', text: this.$t('notif-success-track-update') });
@@ -101,7 +116,6 @@ export default {
     }
   },
   created() {
-    this.name = this.track ? this.track.name : '';
     this.color = { hex: this.track ? this.track.color : this.randomColor() };
   }
 };

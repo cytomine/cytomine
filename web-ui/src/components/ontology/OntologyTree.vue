@@ -1,6 +1,6 @@
 <template>
 <div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
-  <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
+  <sl-vue-tree :value="treeNodes" @input="treeNodes = $event" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
     <template #toggle="{node}">
       <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
         <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
@@ -57,10 +57,7 @@ import { getWildcardRegexp } from '@/utils/string-utils';
 
 export default {
   name: 'ontology-tree',
-  model: {
-    prop: 'selectedNodes',
-    event: 'setSelectedNodes'
-  },
+  emits: ['update:selectedNodes', 'select', 'unselect', 'newTerm'],
   props: {
     ontology: { type: Object },
     additionalNodes: { type: Array, default: () => [] },
@@ -189,7 +186,7 @@ export default {
             this.$emit('select', node.data.id);
           }
         });
-        this.$emit('setSelectedNodes', this.internalSelectedNodes);
+        this.$emit('update:selectedNodes', this.internalSelectedNodes);
       }
 
       this.refreshNodeSelection();

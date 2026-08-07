@@ -1,6 +1,6 @@
 <template>
 <vue-slider
-  :value="value" @change="$emit('input', $event)"
+  :value="modelValue" @change="$emit('update:modelValue', $event)"
   :min="min"
   :max="max"
   :tooltip="(tooltip) ? 'always' : 'none'"
@@ -25,6 +25,7 @@
         ]"
       @mousedown.stop
       @click.stop="startEdition(index)"
+      @keyup.enter="stopEdition(index)"
     >
         <template v-if="indexEdited !== index">
           <slot name="default" :value="value" >
@@ -36,9 +37,8 @@
           type="text"
           ref="inputSlider"
           v-model="editedValue"
-          @hook:mounted="focus()"
+          @vue:mounted="focus()"
           @blur="stopEdition(index)"
-          @keyup.enter.native="stopEdition(index)"
           :size="size"
         />
     </div>
@@ -52,8 +52,9 @@ import VueSlider from 'vue-slider-component';
 export default {
   name: 'cytomine-slider',
   components: { VueSlider },
+  emits: ['update:modelValue'],
   props: {
-    value: { type: null },
+    modelValue: { type: null },
     min: { type: Number, default: 0 },
     max: { type: Number, default: 100 },
     interval: { type: Number },
@@ -73,7 +74,7 @@ export default {
   },
   computed: {
     isArray() {
-      return Array.isArray(this.value);
+      return Array.isArray(this.modelValue);
     },
     range() {
       return this.max - this.min;
@@ -84,11 +85,11 @@ export default {
     tooltipPlacement() {
       if (this.isArray) {
         if (this.smartTooltipPosition) {
-          const n = this.value.length + 1;
-          const values = (Array.isArray(this.internalValue)) ? this.internalValue : this.value;
+          const n = this.modelValue.length + 1;
+          const values = (Array.isArray(this.internalValue)) ? this.internalValue : this.modelValue;
           return values.map((v, i) => (v >= this.range * (i + 1) / n) ? 'left' : 'right');
         }
-        return this.value.map((_, i) => (i === 0) ? 'left' : 'right');
+        return this.modelValue.map((_, i) => (i === 0) ? 'left' : 'right');
       }
 
       if (this.internalValue >= this.middle) {
@@ -107,14 +108,14 @@ export default {
     }
   },
   watch: {
-    value() {
-      this.internalValue = this.value;
+    modelValue() {
+      this.internalValue = this.modelValue;
     }
   },
   methods: {
     startEdition(index) {
       if (this.indexEdited !== index) {
-        this.editedValue = this.isArray ? this.value[index] : this.value;
+        this.editedValue = this.isArray ? this.modelValue[index] : this.modelValue;
         this.indexEdited = index;
       }
     },
@@ -131,14 +132,14 @@ export default {
         parsedValue = Math.max(parsedValue, this.min);
 
         if (this.isArray) {
-          let newVal = this.value.slice();
+          let newVal = this.modelValue.slice();
           newVal[index] = parsedValue;
           if (newVal[0] > newVal[1]) { // reorder bounds if needed
             newVal.reverse();
           }
-          this.$emit('input', newVal);
+          this.$emit('update:modelValue', newVal);
         } else {
-          this.$emit('input', parsedValue);
+          this.$emit('update:modelValue', parsedValue);
         }
       }
     },
@@ -147,7 +148,7 @@ export default {
     }
   },
   created() {
-    this.internalValue = this.value;
+    this.internalValue = this.modelValue;
   }
 };
 </script>

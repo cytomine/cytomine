@@ -69,9 +69,6 @@ export default {
   },
   methods: {
     async save() {
-      // The vee-validate call this replaces named a scope ('password') that no
-      // field ever belonged to, so it validated nothing and always passed. The
-      // `name` rule is really enforced now.
       if (!this.selectedFile || !await validateForm(this.form)) {
         return;
       }

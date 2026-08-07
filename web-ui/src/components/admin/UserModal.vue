@@ -139,8 +139,6 @@ export default {
       return this.$t(this.editionMode ? 'update-user' : 'create-user');
     },
     editableFields() {
-      // An existing user keeps their password unless one is typed, so `required`
-      // only applies on creation.
       return [
         { name: 'firstname', validators: this.requiredRule },
         { name: 'lastname', validators: this.requiredRule },
@@ -197,8 +195,6 @@ export default {
       let { password, ...profile } = this.form.state.values;
       let labelTranslation = this.editionMode ? 'update' : 'creation';
       Object.assign(this.internalUser, profile);
-      // On update an empty password means "leave it alone", so it is only
-      // carried over when one was actually typed.
       if (password) {
         this.internalUser.password = password;
       }

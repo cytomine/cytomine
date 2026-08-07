@@ -66,8 +66,6 @@ export default {
   },
   components: { CytomineModal, Field },
   setup() {
-    // Only one of the two fields is ever mounted, and unmounting a `Field`
-    // deregisters it, so whichever branch the radio is not on is not validated.
     const form = useForm({ defaultValues: { name: '', imageGroup: null } });
     return {
       form,

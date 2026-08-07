@@ -35,15 +35,6 @@
         />
       </ol-tile-layer>
 
-<!--      <ol-image-layer>-->
-<!--        <ol-source-raster-->
-<!--          v-if="baseSource && colorManipulationOn"-->
-<!--          :sources="[baseSource]"-->
-<!--          :operation="operation"-->
-<!--          :lib="lib"-->
-<!--        />-->
-<!--      </ol-image-layer>-->
-
       <annotation-layer
         v-for="layer in selectedLayers"
         :key="'layer-'+layer.id"
@@ -272,15 +263,8 @@ export default {
       loading: true,
 
       overview: null,
-      // vuelayers left ol's controls proxied by Vue 2 reactivity, so reading
-      // `overview.getCollapsed()` from a computed was enough. Every ol object is
-      // `markRaw`ed now, so the collapsed state is mirrored by hand.
       overviewCollapsedState: false,
 
-      // `<ol-view>` must not be bound to the store: it re-applies its options on
-      // every prop change, which would reset the view mid-pan. It gets the
-      // initial state only, and `viewChanged` / `syncViewFromStore` keep the two
-      // in step afterwards, exactly as vuelayers' `vl-view` did.
       initialView: null,
       applyingStoreView: false,
 
@@ -497,8 +481,6 @@ export default {
       immediate: true,
       handler(visible) {
         if (visible && !this.initialView) {
-          // A plain, raw snapshot: handing ol a reactive array would let a store
-          // update reach `<ol-view>`'s props and re-apply its options mid-pan.
           this.initialView = markRaw({
             center: [...this.center],
             zoom: this.zoom,
@@ -524,14 +506,9 @@ export default {
       }
     },
 
-    /**
-     * The ol Map and View exist as soon as `<ol-map>` / `<ol-view>` are set up,
-     * so everything vuelayers deferred on `$createPromise` can happen in one go
-     * once the refs are populated.
-     */
     mapMounted() {
       if (!this.$refs.view || !this.$refs.map) {
-        return; // the viewer was closed again before the map rendered
+        return;
       }
 
       this.olView = markRaw(this.$refs.view.view);
@@ -557,7 +534,6 @@ export default {
       });
     },
 
-    /** ol -> store, throttled by ol itself to one event per view change. */
     viewChanged() {
       if (this.applyingStoreView || !this.olView) {
         return;
@@ -568,8 +544,6 @@ export default {
         this.center = [...center];
       }
 
-      // vuelayers rounded the zoom on the way into the store; the whole app
-      // (tile requests, the zoom panel, tracking) assumes an integer.
       let zoom = this.olView.getZoom();
       if (zoom !== undefined && Math.round(zoom) !== this.zoom) {
         this.zoom = Math.round(zoom);
@@ -618,9 +592,6 @@ export default {
       this.overviewCollapsedState = this.imageWrapper.view.overviewCollapsed;
       this.overview = markRaw(new OverviewMap({
         view: new View({ projection: this.projectionName }),
-        // A layer belongs to a single map, so the overview gets its own layer
-        // over the same source rather than the base layer itself, which is what
-        // was passed under ol 5.
         layers: [new TileLayer({ source: this.baseSource })],
         tipLabel: this.$t('overview'),
         target: this.$refs.overview,

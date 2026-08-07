@@ -26,7 +26,6 @@ export default {
   data() {
     return {
       olSelectObject: null,
-      // Guards the two directions of the selection sync against each other.
       applyingStoreSelection: false,
       format: markRaw(createGeoJsonFmt())
     };
@@ -149,16 +148,6 @@ export default {
     }
   },
   methods: {
-    /**
-     * Since ol 6 `Select` no longer draws selected features in an overlay
-     * layer: it calls `feature.setStyle()` on each one. There is no public
-     * setter for the interaction's style, so redefining it means assigning
-     * `style_` and re-styling what is already selected.
-     *
-     * The result is the same as before because `genStyleFunction` is used as
-     * both the layer style and the select style, and already checks whether a
-     * feature is selected.
-     */
     applySelectStyle(styleFunction) {
       if (!this.olSelectObject) {
         return;
@@ -166,8 +155,6 @@ export default {
       this.olSelectObject.style_ = styleFunction;
       this.olSelectObject.getFeatures().forEach(feature => feature.setStyle(styleFunction));
     },
-
-    /** ol -> store. */
     selectionChanged() {
       if (this.applyingStoreSelection) {
         return;
@@ -175,19 +162,11 @@ export default {
       this.selectedFeatures = this.olSelectObject.getFeatures().getArray()
         .map(feature => this.format.writeFeatureObject(feature));
     },
-
-    /**
-     * store -> ol, so that selecting an annotation from elsewhere in the app
-     * (the annotation list, a route, `selectAnnotationInLayer`) highlights it.
-     * This is what vuelayers' two-way `features` binding used to do.
-     */
     applyStoreSelection(value) {
       if (!this.olSelectObject) {
         return;
       }
 
-      // A dragged vertex is in the collection without an id; leave those alone,
-      // the modify interaction owns them.
       if (value.some(feature => feature.id === undefined)) {
         return;
       }

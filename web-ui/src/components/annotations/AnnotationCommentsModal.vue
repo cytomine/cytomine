@@ -82,9 +82,6 @@ export default {
     comments: Array
   },
   setup() {
-    // The recipients field is only mounted when the author picked specific
-    // members, and unmounting a `Field` deregisters it, so 'send to all' leaves
-    // it out of validation.
     const form = useForm({ defaultValues: { members: [], comment: '' } });
     return {
       form,

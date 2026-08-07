@@ -68,10 +68,6 @@ export default {
       return this.imageWrapper.style.terms || [];
     },
     styleFunction() {
-      // Force this computed to be re-evaluated when one of those properties
-      // changes, so that a new function identity reaches the watcher below and
-      // the layer restyles. (vuelayers needed the same trick, see
-      // https://github.com/ghettovoice/vuelayers/issues/68#issuecomment-404223423)
       this.imageWrapper.selectedFeatures.selectedFeatures;
       this.imageWrapper.style.layersOpacity;
       this.terms.forEach(term => {
@@ -100,9 +96,6 @@ export default {
       this.clearFeatures();
     },
     styleFunction(styleFunction) {
-      // `<ol-vector-layer>` builds its layer once and only forwards prop changes
-      // as ol *properties*, which is not what drives rendering, so the style is
-      // set on the layer directly.
       if (this.olLayerObject) {
         this.olLayerObject.setStyle(styleFunction);
       }
@@ -112,10 +105,6 @@ export default {
     clearFeatures(cache = true) {
       if (this.olSourceObject) {
         this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', { layer: this.layer, cache });
-        // `refresh()`, not `clear()`: ol 5's `clear()` also emptied the loaded
-        // extents, which is what made clearing retrigger the loader. Since ol 6
-        // that moved to `refresh()`, and a bare `clear()` would wipe the
-        // annotations without ever fetching them again.
         this.olSourceObject.refresh();
       }
     },

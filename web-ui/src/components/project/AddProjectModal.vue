@@ -70,9 +70,6 @@ export default {
   },
   components: { CytomineModal, Field },
   setup() {
-    // The ontology select is only mounted on the 'EXISTING' branch, and
-    // unmounting a `Field` deregisters it, so the other two radio choices leave
-    // it out of validation.
     const form = useForm({ defaultValues: { name: '', ontology: null } });
     return {
       form,

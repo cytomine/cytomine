@@ -172,7 +172,6 @@ export default {
   components: { Field },
   mixins: [changeLanguageMixin],
   setup() {
-    // Seeded from the account in `created()`: the store is not reachable here.
     const form = useForm({ defaultValues: { lastName: '', firstName: '', email: '' } });
     return {
       form,

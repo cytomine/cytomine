@@ -121,10 +121,6 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
-    // The `view` prop used to be the `vl-view` *component*, whose position was
-    // reactive because Vue 2 proxied the ol View it wrapped. It is the raw ol
-    // View now, so the position is read from the store, which `CytomineImage`
-    // keeps in step with the map.
     viewCenter() {
       return this.imageWrapper.view.center || [0, 0];
     },

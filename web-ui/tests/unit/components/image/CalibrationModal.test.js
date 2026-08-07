@@ -52,9 +52,6 @@ describe('CalibrationModal.vue', () => {
   });
 
   it('should not hold back a 2D image on the z and t rules it never shows', async () => {
-    // The z and t values are in the form's state either way; only the mounted
-    // fields are validated, which is what keeps an empty z from failing
-    // `required` on an image with a single slice.
     const wrapper = await openModal();
 
     await wrapper.find('form').trigger('submit');

@@ -7,11 +7,6 @@ vi.mock('@/api', () => ({
   Cytomine: { instance: { api: { get: vi.fn() } } },
 }));
 
-// `inputs`, `outputs` and `logs` are absent from a run until the detail row is
-// opened. Issue 12 replaced the `Vue.set(this, 'inputs', …)` these used with
-// plain assignment, which is only equivalent because the run is reached through
-// the reactive array `AppDashboardPage` holds, so `this` inside the method is
-// the proxy and Vue tracks the added key.
 describe('TaskRun lazily fetched fields', () => {
 
   function taskRun(overrides = {}) {

@@ -5,12 +5,6 @@ import listAnnotations from '@/store/modules/project_modules/list-annotations.js
 import annotationsList
   from '@/store/modules/project_modules/viewer_modules/image_modules/annotations-list.js';
 
-// Both modules keep `currentPages` as a `{idProp: page}` map whose keys are only
-// known at runtime, so `setCurrentPage` always adds a key that was not there
-// when the state object was created. That is the case `Vue.set` existed for, and
-// issue 12 replaced it with plain assignment on the strength of Vue 3 tracking
-// added keys. These pin that: a component reading a key that does not exist yet
-// has to re-run once the mutation puts it there.
 describe.each([
   ['project_modules/list-annotations', listAnnotations],
   ['viewer_modules/image_modules/annotations-list', annotationsList],

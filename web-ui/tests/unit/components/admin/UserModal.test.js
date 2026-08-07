@@ -37,8 +37,6 @@ describe('UserModal.vue', () => {
     return user;
   }
 
-  // The modal only fills its fields when `active` flips to true, so every case
-  // opens it rather than mounting it open.
   async function openModal(props = {}) {
     const wrapper = mount(UserModal, {
       props: { active: false, ...props },
@@ -52,7 +50,6 @@ describe('UserModal.vue', () => {
     return wrapper;
   }
 
-  // username, firstname, lastname, email, password — in template order.
   function fields(wrapper) {
     const inputs = wrapper.findAll('.field input');
     return {

@@ -7,10 +7,6 @@ vi.mock('@/api', () => ({
   Cytomine: { instance: { api: { get: vi.fn() } } },
 }));
 
-// Issue 12 replaced `Vue.set(this, 'outputs', data)` here with plain assignment.
-// Unlike TaskRun's fields, `outputs` is already declared in `_initProperties`,
-// so this site was never the "add a key Vue cannot see" case `Vue.set` existed
-// for — it was overwriting a property that was reactive all along.
 describe('Task.fetchOutputs', () => {
 
   function task() {

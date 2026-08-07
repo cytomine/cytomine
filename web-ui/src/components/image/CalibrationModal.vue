@@ -76,9 +76,6 @@ export default {
     return {
       form,
       isValid: form.useStore(state => state.isValid),
-      // The z and t fields only exist for images that have those dimensions.
-      // Unmounting a `Field` deregisters it, so the rules below apply to
-      // whichever of the three are on screen, exactly as vee-validate did.
       resolutionRules: { onChange: rules(required, decimal, positive) }
     };
   },

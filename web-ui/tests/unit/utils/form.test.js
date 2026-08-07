@@ -1,7 +1,5 @@
 import { decimal, email, min, positive, required, rules } from '@/utils/form.js';
 
-// Every rule reads `fieldApi.name` to build its message, which is all a rule
-// needs from a real field.
 function check(rule, value, name = 'field') {
   return rule({ value, fieldApi: { name } });
 }
@@ -81,14 +79,8 @@ describe('utils/form.js', () => {
     });
 
     it('should report the first failure only', () => {
-      // Empty fails `required`; `decimal` would pass it, so a rule order that
-      // did not stop at the first failure would report nothing at all.
       expect(check(rules(required, decimal), '')).toBe('This field is required');
       expect(check(rules(required, positive), '-1')).toBe('Must be positive');
     });
   });
-
-  // `validateForm` only means anything against mounted fields, so it is covered
-  // where they exist: see the modal tests, which submit invalid forms and check
-  // that nothing is saved.
 });

@@ -1,9 +1,6 @@
 <template>
 <div>
   <ol-vector-layer>
-    <!-- Nesting the draw interaction inside the source is what replaces
-         vuelayers' `draw-target-<index>` ident: `<ol-source-vector>` provides
-         its source to its descendants. -->
     <ol-source-vector ref="olSourceDrawTarget">
       <ol-interaction-draw
         v-if="nbActiveLayers > 0 || drawCorrection"

@@ -1,6 +1,5 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { RouterLinkStub, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
-import VueRouter from 'vue-router';
 
 import AppCard from '@/components/appengine/AppCard';
 
@@ -15,9 +14,6 @@ vi.mock('@/api', () => ({
 }));
 
 describe('AppCard.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
-  localVue.use(VueRouter);
 
   const mockApp = {
     namespace: 'my-app',
@@ -31,14 +27,19 @@ describe('AppCard.vue', () => {
   const createWrapper = (options = {}) => shallowMount(
     AppCard,
     {
-      localVue,
-      propsData: {
+      props: {
         app: mockApp,
       },
-      mocks: {
-        $t: (key) => key,
-      },
       ...options,
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (key) => key,
+        },
+        stubs: {
+          'router-link': RouterLinkStub,
+        }
+      }
     },
   );
 
@@ -59,7 +60,7 @@ describe('AppCard.vue', () => {
 
   it('should use the correct router link', () => {
     const wrapper = createWrapper();
-    const link = wrapper.findComponent({ name: 'RouterLink' });
+    const link = wrapper.findComponent(RouterLinkStub);
 
     const expected = {
       path: `/apps/${mockApp.namespace}/${mockApp.version}`,
@@ -70,7 +71,7 @@ describe('AppCard.vue', () => {
 
   it('should fallback to placeholder image when imageUrl is not provided', () => {
     const wrapper = createWrapper({
-      propsData: {
+      props: {
         app: { ...mockApp, imageUrl: '' },
       }
     });

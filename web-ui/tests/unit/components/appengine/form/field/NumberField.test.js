@@ -1,10 +1,9 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import NumberField from '@/components/appengine/forms/fields/NumberField';
 
 describe('NumberField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -16,15 +15,15 @@ describe('NumberField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(NumberField, {
-      localVue,
-      propsData: {
+      props: {
         parameter: mockParameter,
-        value: mockParameter.default,
+        modelValue: mockParameter.default,
       },
+      global: {
+        plugins: [Buefy]
+      }
     });
   });
 
@@ -64,9 +63,10 @@ describe('NumberField.vue', () => {
   });
 
   it('Changing the value should emit an event', async () => {
-    await wrapper.setData({ input: 12 });
+    wrapper.vm.input = 12;
+    await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input.at(0)).toEqual([12]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'].at(0)).toEqual([12]);
   });
 });

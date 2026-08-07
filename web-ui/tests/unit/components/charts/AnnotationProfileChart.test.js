@@ -10,13 +10,15 @@ describe('AnnotationProfileChart.js', () => {
   };
 
   const createWrapper = (annotation = mockAnnotation) => shallowMount(AnnotationProfileChart, {
-    propsData: {
+    props: {
       annotation,
       bpc: 8,
     },
-    mocks: {
-      $t: (key) => key,
-    },
+    global: {
+      mocks: {
+        $t: (key) => key,
+      }
+    }
   });
 
   it('should fetch the annotation profile into the chart data, labelled with the centroid', async () => {
@@ -65,7 +67,7 @@ describe('AnnotationProfileChart.js', () => {
   it('should delegate resetZoom to the underlying chart instance exposed by vue-chartjs', () => {
     const wrapper = createWrapper();
     const resetZoom = vi.fn();
-    wrapper.vm.$refs.chartRef = { chart: { resetZoom } };
+    wrapper.vm.$.refs.chartRef = { chart: { resetZoom } };
 
     wrapper.vm.resetZoom();
 

@@ -61,10 +61,6 @@ describe('CytomineSlider.vue', () => {
     expect(committed(wrapper)).toEqual([[[10, 90]]]);
   });
 
-  // Issue 17: `@hook:mounted` → `@vue:mounted` on the edit `b-input`. Both fire
-  // under compat, so the regression this guards against is the hook silently
-  // going dead once compat is dropped — assert `focus()` still runs when the
-  // field mounts (i.e. on entering edit mode).
   it('focuses the field when edit mode opens', async () => {
     const focus = vi.spyOn(CytomineSlider.methods, 'focus').mockImplementation(() => {});
     const wrapper = createWrapper();

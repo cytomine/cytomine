@@ -40,7 +40,6 @@ describe('AppLayout.vue', () => {
           'b-message': BMessage,
         },
         stubs: {
-          // No router is installed, so router-view would not resolve at all.
           'router-view': true,
         },
         mocks: {

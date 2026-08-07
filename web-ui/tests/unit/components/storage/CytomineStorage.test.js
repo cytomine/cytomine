@@ -32,8 +32,6 @@ describe('CytomineStorage.vue', () => {
     global: {
       mocks: {
         $t: (key) => key,
-        // The `computed` mounting option is gone in Vue Test Utils v2, so the
-        // store the `get()` helpers read from has to be mocked instead.
         $store: {
           state: {
             currentUser: {

@@ -67,7 +67,6 @@ describe('AnnotationProfileChart.js', () => {
   it('should delegate resetZoom to the underlying chart instance exposed by vue-chartjs', () => {
     const wrapper = createWrapper();
     const resetZoom = vi.fn();
-    // `$refs` is shallow-readonly in Vue 3; the raw refs object is not.
     wrapper.vm.$.refs.chartRef = { chart: { resetZoom } };
 
     wrapper.vm.resetZoom();

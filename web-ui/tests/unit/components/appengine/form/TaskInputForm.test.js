@@ -23,10 +23,6 @@ describe('TaskInputForm.vue', () => {
       props: {
         inputs: {},
         task: mockTask,
-        // The component is controlled: it emits the input map it wants and the
-        // parent is expected to feed it back. Without that round-trip its
-        // template reads `inputs[name].value` for entries that do not exist,
-        // and Vue 3 tears the instance down when a render throws.
         onInput: value => wrapper.setProps({ inputs: value }),
         ...overrides.props,
       },

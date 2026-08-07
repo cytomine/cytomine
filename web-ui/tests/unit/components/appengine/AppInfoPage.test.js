@@ -40,8 +40,6 @@ describe('AppInfoPage.vue', () => {
         mocks: {
           $notify: vi.fn(),
           $t: (key) => key,
-          // vue-router 3 cannot be installed on Vue 3, so the route the
-          // component reads in `created` is mocked directly.
           $route: {
             params: { namespace: 'mock-namespace', version: '1.0.0' },
             query: {},

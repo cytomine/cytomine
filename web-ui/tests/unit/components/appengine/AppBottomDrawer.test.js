@@ -63,7 +63,6 @@ describe('AppBottomDrawer.vue', () => {
 
   const createWrapper = ({ data = {}, storeOverrides = {} } = {}) => {
     const mockStore = {
-      // `currentProject` reads through the `get()` helper, which goes to state.
       state: {
         currentProject: { project: { id: 99 } },
       },

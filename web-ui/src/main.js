@@ -2,11 +2,7 @@ import Vue, { createApp } from 'vue';
 import axios from 'axios';
 import constants from '@/utils/constants.js';
 
-// Keep Vue 2 runtime behavior by default while migrating incrementally.
-// COMPONENT_V_MODEL is off: the app's own components use the Vue 3
-// `modelValue` / `update:modelValue` v-model contract (issue 15), so compat
-// must not rewrite it back to the Vue 2 `value` / `input` pair.
-Vue.configureCompat({ MODE: 2, COMPONENT_V_MODEL: false });
+Vue.configureCompat({ MODE: 2, COMPONENT_V_MODEL: false }); // TODO: remove when migration is done
 
 import i18n from './lang.js';
 import router from './routes.js';

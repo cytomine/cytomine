@@ -34,8 +34,6 @@ describe('ImageMultiSelect.vue', () => {
       global: {
         plugins: [Buefy],
         mocks: {
-          // The `computed` mounting option is gone in Vue Test Utils v2, so the
-          // store the `get()` helper reads from has to be mocked instead.
           $store: {
             state: {
               currentProject: { project: { id: 42 } },

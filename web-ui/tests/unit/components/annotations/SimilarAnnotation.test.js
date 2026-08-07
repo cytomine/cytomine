@@ -73,8 +73,6 @@ describe('SimilarAnnotation.vue', () => {
           },
         },
       }),
-      // Vuex 4 wraps the state object in a new reactive proxy instead of making
-      // it reactive in place, so getters have to read the state they are given.
       'currentProject/imageModule': storeState => storeState.currentProject.imageModule,
       'currentProject/terms': storeState => storeState.currentProject.terms,
       'currentProject/currentViewer': storeState => storeState.currentProject.currentViewer,
@@ -149,7 +147,6 @@ describe('SimilarAnnotation.vue', () => {
   });
 
   it('should close the window when close button is clicked', async () => {
-    // The 'back to query annotation' button shares these classes and comes first.
     const closeButton = wrapper.findAll('.button.is-small.close').at(-1);
     await closeButton.trigger('click');
 

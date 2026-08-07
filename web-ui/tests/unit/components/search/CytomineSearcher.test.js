@@ -13,10 +13,6 @@ vi.mock('@/api', () => ({
   }),
 }));
 
-// Issue 10 dropped five `.native` modifiers here: `@click.native` on the search
-// field became `@focus`, and the four on `router-link` moved onto the plain
-// elements enclosing them. Both the opening and the closing of the dropdown are
-// invisible to lint and to the build.
 describe('CytomineSearcher.vue', () => {
   const createWrapper = () => mount(CytomineSearcher, {
     global: {
@@ -82,9 +78,6 @@ describe('CytomineSearcher.vue', () => {
     expect(wrapper.vm.isActive).toBe(false);
   });
 
-  // Issue 14: the highlighted-match markup is rendered with v-html. In Vue 3
-  // v-html on a component (the old `<router-link v-html>`) is dropped, so the
-  // directive now sits on a plain <span> inside the link's slot.
   it('renders the highlighted match markup inside the result links', async () => {
     const wrapper = createWrapper();
     await open(wrapper);

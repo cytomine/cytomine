@@ -19,7 +19,6 @@ const createWrapper = (imageGroup = {}) =>
         'b-dropdown-item': true,
         'b-dropdown': true,
         ImageName: true,
-        // vue-router is not installed here, so router-link needs an explicit stub.
         'router-link': { name: 'router-link', props: ['to'], template: '<a><slot/></a>' },
       }
     }

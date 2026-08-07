@@ -37,7 +37,6 @@ describe('AppCard.vue', () => {
           $t: (key) => key,
         },
         stubs: {
-          // No router is installed, so router-link would not resolve at all.
           'router-link': RouterLinkStub,
         }
       }

@@ -8,7 +8,6 @@ vi.mock('@/utils/token-utils', () => ({
 }));
 
 vi.mock('@/utils/store-helpers', () => ({
-  // `get` builds a computed getter, so the mock has to return one too.
   get: vi.fn(() => () => 'mock-token')
 }));
 
@@ -38,8 +37,6 @@ describe('ActivityLogsItem.vue', () => {
         action
       },
       global: {
-        // Real stubs rather than the default ones: the assertions read the text
-        // rendered inside the router-link slot.
         stubs: {
           'router-link': { template: '<a><slot></slot></a>' },
           'router-view': { template: '<div><slot></slot></div>' }
@@ -61,8 +58,6 @@ describe('ActivityLogsItem.vue', () => {
   });
 
   it('should create the correct annotation route and preview', async () => {
-    // `created` already ran at mount time; Vue 3 does not expose the hook as an
-    // array on $options for it to be re-invoked.
     await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.route).toBe('/project/123/image/456/annotation/1');

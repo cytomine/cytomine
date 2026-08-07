@@ -3,14 +3,9 @@ import Buefy from 'buefy';
 
 import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftButtons.vue';
 
-// Issue 10 moved `@keyup.enter.native` off the `b-input` and onto the plain
-// `.step-selector` wrapper. Nothing else in the suite types into the step
-// selector, and the change is invisible to lint and to the build.
 describe('ImageControlsShiftButtons.vue', () => {
   const commit = vi.fn();
 
-  // `v-popover` comes from the globally installed v-tooltip plugin and keeps
-  // its `popover` slot out of the document; render both slots eagerly instead.
   const VPopover = {
     name: 'v-popover',
     render() {
@@ -60,10 +55,6 @@ describe('ImageControlsShiftButtons.vue', () => {
     expect(commit).not.toHaveBeenCalled();
   });
 
-  // Issue 17: `@hook:mounted` → `@vue:mounted` on the step-selector `b-input`.
-  // Both fire under compat, so this guards against the hook silently going dead
-  // once compat is dropped — the field mounts eagerly here, so `focus()` runs
-  // on mount.
   it('focuses the step field on mount', () => {
     const focus = vi.spyOn(ImageControlsShiftButtons.methods, 'focus').mockImplementation(() => {});
 

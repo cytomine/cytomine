@@ -26,8 +26,6 @@ describe('AttachedFileModal.vue', () => {
         },
         stubs: {
           CytomineModalCard: true,
-          // `Field` is renderless: stubbing it would leave the slot without the
-          // `field`/`state` props the template reads.
           Field: false,
         }
       }

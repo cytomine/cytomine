@@ -27,8 +27,6 @@ describe('AppConfigurationPage.vue', () => {
   const createWrapper = () => {
     return shallowMount(AppConfigurationPage, {
       global: {
-        // b-table's default slot is a scoped slot: rendering it against a stub
-        // would evaluate `{row}` with no slot props at all.
         renderStubDefaultSlot: false,
         plugins: [Buefy, store],
         mocks: {

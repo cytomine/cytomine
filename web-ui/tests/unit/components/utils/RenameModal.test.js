@@ -6,16 +6,10 @@ import RenameModal from '@/components/utils/RenameModal';
 import { flushPromises } from '../../../utils';
 
 describe('RenameModal.vue', () => {
-
   const mocks = {
     $t: message => message,
   };
 
-  // The form fields render through `@tanstack/vue-form`'s renderless `Field`,
-  // which only passes its slot props when it is really rendered, so these mount
-  // fully rather than shallow. `b-modal` still swallows its content under Vue 3
-  // (issue 3, `active` → `modelValue`), so the modal itself is stubbed by one
-  // that renders both slots inline.
   const cytomineModalStub = {
     name: 'cytomine-modal',
     props: ['active', 'title'],

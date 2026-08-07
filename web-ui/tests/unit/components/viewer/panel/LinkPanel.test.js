@@ -3,15 +3,10 @@ import Buefy from 'buefy';
 
 import LinkPanel from '@/components/viewer/panels/LinkPanel.vue';
 
-// Issue 10 moved `@change.native` off the `b-checkbox` and onto the enclosing
-// `<td>`. It has to stay a native DOM event: `handleCheckboxChange` resets the
-// input through `event.target.checked`, and `b-checkbox` emits no `change`.
 describe('LinkPanel.vue', () => {
   const commit = vi.fn();
   const confirm = vi.fn();
 
-  // Two unlinked views besides the current one, so the "solo images" rows —
-  // the ones carrying the checkbox — render.
   const createWrapper = ({ trackedUser = null } = {}) => mount(LinkPanel, {
     props: { index: '0' },
     global: {

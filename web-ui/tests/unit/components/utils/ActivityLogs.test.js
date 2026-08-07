@@ -12,8 +12,6 @@ vi.mock('@/api', () => ({
 }));
 
 describe('ActivityLogs.vue', () => {
-  // shallowMount would stub b-message away without rendering its slot, hiding
-  // the content the assertions below look for.
   const stubs = {
     'b-message': { template: '<div><slot/></div>' }
   };

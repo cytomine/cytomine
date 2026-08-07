@@ -60,16 +60,11 @@ describe('AnnotationLayer.vue', () => {
           },
         },
         stubs: {
-          // The layer stub has to render its slot, otherwise the source below
-          // never mounts and `$refs.olSource` stays empty.
           'ol-vector-layer': {
             name: 'ol-vector-layer',
             template: '<div><slot /></div>',
             data: () => ({ vectorLayer: { setStyle } }),
           },
-          // `$refs` is shallow-readonly in Vue 3, so the ol source the
-          // component reaches for has to come from a real stub rather than
-          // being assigned onto `$refs` after mounting.
           'ol-source-vector': {
             name: 'ol-source-vector',
             template: '<div></div>',
@@ -114,8 +109,6 @@ describe('AnnotationLayer.vue', () => {
 
       wrapper.vm.clearFeatures();
 
-      // A bare `clear()` empties the source without emptying its loaded
-      // extents since ol 6, so the annotations would never come back.
       expect(refresh).toHaveBeenCalled();
     });
   });

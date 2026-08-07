@@ -19,9 +19,6 @@ vi.mock('@/api', () => ({
   AnnotationLink: vi.fn(),
 }));
 
-// Issue 10 replaced `@change.native` on the two "check all" boxes with
-// `@update:model-value`, the event `b-checkbox` actually declares. Neither the
-// build nor lint can tell whether the handler still runs.
 describe('PasteAnnotationWithLinkModal.vue', () => {
   const createWrapper = async () => {
     const wrapper = mount(PasteAnnotationWithLinkModal, {
@@ -55,8 +52,6 @@ describe('PasteAnnotationWithLinkModal.vue', () => {
     return wrapper;
   };
 
-  // Image 2 is in the group and open in the viewer; image 3 is in the group
-  // only. Image 1 holds the copied annotation, so it is not eligible.
   it('renders one "check all" box per section', async () => {
     const wrapper = await createWrapper();
 
@@ -89,11 +84,6 @@ describe('PasteAnnotationWithLinkModal.vue', () => {
     expect(wrapper.vm.checkedInViewer).toEqual([]);
   });
 
-  // Issue 12 replaced the `this.$set(imageInstance, 'inViewerPosition', …)` pair
-  // in `created()` with plain assignment, which carries reactivity only because
-  // the images are read back out of `this.imageGroup` and so arrive as proxies.
-  // Checked by breaking it both ways: dropping the two assignments fails the
-  // seeding test, and marking the images raw fails the other two.
   describe('the position fields added after the images are fetched', () => {
     it('seeds each select with the default for its section', async () => {
       const wrapper = await createWrapper();

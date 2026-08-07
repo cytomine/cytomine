@@ -1,8 +1,8 @@
 <template>
 <b-datepicker
   :class="styles"
-  :value="value"
-  @input="$emit('input', $event)"
+  :model-value="value"
+  @update:model-value="$emit('input', $event)"
   :placeholder="placeholder || this.$t('select-date')"
   :min-date="minDate" :max-date="maxDate"
   :month-names="moment.months()" :day-names="moment.weekdaysMin()"

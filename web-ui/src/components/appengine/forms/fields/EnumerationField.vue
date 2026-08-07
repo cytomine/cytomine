@@ -35,6 +35,7 @@ export default {
     parameter: { type: Object, required: true },
     value: {},
   },
+  emits: ['input'],
   computed: {
     input: {
       get() {

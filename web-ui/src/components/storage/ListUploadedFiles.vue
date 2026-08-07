@@ -5,8 +5,8 @@
     </p>
     <div class="panel-block storage">
       <b-input
-        :value="searchString"
-        @input="debounceSearchString"
+        :model-value="searchString"
+        @update:model-value="debounceSearchString"
         class="search-uploaded-file"
         :placeholder="$t('search-placeholder')"
         icon="search"
@@ -20,40 +20,37 @@
         v-model:openedDetailed="openedDetails"
         :detailed="false"
       >
-        <template #default="{row: uFile}">
-          <b-table-column :label="$t('preview')" width="80" class="image-overview">
-            <image-thumbnail v-if="uFile.thumbnailUrl" :url="uFile.thumbnailUrl" :size="128" :key="uFile.thumbnailUrl" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
-            <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
-          </b-table-column>
+        <b-table-column v-slot="{row: uFile}" :label="$t('preview')" width="80" class="image-overview">
+          <image-thumbnail v-if="uFile.thumbnailUrl" :url="uFile.thumbnailUrl" :size="128" :key="uFile.thumbnailUrl" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
+          <div v-else class="is-size-7 has-text-grey">{{$t('no-preview-available')}}</div>
+        </b-table-column>
 
-          <b-table-column field="originalFilename" :label="$t('filename')" sortable width="200" :data-filename="uFile.originalFilename">
-            <span :data-filename="uFile.originalFilename">{{ uFile.originalFilename }}</span>
-          </b-table-column>
+        <b-table-column v-slot="{row: uFile}" field="originalFilename" :label="$t('filename')" sortable width="200">
+          <span :data-filename="uFile.originalFilename">{{ uFile.originalFilename }}</span>
+        </b-table-column>
 
-          <b-table-column field="created" :label="$t('created')" sortable width="150">
-            {{ formatDate(uFile.created) }}
-          </b-table-column>
+        <b-table-column v-slot="{row: uFile}" field="created" :label="$t('created')" sortable width="150">
+          {{ formatDate(uFile.created) }}
+        </b-table-column>
 
-          <b-table-column field="size" :label="$t('size')" sortable width="80">
-            {{ filesize(uFile.size) }}
-          </b-table-column>
+        <b-table-column v-slot="{row: uFile}" field="size" :label="$t('size')" sortable width="80">
+          {{ filesize(uFile.size) }}
+        </b-table-column>
 
-          <b-table-column field="status" :label="$t('status')" sortable width="80">
-            <uploaded-file-status :file="uFile" />
-          </b-table-column>
+        <b-table-column v-slot="{row: uFile}" field="status" :label="$t('status')" sortable width="80">
+          <uploaded-file-status :file="uFile" />
+        </b-table-column>
 
-          <b-table-column label="" width="120">
-            <div class="buttons is-right">
-              <a class="button is-small is-link" @click="download(uFile.downloadURL)" v-if="uFile.status >= 100">
-                {{$t('button-download')}}
-              </a>
-              <button class="button is-small is-danger delete-file" :data-filename="uFile.originalFilename" @click="confirmDeletion(uFile)">
-                {{$t('button-delete')}}
-              </button>
-            </div>
-          </b-table-column>
-
-        </template>
+        <b-table-column v-slot="{row: uFile}" label="" width="120">
+          <div class="buttons is-right">
+            <a class="button is-small is-link" @click="download(uFile.downloadURL)" v-if="uFile.status >= 100">
+              {{$t('button-download')}}
+            </a>
+            <button class="button is-small is-danger delete-file" :data-filename="uFile.originalFilename" @click="confirmDeletion(uFile)">
+              {{$t('button-delete')}}
+            </button>
+          </div>
+        </b-table-column>
 
         <template #empty>
           <p>{{$t('no-uploaded-file')}}</p>

@@ -1,6 +1,6 @@
 <template>
 <div class="content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
 
   <template v-if="!loading">
     <div class="box error" v-if="!ontologies">

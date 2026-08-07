@@ -1,40 +1,37 @@
-import { shallowMount } from '@vue/test-utils';
+import { nextTick } from 'vue';
+import { mount } from '@vue/test-utils';
+import Buefy from 'buefy';
 
 import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable.vue';
 
 describe('TaskRunParametersTable.vue', () => {
-  const createWrapper = (options = {}) => shallowMount(TaskRunParametersTable, {
-    props: {
-      parameters: options.parameters || [],
-      projectId: 42,
-      type: 'input',
-    },
-    ...options,
-    global: {
-      mocks: {
-        $t: (key) => key,
+  const createWrapper = async (options = {}) => {
+    const wrapper = mount(TaskRunParametersTable, {
+      props: {
+        parameters: options.parameters || [],
+        projectId: 42,
+        type: 'input',
       },
-      stubs: {
-        'b-table': {
-          name: 'b-table',
-          template: '<div><slot v-for="row in data" :row="row"></slot></div>',
-          props: ['data'],
-        },
-        'b-table-column': {
-          name: 'b-table-column',
-          template: '<div><slot></slot></div>',
-          props: ['field', 'label'],
+      ...options,
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (key) => key,
         },
       }
-    }
-  });
+    });
+
+    await nextTick();
+
+    return wrapper;
+  };
 
   describe('Rendering', () => {
-    it('should render b-table with correct props', () => {
+    it('should render b-table with correct props', async () => {
       const parameters = [
         { parameterName: 'test', type: 'STRING', value: 'test value' },
       ];
-      const wrapper = createWrapper({ parameters });
+      const wrapper = await createWrapper({ parameters });
 
       const table = wrapper.findComponent({ name: 'b-table' });
       expect(table.exists()).toBe(true);
@@ -43,63 +40,63 @@ describe('TaskRunParametersTable.vue', () => {
   });
 
   describe('Parameter display', () => {
-    it('should display STRING type parameters', () => {
+    it('should display STRING type parameters', async () => {
       const parameters = [
         { parameterName: 'testParameter', type: 'STRING', value: 'test value' },
       ];
-      const wrapper = createWrapper({ parameters });
+      const wrapper = await createWrapper({ parameters });
 
       expect(wrapper.text()).toContain(parameters[0].parameterName);
       expect(wrapper.text()).toContain(parameters[0].type);
       expect(wrapper.text()).toContain(parameters[0].value);
     });
 
-    it('should display NUMBER type parameters', () => {
+    it('should display NUMBER type parameters', async () => {
       const parameters = [
         { parameterName: 'numParameter', type: 'NUMBER', value: 42.0 },
       ];
-      const wrapper = createWrapper({ parameters });
+      const wrapper = await createWrapper({ parameters });
 
       expect(wrapper.text()).toContain(parameters[0].parameterName);
       expect(wrapper.text()).toContain(parameters[0].type);
       expect(wrapper.text()).toContain(String(parameters[0].value));
     });
 
-    it('should show download button for FILE type', () => {
+    it('should show download button for FILE type', async () => {
       const parameters = [
         { parameterName: 'fileParameter', type: 'FILE', value: new Uint8Array([1, 2, 3]) },
       ];
-      const wrapper = createWrapper({ parameters });
+      const wrapper = await createWrapper({ parameters });
 
       const buttons = wrapper.findAll('button');
       expect(buttons.length).toBeGreaterThan(0);
     });
 
-    it('should show download button for IMAGE type', () => {
+    it('should show download button for IMAGE type', async () => {
       const parameters = [
         { parameterName: 'imageParameter', type: 'IMAGE', value: new Uint8Array([1, 2, 3]) },
       ];
-      const wrapper = createWrapper({ parameters });
+      const wrapper = await createWrapper({ parameters });
 
       const buttons = wrapper.findAll('button');
       expect(buttons.length).toBeGreaterThan(0);
     });
 
-    it('should show download button for GEOMETRY type', () => {
+    it('should show download button for GEOMETRY type', async () => {
       const parameters = [
         { parameterName: 'geoParameter', type: 'GEOMETRY', value: '{"type":"Point","coordinates":[0,0]}' },
       ];
-      const wrapper = createWrapper({ parameters });
+      const wrapper = await createWrapper({ parameters });
 
       const buttons = wrapper.findAll('button');
       expect(buttons.length).toBeGreaterThan(0);
     });
 
-    it('should display no buttons when type is not file, image, or geometry', () => {
+    it('should display no buttons when type is not file, image, or geometry', async () => {
       const parameters = [
         { parameterName: 'numParameter', type: 'NUMBER', value: 42 },
       ];
-      const wrapper = createWrapper({ parameters });
+      const wrapper = await createWrapper({ parameters });
 
       const buttons = wrapper.findAll('button');
       expect(buttons.length).toBe(0);

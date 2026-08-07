@@ -24,8 +24,8 @@
             <b-checkbox
               v-if="term.id"
               size="is-small"
-              :value="terms[termsMapping[term.id]].visible"
-              @input="toggleTermVisibility(termsMapping[term.id])"
+              :model-value="terms[termsMapping[term.id]].visible"
+              @update:model-value="toggleTermVisibility(termsMapping[term.id])"
             />
 
             <b-checkbox v-else size="is-small" v-model="displayNoTerm" />

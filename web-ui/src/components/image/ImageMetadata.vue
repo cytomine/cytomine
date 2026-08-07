@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-loading :is-full-page="false" :active="loading" />
+    <b-loading :is-full-page="false" :model-value="loading" />
     <template v-if="!loading">
       <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
         <h2> {{ $t('error') }} </h2>

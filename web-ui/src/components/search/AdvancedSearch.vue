@@ -30,7 +30,7 @@
         </button>
       </div>
 
-      <b-collapse :open="filtersOpened">
+      <b-collapse :model-value="filtersOpened">
         <div class="filters">
           <div class="columns">
             <div class="column filter is-one-third">
@@ -55,7 +55,7 @@
       </a>
     </p>
     <div class="panel-block">
-      <b-loading :is-full-page="false" :active="loading" />
+      <b-loading :is-full-page="false" :model-value="loading" />
 
       <div
         v-show="activeTab === 'projects'"
@@ -73,54 +73,52 @@
           :revision="revision"
           @setCollectionSize="nbProjects = $event"
         >
-          <template #default="{row: project}">
-            <b-table-column field="currentUserRole" label="" centered width="1" sortable>
-              <icon-project-member-role
-                :is-manager="project.currentUserRoles.admin"
-                :is-representative="project.currentUserRoles.representative"
-              />
-            </b-table-column>
+          <b-table-column v-slot="{row: project}" field="currentUserRole" label="" centered width="1" sortable>
+            <icon-project-member-role
+              :is-manager="project.currentUserRoles.admin"
+              :is-representative="project.currentUserRoles.representative"
+            />
+          </b-table-column>
 
-            <b-table-column :label="$t('id')" width="20" :visible="currentAccount.isDeveloper" field="id" sortable>
-              {{project.id}}
-            </b-table-column>
+          <b-table-column v-slot="{row: project}" :label="$t('id')" width="20" :visible="currentAccount.isDeveloper" field="id" sortable>
+            {{project.id}}
+          </b-table-column>
 
-            <b-table-column field="name" :label="$t('name')" sortable width="250">
-              <router-link :to="`/project/${project.id}`">
-                {{ project.name }}
-              </router-link>
-            </b-table-column>
+          <b-table-column v-slot="{row: project}" field="name" :label="$t('name')" sortable width="250">
+            <router-link :to="`/project/${project.id}`">
+              {{ project.name }}
+            </router-link>
+          </b-table-column>
 
-            <b-table-column field="membersCount" :label="$t('members')" centered sortable width="150">
-              {{ project.membersCount }}
-            </b-table-column>
+          <b-table-column v-slot="{row: project}" field="membersCount" :label="$t('members')" centered sortable width="150">
+            {{ project.membersCount }}
+          </b-table-column>
 
-            <b-table-column field="numberOfImages" :label="$t('images')" centered sortable width="150">
-              <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
-            </b-table-column>
+          <b-table-column v-slot="{row: project}" field="numberOfImages" :label="$t('images')" centered sortable width="150">
+            <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
+          </b-table-column>
 
-            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
-              <router-link :to="`/project/${project.id}/annotations?type=user`">
-                {{ project.numberOfAnnotations }}
-              </router-link>
-            </b-table-column>
+          <b-table-column v-slot="{row: project}" field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
+            <router-link :to="`/project/${project.id}/annotations?type=user`">
+              {{ project.numberOfAnnotations }}
+            </router-link>
+          </b-table-column>
 
-            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
-              <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
-                {{ project.numberOfReviewedAnnotations }}
-              </router-link>
-            </b-table-column>
+          <b-table-column v-slot="{row: project}" field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
+            <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
+              {{ project.numberOfReviewedAnnotations }}
+            </router-link>
+          </b-table-column>
 
-            <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-              {{ formatMomentDate(Number(project.lastActivity), 'll') }}
-            </b-table-column>
+          <b-table-column v-slot="{row: project}" field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
+            {{ formatMomentDate(Number(project.lastActivity), 'll') }}
+          </b-table-column>
 
-            <b-table-column label=" " centered width="150">
-              <router-link :to="`/project/${project.id}`" class="button is-small is-link">
-                {{$t('button-open')}}
-              </router-link>
-            </b-table-column>
-          </template>
+          <b-table-column v-slot="{row: project}" label=" " centered width="150">
+            <router-link :to="`/project/${project.id}`" class="button is-small is-link">
+              {{$t('button-open')}}
+            </router-link>
+          </b-table-column>
 
           <template #detail="{row: project}">
             <project-details
@@ -162,64 +160,66 @@
           :revision="revision"
           @setCollectionSize="nbImages = $event"
         >
-          <template #default="{row: image}">
-            <b-table-column :label="$t('id')" width="20" :visible="currentAccount.isDeveloper">
-              {{image.id}}
-            </b-table-column>
+          <b-table-column v-slot="{row: image}" :label="$t('id')" width="20" :visible="currentAccount.isDeveloper">
+            {{image.id}}
+          </b-table-column>
 
-            <b-table-column :label="$t('overview')" width="100">
-              <router-link :to="`/project/${image.project}/image/${image.id}`">
-                <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
-              </router-link>
-            </b-table-column>
+          <b-table-column v-slot="{row: image}" :label="$t('overview')" width="100">
+            <router-link :to="`/project/${image.project}/image/${image.id}`">
+              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
+            </router-link>
+          </b-table-column>
 
-            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper" sortable field="id">
-              {{image.id}}
-            </b-table-column>
+          <b-table-column v-slot="{row: image}" :label="$t('id')" width="20" :visible="currentUser.isDeveloper" sortable field="id">
+            {{image.id}}
+          </b-table-column>
 
-            <b-table-column
-              :field="image.projectBlind ? 'blindedName' : 'instanceFilename'"
-              :label="$t('name')"
-              sortable
-              width="400"
-            >
-              <router-link :to="`/project/${image.project}/image/${image.id}`">
-                <image-name :image="image" showBothNames />
-              </router-link>
-            </b-table-column>
+          <b-table-column
 
-            <b-table-column
-              field="projectId"
-              :label="$t('project')"
-              width="200"
-            >
-              <router-link :to="`/project/${image.project}`">
-                {{ image.projectName }}
-              </router-link>
-            </b-table-column>
+            v-slot="{row: image}"
+            :field="image.projectBlind ? 'blindedName' : 'instanceFilename'"
+            :label="$t('name')"
+            sortable
+            width="400"
+          >
+            <router-link :to="`/project/${image.project}/image/${image.id}`">
+              <image-name :image="image" showBothNames />
+            </router-link>
+          </b-table-column>
 
-            <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
-              {{ image.magnification || $t('unknown') }}
-            </b-table-column>
+          <b-table-column
 
-            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">
-              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
-                {{ image.numberOfAnnotations }}
-              </router-link>
-            </b-table-column>
+            v-slot="{row: image}"
+            field="projectId"
+            :label="$t('project')"
+            width="200"
+          >
+            <router-link :to="`/project/${image.project}`">
+              {{ image.projectName }}
+            </router-link>
+          </b-table-column>
 
-            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">
-              <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
-                {{ image.numberOfReviewedAnnotations }}
-              </router-link>
-            </b-table-column>
+          <b-table-column v-slot="{row: image}" field="magnification" :label="$t('magnification')" centered sortable width="100">
+            {{ image.magnification || $t('unknown') }}
+          </b-table-column>
 
-            <b-table-column label=" " centered width="150">
-              <router-link :to="`/project/${image.project}/image/${image.id}`" class="button is-small is-link">
-                {{$t('button-open')}}
-              </router-link>
-            </b-table-column>
-          </template>
+          <b-table-column v-slot="{row: image}" field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">
+            <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
+              {{ image.numberOfAnnotations }}
+            </router-link>
+          </b-table-column>
+
+          <b-table-column v-slot="{row: image}" field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">
+            <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
+              {{ image.numberOfReviewedAnnotations }}
+            </router-link>
+          </b-table-column>
+
+          <b-table-column v-slot="{row: image}" label=" " centered width="150">
+            <router-link :to="`/project/${image.project}/image/${image.id}`" class="button is-small is-link">
+              {{$t('button-open')}}
+            </router-link>
+          </b-table-column>
 
           <template #detail="{row: image}">
             <image-details

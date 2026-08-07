@@ -45,7 +45,7 @@
       :searchString="searchString"
       :multipleSelection="multiple"
       @select="handleSelection()"
-      @setSelectedNodes="nodes => $emit('setSelectedNodes', nodes)"
+      @update:selectedNodes="nodes => $emit('update:selectedNodes', nodes)"
     >
       <template #no-result>
         <ul class="multiselect__content">
@@ -71,10 +71,7 @@ export default {
     TrackTree,
     CytomineTrack
   },
-  model: {
-    prop: 'selectedNodes',
-    event: 'setSelectedNodes'
-  },
+  emits: ['update:selectedNodes'],
   props: {
     tracks: { type: Array },
     additionalNodes: { type: Array, default: () => [] },
@@ -119,7 +116,7 @@ export default {
   },
   methods: {
     selectAll() {
-      this.$emit('setSelectedNodes', this.allSelected ? [] : this.allTracks.map(track => track.id));
+      this.$emit('update:selectedNodes', this.allSelected ? [] : this.allTracks.map(track => track.id));
     },
 
     handleSelection() {

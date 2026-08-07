@@ -1,6 +1,6 @@
 <template>
 <div>
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <template v-if="!loading">
     <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
       <h2> {{ $t('error') }} </h2>
@@ -28,50 +28,48 @@
         :detailed=true
         :revision="revision"
       >
-        <template #default="{row: user}">
 
-          <b-table-column field="username" :label="$t('username')" sortable width="100">
-            {{user.username}}
-          </b-table-column>
+        <b-table-column v-slot="{row: user}" field="username" :label="$t('username')" sortable width="100">
+          {{user.username}}
+        </b-table-column>
 
-          <b-table-column field="fullName" :label="$t('name')" sortable width="150">
-            {{user.fullName}}
-          </b-table-column>
+        <b-table-column v-slot="{row: user}" field="fullName" :label="$t('name')" sortable width="150">
+          {{user.fullName}}
+        </b-table-column>
 
-          <b-table-column field="role" :label="$t('role')" width="50">
-            <span class="tag" :class="getRoleData(user).class">{{$t(getRoleData(user).label)}}</span>
-          </b-table-column>
+        <b-table-column v-slot="{row: user}" field="role" :label="$t('role')" width="50">
+          <span class="tag" :class="getRoleData(user).class">{{$t(getRoleData(user).label)}}</span>
+        </b-table-column>
 
-          <b-table-column field="email" :label="$t('email')" sortable width="150">
-            <a :href="`mailto:${user.email}`">{{ user.email }}</a>
-          </b-table-column>
+        <b-table-column v-slot="{row: user}" field="email" :label="$t('email')" sortable width="150">
+          <a :href="`mailto:${user.email}`">{{ user.email }}</a>
+        </b-table-column>
 
-          <b-table-column field="origin" :label="$t('source')" centered sortable width="50">
-            <span :class="['tag', 'is-grey']">
-              {{displayMemberOrigin(user)}}
-            </span>
-          </b-table-column>
+        <b-table-column v-slot="{row: user}" field="origin" :label="$t('source')" centered sortable width="50">
+          <span :class="['tag', 'is-grey']">
+            {{displayMemberOrigin(user)}}
+          </span>
+        </b-table-column>
 
-          <b-table-column field="created" :label="$t('created')" sortable width="150">
-            {{formatMomentDate(Number(user.created), 'll LT')}}
-          </b-table-column>
+        <b-table-column v-slot="{row: user}" field="created" :label="$t('created')" sortable width="150">
+          {{formatMomentDate(Number(user.created), 'll LT')}}
+        </b-table-column>
 
-          <b-table-column field="updated" :label="$t('updated')" sortable width="150">
-            <template v-if="user.updated">{{formatMomentDate(Number(user.updated), 'll LT')}}</template>
-            <template v-else>-</template>
-          </b-table-column>
+        <b-table-column v-slot="{row: user}" field="updated" :label="$t('updated')" sortable width="150">
+          <template v-if="user.updated">{{formatMomentDate(Number(user.updated), 'll LT')}}</template>
+          <template v-else>-</template>
+        </b-table-column>
 
-          <b-table-column label="" width="100">
-            <div class="buttons">
-              <button class="button is-link is-small" @click="startUserEdition(user)">
-                {{$t('button-edit')}}
-              </button>
-              <button class="button is-link is-danger is-small" @click="deleteUser(user)" v-if="canDelete(user)">
-                {{$t('button-delete')}}
-              </button>
-            </div>
-          </b-table-column>
-        </template>
+        <b-table-column v-slot="{row: user}" label="" width="100">
+          <div class="buttons">
+            <button class="button is-link is-small" @click="startUserEdition(user)">
+              {{$t('button-edit')}}
+            </button>
+            <button class="button is-link is-danger is-small" @click="deleteUser(user)" v-if="canDelete(user)">
+              {{$t('button-delete')}}
+            </button>
+          </div>
+        </b-table-column>
 
         <template #detail="{row: user}">
           <user-details :user="user" />

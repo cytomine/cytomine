@@ -107,14 +107,6 @@
           {{ imageGroup.numberOfImages }}
         </b-table-column>
 
-<!--        <b-table-column-->
-<!--          v-slot="{row: imageGroup}"-->
-<!--          field="numberOfAnnotationLinks"-->
-<!--          :label="$t('annotation-links')" centered sortable width="150"-->
-<!--        >-->
-<!--          {{ imageGroup.numberOfAnnotationLinks }}-->
-<!--        </b-table-column>-->
-
         <b-table-column v-slot="{row: imageGroup}" label=" " centered width="150">
           <open-image-group-button :image-group="imageGroup" :key="`open-ig-${imageGroup.id}`"/>
         </b-table-column>

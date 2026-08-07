@@ -4,12 +4,6 @@ import Buefy from 'buefy';
 import CytomineTable from '@/components/utils/CytomineTable';
 import { flushPromises } from '../../../utils';
 
-/**
- * `cytomine-table` is the wrapper behind most of the app's paginated lists, so
- * its slot forwarding is what the Buefy 3 column rewrite hinges on: it now
- * hands the consumer's `<b-table-column>` elements straight to `<b-table>`
- * instead of re-emitting a row-scoped default slot of its own.
- */
 describe('CytomineTable.vue', () => {
   const rows = [
     { id: 1, name: 'first' },

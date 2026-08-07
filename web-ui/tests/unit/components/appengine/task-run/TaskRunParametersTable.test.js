@@ -5,9 +5,6 @@ import Buefy from 'buefy';
 import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable.vue';
 
 describe('TaskRunParametersTable.vue', () => {
-  // Mounted against the real Buefy rather than stubs: the stubs this test used
-  // to carry modelled Buefy 0.8's table contract (the table calling its default
-  // slot once per row), which Buefy 3 no longer has.
   const createWrapper = async (options = {}) => {
     const wrapper = mount(TaskRunParametersTable, {
       props: {
@@ -24,8 +21,6 @@ describe('TaskRunParametersTable.vue', () => {
       }
     });
 
-    // Buefy 3 discovers the columns while rendering the table's default slot,
-    // so the rows only exist on the render after that.
     await nextTick();
 
     return wrapper;

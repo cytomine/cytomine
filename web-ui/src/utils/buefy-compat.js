@@ -1,5 +1,7 @@
 import * as buefy from 'buefy';
 
+// This is a temporary fix
+
 /**
  * Buefy 3 is a plain Vue 3 library, but `configureCompat({MODE: 2})` in
  * `src/main.js` is global: @vue/compat applies its Vue 2 behaviours to every

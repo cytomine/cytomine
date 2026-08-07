@@ -8,11 +8,6 @@
       {{ props.row.type }}
     </b-table-column>
 
-    <!--
-      Buefy 3 discovers the columns once, so the per-row choice between the
-      three shapes of this cell moves from a v-if on the column to a v-if
-      inside it. All three declared the same field and label anyway.
-    -->
     <b-table-column v-slot="props" field="value" :label="$t('app-engine.parameter.value')">
       <button
         v-if="['FILE', 'IMAGE'].includes(props.row.type)"

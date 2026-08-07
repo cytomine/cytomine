@@ -28,12 +28,6 @@
     :is-row-checkable="isRowCheckable"
     @sort="updateSort"
   >
-    <!--
-      Buefy 3 renders the default slot once, with no row, to discover the
-      columns: each <b-table-column> carries its own scoped slot instead. So
-      this forwards the columns as-is and the row scope reaches them directly
-      from <b-table>.
-    -->
     <slot></slot>
 
     <template #detail="{row, index}">

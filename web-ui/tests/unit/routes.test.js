@@ -1,18 +1,10 @@
 import router from '@/routes.js';
 
-// Importing the route table pulls in every page component, and with them
-// `vue-slider-component`, whose Vue 2 UMD build throws "Super expression must
-// either be null or a function" on import under the compat runtime (see
-// CytomineSlider.test.js). Nothing is rendered here, so an empty stand-in is
-// enough to let the module graph load.
 vi.mock('vue-slider-component', () => ({
   __esModule: true,
   default: { name: 'vue-slider', render: () => null },
 }));
 
-// Same reason: `ol-rescale-feature`'s "main" is a UMD bundle that requires the
-// long-gone `openlayers` package. The browser gets its "module" ESM build, so
-// this is a Node-resolution artifact of the test environment only.
 vi.mock('ol-rescale-feature', () => ({ __esModule: true, default: class RescaleFeature {} }));
 
 import AppInfoPage from '@/components/appengine/AppInfoPage.vue';
@@ -25,8 +17,6 @@ import UserActivity from '@/components/user/UserActivity.vue';
 import ListOntologies from '@/components/ontology/ListOntologies.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 
-// Navigates and reports where the router actually ended up, so a route that
-// redirects is judged on its destination rather than on what it was given.
 async function navigate(location) {
   await router.push(location);
   return router.currentRoute.value;
@@ -64,8 +54,6 @@ describe('routes.js', () => {
       const route = await navigate('/ontology');
 
       expect(route.matched.at(-1).components.default).toBe(ListOntologies);
-      // Router 4 reports an absent optional param as '', where 3 left it
-      // undefined. Both are falsy, which is all ListOntologies asks of it.
       expect(route.params.idOntology).toBeFalsy();
     });
 
@@ -115,9 +103,6 @@ describe('routes.js', () => {
     });
   });
 
-  // AdminPanel, ProjectActivity and ProjectConfiguration all switch tab with
-  // `$router.push('?tab=…')`, which only keeps the user on the page as long as
-  // a query-only location still resolves relative to the current one.
   it.each([
     ['/admin', '?tab=users', '/admin?tab=users'],
     ['/project/7/configuration', '?tab=members', '/project/7/configuration?tab=members'],
@@ -134,9 +119,6 @@ describe('routes.js', () => {
     expect(route.matched.at(-1).components.default).toBe(UserActivity);
   });
 
-  // The pre-Vue-3 URLs (/userdashboard, /tabs-image-1-2-3, …) were redirect
-  // records here until they were dropped from the table; they now land on the
-  // 404 page like any other unknown path.
   it.each(['/userdashboard', '/upload', '/tabs-images-42', '/activity-42-'])(
     'should no longer know the retired URL %s',
     async (path) => {

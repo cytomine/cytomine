@@ -7,9 +7,6 @@ import { flushPromises } from '../../../utils';
 
 const Blank = { template: '<div />' };
 
-// The same shape as the /apps section of src/routes.js — nesting matters here,
-// since it is what makes the difference between an inclusive and an exact match
-// on /apps observable. routes.test.js checks the real table.
 function createTestRouter() {
   return createRouter({
     history: createMemoryHistory(),
@@ -72,8 +69,6 @@ describe('AppSidebar.vue', () => {
   });
 
   it('should mark the installed-apps item active only on /apps itself', async () => {
-    // It used to carry `exact`, a prop Router 4 dropped; /apps is the parent of
-    // the other two, so an inclusive match would light it up on all of them.
     const onStore = await createWrapper('/apps/store');
     expect(onStore.findAll('li')[0].classes()).not.toContain('is-active');
 

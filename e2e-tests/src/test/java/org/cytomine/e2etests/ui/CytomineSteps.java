@@ -127,7 +127,7 @@ public class CytomineSteps {
     }
 
     public void undoCommandFromHistory(Wait<WebDriver> wait, URL cytomineUrl, String operation, String description) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/history");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/history");
         String row = format("//tr[td[contains(., '%s')] and td//span[contains(., '%s')]]", description, operation);
         webDriverUtils.xpathClick(wait, row + "//button[contains(., 'Undo')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'Action undone')]"));
@@ -146,7 +146,7 @@ public class CytomineSteps {
 
     @SneakyThrows
     public void addImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName, Optional<String> maybeProjectName) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/storage");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//a[contains(., 'Add files')]"));
 
         Path tempDir = Files.createTempDirectory("selenium-upload");
@@ -203,7 +203,7 @@ public class CytomineSteps {
     }
 
     public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/storage");
         webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(
             wait,
@@ -225,7 +225,7 @@ public class CytomineSteps {
     }
 
     public void sortImagesInStorage(Wait<WebDriver> wait, URL cytomineUrl, Set<String> imageNames) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/storage");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/storage");
         webDriverUtils.waitLoading(wait);
 
         for (String column : List.of("Filename", "Created", "Size", "Status")) {
@@ -359,7 +359,7 @@ public class CytomineSteps {
 
     @SneakyThrows
     public void uploadTask(Wait<WebDriver> wait, URL cytomineUrl, String zipName) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/apps");
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".upload-icon"));
         String bundleName = "selenium-" + UUID.randomUUID() + ".zip";
         Path tempDir = Files.createTempDirectory("selenium-task");
@@ -374,7 +374,7 @@ public class CytomineSteps {
     }
 
     public void deleteTask(Wait<WebDriver> wait, URL cytomineUrl, String taskName) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/apps");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/apps");
         webDriverUtils.byIsDisplayed(
             wait,
             By.xpath("//p[contains(@class, 'title') and contains(text(), '" + taskName + "')]")
@@ -499,7 +499,7 @@ public class CytomineSteps {
         String projectNameToSearch,
         List<String> projectNames
     ) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/projects");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/projects");
         By searchInput = By.cssSelector("div.search-projects input[type='search']");
         webDriverUtils.byClick(wait, searchInput);
         webDriverUtils.bySendKeys(wait, searchInput, projectNameToSearch);
@@ -631,7 +631,7 @@ public class CytomineSteps {
         String email,
         String password
     ) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/admin?tab=users");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New user')]");
         webDriverUtils.byIsDisplayed(wait, By.name("username"));
@@ -652,7 +652,7 @@ public class CytomineSteps {
         String newFirstname,
         String newLastname
     ) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/admin?tab=users");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
         webDriverUtils.xpathClick(
             wait,
@@ -676,7 +676,7 @@ public class CytomineSteps {
         URL cytomineUrl,
         String username
     ) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/admin?tab=users");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
         webDriverUtils.xpathClick(
             wait,
@@ -783,7 +783,7 @@ public class CytomineSteps {
     }
 
     private void goToAdminTags(Wait<WebDriver> wait, URL cytomineUrl) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/admin?tab=tags");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=tags");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New tag')]"));
     }
 
@@ -814,7 +814,7 @@ public class CytomineSteps {
         String projectName,
         String imageName
     ) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/#/projects");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/projects");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + projectName + ")]"));
         webDriverUtils.xpathClick(wait, "//a[contains(text(), '" + projectName + "')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));

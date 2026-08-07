@@ -1,6 +1,7 @@
 import Vue, { createApp } from 'vue';
 import axios from 'axios';
 import constants from '@/utils/constants.js';
+import { getKeycloak } from './keycloak.js';
 
 Vue.configureCompat({ MODE: 2, COMPONENT_V_MODEL: false }); // TODO: to delete when removing @vue/compat
 
@@ -42,23 +43,15 @@ axios.get('/configuration.json').then(response => {
     }
   }
 
-  // Now import and initialize Keycloak with loaded config
-  import('./keycloak').then(module => {
-    const Keycloak = module.default;
-    Vue.use(Keycloak);
+  const keycloak = getKeycloak();
 
-    Vue.$keycloak
-      .init({
-        onLoad: 'login-required'
-      })
-      .then(() => {
-        const app = createApp(App);
-        app.use(i18n);
-        app.use(router);
-        app.use(store);
-        app.use(Buefy, { defaultIconPack: 'fas' });
-        app.use(Notifications);
-        app.mount('#app');
-      });
+  keycloak.init({ onLoad: 'login-required' }).then(() => {
+    const app = createApp(App);
+    app.use(i18n);
+    app.use(router);
+    app.use(store);
+    app.use(Buefy, { defaultIconPack: 'fas' });
+    app.use(Notifications);
+    app.mount('#app');
   });
 });

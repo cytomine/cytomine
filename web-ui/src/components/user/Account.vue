@@ -164,6 +164,7 @@ import { email, required, rules, validateForm } from '@/utils/form.js';
 import { rolesMapping } from '@/utils/role-utils';
 import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
 import { useClipboard } from '@vueuse/core';
+import { getKeycloak } from '@/keycloak.js';
 import { formatMomentDate } from '@/utils/date';
 
 export default {
@@ -204,8 +205,8 @@ export default {
     currentAccount: get('currentUser/account'),
     role() {
       // Guest > User > Admin
-      let key = this.$keycloak.hasResourceRole(KeycloakRole.ADMIN) ? UserRole.ADMIN
-        : this.$keycloak.hasResourceRole(KeycloakRole.USER) ? UserRole.USER : UserRole.GUEST;
+      let key = getKeycloak().hasResourceRole(KeycloakRole.ADMIN) ? UserRole.ADMIN
+        : getKeycloak().hasResourceRole(KeycloakRole.USER) ? UserRole.USER : UserRole.GUEST;
       return rolesMapping[key];
     },
 
@@ -242,7 +243,7 @@ export default {
     },
 
     updatePassword() {
-      this.$keycloak.login({ action: this.passwordCredentials.updateAction });
+      getKeycloak().login({ action: this.passwordCredentials.updateAction });
     },
 
 

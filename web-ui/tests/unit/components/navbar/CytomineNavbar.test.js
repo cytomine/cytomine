@@ -3,6 +3,17 @@ import Vuex from 'vuex';
 
 import CytomineNavbar from '@/components/navbar/CytomineNavbar';
 
+const { keycloak } = vi.hoisted(() => ({
+  keycloak: {
+    hasResourceRole: vi.fn(() => false),
+    logout: vi.fn().mockResolvedValue()
+  }
+}));
+
+vi.mock('@/keycloak.js', () => ({
+  getKeycloak: () => keycloak
+}));
+
 vi.mock('@/lang.js', () => ({
   changeLanguageMixin: {
     methods: {
@@ -14,11 +25,6 @@ vi.mock('@/lang.js', () => ({
 describe('CytomineNavbar.vue', () => {
   const actions = {
     logout: vi.fn()
-  };
-
-  const keycloak = {
-    hasResourceRole: vi.fn(() => false),
-    logout: vi.fn().mockResolvedValue()
   };
 
   const createWrapper = ({ user = {}, projects = {} } = {}) => {
@@ -46,7 +52,6 @@ describe('CytomineNavbar.vue', () => {
         },
         mocks: {
           $t: (message) => message,
-          $keycloak: keycloak,
           $notify: vi.fn()
         },
         stubs: {

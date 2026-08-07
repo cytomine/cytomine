@@ -23,9 +23,11 @@
     <template v-else-if="currentUser">
       <cytomine-navbar />
       <div class="bottom">
-        <keep-alive include="cytomine-storage">
-          <router-view v-if="currentUser" />
-        </keep-alive>
+        <router-view v-if="currentUser" v-slot="{ Component }">
+          <keep-alive include="cytomine-storage">
+            <component :is="Component" v-if="Component" />
+          </keep-alive>
+        </router-view>
       </div>
     </template>
   </template>

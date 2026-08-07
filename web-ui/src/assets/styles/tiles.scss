@@ -1,0 +1,64 @@
+/* Bulma tiles component, removed in Bulma v1 (we upgraded 0.7 -> 1.0).
+   Vendored from Bulma 0.9.4 (sass/grid/tiles.sass) so the activity panels,
+   which are built on `tile is-ancestor / is-parent / is-child`, keep working.
+   Percentages are hard-coded to avoid the Sass division deprecation. */
+
+$tile-spacing: 0.75rem;
+
+.tile {
+  align-items: stretch;
+  display: block;
+  flex-basis: 0;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-height: min-content;
+
+  &.is-ancestor {
+    margin-left: -$tile-spacing;
+    margin-right: -$tile-spacing;
+    margin-top: -$tile-spacing;
+
+    &:last-child {
+      margin-bottom: -$tile-spacing;
+    }
+
+    &:not(:last-child) {
+      margin-bottom: $tile-spacing;
+    }
+  }
+
+  &.is-child {
+    margin: 0 !important;
+  }
+
+  &.is-parent {
+    padding: $tile-spacing;
+  }
+
+  &.is-vertical {
+    flex-direction: column;
+
+    & > .tile.is-child:not(:last-child) {
+      margin-bottom: $tile-spacing * 2 !important;
+    }
+  }
+}
+
+@media screen and (min-width: 769px), print {
+  .tile:not(.is-child) {
+    display: flex;
+  }
+
+  .tile.is-1 { flex: none; width: 8.33333%; }
+  .tile.is-2 { flex: none; width: 16.66667%; }
+  .tile.is-3 { flex: none; width: 25%; }
+  .tile.is-4 { flex: none; width: 33.33333%; }
+  .tile.is-5 { flex: none; width: 41.66667%; }
+  .tile.is-6 { flex: none; width: 50%; }
+  .tile.is-7 { flex: none; width: 58.33333%; }
+  .tile.is-8 { flex: none; width: 66.66667%; }
+  .tile.is-9 { flex: none; width: 75%; }
+  .tile.is-10 { flex: none; width: 83.33333%; }
+  .tile.is-11 { flex: none; width: 91.66667%; }
+  .tile.is-12 { flex: none; width: 100%; }
+}

@@ -14,9 +14,7 @@ import optOutBuefyFromVue2Compat from '@/utils/buefy-compat.js';
 optOutBuefyFromVue2Compat(); // TODO: to delete when removing @vue/compat
 
 import Notifications from '@kyvg/vue3-notification';
-
-import VTooltip from 'v-tooltip';
-Vue.use(VTooltip);
+import FloatingVue from 'floating-vue';
 
 import { vOnClickOutside } from '@vueuse/components';
 Vue.directive('click-outside', vOnClickOutside);
@@ -51,6 +49,7 @@ axios.get('/configuration.json').then(response => {
     app.use(router);
     app.use(store);
     app.use(Buefy, { defaultIconPack: 'fas' });
+    app.use(FloatingVue);
     app.use(Notifications);
     app.mount('#app');
   });

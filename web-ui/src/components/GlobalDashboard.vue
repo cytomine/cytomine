@@ -44,48 +44,48 @@
                 <td>{{projects ? projects.length : "?"}}</td>
                 <td>{{$t('projects')}}</td>
                 <td>
-                  <v-popover>
+                  <VDropdown>
                     <i class="fas fa-info-circle"></i>
-                    <template #popover>
+                    <template #popper>
                       <p>{{$t('number-projects-info-message')}}</p>
                     </template>
-                  </v-popover>
+                  </VDropdown>
                 </td>
               </tr>
               <tr>
                 <td>{{nbImages != null ? nbImages : "?"}}</td>
                 <td>{{$t('images')}}</td>
                 <td>
-                  <v-popover>
+                  <VDropdown>
                     <i class="fas fa-info-circle"></i>
-                    <template #popover>
+                    <template #popper>
                       <p>{{$t('number-images-info-message')}}</p>
                     </template>
-                  </v-popover>
+                  </VDropdown>
                 </td>
               </tr>
               <tr>
                 <td>{{nbUserAnnots != null ? nbUserAnnots : "?"}}</td>
                 <td>{{$t('user-annotations')}}</td>
                 <td>
-                  <v-popover>
+                  <VDropdown>
                     <i class="fas fa-info-circle"></i>
-                    <template #popover>
+                    <template #popper>
                       <p>{{$t('number-annotations-info-message')}}</p>
                     </template>
-                  </v-popover>
+                  </VDropdown>
                 </td>
               </tr>
               <tr>
                 <td>{{nbReviewed != null ? nbReviewed : "?"}}</td>
                 <td>{{$t('reviewed-annotations')}}</td>
                 <td>
-                  <v-popover>
+                  <VDropdown>
                     <i class="fas fa-info-circle"></i>
-                    <template #popover>
+                    <template #popper>
                       <p>{{$t('number-reviewed-annotations-info-message')}}</p>
                     </template>
-                  </v-popover>
+                  </VDropdown>
                 </td>
               </tr>
             </tbody>

@@ -7,12 +7,12 @@
     >
       <i class="fas" :class="{'fa-step-forward': forward, 'fa-step-backward': !forward}"></i>
     </button>
-    <v-popover
+    <VDropdown
         :placement="selectorPlacement"
-        trigger="manual"
-        :open="opened"
+        :triggers="[]"
+        :shown="opened"
         :auto-hide="false"
-        :popover-inner-class="'tooltip-inner popover-inner step-selector'"
+        popper-class="step-selector"
     >
       <button
           class="button is-small item"
@@ -27,7 +27,7 @@
         </div>
       </button>
 
-      <template #popover>
+      <template #popper>
         <div
           v-click-outside="() => stopEdition()"
           v-click-outside:contextmenu.capture="() => stopEdition()"
@@ -42,7 +42,7 @@
           />
         </div>
       </template>
-    </v-popover>
+    </VDropdown>
   </div>
 </template>
 

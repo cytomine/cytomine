@@ -17,12 +17,12 @@
             {{$t('allowed-formats-upload-info')}}
             <template v-if="formatInfos.length">
             <span v-for="(format, index) in formatInfos" :key="format.id">
-              {{format.name}}<v-popover v-if="format.remarks">
+              {{format.name}}<VDropdown v-if="format.remarks">
                 <i class="fas fa-info-circle"></i>
-                <template #popover>
+                <template #popper>
                   <p>{{format.remarks}}</p>
                 </template>
-              </v-popover><template v-if="index < formatInfos.length - 1">, </template>
+              </VDropdown><template v-if="index < formatInfos.length - 1">, </template>
             </span>
             </template>
           </li>

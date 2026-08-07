@@ -14,9 +14,7 @@ import optOutBuefyFromVue2Compat from '@/utils/buefy-compat.js';
 optOutBuefyFromVue2Compat();
 
 import Notifications from '@kyvg/vue3-notification';
-
-import VTooltip from 'v-tooltip';
-Vue.use(VTooltip);
+import FloatingVue from 'floating-vue';
 
 import VueShortKey from 'vue-shortkey';
 Vue.use(VueShortKey, {
@@ -43,7 +41,7 @@ import App from './App.vue';
 Vue.config.productionTip = false;
 
 // Load configuration before initializing Keycloak
-axios.get('configuration.json').then(response => {
+axios.get('/configuration.json').then(response => {
   const settings = response.data;
   for (let i in settings) {
     if (Object.prototype.hasOwnProperty.call(constants, i)
@@ -60,6 +58,7 @@ axios.get('configuration.json').then(response => {
     app.use(router);
     app.use(store);
     app.use(Buefy, { defaultIconPack: 'fas' });
+    app.use(FloatingVue);
     app.use(Notifications);
     app.mount('#app');
   });

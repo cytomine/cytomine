@@ -12,6 +12,8 @@
         icon="search"
       />
 
+      <MetadataFilter />
+
       <cytomine-table
         :collection="uploadedFileCollection"
         sort="created" order="desc"
@@ -70,6 +72,7 @@ import { UploadedFileCollection, UploadedFile } from '@/api';
 import filesize from 'filesize';
 import _ from 'lodash';
 import CytomineTable from '@/components/utils/CytomineTable.vue';
+import MetadataFilter from '@/components/search/MetadataFilter.vue';
 import UploadedFileStatusComponent from './UploadedFileStatus.vue';
 import { appendShortTermToken } from '@/utils/token-utils';
 import { formatDate } from '@/utils/date';
@@ -79,6 +82,7 @@ export default {
   components: {
     CytomineTable,
     ImageThumbnail,
+    MetadataFilter,
     'uploaded-file-status': UploadedFileStatusComponent
   },
   data() {
@@ -100,10 +104,7 @@ export default {
     users: get('currentStorage/users'),
     shortTermToken: get('currentUser/shortTermToken'),
     uploadedFileCollection() {
-      return new UploadedFileCollection({
-        onlyRootsWithDetails: true,
-        originalFilename: { ilike: encodeURIComponent(this.searchString) }
-      });
+      return new UploadedFileCollection({ originalFilename: { ilike: encodeURIComponent(this.searchString) } });
     }
   },
   methods: {

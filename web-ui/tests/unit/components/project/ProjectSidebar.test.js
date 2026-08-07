@@ -6,8 +6,6 @@ import { flushPromises } from '../../../utils';
 
 const Blank = { template: '<div />' };
 
-// In sidebar order. The configuration key and the path differ for the activity
-// tab, which is `project-activities-tab` but lives at /activity.
 const TABS = [
   { key: 'images', path: 'images' },
   { key: 'image-groups', path: 'image-groups' },
@@ -18,8 +16,6 @@ const TABS = [
   { key: 'configuration', path: 'configuration' },
 ];
 
-// The project section of src/routes.js in miniature: every tab is a child of
-// /project/:idProject, which is what an active link has to be matched against.
 function createTestRouter() {
   return createRouter({
     history: createMemoryHistory(),
@@ -50,7 +46,6 @@ describe('ProjectSidebar.vue', () => {
           $store: {
             state: {
               currentUser: { expandedSidebar: true },
-              // `project-<tab>-tab` is what isTabDisplayed() looks up.
               currentProject: {
                 project: { id: 7, name: 'Project 7' },
                 configUI: Object.fromEntries(TABS.map(({ key }) => [`project-${key}-tab`, true])),

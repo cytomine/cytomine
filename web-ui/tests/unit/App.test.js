@@ -16,13 +16,8 @@ vi.mock('@/api', () => ({ Cytomine: class Cytomine {} }));
 
 vi.mock('@/utils/token-utils', () => ({ updateToken: vi.fn().mockResolvedValue(null) }));
 
-// created() freezes the constants module, which would leak into every later
-// test file sharing the module registry.
 vi.mock('@/utils/constants.js', () => ({ default: { IDLE_DURATION: 0, PING_INTERVAL: 100000 } }));
 
-// Two pages that report their own lifecycle, standing in for whatever the route
-// table resolves to: <keep-alive include="cytomine-storage"> matches on the
-// component's `name`.
 function createPage(name) {
   return {
     name,
@@ -57,8 +52,6 @@ describe('App.vue', () => {
       global: {
         plugins: [router],
         stubs: {
-          // Not rendering the `body` slot: it is a scoped slot, and the real
-          // component only ever fills it with a notification to show.
           notifications: { template: '<div />' },
           'cytomine-navbar': true,
         },
@@ -72,7 +65,6 @@ describe('App.vue', () => {
         },
       },
     });
-    // created() awaits the configuration fetch before anything renders.
     await flushPromises();
 
     return wrapper;
@@ -93,9 +85,6 @@ describe('App.vue', () => {
     await flushPromises();
 
     expect(wrapper.find('.cytomine-storage').exists()).toBe(true);
-    // Created once, restored from the cache on the way back. Wrapping
-    // <router-view> instead of using its slot caches the view rather than the
-    // page, and creates it again on every visit.
     expect(hooks.filter(hook => hook === 'cytomine-storage:created')).toHaveLength(1);
     expect(hooks.filter(hook => hook === 'cytomine-storage:activated')).toHaveLength(2);
   });

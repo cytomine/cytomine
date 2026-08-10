@@ -14,8 +14,8 @@
     ></div>
     <template #popper v-if="showColorSelector">
       <sketch-picker
-        :value="formattedColor"
-        @input="setColor"
+        :model-value="formattedColor"
+        @update:model-value="setColor"
         :presetColors="presetColors"
         :disable-alpha="true"
       />
@@ -31,12 +31,12 @@
 <script>
 import _ from 'lodash';
 
-import { Sketch } from 'vue-color';
+import { SketchPicker, tinycolor } from 'vue-color';
 
 export default {
   name: 'cytomine-channel',
   components: {
-    'sketch-picker': Sketch,
+    SketchPicker,
   },
   props: {
     name: String,
@@ -95,7 +95,7 @@ export default {
       }
     },
     setColor: _.debounce(function (color) {
-      this.$emit('setColor', color.hex);
+      this.$emit('setColor', tinycolor(color).toHexString());
     }, 500, { leading: true }),
   }
 };
@@ -105,17 +105,17 @@ export default {
   padding: 0 !important;
 }
 
-.color-selector .vc-sketch {
+.color-selector .vc-sketch-picker {
   width: 180px;
 }
 
-.color-selector .vc-sketch-presets-color {
+.color-selector .preset-color {
   width: 1em;
   height: 1em;
   margin: 0 0.25em 0.25em 0;
 }
 
-.color-selector .vc-sketch-presets-color:first-child {
+.color-selector .preset-color:first-child {
   width: 2.25em;
 }
 </style>

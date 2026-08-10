@@ -28,9 +28,6 @@ Vue.use(VueShortKey, {
   ]
 });
 
-import * as vClickOutside from 'v-click-outside-x';
-Vue.use(vClickOutside);
-
 import ViewerOpenLayers from './viewer-ol';
 Vue.use(ViewerOpenLayers);
 
@@ -38,6 +35,8 @@ import 'chart.js/auto';
 import 'vue-color/style.css';
 import optOutVueColorFromVue2Compat from '@/utils/vue-color-compat.js';
 optOutVueColorFromVue2Compat(); // TODO: to delete when removing @vue/compat
+
+import clickOutside from '@/directives/click-outside.js';
 
 import App from './App.vue';
 
@@ -63,6 +62,7 @@ axios.get('/configuration.json').then(response => {
     app.use(Buefy, { defaultIconPack: 'fas' });
     app.use(FloatingVue);
     app.use(Notifications);
+    app.directive('click-outside', clickOutside);
     app.mount('#app');
   });
 });

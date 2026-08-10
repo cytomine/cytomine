@@ -43,7 +43,6 @@
     "ol-rescale-feature": "^1.0.0",
     "ol-rotate-feature": "^3.3.0",
     "sl-vue-tree": "1.8.3",
-    "v-click-outside-x": "^4.0.1",
     "vue": "^3.5.40",
     "vue-chartjs": "^5.3.4",
     "vue-color": "^3.3.3",

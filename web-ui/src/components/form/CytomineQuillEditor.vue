@@ -82,7 +82,7 @@
             :class="['ql-picker', expandedSpecialChars ? 'ql-expanded' : '', 'ql-special-characters']"
             :title="$t('ql-special-character')"
             @click="expandedSpecialChars = !expandedSpecialChars"
-            v-click-outside="() => expandedSpecialChars = false"
+            v-on-click-outside="() => expandedSpecialChars = false"
           >
             <span class="ql-picker-label" tabindex="0" role="button">
               <svg viewBox="0 0 18 18">

@@ -1,7 +1,7 @@
 <template>
 <div class="multiselect"
   :class="{'multiselect--active': activeSelector}"
-  v-click-outside="() => activeSelector = false"
+  v-on-click-outside="() => activeSelector = false"
 >
 
   <div class="multiselect__select" @click="activeSelector = !activeSelector"></div>

@@ -1,14 +1,10 @@
 <template>
   <div class="similar-annotations-playground">
-    <vue-draggable-resizable
+    <div
+      ref="draggable"
       class="draggable"
       v-show="displayAnnotDetails && selectedFeature && showSimilarAnnotations"
-      :parent="false"
-      :resizable="false"
-      :x="350"
-      :y="0"
-      :h="'auto'"
-      :w="450"
+      :style="dragStyle"
     >
       <b-loading :is-full-page="false" :model-value="loading"/>
 
@@ -68,30 +64,36 @@
           </div>
         </div>
       </div>
-    </vue-draggable-resizable>
+    </div>
   </div>
 </template>
 
 <script>
+import { ref } from 'vue';
+import { useDraggable } from '@vueuse/core';
+
 import eventBus from '@/utils/event-bus';
 
 import { Annotation, AnnotationTerm } from '@/api';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 import CytomineTerm from '@/components/ontology/CytomineTerm.vue';
-import VueDraggableResizable from 'vue-draggable-resizable';
 
 export default {
   name: 'SimilarAnnotation',
   components: {
     AnnotationPreview,
     CytomineTerm,
-    VueDraggableResizable,
   },
   props: {
     image: { type: Object },
     index: { type: String, required: true },
     size: { type: Number, default: 64 },
+  },
+  setup() {
+    const draggable = ref(null);
+    const { style: dragStyle } = useDraggable(draggable, { initialValue: { x: 350, y: 0 } });
+    return { draggable, dragStyle };
   },
   data() {
     return {
@@ -221,6 +223,8 @@ export default {
 }
 
 .draggable {
+  position: absolute;
+  width: 450px;
   background: #f2f2f2;
   border-radius: 5px;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);

@@ -16,18 +16,6 @@ optOutBuefyFromVue2Compat(); // TODO: to delete when removing @vue/compat
 import Notifications from '@kyvg/vue3-notification';
 import FloatingVue from 'floating-vue';
 
-import VueShortKey from 'vue-shortkey';
-Vue.use(VueShortKey, {
-  prevent: [
-    'input[type=text]',
-    'input[type=password]',
-    'input[type=search]',
-    'input[type=email]',
-    'textarea',
-    '.ql-editor'
-  ]
-});
-
 import ViewerOpenLayers from './viewer-ol';
 Vue.use(ViewerOpenLayers);
 
@@ -36,7 +24,7 @@ import 'vue-color/style.css';
 import optOutVueColorFromVue2Compat from '@/utils/vue-color-compat.js';
 optOutVueColorFromVue2Compat(); // TODO: to delete when removing @vue/compat
 
-import clickOutside from '@/directives/click-outside.js';
+import { vOnClickOutside } from '@vueuse/components';
 
 import App from './App.vue';
 
@@ -62,7 +50,7 @@ axios.get('/configuration.json').then(response => {
     app.use(Buefy, { defaultIconPack: 'fas' });
     app.use(FloatingVue);
     app.use(Notifications);
-    app.directive('click-outside', clickOutside);
+    app.directive('on-click-outside', vOnClickOutside);
     app.mount('#app');
   });
 });

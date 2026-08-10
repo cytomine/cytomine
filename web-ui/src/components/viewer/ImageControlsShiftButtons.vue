@@ -29,8 +29,7 @@
 
       <template #popper>
         <div
-          v-click-outside="() => stopEdition()"
-          v-click-outside:contextmenu.capture="() => stopEdition()"
+          v-on-click-outside="() => stopEdition()"
           class="step-selector"
           @keyup.enter="stopEdition()"
         >

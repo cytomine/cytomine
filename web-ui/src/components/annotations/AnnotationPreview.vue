@@ -25,7 +25,7 @@
 
   <template #popper>
     <annotation-details
-      v-click-outside.capture="(event) => close(event)"
+      v-on-click-outside="(event) => close(event)"
       :annotation="annot"
       :terms="terms"
       :users="users"

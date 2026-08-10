@@ -63,7 +63,7 @@
               @click="removeTerm(term.id, user.id)">
             </button>
           </b-tag>
-          <div class="add-term-wrapper" v-if="canEditTerms" v-click-outside="() => showTermSelector = false">
+          <div class="add-term-wrapper" v-if="canEditTerms" v-on-click-outside="() => showTermSelector = false">
             <b-field>
               <b-input
                 size="is-small"
@@ -101,7 +101,7 @@
                     @click="removeTrack(track.id)">
             </button>
           </b-tag>
-          <div class="add-track-wrapper" v-if="canEditTerms" v-click-outside="() => showTrackSelector = false">
+          <div class="add-track-wrapper" v-if="canEditTerms" v-on-click-outside="() => showTrackSelector = false">
             <b-field>
               <b-input
                 size="is-small"

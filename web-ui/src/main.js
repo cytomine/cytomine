@@ -2,11 +2,7 @@ import Vue, { createApp } from 'vue';
 import axios from 'axios';
 import constants from '@/utils/constants.js';
 
-// Keep Vue 2 runtime behavior by default while migrating incrementally.
-// COMPONENT_V_MODEL is off: the app's own components use the Vue 3
-// `modelValue` / `update:modelValue` v-model contract (issue 15), so compat
-// must not rewrite it back to the Vue 2 `value` / `input` pair.
-Vue.configureCompat({ MODE: 2, COMPONENT_V_MODEL: false });
+Vue.configureCompat({ MODE: 2, COMPONENT_V_MODEL: false }); // TODO: to delete when removing @vue/compat
 
 import i18n from './lang.js';
 import router from './routes.js';
@@ -14,7 +10,7 @@ import store from './store/store.js';
 
 import Buefy from 'buefy';
 import optOutBuefyFromVue2Compat from '@/utils/buefy-compat.js';
-optOutBuefyFromVue2Compat();
+optOutBuefyFromVue2Compat(); // TODO: to delete when removing @vue/compat
 
 import Notifications from '@kyvg/vue3-notification';
 
@@ -28,6 +24,9 @@ import ViewerOpenLayers from './viewer-ol';
 Vue.use(ViewerOpenLayers);
 
 import 'chart.js/auto';
+import 'vue-color/style.css';
+import optOutVueColorFromVue2Compat from '@/utils/vue-color-compat.js';
+optOutVueColorFromVue2Compat(); // TODO: to delete when removing @vue/compat
 
 import App from './App.vue';
 

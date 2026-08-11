@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
-import VTooltip from 'v-tooltip';
+import FloatingVue from 'floating-vue';
 
 import GlobalDashboard from '@/components/GlobalDashboard';
 import { ImageInstanceCollection, ProjectCollection } from '@/api';
@@ -39,7 +39,7 @@ describe('GlobalDashboard.vue', () => {
         nbRecent: 3
       },
       global: {
-        plugins: [Buefy, VTooltip],
+        plugins: [Buefy, FloatingVue],
         mocks: {
           $t: (message) => message,
           $store: {

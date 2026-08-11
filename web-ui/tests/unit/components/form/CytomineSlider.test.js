@@ -3,28 +3,6 @@ import Buefy from 'buefy';
 
 import CytomineSlider from '@/components/form/CytomineSlider.vue';
 
-// `vue-slider-component` only ships a Vue 2 UMD build, which throws
-// "Super expression must either be null or a function" the moment it is
-// imported under the compat runtime. Stand in for it with a component that
-// renders the `tooltip` scoped slot the same way, since it is that slot's
-// markup — not the slider — that this file is about.
-vi.mock('vue-slider-component', () => ({
-  __esModule: true,
-  default: {
-    name: 'vue-slider',
-    props: ['value'],
-    render() {
-      const values = Array.isArray(this.value) ? [...this.value] : [this.value];
-      // compat keeps `$slots` Vue-2 shaped, so scoped slots come off
-      // `$scopedSlots`.
-      return values.map((value, index) => this.$scopedSlots.tooltip({ value, index }));
-    },
-  },
-}));
-
-// Issue 10 moved `@keyup.enter.native` off the `b-input` and onto the plain
-// wrapper element. That is invisible to lint, to the build and to every other
-// test, so it is asserted directly here.
 describe('CytomineSlider.vue', () => {
   const createWrapper = (props = {}) => mount(CytomineSlider, {
     props: { modelValue: 20, min: 0, max: 100, ...props },
@@ -32,7 +10,7 @@ describe('CytomineSlider.vue', () => {
   });
 
   const edit = async (wrapper, dot = 0) => {
-    await wrapper.findAll('.vue-slider-dot-tooltip-inner')[dot].trigger('click');
+    await wrapper.findAll('.cytomine-slider-tooltip')[dot].trigger('click');
     return wrapper.find('input');
   };
 

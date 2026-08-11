@@ -1,6 +1,6 @@
 <template>
 <multiselect
-  :value="modelValue" @input="$emit('update:modelValue', $event)"
+  :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)"
   :label="label"
   :track-by="trackBy"
   :group-label="groupLabel"
@@ -55,6 +55,8 @@
 
 <script>
 import Multiselect from 'vue-multiselect';
+
+Multiselect.compatConfig = { MODE: 3 }; // TODO remove when @vue/compat is removed
 
 export default {
   name: 'cytomine-multiselect',

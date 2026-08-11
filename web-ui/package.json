@@ -52,7 +52,6 @@
     "vue-multiselect": "^3.5.0",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^4.6.4",
-    "vue-slider-component": "^3.0.31",
     "vue3-openlayers": "^12.2.2",
     "vuex": "^4.1.0"
   },

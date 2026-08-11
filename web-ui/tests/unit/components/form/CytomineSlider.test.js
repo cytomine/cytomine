@@ -3,18 +3,6 @@ import Buefy from 'buefy';
 
 import CytomineSlider from '@/components/form/CytomineSlider.vue';
 
-vi.mock('vue-slider-component', () => ({
-  __esModule: true,
-  default: {
-    name: 'vue-slider',
-    props: ['value'],
-    render() {
-      const values = Array.isArray(this.value) ? [...this.value] : [this.value];
-      return values.map((value, index) => this.$scopedSlots.tooltip({ value, index }));
-    },
-  },
-}));
-
 describe('CytomineSlider.vue', () => {
   const createWrapper = (props = {}) => mount(CytomineSlider, {
     props: { modelValue: 20, min: 0, max: 100, ...props },
@@ -22,7 +10,7 @@ describe('CytomineSlider.vue', () => {
   });
 
   const edit = async (wrapper, dot = 0) => {
-    await wrapper.findAll('.vue-slider-dot-tooltip-inner')[dot].trigger('click');
+    await wrapper.findAll('.cytomine-slider-tooltip')[dot].trigger('click');
     return wrapper.find('input');
   };
 

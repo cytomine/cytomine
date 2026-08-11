@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.-->
-
 <template>
   <b-carousel
       autoplay repeat
@@ -36,15 +22,15 @@ limitations under the License.-->
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 
 export default {
   name: 'image-group-preview',
-  components: {ImageThumbnail},
+  components: { ImageThumbnail },
   props: {
-    imageGroup: {type: Object},
+    imageGroup: { type: Object },
   },
   computed: {
     shortTermToken: get('currentUser/shortTermToken'),
@@ -53,7 +39,7 @@ export default {
 </script>
 
 <style scoped>
->>> .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }
@@ -64,12 +50,12 @@ export default {
   width: 10rem;
 }
 
->>> .carousel-arrow .icon.has-icons-right {
+:deep(.carousel-arrow .icon.has-icons-right) {
   color: #3273dc;
   right: 0.5rem;
 }
 
->>> .carousel-arrow .icon.has-icons-left {
+:deep(.carousel-arrow .icon.has-icons-left) {
   color: #3273dc;
   left: 0.5rem;
 }

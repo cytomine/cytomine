@@ -18,11 +18,11 @@ import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.domain.ontology.AnnotationIndex;
 import be.cytomine.domain.ontology.AnnotationTrack;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.image.SliceInstanceRepository;
-import be.cytomine.repository.ontology.AnnotationIndexRepository;
 import be.cytomine.repository.ontology.AnnotationTrackRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
@@ -47,8 +47,6 @@ public class SliceInstanceService extends ModelService {
     private final SliceInstanceRepository sliceInstanceRepository;
 
     private final AnnotationTrackService annotationTrackService;
-
-    private final AnnotationIndexRepository annotationIndexRepository;
 
     private final AnnotationTrackRepository annotationTrackRepository;
 
@@ -174,7 +172,13 @@ public class SliceInstanceService extends ModelService {
     }
 
     private void deleteDependentAnnotationIndex(SliceInstance slice) {
-        annotationIndexRepository.deleteAllBySlice(slice);
+        List<AnnotationIndex> annotationIndexes = getEntityManager()
+            .createQuery("SELECT ai FROM AnnotationIndex ai WHERE ai.slice = :slice", AnnotationIndex.class)
+            .setParameter("slice", slice)
+            .getResultList();
+        for (AnnotationIndex annotationIndex : annotationIndexes) {
+            getEntityManager().remove(annotationIndex);
+        }
     }
 
     @Override

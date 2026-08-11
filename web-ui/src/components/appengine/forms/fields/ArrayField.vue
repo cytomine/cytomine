@@ -41,7 +41,7 @@ export default {
     ArrayModal,
   },
   props: {
-    parameter: {type: Object, required: true},
+    parameter: { type: Object, required: true },
     value: {},
   },
   data() {
@@ -65,19 +65,19 @@ export default {
       return this.type.subType;
     },
     maxSize() {
-      let {maxSize} = this.type;
+      let { maxSize } = this.type;
       return maxSize;
     },
     minSize() {
-      let {minSize} = this.type;
+      let { minSize } = this.type;
       return minSize;
     },
     hasConstraints() {
-      let {minSize, maxSize} = this.type;
+      let { minSize, maxSize } = this.type;
       return minSize !== null || maxSize !== null;
     },
     constraintsSummary() {
-      let {minSize, maxSize} = this.type;
+      let { minSize, maxSize } = this.type;
       let summary = '';
 
       if (!!minSize || minSize === 0) {

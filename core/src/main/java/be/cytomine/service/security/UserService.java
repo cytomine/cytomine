@@ -299,6 +299,9 @@ public class UserService extends ModelService {
 
         Map<String, Object> mapParams = new HashMap<>();
 
+        where += " AND u.deleted IS NULL ";
+
+
         if (multiSearch.isPresent()) {
             String value = ((String) multiSearch.get().getValue()).toLowerCase();
             value = "%" + value + "%";
@@ -862,6 +865,7 @@ public class UserService extends ModelService {
         securityACLService.checkAdmin(currentUser);
         securityACLService.checkIsSameUser((User) domain, currentUser);
         Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        accountService.delete(((User) domain).getUsername());
         return executeCommand(c, domain, null);
     }
 

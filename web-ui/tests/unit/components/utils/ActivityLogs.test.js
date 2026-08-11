@@ -1,10 +1,9 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
-import moment from 'moment';
 
 import ActivityLogs from '@/components/utils/ActivityLogs';
 import ActivityLogsItem from '@/components/utils/ActivityLogsItem';
-import {Project} from '@/api';
+import { Project } from '@/api';
 
 vi.mock('@/api', () => ({
   Project: {
@@ -26,10 +25,6 @@ describe('ActivityLogs.vue', () => {
 
   let wrapper;
 
-  beforeAll(() => {
-    localVue.filter('moment', vi.fn((value, format) => moment(Number(value)).format(format)));
-  });
-
   beforeEach(() => {
     Project.fetchCommandHistory.mockResolvedValue([]);
 
@@ -40,7 +35,7 @@ describe('ActivityLogs.vue', () => {
         startDate: 1622505600000,
         endDate: 1625097600000,
         idUser: 1,
-        project: {id: 123}
+        project: { id: 123 }
       }
     });
   });
@@ -51,7 +46,7 @@ describe('ActivityLogs.vue', () => {
 
   it('should render the loading state correctly', async () => {
     Project.fetchCommandHistory.mockResolvedValue([
-      {id: 1, created: '1622505600000', message: 'Action 1'}
+      { id: 1, created: '1622505600000', message: 'Action 1' }
     ]);
 
     await wrapper.vm.loadActions();
@@ -67,7 +62,7 @@ describe('ActivityLogs.vue', () => {
   });
 
   it('should render error message when "error" is true', async () => {
-    wrapper.setData({error: true});
+    wrapper.setData({ error: true });
     await wrapper.vm.$nextTick();
     const errorMessage = wrapper.find('p');
 
@@ -78,8 +73,8 @@ describe('ActivityLogs.vue', () => {
 
   it('should render a list of actions grouped by month and day', async () => {
     Project.fetchCommandHistory.mockResolvedValue([
-      {id: 1, created: '1622505600000', message: 'Action 1'},
-      {id: 2, created: '1622592000000', message: 'Action 2'}
+      { id: 1, created: '1622505600000', message: 'Action 1' },
+      { id: 2, created: '1622592000000', message: 'Action 2' }
     ]);
 
     await wrapper.vm.loadActions();
@@ -121,7 +116,7 @@ describe('ActivityLogs.vue', () => {
   });
 
   it('should reset data when loadActions is called with "append" to false', async () => {
-    const actions = [{id: 1, created: '1625097600000', message: 'Action'}];
+    const actions = [{ id: 1, created: '1625097600000', message: 'Action' }];
     Project.fetchCommandHistory.mockResolvedValue(actions);
 
     await wrapper.vm.loadActions(false);

@@ -22,7 +22,7 @@ export default class UserCollection extends Collection {
    * @returns {UserCollection} Collection of users following user (userId) on image (imageId)
    */
   static async fetchFollowers(userId, imageId) {
-    let {data} = await Cytomine.instance.api.get(`imageinstance/${imageId}/followers/${userId}.json`);
+    let { data } = await Cytomine.instance.api.get(`imageinstance/${imageId}/followers/${userId}.json`);
     return data.collection;
   }
 }

@@ -81,19 +81,21 @@
 
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import WKT from 'ol/format/WKT';
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import ImageName from '@/components/image/ImageName.vue';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
 
-import {ImageGroup, ImageInstanceCollection, AnnotationGroup, AnnotationCollection, Annotation, AnnotationLink} from '@/api';
-import {getCenter, containsExtent, getIntersection} from 'ol/extent';
-import {listAnnotationsInGroup} from '@/utils/annotation-utils';
+import { ImageGroup, ImageInstanceCollection, AnnotationGroup, AnnotationCollection, Annotation, AnnotationLink } from '@/api';
+import { getCenter, containsExtent, getIntersection } from 'ol/extent';
+import { listAnnotationsInGroup } from '@/utils/annotation-utils';
 
 export default {
   name: 'paste-annotation-with-link-modal',
-  components: {CytomineModalCard, ImageName, AnnotationLinksPreview},
+  components: { CytomineModalCard, ImageName, AnnotationLinksPreview },
   props: {
     index: String
   },
@@ -107,9 +109,9 @@ export default {
       mainColor: '0099ff',
       linkColor: '696969',
 
-      viewerCenterPosition: {label: this.$t('viewer-center-position'), value: 'viewer'},
-      imageCenterPosition: {label: this.$t('image-center-position'), value: 'image'},
-      annotationPosition: {label: this.$t('annotation-position'), value: 'annotation'},
+      viewerCenterPosition: { label: this.$t('viewer-center-position'), value: 'viewer' },
+      imageCenterPosition: { label: this.$t('image-center-position'), value: 'image' },
+      annotationPosition: { label: this.$t('annotation-position'), value: 'annotation' },
 
       checkedInViewer: [],
       checkedNotInViewer: [],
@@ -194,11 +196,11 @@ export default {
     selectedImagesAndOptions() {
       let selected1 = this.imagesInGroupInViewer.filter(image => this.checkedInViewer.includes(image.id))
         .map(image => {
-          return {'image': image.id, 'position': image.inViewerPosition};
+          return { 'image': image.id, 'position': image.inViewerPosition };
         });
       let selected2 = this.imagesInGroupNotInViewer.filter(image => this.checkedNotInViewer.includes(image.id))
         .map(image => {
-          return {'image': image.id, 'position': image.notInViewerPosition};
+          return { 'image': image.id, 'position': image.notInViewerPosition };
         });
       return selected1.concat(selected2);
     },
@@ -283,7 +285,7 @@ export default {
 
         (await listAnnotationsInGroup(this.image.project, annotGroup.id)).forEach(a => {
           if (existingAnnots.includes(a.id)) {
-            this.$eventBus.$emit('editAnnotation', a);
+            eventBus.emit('editAnnotation', a);
 
             if (a.id === this.copiedAnnot.id) {
               let copiedAnnot = this.copiedAnnot.clone();
@@ -292,18 +294,18 @@ export default {
               this.copiedAnnot = copiedAnnot;
             }
           } else {
-            this.$eventBus.$emit('addAnnotation', a);
+            eventBus.emit('addAnnotation', a);
           }
           if (this.imagesIdsInGroupInViewer.includes(a.image)) {
             let index = this.findWrapper(a.image).index;
-            this.$eventBus.$emit('selectAnnotation', {index, annot: a, center: false});
+            eventBus.emit('selectAnnotation', { index, annot: a, center: false });
           }
         });
 
-        this.$notify({type: 'success', text: this.$t('notif-success-annotation-link-paste')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-annotation-link-paste') });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-link-paste')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-link-paste') });
       }
       this.$parent.close();
     },

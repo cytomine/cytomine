@@ -1,4 +1,4 @@
-import {detect} from 'detect-browser';
+import { detect } from 'detect-browser';
 
 import Model from './model.js';
 import Cytomine from '../cytomine.js';
@@ -37,7 +37,7 @@ export default class ProjectConnection extends Model {
     // super.save(); // TODO: uncomment once lack of consistency in core is fixed
 
     if (this.isNew()) {
-      let {data} = await Cytomine.instance.api.post(this.uri, this.getPublicProperties());
+      let { data } = await Cytomine.instance.api.post(this.uri, this.getPublicProperties());
       this.populate(data);
       // TODO: store command ID (currently not returned by backend)
       return this;

@@ -140,6 +140,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
+    // search
+    implementation 'com.meilisearch.sdk:meilisearch-java:0.17.1'
+
     // Utils
     implementation 'org.apache.commons:commons-text:1.11.0'
     implementation 'net.bull.javamelody:javamelody-spring-boot-starter:2.1.0'

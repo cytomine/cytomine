@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
   <div class="box" v-if="!loading">
     <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
@@ -22,7 +8,7 @@
       <div class="columns">
         <h2 class="column is-marginless">{{$t('members-activity')}}</h2>
         <p class="column has-text-right is-size-7 has-text-grey">
-          {{$t('data-last-updated-on', {time: $options.filters.moment(lastUpdate, 'LTS')})}}
+          {{$t('data-last-updated-on', {time: formatMomentDate(lastUpdate, 'LTS')})}}
         </p>
       </div>
 
@@ -96,7 +82,7 @@
 
           <b-table-column field="lastConnection" :label="$t('last-connection')" sortable width="100">
             <template v-if="member.lastConnection">
-              {{Number(member.lastConnection) | moment('ll LT')}}
+              {{formatMomentDate(Number(member.lastConnection), 'll LT')}}
             </template>
             <em v-else class="has-text-grey">{{$t('no-record')}}</em>
           </b-table-column>
@@ -146,14 +132,15 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
 import Username from '@/components/user/Username.vue';
 
 import constants from '@/utils/constants.js';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { getWildcardRegexp } from '@/utils/string-utils';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'members-activity',
@@ -211,6 +198,7 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
     async fetchData() {
       try {
         await Promise.all([

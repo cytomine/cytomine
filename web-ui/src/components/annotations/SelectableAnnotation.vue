@@ -24,10 +24,10 @@ export default {
     AnnotationPreview,
   },
   props: {
-    annotation: {type: Object, default: null},
-    images: {type: Array, default: () => []},
-    isSelected: {type: Boolean, default: false},
-    users: {type: Array, default: () => []},
+    annotation: { type: Object, default: null },
+    images: { type: Array, default: () => [] },
+    isSelected: { type: Boolean, default: false },
+    users: { type: Array, default: () => [] },
   }
 };
 </script>

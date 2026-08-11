@@ -18,23 +18,23 @@ export default {
     stateIconography() {
       switch (this.state) {
         case 'CREATED':
-          return {'type': 'is-primary', 'icon': 'plus-circle'};
+          return { 'type': 'is-primary', 'icon': 'plus-circle' };
         case 'PROVISIONED':
-          return {'type': 'is-primary', 'icon': 'boxes'};
+          return { 'type': 'is-primary', 'icon': 'boxes' };
         case 'QUEUING':
-          return {'type': 'is-warning', 'icon': 'route'};
+          return { 'type': 'is-warning', 'icon': 'route' };
         case 'QUEUED':
-          return {'type': 'is-warning', 'icon': 'route'};
+          return { 'type': 'is-warning', 'icon': 'route' };
         case 'PENDING':
-          return {'type': 'is-warning', 'icon': 'pause'};
+          return { 'type': 'is-warning', 'icon': 'pause' };
         case 'RUNNING':
-          return {'type': 'is-primary', 'icon': 'running'};
+          return { 'type': 'is-primary', 'icon': 'running' };
         case 'FAILED':
-          return {'type': 'is-danger', 'icon': 'times'};
+          return { 'type': 'is-danger', 'icon': 'times' };
         case 'FINISHED':
-          return {'type': 'is-success', 'icon': 'check-circle'};
+          return { 'type': 'is-success', 'icon': 'check-circle' };
         default:
-          return {'type': 'is-primary', 'icon': 'question-circle'};
+          return { 'type': 'is-primary', 'icon': 'question-circle' };
       }
     },
     stateIcon() {

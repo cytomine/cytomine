@@ -21,7 +21,7 @@ export default class PropertyCollection extends DomainCollection {
    * @returns {Array<{key: String, userId: String}> | Array<String>}
    */
   static async fetchKeysAnnotationProperties(idProject, idImage, user = false, max = 0, offset = 0) {
-    let {data} = await Cytomine.instance.api.get('annotation/property/key.json', {
+    let { data } = await Cytomine.instance.api.get('annotation/property/key.json', {
       params: {
         idProject, idImage, user, max, offset
       }
@@ -39,7 +39,7 @@ export default class PropertyCollection extends DomainCollection {
    * @returns {Array<String>}
    */
   static async fetchKeysImageProperties(idProject, max = 0, offset = 0) {
-    let {data} = await Cytomine.instance.api.get('imageinstance/property/key.json', {params: {idProject, max, offset}});
+    let { data } = await Cytomine.instance.api.get('imageinstance/property/key.json', { params: { idProject, max, offset } });
     return data.collection;
   }
 
@@ -56,7 +56,7 @@ export default class PropertyCollection extends DomainCollection {
    * @returns {Array<{idAnnotation: Number, x: Number, y: Number, value: String}>}
    */
   static async fetchPropertiesValuesAndPositions(idUser, idImage, key, bbox, max = 0, offset = 0) {
-    let params = {key};
+    let params = { key };
     if (bbox) {
       params.bbox = bbox;
     }
@@ -66,7 +66,7 @@ export default class PropertyCollection extends DomainCollection {
     if (offset) {
       params.offset = offset;
     }
-    let {data} = await Cytomine.instance.api.get(`user/${idUser}/imageinstance/${idImage}/annotationposition.json`, {params});
+    let { data } = await Cytomine.instance.api.get(`user/${idUser}/imageinstance/${idImage}/annotationposition.json`, { params });
     return data.collection;
   }
 }

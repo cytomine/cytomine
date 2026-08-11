@@ -1,20 +1,6 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <li :key="action.id">
-  <strong>{{Number(action.created) | moment('l LTS')}}:</strong>
+  <strong>{{formatMomentDate(Number(action.created), 'l LTS')}}:</strong>
   <span class="content" @mouseenter="enter" @mouseleave="leave">
     <router-link v-if="route" :to="route">
       {{action.message}}
@@ -32,8 +18,9 @@
 <script>
 
 
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {get} from '@/utils/store-helpers.js';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { get } from '@/utils/store-helpers.js';
+import { formatMomentDate } from '@/utils/date';
 
 const ANNOT = 1;
 const IMAGE = 2;
@@ -56,7 +43,6 @@ export default {
     actionData() {
       return JSON.parse(this.action.data);
     },
-    // eslint-disable-next-line vue/return-in-computed-property
     type() {
       switch (this.action.serviceName) {
         case 'userAnnotationService':
@@ -73,6 +59,7 @@ export default {
   },
   methods: {
     appendShortTermToken,
+    formatMomentDate,
     enter() {
       this.showPreview = true;
     },

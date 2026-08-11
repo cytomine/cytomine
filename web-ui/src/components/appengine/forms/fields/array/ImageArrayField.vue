@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     onMultiSelect(ids, type) {
-      this.$emit('input', {ids, type});
+      this.$emit('input', { ids, type });
     }
   },
 };

@@ -1,9 +1,18 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
+import eventBus from '@/utils/event-bus';
 
 import MetadataPanel from '@/components/viewer/panels/MetadataPanel';
+
+vi.mock('@/utils/event-bus', () => ({
+  default: {
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
+  }
+}));
 
 vi.mock('@/api', () => ({
   Cytomine: {
@@ -12,8 +21,8 @@ vi.mock('@/api', () => ({
         get: vi.fn(() => Promise.resolve({
           data: {
             collection: [
-              {namespace: 'ns1', key: 'key1', value: 'value1'},
-              {namespace: 'ns2', key: 'key2', value: 'value2'}
+              { namespace: 'ns1', key: 'key1', value: 'value1' },
+              { namespace: 'ns2', key: 'key2', value: 'value2' }
             ]
           }
         }))
@@ -36,17 +45,16 @@ describe('MetadataPanel.vue', () => {
 
     wrapper = shallowMount(MetadataPanel, {
       localVue,
-      propsData: {index: '0'},
+      propsData: { index: '0' },
       mocks: {
         $t: (message) => message,
         $store: {
           getters: {
             'currentProject/currentViewer': {
-              images: [{imageInstance: {id: 123}}]
+              images: [{ imageInstance: { id: 123 } }]
             }
           }
-        },
-        $eventBus: {$emit: vi.fn()}
+        }
       }
     });
 
@@ -59,7 +67,7 @@ describe('MetadataPanel.vue', () => {
   });
 
   it('should filter metadata based on search string', async () => {
-    wrapper.setData({searchString: 'key1'});
+    wrapper.setData({ searchString: 'key1' });
 
     await wrapper.vm.$nextTick();
 
@@ -70,6 +78,6 @@ describe('MetadataPanel.vue', () => {
   it('should emit close event when closeMetadata is called', () => {
     wrapper.vm.closeMetadata();
 
-    expect(wrapper.vm.$eventBus.$emit).toHaveBeenCalledWith('close-metadata');
+    expect(eventBus.emit).toHaveBeenCalledWith('close-metadata');
   });
 });

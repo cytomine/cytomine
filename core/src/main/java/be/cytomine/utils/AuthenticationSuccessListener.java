@@ -84,6 +84,11 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         if (userByUsername.isPresent() && userByReference.isEmpty()) {
             User user = userByUsername.get();
             user.setReference(sub.toString());
+            user.setFirstname(tokenAttributes.get("given_name") != null
+                ? tokenAttributes.get("given_name").toString() : "");
+            user.setLastname(tokenAttributes.get("family_name") != null
+                ? tokenAttributes.get("family_name").toString() : "");
+            user.setEmail(tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "");
             userRepository.save(user);
 
             self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
@@ -95,6 +100,11 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             newUser.setUsername(jwtAuthenticationToken.getName());
             newUser.setReference(sub.toString());
             newUser.setName(tokenAttributes.get("name").toString());
+            newUser.setFirstname(tokenAttributes.get("given_name") != null
+                ? tokenAttributes.get("given_name").toString() : "");
+            newUser.setLastname(tokenAttributes.get("family_name") != null
+                ? tokenAttributes.get("family_name").toString() : "");
+            newUser.setEmail(tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "");
             // generate keys for public/private keys authentication
             newUser.generateKeys();
 

@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="project-actions-wrapper">
   <rename-modal
@@ -84,15 +70,15 @@
 </template>
 
 <script>
-import {OntologyCollection} from '@/api';
+import { OntologyCollection } from '@/api';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 import RenameModal from '@/components/utils/RenameModal.vue';
 
 export default {
   name: 'project-actions',
   props: {
-    project: {type: Object},
-    size: {type: String, default: 'is-small'}
+    project: { type: Object },
+    size: { type: String, default: 'is-small' }
   },
   components: {
     CytomineModal,
@@ -115,7 +101,7 @@ export default {
       if (val) {
         if (this.loadingOntologies) { // first opening of the ontology modal => load ontologies
           try {
-            this.ontologies = (await OntologyCollection.fetchAll({light: true})).array;
+            this.ontologies = (await OntologyCollection.fetchAll({ light: true })).array;
             this.ontologies.sort((a, b) => a.name.localeCompare(b.name));
             this.loadingOntologies = false;
           } catch (error) {
@@ -139,13 +125,13 @@ export default {
         this.$emit('update', updatedProject);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-project-rename', {projectName: updatedProject.name})
+          text: this.$t('notif-success-project-rename', { projectName: updatedProject.name })
         });
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-project-rename', {projectName: this.project.name})
+          text: this.$t('notif-error-project-rename', { projectName: this.project.name })
         });
       }
       this.isRenameModalActive = false;
@@ -161,7 +147,7 @@ export default {
         this.$emit('update', updatedProject);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-project-ontology-change', {projectName: this.project.name})
+          text: this.$t('notif-success-project-ontology-change', { projectName: this.project.name })
         });
       } catch (error) {
         console.log(error);
@@ -172,7 +158,7 @@ export default {
           if (counts.reviewedAssociatedTermsCount === 0) {
             this.$buefy.dialog.confirm({
               title: this.$t('confirm-ontology-change'),
-              message: this.$t('confirm-ontology-change-delete-user-terms', {count: counts.userAssociatedTermsCount}),
+              message: this.$t('confirm-ontology-change-delete-user-terms', { count: counts.userAssociatedTermsCount }),
               type: 'is-danger',
               confirmText: this.$t('button-confirm'),
               cancelText: this.$t('button-cancel'),
@@ -188,7 +174,7 @@ export default {
         } else {
           this.$notify({
             type: 'error',
-            text: this.$t('notif-error-project-ontology-change', {projectName: this.project.name})
+            text: this.$t('notif-error-project-ontology-change', { projectName: this.project.name })
           });
         }
       }
@@ -199,7 +185,7 @@ export default {
     deleteProject() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-project'),
-        message: this.$t('delete-project-confirmation-message', {projectName: this.project.name}),
+        message: this.$t('delete-project-confirmation-message', { projectName: this.project.name }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),

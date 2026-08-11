@@ -12,7 +12,7 @@
 export default {
   name: 'UploadErrorMessage',
   props: {
-    error: {type: Object, required: true},
+    error: { type: Object, required: true },
   },
   computed: {
     title() {

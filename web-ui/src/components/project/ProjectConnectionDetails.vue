@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <table class="table">
   <b-loading :is-full-page="false" :active.sync="loading" />
@@ -35,7 +21,7 @@
               <div class="details">
                 <p>
                   <strong>{{$t('duration')}}:</strong>
-                  {{ consultation.time | duration('humanize') }}
+                  {{ formatMomentDuration(consultation.time, 'humanize') }}
                   <br>
                   <strong>{{$t('annotation-creations')}}:</strong>
                   {{consultation.countCreatedAnnotations || 0}}
@@ -52,12 +38,13 @@
 </template>
 
 <script>
-import {ImageConsultationCollection} from '@/api';
+import { ImageConsultationCollection } from '@/api';
 import ImagePreview from '@/components/image/ImagePreview.vue';
+import { formatMomentDuration } from '@/utils/date';
 
 export default {
   name: 'project-connection-details',
-  components: {ImagePreview},
+  components: { ImagePreview },
   props: {
     connection: Object
   },
@@ -72,12 +59,15 @@ export default {
       return this.$store.state.currentProject.project.blindMode;
     }
   },
+  methods: {
+    formatMomentDuration
+  },
   async created() {
     try {
-      this.consultations = (await ImageConsultationCollection.fetchAll({projectConnection: this.connection.id})).array;
+      this.consultations = (await ImageConsultationCollection.fetchAll({ projectConnection: this.connection.id })).array;
     } catch (error) {
       console.log(error);
-      this.$notify({type: 'error', text: this.$t('error-failed-to-fetch-image-consultations')});
+      this.$notify({ type: 'error', text: this.$t('error-failed-to-fetch-image-consultations') });
     }
     this.loading = false;
   }

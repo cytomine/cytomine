@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.-->
-
 <template>
 <div class="annotation-details">
   <template v-if="filteredLinks.length > 0">
@@ -48,12 +34,14 @@ limitations under the License.-->
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import eventBus from '@/utils/event-bus';
+
+import { get } from '@/utils/store-helpers';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 import constants from '@/utils/constants';
 
-import {Annotation} from '@/api';
+import { Annotation } from '@/api';
 
 export default {
   name: 'annotation-links-preview',
@@ -61,15 +49,15 @@ export default {
     'annotation-preview': AnnotationPreview,
   },
   props: {
-    index: {type: String, default: null},
-    annotation: {type: Object},
-    images: {type: Array},
-    allowAnnotationSelection: {type: Boolean, default: false},
-    showSelectAllButton: {type: Boolean, default: false},
-    showMainAnnotation: {type: Boolean, default: false},
-    size: {type: Number, default: 64},
-    mainColor: {type: String, default: null},
-    linkColor: {type: String, default: null},
+    index: { type: String, default: null },
+    annotation: { type: Object },
+    images: { type: Array },
+    allowAnnotationSelection: { type: Boolean, default: false },
+    showSelectAllButton: { type: Boolean, default: false },
+    showMainAnnotation: { type: Boolean, default: false },
+    size: { type: Number, default: 64 },
+    mainColor: { type: String, default: null },
+    linkColor: { type: String, default: null },
   },
   data() {
     return {};
@@ -80,7 +68,7 @@ export default {
 
     image() {
       return this.images.find(image => image.id === this.annotation.image) ||
-        {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
+        { 'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename };
     },
 
     annotationURL() {
@@ -127,21 +115,21 @@ export default {
   methods: {
     showLinkedAnnotations() {
       this.filteredLinks.forEach(link => {
-        this.$emit('select', {annot: link, options:{}});
+        this.$emit('select', { annot: link, options:{} });
       });
     },
-    selectAnnotation({annot, options}) {
+    selectAnnotation({ annot, options }) {
       if (this.allowAnnotationSelection) {
-        this.$emit('select', {annot, options});
+        this.$emit('select', { annot, options });
       }
     },
     selectNext() {
       let annot = this.orderedLinks[1];
-      this.selectAnnotation({annot, options:{trySameView: true}});
+      this.selectAnnotation({ annot, options:{ trySameView: true } });
     },
     selectPrevious() {
       let annot = this.orderedLinks[this.orderedLinks.length - 1];
-      this.selectAnnotation({annot, options:{trySameView: true}});
+      this.selectAnnotation({ annot, options:{ trySameView: true } });
     },
     shortkeyHandler(key) {
       if (!this.isActiveImage) {
@@ -157,19 +145,19 @@ export default {
   },
   mounted() {
     if (this.index !== null) {
-      this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+      eventBus.on('shortkeyEvent', this.shortkeyHandler);
     }
   },
   beforeDestroy() {
     if (this.index !== null) {
-      this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+      eventBus.off('shortkeyEvent', this.shortkeyHandler);
     }
   }
 };
 </script>
 
 <style scoped>
->>> .annot-preview {
+:deep(.annot-preview) {
   margin: 3px;
 }
 

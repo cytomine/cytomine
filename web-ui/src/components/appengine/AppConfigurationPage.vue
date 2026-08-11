@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 
 import AppStoreAddModal from '@/components/appengine/AppStoreAddModal.vue';
 
@@ -81,7 +81,7 @@ export default {
 
         this.$store.commit('appStores/delete', store);
 
-        this.$notify({type: 'success', text: this.$t('notify-success-app-store-deletion')});
+        this.$notify({ type: 'success', text: this.$t('notify-success-app-store-deletion') });
       } catch (error) {
         console.error('Failed to delete store:', error);
       }

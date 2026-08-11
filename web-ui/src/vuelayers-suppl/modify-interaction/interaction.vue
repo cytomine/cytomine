@@ -1,15 +1,15 @@
 <script>
-import {altKeyOnly, always, primaryAction} from 'ol/events/condition';
+import { altKeyOnly, always, primaryAction } from 'ol/events/condition';
 import ModifyInteraction from './modify';
 import interaction from 'vuelayers/lib/mixin/interaction';
 import stylesContainer from 'vuelayers/lib/mixin/styles-container';
-import {createStyle, defaultEditStyle} from 'vuelayers/lib/ol-ext/style';
-import {isCollection, isVectorSource} from 'vuelayers/lib/ol-ext/util';
+import { createStyle, defaultEditStyle } from 'vuelayers/lib/ol-ext/style';
+import { isCollection, isVectorSource } from 'vuelayers/lib/ol-ext/util';
 import observableFromOlEvent from 'vuelayers/lib/rx-ext/from-ol-event';
-import {hasInteraction} from 'vuelayers/lib/util/assert';
-import {isFunction, mapValues} from 'vuelayers/lib/util/minilo';
+import { hasInteraction } from 'vuelayers/lib/util/assert';
+import { isFunction, mapValues } from 'vuelayers/lib/util/minilo';
 import mergeDescriptors from 'vuelayers/lib/util/multi-merge-descriptors';
-import {makeWatchers} from 'vuelayers/lib/util/vue-helpers';
+import { makeWatchers } from 'vuelayers/lib/util/vue-helpers';
 
 /**
  * @vueProps

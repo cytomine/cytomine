@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 
@@ -7,7 +7,7 @@ vi.mock('@/api', () => ({
     instance: {
       api: {
         get: vi.fn(() => Promise.resolve({
-          data: new Blob(['test image data'], {type: 'image/jpeg'})
+          data: new Blob(['test image data'], { type: 'image/jpeg' })
         })),
       },
     },
@@ -18,26 +18,15 @@ const mockBlobUrl = 'blob:mock-url-12345';
 
 describe('AnnotationPreview.vue', () => {
   const createWrapper = (options) => shallowMount(AnnotationPreview, {
-    mocks: {
-      $eventBus: mockEventBus,
-    },
     stubs: {
       'v-popover': true,
     },
     ...options,
   });
 
-  let mockEventBus;
-
   beforeEach(() => {
     global.URL.createObjectURL = vi.fn(() => mockBlobUrl);
     global.URL.revokeObjectURL = vi.fn();
-
-    mockEventBus = {
-      $on: vi.fn(),
-      $off: vi.fn(),
-      $emit: vi.fn()
-    };
   });
 
   afterEach(() => {
@@ -80,7 +69,7 @@ describe('AnnotationPreview.vue', () => {
     it('should display preview button is showDetails is true', () => {
       const wrapper = createWrapper();
 
-      const buttonWrapper = wrapper.findComponent({ref: 'previewButton'});
+      const buttonWrapper = wrapper.findComponent({ ref: 'previewButton' });
       expect(buttonWrapper.exists()).toBe(true);
     });
 
@@ -91,7 +80,7 @@ describe('AnnotationPreview.vue', () => {
         }
       });
 
-      const buttonWrapper = wrapper.findComponent({ref: 'previewButton'});
+      const buttonWrapper = wrapper.findComponent({ ref: 'previewButton' });
       expect(buttonWrapper.exists()).toBe(false);
     });
   });

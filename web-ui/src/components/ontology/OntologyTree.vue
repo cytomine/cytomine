@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
   <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
@@ -66,8 +52,8 @@
 import SlVueTree from 'sl-vue-tree';
 import CytomineTerm from './CytomineTerm.vue';
 import TermModal from './TermModal.vue';
-import {Term} from '@/api';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { Term } from '@/api';
+import { getWildcardRegexp } from '@/utils/string-utils';
 
 export default {
   name: 'ontology-tree',
@@ -76,17 +62,17 @@ export default {
     event: 'setSelectedNodes'
   },
   props: {
-    ontology: {type: Object},
-    additionalNodes: {type: Array, default: () => []},
-    startWithAdditionalNodes: {type: Boolean, default: false},
-    searchString: {type: String, default: ''},
-    selectedNodes: {type: Array, default: () => []},
-    allowSelection: {type: Boolean, default: true},
-    multipleSelection: {type: Boolean, default: true},
-    allowDrag: {type: Boolean, default: false},
-    allowEdition: {type: Boolean, default: false},
-    allowNew: {type: Boolean, default: false},
-    hiddenNodes: {type: Array, default: () => []}
+    ontology: { type: Object },
+    additionalNodes: { type: Array, default: () => [] },
+    startWithAdditionalNodes: { type: Boolean, default: false },
+    searchString: { type: String, default: '' },
+    selectedNodes: { type: Array, default: () => [] },
+    allowSelection: { type: Boolean, default: true },
+    multipleSelection: { type: Boolean, default: true },
+    allowDrag: { type: Boolean, default: false },
+    allowEdition: { type: Boolean, default: false },
+    allowNew: { type: Boolean, default: false },
+    hiddenNodes: { type: Array, default: () => [] }
   },
   components: {
     SlVueTree,
@@ -246,7 +232,7 @@ export default {
       this.openModal();
     },
     updateTerm(term) {
-      this.$refs.tree.updateNode(this.editedNode.path, {data: {...term}});
+      this.$refs.tree.updateNode(this.editedNode.path, { data: { ...term } });
     },
 
     openModal() {
@@ -278,10 +264,10 @@ export default {
             });
           } catch (error) {
             console.log(error);
-            this.$notify({type: 'error', text: this.$t('notif-error-ontology-tree-update')});
+            this.$notify({ type: 'error', text: this.$t('notif-error-ontology-tree-update') });
           }
         } else {
-          this.$notify({type: 'warn', text: this.$t('notif-warn-ontology-tree-order-not-persisted')});
+          this.$notify({ type: 'warn', text: this.$t('notif-warn-ontology-tree-order-not-persisted') });
         }
       });
     },
@@ -289,7 +275,7 @@ export default {
     confirmTermDeletion(node) {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
-        message: this.$t('confirm-deletion-term', {name: node.data.name}),
+        message: this.$t('confirm-deletion-term', { name: node.data.name }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -302,7 +288,7 @@ export default {
         this.$refs.tree.remove([node.path]);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-term-deletion')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-term-deletion') });
       }
     }
   },

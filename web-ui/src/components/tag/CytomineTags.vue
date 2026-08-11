@@ -1,18 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
-
 <template>
 <div class="tags-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -43,15 +28,15 @@
 
 <script>
 
-import {Tag, TagDomainAssociation, TagDomainAssociationCollection} from '@/api';
+import { Tag, TagDomainAssociation, TagDomainAssociationCollection } from '@/api';
 import AddTagDomainAssociationModal from '@/components/tag/AddTagDomainAssociationModal.vue';
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'cytomine-tags',
   props: {
-    object: {type: Object},
-    canEdit: {type: Boolean, default: true}
+    object: { type: Object },
+    canEdit: { type: Boolean, default: true }
   },
   data() {
     return {
@@ -74,9 +59,9 @@ export default {
       this.$buefy.modal.open({
         parent: this,
         component: AddTagDomainAssociationModal,
-        props: {associatedTags: this.associatedTags},
+        props: { associatedTags: this.associatedTags },
         hasModalCard: true,
-        events: {'addObjects': this.addAssociations}
+        events: { 'addObjects': this.addAssociations }
       });
     },
     sortAssociatedTags() {
@@ -84,7 +69,7 @@ export default {
     },
     async addAssociations(tags) {
       if (tags.length === 0) {
-        this.$notify({type: 'error', text: this.$t('notif-error-add-tag-domain-associations')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-add-tag-domain-associations') });
         return;
       }
 
@@ -99,7 +84,7 @@ export default {
       try {
         let tagPromises = [];
         for (let i = 0; i < newTags.length; i++) {
-          tagPromises.push(new Tag({name : newTags[i]}, this.object).save());
+          tagPromises.push(new Tag({ name : newTags[i] }, this.object).save());
         }
         newTags = await Promise.all(tagPromises).then(function (values) {
           return values;
@@ -107,23 +92,23 @@ export default {
         tags = existingTags.concat(newTags);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-add-tags')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-add-tags') });
       }
 
       try {
         let associationPromises = [];
         for (let i = 0; i < tags.length; i++) {
-          associationPromises.push(new TagDomainAssociation({tag : tags[i].id}, this.object).save());
+          associationPromises.push(new TagDomainAssociation({ tag : tags[i].id }, this.object).save());
         }
         let newAssocations = await Promise.all(associationPromises).then(function (values) {
           return values;
         });
         this.associatedTags = this.associatedTags.concat(newAssocations);
         this.sortAssociatedTags();
-        this.$notify({type: 'success', text: this.$t('notif-success-add-tag-domain-association')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-add-tag-domain-association') });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-add-tag-domain-associations')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-add-tag-domain-associations') });
       }
     },
     async removeTag(association, idx) {
@@ -133,13 +118,13 @@ export default {
         this.$emit('update');
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-remove-tag')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-remove-tag') });
       }
     },
   },
   async created() {
     try {
-      this.associatedTags = (await new TagDomainAssociationCollection({object: this.object}).fetchAll()).array;
+      this.associatedTags = (await new TagDomainAssociationCollection({ object: this.object }).fetchAll()).array;
       this.sortAssociatedTags();
     } catch (error) {
       console.log(error);

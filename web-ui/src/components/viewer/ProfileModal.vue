@@ -52,8 +52,8 @@
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 import AnnotationProfileChart from '@/components/charts/AnnotationProfileChart';
 import AnnotationProfileProjectionTable from '@/components/viewer/AnnotationProfileProjectionTable.vue';
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {get} from '@/utils/store-helpers';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'profile-modal',
@@ -64,8 +64,8 @@ export default {
   },
   props: {
     annotation: Object,
-    image: {type: Object, default: null},
-    spatialAxis: {type: Boolean, default: false}
+    image: { type: Object, default: null },
+    spatialAxis: { type: Boolean, default: false }
   },
   data() {
     return {

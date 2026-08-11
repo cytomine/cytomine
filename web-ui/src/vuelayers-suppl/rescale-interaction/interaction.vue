@@ -1,29 +1,15 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <script>
 /** @module rotate-interaction/interaction */
 import RescaleFeatureInteraction from 'ol-rescale-feature';
 import observableFromOlEvent from 'vuelayers/lib/rx-ext/from-ol-event';
 import interaction from 'vuelayers/lib/mixin/interaction';
 import stylesContainer from 'vuelayers/lib/mixin/styles-container';
-import {defaultEditStyle, createStyle} from 'vuelayers/lib/ol-ext/style';
-import {isCollection, isVectorSource} from 'vuelayers/lib/ol-ext/util';
-import {mapValues, isFunction} from 'vuelayers/lib/util/minilo';
+import { defaultEditStyle, createStyle } from 'vuelayers/lib/ol-ext/style';
+import { isCollection, isVectorSource } from 'vuelayers/lib/ol-ext/util';
+import { mapValues, isFunction } from 'vuelayers/lib/util/minilo';
 import mergeDescriptors from 'vuelayers/lib/util/multi-merge-descriptors';
-import {hasInteraction} from 'vuelayers/lib/util/assert';
-import {makeWatchers} from 'vuelayers/lib/util/vue-helpers';
+import { hasInteraction } from 'vuelayers/lib/util/assert';
+import { makeWatchers } from 'vuelayers/lib/util/vue-helpers';
 
 /**
  * @vueProps

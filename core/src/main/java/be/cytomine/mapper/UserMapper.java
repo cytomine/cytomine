@@ -13,7 +13,8 @@ public interface UserMapper {
 
     @Mapping(target = "deleted", ignore = true)
     @BeanMapping(ignoreUnmappedSourceProperties = {"callBack", "version", "fullName", "reference", "creator",
-        "password", "enabled", "accountExpired", "accountLocked", "passwordExpired", "publicKey", "privateKey"
+        "password", "enabled", "accountExpired", "accountLocked", "passwordExpired", "publicKey", "privateKey",
+        "deleted"
 
     })
     UserResponse map(User user);

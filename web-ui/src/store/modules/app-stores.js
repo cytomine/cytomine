@@ -21,7 +21,7 @@ export default {
     },
 
     reset(state) {
-      Object.assign(state, {stores: []});
+      Object.assign(state, { stores: [] });
     }
   },
 

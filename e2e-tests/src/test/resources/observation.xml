@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OBSERVATION_SET>
+    <OBSERVATION alias="OBSERVATION_a">
+        <SPECIMEN_REF alias="SPECIMEN_a"></SPECIMEN_REF>
+        <OBSERVER_REF alias="OBSERVER_a"></OBSERVER_REF>
+        <STATEMENT>
+            <STATEMENT_TYPE>Finding</STATEMENT_TYPE>
+            <STATEMENT_STATUS>Summary</STATEMENT_STATUS>
+            <CODE_ATTRIBUTES>
+                <CODE_ATTRIBUTE>
+                    <TAG>MISTRESC</TAG>
+                    <VALUE>
+                        <CODE>C96301</CODE>
+                        <SCHEME>SEND</SCHEME>
+                        <MEANING>UNREMARKABLE</MEANING>
+                        <SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+                    </VALUE>
+                </CODE_ATTRIBUTE>
+                <CODE_ATTRIBUTE>
+                    <TAG>MITEST</TAG>
+                    <VALUE>
+                        <CODE>C147493</CODE>
+                        <SCHEME>SEND</SCHEME>
+                        <MEANING>General Histopathologic Exam, Qual</MEANING>
+                        <SCHEME_VERSION>Version 3.1</SCHEME_VERSION>
+                    </VALUE>
+                </CODE_ATTRIBUTE>
+            </CODE_ATTRIBUTES>
+            <CUSTOM_ATTRIBUTES>
+                <STRING_ATTRIBUTE>
+                    <TAG>MIORRES</TAG>
+                    <VALUE>No Abnormalities Detected</VALUE>
+                </STRING_ATTRIBUTE>
+            </CUSTOM_ATTRIBUTES>
+            <FREETEXT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></FREETEXT>
+            <ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+        </STATEMENT>
+        <ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+    </OBSERVATION>
+</OBSERVATION_SET>

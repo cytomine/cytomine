@@ -21,7 +21,7 @@ export default class AnnotationGroup extends Model {
       throw new Error('Cannot merge to an annotation group with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.post(`${this.callbackIdentifier}/${this.id}/${this.callbackIdentifier}/${toMerge}/merge.json`, {});
+    let { data } = await Cytomine.instance.api.post(`${this.callbackIdentifier}/${this.id}/${this.callbackIdentifier}/${toMerge}/merge.json`, {});
     this.populate(data[this.callbackIdentifier]);
     // Cytomine.instance.lastCommand = data.command;
     return this;

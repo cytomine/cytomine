@@ -10,6 +10,7 @@ import com.meilisearch.sdk.Index;
 import com.meilisearch.sdk.SearchRequest;
 import com.meilisearch.sdk.model.SearchResult;
 import com.meilisearch.sdk.model.Searchable;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,21 @@ public class MeiliSearchService {
     private final ObjectMapper objectMapper;
     @Value("${meilisearch.index_id}")
     private String indexId;
+
+    @PostConstruct
+    public void createIndexIfNotExists() {
+        try {
+            for (Index index : meiliSearchClient.getIndexes().getResults()) {
+                if (indexId.equals(index.getUid())) {
+                    return;
+                }
+            }
+            meiliSearchClient.createIndex(indexId);
+            log.info("Created MeiliSearch index '{}'", indexId);
+        } catch (Exception e) {
+            log.warn("Could not create MeiliSearch index '{}' at startup: {}", indexId, e.getMessage());
+        }
+    }
 
     public List<MeiliSearchImageResponse> search(
         String query,
@@ -137,5 +153,4 @@ public class MeiliSearchService {
 
         return trimmed;
     }
-
 }

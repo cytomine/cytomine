@@ -132,7 +132,6 @@ export default {
     openHotkeysModal() {
       if (!this.hotkeysModal) {
         this.hotkeysModal = this.$buefy.modal.open({
-          parent: this,
           component: HotkeysModal,
           hasModalCard: true,
           onCancel: () => this.hotkeysModal = null,
@@ -141,7 +140,6 @@ export default {
     },
     openAboutModal() {
       this.$buefy.modal.open({
-        parent: this,
         component: AboutCytomineModal,
         hasModalCard: true
       });

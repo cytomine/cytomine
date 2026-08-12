@@ -1,5 +1,5 @@
 <template>
-<cytomine-modal-card :title="$t('annotation-comments')" @close="$parent.close()">
+<cytomine-modal-card :title="$t('annotation-comments')" @close="$emit('close')">
   <div v-if="!comments || !comments.length">
     <em class="has-text-grey">
       {{$t('no-annotation-comments')}}

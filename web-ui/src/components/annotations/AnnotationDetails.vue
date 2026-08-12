@@ -523,7 +523,6 @@ export default {
 
     openCommentsModal() {
       this.$buefy.modal.open({
-        parent: this,
         component: AnnotationCommentsModal,
         props: { annotation: this.annotation, comments: this.comments },
         hasModalCard: true,
@@ -545,7 +544,6 @@ export default {
 
     openProfileModal(spatialAxis) {
       this.$buefy.modal.open({
-        parent: this,
         component: ProfileModal,
         props: { annotation: this.annotation, image: this.image, spatialAxis },
         hasModalCard: true

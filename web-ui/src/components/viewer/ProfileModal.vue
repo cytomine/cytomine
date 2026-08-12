@@ -3,7 +3,7 @@
     :title="title"
     class="profile-modal"
     :class="{expanded: expanded}"
-    @close="$parent.close()"
+    @close="$emit('close')"
   >
     <template #controls>
       <button class="button is-small" @click="expanded = !expanded">

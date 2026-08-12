@@ -232,7 +232,6 @@ export default {
 
     openModal() {
       this.$buefy.modal.open({
-        parent: this,
         component: TrackModal,
         props: {
           track: this.editedNode ? this.editedNode.data : null,

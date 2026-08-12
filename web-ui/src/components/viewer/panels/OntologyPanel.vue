@@ -180,7 +180,7 @@ input[type="range"].slider {
   padding: 0 !important;
 }
 
-:deep(.ontology-tree .sl-vue-tree-node-item), :deep(.ontology-tree .no-result) {
+:deep(.ontology-tree .tree-node-item), :deep(.ontology-tree .no-result) {
   line-height: 2;
   font-size: 0.9em;
 }

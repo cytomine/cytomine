@@ -1367,7 +1367,7 @@ $colorActiveIcon: #fff;
       padding: 0.75em 0;
     }
 
-    .sl-vue-tree-sidebar {
+    .tree-sidebar {
       margin-right: 1.5em;
     }
   }

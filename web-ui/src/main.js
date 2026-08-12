@@ -13,6 +13,7 @@ import store from '@/store/store.js';
 import constants from '@/utils/constants.js';
 import ViewerOpenLayers from '@/viewer-ol';
 
+import '@he-tree/vue/style/default.css';
 import 'chart.js/auto';
 import 'vue-color/style.css';
 

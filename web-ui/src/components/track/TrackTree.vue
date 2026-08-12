@@ -1,41 +1,51 @@
 <template>
   <div class="track-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
-    <sl-vue-tree :value="treeNodes" @input="treeNodes = $event" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
-      <template #toggle="{node}">
-        <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
-          <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
-        </template>
-        <div class="sl-vue-tree-gap"></div>
-      </template>
+    <Draggable
+      ref="tree"
+      :key="treeKey"
+      v-model="treeNodes"
+      children-key="children"
+      :indent="20"
+      :default-open="true"
+      :disable-drag="!allowDrag"
+      @after-drop="onAfterDrop"
+      v-slot="{ node, stat, indentStyle }"
+    >
+      <div v-if="!node.hidden" class="tree-node-item" :class="{'is-selected': isSelected(node)}" :style="indentStyle">
+        <span class="tree-toggle-wrap" @click.stop="stat.open = !stat.open">
+          <i
+            v-if="stat.children.length > 0"
+            :class="['tree-toggle', 'fas', stat.open ? 'fa-angle-down' : 'fa-angle-right']"
+          ></i>
+        </span>
 
-      <template #title="{node}">
-        <div v-if="!node.data.hidden" class="tree-selector">
+        <div class="tree-selector" @click="toggleSelect(node)">
           <i class="tree-checkbox"
              v-if="allowSelection"
              :class="classNames(node)">
           </i>
-          <cytomine-track :track="node.data" />
+          <cytomine-track :track="node" />
         </div>
-        <div v-else></div>
-      </template>
 
-      <template #sidebar="{node}">
-        <slot v-if="!node.data.hidden" name="custom-sidebar" :track="node.data">
-          <div v-if="allowEdition" class="buttons">
-            <button class="button is-small" @click="startTrackUpdate(node)">
-            <span class="icon is-small">
-              <i class="fas fa-edit"></i>
-            </span>
-            </button>
-            <button class="button is-small" @click="confirmTrackDeletion(node)">
-            <span class="icon is-small">
-              <i class="far fa-trash-alt"></i>
-            </span>
-            </button>
-          </div>
-        </slot>
-      </template>
-    </sl-vue-tree>
+        <div class="tree-sidebar">
+          <slot name="custom-sidebar" :track="node">
+            <div v-if="allowEdition" class="buttons">
+              <button class="button is-small" @click.stop="startTrackUpdate(node)">
+              <span class="icon is-small">
+                <i class="fas fa-edit"></i>
+              </span>
+              </button>
+              <button class="button is-small" @click.stop="confirmTrackDeletion(node)">
+              <span class="icon is-small">
+                <i class="far fa-trash-alt"></i>
+              </span>
+              </button>
+            </div>
+          </slot>
+        </div>
+      </div>
+      <div v-else></div>
+    </Draggable>
 
     <slot v-if="noResult" name="no-result">
       <em class="has-text-grey no-result">{{$t('no-result')}}</em>
@@ -49,7 +59,10 @@
 </template>
 
 <script>
-import SlVueTree from 'sl-vue-tree';
+import { Draggable, dragContext } from '@he-tree/vue';
+
+Draggable.compatConfig = { MODE: 3 };  // TODO: remove when removing @vue/compat
+
 import CytomineTrack from './CytomineTrack.vue';
 import TrackModal from './TrackModal.vue';
 import { Track } from '@/api';
@@ -71,12 +84,13 @@ export default {
     image: { type: Object, default: null } //Cannot be null if allowNew
   },
   components: {
-    SlVueTree,
-    CytomineTrack
+    CytomineTrack,
+    Draggable,
   },
   data() {
     return {
       treeNodes: [],
+      treeKey: 0,
       internalSelectedNodes: [],
       editedNode: null
     };
@@ -86,7 +100,7 @@ export default {
       return this.searchString.toLowerCase();
     },
     noResult() {
-      return this.treeNodes.every(node => node.data.hidden);
+      return this.treeNodes.every(node => node.hidden);
     }
   },
   watch: {
@@ -98,7 +112,6 @@ export default {
     },
     selectedNodes() {
       this.internalSelectedNodes = this.selectedNodes.slice();
-      this.refreshNodeSelection();
     },
     lowCaseSearchString() {
       this.filter();
@@ -108,6 +121,7 @@ export default {
     makeTree() {
       if (!this.tracks) {
         this.treeNodes = [];
+        this.treeKey++;
         return;
       }
 
@@ -116,6 +130,7 @@ export default {
       this.treeNodes = this.startWithAdditionalNodes ? additionalNodes.concat(nodes) : nodes.concat(additionalNodes);
 
       this.filter();
+      this.treeKey++;
     },
 
     createSubTree(tracks) {
@@ -124,19 +139,12 @@ export default {
 
     createNode(track) {
       return {
-        title: track.name,
-        isLeaf: false, // all tracks can be used as parent for drag and drop
-        isDraggable: this.allowDrag,
-        isExpanded: true,
-        isSelected: this.internalSelectedNodes.includes(track.id),
-        data: {
-          id: track.id,
-          name: track.name,
-          color: track.color,
-          parent: track.parent,
-          image: track.image,
-          hidden: false
-        },
+        id: track.id,
+        name: track.name,
+        color: track.color,
+        parent: track.parent,
+        image: track.image,
+        hidden: false,
         children: track.children && track.children.length > 0 ? this.createSubTree(track.children) : []
       };
     },
@@ -144,65 +152,62 @@ export default {
     filter() {
       let str = this.lowCaseSearchString;
       this.applyToAllNodes(node => {
-        let match = node.title.toLowerCase().indexOf(str) >= 0;
-        if (node.children) {
-          let matchInChildren = node.children.some(child => !child.data.hidden); // OK because applyToAllNodes performs bottom-up operations
-          node.isExpanded = matchInChildren;
+        let match = node.name.toLowerCase().indexOf(str) >= 0;
+        if (node.children && node.children.length > 0) {
+          let matchInChildren = node.children.some(child => !child.hidden); // OK because applyToAllNodes performs bottom-up operations
           match = match || matchInChildren;
         }
-        node.data.hidden = !match;
+        node.hidden = !match;
       });
+      this.refreshExpansion();
+    },
+
+    refreshExpansion() {
+      let tree = this.$refs.tree;
+      if (!tree || !tree.statsFlat) {
+        return;
+      }
+      tree.statsFlat.forEach(stat => {
+        if (stat.children.length > 0) {
+          stat.open = stat.children.some(child => !child.data.hidden);
+        }
+      });
+    },
+
+    isSelected(node) {
+      return node.id != null && this.internalSelectedNodes.includes(node.id);
     },
 
     classNames(node) {
+      let selected = this.isSelected(node);
       if (this.multipleSelection) {
-        return node.isSelected ? ['fas', 'fa-check-square'] : ['far', 'fa-square'];
+        return selected ? ['fas', 'fa-check-square'] : ['far', 'fa-square'];
       } else {
-        return node.isSelected ? ['fas', 'fa-dot-circle'] : ['far', 'fa-circle'];
+        return selected ? ['fas', 'fa-dot-circle'] : ['far', 'fa-circle'];
       }
     },
 
-    select(nodes, event) {
+    toggleSelect(node) {
       if (!this.allowSelection) {
         return;
       }
 
-      if (this.clickOnTreeSelector(event.target)) {
-        nodes.forEach(node => {
-          if (this.multipleSelection) {
-            let indexSelected = this.internalSelectedNodes.indexOf(node.data.id);
-            if (indexSelected >= 0) {
-              this.internalSelectedNodes.splice(indexSelected, 1);
-              this.$emit('unselect', node.data.id);
-            } else {
-              this.internalSelectedNodes.push(node.data.id);
-              this.$emit('select', node.data.id);
-            }
-          } else {
-            this.internalSelectedNodes = [node.data.id];
-            this.$emit('select', node.data.id);
-          }
-        });
-        this.$emit('update:selectedNodes', this.internalSelectedNodes);
+      if (this.multipleSelection) {
+        let indexSelected = this.internalSelectedNodes.indexOf(node.id);
+        if (indexSelected >= 0) {
+          this.internalSelectedNodes.splice(indexSelected, 1);
+          this.$emit('unselect', node.id);
+        } else {
+          this.internalSelectedNodes.push(node.id);
+          this.$emit('select', node.id);
+        }
+      } else {
+        this.internalSelectedNodes = [node.id];
+        this.$emit('select', node.id);
       }
+      this.$emit('update:selectedNodes', this.internalSelectedNodes);
+    },
 
-      this.refreshNodeSelection();
-    },
-    refreshNodeSelection() {
-      if (!this.allowSelection) {
-        return;
-      }
-
-      this.applyToAllNodes(node => {
-        node.isSelected = this.internalSelectedNodes.some(id => id === node.data.id);
-      });
-    },
-    clickOnTreeSelector(elem) {
-      if (elem.classList.contains('tree-selector')) {
-        return true;
-      }
-      return elem.parentElement ? this.clickOnTreeSelector(elem.parentElement) : false;
-    },
     applyToAllNodes(fct, nodes = this.treeNodes) {
       nodes.forEach(node => {
         if (node.children) {
@@ -212,12 +217,40 @@ export default {
       });
     },
 
+    async onAfterDrop() {
+      let dragNode = dragContext.dragNode;
+      if (!dragNode) {
+        return;
+      }
+      let node = dragNode.data;
+      let newParentId = dragNode.parent ? dragNode.parent.data.id : null;
+
+      if ((node.parent ?? null) === newParentId) {
+        this.$notify({ type: 'warn', text: this.$t('notif-warn-track-tree-order-not-persisted') });
+        return;
+      }
+
+      try {
+        await new Track({
+          id: node.id,
+          name: node.name,
+          color: node.color,
+          parent: node.parent,
+          image: node.image
+        }).changeParent(newParentId);
+        node.parent = newParentId;
+      } catch (error) {
+        console.log(error);
+        this.$notify({ type: 'error', text: this.$t('notif-error-track-tree-update') });
+      }
+    },
+
     startTrackCreation() {
       this.editedNode = null;
       this.openModal();
     },
     createTrack(track) {
-      this.treeNodes.push(this.createNode(track));
+      this.$refs.tree.add(this.createNode(track));
       this.$emit('newTrack', track);
     },
 
@@ -226,7 +259,7 @@ export default {
       this.openModal();
     },
     updateTrack(track) {
-      this.$refs.tree.updateNode(this.editedNode.path, { data: { ...track } });
+      Object.assign(this.editedNode, { name: track.name, color: track.color });
       this.$emit('updatedTrack', track);
     },
 
@@ -234,7 +267,7 @@ export default {
       this.$buefy.modal.open({
         component: TrackModal,
         props: {
-          track: this.editedNode ? this.editedNode.data : null,
+          track: this.editedNode ? this.editedNode : null,
           image: this.image
         },
         events: {
@@ -245,31 +278,10 @@ export default {
       });
     },
 
-    drop(nodes, position) {
-      nodes.forEach(async node => {
-        let idParent = (position.placement === 'inside') ? position.node.data.id : position.node.data.parent;
-        if (node.data.parent !== idParent) {
-          try {
-            await new Track(node.data).changeParent(idParent);
-            this.applyToAllNodes(tmp => {
-              if (tmp.data.id === node.data.id) {
-                tmp.data.parent = idParent;
-              }
-            });
-          } catch (error) {
-            console.log(error);
-            this.$notify({ type: 'error', text: this.$t('notif-error-track-tree-update') });
-          }
-        } else {
-          this.$notify({ type: 'warn', text: this.$t('notif-warn-track-tree-order-not-persisted') });
-        }
-      });
-    },
-
     confirmTrackDeletion(node) {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
-        message: this.$t('confirm-deletion-track', { name: node.data.name }),
+        message: this.$t('confirm-deletion-track', { name: node.name }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -278,9 +290,9 @@ export default {
     },
     async deleteTrack(node) {
       try {
-        await Track.delete(node.data.id);
-        this.$refs.tree.remove([node.path]);
-        this.$emit('deletedTrack', node.data.id);
+        await Track.delete(node.id);
+        this.$refs.tree.remove(this.$refs.tree.getStat(node));
+        this.$emit('deletedTrack', node.id);
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-track-deletion') });
@@ -304,61 +316,82 @@ export default {
 
 
 <style>
-  .track-tree {
-    padding: 0 0 2px 0;
-  }
+.track-tree {
+  padding: 0 0 2px 0;
+}
 
-  .track-tree .tree-checkbox {
-    margin-right: 10px;
-    color: rgba(0, 0, 0, 0.2);
-    font-size: 1rem;
-  }
+.track-tree .tree-node-item {
+  display: flex;
+  align-items: center;
+  line-height: 2.2;
+  font-size: 0.9rem;
+}
 
-  .track-tree.selector .sl-vue-tree-node-item:hover {
-    background: rgba(0, 0, 0, 0.05);
-  }
+.track-tree .tree-toggle-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  flex-shrink: 0;
+}
 
-  .track-tree.selector .sl-vue-tree-selected > .sl-vue-tree-node-item {
-    background: rgba(0, 0, 0, 0.05);
-    font-weight: 600;
-  }
+.track-tree.selector .tree-toggle-wrap {
+  width: 24px;
+}
 
-  .track-tree .sl-vue-tree-selected > .sl-vue-tree-node-item .tree-checkbox {
-    color: #61b2e8;
-  }
+.track-tree .tree-toggle {
+  cursor: pointer;
+}
 
-  .track-tree.selector .sl-vue-tree-gap {
-    width: 24px;
-  }
+.track-tree .tree-checkbox {
+  margin-right: 10px;
+  color: rgba(0, 0, 0, 0.2);
+  font-size: 1rem;
+}
 
-  .track-tree.selector .tree-selector {
-    cursor: pointer;
-    flex-grow: 1;
-  }
+.track-tree.selector .tree-node-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
 
-  .track-tree .tree-selector {
-    min-width: 0; /* to allow correct handling of overflow-wrap */
-  }
+.track-tree.selector .tree-node-item.is-selected {
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
 
-  .track-tree .tree-selector:hover .tree-checkbox {
-    color: #61b2e8;
-  }
+.track-tree .tree-node-item.is-selected .tree-checkbox {
+  color: #61b2e8;
+}
 
-  .track-tree .no-result {
-    margin-left: 20px;
-    line-height: 1.5;
-    font-size: 0.9rem;
-  }
+.track-tree .tree-selector {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  min-width: 0;
+}
 
-  .track-tree .buttons, .track-tree .button {
-    margin-bottom: 0 !important;
-  }
+.track-tree.selector .tree-selector {
+  cursor: pointer;
+}
 
-  .track-tree.editable .sl-vue-tree-sidebar {
-    padding-left: 20px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-  }
+.track-tree .tree-selector:hover .tree-checkbox {
+  color: #61b2e8;
+}
+
+.track-tree .no-result {
+  margin-left: 20px;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+.track-tree .buttons, .track-tree .button {
+  margin-bottom: 0 !important;
+}
+
+.track-tree.editable .tree-sidebar {
+  padding-left: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
 </style>

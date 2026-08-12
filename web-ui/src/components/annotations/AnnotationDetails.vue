@@ -648,7 +648,7 @@ a.is-fullwidth {
   margin-top: 4px;
 }
 
-:deep(.sl-vue-tree-node-item) {
+:deep(.tree-node-item) {
   font-size: 0.9em;
 }
 

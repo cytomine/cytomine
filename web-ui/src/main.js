@@ -21,6 +21,7 @@ Vue.use(ViewerOpenLayers);
 
 import 'chart.js/auto';
 import 'vue-color/style.css';
+import '@he-tree/vue/style/default.css';
 import optOutVueColorFromVue2Compat from '@/utils/vue-color-compat.js';
 optOutVueColorFromVue2Compat(); // TODO: to delete when removing @vue/compat
 

@@ -19,7 +19,6 @@
     "@he-tree/vue": "^2.10.5",
     "@kyvg/vue3-notification": "^3.4.2",
     "@tanstack/vue-form": "^1.33.2",
-    "@vue/compat": "^3.5.40",
     "@vueuse/components": "^14.4.0",
     "@vueuse/core": "^14.4.0",
     "axios": "^1.18.0",

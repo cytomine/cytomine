@@ -260,9 +260,6 @@ export default {
       }
     },
   },
-  mounted() {
-    appendShortTermToken();
-  },
   async created() {
     this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];
     this.selectedRoles = this.availableRoles;

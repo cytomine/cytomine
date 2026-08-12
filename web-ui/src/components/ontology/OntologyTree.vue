@@ -61,8 +61,6 @@
 <script>
 import { Draggable, dragContext } from '@he-tree/vue';
 
-Draggable.compatConfig = { MODE: 3 };  // TODO: remove when removing @vue/compat
-
 import CytomineTerm from './CytomineTerm.vue';
 import TermModal from './TermModal.vue';
 import { Term } from '@/api';

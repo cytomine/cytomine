@@ -1,3 +1,4 @@
+import { h } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { ProjectConnectionCollection } from '@/api';
 import moment from 'moment';
@@ -115,13 +116,11 @@ export default {
   async mounted() {
     await this.fetchData();
   },
-  render(h) {
+  render() {
     return h('div', { class: this.cssClasses }, [
       h(Bar, {
-        props: {
-          data: this.chartData,
-          options: this.chartOptions,
-        },
+        data: this.chartData,
+        options: this.chartOptions,
       }),
     ]);
   },

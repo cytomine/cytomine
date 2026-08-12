@@ -10,7 +10,7 @@
     <sketch-picker v-model="color" :presetColors="presetColors" :disable-alpha="true" />
 
     <template #footer>
-      <button class="button" type="button" @click="$parent.close()">
+      <button class="button" type="button" @click="$emit('close')">
         {{$t('button-cancel')}}
       </button>
       <button class="button is-link" :disabled="!isValid">
@@ -94,7 +94,7 @@ export default {
         }).save();
         this.$notify({ type: 'success', text: this.$t('notif-success-term-creation') });
         this.$emit('newTerm', term);
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-term-creation') });
@@ -108,7 +108,7 @@ export default {
         await term.save();
         this.$notify({ type: 'success', text: this.$t('notif-success-term-update') });
         this.$emit('updateTerm', term);
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-term-update') });

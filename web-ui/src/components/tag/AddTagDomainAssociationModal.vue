@@ -8,7 +8,7 @@
   </template>
 
   <template #footer>
-    <button class="button" @click="$parent.close()">
+    <button class="button" @click="$emit('close')">
       {{$t('button-cancel')}}
     </button>
     <button class="button is-link" @click="addAssociations">
@@ -48,7 +48,7 @@ export default {
   methods: {
     async addAssociations() {
       this.$emit('addObjects', this.selectedTags);
-      this.$parent.close();
+      this.$emit('close');
     },
     async fetchTags() {
       this.tags = (await TagCollection.fetchAll()).array;

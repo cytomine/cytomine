@@ -1,5 +1,5 @@
 <template>
-<cytomine-modal-card :title="$t('shortcuts')" @close="$parent.close()" :footer="false">
+<cytomine-modal-card :title="$t('shortcuts')" @close="$emit('close')" :footer="false">
   <b-input
       v-model="searchString"
       :placeholder="$t('search-placeholder')"

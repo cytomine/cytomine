@@ -69,7 +69,7 @@
     </template>
 
     <template #footer>
-      <button class="button" @click="$parent.close()">
+      <button class="button" @click="$emit('close')">
         {{$t('button-cancel')}}
       </button>
       <button class="button is-link" :disabled="selectedImagesAndOptions.length === 0" @click="paste()">
@@ -307,7 +307,7 @@ export default {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-annotation-link-paste') });
       }
-      this.$parent.close();
+      this.$emit('close');
     },
     convertLocation(originalLocation, destImage, position) {
       let geometry = new WKT().readGeometry(originalLocation);

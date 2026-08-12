@@ -784,7 +784,6 @@ export default {
     openPasteWithLinkModal() {
       this.$buefy.modal.open({
         component: PasteAnnotationWithLinkModal,
-        parent: this,
         hasModalCard: true,
         props: {
           index: this.index

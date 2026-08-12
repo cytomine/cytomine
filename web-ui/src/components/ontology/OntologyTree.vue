@@ -234,7 +234,6 @@ export default {
 
     openModal() {
       this.$buefy.modal.open({
-        parent: this,
         component: TermModal,
         props: {
           term: this.editedNode ? this.editedNode.data : null,

@@ -22,7 +22,7 @@ export default {
   name: 'cytomine-modal-card',
   props: {
     title: String,
-    footer: { type: Boolean, default: true }
-  }
+    footer: { type: Boolean, default: true },
+  },
 };
 </script>

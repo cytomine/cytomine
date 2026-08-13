@@ -110,8 +110,9 @@ public class CytomineSteps {
     public void renameOntology(Wait<WebDriver> wait, String ontologyUrl, String newName) {
         webDriverUtils.goTo(wait, ontologyUrl);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Rename')]");
-        webDriverUtils.byClear(wait, By.name("name"));
-        webDriverUtils.bySendKeys(wait, By.name("name"), newName);
+        By nameInput = By.xpath("//div[@class='field'][.//label[text()='New name']]//input");
+        webDriverUtils.byClear(wait, nameInput);
+        webDriverUtils.bySendKeys(wait, nameInput, newName);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
         webDriverUtils.byIsDisplayed(
             wait,

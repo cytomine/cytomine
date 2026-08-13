@@ -63,4 +63,8 @@ export default {
 :deep(input[type=text]) {
   width: 26em;
 }
+
+:deep(.modal-card-foot) {
+  gap: 0.5em;
+}
 </style>

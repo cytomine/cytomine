@@ -72,12 +72,12 @@ export default {
       let labelTranslation = this.editionMode ? 'update' : 'creation';
 
       try {
-        const { data } = this.editionMode
+        this.editionMode
           ? await Cytomine.instance.api.put(`/tag/${this.tag.id}.json`, { name })
           : await Cytomine.instance.api.post('/tag.json', { name });
         this.$notify({ type: 'success', text: this.$t('notif-success-tag-' + labelTranslation) });
         this.$emit('update:active', false);
-        this.$emit(this.editionMode ? 'updateTag' : 'addTag', data.data);
+        this.$emit(this.editionMode ? 'updateTag' : 'addTag');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-tag-' + labelTranslation) });

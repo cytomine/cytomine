@@ -148,28 +148,44 @@ describe('AdminTags.vue', () => {
     expect(wrapper.vm.modal).toBe(true);
   });
 
-  it('should add the new tag to the list', async () => {
+  it('should refetch the tags when a tag is added on the first page', async () => {
     const wrapper = await createWrapper();
+    Cytomine.instance.api.get.mockClear();
 
-    const newTag = createTag(4, 'liver', 'admin');
-    wrapper.vm.addTag(newTag);
+    wrapper.vm.addTag();
+    await flushPromises();
 
-    expect(wrapper.vm.tags.length).toBe(4);
-    expect(wrapper.vm.tags[3]).toEqual(newTag);
+    expect(Cytomine.instance.api.get).toHaveBeenCalledTimes(1);
   });
 
-  it('should replace the edited tag in the list on update', async () => {
+  it('should return to the first page when a tag is added from another page', async () => {
     const wrapper = await createWrapper();
+    await wrapper.setData({ currentPage: 2 });
+    Cytomine.instance.api.get.mockClear();
 
-    wrapper.vm.startTagEdition(wrapper.vm.tags[0]);
-    wrapper.vm.updateTag({ name: 'renamed' });
+    wrapper.vm.addTag();
+    await flushPromises();
 
-    expect(wrapper.vm.tags[0]).toEqual({ ...tags[0], name: 'renamed' });
+    expect(wrapper.vm.currentPage).toBe(1);
+    expect(Cytomine.instance.api.get).toHaveBeenCalledTimes(1);
   });
 
-  it('should delete the tag and remove it from the list on confirmation', async () => {
+  it('should refetch the tags on update', async () => {
+    const wrapper = await createWrapper();
+    Cytomine.instance.api.get.mockClear();
+
+    wrapper.vm.updateTag();
+    await flushPromises();
+
+    expect(Cytomine.instance.api.get).toHaveBeenCalledTimes(1);
+  });
+
+  it('should delete the tag and refetch the list on confirmation', async () => {
     const wrapper = await createWrapper();
     const deletedTag = wrapper.vm.tags[0];
+
+    const remaining = tags.slice(1);
+    Cytomine.instance.api.get.mockResolvedValue({ data: { collection: remaining, size: remaining.length } });
 
     await wrapper.findAll('tbody tr').at(0).find('button.is-danger').trigger('click');
     await flushPromises();

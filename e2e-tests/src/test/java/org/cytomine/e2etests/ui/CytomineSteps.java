@@ -880,8 +880,9 @@ public class CytomineSteps {
     ) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "image-groups"));
         webDriverUtils.xpathClick(wait, "//button[normalize-space()='Add image group']");
-        webDriverUtils.bySendKeys(wait, By.cssSelector("input[name='name']"), imageGroupName);
-        webDriverUtils.xpathClick(wait, "//button[normalize-space()='Save']");
+        By nameInput = By.xpath("//div[@class='field'][.//label[text()='Name']]//input");
+        webDriverUtils.bySendKeys(wait, nameInput, imageGroupName);
+        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'Image group successfully created')]"));
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'Image group successfully created')]"));
 

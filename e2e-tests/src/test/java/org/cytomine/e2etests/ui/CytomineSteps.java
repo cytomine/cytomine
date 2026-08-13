@@ -395,8 +395,7 @@ public class CytomineSteps {
             "//a[contains(@class, 'dropdown-item') and .//span[contains(text(), 'Delete')]]"
         );
 
-        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
-
+        webDriverUtils.xpathClick(wait, "//button[contains(., 'Confirm')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'App deleted successfully')]"));
     }
 
@@ -423,7 +422,7 @@ public class CytomineSteps {
     public void selectAnnotationForGeometryInput(Wait<WebDriver> wait) {
         webDriverUtils.xpathClick(
             wait,
-            "//div[contains(@class,'field')][.//span[.=' input ']]//button[.//span[.=' Select ']]"
+            "//span[.='input']/../..//button[.//span[.='Select']]"
         );
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card .annotation-content"));
         wait.until(d -> !d.findElements(By.cssSelector(".annotation-content > div")).isEmpty());
@@ -443,7 +442,7 @@ public class CytomineSteps {
     public void runTask(Wait<WebDriver> wait, WebDriver driver) {
         webDriverUtils.xpathClick(
             wait,
-            "//button[contains(@class,'start-button')][.//span[.=' Run Task ']]"
+            "//button[contains(@class,'start-button')][.//span[.='Run Task']]"
         );
 
         Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(300));
@@ -453,7 +452,7 @@ public class CytomineSteps {
     public void deleteTaskRun(Wait<WebDriver> wait, String projectUrl, String taskName) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "apps"));
         webDriverUtils.byClick(wait, By.cssSelector("table tbody tr:first-child button.is-danger"));
-        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.xpathClick(wait, "//button[contains(., 'Confirm')]");
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(text(),'" + taskName + "')]"));
     }
 

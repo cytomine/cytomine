@@ -459,7 +459,7 @@ public class CytomineSteps {
 
     public void addUserToProject(Wait<WebDriver> wait, String projectUrl, String username) {
         webDriverUtils.goTo(wait, projectUrl);
-        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
+        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and normalize-space(.)='Members']"));
         webDriverUtils.byClick(wait, By.cssSelector("button.button.is-link.add-member"));
         By searchInput = By.xpath("//input[@placeholder='Search user...']");
         webDriverUtils.byClick(wait, searchInput);
@@ -478,7 +478,7 @@ public class CytomineSteps {
 
     public void removeUserFromProject(Wait<WebDriver> wait, String projectUrl, String username) {
         webDriverUtils.goTo(wait, projectUrl);
-        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
+        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and normalize-space(.)='Members']"));
         webDriverUtils.byClick(
             wait,
             By.xpath("//td[@data-label='Username' and normalize-space(text())='" + username + "']"
@@ -490,7 +490,7 @@ public class CytomineSteps {
         );
         webDriverUtils.byClick(
             wait,
-            By.xpath("//button[contains(@class,'is-danger') and normalize-space(text())='Confirm']")
+            By.xpath("//button[contains(@class,'is-danger') and normalize-space(.)='Confirm']")
         );
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
     }

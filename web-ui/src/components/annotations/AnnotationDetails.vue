@@ -152,16 +152,14 @@
         </td>
       </tr>
 
-      <template>
-        <tr>
-          <td colspan="2">
-            <h5>{{ $t('similar-annotations') }}</h5>
-            <button class="button is-small is-fullwidth" @click="$emit('searchSimilarAnnotations')">
-              {{ $t('search-similar-annotation') }}
-            </button>
-          </td>
-        </tr>
-      </template>
+      <tr>
+        <td colspan="2">
+          <h5>{{ $t('similar-annotations') }}</h5>
+          <button class="button is-small is-fullwidth" @click="$emit('searchSimilarAnnotations')">
+            {{ $t('search-similar-annotation') }}
+          </button>
+        </td>
+      </tr>
 
       <template v-if="isPropDisplayed('linked-annotations')">
         <tr>
@@ -246,22 +244,22 @@
       {{ $t('button-center-view-on-annot') }}
     </a>
 
-    <div class="level">
-      <a @click="openCrop(annotation)" class="level-item button is-small">
+    <div class="buttons">
+      <a @click="openCrop(annotation)" class="button is-small">
         {{ $t('button-view-crop') }}
       </a>
 
-      <button class="level-item button is-small" @click="copyURL()">
+      <button class="button is-small" @click="copyURL()">
         {{ $t('button-copy-url') }}
       </button>
 
-      <button v-if="isPropDisplayed('comments') && comments" class="level-item button is-small"
+      <button v-if="isPropDisplayed('comments') && comments" class="button is-small"
         @click="openCommentsModal()"
       >
         {{ $t('button-comments') }} ({{comments.length}})
       </button>
 
-      <button v-if="canEdit" class="level-item button is-small is-danger" @click="confirmDeletion()">
+      <button v-if="canEdit" class="button is-small is-danger" @click="confirmDeletion()">
         {{ $t('button-delete') }}
       </button>
     </div>
@@ -599,6 +597,13 @@ export default {
 .annotation-details {
   position: relative;
   font-size: 0.85rem;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.annotation-details :deep(img),
+.annotation-details :deep(table) {
+  max-width: 100%;
 }
 
 .table {
@@ -609,6 +614,7 @@ export default {
 
 .table th, .table td {
   vertical-align: middle;
+  overflow-wrap: anywhere;
 }
 
 h5 {
@@ -623,6 +629,21 @@ h5 {
 .actions .button {
   margin: 3px;
   box-sizing: border-box;
+}
+
+.actions .button.is-fullwidth {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.actions .buttons {
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 0.25rem;
+}
+
+.actions .buttons .button {
+  margin: 0;
 }
 
 a.is-fullwidth {

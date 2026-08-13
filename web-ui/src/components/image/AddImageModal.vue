@@ -1,8 +1,7 @@
 <template>
-<cytomine-modal :active="active" :title="$t('add-images')" @close="$emit('update:active', false)">
-  <b-loading :is-full-page="false" :model-value="loading" class="small" />
-  <template v-if="!loading">
-    <template>
+  <cytomine-modal :active="active" :title="$t('add-images')" @close="$emit('update:active', false)">
+    <b-loading :is-full-page="false" :model-value="loading" class="small" />
+    <template v-if="!loading">
       <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
       type="search" icon="search" />
 
@@ -45,8 +44,7 @@
         </template>
       </cytomine-table>
     </template>
-  </template>
-</cytomine-modal>
+  </cytomine-modal>
 </template>
 
 <script>

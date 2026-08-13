@@ -517,8 +517,7 @@ public class CytomineTests {
         String imageName = "wsi";
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
 
-        cytomineSteps.checkPimsImportProject(wait,
-            cytomineUrl, projectName, imageName);
+        cytomineSteps.checkPimsImportProject(wait, cytomineUrl, projectName, imageName);
 
         cytomineSteps.logout(wait, cytomineUrl);
     }

@@ -56,7 +56,7 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='/projects']");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New project')]");
-        webDriverUtils.bySendKeys(wait, By.name("name"), projectName);
+        webDriverUtils.bySendKeys(wait, By.xpath("//div[@class='field'][.//label[text()='Name']]//input"), projectName);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//h1[contains(text(), 'Project: ')]"));
         return driver.getCurrentUrl();
@@ -65,7 +65,7 @@ public class CytomineSteps {
     public void deleteProject(Wait<WebDriver> wait, String projectURL) {
         webDriverUtils.goTo(wait, projectURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
-        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.xpathClick(wait, "//button[contains(., 'Confirm')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
     }
@@ -82,7 +82,7 @@ public class CytomineSteps {
     public void listImagesInProject(Wait<WebDriver> wait, String projectUrl, Set<String> imageNames) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "images"));
         imageNames.forEach(
-            name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[span[contains(text(), '%s')]]", name)))
+            name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[span[contains(., '%s')]]", name)))
         );
     }
 
@@ -90,7 +90,8 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='/ontology']");
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'New ontology')]");
-        webDriverUtils.bySendKeys(wait, By.name("name"), ontologyName);
+        By nameInput = By.xpath("//div[@class='field'][.//label[text()='Name']]//input");
+        webDriverUtils.bySendKeys(wait, nameInput, ontologyName);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
         webDriverUtils.byIsDisplayed(
             wait,
@@ -102,7 +103,7 @@ public class CytomineSteps {
     public void deleteOntology(Wait<WebDriver> wait, String ontologyURL) {
         webDriverUtils.goTo(wait, ontologyURL);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Delete')]");
-        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.xpathClick(wait, "//button[contains(., 'Confirm')]");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
     }
 
@@ -263,7 +264,7 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, ontologyURL);
         Thread.sleep(250);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Add a term')]");
-        webDriverUtils.bySendKeys(wait, By.name("name"), termName);
+        webDriverUtils.bySendKeys(wait, By.xpath("//div[@class='field'][.//label[text()='Name']]//input"), termName);
         webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Save')]");
         webDriverUtils.byIsDisplayed(
             wait,
@@ -278,7 +279,7 @@ public class CytomineSteps {
             "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]");
         webDriverUtils.xpathClick(wait,
             "//button[contains(@data-delete-term, '" + termName + "')]");
-        webDriverUtils.xpathClick(wait, "//button[contains(text(), 'Confirm')]");
+        webDriverUtils.xpathClick(wait, "//button[contains(., 'Confirm')]");
         webDriverUtils.waitUntilByEmpty(wait, By.xpath(
             "//span[contains(@class, 'ontology-term') and contains(text(), '" + termName + "')]"));
     }

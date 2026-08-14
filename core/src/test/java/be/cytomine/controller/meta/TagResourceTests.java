@@ -31,6 +31,7 @@ import be.cytomine.common.repository.model.tag.payload.UpdateTag;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.meta.Tag;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPER_ADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 public class TagResourceTests {

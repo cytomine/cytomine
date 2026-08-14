@@ -20,11 +20,12 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPER_ADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @Transactional
 public class DescriptionServiceTests {

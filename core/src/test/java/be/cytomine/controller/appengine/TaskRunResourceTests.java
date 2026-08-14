@@ -28,6 +28,7 @@ import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.dto.appengine.task.TaskRunProvisionedResponse;
 import be.cytomine.repository.appengine.TaskRunRepository;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPER_ADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class TaskRunResourceTests {
 

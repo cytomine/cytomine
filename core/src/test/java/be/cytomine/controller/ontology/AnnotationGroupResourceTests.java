@@ -24,6 +24,7 @@ import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.AnnotationGroupService;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -34,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPER_ADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 public class AnnotationGroupResourceTests {
 

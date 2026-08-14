@@ -24,6 +24,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.doNothing;
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPER_ADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
 @ExtendWith(MockitoExtension.class)
 public class WebSocketUserPositionTests {

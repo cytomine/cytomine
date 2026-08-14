@@ -55,6 +55,7 @@ import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.ReportType;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static be.cytomine.service.utils.SimplifyGeometryServiceTests.getPointMultiplyByGeometriesOrInteriorRings;
@@ -77,7 +78,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPER_ADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class AnnotationDomainResourceTests {

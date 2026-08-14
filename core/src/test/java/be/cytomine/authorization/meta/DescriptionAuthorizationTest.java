@@ -67,7 +67,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanList() {
         expectOK(() -> descriptionService.list());
     }
@@ -241,7 +241,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanAddForProject() {
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(builder.givenAProject())
             .toJsonObject(urlApi)));
@@ -264,7 +264,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanEditForProject() {
         expectOK(() -> descriptionService.update(
             descriptionForProject,
@@ -295,7 +295,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanDeleteForProject() {
         expectOK(() -> descriptionService.delete(
             builder.givenADescription(builder.givenAProject()),

@@ -20,6 +20,7 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.project.Project;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,7 +38,7 @@ public class TaskControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "superadmin")
+    @WithMockUser(username = SUPER_ADMIN)
     public void taskWorkflow() throws Exception {
         Project project = builder.givenAProject();
         MvcResult response = restCommandControllerMockMvc.perform(post("/api/task.json")

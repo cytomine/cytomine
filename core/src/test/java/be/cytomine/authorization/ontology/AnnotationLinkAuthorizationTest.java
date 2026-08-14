@@ -97,7 +97,7 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanListAnnotationGroupByAnnotationGroup() {
         assertThat(annotationLinkService.list(annotationLink.getGroup())).contains(annotationLink);
     }
@@ -116,7 +116,7 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanUpdateAnnotationGroupInRestrictedProject() {
         AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         annotationLink.getImage().getProject().setMode(EditingMode.RESTRICTED);

@@ -51,7 +51,7 @@ public class AbstractImageAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanListAbstractImages() {
         assertThat(abstractImageService.list()).contains(abstractImage);
         AbstractImage anotherAbstractImage = builder.givenAnAbstractImage();

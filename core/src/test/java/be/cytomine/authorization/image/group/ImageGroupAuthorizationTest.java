@@ -99,7 +99,7 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanListImagegroup() {
         assertThat(imageGroupService.list(imageGroup.getProject())).contains(imageGroup);
     }

@@ -21,7 +21,7 @@ import be.cytomine.service.PermissionService;
 @Transactional
 public abstract class AbstractAuthorizationTest {
 
-    public static final String SUPERADMIN = "SUPER_ADMIN_ACL";
+    public static final String SUPER_ADMIN = "SUPER_ADMIN_ACL";
 
     public static final String ADMIN = "ADMIN_ACL";
 

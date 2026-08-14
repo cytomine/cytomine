@@ -137,7 +137,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void shouldUpdateUserNameWhenAdminModifiesUser() {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
         JsonObject userJson = user.toJsonObject(urlApi)
@@ -178,7 +178,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void shouldAddAndRemoveUserFromProjectWhenAdmin() {
         User user = builder.givenAUser();
         Project project = builder.givenAProject();

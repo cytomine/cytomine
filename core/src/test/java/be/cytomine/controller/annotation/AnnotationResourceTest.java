@@ -13,11 +13,12 @@ import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.domain.annotation.Annotation;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPER_ADMIN)
 @AutoConfigureMockMvc
 @SpringBootTest
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})

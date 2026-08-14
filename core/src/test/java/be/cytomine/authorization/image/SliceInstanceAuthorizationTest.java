@@ -48,7 +48,7 @@ public class SliceInstanceAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanListSliceInstances() {
         assertThat(sliceInstanceService.list(sliceInstance.getImage())).contains(sliceInstance);
     }

@@ -49,7 +49,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanListImageInstances() {
         assertThat(imageInstanceService.listByProject(imageInstance.getProject())).contains(imageInstance);
     }

@@ -42,7 +42,7 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanListProjectRepresentativeUser() {
         expectOK(() -> {
             projectRepresentativeUserService

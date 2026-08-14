@@ -43,7 +43,7 @@ public class NestedImageInstanceAuthorizationTest extends CRUDAuthorizationTest 
     }
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanList() {
         assertThat(nestedImageInstanceService.list(nestedImageInstance.getParent())).contains(nestedImageInstance);
     }

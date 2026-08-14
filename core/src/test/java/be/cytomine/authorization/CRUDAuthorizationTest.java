@@ -11,7 +11,7 @@ public abstract class CRUDAuthorizationTest extends CRDAuthorizationTest {
     protected abstract void whenIEditDomain();
 
     @Test
-    @WithMockUser(username = SUPERADMIN)
+    @WithMockUser(username = SUPER_ADMIN)
     public void adminCanEditDomain() {
         if (minimalRoleForEdit().isPresent() && minimalRoleForEdit().get().equals("CREATOR")) {
             expectOK(this::whenIEditDomain);

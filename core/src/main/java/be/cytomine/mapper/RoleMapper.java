@@ -14,4 +14,9 @@ public interface RoleMapper {
     @Mapping(target = "deleted", ignore = true)
     @BeanMapping(ignoreUnmappedSourceProperties = {"callBack", "version"})
     RoleResponse map(SecRole secRole);
+
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "callBack", ignore = true)
+    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
+    SecRole map(RoleResponse roleResponse);
 }

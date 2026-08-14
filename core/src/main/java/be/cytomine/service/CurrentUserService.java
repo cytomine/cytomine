@@ -16,6 +16,7 @@ import be.cytomine.common.repository.model.command.payload.response.UserResponse
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.security.current.CurrentUser;
 import be.cytomine.security.current.FullCurrentUser;
@@ -29,6 +30,36 @@ public class CurrentUserService {
 
     private final UserRepository userRepository;
     private final UserHttpContract userHttpContract;
+    private final UserMapper userMapper;
+
+    public static Optional<CurrentUser> getSecurityCurrentUser() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return Optional.ofNullable(extractCurrentUser(securityContext.getAuthentication()));
+    }
+
+    private static CurrentUser extractCurrentUser(Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        } else if (authentication.getDetails() instanceof User) {
+            FullCurrentUser fullCurrentUser = new FullCurrentUser();
+            fullCurrentUser.setUser((UserResponse) authentication.getDetails());
+            return fullCurrentUser;
+        } else if (authentication.getPrincipal() instanceof String) {
+            PartialCurrentUser partialCurrentUser = new PartialCurrentUser();
+            partialCurrentUser.setUsername((String) authentication.getPrincipal());
+            return partialCurrentUser;
+        } else if (authentication.getPrincipal() instanceof UserDetails) {
+            PartialCurrentUser partialCurrentUser = new PartialCurrentUser();
+            partialCurrentUser.setUsername(((UserDetails) authentication.getPrincipal()).getUsername());
+            return partialCurrentUser;
+        } else if (authentication instanceof JwtAuthenticationToken) {
+            PartialCurrentUser partialCurrentUser = new PartialCurrentUser();
+            // this is the preferred_username coming from token claims
+            partialCurrentUser.setUsername(authentication.getName());
+            return partialCurrentUser;
+        }
+        return null;
+    }
 
     public String getCurrentUsername() {
         CurrentUser currentUser = getSecurityCurrentUser().orElseThrow(() -> new ServerException(
@@ -68,36 +99,7 @@ public class CurrentUserService {
     }
 
     public User getCurrentUserOld() {
-        return userRepository.findById(getCurrentUser().id()).orElseThrow();
-    }
-
-    public static Optional<CurrentUser> getSecurityCurrentUser() {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        return Optional.ofNullable(extractCurrentUser(securityContext.getAuthentication()));
-    }
-
-    private static CurrentUser extractCurrentUser(Authentication authentication) {
-        if (authentication == null) {
-            return null;
-        } else if (authentication.getDetails() instanceof User) {
-            FullCurrentUser fullCurrentUser = new FullCurrentUser();
-            fullCurrentUser.setUser((UserResponse) authentication.getDetails());
-            return fullCurrentUser;
-        } else if (authentication.getPrincipal() instanceof String) {
-            PartialCurrentUser partialCurrentUser = new PartialCurrentUser();
-            partialCurrentUser.setUsername((String) authentication.getPrincipal());
-            return partialCurrentUser;
-        } else if (authentication.getPrincipal() instanceof UserDetails) {
-            PartialCurrentUser partialCurrentUser = new PartialCurrentUser();
-            partialCurrentUser.setUsername(((UserDetails) authentication.getPrincipal()).getUsername());
-            return partialCurrentUser;
-        } else if (authentication instanceof JwtAuthenticationToken) {
-            PartialCurrentUser partialCurrentUser = new PartialCurrentUser();
-            // this is the preferred_username coming from token claims
-            partialCurrentUser.setUsername(authentication.getName());
-            return partialCurrentUser;
-        }
-        return null;
+        return userMapper.map(getCurrentUser());
     }
 
 }

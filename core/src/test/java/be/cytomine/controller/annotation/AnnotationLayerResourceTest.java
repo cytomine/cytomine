@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(username = SUPER_ADMIN)
 @AutoConfigureMockMvc
 @SpringBootTest
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class AnnotationLayerResourceTest {
 
     @Autowired

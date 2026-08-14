@@ -34,6 +34,7 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractImage;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.ADMIN;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -46,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "admin")
+@WithMockUser(username = ADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 class UploadedFileResourceTests {

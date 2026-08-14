@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
 import static org.hamcrest.Matchers.greaterThan;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = SUPER_ADMIN)
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class ImageFilterResourceTests {
 
     @Autowired

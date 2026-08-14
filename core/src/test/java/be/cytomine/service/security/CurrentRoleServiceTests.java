@@ -13,17 +13,20 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.service.CurrentRoleService;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.GUEST;
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class CurrentRoleServiceTests {
 
@@ -58,7 +61,7 @@ public class CurrentRoleServiceTests {
     }
 
     @Test
-    @WithMockUser(username = "admin")
+    @WithMockUser(username = ADMIN)
     public void findRoleForAdmin() {
 
         assertThat(currentRoleService.findRealAuthorities(userMapper.map(builder.givenDefaultAdmin())))
@@ -94,7 +97,7 @@ public class CurrentRoleServiceTests {
     }
 
     @Test
-    @WithMockUser(username = "guest")
+    @WithMockUser(username = GUEST)
     public void findRoleForGuest() {
 
         assertThat(currentRoleService.findRealAuthorities(userMapper.map(builder.givenAGuest())))
@@ -112,7 +115,7 @@ public class CurrentRoleServiceTests {
     }
 
     @Test
-    @WithMockUser(username = "admin")
+    @WithMockUser(username = ADMIN)
     public void openCloseAdminSessionAsAdmin() {
         assertThat(currentRoleService.findCurrentAuthorities(userMapper.map(builder.givenDefaultAdmin())))
             .containsExactlyInAnyOrder("ROLE_USER");

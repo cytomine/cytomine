@@ -27,6 +27,7 @@ import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
 import be.cytomine.utils.JsonObject;
@@ -48,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = SUPER_ADMIN)
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class TermResourceTests {
 
     @Autowired

@@ -29,6 +29,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.security.User;
@@ -60,7 +61,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @WithMockUser(username = SUPER_ADMIN)
 @ExtendWith(MockitoExtension.class)
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class UserPositionResourceTests {
 
     @Autowired

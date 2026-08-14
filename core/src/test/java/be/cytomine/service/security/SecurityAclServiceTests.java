@@ -14,6 +14,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
@@ -29,7 +30,7 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class SecurityAclServiceTests {
 

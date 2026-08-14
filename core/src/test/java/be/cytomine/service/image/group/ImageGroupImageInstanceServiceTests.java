@@ -15,6 +15,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
@@ -29,7 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(username = SUPER_ADMIN)
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class ImageGroupImageInstanceServiceTests {
 

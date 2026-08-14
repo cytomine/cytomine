@@ -103,7 +103,7 @@ public class ProjectRepresentativeUserService extends ModelService {
 
         securityACLService.checkIsUserInProject(user, project);
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
+        return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
     }
 
     public CommandResponse add(JsonObject jsonObject, User adminAsCurrent) {
@@ -115,7 +115,7 @@ public class ProjectRepresentativeUserService extends ModelService {
 
         securityACLService.checkIsUserInProject(user, project);
 
-        return executeCommand(new AddCommand(adminAsCurrent), null, jsonObject);
+        return executeCommand(new AddCommand(adminAsCurrent.getId()), null, jsonObject);
     }
 
 
@@ -127,16 +127,14 @@ public class ProjectRepresentativeUserService extends ModelService {
         }
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), WRITE);
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 
     public CommandResponse deleteWithAdmin(
         CytomineDomain domain,
         Transaction transaction,
-        Task task,
-        boolean printMessage,
-        User currentAsAdmin) {
+        long currentAsAdmin) {
         if (listByProject(((ProjectRepresentativeUser) domain).getProject()).size() < 2) {
             throw new WrongArgumentException("You cannot remove the last representative role. "
                 + "Add someone else as representative");

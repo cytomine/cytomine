@@ -116,7 +116,7 @@ public class ImageGroupImageInstanceService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.checkIsNotReadOnly(group.getProject());
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class ImageGroupImageInstanceService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new DeleteCommand(currentUserService.getCurrentUserOld(), transaction), domain, null);
+        return executeCommand(new DeleteCommand(currentUser.id(), transaction), domain, null);
     }
 
     public List<ImageInstance> getImages(Long groupId, Long imageId) {

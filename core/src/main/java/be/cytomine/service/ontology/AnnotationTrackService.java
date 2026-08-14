@@ -103,13 +103,14 @@ public class AnnotationTrackService extends ModelService {
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", jsonObject.getJSONAttrStr("annotationIdent")));
         securityACLService.check(annotation.container(), READ);
         securityACLService.checkFullOrRestrictedForOwner(annotation, annotation.user());
-        securityACLService.checkUser(currentUserService.getCurrentUser());
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        securityACLService.checkUser(currentUser);
 
         jsonObject.put("slice", annotation.getSlice().getId());
         jsonObject.put("annotationIdent", annotation.getId());
         jsonObject.put("annotationClassName", annotation.getClass().getName());
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
+        return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
     }
 
     public CommandResponse addAnnotationTrack(
@@ -125,7 +126,8 @@ public class AnnotationTrackService extends ModelService {
             "track", idTrack,
             "slice", idSlice
         );
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld(), transaction), null, jsonObject);
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        return executeCommand(new AddCommand(currentUser.id(), transaction), null, jsonObject);
     }
 
     /**
@@ -149,7 +151,7 @@ public class AnnotationTrackService extends ModelService {
         securityACLService.checkUser(currentUserService.getCurrentUser());
 
         UserResponse currentUser = currentUserService.getCurrentUser();
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

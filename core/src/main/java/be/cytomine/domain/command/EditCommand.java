@@ -18,8 +18,8 @@ import be.cytomine.utils.JsonObject;
 @DiscriminatorValue("be.cytomine.domain.command.EditCommand")
 public class EditCommand extends Command {
 
-    public EditCommand(User currentUser, Transaction transaction) {
-        this.user = currentUser;
+    public EditCommand(long currentUser, Transaction transaction) {
+        this.userId = currentUser;
         this.transaction = transaction;
     }
 

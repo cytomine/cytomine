@@ -17,6 +17,6 @@ public interface CommandHistoryRepository extends JpaRepository<CommandHistory, 
 
     void deleteAllByProject(Project project);
 
-    void deleteAllByUser(User user);
+    void deleteAllByUserId(long userId);
 
 }

@@ -235,7 +235,7 @@ public class ProjectMemberService {
                     .find(project, (User) user);
                 if (foundRepOptional.isPresent()) {
                     ProjectRepresentativeUser foundRep = foundRepOptional.get();
-                    projectRepresentativeUserService.deleteWithAdmin(foundRep, null, null, false, adminUser);
+                    projectRepresentativeUserService.deleteWithAdmin(foundRep, null, adminUser.getId());
                 }
 
             }

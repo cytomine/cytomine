@@ -22,10 +22,7 @@ public class RedoStackItem extends CytomineDomain {
     @JoinColumn(name = "command_id", nullable = false)
     protected Command command;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    protected User user;
+    protected Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transaction_id", nullable = true)
@@ -36,7 +33,7 @@ public class RedoStackItem extends CytomineDomain {
 
     public RedoStackItem(UndoStackItem firstUndoStack) {
         this.command = firstUndoStack.getCommand();
-        this.user = firstUndoStack.getUser();
+        this.userId = firstUndoStack.getUserId();
         this.transaction = firstUndoStack.getTransaction();
     }
 

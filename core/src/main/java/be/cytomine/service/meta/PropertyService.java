@@ -105,7 +105,7 @@ public class PropertyService extends ModelService {
         }
 
 
-        Command command = new AddCommand(userRepository.findById(currentUser.id()).orElseThrow(), transaction);
+        Command command = new AddCommand(currentUser.id(), transaction);
         return executeCommand(command, null, jsonObject);
     }
 
@@ -114,7 +114,7 @@ public class PropertyService extends ModelService {
         Long domainIdent,
         String key,
         String value,
-        User user,
+        long userId,
         Transaction transaction
     ) {
         JsonObject jsonObject = JsonObject.of(
@@ -123,7 +123,7 @@ public class PropertyService extends ModelService {
             "key", key,
             "value", value
         );
-        return executeCommand(new AddCommand(user, transaction), null, jsonObject);
+        return executeCommand(new AddCommand(userId, transaction), null, jsonObject);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class PropertyService extends ModelService {
             //TODO when is this used ?
             securityACLService.checkUser(currentUser);
         }
-        return executeCommand(new EditCommand(userRepository.findById(currentUser.id()).orElseThrow(), transaction),
+        return executeCommand(new EditCommand(currentUser.id(), transaction),
             domain, jsonNewData);
     }
 
@@ -156,7 +156,7 @@ public class PropertyService extends ModelService {
             //TODO when is this used ?
             securityACLService.checkUser(currentUser);
         }
-        Command c = new DeleteCommand(userRepository.findById(currentUser.id()).orElseThrow(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

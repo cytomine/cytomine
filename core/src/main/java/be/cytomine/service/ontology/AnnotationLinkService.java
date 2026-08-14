@@ -109,7 +109,7 @@ public class AnnotationLinkService extends ModelService {
         json.put("annotationIdent", annotation.getId());
         json.put("annotationClassName", annotation.getClass().getName());
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class AnnotationLinkService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new DeleteCommand(currentUserService.getCurrentUserOld(), transaction), domain, null);
+        return executeCommand(new DeleteCommand(currentUser.id(), transaction), domain, null);
     }
 
     public CommandResponse addAnnotationLink(
@@ -134,7 +134,7 @@ public class AnnotationLinkService extends ModelService {
             "group", groupId,
             "image", imageId
         );
-
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld(), transaction), null, jsonObject);
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        return executeCommand(new AddCommand(currentUser.id(), transaction), null, jsonObject);
     }
 }

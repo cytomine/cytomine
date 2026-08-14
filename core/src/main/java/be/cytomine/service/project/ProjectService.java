@@ -687,7 +687,7 @@ public class ProjectService extends ModelService {
         }
 
         taskService.updateTask(task, 10, "Check retrieval consistency");
-        CommandResponse commandResponse = executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null,
+        CommandResponse commandResponse = executeCommand(new AddCommand(currentUser.id()), null,
             jsonObject);
         Project project = (Project) commandResponse.getObject();
         taskService.updateTask(task, 20, "Project " + project.getName() + " created");
@@ -783,7 +783,7 @@ public class ProjectService extends ModelService {
         }
 
         CommandResponse commandResponse = executeCommand(
-            new EditCommand(currentUserService.getCurrentUserOld(), transaction),
+            new EditCommand(currentUser.id(), transaction),
             domain,
             jsonNewData
         );
@@ -992,7 +992,7 @@ public class ProjectService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), ADMINISTRATION);
         securityACLService.checkIsNotReadOnly(domain.container());
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

@@ -231,7 +231,7 @@ public class AbstractImageService extends ModelService {
         if (!json.isMissing("uploadedFile")) {
             //TODO: ???
         }
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
 
     }
 
@@ -251,7 +251,7 @@ public class AbstractImageService extends ModelService {
         JsonObject versionBeforeUpdate = domain.toJsonObject(urlApi);
 
         CommandResponse commandResponse = executeCommand(
-            new EditCommand(currentUserService.getCurrentUserOld(), transaction),
+            new EditCommand(currentUser.id(), transaction),
             domain,
             jsonNewData
         );
@@ -350,7 +350,7 @@ public class AbstractImageService extends ModelService {
         securityACLService.check(domain.container(), WRITE);
 
         if (!isAbstractImageUsed(domain.getId())) {
-            Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+            Command c = new DeleteCommand(currentUser.id(), transaction);
             return executeCommand(c, domain, null);
         } else {
             List<ImageInstance> instances = imageInstanceRepository.findAllByBaseImage((AbstractImage) domain);

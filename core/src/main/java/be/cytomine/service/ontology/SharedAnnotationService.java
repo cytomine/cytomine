@@ -99,16 +99,16 @@ public class SharedAnnotationService extends ModelService {
     @Override
     @Transactional(dontRollbackOn = IOException.class)
     public CommandResponse add(JsonObject jsonObject) {
-        UserResponse sender = currentUserService.getCurrentUser();
-        securityACLService.checkUser(sender);
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        securityACLService.checkUser(currentUser);
 
         AnnotationDomain annotation = annotationDomainRepository.findById(jsonObject.getJSONAttrLong("annotationIdent"))
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", jsonObject.getJSONAttrStr("annotationIdent")));
 
-        jsonObject.putIfAbsent("sender", sender.id());
+        jsonObject.putIfAbsent("sender", currentUser.id());
 
         securityACLService.checkFullOrRestrictedForOwner(annotation, annotation.user());
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
+        return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
     }
 
 
@@ -124,7 +124,8 @@ public class SharedAnnotationService extends ModelService {
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
         securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((SharedAnnotation) domain).getSender());
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

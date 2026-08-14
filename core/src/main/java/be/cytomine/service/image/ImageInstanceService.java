@@ -998,7 +998,7 @@ public class ImageInstanceService extends ModelService {
         securityACLService.checkIsNotReadOnly(json.getJSONAttrLong("project"), Project.class);
 
         json.put("user", currentUser.id());
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
 
     }
 
@@ -1053,7 +1053,7 @@ public class ImageInstanceService extends ModelService {
 
         JsonObject attributes = domain.toJsonObject(urlApi);
         CommandResponse commandResponse = executeCommand(
-            new EditCommand(currentUserService.getCurrentUserOld(), transaction),
+            new EditCommand(currentUser.id(), transaction),
             domain,
             jsonNewData
         );
@@ -1100,7 +1100,7 @@ public class ImageInstanceService extends ModelService {
         if (Lock.getInstance().lockProject(project)) {
             try {
                 log.debug("Delete image " + domain.getId());
-                Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+                Command c = new DeleteCommand(currentUser.id(), transaction);
                 return executeCommand(c, domain, null);
             } finally {
                 Lock.getInstance().unlockProject(project);

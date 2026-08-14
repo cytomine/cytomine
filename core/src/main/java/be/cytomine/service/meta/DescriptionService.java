@@ -104,7 +104,7 @@ public class DescriptionService extends ModelService {
         } else {
             securityACLService.checkUserAccessRightsForMeta(domain, currentUser);
         }
-        Command command = new AddCommand(currentUserService.getCurrentUserOld(), null);
+        Command command = new AddCommand(currentUser.id(), null);
         return executeCommand(command, null, jsonObject);
     }
 
@@ -116,7 +116,7 @@ public class DescriptionService extends ModelService {
             ((Description) domain).getDomainIdent()
         );
         securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
-        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain,
+        return executeCommand(new EditCommand(currentUser.id(), transaction), domain,
             jsonNewData);
     }
 
@@ -128,7 +128,7 @@ public class DescriptionService extends ModelService {
             ((Description) domain).getDomainIdent()
         );
         securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

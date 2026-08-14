@@ -18,12 +18,12 @@ import be.cytomine.utils.CommandResponse;
 @DiscriminatorValue("be.cytomine.domain.command.AddCommand")
 public class AddCommand extends Command {
 
-    public AddCommand(User currentUser) {
-        this.user = currentUser;
+    public AddCommand(long currentUser) {
+        this.userId = currentUser;
     }
 
-    public AddCommand(User currentUser, Transaction transaction) {
-        this.user = currentUser;
+    public AddCommand(long currentUser, Transaction transaction) {
+        this.userId = currentUser;
         this.transaction = transaction;
     }
 

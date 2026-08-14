@@ -108,7 +108,7 @@ public class AbstractSliceService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
 
     }
 
@@ -125,7 +125,7 @@ public class AbstractSliceService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), WRITE);
         return executeCommand(
-            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     /**
@@ -145,7 +145,7 @@ public class AbstractSliceService extends ModelService {
         securityACLService.check(domain.container(), WRITE);
 
         if (!isAbstractSliceUsed(domain.getId())) {
-            Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+            Command c = new DeleteCommand(currentUser.id(), transaction);
             return executeCommand(c, domain, null);
         } else {
             List<SliceInstance> instances = sliceInstanceRepository.findAllByBaseSlice((AbstractSlice) domain);

@@ -109,7 +109,7 @@ public class TrackService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
+        return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
     }
 
     /**
@@ -136,7 +136,7 @@ public class TrackService extends ModelService {
         jsonNewData.put("project", imageInstance.getProject().getId());
 
         return executeCommand(
-            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     /**
@@ -157,7 +157,7 @@ public class TrackService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

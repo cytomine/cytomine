@@ -153,7 +153,6 @@ public class AnnotationTermServiceTests {
             annotationTerm.getTerm().getId(),
             null,
             annotationTerm.getUser().getId(),
-            annotationTerm.getUser(),
             null
         );
         assertThat(commandResponse).isNotNull();

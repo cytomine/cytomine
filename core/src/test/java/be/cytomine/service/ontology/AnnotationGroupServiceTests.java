@@ -37,6 +37,7 @@ public class AnnotationGroupServiceTests {
 
     @Autowired
     AnnotationGroupService annotationGroupService;
+
     @Autowired
     private UrlApi urlApi;
 
@@ -149,7 +150,7 @@ public class AnnotationGroupServiceTests {
 
         CommandResponse commandResponse = annotationGroupService.merge(
             annotationGroup.getId(),
-            annotationGroupToMerge.getId()
+            annotationGroupToMerge.getId(), 1
         );
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);

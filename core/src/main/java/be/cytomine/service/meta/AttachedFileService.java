@@ -119,7 +119,7 @@ public class AttachedFileService extends ModelService {
             securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
         }
 
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

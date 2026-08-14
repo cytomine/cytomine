@@ -203,7 +203,7 @@ public class ReviewedAnnotationService extends ModelService {
 
         synchronized (this.getClass()) {
             CommandResponse commandResponse = executeCommand(
-                new AddCommand(currentUserService.getCurrentUserOld(), transaction),
+                new AddCommand(currentUser.id(), transaction),
                 null,
                 jsonObject
             );
@@ -225,7 +225,7 @@ public class ReviewedAnnotationService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.checkIsCreator(domain, currentUser);
         CommandResponse result = executeCommand(
-            new EditCommand(currentUserService.getCurrentUserOld(), null), domain, jsonNewData);
+            new EditCommand(currentUser.id(), null), domain, jsonNewData);
         return result;
     }
 
@@ -244,7 +244,7 @@ public class ReviewedAnnotationService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.checkIsCreator(domain, currentUser);
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

@@ -30,7 +30,7 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
             "SELECT usi "
                 + "FROM UndoStackItem usi "
                 + "WHERE usi.transaction = :transaction "
-                + "AND usi.user.id = :userId "
+                + "AND usi.userId = :userId "
                 + "ORDER BY usi.created DESC"
     )
     List<UndoStackItem> findAllUndoOrderByCreatedDesc(Long userId, Transaction transaction);
@@ -40,17 +40,17 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
             "SELECT rsi "
                 + "FROM RedoStackItem rsi "
                 + "WHERE rsi.transaction = :transaction "
-                + "AND rsi.user.id = :userId "
+                + "AND rsi.userId = :userId "
                 + "ORDER BY rsi.created DESC"
     )
     List<RedoStackItem> findAllRedoOrderByCreatedDesc(Long userId, Transaction transaction);
 
     @Query(
-        "SELECT usi FROM UndoStackItem usi WHERE usi.command = :command AND usi.user.id = :userId ORDER BY usi"
+        "SELECT usi FROM UndoStackItem usi WHERE usi.command = :command AND usi.userId = :userId ORDER BY usi"
             + ".created DESC")
     Page<UndoStackItem> findLastUndoStackItems(Long userId, Command command, Pageable pageable);
 
-    @Query("SELECT usi FROM UndoStackItem usi WHERE usi.user.id = :user ORDER BY usi.created DESC")
+    @Query("SELECT usi FROM UndoStackItem usi WHERE usi.userId = :user ORDER BY usi.created DESC")
     Page<UndoStackItem> findLastUndoStackItems(Long userId, Pageable pageable);
 
     default Optional<UndoStackItem> findLastUndoStackItem(Long userId, Command command) {
@@ -62,11 +62,11 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
     }
 
     @Query(
-        "SELECT usi FROM RedoStackItem usi WHERE usi.command = :command AND usi.user.id = :userId ORDER BY usi"
+        "SELECT usi FROM RedoStackItem usi WHERE usi.command = :command AND usi.userId = :userId ORDER BY usi"
             + ".created DESC")
     Page<RedoStackItem> findLastRedoStackItems(Long userId, Command command, Pageable pageable);
 
-    @Query("SELECT usi FROM RedoStackItem usi WHERE usi.user.id = :userId ORDER BY usi.created DESC")
+    @Query("SELECT usi FROM RedoStackItem usi WHERE usi.userId = :userId ORDER BY usi.created DESC")
     Page<RedoStackItem> findLastRedoStackItems(Long userId, Pageable pageable);
 
     default Optional<RedoStackItem> findLastRedoStackItem(Long userId, Command command) {
@@ -79,5 +79,5 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
 
     void deleteAllByProject(Project project);
 
-    void deleteAllByUser(User user);
+    void deleteAllByUserId(long userId);
 }

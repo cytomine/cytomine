@@ -322,7 +322,7 @@ public class UserAnnotationService extends ModelService {
         Transaction transaction = transactionService.start();
 
         CommandResponse commandResponse =
-            executeCommand(new AddCommand(currentUserService.getCurrentUserOld(), transaction), null, jsonObject);
+            executeCommand(new AddCommand(currentUser.id(), transaction), null, jsonObject);
         UserAnnotation addedAnnotation = (UserAnnotation) commandResponse.getObject();
 
         if (addedAnnotation == null) {
@@ -343,7 +343,6 @@ public class UserAnnotationService extends ModelService {
                 termId,
                 null,
                 currentUser.id(),
-                currentUserService.getCurrentUserOld(),
                 transaction
             );
             terms.add(((AnnotationTerm) (response.getObject())).getTerm());
@@ -368,7 +367,7 @@ public class UserAnnotationService extends ModelService {
                 addedAnnotation.getId(),
                 key,
                 value,
-                currentUserService.getCurrentUserOld(),
+                currentUser.id(),
                 transaction
             );
         }
@@ -517,7 +516,7 @@ public class UserAnnotationService extends ModelService {
             );
         }
         CommandResponse result =
-            executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), null), domain, jsonNewData);
+            executeCommand(new EditCommand(currentUser.id(), null), domain, jsonNewData);
 
         return result;
     }
@@ -557,7 +556,7 @@ public class UserAnnotationService extends ModelService {
             log.warn("Deleting annotation index failed: " + e.getMessage());
         }
 
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

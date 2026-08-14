@@ -88,7 +88,7 @@ public class AnnotationGroupService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(json.getJSONAttrLong("project"), Project.class, READ);
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class AnnotationGroupService extends ModelService {
         securityACLService.check(domain.container(), READ);
 
         return executeCommand(
-            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     @Override
@@ -107,10 +107,10 @@ public class AnnotationGroupService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new DeleteCommand(currentUserService.getCurrentUserOld(), transaction), domain, null);
+        return executeCommand(new DeleteCommand(currentUser.id(), transaction), domain, null);
     }
 
-    public CommandResponse merge(Long id, Long mergedId) {
+    public CommandResponse merge(Long id, Long mergedId, long currentUserId) {
         AnnotationGroup ag = get(id);
         AnnotationGroup agToMerge = get(mergedId);
 
@@ -131,7 +131,7 @@ public class AnnotationGroupService extends ModelService {
         annotationGroupRepository.delete(agToMerge);
 
         return executeCommand(
-            new EditCommand(currentUserService.getCurrentUserOld(), null),
+            new EditCommand(currentUserId, null),
             ag,
             AnnotationGroup.getDataFromDomain(ag)
         );

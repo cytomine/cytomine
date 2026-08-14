@@ -91,7 +91,7 @@ public class CompanionFileService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
 
     }
 
@@ -108,7 +108,7 @@ public class CompanionFileService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), WRITE);
         return executeCommand(
-            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     /**
@@ -127,7 +127,7 @@ public class CompanionFileService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), WRITE);
 
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

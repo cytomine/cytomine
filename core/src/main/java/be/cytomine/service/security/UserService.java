@@ -824,7 +824,7 @@ public class UserService extends ModelService {
                 List.of(json.getJSONAttrStr("role").substring(5)));
 
             accountService.createAccount(account);
-            CommandResponse response = executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null,
+            CommandResponse response = executeCommand(new AddCommand(currentUser.id()), null,
                 json);
 
             return response;
@@ -847,7 +847,7 @@ public class UserService extends ModelService {
             jsonNewData.getJSONAttrStr("language").toLowerCase(),
             List.of(jsonNewData.getJSONAttrStr("role").substring(5)));
         accountService.update(account);
-        return executeCommand(new EditCommand(currentUserService.getCurrentUserOld(), null), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), null), domain, jsonNewData);
     }
 
     /**
@@ -864,7 +864,7 @@ public class UserService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkAdmin(currentUser);
         securityACLService.checkIsSameUser((User) domain, currentUser);
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         accountService.delete(((User) domain).getUsername());
         return executeCommand(c, domain, null);
     }
@@ -898,11 +898,11 @@ public class UserService extends ModelService {
 
     @Override
     protected void beforeDelete(CytomineDomain domain) {
-        User user = (User) domain;
-        commandHistoryRepository.deleteAllByUser(user);
-        redoStackItemRepository.deleteAllByUser(user);
-        undoStackItemRepository.deleteAllByUser(user);
-        commandRepository.deleteAllByUser(user);
+        Long userId = domain.getId();
+        commandHistoryRepository.deleteAllByUserId(userId);
+        redoStackItemRepository.deleteAllByUserId(userId);
+        undoStackItemRepository.deleteAllByUserId(userId);
+        commandRepository.deleteAllByUserId(userId);
     }
 
     protected void afterAdd(CytomineDomain domain, CommandResponse response) {

@@ -90,7 +90,7 @@ public class ConfigurationService extends ModelService {
     public CommandResponse add(JsonObject jsonObject) {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         UserResponse currentUser = currentUserService.getCurrentUser();
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
+        return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
     }
 
 
@@ -99,14 +99,14 @@ public class ConfigurationService extends ModelService {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         UserResponse currentUser = currentUserService.getCurrentUser();
         return executeCommand(
-            new EditCommand(currentUserService.getCurrentUserOld(), transaction), domain, jsonNewData);
+            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkAdmin(currentUser);
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

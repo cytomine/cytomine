@@ -83,7 +83,7 @@ public class PropertyServiceTests {
                 project.getId(),
                 "key",
                 "value",
-                builder.givenSuperAdmin(),
+                builder.givenSuperAdmin().getId(),
                 null
             );
         assertThat(commandResponse).isNotNull();

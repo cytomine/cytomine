@@ -83,15 +83,15 @@ public class ImageFilterProjectService extends ModelService {
             .orElseThrow(() -> new ObjectNotFoundException("ImageFilter", jsonObject.getJSONAttrStr("imageFilter")));
 
         securityACLService.check(project, ADMINISTRATION);
-
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), ADMINISTRATION);
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

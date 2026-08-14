@@ -82,7 +82,7 @@ public class CommandService {
             if (c.isSaveOnUndoRedoStack()) {
                 UndoStackItem item = new UndoStackItem();
                 item.setCommand(c);
-                item.setUser(c.getUser());
+                item.setUserId(c.getUserId());
                 item.setTransaction(c.getTransaction());
                 entityManager.persist(item);
                 //entityManager.flush();

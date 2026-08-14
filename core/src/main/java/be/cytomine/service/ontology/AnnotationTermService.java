@@ -124,7 +124,7 @@ public class AnnotationTermService extends ModelService {
         ).orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", jsonObject.getJSONAttrStr("userannotation")));
         //Check if user has at least READ permission for the project
         securityACLService.check(ua.container(), READ, currentUser);
-        return executeCommand(new AddCommand(currentUserService.getCurrentUserOld()), null, jsonObject);
+        return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
     }
 
     /**
@@ -149,7 +149,7 @@ public class AnnotationTermService extends ModelService {
             domain,
             ((AnnotationTerm) domain).getUserAnnotation().getUser()
         );
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 
@@ -157,23 +157,22 @@ public class AnnotationTermService extends ModelService {
         Long idUserAnnotation,
         Long idTerm,
         Long idExpectedTerm,
-        Long idUser,
-        User currentUser,
+        long currentUser,
         Transaction transaction
     ) {
-        termRepository.findTermByID(idTerm, currentUser.getId())
+        termRepository.findTermByID(idTerm, currentUser)
             .orElseThrow(() -> new ObjectNotFoundException("Term", idExpectedTerm));
         UserAnnotation userAnnotation = userAnnotationRepository.findById(idUserAnnotation)
             .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", idUserAnnotation));
-        User creator = userRepository.findById(idUser)
-            .orElseThrow(() -> new ObjectNotFoundException("User", idUser));
+
         securityACLService.check(userAnnotation.container(), READ);
         JsonObject jsonObject = JsonObject.of(
             "userannotation", idUserAnnotation,
             "term", idTerm,
             "expectedTerm", idExpectedTerm,
-            "user", idUser
+            "user", currentUser
         );
+
         return executeCommand(new AddCommand(currentUser, transaction), null, jsonObject);
     }
 
@@ -200,8 +199,8 @@ public class AnnotationTermService extends ModelService {
                 this.delete(annotationTerm, transaction, null, true);
             }
             //Add annotation term
-            return addAnnotationTerm(idAnnotation, idTerm, null, currentUser.id(),
-                currentUserService.getCurrentUserOld(), transaction);
+            return addAnnotationTerm(idAnnotation, idTerm, null,
+                currentUser.id(), transaction);
         } else if (annotation instanceof ReviewedAnnotation) {
             reviewedAnnotationHttpContract.replaceAllTermIds(idAnnotation, currentUser.id(), Set.of(idTerm));
             CommandResponse commandResponse = new CommandResponse();

@@ -123,7 +123,7 @@ public class TagDomainAssociationService extends ModelService {
             //TODO when is this used ?
             securityACLService.checkUser(currentUser);
         }
-        Command c = new DeleteCommand(currentUserService.getCurrentUserOld(), transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

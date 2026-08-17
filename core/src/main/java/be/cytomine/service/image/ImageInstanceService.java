@@ -182,7 +182,6 @@ public class ImageInstanceService extends ModelService {
         return find(id).orElse(null);
     }
 
-
     public Optional<ImageInstance> next(ImageInstance imageInstance) {
         return imageInstanceRepository.findTopByProjectAndCreatedLessThanOrderByCreatedDesc(
             imageInstance.getProject(),
@@ -238,7 +237,6 @@ public class ImageInstanceService extends ModelService {
                 parameter.setProperty("countImageAnnotations");
             }
         }
-
 
         List<SearchParameterEntry> validParameters = SQLSearchParameter.getDomainAssociatedSearchParameters(
             ImageInstance.class,
@@ -322,7 +320,6 @@ public class ImageInstanceService extends ModelService {
         String imageInstanceAlias = "ui";
         String abstractImageAlias = "ai";
 
-
         if (sortColumn == null) {
             sortColumn = "created";
         }
@@ -376,7 +373,6 @@ public class ImageInstanceService extends ModelService {
             .filter(x -> x.getProperty().equals("ui.instanceFilename"))
             .forEach(searchParameterEntry -> searchParameterEntry.setProperty("name"));
 
-
         final String finalSortedProperty = sortedProperty;
         boolean joinAI = validatedSearchParameters.stream()
             .anyMatch(x -> x.getProperty().contains(abstractImageAlias + ".") || finalSortedProperty.contains(
@@ -389,7 +385,6 @@ public class ImageInstanceService extends ModelService {
             .filter(x -> x.getProperty().equals("name"))
             .findFirst()
             .orElse(null);
-
 
         String imageInstanceCondition = sqlSearchConditions.getData()
             .stream()
@@ -457,7 +452,6 @@ public class ImageInstanceService extends ModelService {
                 "COALESCE(" + imageInstanceAlias + ".instance_filename, " + abstractImageAlias + ".original_filename)"
             );
         }
-
 
         if (sortedProperty.contains(imageInstanceAlias + ".instance_filename")) {
             joinAI = true;
@@ -577,7 +571,6 @@ public class ImageInstanceService extends ModelService {
         if (sortColumn.equals("numberOfReviewedAnnotations")) {
             sortColumn = "countImageReviewedAnnotations";
         }
-
 
         String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null
             ? imageInstanceAlias
@@ -849,7 +842,6 @@ public class ImageInstanceService extends ModelService {
         return PageUtils.buildPageFromPageResults(results, max, offset, count);
     }
 
-
     public List<Map<String, Object>> listLight(UserResponse user) {
         securityACLService.checkIsSameUser(currentUserService.getCurrentUser().id(), user);
         boolean isAdmin = currentRoleService.isAdminByNow(user);
@@ -978,7 +970,6 @@ public class ImageInstanceService extends ModelService {
         return sliceInstanceRepository.findByBaseSliceAndImage(abstractSlice, imageInstance).orElse(null);
     }
 
-
     /**
      * Add the new domain with JSON data
      *
@@ -1031,7 +1022,6 @@ public class ImageInstanceService extends ModelService {
 
     }
 
-
     /**
      * Update this domain with new data from json
      *
@@ -1077,7 +1067,6 @@ public class ImageInstanceService extends ModelService {
 
         return commandResponse;
     }
-
 
     /**
      * Delete this domain
@@ -1128,7 +1117,6 @@ public class ImageInstanceService extends ModelService {
         deleteDependentTrack(imageInstance, transaction, task);
     }
 
-
     private void deleteDependentReviewedAnnotation(ImageInstance image, Transaction transaction, Task task) {
         for (ReviewedAnnotation reviewedAnnotation : reviewedAnnotationRepository.findAllByImage(image)) {
             reviewedAnnotationService.delete(reviewedAnnotation, transaction, task, false);
@@ -1141,7 +1129,6 @@ public class ImageInstanceService extends ModelService {
             userAnnotationService.delete(userAnnotation, transaction, task, false);
         }
     }
-
 
     private void deleteDependentAnnotationAction(ImageInstance image) {
         annotationActionRepository.deleteAllByImage(image.getId());
@@ -1188,7 +1175,6 @@ public class ImageInstanceService extends ModelService {
         );
     }
 
-
     @Override
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         // TODO: with new session?
@@ -1220,9 +1206,10 @@ public class ImageInstanceService extends ModelService {
                 + " and image.reviewUser="
                 + imageInstance.getReviewUser());
         }
-        if (!(currentUserService.getCurrentUser().id() == imageInstance.getReviewUser().getId())) {
-            throw new WrongArgumentException("Review can only be validate or stop by " + imageInstance.getReviewUser()
-                .getUsername());
+        if (!(Objects.equals(currentUserService.getCurrentUser().username(),
+            imageInstance.getReviewUser().getUsername()))) {
+            throw new WrongArgumentException(
+                "Review can only be validated or stopped by " + imageInstance.getReviewUser().getUsername());
         }
 
         if (cancelReview) {

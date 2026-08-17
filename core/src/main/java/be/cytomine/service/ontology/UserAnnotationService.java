@@ -589,13 +589,12 @@ public class UserAnnotationService extends ModelService {
         return collection;
     }
 
-
-    public List<Object> getStringParamsI18n(CytomineDomain domain) {
+    public List<String> getStringParamsI18n(CytomineDomain domain) {
         UserAnnotation annotation = (UserAnnotation) domain;
         return List.of(
-            currentUserService.getCurrentUser().toString(),
+            currentUserService.getCurrentUser().username(),
             annotation.getImage().getBlindInstanceFilename(),
-            ((UserAnnotation) domain).getUser().toString()
+            ((UserAnnotation) domain).getUser().getUsername()
         );
     }
 

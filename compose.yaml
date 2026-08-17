@@ -371,7 +371,7 @@ volumes:
   app-engine-shared-inputs: {}
   app-engine-shared-datasets: {}
   cbir-data: {}
-  meilisearch-data: { }
+  meilisearch-data: {}
 
 networks:
   host_network:

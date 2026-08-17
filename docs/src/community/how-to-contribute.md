@@ -29,8 +29,7 @@ To work on it locally:
     npm run dev
     ```
 
-   The website will be available at <http://localhost:8080> (or using any other port as printed out in the log of the
-   process).
+    The website will be available at <http://localhost:8080> (or using any other port as printed out in the log of the process).
 
 4. Edit the relevant Markdown file(s) under `docs/src`, then open a pull request following the same process as for code contributions.
 

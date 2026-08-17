@@ -12,7 +12,7 @@ license = "Apache-2.0"
 [dependency-groups]
 dev = [
   "pyrefly==1.1.1",
-    "ruff==0.16.1",
+  "ruff==0.16.1",
 ]
 
 [tool.ruff]

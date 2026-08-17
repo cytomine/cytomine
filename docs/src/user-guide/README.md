@@ -6,8 +6,7 @@ redirectFrom:
 
 # Introduction
 
-In this section, we present the various features of Cytomine, the solution for your projects in research, education or
-diagnostics.
+In this section, we present the various features of Cytomine, the solution for your projects in research, education or diagnostics.
 
 ## Where to start
 

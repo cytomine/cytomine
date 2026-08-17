@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -404,7 +403,7 @@ public class UserAnnotationResourceTests {
         wiremockRepository.stubTerm(term1);
         wiremockRepository.stubTerm(term2);
         JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
-        jsonObject.put("term", Arrays.asList(term1.getId(), term2.getId()));
+        jsonObject.put("term", List.of(term1.getId(), term2.getId()));
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
                 .contentType(MediaType.APPLICATION_JSON)

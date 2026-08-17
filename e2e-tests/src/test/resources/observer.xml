@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <OBSERVER_SET>
-    <OBSERVER alias="OBSERVER_a">
-        <OBSERVER_TYPE>Human</OBSERVER_TYPE>
-        <ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
-    </OBSERVER>
+	<OBSERVER alias="OBSERVER_a">
+		<OBSERVER_TYPE>Human</OBSERVER_TYPE>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</OBSERVER>
 </OBSERVER_SET>

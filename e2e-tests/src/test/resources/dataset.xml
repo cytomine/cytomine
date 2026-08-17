@@ -9,7 +9,7 @@
         <DATASET_TYPE>Whole slide imaging</DATASET_TYPE>
         <IMAGE_REF alias="wsi"></IMAGE_REF>
         <OBSERVATION_REF alias="OBSERVATION_a"/>
-        <ATTRIBUTES>
+                <ATTRIBUTES>
             <STRING_ATTRIBUTE>
                 <TAG>tox_study_duration</TAG>
                 <VALUE>P14D</VALUE>

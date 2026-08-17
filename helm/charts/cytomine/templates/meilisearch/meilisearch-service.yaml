@@ -1,4 +1,4 @@
-{ { if .Values.meilisearch.deploy } }
+{{ if .Values.meilisearch.deploy }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -9,5 +9,5 @@ spec:
     app: meilisearch
   ports:
     - name: http
-      port: { { .Values.meilisearch.port } }
-  { { end } }
+      port: {{ .Values.meilisearch.port }}
+{{ end }}

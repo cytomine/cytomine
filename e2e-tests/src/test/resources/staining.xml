@@ -1,38 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <STAINING_SET>
-    <STAINING alias="STAINING_LIST_a">
-        <STAIN>
-            <STRING_ATTRIBUTE>
-                <TAG>staining_method</TAG>
-                <VALUE>chemical</VALUE>
-            </STRING_ATTRIBUTE>
-            <CODE_ATTRIBUTE>
-                <TAG>staining_compound</TAG>
-                <VALUE>
-                    <CODE>12710070</CODE>
-                    <SCHEME>SNOMED-CT</SCHEME>
-                    <MEANING>hematoxylin stain</MEANING>
-                    <SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                    xsi:nil="true"></SCHEME_VERSION>
-                </VALUE>
-            </CODE_ATTRIBUTE>
-        </STAIN>
-        <STAIN>
-            <STRING_ATTRIBUTE>
-                <TAG>staining_method</TAG>
-                <VALUE>chemical</VALUE>
-            </STRING_ATTRIBUTE>
-            <CODE_ATTRIBUTE>
-                <TAG>staining_compound</TAG>
-                <VALUE>
-                    <CODE>36879070</CODE>
-                    <SCHEME>SNOMED-CT</SCHEME>
-                    <MEANING>water soluble eosin stain</MEANING>
-                    <SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                    xsi:nil="true"></SCHEME_VERSION>
-                </VALUE>
-            </CODE_ATTRIBUTE>
-        </STAIN>
-        <ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
-    </STAINING>
+	<STAINING alias="STAINING_LIST_a">
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>12710070</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>hematoxylin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<STAIN>
+			<STRING_ATTRIBUTE>
+				<TAG>staining_method</TAG>
+				<VALUE>chemical</VALUE>
+			</STRING_ATTRIBUTE>
+			<CODE_ATTRIBUTE>
+				<TAG>staining_compound</TAG>
+				<VALUE>
+					<CODE>36879070</CODE>
+					<SCHEME>SNOMED-CT</SCHEME>
+					<MEANING>water soluble eosin stain</MEANING>
+					<SCHEME_VERSION xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></SCHEME_VERSION>
+				</VALUE>
+			</CODE_ATTRIBUTE>
+		</STAIN>
+		<ATTRIBUTES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"></ATTRIBUTES>
+	</STAINING>
 </STAINING_SET>

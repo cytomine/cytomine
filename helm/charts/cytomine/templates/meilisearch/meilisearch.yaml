@@ -1,4 +1,4 @@
-{ { if .Values.meilisearch.deploy } }
+{{ if .Values.meilisearch.deploy }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -7,43 +7,43 @@ metadata:
     kube-score/ignore: container-security-context-user-group-id
   labels:
     role: meilisearch
-    app: { { include "cytomine.name" . } }
-    component: { { .Release.Name } }-meilisearch
-    release: { { .Release.Name } }
+    app: {{ include "cytomine.name" . }}
+    component: {{ .Release.Name }}-meilisearch
+    release: {{ .Release.Name }}
 spec:
   replicas: 1
   serviceName: meilisearch
   selector:
     matchLabels:
       app: meilisearch
-      release: { { .Release.Name } }
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         role: meilisearch
         app: meilisearch
-        release: { { .Release.Name } }
+        release: {{ .Release.Name }}
     spec:
-      serviceAccountName: { { include "cytomine.serviceAccountName" . } }
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
       securityContext:
-      { { - include "cytomine.podSecurityContext" . | nindent 8 } }
-      { { - with .Values.global.affinity } }
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
+      {{- with .Values.global.affinity }}
       affinity:
-        { { - toYaml . | nindent 8 } }
-      { { - end } }
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         - name: temp
-          emptyDir: { }
-        { { if not .Values.meilisearch.storageClassName - } }
+          emptyDir: {}
+        {{ if not .Values.meilisearch.storageClassName -}}
         - name: meilisearch-data
-          emptyDir: { }
-        { { end } }
+          emptyDir: {}
+        {{ end }}
       containers:
         - name: meilisearch
           image: "{{ .Values.images.meilisearch }}"
-          imagePullPolicy: { { .Values.images.pullPolicy } }
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
-          { { - include "cytomine.containerSecurityContext" . | nindent 12 } }
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
           volumeMounts:
             - name: meilisearch-data
               mountPath: /meili_data
@@ -51,7 +51,7 @@ spec:
               mountPath: /tmp
           ports:
             - name: http
-              containerPort: { { .Values.meilisearch.port } }
+              containerPort: {{ .Values.meilisearch.port }}
               protocol: TCP
           env:
             - name: MEILI_ENV
@@ -66,7 +66,7 @@ spec:
           startupProbe:
             httpGet:
               path: /health
-              port: { { .Values.meilisearch.port } }
+              port: {{ .Values.meilisearch.port }}
             initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 30
@@ -74,33 +74,33 @@ spec:
           readinessProbe:
             httpGet:
               path: /health
-              port: { { .Values.meilisearch.port } }
+              port: {{ .Values.meilisearch.port }}
             periodSeconds: 10
             failureThreshold: 3
             timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /health
-              port: { { .Values.meilisearch.port } }
+              port: {{ .Values.meilisearch.port }}
             periodSeconds: 10
             failureThreshold: 3
             timeoutSeconds: 5
           resources:
-            { { - toYaml .Values.meilisearch.resources | nindent 12 } }
-      { { - with .Values.global.tolerations } }
+            {{- toYaml .Values.meilisearch.resources | nindent 12 }}
+      {{- with .Values.global.tolerations }}
       tolerations:
-        { { - toYaml . | nindent 8 } }
-      { { - end } }
-  { { if .Values.meilisearch.storageClassName - } }
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{ if .Values.meilisearch.storageClassName -}}
   volumeClaimTemplates:
     - metadata:
         name: meilisearch-data
       spec:
-        storageClassName: { { .Values.meilisearch.storageClassName } }
+        storageClassName: {{ .Values.meilisearch.storageClassName }}
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
-            storage: { { .Values.meilisearch.storage } }
-  { { end } }
-  { { end } }
+            storage: {{ .Values.meilisearch.storage }}
+  {{ end }}
+{{ end }}

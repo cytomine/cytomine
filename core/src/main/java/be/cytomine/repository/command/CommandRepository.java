@@ -16,7 +16,6 @@ import be.cytomine.domain.command.RedoStackItem;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.command.UndoStackItem;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 
 @Repository
 public interface CommandRepository extends JpaRepository<Command, Long> {

@@ -154,8 +154,7 @@ public class SecurityACLService {
      * @return true if user has this permission on current domain
      */
     public boolean hasPermission(CytomineDomain domain, Permission permission, boolean isAdmin) {
-        boolean right = permissionService.hasACLPermission(domain, permission) || isAdmin;
-        return right;
+        return permissionService.hasACLPermission(domain, permission) || isAdmin;
     }
 
     public boolean hasPermission(CytomineDomain domain, Permission permission) {

@@ -229,7 +229,7 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
         );
         returnArray.put("user", annotationDomain.getUserId());
 
-        returnArray.put("location", annotationDomain.location.toString()); //TODO: totext?
+        returnArray.put("location", annotationDomain.location.toString()); //TODO: to text?
         returnArray.put("geometryCompression", annotationDomain.geometryCompression);
         returnArray.put("centroid", annotationDomain.getCentroid());
 

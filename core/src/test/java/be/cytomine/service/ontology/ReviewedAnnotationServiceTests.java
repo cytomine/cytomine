@@ -24,6 +24,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
@@ -55,6 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class ReviewedAnnotationServiceTests {
 
     static Map<String, String> POLYGONES = Map.of(

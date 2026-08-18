@@ -57,7 +57,7 @@ public class MeiliSearchService {
         int limit,
         int offset
     ) {
-        Index index = doesIndexExist(indexId);
+        Index index = getIndexOrThrow(indexId);
 
         try {
             SearchRequest searchRequest = buildSearchRequest(query, filters)
@@ -74,7 +74,7 @@ public class MeiliSearchService {
     }
 
     public Set<Long> searchImageIds(String query, List<String> filters) {
-        Index index = doesIndexExist(indexId);
+        Index index = getIndexOrThrow(indexId);
 
         try {
             SearchResultPaginated firstPage = searchPage(index, query, filters, 1);
@@ -123,7 +123,7 @@ public class MeiliSearchService {
     }
 
     public MeiliSearchImageResponse getImage(String imageId) {
-        Index index = doesIndexExist(indexId);
+        Index index = getIndexOrThrow(indexId);
         try {
             Object document = index.getDocument(imageId, Object.class);
             return objectMapper.convertValue(document, MeiliSearchImageResponse.class);
@@ -134,7 +134,7 @@ public class MeiliSearchService {
 
     public MeiliSearchFacetsResponse getFacetDistribution() {
 
-        Index index = doesIndexExist(indexId);
+        Index index = getIndexOrThrow(indexId);
         try {
             String[] attributes = index.getFilterableAttributesSettings();
             SearchRequest searchRequest = new SearchRequest("")
@@ -148,7 +148,7 @@ public class MeiliSearchService {
         }
     }
 
-    public Index doesIndexExist(String indexUid) {
+    public Index getIndexOrThrow(String indexUid) {
         Index[] indexes = meiliSearchClient.getIndexes().getResults();
         for (Index index : indexes) {
             if (indexUid.equals(index.getUid())) {

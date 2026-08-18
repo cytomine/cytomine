@@ -54,7 +54,7 @@ public class ResponseService {
             paramsCallback.putAll(additionalCallbackParams);
         }
 
-        //load message from i18n filel
+        // load message from i18n file
         String message = messageSource.getMessage(command, messageParams.toArray(), Locale.ENGLISH);
 
         HashMap<String, Object> params = new HashMap<>();

@@ -1,6 +1,7 @@
 package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,7 @@ public class UploadedFileController implements UploadedFileHttpContract {
     }
 
     @Override
-    public Page<UploadedFileResponse> getAll(long userId, Pageable pageable) {
-        return service.getAll(userId, pageable);
+    public Page<UploadedFileResponse> getAll(long userId, List<Long> uploadedFileIds, Pageable pageable) {
+        return service.getAll(userId, uploadedFileIds, pageable);
     }
 }

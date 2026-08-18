@@ -22,6 +22,7 @@ public class MeiliSearchImageResponse {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Image {
         private String identifier;
+        private Long abstractImageId;
         private SlideDetail slide;
         private Scanner scanner;
         private ImagingSetting imagingSetting;

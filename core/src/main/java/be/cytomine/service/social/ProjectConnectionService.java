@@ -753,11 +753,14 @@ public class ProjectConnectionService {
         Long afterThan,
         Long beforeThan,
         Project project,
-        long userId
+        Long userId
     ) {
         if (project != null) {
             securityACLService.check(project, READ);
-            securityACLService.checkIsSameUserOrAdminContainer(project, userId, currentUserService.getCurrentUser());
+            if (userId != null) {
+                securityACLService.checkIsSameUserOrAdminContainer(
+                    project, userId, currentUserService.getCurrentUser());
+            }
         } else {
             securityACLService.checkAdmin(currentUserService.getCurrentUser());
         }
@@ -883,8 +886,9 @@ public class ProjectConnectionService {
             matchs.add(match(eq("project", project.getId())));
         }
 
-        matchs.add(match(eq("user", userId)));
-
+        if (userId != null) {
+            matchs.add(match(eq("user", userId)));
+        }
 
         List<Bson> requests = new ArrayList<>();
         requests.addAll(matchs);

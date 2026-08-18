@@ -659,6 +659,13 @@ public class UserService extends ModelService {
             layersFormatted.addAll(humanAdmins.stream().map(u -> u.toJsonObject(urlApi)).toList());
         }
 
+        boolean isProjectMember = humanUsers.stream().anyMatch(u -> u.getId().equals(currentUser.id()));
+        boolean hasOwnLayer = layersFormatted.stream()
+            .anyMatch(x -> x.getJSONAttrLong("id").equals(currentUser.id()));
+        if (isProjectMember && !hasOwnLayer) {
+            layersFormatted.add(userMapper.map(currentUser).toJsonObject(urlApi));
+        }
+
         return layersFormatted;
     }
 

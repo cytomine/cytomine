@@ -61,6 +61,7 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -177,6 +178,13 @@ public class BasicInstanceBuilder {
     public User givenSuperAdmin() {
         return userRepository.findByUsernameLikeIgnoreCase("superadmin")
             .orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
+    }
+
+    public User givenCurrentUser() {
+        return CurrentUserService.getSecurityCurrentUser()
+            .map(currentUser -> currentUser.getUser().username())
+            .flatMap(userRepository::findByUsernameLikeIgnoreCase)
+            .orElseGet(this::givenSuperAdmin);
     }
 
     public User givenANotPersistedUser() {
@@ -614,7 +622,7 @@ public class BasicInstanceBuilder {
     public AnnotationTerm givenANotPersistedAnnotationTerm(UserAnnotation annotation, Term term) {
         AnnotationTerm annotationTerm = new AnnotationTerm();
         annotationTerm.setTerm(term);
-        annotationTerm.setUser(this.givenSuperAdmin());
+        annotationTerm.setUser(this.givenCurrentUser());
         annotationTerm.setUserAnnotation(annotation);
         return annotationTerm;
     }

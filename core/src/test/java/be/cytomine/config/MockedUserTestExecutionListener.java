@@ -9,6 +9,7 @@ import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.UserRepository;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +24,8 @@ public class MockedUserTestExecutionListener implements TestExecutionListener, O
 
         when(userHttpContract.search(anyString())).thenAnswer(invocation ->
             userRepository.findByUsernameLikeIgnoreCase(invocation.getArgument(0)).map(userMapper::map));
+        when(userHttpContract.get(anyLong(), anyLong())).thenAnswer(invocation ->
+            userRepository.findById(invocation.<Long>getArgument(0)).map(userMapper::map));
     }
 
     @Override

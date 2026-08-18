@@ -45,6 +45,7 @@ import be.cytomine.service.social.WebSocketUserPositionHandler;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_NO_ACL;
 import static be.cytomine.service.social.UserPositionServiceTests.ANOTHER_USER_VIEW;
 import static be.cytomine.service.social.UserPositionServiceTests.USER_VIEW;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -292,6 +293,7 @@ public class UserPositionResourceTests {
 
     @Test
     @Transactional
+    @WithMockUser(username = USER_NO_ACL)
     public void listFollowersForForbiddenUser() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Long imageId = imageInstance.getId();
@@ -354,7 +356,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void addPosition() throws Exception {
-        User user = builder.givenSuperAdmin();
+        long userId = currentUserService.getCurrentUser().id();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -387,7 +389,7 @@ public class UserPositionResourceTests {
         restUserPositionControllerMockMvc.perform(get("/api/imageinstance/{image}/online.json", imageInstance.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.users", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.users[0]").value(user.getId()));
+            .andExpect(jsonPath("$.users[0]").value(userId));
 
         List<PersistentUserPosition> persisted = persistentUserPositionRepository.findAll(Sort.by(
             Sort.Direction.DESC,
@@ -457,7 +459,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void getLastUserPositionOfUserAlreadyFollowedByCurrentUser() throws Exception {
-        User admin = builder.givenSuperAdmin();
+        User admin = currentUserService.getCurrentUserOld();
         User user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();

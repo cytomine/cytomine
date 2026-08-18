@@ -179,9 +179,8 @@ public class RestProjectConnectionController extends RestCytomineController {
         @RequestParam(required = false, value = "user", defaultValue = "0") Long userId
     ) {
         Project project = projectService.find(projectId).orElse(null);
-        User user = userService.find(userId).orElse(null);
         return responseSuccess(projectConnectionService.averageOfProjectConnections(
-            period, afterThan, beforeThan, project, user.getId()
+            period, afterThan, beforeThan, project, userService.find(userId).map(User::getId).orElse(null)
         ));
     }
 

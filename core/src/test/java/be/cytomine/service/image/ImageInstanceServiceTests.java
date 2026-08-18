@@ -50,6 +50,8 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
+import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.search.ImageSearchExtension;
 import be.cytomine.service.social.AnnotationActionService;
@@ -94,6 +96,8 @@ public class ImageInstanceServiceTests {
     PersistentUserPositionRepository persistentUserPositionRepository;
     @Autowired
     ImageConsultationService imageConsultationService;
+    @Autowired
+    CurrentUserService currentUserService;
     @Autowired
     PersistentImageConsultationRepository persistentImageConsultationRepository;
 
@@ -283,7 +287,7 @@ public class ImageInstanceServiceTests {
         Date consultation = new Date();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
-        imageConsultationService.add(builder.givenSuperAdmin().getId(), imageInstance1.getId(), "xxx", "view",
+        imageConsultationService.add(currentUserService.getCurrentUser().id(), imageInstance1.getId(), "xxx", "view",
             consultation);
 
         ImageSearchExtension imageSearchExtension = new ImageSearchExtension();

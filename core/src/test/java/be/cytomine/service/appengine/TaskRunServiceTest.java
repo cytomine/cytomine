@@ -30,6 +30,10 @@ import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.dto.appengine.task.output.CollectionOutput;
 import be.cytomine.dto.appengine.task.output.GeometryOutput;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import be.cytomine.common.mapper.BaseMapperImpl;
+import be.cytomine.mapper.RoleMapperImpl;
 import be.cytomine.mapper.UserMapperImpl;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
 import be.cytomine.repository.appengine.TaskRunRepository;
@@ -55,7 +59,17 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskRunServiceTest {
-    private final UserMapperImpl userMapper = new UserMapperImpl();
+    private final UserMapperImpl userMapper = userMapper();
+
+    private static UserMapperImpl userMapper() {
+        RoleMapperImpl roleMapper = new RoleMapperImpl();
+        ReflectionTestUtils.setField(roleMapper, "baseMapper", new BaseMapperImpl());
+
+        UserMapperImpl mapper = new UserMapperImpl();
+        ReflectionTestUtils.setField(mapper, "baseMapper", new BaseMapperImpl());
+        ReflectionTestUtils.setField(mapper, "roleMapper", roleMapper);
+        return mapper;
+    }
 
     @Mock
     private AnnotationService annotationService;
@@ -189,6 +203,7 @@ public class TaskRunServiceTest {
         when(appEngineService.get("task-runs/" + taskRunId)).thenReturn(taskRunJson);
         when(appEngineService.getTaskRunOutputs(taskRunId)).thenReturn(List.of(collectionOutput));
         when(currentUserService.getCurrentUser()).thenReturn(userResponse);
+        when(currentUserService.getCurrentUserOld()).thenReturn(currentUser);
         when(geometryService.addOffset(
             any(Geometry.class),
             anyInt(),
@@ -291,6 +306,7 @@ public class TaskRunServiceTest {
         doNothing().when(securityACLService).check(project, READ);
         doNothing().when(securityACLService).checkIsNotReadOnly(project);
         when(currentUserService.getCurrentUser()).thenReturn(userResponse);
+        when(currentUserService.getCurrentUserOld()).thenReturn(currentUser);
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
         when(annotationLayerService.createAnnotationLayer("layer-name")).thenReturn(annotationLayer);
         when(appEngineService.get("task-runs/" + taskRunId + "/outputs")).thenReturn(outputsJson);

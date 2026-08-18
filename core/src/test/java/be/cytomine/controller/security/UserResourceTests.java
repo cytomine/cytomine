@@ -32,6 +32,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.OntologyMapper;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
@@ -52,6 +53,7 @@ import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
 import be.cytomine.repositorynosql.social.ProjectConnectionRepository;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.database.SequenceService;
 import be.cytomine.service.social.ImageConsultationService;
@@ -118,6 +120,12 @@ public class UserResourceTests {
 
     @Autowired
     private BasicInstanceBuilder builder;
+
+    @Autowired
+    private CurrentUserService currentUserService;
+
+    @Autowired
+    private WiremockRepository wiremockRepository;
 
     @Autowired
     private MockMvc restUserControllerMockMvc;
@@ -215,6 +223,7 @@ public class UserResourceTests {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
+        wiremockRepository.stubUser(projectAdmin);
 
         restUserControllerMockMvc.perform(get("/api/project/{id}/admin.json", project.getId()).with(
                 user(projectAdmin.getUsername())))
@@ -347,6 +356,7 @@ public class UserResourceTests {
     @Transactional
     @WithMockUser(username = "user")
     public void getKeysFromOtherUserIsForbidden() throws Exception {
+        wiremockRepository.stubUser(builder.givenDefaultUser());
         User user = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(get("/api/user/{id}/keys.json", user.getId()))
             .andExpect(status().isForbidden());
@@ -359,6 +369,7 @@ public class UserResourceTests {
     @WithMockUser(username = "user")
     public void getSignature() throws Exception {
         User user = builder.givenDefaultUser();
+        wiremockRepository.stubUser(user);
         restUserControllerMockMvc.perform(get("/api/signature.json").param("method", "GET"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.publicKey").value(user.getPublicKey()))
@@ -368,12 +379,12 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void getCurrentUserKeys() throws Exception {
-        User currentUser = builder.givenSuperAdmin();
+        UserResponse currentUser = currentUserService.getCurrentUser();
 
         restUserControllerMockMvc.perform(get("/api/user/current/keys"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.primaryKey").value(currentUser.getPublicKey()))
-            .andExpect(jsonPath("$.secondaryKey").value(currentUser.getPrivateKey()));
+            .andExpect(jsonPath("$.primaryKey").value(currentUser.publicKey().orElseThrow()))
+            .andExpect(jsonPath("$.secondaryKey").value(currentUser.privateKey().orElseThrow()));
     }
 
     @Test
@@ -393,7 +404,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void getCurrentUser() throws Exception {
-        User currentUser = builder.givenSuperAdmin();
+        User currentUser = currentUserService.getCurrentUserOld();
 
         restUserControllerMockMvc.perform(get("/api/user/current.json"))
             .andExpect(status().isOk())

@@ -24,6 +24,7 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.AnnotationAction;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.social.AnnotationActionService;
 import be.cytomine.utils.JsonObject;
 
@@ -53,6 +54,9 @@ public class AnnotationActionResourceTests {
     @Autowired
     private AnnotationActionService annotationActionService;
 
+    @Autowired
+    private CurrentUserService currentUserService;
+
     @BeforeEach
     public void cleanDB() {
         annotationActionRepository.deleteAll();
@@ -75,7 +79,7 @@ public class AnnotationActionResourceTests {
     @Test
     public void addActionForAnnotation() throws Exception {
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(0);
-        User user = builder.givenSuperAdmin();
+        long userId = currentUserService.getCurrentUser().id();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         JsonObject jsonObject = new JsonObject();
@@ -90,13 +94,13 @@ public class AnnotationActionResourceTests {
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.social.AnnotationAction"))
             .andExpect(jsonPath("$.id").exists())
             .andExpect(jsonPath("$.created").exists())
-            .andExpect(jsonPath("$.user").value(user.getId()))
+            .andExpect(jsonPath("$.user").value(userId))
             .andExpect(jsonPath("$.image").value(annotationDomain.getImage().getId()))
             .andExpect(jsonPath("$.project").value(annotationDomain.getProject().getId()))
             .andExpect(jsonPath("$.action").value("select"))
             .andExpect(jsonPath("$.annotationIdent").value(annotationDomain.getId()))
             .andExpect(jsonPath("$.annotationClassName").value(annotationDomain.getClass().getName()))
-            .andExpect(jsonPath("$.annotationCreator").value(user.getId()));
+            .andExpect(jsonPath("$.annotationCreator").value(annotationDomain.user().getId()));
 
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(1);
     }

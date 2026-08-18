@@ -183,15 +183,15 @@ public class RestUserController extends RestCytomineController {
         String signature = ApiKeyFilter.generateKeys(
             method, contentMD5, contenttype.isEmpty() ? contentType : contenttype, date, user.privateKey().get()
         );
-        return responseSuccess(JsonObject.of("signature", signature, "publicKey", user.publicKey()));
+        return responseSuccess(JsonObject.of("signature", signature, "publicKey", user.publicKey().orElse(null)));
     }
 
     @GetMapping("/user/current/keys")
     public ResponseEntity<String> getCurrentUserKeys() {
         UserResponse user = currentUserService.getCurrentUser();
         return responseSuccess(JsonObject.of(
-                "primaryKey", user.publicKey(),
-                "secondaryKey", user.privateKey()
+                "primaryKey", user.publicKey().orElse(null),
+                "secondaryKey", user.privateKey().orElse(null)
             )
         );
     }

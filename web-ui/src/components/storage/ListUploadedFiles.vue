@@ -12,7 +12,7 @@
         icon="search"
       />
 
-      <MetadataFilter />
+      <MetadataFilter @filter-change="onMetadataFilterChange" />
 
       <cytomine-table
         :collection="uploadedFileCollection"
@@ -89,6 +89,8 @@ export default {
     return {
       loading: true,
       searchString: '',
+      metadataSearch: '',
+      metadataFilters: [],
       openedDetails: [],
     };
   },
@@ -104,7 +106,11 @@ export default {
     users: get('currentStorage/users'),
     shortTermToken: get('currentUser/shortTermToken'),
     uploadedFileCollection() {
-      return new UploadedFileCollection({ originalFilename: { ilike: encodeURIComponent(this.searchString) } });
+      return new UploadedFileCollection({
+        originalFilename: { ilike: encodeURIComponent(this.searchString) },
+        metadataSearch: this.metadataSearch || null,
+        metadataFilter: this.metadataFilters.length ? this.metadataFilters.join(' AND ') : null,
+      });
     }
   },
   methods: {
@@ -117,6 +123,10 @@ export default {
     debounceSearchString: _.debounce(async function (value) {
       this.searchString = value;
     }, 500),
+    onMetadataFilterChange({ query, filters }) {
+      this.metadataSearch = query;
+      this.metadataFilters = filters;
+    },
     updatedTree() {
       this.$emit('update:revision', this.revision + 1); // updating the table will result in new files objects => the uf details will also be updated
     },

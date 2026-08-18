@@ -1,6 +1,7 @@
 package be.cytomine.controller.repository;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -38,6 +39,7 @@ import be.cytomine.mapper.UploadedFileMapper;
 import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.middleware.ImageServerService.DownloadType;
@@ -57,6 +59,7 @@ public class UploadedFileController {
     private final AbstractImageRepository abstractImageRepository;
     private final CurrentUserService currentUserService;
     private final ImageServerService imageServerService;
+    private final MeiliSearchService meiliSearchService;
     private final PageMapper pageMapper;
     private final UploadedFileHttpContract uploadedFileHttpContract;
     private final UploadedFileMapper uploadedFileMapper;
@@ -64,11 +67,14 @@ public class UploadedFileController {
 
     @GetMapping("/uploadedfile.json")
     public CollectionResponse<UploadedFileResponse> getAll(
+        @RequestParam(defaultValue = "") String metadataSearch,
+        @RequestParam(defaultValue = "") String metadataFilter,
         @SortDefault(sort = "created", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         log.debug("GET /uploadedfile.json");
         long userId = currentUserService.getCurrentUser().getId();
-        Page<UploadedFileResponse> page = uploadedFileHttpContract.getAll(userId, pageable);
+
+        Page<UploadedFileResponse> page = getPage(userId, metadataSearch, metadataFilter, pageable);
         Set<Long> ids = page.getContent().stream().map(UploadedFileResponse::id).collect(Collectors.toSet());
         Map<Long, Long> abstractImageIdByUploadedFileId = abstractImageRepository
             .findIdsByUploadedFileIds(ids)
@@ -140,6 +146,30 @@ public class UploadedFileController {
             .ok()
             .headers(headers)
             .body(stream);
+    }
+
+    private Page<UploadedFileResponse> getPage(
+        long userId,
+        String metadataSearch,
+        String metadataFilter,
+        Pageable pageable
+    ) {
+        boolean hasSearch = !metadataSearch.isBlank();
+        boolean hasFilter = !metadataFilter.isBlank();
+        if (!hasSearch && !hasFilter) {
+            return uploadedFileHttpContract.getAll(userId, null, pageable);
+        }
+
+        List<String> filters = hasFilter ? List.of(metadataFilter) : List.of();
+        Set<Long> abstractImageIds = meiliSearchService.searchImageIds(metadataSearch, filters);
+        Set<Long> uploadedFileIds = abstractImageIds.isEmpty()
+            ? Set.of()
+            : abstractImageRepository.findUploadedFileIdsByAbstractImageIds(abstractImageIds);
+        if (uploadedFileIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        return uploadedFileHttpContract.getAll(userId, List.copyOf(uploadedFileIds), pageable);
     }
 
     private UploadedFileResponse withThumbnailUrl(UploadedFileResponse r, Long abstractImageId) {

@@ -3,11 +3,10 @@ import Buefy from 'buefy';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
 import MetadataFilter from '@/components/search/MetadataFilter.vue';
-import { fetchFacets, searchMetadata } from '@/utils/search';
+import { fetchFacets } from '@/utils/search';
 
 vi.mock('@/utils/search', () => ({
   fetchFacets: vi.fn(),
-  searchMetadata: vi.fn(),
 }));
 
 const facets = {
@@ -38,8 +37,6 @@ const TYPE = 'specimens.specimen_type.meaning';
 
 const emptySelection = Object.fromEntries(Object.keys(facets).map((key) => [key, []]));
 
-const results = [{ id: 1 }, { id: 2 }];
-
 const advance = async (ms) => vi.advanceTimersByTimeAsync(ms);
 
 const createWrapper = async (options = {}) => {
@@ -58,18 +55,10 @@ const createWrapper = async (options = {}) => {
   return wrapper;
 };
 
-const createSearchedWrapper = async (options = {}) => {
-  const wrapper = await createWrapper(options);
-  await advance(300);
-  searchMetadata.mockClear();
-  return wrapper;
-};
-
 describe('MetadataFilter.vue', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     fetchFacets.mockResolvedValue(facets);
-    searchMetadata.mockResolvedValue(results);
   });
 
   afterEach(async () => {
@@ -133,15 +122,15 @@ describe('MetadataFilter.vue', () => {
 
     await wrapper.setData({ selectedFacets: { [SEX]: ['Male'] } });
 
-    expect(wrapper.vm.filters).toEqual([`${SEX}:Male`]);
+    expect(wrapper.vm.filters).toEqual([`${SEX} = "Male"`]);
   });
 
-  it('should build an unquoted filter for a single value containing separators', async () => {
+  it('should quote a single value containing separators', async () => {
     const wrapper = await createWrapper();
 
     await wrapper.setData({ selectedFacets: { [SITE]: ['LARGE INTESTINE, CECUM'] } });
 
-    expect(wrapper.vm.filters).toEqual([`${SITE}:LARGE INTESTINE, CECUM`]);
+    expect(wrapper.vm.filters).toEqual([`${SITE} = "LARGE INTESTINE, CECUM"`]);
   });
 
   it('should build a disjunction when several values are selected', async () => {
@@ -167,64 +156,41 @@ describe('MetadataFilter.vue', () => {
 
     expect(wrapper.vm.filters).toEqual([
       `(${SITE} = "LIVER" OR ${SITE} = "KIDNEY")`,
-      `${SEX}:Male`,
-      `${TYPE}:Tissue specimen (specimen)`,
+      `${SEX} = "Male"`,
+      `${TYPE} = "Tissue specimen (specimen)"`,
     ]);
   });
 
-  it('should search without filter once the facets are loaded', async () => {
+  it('should emit the query and filters when the selected facets change', async () => {
     const wrapper = await createWrapper();
-
-    expect(searchMetadata).not.toHaveBeenCalled();
-
-    await advance(300);
-
-    expect(searchMetadata).toHaveBeenCalledWith({ query: '', filters: [], limit: 20, offset: 0 });
-    expect(wrapper.vm.results).toEqual(results);
-    expect(wrapper.vm.searched).toBe(true);
-  });
-
-  it('should emit the results of the search', async () => {
-    const wrapper = await createSearchedWrapper();
-
-    await wrapper.setData({ selectedFacets: { [SEX]: ['Male'] } });
-    await advance(300);
-
-    expect(wrapper.emitted('search').at(-1)).toEqual([results]);
-  });
-
-  it('should search when the selected facets change', async () => {
-    const wrapper = await createSearchedWrapper();
 
     await wrapper.setData({ selectedFacets: { [SITE]: ['LIVER', 'KIDNEY'], [SEX]: ['Male'] } });
     await advance(300);
 
-    expect(searchMetadata).toHaveBeenCalledWith({
+    expect(wrapper.emitted('filter-change').at(-1)).toEqual([{
       query: '',
-      filters: [`(${SITE} = "LIVER" OR ${SITE} = "KIDNEY")`, `${SEX}:Male`],
-      limit: 20,
-      offset: 0,
-    });
+      filters: [`(${SITE} = "LIVER" OR ${SITE} = "KIDNEY")`, `${SEX} = "Male"`],
+    }]);
   });
 
-  it('should search only once when the selected facets change repeatedly', async () => {
-    const wrapper = await createSearchedWrapper();
+  it('should emit only once when the selected facets change repeatedly', async () => {
+    const wrapper = await createWrapper();
 
     await wrapper.setData({ selectedFacets: { [SITE]: ['LIVER'] } });
     await advance(100);
     await wrapper.setData({ selectedFacets: { [SITE]: ['LIVER', 'KIDNEY'] } });
     await advance(300);
 
-    expect(searchMetadata).toHaveBeenCalledExactlyOnceWith({
+    expect(wrapper.emitted('filter-change')).toEqual([[{
       query: '',
       filters: [`(${SITE} = "LIVER" OR ${SITE} = "KIDNEY")`],
-      limit: 20,
-      offset: 0,
-    });
+    }]]);
   });
 
-  it('should debounce the search string typed by the user', async () => {
-    const wrapper = await createSearchedWrapper();
+  it('should debounce the search string typed by the user before emitting', async () => {
+    const wrapper = await createWrapper();
+    await advance(300); // flush the baseline emission triggered once the facets are loaded
+    const emittedCount = wrapper.emitted('filter-change').length;
 
     const input = wrapper.find('input');
     input.element.value = 'liv';
@@ -238,38 +204,16 @@ describe('MetadataFilter.vue', () => {
     await advance(500);
 
     expect(wrapper.vm.searchString).toBe('liver');
-    expect(searchMetadata).not.toHaveBeenCalled();
+    expect(wrapper.emitted('filter-change').length).toBe(emittedCount);
 
     await advance(300);
 
-    expect(searchMetadata).toHaveBeenCalledExactlyOnceWith({
-      query: 'liver',
-      filters: [],
-      limit: 20,
-      offset: 0,
-    });
-  });
-
-  it('should search when the limit changes', async () => {
-    const wrapper = await createSearchedWrapper({ propsData: { limit: 5 } });
-
-    wrapper.setProps({ limit: 10 });
-    await advance(300);
-
-    expect(searchMetadata).toHaveBeenCalledWith({ query: '', filters: [], limit: 10, offset: 0 });
-  });
-
-  it('should search when the offset changes', async () => {
-    const wrapper = await createSearchedWrapper();
-
-    wrapper.setProps({ offset: 20 });
-    await advance(300);
-
-    expect(searchMetadata).toHaveBeenCalledWith({ query: '', filters: [], limit: 20, offset: 20 });
+    expect(wrapper.emitted('filter-change').length).toBe(emittedCount + 1);
+    expect(wrapper.emitted('filter-change').at(-1)).toEqual([{ query: 'liver', filters: [] }]);
   });
 
   it('should reset the search string and the selected facets on clear', async () => {
-    const wrapper = await createSearchedWrapper();
+    const wrapper = await createWrapper();
 
     await wrapper.setData({
       searchString: 'liver',
@@ -285,11 +229,6 @@ describe('MetadataFilter.vue', () => {
 
     await advance(300);
 
-    expect(searchMetadata).toHaveBeenLastCalledWith({
-      query: '',
-      filters: [],
-      limit: 20,
-      offset: 0,
-    });
+    expect(wrapper.emitted('filter-change').at(-1)).toEqual([{ query: '', filters: [] }]);
   });
 });

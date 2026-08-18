@@ -24,17 +24,6 @@
       </div>
 
       <b-button icon-left="times" @click="clear()">{{ $t('button-clear') }}</b-button>
-
-      <div v-if="searched" class="search-results">
-        <h2>{{ results.length }} result(s)</h2>
-
-        <p v-if="!results.length">No result</p>
-        <ul v-else>
-          <li v-for="result in results" :key="result.id">
-            {{ resultLabel(result) }}
-          </li>
-        </ul>
-      </div>
     </template>
   </div>
 </template>
@@ -43,24 +32,18 @@
 import _ from 'lodash';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
-import { fetchFacets, searchMetadata } from '@/utils/search';
+import { fetchFacets } from '@/utils/search';
 
 export default {
   name: 'MetadataFilter',
   components: {
     CytomineMultiselect,
   },
-  props: {
-    limit: { type: Number, default: 20 },
-    offset: { type: Number, default: 0 },
-  },
   data() {
     return {
       facets: [],
       selectedFacets: {},
       searchString: '',
-      results: [],
-      searched: false,
     };
   },
   computed: {
@@ -68,25 +51,20 @@ export default {
       return Object.entries(this.selectedFacets)
         .filter(([, values]) => values.length > 0)
         .map(([key, values]) => {
-          if (values.length === 1) {
-            return `${key}:${values[0]}`;
-          }
-          return `(${values.map(value => `${key} = "${value}"`).join(' OR ')})`;
+          // Keep filters that are composed of several words with commas
+          let clause = values
+            .map(value => `${key} = "${value.replace(/"/g, '\\"')}"`)
+            .join(' OR ');
+          return values.length === 1 ? clause : `(${clause})`;
         });
     },
   },
   watch: {
     filters() {
-      this.search();
+      this.emitFilterChange();
     },
     searchString() {
-      this.search();
-    },
-    limit() {
-      this.search();
-    },
-    offset() {
-      this.search();
+      this.emitFilterChange();
     },
   },
   methods: {
@@ -99,20 +77,12 @@ export default {
       }));
       this.selectedFacets = Object.fromEntries(this.facets.map(({ key }) => [key, []]));
     },
-    search: _.debounce(async function () {
-      this.results = await searchMetadata({
+    emitFilterChange: _.debounce(function () {
+      this.$emit('filter-change', {
         query: this.searchString,
         filters: this.filters,
-        limit: this.limit,
-        offset: this.offset,
       });
-      this.searched = true;
-      this.$emit('search', this.results);
     }, 300),
-    resultLabel(result) {
-      let image = result.image || {};
-      return image.name || image.identifier || result.id;
-    },
     clear() {
       this.searchString = '';
       this.selectedFacets = Object.fromEntries(this.facets.map(({ key }) => [key, []]));
@@ -153,13 +123,5 @@ export default {
 
 .facet-filters .label {
   overflow-wrap: anywhere;
-}
-
-.metadata-filter .search-results {
-  margin-top: 1rem;
-}
-
-.metadata-filter .search-results ul {
-  list-style: disc inside;
 }
 </style>

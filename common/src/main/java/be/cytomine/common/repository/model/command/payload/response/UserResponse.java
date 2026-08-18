@@ -19,6 +19,12 @@ public record UserResponse(long id, String username, String email, Optional<Stri
         if (roles == null) {
             roles = new HashSet<>();
         }
+        if (deleted == null) {
+            deleted = Optional.empty();
+        }
+        if (language == null) {
+            language = Optional.empty();
+        }
     }
 
     @Override

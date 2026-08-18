@@ -1,6 +1,10 @@
 package be.cytomine.config;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -133,6 +137,22 @@ public class WiremockRepository {
             .willReturn(aResponse()
                 .withHeader("Content-Type", "application/json")
                 .withBody(objectMapper.writeValueAsString(termMapper.map(term)))
+            )
+        );
+    }
+
+    @SneakyThrows
+    public void stubTermsByProject(long projectId, Term... terms) {
+        List<Object> content = Arrays.stream(terms).map(termMapper::map).collect(Collectors.toList());
+        SERVER.stubFor(WireMock.get(urlPathEqualTo("/terms/project/" + projectId))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBody(objectMapper.writeValueAsString(Map.of(
+                    "content", content,
+                    "number", 0,
+                    "size", content.size(),
+                    "totalElements", content.size()
+                )))
             )
         );
     }

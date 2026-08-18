@@ -100,9 +100,9 @@ public class CommandService {
         User user = currentUserService.getCurrentUser();
         Optional<UndoStackItem> lastUndoStackItem;
         if (commandId != null) {
-            lastUndoStackItem = commandRepository.findLastUndoStackItem(user, commandRepository.getById(commandId));
+            lastUndoStackItem = commandRepository.findLastUndoStackItem(user.getId(), commandRepository.getById(commandId));
         } else {
-            lastUndoStackItem = commandRepository.findLastUndoStackItem(user);
+            lastUndoStackItem = commandRepository.findLastUndoStackItem(user.getId());
         }
 
         if (lastUndoStackItem.isEmpty()) {
@@ -134,7 +134,7 @@ public class CommandService {
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user, transaction);
+            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user.getId(), transaction);
             for (UndoStackItem undoStack : undoStacks) {
                 //browse all command and undo it while its the same transaction
                 if (undoStack.getCommand().isRefuseUndo()) {
@@ -196,7 +196,7 @@ public class CommandService {
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(user, transaction);
+            List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(user.getId(), transaction);
             for (RedoStackItem redoStack : redoStacks) {
                 //Redo each command from the same transaction
                 result = performRedo(redoStack.getCommand());
@@ -211,9 +211,9 @@ public class CommandService {
         User user = currentUserService.getCurrentUser();
         Optional<RedoStackItem> lastRedoStackItem;
         if (commandId != null) {
-            lastRedoStackItem = commandRepository.findLastRedoStackItem(user, commandRepository.getById(commandId));
+            lastRedoStackItem = commandRepository.findLastRedoStackItem(user.getId(), commandRepository.getById(commandId));
         } else {
-            lastRedoStackItem = commandRepository.findLastRedoStackItem(user);
+            lastRedoStackItem = commandRepository.findLastRedoStackItem(user.getId());
         }
 
         if (lastRedoStackItem.isEmpty()) {

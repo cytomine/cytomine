@@ -162,9 +162,11 @@ public class UploadedFileController {
 
         List<String> filters = hasFilter ? List.of(metadataFilter) : List.of();
         Set<Long> abstractImageIds = meiliSearchService.searchImageIds(metadataSearch, filters);
-        Set<Long> uploadedFileIds = abstractImageIds.isEmpty()
-            ? Set.of()
-            : abstractImageRepository.findUploadedFileIdsByAbstractImageIds(abstractImageIds);
+        if (abstractImageIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        Set<Long> uploadedFileIds = abstractImageRepository.findUploadedFileIdsByAbstractImageIds(abstractImageIds);
         if (uploadedFileIds.isEmpty()) {
             return Page.empty(pageable);
         }

@@ -42,7 +42,7 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListAnnotationTracks() {
         expectOK(() -> annotationTrackService.list(annotationTrack.getTrack()));
     }

@@ -98,7 +98,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListAnnotationGroupByProject() {
         assertThat(annotationGroupService.list(annotationGroup.getProject())).contains(annotationGroup);
     }
@@ -110,7 +110,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListAnnotationGroupByImageGroup() {
         assertThat(annotationGroupService.list(annotationGroup.getImageGroup())).contains(annotationGroup);
     }
@@ -129,7 +129,7 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanUpdateAnnotationGroupInRestrictedProject() {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         annotationGroup.getProject().setMode(EditingMode.RESTRICTED);

@@ -41,7 +41,7 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListAllImageFilters() {
         expectOK(() -> imageFilterProjectService.list());
     }

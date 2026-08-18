@@ -42,7 +42,7 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListProjectRepresentativeUser() {
         expectOK(() -> projectDefaultLayerService.listByProject(projectDefaultLayer.getProject()));
     }

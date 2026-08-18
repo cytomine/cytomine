@@ -60,7 +60,7 @@ import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
-import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static be.cytomine.service.social.UserPositionServiceTests.USER_VIEW;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -72,7 +72,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = SUPER_ADMIN)
+@WithMockUser(username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 @MockedUser

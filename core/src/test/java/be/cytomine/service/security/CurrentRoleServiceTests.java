@@ -21,7 +21,7 @@ import be.cytomine.service.CurrentRoleService;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.ADMIN;
 import static be.cytomine.authorization.AbstractAuthorizationTest.GUEST;
-import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -43,7 +43,7 @@ public class CurrentRoleServiceTests {
     UserMapper userMapper;
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void findRoleForSuperadmin() {
 
         assertThat(currentRoleService.findRealAuthorities(userMapper.map(builder.givenSuperAdmin())))

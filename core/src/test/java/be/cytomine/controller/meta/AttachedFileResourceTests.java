@@ -23,7 +23,7 @@ import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repository.meta.AttachedFileRepository;
 
-import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = SUPER_ADMIN)
+@WithMockUser(username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class AttachedFileResourceTests {
 

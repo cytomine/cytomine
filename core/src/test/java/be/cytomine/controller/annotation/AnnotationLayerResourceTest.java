@@ -18,7 +18,7 @@ import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.TaskRunLayer;
 
-import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
-@WithMockUser(username = SUPER_ADMIN)
+@WithMockUser(username = SUPERADMIN)
 @AutoConfigureMockMvc
 @SpringBootTest
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})

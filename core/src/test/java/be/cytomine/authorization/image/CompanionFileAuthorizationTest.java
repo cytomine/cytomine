@@ -44,7 +44,7 @@ public class CompanionFileAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanList() {
         assertThat(companionFileService.list(companionFile.getImage())).contains(companionFile);
         AbstractImage anotherAbstractImage = builder.givenAnAbstractImage();

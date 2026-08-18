@@ -23,12 +23,12 @@ import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.dto.image.SliceCoordinate;
 import be.cytomine.dto.image.SliceCoordinates;
 
-import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = SUPER_ADMIN)
+@WithMockUser(username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class SliceCoordinatesServiceTests {

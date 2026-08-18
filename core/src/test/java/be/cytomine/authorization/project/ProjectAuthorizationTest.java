@@ -141,7 +141,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListProjects() {
         assertThat(projectService.list(null, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", 0L, 0L)
             .stream().map(x -> x.get("id")))
@@ -175,7 +175,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanAddUserToProject() {
         expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, true));
         expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, false));

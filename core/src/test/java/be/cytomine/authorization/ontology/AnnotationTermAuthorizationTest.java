@@ -45,7 +45,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListRelationTerms() {
         expectOK(() -> annotationTermService.list(annotationTerm.getUserAnnotation()));
     }
@@ -63,7 +63,7 @@ public class AnnotationTermAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanUpdateAnnotationInRestrictedProject() {
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(this.annotationTerm.getUserAnnotation());
         Project project = (Project) annotationTerm.container();

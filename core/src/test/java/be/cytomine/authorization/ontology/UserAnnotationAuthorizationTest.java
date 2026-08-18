@@ -85,7 +85,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void shouldReturnAllUserAnnotationsWhenRequestedBySuperAdmin() {
         expectOK(() -> userAnnotationService.listLight());
     }
@@ -97,7 +97,7 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanUpdateAnnotationInRestrictedProject() {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.setProject(this.userAnnotation.getProject());

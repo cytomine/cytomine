@@ -18,12 +18,12 @@ import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.repository.security.AclRepository;
 import be.cytomine.service.PermissionService;
 
-import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = SUPER_ADMIN)
+@WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class PermissionTests {

@@ -101,7 +101,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListByDomain() {
         expectOK(() -> {
             attachedFileService.findAllByDomain(attachedFile.getDomainClassName(), attachedFile.getDomainIdent());
@@ -245,7 +245,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
 
     //PROJECT
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanAddForProject() {
         expectOK(() -> attachedFileService.create(
             "test",
@@ -281,7 +281,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanDeleteForProject() {
         AttachedFile attachedFile = builder.givenAnAttachedFile(project);
         expectOK(() -> attachedFileService.delete(attachedFile, null, null, true));

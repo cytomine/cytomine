@@ -21,7 +21,7 @@ import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 
-import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -70,7 +70,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void retrieveGlobalCustomUiAsSuperadmin() throws Exception {
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json"))
             .andExpect(status().isOk())
@@ -105,7 +105,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void retrieveProjectCustomUi() throws Exception {
         Project project = builder.givenAProject();
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
@@ -141,7 +141,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void retrieveProjectCustomUiAsSuperadmin() throws Exception {
         Project project = builder.givenAProject();
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/project/{project}.json", project.getId()))
@@ -153,7 +153,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void changeProjectCustomUi() throws Exception {
         Project project = builder.givenAProject();
 

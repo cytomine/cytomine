@@ -24,7 +24,7 @@ import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.service.PermissionService;
 
-import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -231,7 +231,7 @@ public class SecurityAclServiceTests {
         securityACLService.checkIsNotReadOnly(project);
     }
 
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     @Test
     void checkIsUserInProject() {
         Project project = builder.givenAProject();

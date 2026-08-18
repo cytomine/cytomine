@@ -41,7 +41,7 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListTracks() {
         expectOK(() -> trackService.list(track.getProject()));
     }

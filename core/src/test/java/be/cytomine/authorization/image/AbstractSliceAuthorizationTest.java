@@ -42,7 +42,7 @@ public class AbstractSliceAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListAbstractSlices() {
         assertThat(abstractSliceService.list(abstractSlice.getImage())).contains(abstractSlice);
         assertThat(abstractSliceService.list(abstractSlice.getUploadedFile())).contains(abstractSlice);

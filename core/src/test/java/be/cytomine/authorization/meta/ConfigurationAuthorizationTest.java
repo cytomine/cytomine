@@ -56,7 +56,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanListConfig() {
         assertThat(configurationService.list()).contains(configForAdmin, configForUser, configForAll);
     }
@@ -74,7 +74,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminReadConfig() {
         expectOK(() -> configurationService.findByKey(configForAdmin.getKey()));
         expectOK(() -> configurationService.findByKey(configForUser.getKey()));
@@ -98,7 +98,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanCreateConfig() {
         expectOK(() -> configurationService.add(configForUser.toJsonObject(urlApi)
             .withChange("id", null)
@@ -114,7 +114,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanEditConfig() {
         expectOK(() -> configurationService.update(
             configForUser,
@@ -132,7 +132,7 @@ public class ConfigurationAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanDeleteConfig() {
         Configuration configuration = builder.givenAConfiguration("xxx");
         expectOK(() -> configurationService.delete(configuration, null, null, false));

@@ -67,7 +67,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanList() {
         expectOK(() -> propertyService.list());
     }
@@ -261,7 +261,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanAddForProject() {
         expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(
             builder.givenAProject(),
@@ -290,7 +290,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanEditForProject() {
         expectOK(() -> propertyService.update(propertyForProject, propertyForProject.toJsonObject(urlApi), null, null));
     }
@@ -316,7 +316,7 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminCanDeleteForProject() {
         expectOK(() -> propertyService.delete(builder.givenAProperty(builder.givenAProject()), null, null, true));
     }

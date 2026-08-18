@@ -58,7 +58,7 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
     protected abstract Optional<String> minimalRoleForEdit();
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     public void adminGetDomain() {
         expectOK(this::whenIGetDomain);
     }
@@ -106,7 +106,7 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     public void adminAddDomain() {
         expectOK(this::whenIAddDomain);
@@ -188,7 +188,7 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
-    @WithMockUser(username = SUPER_ADMIN)
+    @WithMockUser(username = SUPERADMIN)
     @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     public void adminDeleteDomain() {
         if (minimalRoleForDelete().isPresent() && minimalRoleForDelete().get().equals("CREATOR")) {

@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueI18n from 'vue-i18n';
 
 import CytomineDescriptionModal from '@/components/description/CytomineDescriptionModal';
@@ -33,7 +33,7 @@ describe('CytomineDescriptionModal', () => {
         $notify: vi.fn()
       },
       propsData: {
-        description: {data: 'Test description'},
+        description: { data: 'Test description' },
         edit: false
       }
     });

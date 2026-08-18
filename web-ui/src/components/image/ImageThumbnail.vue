@@ -7,16 +7,16 @@
 </template>
 
 <script>
-import {combineImageUrl, splitImageUrl} from '@/utils/image-utils';
+import { combineImageUrl, splitImageUrl } from '@/utils/image-utils';
 
 export default {
   name: 'ImageThumbnail',
   props: {
-    image: {type: Object, default: () => {}},
-    macro: {type: Boolean, default: false}, // Ignored if URL is used
-    url: {type: String, default: null}, // Cannot be null if image is null or empty
-    size: {type: Number},
-    extraParameters: {type: Object, default: () => {}}
+    image: { type: Object, default: () => {} },
+    macro: { type: Boolean, default: false }, // Ignored if URL is used
+    url: { type: String, default: null }, // Cannot be null if image is null or empty
+    size: { type: Number },
+    extraParameters: { type: Object, default: () => {} }
   },
   computed: {
     jpegSrc() {
@@ -41,12 +41,12 @@ export default {
     }
   },
   methods: {
-    combineURL({host, pathname, format, params}) {
-      return combineImageUrl({host, pathname, format, params});
+    combineURL({ host, pathname, format, params }) {
+      return combineImageUrl({ host, pathname, format, params });
     },
     formatSrc(format) {
       if (this.url !== null) {
-        return this.combineURL({format, ...this.splitURL});
+        return this.combineURL({ format, ...this.splitURL });
       }
       if (this.macro) {
         return this.image.associatedImageURL('macro', this.size, format, this.extraParameters);

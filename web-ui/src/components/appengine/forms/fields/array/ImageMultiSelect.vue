@@ -16,8 +16,8 @@
 
 <script>
 import SelectableImage from '@/components/image/SelectableImage.vue';
-import {ImageInstanceCollection} from '@/api';
-import {get} from '@/utils/store-helpers';
+import { ImageInstanceCollection } from '@/api';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'ImageMultiSelect',

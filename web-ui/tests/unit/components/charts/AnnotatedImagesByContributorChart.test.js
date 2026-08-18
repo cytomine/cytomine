@@ -1,13 +1,13 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AnnotatedImagesByContributorChart from '@/components/charts/AnnotatedImagesByContributorChart.js';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
 describe('AnnotatedImagesByContributorChart.js', () => {
   const mockProject = {
     fetchStatsAnnotatedImagesByCreator: vi.fn().mockResolvedValue([
-      {key: 'alice', value: 3},
-      {key: 'bob', value: 5},
+      { key: 'alice', value: 3 },
+      { key: 'bob', value: 5 },
     ]),
   };
 
@@ -40,7 +40,7 @@ describe('AnnotatedImagesByContributorChart.js', () => {
   it('should render as a horizontal bar via indexAxis, not the removed HorizontalBar type', () => {
     const wrapper = createWrapper();
 
-    const {indexAxis} = wrapper.vm.chartOptions;
+    const { indexAxis } = wrapper.vm.chartOptions;
 
     expect(indexAxis).toBe('y');
   });
@@ -48,7 +48,7 @@ describe('AnnotatedImagesByContributorChart.js', () => {
   it('should pass the datalabels plugin with the anchor/align/offset/clamp config', () => {
     const wrapper = createWrapper();
 
-    const {datalabels} = wrapper.vm.chartOptions.plugins;
+    const { datalabels } = wrapper.vm.chartOptions.plugins;
 
     expect(datalabels).toEqual({
       anchor: 'end',

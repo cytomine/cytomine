@@ -132,15 +132,15 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
 import Username from '@/components/user/Username.vue';
 
 import constants from '@/utils/constants.js';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { getWildcardRegexp } from '@/utils/string-utils';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'members-activity',

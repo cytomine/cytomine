@@ -1,11 +1,11 @@
-import {Line} from 'vue-chartjs';
+import { Line } from 'vue-chartjs';
 import _ from 'lodash';
 
 export default {
   name: 'histogram-chart',
-  components: {Line},
+  components: { Line },
   props: {
-    cssClasses: {type: String, default: ''},
+    cssClasses: { type: String, default: '' },
     logScale: Boolean,
     color: String,
 
@@ -70,8 +70,8 @@ export default {
     systemResponse() {
       if (this.currentLabels.length === 1) {
         return [
-          {x: this.currentLabels[0], y: 0},
-          {x: this.currentLabels[0], y: 255}
+          { x: this.currentLabels[0], y: 0 },
+          { x: this.currentLabels[0], y: 255 }
         ];
       }
 
@@ -181,7 +181,7 @@ export default {
               display: false
             },
             ticks: {
-              font: {size: 10},
+              font: { size: 10 },
             }
           },
           yHistogram: {
@@ -203,7 +203,7 @@ export default {
     },
   },
   render(h) {
-    return h('div', {class: this.cssClasses}, [
+    return h('div', { class: this.cssClasses }, [
       h(Line, {
         props: {
           data: this.chartData,

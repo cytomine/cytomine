@@ -11,9 +11,9 @@ import i18n from './lang.js';
 import store from './store/store.js';
 
 import Buefy from 'buefy';
-Vue.use(Buefy, {defaultIconPack: 'fas'});
+Vue.use(Buefy, { defaultIconPack: 'fas' });
 
-import VeeValidate, {Validator} from 'vee-validate';
+import VeeValidate, { Validator } from 'vee-validate';
 Validator.extend('positive', value => Number(value) > 0);
 Vue.use(VeeValidate, {
   i18nRootKey: 'validations',

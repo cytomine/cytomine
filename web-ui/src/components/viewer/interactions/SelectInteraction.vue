@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import {isCluster} from '@/utils/style-utils.js';
-import {never, shiftKeyOnly} from 'ol/events/condition';
+import { isCluster } from '@/utils/style-utils.js';
+import { never, shiftKeyOnly } from 'ol/events/condition';
 
 export default {
   name: 'select-interaction',

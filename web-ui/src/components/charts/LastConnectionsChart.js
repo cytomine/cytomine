@@ -1,18 +1,18 @@
-import {Bar} from 'vue-chartjs';
-import {ProjectConnectionCollection} from '@/api';
+import { Bar } from 'vue-chartjs';
+import { ProjectConnectionCollection } from '@/api';
 import moment from 'moment';
 
 export default {
   name: 'last-connections-chart',
-  components: {Bar},
+  components: { Bar },
   props: {
-    cssClasses: {type: String, default: ''},
+    cssClasses: { type: String, default: '' },
     startDate: Number,
     endDate: Number,
     period: String,
     project: Number,
     user: Number,
-    showDates: {type: Boolean, default: false},
+    showDates: { type: Boolean, default: false },
     revision: Number
   },
   data() {
@@ -53,7 +53,7 @@ export default {
       return {
         maintainAspectRatio: false,
         plugins: {
-          legend: {display: false}
+          legend: { display: false }
         },
         scales: {
           y: {
@@ -90,7 +90,7 @@ export default {
           allConnections.push(connections[indexConnection]);
           indexConnection++;
         } else {
-          allConnections.push({time: iterMoment.valueOf(), frequency: 0});
+          allConnections.push({ time: iterMoment.valueOf(), frequency: 0 });
         }
         iterMoment.add(1, this.momentPeriod);
       }
@@ -116,7 +116,7 @@ export default {
     await this.fetchData();
   },
   render(h) {
-    return h('div', {class: this.cssClasses}, [
+    return h('div', { class: this.cssClasses }, [
       h(Bar, {
         props: {
           data: this.chartData,

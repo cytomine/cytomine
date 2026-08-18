@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import HistogramChart from '@/components/charts/HistogramChart.js';
 
@@ -11,9 +11,9 @@ describe('HistogramChart.js', () => {
       nBins: 5,
       firstBin: 0,
       lastBin: 4,
-      defaultBounds: {min: 0, max: 255},
-      imageBounds: {min: 0, max: 255},
-      currentBounds: {min: 0, max: 255},
+      defaultBounds: { min: 0, max: 255 },
+      imageBounds: { min: 0, max: 255 },
+      currentBounds: { min: 0, max: 255 },
       gamma: 1,
       inverted: false,
       ...propsData,
@@ -42,7 +42,7 @@ describe('HistogramChart.js', () => {
   it('should use scale ids keyed directly, not xAxes/yAxes arrays', () => {
     const wrapper = createWrapper();
 
-    const {scales} = wrapper.vm.chartOptions;
+    const { scales } = wrapper.vm.chartOptions;
 
     expect(scales.x).toBeDefined();
     expect(scales.yHistogram).toBeDefined();
@@ -53,30 +53,30 @@ describe('HistogramChart.js', () => {
 
   it('should round the exponential value in the tooltip label when logScale is enabled', () => {
     const pixelIntensity = 10;
-    const wrapper = createWrapper({logScale: true});
-    const {label} = wrapper.vm.chartOptions.plugins.tooltip.callbacks;
+    const wrapper = createWrapper({ logScale: true });
+    const { label } = wrapper.vm.chartOptions.plugins.tooltip.callbacks;
 
-    const result = label({parsed: {y: Math.log(pixelIntensity)}});
+    const result = label({ parsed: { y: Math.log(pixelIntensity) } });
 
     expect(result).toBe(pixelIntensity);
   });
 
   it('should return the raw parsed value in the tooltip label when logScale is disabled', () => {
     const pixelIntensity = 42;
-    const wrapper = createWrapper({logScale: false});
-    const {label} = wrapper.vm.chartOptions.plugins.tooltip.callbacks;
+    const wrapper = createWrapper({ logScale: false });
+    const { label } = wrapper.vm.chartOptions.plugins.tooltip.callbacks;
 
-    const result = label({parsed: {y: pixelIntensity}});
+    const result = label({ parsed: { y: pixelIntensity } });
 
     expect(result).toBe(pixelIntensity);
   });
 
   it('should filter out the response dataset from the tooltip', () => {
     const wrapper = createWrapper();
-    const {filter} = wrapper.vm.chartOptions.plugins.tooltip;
+    const { filter } = wrapper.vm.chartOptions.plugins.tooltip;
 
-    const responseFiltered = filter({datasetIndex: 0});
-    const histogramFiltered = filter({datasetIndex: 1});
+    const responseFiltered = filter({ datasetIndex: 0 });
+    const histogramFiltered = filter({ datasetIndex: 1 });
 
     expect(responseFiltered).toBe(false);
     expect(histogramFiltered).toBe(true);

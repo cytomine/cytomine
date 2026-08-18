@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
 
 import CytomineNavbar from '@/components/navbar/CytomineNavbar';
@@ -25,13 +25,13 @@ describe('CytomineNavbar.vue', () => {
     logout: vi.fn().mockResolvedValue()
   };
 
-  const createWrapper = ({user = {}, projects = {}} = {}) => {
+  const createWrapper = ({ user = {}, projects = {} } = {}) => {
     const store = new Vuex.Store({
       modules: {
         currentUser: {
           namespaced: true,
           state: {
-            user: {fullName: 'John Doe', guestByNow: false, ...user}
+            user: { fullName: 'John Doe', guestByNow: false, ...user }
           }
         },
         projects: {
@@ -69,7 +69,7 @@ describe('CytomineNavbar.vue', () => {
     let wrapper = createWrapper();
     expect(wrapper.find('[to="/storage"]').exists()).toBe(true);
 
-    wrapper = createWrapper({user: {guestByNow: true}});
+    wrapper = createWrapper({ user: { guestByNow: true } });
     expect(wrapper.find('[to="/storage"]').exists()).toBe(false);
   });
 
@@ -86,7 +86,7 @@ describe('CytomineNavbar.vue', () => {
     let wrapper = createWrapper();
     expect(wrapper.find('navbar-dropdown-stub[icon="fa-folder-open"]').exists()).toBe(false);
 
-    wrapper = createWrapper({projects: {1: {}}});
+    wrapper = createWrapper({ projects: { 1: {} } });
     expect(wrapper.find('navbar-dropdown-stub[icon="fa-folder-open"]').exists()).toBe(true);
   });
 

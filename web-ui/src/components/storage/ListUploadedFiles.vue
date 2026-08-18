@@ -64,15 +64,15 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
-import {UploadedFileCollection, UploadedFile} from '@/api';
+import { UploadedFileCollection, UploadedFile } from '@/api';
 import filesize from 'filesize';
 import _ from 'lodash';
 import CytomineTable from '@/components/utils/CytomineTable.vue';
 import UploadedFileStatusComponent from './UploadedFileStatus.vue';
-import {appendShortTermToken} from '@/utils/token-utils';
-import {formatDate} from '@/utils/date';
+import { appendShortTermToken } from '@/utils/token-utils';
+import { formatDate } from '@/utils/date';
 
 export default {
   name: 'list-uploaded-files',
@@ -93,7 +93,7 @@ export default {
       type: Number,
       default: 0
     },
-    revision : {type: Number, default: 0}
+    revision : { type: Number, default: 0 }
   },
   computed: {
     currentUser: get('currentUser/user'),
@@ -102,13 +102,13 @@ export default {
     uploadedFileCollection() {
       return new UploadedFileCollection({
         onlyRootsWithDetails: true,
-        originalFilename: {ilike: encodeURIComponent(this.searchString)}
+        originalFilename: { ilike: encodeURIComponent(this.searchString) }
       });
     }
   },
   methods: {
     filesize(size) {
-      return (size) ? filesize(size, {base: 10}) : null;
+      return (size) ? filesize(size, { base: 10 }) : null;
     },
     formatDate(date) {
       return formatDate(date, this.$i18n.locale);
@@ -152,7 +152,7 @@ export default {
         } else {
           text = this.$t('notif-error-delete-uploaded-file');
         }
-        this.$notify({type: 'error', text});
+        this.$notify({ type: 'error', text });
       }
     },
   },

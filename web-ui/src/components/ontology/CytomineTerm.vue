@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'cytomine-term',

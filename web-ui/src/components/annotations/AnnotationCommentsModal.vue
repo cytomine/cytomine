@@ -55,13 +55,13 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
-import {AnnotationComment} from '@/api';
+import { AnnotationComment } from '@/api';
 import DomainTagInput from '@/components/utils/DomainTagInput.vue';
 
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
-import {formatMomentDate} from '@/utils/date';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'annotation-comments-modal',
@@ -69,7 +69,7 @@ export default {
     DomainTagInput,
     CytomineModalCard
   },
-  $_veeValidate: {validator: 'new'},
+  $_veeValidate: { validator: 'new' },
   props: {
     annotation: Object,
     comments: Array
@@ -125,11 +125,11 @@ export default {
           shareAnnotationURL: this.annotationURL + '?action=comments'
         }).save();
         this.$emit('addComment', newComment);
-        this.$notify({type: 'success', text: this.$t('notif-success-new-comment')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-new-comment') });
         this.addingComment = false;
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-new-comment')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-new-comment') });
       }
       this.loading = false;
     },

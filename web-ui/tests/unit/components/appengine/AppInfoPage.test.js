@@ -1,9 +1,9 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 
 import AppInfoPage from '@/components/appengine/AppInfoPage.vue';
 import Task from '@/utils/appengine/task';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
 vi.mock('@/api', () => ({
   Cytomine: {
@@ -28,7 +28,7 @@ const router = new VueRouter();
 describe('AppInfoPage.vue', () => {
   const mockTask = {
     name: 'Test App',
-    authors: [{firstName: 'John', lastName: 'Doe'}],
+    authors: [{ firstName: 'John', lastName: 'Doe' }],
     date: '2025-10-23',
     version: '1.0.0',
     imageUrl: 'https://example.com/image.png',
@@ -98,7 +98,7 @@ describe('AppInfoPage.vue', () => {
   it('should render no description when description is missing', async () => {
     Task.fetchNamespaceVersion.mockResolvedValue({
       name: 'Test App',
-      authors: [{firstName: 'John', lastName: 'Doe'}],
+      authors: [{ firstName: 'John', lastName: 'Doe' }],
       date: '2025-10-23',
       version: '1.0.0',
       imageUrl: 'https://example.com/image.png',
@@ -113,7 +113,7 @@ describe('AppInfoPage.vue', () => {
   it('should render unknown when date is missing', async () => {
     Task.fetchNamespaceVersion.mockResolvedValue({
       name: 'Test App',
-      authors: [{firstName: 'John', lastName: 'Doe'}],
+      authors: [{ firstName: 'John', lastName: 'Doe' }],
       version: '1.0.0',
       imageUrl: 'https://example.com/image.png',
       description: 'App description here',

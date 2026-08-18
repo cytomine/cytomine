@@ -50,7 +50,7 @@ export default class AnnotationCollection extends Collection {
   /** @override */
   async _doFetch() {
     // in large projects, URL can become very long if performed with GET => use POST instead
-    let {data} = await Cytomine.instance.api.post('annotation/search.json', this.getParameters());
+    let { data } = await Cytomine.instance.api.post('annotation/search.json', this.getParameters());
     return data;
   }
 
@@ -63,7 +63,7 @@ export default class AnnotationCollection extends Collection {
       throw new Error('Cannot construct download if no project ID is provided.');
     }
 
-    let paramsBody = {format};
+    let paramsBody = { format };
     const paramFields = ['reviewed', 'terms', 'users', 'reviewUsers', 'images', 'noTerm', 'multipleTerms', 'afterThan', 'beforeThan'];
     paramFields.forEach(param => {
       if (this[param] !== null) {
@@ -74,7 +74,7 @@ export default class AnnotationCollection extends Collection {
     Cytomine.instance.api.post(
       `project/${this.project}/annotation/download`,
       paramsBody,
-      {responseType: 'blob'}
+      { responseType: 'blob' }
     ).then(response => {
       const cd = response.headers?.['content-disposition'];
       const filename = this.getFilenameFromContentDisposition(cd);
@@ -127,7 +127,7 @@ export default class AnnotationCollection extends Collection {
    * @param {Array<Number>} users The identifiers of the users whose annotation layers must be accepted or rejected
    * @param {Number} task         The identifier of the Cytomine task to use
    */
-  static async reviewAll({accept, image, users, task} = {}) {
+  static async reviewAll({ accept, image, users, task } = {}) {
     let uri = `imageinstance/${image}/annotation/review.json?users=${users.join(',')}&task=${task}`;
     if (accept) {
       await Cytomine.instance.api.post(uri);

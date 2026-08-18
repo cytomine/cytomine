@@ -1,5 +1,6 @@
 package be.cytomine.domain.security;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -102,6 +103,9 @@ public class User extends CytomineDomain {
 
     @Deprecated
     protected String privateKey;
+
+    @Column(name = "deleted")
+    protected Date deleted;
 
     @Deprecated
     public void generateKeys() {

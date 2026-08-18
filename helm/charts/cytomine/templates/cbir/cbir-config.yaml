@@ -7,3 +7,4 @@ data:
   HOST: "redis.{{ .Release.Namespace }}.svc.cluster.local"
   PORT: "{{ .Values.redis.port }}"
   TORCHINDUCTOR_CACHE_DIR: "/.cache/torchinductor"
+  NUM_THREADS: "4"

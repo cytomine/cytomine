@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import BooleanField from '@/components/appengine/forms/fields/BooleanField';
@@ -34,7 +34,7 @@ describe('BooleanField.vue', () => {
     expect(wrapper.findAll('input[type="radio"][value="true"]').length).toBe(1);
     expect(wrapper.findAll('input[type="radio"][value="false"]').length).toBe(1);
 
-    const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
+    const tooltips = wrapper.findAllComponents({ name: 'BTooltip' });
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
     expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
@@ -45,7 +45,7 @@ describe('BooleanField.vue', () => {
   });
 
   it('The "False" radio button should be checked when the input is false', async () => {
-    await wrapper.setProps({value: null});
+    await wrapper.setProps({ value: null });
 
     const radioTrue = wrapper.find('input[type="radio"][value="true"]');
     expect(radioTrue.element.checked).toBe(false);
@@ -53,14 +53,14 @@ describe('BooleanField.vue', () => {
     const radioFalse = wrapper.find('input[type="radio"][value="false"]');
     expect(radioFalse.element.checked).toBe(false);
 
-    await wrapper.setProps({value: false});
+    await wrapper.setProps({ value: false });
 
     expect(radioTrue.element.checked).toBe(false);
     expect(radioFalse.element.checked).toBe(true);
   });
 
   it('The "True" radio button should be checked when the input is true', async () => {
-    await wrapper.setProps({value: null});
+    await wrapper.setProps({ value: null });
 
     const radioTrue = wrapper.find('input[type="radio"][value="true"]');
     expect(radioTrue.element.checked).toBe(false);
@@ -68,14 +68,14 @@ describe('BooleanField.vue', () => {
     const radioFalse = wrapper.find('input[type="radio"][value="false"]');
     expect(radioFalse.element.checked).toBe(false);
 
-    await wrapper.setProps({value: true});
+    await wrapper.setProps({ value: true });
 
     expect(radioTrue.element.checked).toBe(true);
     expect(radioFalse.element.checked).toBe(false);
   });
 
   it('Selecting the radio button should emit an event', async () => {
-    await wrapper.setProps({value: null});
+    await wrapper.setProps({ value: null });
     expect(wrapper.vm.input).toBe(null);
 
     const radioFalse = wrapper.find('input[type="radio"][value="false"]');

@@ -15,7 +15,7 @@ export default class Description extends DomainModel {
 
   /** @inheritdoc */
   static async fetch(object) {
-    return new this({id: 0}, object).fetch(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0 }, object).fetch(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @inheritdoc */
@@ -26,7 +26,7 @@ export default class Description extends DomainModel {
 
   /** @inheritdoc */
   static async delete(object) {
-    return new this({id: 0}, object).delete(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0 }, object).delete(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @inheritdoc */

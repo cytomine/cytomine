@@ -18,9 +18,9 @@ export default {
   props: {
     active: Boolean,
     image: Object,
-    error: {type: Boolean, default: false}
+    error: { type: Boolean, default: false }
   },
-  components: {ImageMetadata, CytomineModal},
+  components: { ImageMetadata, CytomineModal },
 };
 </script>
 

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import be.cytomine.domain.image.SliceInstance;
@@ -30,8 +31,12 @@ public interface AnnotationIndexRepository
 
     List<AnnotationIndexLightDTO> findAllBySlice(SliceInstance slice);
 
-    void deleteAllBySlice(SliceInstance sliceInstance);
+    @Modifying
+    @Query("delete from AnnotationIndex ai where ai.slice = :slice")
+    void deleteAllBySlice(SliceInstance slice);
 
+    @Modifying
+    @Query("delete from AnnotationIndex ai where ai.user = :user")
     void deleteAllByUser(User user);
 
     Optional<AnnotationIndexLightDTO> findOneBySliceInAndUser(List<SliceInstance> slices, User user);

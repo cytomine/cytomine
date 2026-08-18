@@ -76,11 +76,11 @@ export default {
     event: 'setSelectedNodes'
   },
   props: {
-    tracks: {type: Array},
-    additionalNodes: {type: Array, default: () => []},
-    startWithAdditionalNodes: {type: Boolean, default: false},
-    selectedNodes: {type: Array, default: () => []},
-    multiple: {type: Boolean, default: true}
+    tracks: { type: Array },
+    additionalNodes: { type: Array, default: () => [] },
+    startWithAdditionalNodes: { type: Boolean, default: false },
+    selectedNodes: { type: Array, default: () => [] },
+    multiple: { type: Boolean, default: true }
   },
   data() {
     return {

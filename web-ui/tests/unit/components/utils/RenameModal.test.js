@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VeeValidate from 'vee-validate';
 import Buefy from 'buefy';
 

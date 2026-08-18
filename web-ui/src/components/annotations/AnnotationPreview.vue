@@ -50,7 +50,7 @@
 <script>
 import eventBus from '@/utils/event-bus';
 
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 
 export default {
   name: 'annotation-preview',
@@ -62,11 +62,11 @@ export default {
     users: Array,
     images: Array,
     tracks: Array,
-    showDetails: {type: Boolean, default: true},
-    showImageInfo: {type: Boolean, default: true},
-    showSliceInfo: {type: Boolean, default: false},
-    clickable: {type: Boolean, default: true},
-    sameViewOnClick: {type: Boolean, default: false}
+    showDetails: { type: Boolean, default: true },
+    showImageInfo: { type: Boolean, default: true },
+    showSliceInfo: { type: Boolean, default: false },
+    clickable: { type: Boolean, default: true },
+    sameViewOnClick: { type: Boolean, default: false }
   },
   components: {
     AnnotationDetails: () => import('./AnnotationDetails.vue') // To resolve circular reference
@@ -118,7 +118,7 @@ export default {
   methods: {
     async fetchThumbnail() {
       try {
-        const response = await Cytomine.instance.api.get(this.cropUrl, {responseType: 'blob'});
+        const response = await Cytomine.instance.api.get(this.cropUrl, { responseType: 'blob' });
 
         if (this.imageDataUrl) {
           URL.revokeObjectURL(this.imageDataUrl);
@@ -131,7 +131,7 @@ export default {
     },
     viewAnnot(trySameView = false) {
       if (this.clickable) {
-        this.$emit('select', {annot: this.annot, options:{trySameView}});
+        this.$emit('select', { annot: this.annot, options:{ trySameView } });
       }
     },
     close(event) {

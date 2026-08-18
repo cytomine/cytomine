@@ -321,6 +321,7 @@ services:
     environment:
       MEILI_ENV: production
       MEILI_MASTER_KEY: *MEILI_MASTER_KEY
+      MEILI_NO_ANALYTICS: true
     networks:
       host_network:
         ipv4_address: 172.16.238.19

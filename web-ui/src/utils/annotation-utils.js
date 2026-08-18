@@ -1,5 +1,5 @@
-import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection, AnnotationLinkCollection,
-  AnnotationCollection} from '@/api';
+import { AnnotationTermCollection, AnnotationType, AnnotationTrackCollection, AnnotationLinkCollection,
+  AnnotationCollection } from '@/api';
 
 /** Enum providing the actions that can be performed on annotations */
 export const Action = Object.freeze({
@@ -15,15 +15,15 @@ export const Action = Object.freeze({
  * @param {Object} annot The annotation to update
  */
 export async function updateTermProperties(annot) {
-  let annotTerms = await AnnotationTermCollection.fetchAll({filterKey: 'annotation', filterValue: annot.id});
+  let annotTerms = await AnnotationTermCollection.fetchAll({ filterKey: 'annotation', filterValue: annot.id });
   annot.term = [];
   annot.userByTerm = [];
   let mapping = {};
-  annotTerms.array.forEach(({term, user}) => {
+  annotTerms.array.forEach(({ term, user }) => {
     if (!annot.term.includes(term)) {
       mapping[term] = annot.term.length;
       annot.term.push(term);
-      annot.userByTerm.push({term, user: [user]});
+      annot.userByTerm.push({ term, user: [user] });
     } else { // this term was already treated => add user to existing userByTerm object related to the term
       annot.userByTerm[mapping[term]].user.push(user);
     }
@@ -36,7 +36,7 @@ export async function updateTermProperties(annot) {
  * @param {Object} annot The annotation to update
  */
 export async function updateTrackProperties(annot) {
-  let annotTracks = await AnnotationTrackCollection.fetchAll({filterKey: 'annotation', filterValue: annot.id});
+  let annotTracks = await AnnotationTrackCollection.fetchAll({ filterKey: 'annotation', filterValue: annot.id });
   annot.track = annotTracks.array.map(at => at.track);
   annot.annotationTrack = annotTracks.array;
 }
@@ -47,7 +47,7 @@ export async function updateTrackProperties(annot) {
  * @param {Object} annot The annotation to update
  */
 export async function updateAnnotationLinkProperties(annot) {
-  let annotLinks = (await AnnotationLinkCollection.fetchAll({filterKey: 'annotation', filterValue: annot.id})).array;
+  let annotLinks = (await AnnotationLinkCollection.fetchAll({ filterKey: 'annotation', filterValue: annot.id })).array;
   annot.group = (annotLinks.length > 0) ? annotLinks[0].group : null;
   annot.annotationLink = annotLinks.map(link => {
     return {

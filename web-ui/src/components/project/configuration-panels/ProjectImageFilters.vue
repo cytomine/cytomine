@@ -49,9 +49,9 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {ImageFilterCollection, ImageFilterProject, ImageFilterProjectCollection} from '@/api';
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { get } from '@/utils/store-helpers';
+import { ImageFilterCollection, ImageFilterProject, ImageFilterProjectCollection } from '@/api';
+import { getWildcardRegexp } from '@/utils/string-utils';
 
 export default {
   name: 'project-image-filters',
@@ -92,7 +92,7 @@ export default {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-change-status-image-filter-project', {filterName: filter.name})
+          text: this.$t('notif-error-change-status-image-filter-project', { filterName: filter.name })
         });
       }
     }

@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import {deleteApp, installApp} from '@/utils/app';
+import { deleteApp, installApp } from '@/utils/app';
 import Task from '@/utils/appengine/task';
 
 export default {

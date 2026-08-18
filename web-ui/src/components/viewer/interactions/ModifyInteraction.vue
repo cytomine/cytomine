@@ -37,9 +37,9 @@
 import eventBus from '@/utils/event-bus';
 
 import WKT from 'ol/format/WKT';
-import {Action} from '@/utils/annotation-utils.js';
-import {singleClick} from 'ol/events/condition';
-import {isRectangle} from '@/utils/geometry-utils';
+import { Action } from '@/utils/annotation-utils.js';
+import { singleClick } from 'ol/events/condition';
+import { isRectangle } from '@/utils/geometry-utils';
 
 export default {
   name: 'modify-interaction',
@@ -92,7 +92,7 @@ export default {
     startEdit() {
       this.ongoingEdit = true;
     },
-    async endEdit({features}) {
+    async endEdit({ features }) {
       features.forEach(async feature => {
         if (!feature.get('annot')) {
           return;
@@ -106,10 +106,10 @@ export default {
           await annot.save();
           eventBus.emit('editAnnotation', annot);
           eventBus.emit('reloadAnnotationCrop', annot);
-          this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.UPDATE});
+          this.$store.commit(this.imageModule + 'addAction', { annot, type: Action.UPDATE });
         } catch (err) {
           console.log(err);
-          this.$notify({type: 'error', text: this.$t('notif-error-annotation-update')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-annotation-update') });
           annot.location = oldLocation;
           feature.setGeometry(this.format.readGeometry(annot.location));
         }

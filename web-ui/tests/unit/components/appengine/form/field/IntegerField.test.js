@@ -1,4 +1,4 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import IntegerField from '@/components/appengine/forms/fields/IntegerField';
@@ -12,7 +12,7 @@ describe('IntegerField.vue', () => {
     display_name: 'Test Parameter',
     default: 42,
     description: 'This is a test description',
-    type: {gt: 10, lt: 20, geq: null, leq: null},
+    type: { gt: 10, lt: 20, geq: null, leq: null },
   };
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ describe('IntegerField.vue', () => {
 
     expect(wrapper.findAll('input[type="number"]').length).toBe(1);
 
-    const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
+    const tooltips = wrapper.findAllComponents({ name: 'BTooltip' });
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
     const expectedLabel = mockParameter.description + ', 10 < Test Parameter < 20';
@@ -55,16 +55,16 @@ describe('IntegerField.vue', () => {
       parameter: {
         default: 42,
         description: null,
-        type: {gt: 10, lt: 20, geq: null, leq: null},
+        type: { gt: 10, lt: 20, geq: null, leq: null },
       }
     });
 
     expect(wrapper.vm.tooltips).toBeUndefined();
-    expect(wrapper.findAllComponents({name: 'BTooltip'}).length).toBe(0);
+    expect(wrapper.findAllComponents({ name: 'BTooltip' }).length).toBe(0);
   });
 
   it('Changing the value should emit an event', async () => {
-    await wrapper.setData({input: 12});
+    await wrapper.setData({ input: 12 });
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input.at(0)).toEqual([12]);

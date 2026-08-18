@@ -18,9 +18,9 @@
 <script>
 
 
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {get} from '@/utils/store-helpers.js';
-import {formatMomentDate} from '@/utils/date';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { get } from '@/utils/store-helpers.js';
+import { formatMomentDate } from '@/utils/date';
 
 const ANNOT = 1;
 const IMAGE = 2;
@@ -43,7 +43,6 @@ export default {
     actionData() {
       return JSON.parse(this.action.data);
     },
-    // eslint-disable-next-line vue/return-in-computed-property
     type() {
       switch (this.action.serviceName) {
         case 'userAnnotationService':

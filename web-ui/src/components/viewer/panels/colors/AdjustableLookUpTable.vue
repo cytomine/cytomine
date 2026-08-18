@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import {sameHistogramBounds} from '@/utils/histogram-utils';
+import { sameHistogramBounds } from '@/utils/histogram-utils';
 
 import CytomineSlider from '@/components/form/CytomineSlider.vue';
 
@@ -208,7 +208,7 @@ export default {
       }
       min = Math.max(this.defaultBounds.min, Math.min(min, this.defaultBounds.max));
       max = Math.min(this.defaultBounds.max, Math.max(max, this.defaultBounds.min));
-      this.$emit('setBounds', {min, max});
+      this.$emit('setBounds', { min, max });
     },
     setBrightness(value) {
       // https://imagej.nih.gov/ij/developer/source/ij/plugin/frame/ContrastAdjuster.java.html

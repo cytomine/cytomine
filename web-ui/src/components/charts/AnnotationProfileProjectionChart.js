@@ -1,11 +1,11 @@
-import {Line} from 'vue-chartjs';
+import { Line } from 'vue-chartjs';
 import ChartZoom from 'chartjs-plugin-zoom';
 
 export default {
   name: 'annotation-profile-projection-chart',
-  components: {Line},
+  components: { Line },
   props: {
-    cssClasses: {type: String, default: ''},
+    cssClasses: { type: String, default: '' },
     annotation: Object,
     data: Array,
     spatialAxis: Boolean,
@@ -14,7 +14,7 @@ export default {
   },
   data() {
     return {
-      chartData: {labels: [], datasets: []},
+      chartData: { labels: [], datasets: [] },
     };
   },
   computed: {
@@ -57,8 +57,8 @@ export default {
               mode: 'xy',
             },
             zoom: {
-              wheel: {enabled: true},
-              drag: {enabled: false},
+              wheel: { enabled: true },
+              drag: { enabled: false },
               mode: 'xy',
             }
           }
@@ -122,7 +122,7 @@ export default {
     await this.updateData();
   },
   render(h) {
-    return h('div', {class: this.cssClasses}, [
+    return h('div', { class: this.cssClasses }, [
       h(Line, {
         ref: 'chartRef',
         props: {

@@ -39,7 +39,7 @@ export default {
       state.filtersOpened = value;
     },
 
-    setFilter(state, {filterName, propValue}) {
+    setFilter(state, { filterName, propValue }) {
       state.filters[filterName] = propValue;
     },
 

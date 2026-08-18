@@ -78,15 +78,10 @@ public class BasicInstanceBuilder {
     public static final String ROLE_GUEST = "ROLE_GUEST";
 
     EntityManager em;
-
     TransactionTemplate transactionTemplate;
-
     PermissionService permissionService;
-
     SecRoleRepository secRoleRepository;
-
     UserRepository userRepository;
-
     private User aUser;
     private User anAdmin;
     private User aGuest;

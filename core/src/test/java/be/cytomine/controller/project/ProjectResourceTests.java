@@ -852,7 +852,8 @@ public class ProjectResourceTests {
     public void listByUser() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, currentUserService.getCurrentUsername());
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project.json", currentUserService.getCurrentUser().id()))
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project.json", currentUserService.getCurrentUser().id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[0].id").value(project.getId()));
     }

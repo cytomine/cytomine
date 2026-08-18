@@ -18,7 +18,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import be.cytomine.common.mapper.BaseMapperImpl;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.CropOffset;
@@ -30,9 +32,6 @@ import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.dto.appengine.task.output.CollectionOutput;
 import be.cytomine.dto.appengine.task.output.GeometryOutput;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import be.cytomine.common.mapper.BaseMapperImpl;
 import be.cytomine.mapper.RoleMapperImpl;
 import be.cytomine.mapper.UserMapperImpl;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
@@ -60,6 +59,32 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @ExtendWith(MockitoExtension.class)
 public class TaskRunServiceTest {
     private final UserMapperImpl userMapper = userMapper();
+    @Mock
+    private AnnotationService annotationService;
+    @Mock
+    private AnnotationLayerService annotationLayerService;
+    @Mock
+    private AppEngineService appEngineService;
+    @Mock
+    private CurrentUserService currentUserService;
+    @Mock
+    private GeometryService geometryService;
+    @Mock
+    private ProjectService projectService;
+    @Mock
+    private SecurityACLService securityACLService;
+    @Mock
+    private TaskRunRepository taskRunRepository;
+    @Mock
+    private TaskRunLayerRepository taskRunLayerRepository;
+    @Mock
+    private AsyncService asyncService;
+    @Mock
+    private UserAnnotationService userAnnotationService;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
+    @InjectMocks
+    private TaskRunService taskRunService;
 
     private static UserMapperImpl userMapper() {
         RoleMapperImpl roleMapper = new RoleMapperImpl();
@@ -70,45 +95,6 @@ public class TaskRunServiceTest {
         ReflectionTestUtils.setField(mapper, "roleMapper", roleMapper);
         return mapper;
     }
-
-    @Mock
-    private AnnotationService annotationService;
-
-    @Mock
-    private AnnotationLayerService annotationLayerService;
-
-    @Mock
-    private AppEngineService appEngineService;
-
-    @Mock
-    private CurrentUserService currentUserService;
-
-    @Mock
-    private GeometryService geometryService;
-
-    @Mock
-    private ProjectService projectService;
-
-    @Mock
-    private SecurityACLService securityACLService;
-
-    @Mock
-    private TaskRunRepository taskRunRepository;
-
-    @Mock
-    private TaskRunLayerRepository taskRunLayerRepository;
-
-    @Mock
-    private AsyncService asyncService;
-
-    @Mock
-    private UserAnnotationService userAnnotationService;
-
-    @Spy
-    private ObjectMapper objectMapper = new ObjectMapper();
-
-    @InjectMocks
-    private TaskRunService taskRunService;
 
     @DisplayName("Successfully create annotations from geometry array output")
     @Test

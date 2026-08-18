@@ -191,7 +191,7 @@ public class AnnotationTermService extends ModelService {
             //Delete all annotation term
             List<AnnotationTerm> annotationTerms =
                 annotationTermRepository.findAllByUserAnnotationId(annotation.getId()).stream()
-                    .filter(x -> fromAllUser || x.getUser().equals(currentUser)).toList();
+                    .filter(x -> fromAllUser || x.getUser().getId().equals(currentUser.id())).toList();
 
             log.info("Delete old annotationTerm= " + annotationTerms.size());
             for (AnnotationTerm annotationTerm : annotationTerms) {

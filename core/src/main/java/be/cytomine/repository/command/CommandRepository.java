@@ -49,7 +49,7 @@ public interface CommandRepository extends JpaRepository<Command, Long> {
             + ".created DESC")
     Page<UndoStackItem> findLastUndoStackItems(Long userId, Command command, Pageable pageable);
 
-    @Query("SELECT usi FROM UndoStackItem usi WHERE usi.userId = :user ORDER BY usi.created DESC")
+    @Query("SELECT usi FROM UndoStackItem usi WHERE usi.userId = :userId ORDER BY usi.created DESC")
     Page<UndoStackItem> findLastUndoStackItems(Long userId, Pageable pageable);
 
     default Optional<UndoStackItem> findLastUndoStackItem(Long userId, Command command) {

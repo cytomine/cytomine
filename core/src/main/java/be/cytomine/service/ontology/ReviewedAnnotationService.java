@@ -464,7 +464,7 @@ public class ReviewedAnnotationService extends ModelService {
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
         ReviewedAnnotation annotation = (ReviewedAnnotation) domain;
         return List.of(
-            currentUserService.getCurrentUser().toString(),
+            currentUserService.getCurrentUser().id(),
             annotation.getImage().getBaseImage().getOriginalFilename()
         );
     }

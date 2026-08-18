@@ -100,7 +100,8 @@ public class CommandService {
         User user = currentUserService.getCurrentUser();
         Optional<UndoStackItem> lastUndoStackItem;
         if (commandId != null) {
-            lastUndoStackItem = commandRepository.findLastUndoStackItem(user.getId(), commandRepository.getById(commandId));
+            lastUndoStackItem =
+                commandRepository.findLastUndoStackItem(user.getId(), commandRepository.getById(commandId));
         } else {
             lastUndoStackItem = commandRepository.findLastUndoStackItem(user.getId());
         }
@@ -211,7 +212,8 @@ public class CommandService {
         User user = currentUserService.getCurrentUser();
         Optional<RedoStackItem> lastRedoStackItem;
         if (commandId != null) {
-            lastRedoStackItem = commandRepository.findLastRedoStackItem(user.getId(), commandRepository.getById(commandId));
+            lastRedoStackItem =
+                commandRepository.findLastRedoStackItem(user.getId(), commandRepository.getById(commandId));
         } else {
             lastRedoStackItem = commandRepository.findLastRedoStackItem(user.getId());
         }

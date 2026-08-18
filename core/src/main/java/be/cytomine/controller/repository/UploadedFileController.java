@@ -72,7 +72,7 @@ public class UploadedFileController {
         @SortDefault(sort = "created", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         log.debug("GET /uploadedfile.json");
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
 
         Page<UploadedFileResponse> page = getPage(userId, metadataSearch, metadataFilter, pageable);
         Set<Long> ids = page.getContent().stream().map(UploadedFileResponse::id).collect(Collectors.toSet());
@@ -89,14 +89,14 @@ public class UploadedFileController {
     @PostMapping("/uploadedfile.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateUploadedFile payload) {
         log.debug("POST /uploadedfile.json - {}", payload);
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         return uploadedFileHttpContract.create(userId, payload);
     }
 
     @GetMapping("/uploadedfile/{id}.json")
     public UploadedFileResponse show(@PathVariable Long id) {
         log.debug("GET /uploadedFile/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         UploadedFileResponse response = uploadedFileHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
         Long abstractImageId = abstractImageRepository.findIdByUploadedFileId(id).orElse(null);
@@ -106,7 +106,7 @@ public class UploadedFileController {
     @PutMapping("/uploadedfile/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateUploadedFile payload) {
         log.debug("PUT /uploadedfile/{}.json - {}", id, payload);
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         return uploadedFileHttpContract.update(id, userId, payload)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
     }
@@ -114,7 +114,7 @@ public class UploadedFileController {
     @DeleteMapping("/uploadedfile/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("DELETE /uploadedfile/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         return uploadedFileHttpContract.delete(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
     }

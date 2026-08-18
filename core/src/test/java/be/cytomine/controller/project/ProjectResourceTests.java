@@ -803,7 +803,7 @@ public class ProjectResourceTests {
         builder.addUserToProject(projectNotOpened, currentUserService.getCurrentUsername());
 
         assertThat(persistentProjectConnectionRepository.count()).isEqualTo(0);
-        givenAPersistentConnectionInProject(currentUserService.getCurrentUser().id(), project, new Date());
+        givenAPersistentConnectionInProject(currentUserService.getCurrentUser().getId(), project, new Date());
         assertThat(persistentProjectConnectionRepository.count()).isEqualTo(1);
 
         restProjectControllerMockMvc.perform(get("/api/project/method/lastopened.json"))
@@ -853,7 +853,7 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, currentUserService.getCurrentUsername());
         restProjectControllerMockMvc.perform(
-                get("/api/user/{id}/project.json", currentUserService.getCurrentUser().id()))
+                get("/api/user/{id}/project.json", currentUserService.getCurrentUser().getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[0].id").value(project.getId()));
     }
@@ -872,7 +872,7 @@ public class ProjectResourceTests {
         builder.addUserToProject(project, currentUserService.getCurrentUsername());
         restProjectControllerMockMvc.perform(get(
                 "/api/user/{id}/project/light.json",
-                currentUserService.getCurrentUser().id()
+                currentUserService.getCurrentUser().getId()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
@@ -921,7 +921,7 @@ public class ProjectResourceTests {
 
         restProjectControllerMockMvc.perform(get(
                 "/api/user/{id}/project/light.json",
-                currentUserService.getCurrentUser().id()
+                currentUserService.getCurrentUser().getId()
             )
                 .param("admin", "true"))
             .andExpect(status().isOk())
@@ -952,7 +952,7 @@ public class ProjectResourceTests {
 
         restProjectControllerMockMvc.perform(get(
                 "/api/user/{id}/project/light.json",
-                currentUserService.getCurrentUser().id()
+                currentUserService.getCurrentUser().getId()
             )
                 .param("user", "true"))
             .andExpect(status().isOk())
@@ -1023,7 +1023,7 @@ public class ProjectResourceTests {
     @Transactional
     public void listCommandHistory() throws Exception {
         Project project = builder.givenAProject();
-        long currentUserId = currentUserService.getCurrentUser().id();
+        long currentUserId = currentUserService.getCurrentUser().getId();
         builder.addUserToProject(project, currentUserService.getCurrentUsername());
 
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);

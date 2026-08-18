@@ -386,7 +386,7 @@ public class SecurityACLService {
                 case RESTRICTED:
                     log.debug("Owner is " + (owner != null ? owner.getUsername() : "null"));
                     if (owner != null) {
-                        if (!Objects.equals(owner.getId(), currentUserService.getCurrentUser().id())) {
+                        if (!Objects.equals(owner.getId(), currentUserService.getCurrentUser().getId())) {
                             throw new ForbiddenException(
                                 "You don't have the right to do this. You must be the creator or the container admin");
                         }

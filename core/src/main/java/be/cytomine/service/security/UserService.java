@@ -986,7 +986,7 @@ public class UserService extends ModelService {
     }
 
     public void deleteDependentSecUserSecRole(User user, Transaction transaction, Task task) {
-        long requestingUserId = currentUserService.getCurrentUser().id();
+        long requestingUserId = currentUserService.getCurrentUser().getId();
         for (SecUserSecRole secSecUserSecRole : secSecUserSecRoleRepository.findAllBySecUser(user)) {
             userRoleHttpContract.delete(secSecUserSecRole.getId(), requestingUserId);
         }

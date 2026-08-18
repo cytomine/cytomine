@@ -258,7 +258,7 @@ public class ReviewedAnnotationService extends ModelService {
         if (basedAnnotation.getImage().getReviewUser() != null
             && !Objects.equals(
             basedAnnotation.getImage().getReviewUser().getId(),
-            currentUserService.getCurrentUser().id()
+            currentUserService.getCurrentUser().getId()
         )) {
             throw new WrongArgumentException("You must be the image reviewer to accept annotation. Image reviewer is "
                 + basedAnnotation.getImage().getReviewUser());
@@ -285,7 +285,7 @@ public class ReviewedAnnotationService extends ModelService {
 
         reviewedAnnotationHttpContract.replaceAllTermIds(
             commandResponse.getObject().getId(),
-            currentUserService.getCurrentUser().id(), termsToAdd
+            currentUserService.getCurrentUser().getId(), termsToAdd
         );
 
         return commandResponse;
@@ -298,7 +298,7 @@ public class ReviewedAnnotationService extends ModelService {
         if (reviewedAnnotation.getImage().getReviewUser() != null && !Objects.equals(
             reviewedAnnotation.getImage()
                 .getReviewUser()
-                .getId(), currentUserService.getCurrentUser().id()
+                .getId(), currentUserService.getCurrentUser().getId()
         )) {
             throw new WrongArgumentException("You must be the image reviewer to reject annotation. Image reviewer is  "
                 + reviewedAnnotation.getImage().getReviewUser().getUsername());
@@ -346,7 +346,7 @@ public class ReviewedAnnotationService extends ModelService {
             throw new WrongArgumentException("Cannot review annotation, enable image review mode!");
         } else if (imageInstance.getReviewUser() != null && !Objects.equals(
             imageInstance.getReviewUser().getId(),
-            currentUserService.getCurrentUser().id()
+            currentUserService.getCurrentUser().getId()
         )) {
             throw new WrongArgumentException("You must be the image reviewer to review annotation. Image reviewer is "
                 + imageInstance.getReviewUser());
@@ -408,7 +408,7 @@ public class ReviewedAnnotationService extends ModelService {
             throw new WrongArgumentException("Cannot reject annotation, enable image review mode!");
         } else if (imageInstance.getReviewUser() != null && !Objects.equals(
             imageInstance.getReviewUser().getId(),
-            currentUserService.getCurrentUser().id()
+            currentUserService.getCurrentUser().getId()
         )) {
             throw new WrongArgumentException("You must be the image reviewer to reject annotation. Image reviewer is "
                 + imageInstance.getReviewUser().getUsername());
@@ -464,7 +464,7 @@ public class ReviewedAnnotationService extends ModelService {
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
         ReviewedAnnotation annotation = (ReviewedAnnotation) domain;
         return List.of(
-            currentUserService.getCurrentUser().id(),
+            currentUserService.getCurrentUser().getId(),
             annotation.getImage().getBaseImage().getOriginalFilename()
         );
     }

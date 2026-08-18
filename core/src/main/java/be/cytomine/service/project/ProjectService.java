@@ -720,7 +720,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent() && !Objects.equals(
                 optionalUser.get().getId(),
-                currentUserService.getCurrentUser().id()
+                currentUserService.getCurrentUser().getId()
             )) {
                 // current user is already in project
                 log.info("addUserToProject (admin) project=" + project.getId() + " user=" + optionalUser.get().getId());

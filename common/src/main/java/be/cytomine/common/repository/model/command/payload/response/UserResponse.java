@@ -27,6 +27,8 @@ public record UserResponse(long id, String username, String email, Optional<Stri
         }
     }
 
+    public long getId() {return id;}
+
     @Override
     public DataType getDataType() {
         return DataType.USER;

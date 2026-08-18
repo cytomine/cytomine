@@ -75,7 +75,7 @@ public class TagDomainAssociationResourceTests {
     @Transactional
     public void shouldReturnTagDomainAssociationById() throws Exception {
         TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         when(httpContract.read(eq(tda.getId()), eq(userId))).thenReturn(Optional.of(toResponse(tda)));
 
         mockMvc.perform(get("/api/tag_domain_association/{id}.json", tda.getId())).andExpect(status().isOk())
@@ -85,7 +85,7 @@ public class TagDomainAssociationResourceTests {
     @Test
     @Transactional
     public void getAnTagDomainAssociationDoesNotExists() throws Exception {
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         when(httpContract.read(eq(0L), eq(userId))).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/tag_domain_association/{id}.json", 0L)).andExpect(status().isNotFound());
@@ -95,7 +95,7 @@ public class TagDomainAssociationResourceTests {
     @Transactional
     public void listAllTagDomainAssociation() throws Exception {
         TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         when(httpContract.readAll(eq(userId), any(Pageable.class))).thenReturn(
             new PageImpl<>(List.of(toResponse(tda))));
 
@@ -108,7 +108,7 @@ public class TagDomainAssociationResourceTests {
     @Transactional
     public void listTagDomainAssociationsByDomain() throws Exception {
         TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         when(httpContract.readAllByDomain(eq(tda.getDomainClassName()), eq(tda.getDomainIdent()), eq(userId),
             any(Pageable.class))).thenReturn(new PageImpl<>(List.of(toResponse(tda))));
 
@@ -123,7 +123,7 @@ public class TagDomainAssociationResourceTests {
     @Transactional
     public void listTagDomainAssociationsByDomainReturnsEmptyWhenNotAccessible() throws Exception {
         TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         when(httpContract.readAllByDomain(eq(tda.getDomainClassName()), eq(0L), eq(userId),
             any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
@@ -137,7 +137,7 @@ public class TagDomainAssociationResourceTests {
     @Transactional
     public void addValidAssociation() throws Exception {
         TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         UUID commandId = UUID.randomUUID();
         when(httpContract.create(eq(userId), any())).thenReturn(Optional.of(
             new HttpCommandResponse(true, toResponse(tda), commandId, Commands.CREATE_TAG_DOMAIN_ASSOCIATION,
@@ -157,7 +157,7 @@ public class TagDomainAssociationResourceTests {
     @Transactional
     public void addValidPropertyOtherPath() throws Exception {
         TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         UUID commandId = UUID.randomUUID();
         when(httpContract.create(eq(userId), any())).thenReturn(Optional.of(
             new HttpCommandResponse(true, toResponse(tda), commandId, Commands.CREATE_TAG_DOMAIN_ASSOCIATION,
@@ -174,7 +174,7 @@ public class TagDomainAssociationResourceTests {
     @Transactional
     public void deleteTagDomainAssociation() throws Exception {
         TagDomainAssociation tda = builder.givenATagAssociation(builder.givenATag(), builder.givenAProject());
-        long userId = currentUserService.getCurrentUser().id();
+        long userId = currentUserService.getCurrentUser().getId();
         UUID commandId = UUID.randomUUID();
         when(httpContract.delete(eq(tda.getId()), eq(userId))).thenReturn(Optional.of(
             new HttpCommandResponse(true, toResponse(tda), commandId, Commands.DELETE_TAG_DOMAIN_ASSOCIATION,

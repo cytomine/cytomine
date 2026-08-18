@@ -287,7 +287,7 @@ public class ImageInstanceServiceTests {
         Date consultation = new Date();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
-        imageConsultationService.add(currentUserService.getCurrentUser().id(), imageInstance1.getId(), "xxx", "view",
+        imageConsultationService.add(currentUserService.getCurrentUser().getId(), imageInstance1.getId(), "xxx", "view",
             consultation);
 
         ImageSearchExtension imageSearchExtension = new ImageSearchExtension();

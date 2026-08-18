@@ -59,7 +59,7 @@ public class RestProjectConnectionController extends RestCytomineController {
         String browser = json.getJSONAttrStr("browser");
         String browserVersion = json.getJSONAttrStr("browserVersion");
         return responseSuccess(projectConnectionService.add(
-            currentUserService.getCurrentUser().id(), project, session, os, browser, browserVersion
+            currentUserService.getCurrentUser().getId(), project, session, os, browser, browserVersion
         ));
 
     }

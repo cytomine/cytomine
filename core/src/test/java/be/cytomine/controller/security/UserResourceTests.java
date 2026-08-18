@@ -60,7 +60,6 @@ import be.cytomine.service.social.UserPositionService;
 import be.cytomine.service.social.UserPositionServiceTests;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPER_ADMIN;
-import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_READ;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;

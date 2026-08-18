@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.Project;
@@ -80,6 +79,6 @@ public class RestAnnotationGroupController extends RestCytomineController {
     @PostMapping("/annotationgroup/{id}/annotationgroup/{mergedId}/merge.json")
     public ResponseEntity<String> merge(@PathVariable Long id, @PathVariable Long mergedId) {
         log.debug("REST request to merge annotationgroup {} with annotationgroup {}", id, mergedId);
-        return responseSuccess(annotationGroupService.merge(id, mergedId,currentUserService.getCurrentUser().id()));
+        return responseSuccess(annotationGroupService.merge(id, mergedId, currentUserService.getCurrentUser().id()));
     }
 }

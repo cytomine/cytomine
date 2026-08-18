@@ -12,7 +12,7 @@ import org.mapstruct.Mapper;
 
 /**
  * It's tempting to add a
- *  `T map(Optional<T> value)`
+ *  `T map(Optional&lt;T&gt; value)`
  * here, but then ObjectMapper does a lot of obscure chained calls.
  * Be careful.
  */
@@ -43,11 +43,11 @@ public interface BaseMapper {
         return value.toInstant().atZone(ZoneOffset.systemDefault()).toLocalDateTime();
     }
 
-    default String mapMaybeString(Optional<String> value){
+    default String mapMaybeString(Optional<String> value) {
         return value.orElse(null);
     }
 
-    default UUID mapMaybeUUID(Optional<UUID> value){
+    default UUID mapMaybeUUID(Optional<UUID> value) {
         return value.orElse(null);
     }
 

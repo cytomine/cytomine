@@ -82,7 +82,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void getATermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         TermRelationResponse expected = buildResponse(relationTerm);
         when(termRelationHttpContract.findTermRelationByID(eq(relationTerm.getId()), eq(userId)))
             .thenReturn(Optional.of(expected));
@@ -98,7 +98,7 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void getATermRelationNotFoundReturns404() throws Exception {
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         when(termRelationHttpContract.findTermRelationByID(eq(999L), eq(userId))).thenReturn(Optional.empty());
 
         restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", 999L))
@@ -109,7 +109,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void addTermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         CreateTermRelation createTermRelation = new CreateTermRelation(
             relationTerm.getTerm1().getId(),
@@ -137,7 +137,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void addTermRelationWithNoWriteAccessReturnsEmpty() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         CreateTermRelation createTermRelation = new CreateTermRelation(
             relationTerm.getTerm1().getId(),
             relationTerm.getTerm2().getId(), RelationTerm.PARENT
@@ -160,7 +160,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void editTermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         UpdateTermRelation updateTermRelation = new UpdateTermRelation(
             Optional.of(relationTerm.getTerm1().getId()),
@@ -189,7 +189,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void editTermRelationWithNoWriteAccessReturnsNotFound() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         UpdateTermRelation updateTermRelation = new UpdateTermRelation(
             Optional.of(relationTerm.getTerm1().getId()),
             Optional.of(relationTerm.getTerm2().getId()), Optional.empty()
@@ -210,7 +210,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void deleteTermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         HttpCommandResponse expected = new HttpCommandResponse(
             true, buildResponse(relationTerm),
@@ -230,7 +230,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void deleteTermRelationWithNoDeleteAccessReturnsNotFound() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         when(termRelationHttpContract.delete(eq(relationTerm.getId()), eq(userId))).thenReturn(Optional.empty());
 
         restRelationTermControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationTerm.getId()))

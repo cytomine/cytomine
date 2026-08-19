@@ -55,14 +55,14 @@ public class RoleController {
     @PostMapping("/role.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateRole payload) {
         log.debug("POST /role.json - {}", payload);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return roleHttpContract.create(userId, payload);
     }
 
     @PutMapping("/role/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateRole payload) {
         log.debug("PUT /role/{}.json - {}", id, payload);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return roleHttpContract.update(id, userId, payload)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_ROLE, id)));
     }
@@ -70,7 +70,7 @@ public class RoleController {
     @DeleteMapping("/role/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("DELETE /role/{}.json", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return roleHttpContract.delete(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_ROLE, id)));
     }

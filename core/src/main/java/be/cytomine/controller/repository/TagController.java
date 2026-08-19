@@ -45,14 +45,14 @@ public class TagController {
         @SortDefault(sort = "created", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         log.debug("GET /tag.json");
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return pageMapper.toCollectionResponse(tagHttpContract.list(userId, pageable));
     }
 
     @GetMapping("/tag/{id}.json")
     public TagResponse read(@PathVariable long id) {
         log.debug("GET /tag/{}.json", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return tagHttpContract.read(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TAG, id)));
     }
@@ -60,14 +60,14 @@ public class TagController {
     @PostMapping("/tag.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateTag payload) {
         log.debug("POST /tag.json - {}", payload);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return tagHttpContract.create(userId, payload);
     }
 
     @PutMapping("/tag/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateTag payload) {
         log.debug("PUT /tag/{}.json - {}", id, payload);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return tagHttpContract.update(id, userId, payload)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TAG, id)));
     }
@@ -75,7 +75,7 @@ public class TagController {
     @DeleteMapping("/tag/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("DELETE /tag/{}.json", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return tagHttpContract.delete(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TAG, id)));
     }

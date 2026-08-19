@@ -180,7 +180,7 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/term/{id}/project/stat.json")
     public ResponseEntity<String> statAnnotationTermedByProject(@PathVariable Long id) {
-        TermResponse term = termRepository.findTermByID(id, currentUserService.getCurrentUser().getId())
+        TermResponse term = termRepository.findTermByID(id, currentUserService.getCurrentUser().id())
             .orElseThrow(() -> new ObjectNotFoundException("Term", id));
         return responseSuccess(statsService.statAnnotationTermedByProject(term.id(), term.ontologyId()));
     }

@@ -27,18 +27,6 @@ Vue.use(Notifications);
 import VTooltip from 'v-tooltip';
 Vue.use(VTooltip);
 
-import VueShortKey from 'vue-shortkey';
-Vue.use(VueShortKey, {
-  prevent: [
-    'input[type=text]',
-    'input[type=password]',
-    'input[type=search]',
-    'input[type=email]',
-    'textarea',
-    '.ql-editor'
-  ]
-});
-
 import VueHtml2Canvas from 'vue-html2canvas';
 Vue.use(VueHtml2Canvas);
 

@@ -103,7 +103,7 @@ public class ProjectMemberService {
     }
 
     public void deleteUserFromProject(User user, Project project, boolean admin) {
-        if (!Objects.equals(currentUserService.getCurrentUser().getId(), user.getId())) {
+        if (!Objects.equals(currentUserService.getCurrentUser().id(), user.getId())) {
             securityACLService.check(project, ADMINISTRATION);
         }
         if (project != null) {

@@ -101,9 +101,9 @@ public class CommandService {
         Optional<UndoStackItem> lastUndoStackItem;
         if (commandId != null) {
             lastUndoStackItem =
-                commandRepository.findLastUndoStackItem(user.getId(), commandRepository.getById(commandId));
+                commandRepository.findLastUndoStackItem(user.id(), commandRepository.getById(commandId));
         } else {
-            lastUndoStackItem = commandRepository.findLastUndoStackItem(user.getId());
+            lastUndoStackItem = commandRepository.findLastUndoStackItem(user.id());
         }
 
         if (lastUndoStackItem.isEmpty()) {
@@ -135,7 +135,7 @@ public class CommandService {
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user.getId(), transaction);
+            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user.id(), transaction);
             for (UndoStackItem undoStack : undoStacks) {
                 //browse all command and undo it while it's the same transaction
                 if (undoStack.getCommand().isRefuseUndo()) {
@@ -213,9 +213,9 @@ public class CommandService {
         Optional<RedoStackItem> lastRedoStackItem;
         if (commandId != null) {
             lastRedoStackItem =
-                commandRepository.findLastRedoStackItem(user.getId(), commandRepository.getById(commandId));
+                commandRepository.findLastRedoStackItem(user.id(), commandRepository.getById(commandId));
         } else {
-            lastRedoStackItem = commandRepository.findLastRedoStackItem(user.getId());
+            lastRedoStackItem = commandRepository.findLastRedoStackItem(user.id());
         }
 
         if (lastRedoStackItem.isEmpty()) {

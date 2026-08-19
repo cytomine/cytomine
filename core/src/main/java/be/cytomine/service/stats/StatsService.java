@@ -222,7 +222,7 @@ public class StatsService {
         Optional<LocalDateTime> endDate
     ) {
         securityACLService.check(project, READ);
-        Long userId = currentUserService.getCurrentUser().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         return statsHttpContract.findTermsByProject(
             project.getId(),
             userId,
@@ -246,7 +246,7 @@ public class StatsService {
 
     public List<JsonObject> statTerm(Project project, Date startDate, Date endDate, boolean leafsOnly) {
         securityACLService.check(project, READ);
-        Long userId = currentUserService.getCurrentUser().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         Optional<LocalDateTime> start = Optional.ofNullable(startDate)
             .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         Optional<LocalDateTime> end = Optional.ofNullable(endDate)
@@ -267,7 +267,7 @@ public class StatsService {
 
     public List<StatUserTerm> statUserAnnotations(Project project) {
         securityACLService.check(project, READ);
-        Long userId = currentUserService.getCurrentUser().getId();
+        Long userId = currentUserService.getCurrentUser().id();
 
         return statsMapper.mapToUserTerms(
             statsHttpContract.findUserTermsByProject(project.getId(), userId, Pageable.unpaged()).toSet()

@@ -156,7 +156,7 @@ public class RestProjectController extends RestCytomineController {
     @GetMapping("/ontology/{id}/project.json")
     public ResponseEntity<String> listByOntology(@PathVariable Long id) {
         log.debug("REST request to list project with ontology {}", id);
-        long ontologyId = ontologyHttpContract.getLight(id, currentUserService.getCurrentUser().getId())
+        long ontologyId = ontologyHttpContract.getLight(id, currentUserService.getCurrentUser().id())
             .map(OntologyLight::id)
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
         return responseSuccess(projectService.listByOntology(ontologyId));

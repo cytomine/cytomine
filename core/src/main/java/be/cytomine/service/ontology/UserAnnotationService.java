@@ -235,10 +235,10 @@ public class UserAnnotationService extends ModelService {
         securityACLService.checkGuest(currentUser);
         //If user info is missing from input, add it
         if (jsonObject.isMissing("user")) {
-            jsonObject.put("user", currentUser.getId());
+            jsonObject.put("user", currentUser.id());
             jsonObject.put("userObject", currentUser);
             // check if user is the owner of the annotation, if not check project editing mode and user role
-        } else if (!Objects.equals(jsonObject.getJSONAttrLong("user"), currentUser.getId())) {
+        } else if (!Objects.equals(jsonObject.getJSONAttrLong("user"), currentUser.id())) {
             securityACLService.checkFullOrRestrictedForOwner(project, null);
         }
 
@@ -338,7 +338,7 @@ public class UserAnnotationService extends ModelService {
                 addedAnnotation.getId(),
                 termId,
                 null,
-                currentUser.getId(),
+                currentUser.id(),
                 transaction
             );
             terms.add(((AnnotationTerm) (response.getObject())).getTerm());

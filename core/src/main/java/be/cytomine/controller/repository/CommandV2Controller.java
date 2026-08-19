@@ -34,7 +34,7 @@ public class CommandV2Controller {
     public CollectionResponse<CommandV2Response<?>> getAll(
         @SortDefault(sort = "created", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         log.debug("GET /commands for user {}", userId);
 
         return pageMapper.toCollectionResponse(commandHttpContract.getAllForUser(userId, pageable));
@@ -42,7 +42,7 @@ public class CommandV2Controller {
 
     @PostMapping("/commands/undo/{commandId}")
     public Optional<HttpCommandResponse> undo(@PathVariable UUID commandId) {
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         log.debug("POST /commands/undo/{} for user {}", commandId, userId);
 
         return commandHttpContract.undo(commandId, userId);

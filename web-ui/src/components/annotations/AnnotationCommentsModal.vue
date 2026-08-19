@@ -91,7 +91,7 @@ export default {
     },
     annotationURL() {
       let uri = `project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
-      return `${window.location.origin}/#/${uri}`;
+      return `${window.location.origin}/${uri}`;
     }
   },
   watch: {

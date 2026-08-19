@@ -40,11 +40,10 @@ Vue.use(VueShortKey, {
 });
 
 import VueHtml2Canvas from 'vue-html2canvas';
-
 Vue.use(VueHtml2Canvas);
 
-import * as vClickOutside from 'v-click-outside-x';
-Vue.use(vClickOutside);
+import { vOnClickOutside } from '@vueuse/components';
+Vue.directive('click-outside', vOnClickOutside);
 
 import VueLayers from 'vuelayers';
 import CytomineSource from './vuelayers-suppl/cytomine-source';

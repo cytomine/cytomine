@@ -5,25 +5,31 @@
         <h1 class="sidebar-title">{{ $t('app-engine.applications') }}</h1>
 
         <ul>
-          <router-link tag="li" to="/apps" exact>
-            <a>
-              <i class="fas fa-code"></i>
-              {{ $t('app-engine.tasks.installed') }}
-            </a>
+          <router-link v-slot="{href, navigate, isExactActive}" to="/apps" custom>
+            <li :class="{'is-active': isExactActive}">
+              <a :href="href" @click="navigate">
+                <i class="fas fa-code"></i>
+                {{ $t('app-engine.tasks.installed') }}
+              </a>
+            </li>
           </router-link>
-          <router-link tag="li" to="/apps/store">
-            <a>
-              <i class="fas fa-store"></i>
-              {{ $t('app-store') }}
-            </a>
+          <router-link v-slot="{href, navigate, isActive}" to="/apps/store" custom>
+            <li :class="{'is-active': isActive}">
+              <a :href="href" @click="navigate">
+                <i class="fas fa-store"></i>
+                {{ $t('app-store') }}
+              </a>
+            </li>
           </router-link>
         </ul>
         <ul class="bottom-menu">
-          <router-link tag="li" to="/apps/configuration">
-            <a>
-              <i class="fas fa-cogs"></i>
-              {{ $t('configuration') }}
-            </a>
+          <router-link v-slot="{href, navigate, isActive}" to="/apps/configuration" custom>
+            <li :class="{'is-active': isActive}">
+              <a :href="href" @click="navigate">
+                <i class="fas fa-cogs"></i>
+                {{ $t('configuration') }}
+              </a>
+            </li>
           </router-link>
         </ul>
       </nav>

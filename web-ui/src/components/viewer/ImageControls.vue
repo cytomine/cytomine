@@ -6,8 +6,8 @@
       <strong class="image-dimension-name">C</strong>
       <template v-if="areChannelsMergeable">
         <b-select
-          :value="currentChannelsIndexesOption"
-          @input="setCurrentChannelsIndexes"
+          :model-value="currentChannelsIndexesOption"
+          @update:model-value="setCurrentChannelsIndexes"
           size="is-small"
           class="channel-selector"
           expanded
@@ -415,7 +415,7 @@ export default {
   mounted() {
     eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };

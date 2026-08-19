@@ -2,7 +2,7 @@
 <div class="cytomine-quill-editor">
   <div id="tooltip-container"></div> <!-- invisible div defining the allowed positions for ql tooltip -->
 
-  <quill-editor :value="value" @input="$emit('input', $event)" :options="editorOptions" ref="quillEditor">
+  <quill-editor :value="modelValue" @input="$emit('update:modelValue', $event)" :options="editorOptions" ref="quillEditor">
     <template #toolbar>
       <div id="toolbar">
         <span class="ql-formats">
@@ -114,8 +114,9 @@ import { quillEditor } from 'vue-quill-editor';
 export default {
   name: 'cytomine-quill-editor',
   components: { quillEditor },
+  emits: ['update:modelValue'],
   props: {
-    value: String,
+    modelValue: String,
     placeholder: String
   },
   data() {

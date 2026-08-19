@@ -1,8 +1,8 @@
 <template>
 <b-datepicker
   :class="styles"
-  :value="value"
-  @input="$emit('input', $event)"
+  :model-value="modelValue"
+  @update:model-value="$emit('update:modelValue', $event)"
   :placeholder="placeholder || this.$t('select-date')"
   :min-date="minDate" :max-date="maxDate"
   :month-names="moment.months()" :day-names="moment.weekdaysMin()"
@@ -10,7 +10,7 @@
   :position="position"
 >
   <div v-if="resetButton" class="has-text-centered">
-    <button class="button is-small is-link" :disabled="!value" @click="$emit('input', null)">
+    <button class="button is-small is-link" :disabled="!modelValue" @click="$emit('update:modelValue', null)">
       {{$t('button-reset')}}
     </button>
   </div>
@@ -22,8 +22,9 @@ import moment from 'moment';
 
 export default {
   name: 'cytomine-date-picker',
+  emits: ['update:modelValue'],
   props: {
-    value: Date,
+    modelValue: Date,
     resetButton: { type: Boolean, default: true },
     maxDate: Date,
     minDate: Date,

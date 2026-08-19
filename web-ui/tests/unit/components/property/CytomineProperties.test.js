@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineProperties from '@/components/property/CytomineProperties';
@@ -32,18 +32,17 @@ describe('CytomineProperties.vue', () => {
   };
 
   let wrapper;
-  let localVue;
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = shallowMount(CytomineProperties, {
-      localVue,
-      mocks: mocks,
-      propsData: {
+      props: {
         canEdit: true,
       },
+      global: {
+        plugins: [Buefy],
+        mocks: mocks
+      }
     });
   });
 

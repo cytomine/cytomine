@@ -1,6 +1,6 @@
 <template>
   <div class="track-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
-    <sl-vue-tree v-model="treeNodes" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
+    <sl-vue-tree :value="treeNodes" @input="treeNodes = $event" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
       <template #toggle="{node}">
         <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
           <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
@@ -56,10 +56,7 @@ import { Track } from '@/api';
 
 export default {
   name: 'track-tree',
-  model: {
-    prop: 'selectedNodes',
-    event: 'setSelectedNodes'
-  },
+  emits: ['update:selectedNodes', 'select', 'unselect', 'newTrack', 'updatedTrack', 'deletedTrack'],
   props: {
     tracks: { type: Array },
     additionalNodes: { type: Array, default: () => [] },
@@ -186,7 +183,7 @@ export default {
             this.$emit('select', node.data.id);
           }
         });
-        this.$emit('setSelectedNodes', this.internalSelectedNodes);
+        this.$emit('update:selectedNodes', this.internalSelectedNodes);
       }
 
       this.refreshNodeSelection();

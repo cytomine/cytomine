@@ -1,6 +1,5 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
-import VeeValidate from 'vee-validate';
 
 import AttachedFileModal from '@/components/attached-file/AttachedFileModal';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
@@ -17,24 +16,26 @@ describe('AttachedFileModal.vue', () => {
   let wrapper;
 
   beforeEach(() => {
-    let localVue = createLocalVue();
-    localVue.use(Buefy);
-    localVue.use(VeeValidate);
 
     wrapper = shallowMount(AttachedFileModal, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
-      propsData: { object: { id: 1 } },
-      stubs: {
-        CytomineModalCard: true,
-      },
+      props: { object: { id: 1 } },
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (message) => message,
+        },
+        stubs: {
+          CytomineModalCard: true,
+          // `Field` is renderless: stubbing it would leave the slot without the
+          // `field`/`state` props the template reads.
+          Field: false,
+        }
+      }
     });
   });
 
   afterEach(() => {
-    wrapper.destroy();
+    wrapper.unmount();
   });
 
   it('should render the component correctly', () => {
@@ -44,7 +45,7 @@ describe('AttachedFileModal.vue', () => {
   });
 
   it('should update the name when a file is selected', async () => {
-    expect(wrapper.vm.name).toBe('');
+    expect(wrapper.vm.form.state.values.name).toBe('');
     expect(wrapper.find('.filename').exists()).toBe(false);
 
     const mockFile = new File(['content'], 'mockFile.pdf', { type: 'application/pdf' });
@@ -52,7 +53,7 @@ describe('AttachedFileModal.vue', () => {
 
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.name).toBe('mockFile.pdf');
+    expect(wrapper.vm.form.state.values.name).toBe('mockFile.pdf');
     expect(wrapper.find('.filename').exists()).toBe(true);
     expect(wrapper.find('.filename').text()).toContain('mockFile.pdf');
   });

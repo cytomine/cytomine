@@ -1,6 +1,6 @@
 <template>
   <cytomine-modal-card :title="$t('paste-with-link')">
-    <b-loading :is-full-page="false" :active="loading" class="small" />
+    <b-loading :is-full-page="false" :model-value="loading" class="small" />
     <template v-if="!loading">
       <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
         <h2> {{ $t('error') }} </h2>
@@ -8,7 +8,7 @@
       </b-message>
       <template v-else>
         <div class="info" v-if="copiedAnnot.group"
-             v-html="$tc('count-copied-annot-links', nbAlreadyLinkedAnnotations, {count: nbAlreadyLinkedAnnotations})"></div>
+             v-html="$t('count-copied-annot-links', nbAlreadyLinkedAnnotations, {count: nbAlreadyLinkedAnnotations})"></div>
         <annotation-links-preview
             :size="64"
             :main-color="mainColor"
@@ -21,7 +21,7 @@
 
         <div v-if="imagesInGroupInViewer.length > 0">
           <div class="field header">
-            <b-checkbox :value="allCheckedInViewer" @change.native="checkAllInViewer()">
+            <b-checkbox :model-value="allCheckedInViewer" @update:model-value="checkAllInViewer()">
               {{$t('eligible-images-in-this-viewer', {imageGroup: imageGroup.name})}}
             </b-checkbox>
           </div>
@@ -42,7 +42,7 @@
         </div>
         <div v-if="imagesInGroupNotInViewer.length > 0">
           <div class="field header">
-            <b-checkbox :value="allCheckedNotInViewer" @change.native="checkAllNotInViewer()">
+            <b-checkbox :model-value="allCheckedNotInViewer" @update:model-value="checkAllNotInViewer()">
               {{$t('eligible-images-not-in-this-viewer', {imageGroup: imageGroup.name})}}
             </b-checkbox>
           </div>
@@ -375,8 +375,8 @@ export default {
     try {
       this.imageGroup = await ImageGroup.fetch(this.imageGroupId);
       for (let imageInstance of this.imageGroup.imageInstances) {
-        this.$set(imageInstance, 'inViewerPosition', this.viewerCenterPosition.value);
-        this.$set(imageInstance, 'notInViewerPosition', this.imageCenterPosition.value);
+        imageInstance.inViewerPosition = this.viewerCenterPosition.value;
+        imageInstance.notInViewerPosition = this.imageCenterPosition.value;
       }
       this.loading = false;
     } catch (error) {

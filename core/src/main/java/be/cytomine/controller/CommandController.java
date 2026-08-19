@@ -54,9 +54,9 @@ public class CommandController extends RestCytomineController {
 
         Optional<UndoStackItem> lastCommand;
         if (command != null) {
-            lastCommand = commandRepository.findLastUndoStackItem(user, command);
+            lastCommand = commandRepository.findLastUndoStackItem(user.getId(), command);
         } else {
-            lastCommand = commandRepository.findLastUndoStackItem(user);
+            lastCommand = commandRepository.findLastUndoStackItem(user.getId());
         }
 
         //There is no command, so nothing to undo
@@ -100,9 +100,9 @@ public class CommandController extends RestCytomineController {
 
         Optional<RedoStackItem> lastCommand;
         if (command != null) {
-            lastCommand = commandRepository.findLastRedoStackItem(user, command);
+            lastCommand = commandRepository.findLastRedoStackItem(user.getId(), command);
         } else {
-            lastCommand = commandRepository.findLastRedoStackItem(user);
+            lastCommand = commandRepository.findLastRedoStackItem(user.getId());
         }
 
         //There is no command, so nothing to undo

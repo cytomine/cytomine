@@ -157,10 +157,10 @@ public class UserAnnotationService extends ModelService {
     public Long count(User user, Project project) {
         if (project != null) {
             securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
-            return userAnnotationRepository.countByUserAndProject(user, project);
+            return userAnnotationRepository.countByUserIdAndProject(user.getId(), project);
         } else {
             securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-            return userAnnotationRepository.countByUser(user);
+            return userAnnotationRepository.countByUserId(user.getId());
         }
     }
 

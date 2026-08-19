@@ -250,7 +250,7 @@ public class ProjectMemberService {
             permissionService.deletePermission(project.getOntology(), user.getUsername(), READ);
             permissionService.deletePermission(project.getOntology(), user.getUsername(), ADMINISTRATION);
         } else if (admin) {
-            List<Long> managedProjectList = projectRepository.listByAdmin(user)
+            List<Long> managedProjectList = projectRepository.listByAdminId(user.getId())
                 .stream()
                 .map(NamedCytomineDomain::getId)
                 .toList();

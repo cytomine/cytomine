@@ -19,7 +19,7 @@ import be.cytomine.utils.JsonObject;
 public class EditCommand extends Command {
 
     public EditCommand(User currentUser, Transaction transaction) {
-        this.user = currentUser;
+        this.userId = currentUser.getId();
         this.transaction = transaction;
     }
 

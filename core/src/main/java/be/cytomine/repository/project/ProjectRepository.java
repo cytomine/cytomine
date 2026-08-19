@@ -51,8 +51,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query(value = "select id, name from admin_project where user_id = :userId", nativeQuery = true)
     List<Tuple> listByAdmin(Long userId);
 
-    default List<NamedCytomineDomain> listByAdmin(User user) {
-        return listByAdmin(user.getId()).stream()
+    default List<NamedCytomineDomain> listByAdminId(long userId) {
+        return listByAdmin(userId).stream()
             .map(x -> new NamedCytomineDomain(((Long) x.get(0)), (String) x.get(1)))
             .collect(Collectors.toList());
     }

@@ -112,7 +112,7 @@ public class ReviewedAnnotationService extends ModelService {
     }
 
     public Long count(User user) {
-        return reviewedAnnotationRepository.countByUser(user);
+        return reviewedAnnotationRepository.countByUserId(user.getId());
     }
 
     public Long countByProject(Project project, Date startDate, Date endDate) {

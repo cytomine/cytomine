@@ -44,4 +44,7 @@ public interface AbstractImageRepository
 
     @Query("SELECT ai.id FROM AbstractImage ai WHERE ai.uploadedFile.id = :uploadedFileId")
     Optional<Long> findIdByUploadedFileId(Long uploadedFileId);
+
+    @Query("SELECT ai.uploadedFile.id FROM AbstractImage ai WHERE ai.id IN :abstractImageIds")
+    Set<Long> findUploadedFileIdsByAbstractImageIds(Set<Long> abstractImageIds);
 }

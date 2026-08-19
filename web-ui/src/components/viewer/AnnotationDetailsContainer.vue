@@ -224,7 +224,7 @@ export default {
     window.addEventListener('resize', this.handleResize);
     eventBus.on('updateMapSize', this.handleResize);
   },
-  destroyed() {
+  unmounted() {
     window.removeEventListener('resize', this.handleResize);
     eventBus.off('updateMapSize', this.handleResize);
   }

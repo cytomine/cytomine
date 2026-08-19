@@ -22,29 +22,15 @@ describe('AnnotationSelection.vue', () => {
     { id: 1, name: 'Annotation 1' },
     { id: 2, name: 'Annotation 2' },
   ];
-  const mockImages = [{ imageInstance: { id: 1 } }];
+  const mockImages = [{
+    imageInstance: { id: 1 },
+    layers: { selectedLayers: [{ id: 101, name: 'Mock Layer 1' }, { id: 102, name: 'Mock Layer 2' }] },
+  }];
 
   const createWrapper = () => {
     return shallowMount(AnnotationSelection, {
-      propsData: {
+      props: {
         active: true,
-      },
-      computed: {
-        project: () => ({
-          id: 42,
-        }),
-        layers: () => [
-          { id: 101, name: 'Mock Layer 1' },
-          { id: 102, name: 'Mock Layer 2' }
-        ]
-      },
-      mocks: {
-        $store: {
-          getters: {
-            'currentProject/currentViewer': { images: mockImages },
-          },
-        },
-        $t: (message) => message,
       },
       data() {
         return {
@@ -52,13 +38,26 @@ describe('AnnotationSelection.vue', () => {
           selectedAnnotation: null,
         };
       },
-      stubs: {
-        AnnotationPreview: true,
-        'cytomine-modal': true,
-        'b-loading': true,
-        'b-pagination': true,
-        SelectableAnnotation: true,
-      },
+      global: {
+        mocks: {
+          $store: {
+            state: {
+              currentProject: { project: { id: 42 } },
+            },
+            getters: {
+              'currentProject/currentViewer': { images: mockImages },
+            },
+          },
+          $t: (message) => message,
+        },
+        stubs: {
+          AnnotationPreview: true,
+          'cytomine-modal': true,
+          'b-loading': true,
+          'b-pagination': true,
+          SelectableAnnotation: true,
+        }
+      }
     });
   };
 
@@ -74,7 +73,8 @@ describe('AnnotationSelection.vue', () => {
     const wrapper = createWrapper();
     await flushPromises();
 
-    await wrapper.setData({ loading: true });
+    wrapper.vm.loading = true;
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.exists()).toBe(true);
     expect(wrapper.findComponent(CytomineModal).exists()).toBe(true);
@@ -84,7 +84,7 @@ describe('AnnotationSelection.vue', () => {
   it('Selecting an annotation should emit the select-annotation event', async () => {
     const wrapper = createWrapper();
 
-    wrapper.setData({ selectedAnnotation: mockAnnotations[0] });
+    wrapper.vm.selectedAnnotation = mockAnnotations[0];
     await wrapper.vm.selectAnnotation();
 
     expect(wrapper.emitted('select-annotation')).toBeTruthy();
@@ -94,9 +94,9 @@ describe('AnnotationSelection.vue', () => {
   it('Clicking on cancel annotation should reset selectedAnnotation', async () => {
     const wrapper = createWrapper();
 
-    wrapper.setData({ selectedAnnotation: mockAnnotations[0] });
+    wrapper.vm.selectedAnnotation = mockAnnotations[0];
 
-    expect(wrapper.vm.selectedAnnotation).toBe(mockAnnotations[0]);
+    expect(wrapper.vm.selectedAnnotation).toEqual(mockAnnotations[0]);
 
     wrapper.vm.cancelAnnotation();
     await wrapper.vm.$nextTick();

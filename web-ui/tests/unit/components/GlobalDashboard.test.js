@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 import VTooltip from 'v-tooltip';
 
@@ -30,31 +30,31 @@ vi.mock('@/api', () => ({
 }));
 
 describe('GlobalDashboard.vue', () => {
-  let localVue;
   let wrapper;
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
-    localVue.use(VTooltip);
 
     wrapper = mount(GlobalDashboard, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
-      computed: {
-        currentUser: () => ({
-          fetchNbAnnotations: vi.fn().mockResolvedValue(5),
-        })
-      },
-      propsData: {
+      props: {
         nbRecent: 3
       },
-      stubs: {
-        'image-preview': true,
-        'list-images-preview': true,
-        'router-link': true,
+      global: {
+        plugins: [Buefy, VTooltip],
+        mocks: {
+          $t: (message) => message,
+          $store: {
+            state: {
+              currentUser: {
+                user: { fetchNbAnnotations: vi.fn().mockResolvedValue(5) },
+              },
+            },
+          },
+        },
+        stubs: {
+          'image-preview': true,
+          'list-images-preview': true,
+          'router-link': true,
+        }
       }
     });
   });
@@ -85,5 +85,19 @@ describe('GlobalDashboard.vue', () => {
   it('The component should fetch the last opened image and bind it to the template', async () => {
     expect(ImageInstanceCollection.fetchLastOpened).toHaveBeenCalled();
     expect(wrapper.vm.lastOpenedImage.projectName).toBe('Project 1');
+  });
+
+  it('The recent projects table should render a row per project', () => {
+    const rows = wrapper.findAll('.b-table tbody tr');
+
+    expect(rows.length).toBe(2);
+    expect(rows.at(0).text()).toContain('Project 1');
+    expect(rows.at(1).text()).toContain('Project 2');
+  });
+
+  it('The recent projects table should render both column headers', () => {
+    const headers = wrapper.findAll('.b-table thead th').map((th) => th.text());
+
+    expect(headers).toEqual(['project', 'images']);
   });
 });

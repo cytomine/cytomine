@@ -263,7 +263,7 @@ export default {
   mounted() {
     eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };

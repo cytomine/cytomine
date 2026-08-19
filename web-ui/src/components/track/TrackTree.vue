@@ -56,10 +56,7 @@ import { Track } from '@/api';
 
 export default {
   name: 'track-tree',
-  model: {
-    prop: 'selectedNodes',
-    event: 'setSelectedNodes'
-  },
+  emits: ['update:selectedNodes', 'select', 'unselect', 'newTrack', 'updatedTrack', 'deletedTrack'],
   props: {
     tracks: { type: Array },
     additionalNodes: { type: Array, default: () => [] },
@@ -186,7 +183,7 @@ export default {
             this.$emit('select', node.data.id);
           }
         });
-        this.$emit('setSelectedNodes', this.internalSelectedNodes);
+        this.$emit('update:selectedNodes', this.internalSelectedNodes);
       }
 
       this.refreshNodeSelection();

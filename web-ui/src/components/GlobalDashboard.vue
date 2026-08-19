@@ -12,17 +12,15 @@
           </b-message>
           <b-table v-else :data="recentProjects">
 
-            <template #default="{row: project}">
-              <b-table-column :label="$t('project')" width="100" centered>
-                <router-link class="project-name" :to="`/project/${project.id}`">
-                  {{ project.name }}
-                </router-link>
-              </b-table-column>
+            <b-table-column v-slot="{row: project}" :label="$t('project')" width="100" centered>
+              <router-link class="project-name" :to="`/project/${project.id}`">
+                {{ project.name }}
+              </router-link>
+            </b-table-column>
 
-              <b-table-column :label="$t('images')" width="400">
-                <list-images-preview :project="project" />
-              </b-table-column>
-            </template>
+            <b-table-column v-slot="{row: project}" :label="$t('images')" width="400">
+              <list-images-preview :project="project" />
+            </b-table-column>
 
             <template #empty>
               <div class="content has-text-grey has-text-centered">

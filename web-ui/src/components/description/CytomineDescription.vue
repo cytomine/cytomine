@@ -1,6 +1,6 @@
 <template>
 <div :class="['description-wrapper', loading ? 'loading' : '']">
-  <b-loading :is-full-page="false" :active="loading" class="small" />
+  <b-loading :is-full-page="false" :model-value="loading" class="small" />
   <template v-if="!loading">
     <template v-if="description">
       <div class="ql-snow">

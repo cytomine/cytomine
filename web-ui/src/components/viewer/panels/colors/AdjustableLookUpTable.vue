@@ -101,7 +101,7 @@
           {{$t('inverse')}}
         </div>
         <div class="adjustment-body">
-          <b-switch :value="inverted" @input="$emit('invert', $event)" size="is-small">
+          <b-switch :model-value="inverted" @update:model-value="$emit('invert', $event)" size="is-small">
             <template v-if="inverted">{{$t('yes')}}</template>
             <template v-else>{{$t('no')}}</template>
           </b-switch>

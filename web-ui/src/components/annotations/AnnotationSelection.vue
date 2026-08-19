@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="selectAnnotation()">
     <cytomine-modal :active="active" :title="$t('select-annotation')" @close="$emit('update:active', false)">
-      <b-loading class="small" :active="loading" :is-full-page="false"/>
+      <b-loading class="small" :model-value="loading" :is-full-page="false"/>
 
       <template v-if="!loading">
         <div class="annotation-content">

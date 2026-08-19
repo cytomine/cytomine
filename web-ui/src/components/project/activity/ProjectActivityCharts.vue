@@ -123,7 +123,7 @@
                 :additionalNodes="[{id: 0, name: this.$t('all')}]"
                 :startWithAdditionalNodes="true"
                 :multiple="false"
-                v-model="selectedTerms"
+                v-model:selectedNodes="selectedTerms"
               />
             </div>
           </template>

@@ -30,30 +30,28 @@
         pagination-size="is-small"
         @sort="onSort"
       >
-        <template #default="{row: tag}">
-          <b-table-column field="name" :label="$t('name')" sortable>
-            {{ tag.name }}
-          </b-table-column>
+        <b-table-column v-slot="{row: tag}" field="name" :label="$t('name')" sortable>
+          {{ tag.name }}
+        </b-table-column>
 
-          <b-table-column field="creatorName" :label="$t('creator')">
-            {{ tag.creatorName }}
-          </b-table-column>
+        <b-table-column v-slot="{row: tag}" field="creatorName" :label="$t('creator')">
+          {{ tag.creatorName }}
+        </b-table-column>
 
-          <b-table-column field="created" :label="$t('created')" sortable>
-            {{ formatDate(tag.created) }}
-          </b-table-column>
+        <b-table-column v-slot="{row: tag}" field="created" :label="$t('created')" sortable>
+          {{ formatDate(tag.created) }}
+        </b-table-column>
 
-          <b-table-column label=" " centered>
-            <div class="buttons">
-              <button class="button is-small is-link" @click="startTagEdition(tag)">
-                {{ $t('button-edit') }}
-              </button>
-              <button class="button is-small is-danger" @click="deleteTagDialog(tag)">
-                {{ $t('button-delete') }}
-              </button>
-            </div>
-          </b-table-column>
-        </template>
+        <b-table-column v-slot="{row: tag}" label=" " centered>
+          <div class="buttons">
+            <button class="button is-small is-link" @click="startTagEdition(tag)">
+              {{ $t('button-edit') }}
+            </button>
+            <button class="button is-small is-danger" @click="deleteTagDialog(tag)">
+              {{ $t('button-delete') }}
+            </button>
+          </div>
+        </b-table-column>
 
         <template #empty>
           <div class="content has-text-grey has-text-centered">

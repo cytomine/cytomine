@@ -9,15 +9,13 @@
     per-page="5"
     @details-open="onDetailsOpen"
   >
-    <template #default="props">
-      <b-table-column :label="$t('app-engine.task-run.state.title')">
-        <task-run-state-icon :state="props.row.state" />
-      </b-table-column>
+    <b-table-column v-slot="props" :label="$t('app-engine.task-run.state.title')">
+      <task-run-state-icon :state="props.row.state" />
+    </b-table-column>
 
-      <b-table-column :label="$t('app-engine.task.name')">
-        {{ taskRunName(props.row) }}
-      </b-table-column>
-    </template>
+    <b-table-column v-slot="props" :label="$t('app-engine.task.name')">
+      {{ taskRunName(props.row) }}
+    </b-table-column>
 
     <template #detail="props">
       <section v-if="props.row.inputs">

@@ -1,24 +1,36 @@
 import * as buefy from 'buefy';
 
+// This is a temporary fix
+
 /**
- * This is a temporary fix
- * In Vue 2 mode, @vue/compat rewrites the `modelValue` prop a `v-model` compiles
- * to back into the Vue 2 `value` prop, for every component. That is what the
- * app's own components still expect, but Buefy 3 components are plain Vue 3
- * components declaring `modelValue`: the rewrite makes `v-model` on any `<b-*>`
- * component a one-way binding that never updates.
+ * Buefy 3 is a plain Vue 3 library, but `configureCompat({MODE: 2})` in
+ * `src/main.js` is global: @vue/compat applies its Vue 2 behaviours to every
+ * component in the tree, Buefy's included, and several of them actively break
+ * it. Per-component `compatConfig: {MODE: 3}` opts a component out of all of
+ * them, which is what Buefy wants, while the app's own components keep MODE 2.
  *
- * @vue/compat resolves COMPONENT_V_MODEL against the compat config of the
- * component receiving the v-model, so opting Buefy's components out one by one
- * fixes them without changing the contract of ours.
+ * The two that were breaking things concretely:
  *
- * This can be dropped once the app's own components use the Vue 3 `modelValue` /
- * `update:modelValue` contract and COMPONENT_V_MODEL can be disabled globally.
+ * - COMPONENT_V_MODEL rewrites the `modelValue` prop a `v-model` compiles to
+ *   back into the Vue 2 `value` prop. Buefy 3 components declare `modelValue`,
+ *   so `v-model` on any `<b-*>` was a one-way binding that never updated.
+ *   compat resolves this flag against the component *receiving* the v-model,
+ *   so opting Buefy out fixes it without changing the contract of ours.
+ * - RENDER_FUNCTION makes `$slots` a Vue 2 style proxy that *calls* each slot
+ *   function on property access, with no arguments. `<b-table>` renders a cell
+ *   by testing `column.$slots.default`, so merely testing it invoked every
+ *   `<b-table-column v-slot="{row}">` with `undefined` and threw. It applies to
+ *   any Buefy component with a hand-written `render()` — `BTableColumn`,
+ *   `BSlotComponent`.
+ *
+ * This whole file goes away with @vue/compat itself (issue 16), once the app's
+ * own components use the Vue 3 `modelValue` / `update:modelValue` contract and
+ * MODE 2 can be turned off globally.
  */
-export default function optOutBuefyFromVModelCompat() {
+export default function optOutBuefyFromVue2Compat() {
   for (const [name, exported] of Object.entries(buefy)) {
     if (name.startsWith('B') && exported && typeof exported === 'object') {
-      exported.compatConfig = { ...exported.compatConfig, COMPONENT_V_MODEL: false };
+      exported.compatConfig = { ...exported.compatConfig, MODE: 3 };
     }
   }
 }

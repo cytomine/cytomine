@@ -1,6 +1,6 @@
 <template>
 <div class="user-activity-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <div class="content-wrapper" v-if="!loading">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
@@ -71,24 +71,22 @@
           pagination-size="is-small"
           detailed detail-key="id"
         >
-          <template #default="{row: connection}">
-            <b-table-column :label="$t('date')" field="created" sortable>
-              {{ formatMomentDate(Number(connection.created), 'll LT') }}
-            </b-table-column>
+          <b-table-column v-slot="{row: connection}" :label="$t('date')" field="created" sortable>
+            {{ formatMomentDate(Number(connection.created), 'll LT') }}
+          </b-table-column>
 
-            <b-table-column :label="$t('duration')" field="time" sortable>
-              {{ formatMomentDuration(connection.time, 'humanize') }}
-              <span class="tag is-success" v-if="connection.online">{{$t('ongoing')}}</span>
-            </b-table-column>
+          <b-table-column v-slot="{row: connection}" :label="$t('duration')" field="time" sortable>
+            {{ formatMomentDuration(connection.time, 'humanize') }}
+            <span class="tag is-success" v-if="connection.online">{{$t('ongoing')}}</span>
+          </b-table-column>
 
-            <b-table-column :label="$t('number-viewed-images')" field="countViewedImages" centered sortable>
-              {{ connection.countViewedImages }}
-            </b-table-column>
+          <b-table-column v-slot="{row: connection}" :label="$t('number-viewed-images')" field="countViewedImages" centered sortable>
+            {{ connection.countViewedImages }}
+          </b-table-column>
 
-            <b-table-column :label="$t('number-annotation-creations')" field="countCreatedAnnotations" centered sortable>
-              {{ connection.countCreatedAnnotations }}
-            </b-table-column>
-          </template>
+          <b-table-column v-slot="{row: connection}" :label="$t('number-annotation-creations')" field="countCreatedAnnotations" centered sortable>
+            {{ connection.countCreatedAnnotations }}
+          </b-table-column>
 
           <template #empty>
             <div class="content has-text-grey has-text-centered">
@@ -162,39 +160,37 @@
         <h2>{{$t('detailed-image-consultations')}}</h2>
 
         <b-table :data="consultations.array" :paginated="true" :per-page="consultationsPerPage" pagination-size="is-small">
-          <template #default="{row: consultation}">
-            <b-table-column :label="$t('overview')" field="created">
-              <router-link :to="`/project/${project.id}/image/${consultation.image}`">
-                <image-thumbnail :url="consultation.imageThumb" :size="128" :key="consultation.imageThumb" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
-              </router-link>
-            </b-table-column>
+          <b-table-column v-slot="{row: consultation}" :label="$t('overview')" field="created">
+            <router-link :to="`/project/${project.id}/image/${consultation.image}`">
+              <image-thumbnail :url="consultation.imageThumb" :size="128" :key="consultation.imageThumb" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
+            </router-link>
+          </b-table-column>
 
-            <b-table-column :label="$t('image')" field="imageName" sortable>
-              <router-link :to="`/project/${project.id}/image/${consultation.image}`">
-                {{ consultation.imageName }}
-              </router-link>
-            </b-table-column>
+          <b-table-column v-slot="{row: consultation}" :label="$t('image')" field="imageName" sortable>
+            <router-link :to="`/project/${project.id}/image/${consultation.image}`">
+              {{ consultation.imageName }}
+            </router-link>
+          </b-table-column>
 
-            <b-table-column :label="$t('duration')" field="time" sortable>
-              {{ formatMomentDuration(consultation.time, 'humanize') }}
-            </b-table-column>
+          <b-table-column v-slot="{row: consultation}" :label="$t('duration')" field="time" sortable>
+            {{ formatMomentDuration(consultation.time, 'humanize') }}
+          </b-table-column>
 
-            <b-table-column :label="$t('number-consultations')" field="frequency" centered sortable>
-              {{ consultation.frequency }}
-            </b-table-column>
+          <b-table-column v-slot="{row: consultation}" :label="$t('number-consultations')" field="frequency" centered sortable>
+            {{ consultation.frequency }}
+          </b-table-column>
 
-            <b-table-column :label="$t('first-consultation')" field="first" centered sortable>
-              {{ formatMomentDate(Number(consultation.first), 'll LT') }}
-            </b-table-column>
+          <b-table-column v-slot="{row: consultation}" :label="$t('first-consultation')" field="first" centered sortable>
+            {{ formatMomentDate(Number(consultation.first), 'll LT') }}
+          </b-table-column>
 
-            <b-table-column :label="$t('last-consultation')" field="last" centered sortable>
-              {{ formatMomentDate(Number(consultation.last), 'll LT') }}
-            </b-table-column>
+          <b-table-column v-slot="{row: consultation}" :label="$t('last-consultation')" field="last" centered sortable>
+            {{ formatMomentDate(Number(consultation.last), 'll LT') }}
+          </b-table-column>
 
-            <b-table-column :label="$t('number-annotation-creations')" field="countCreatedAnnotations" centered sortable>
-              {{ consultation.countCreatedAnnotations }}
-            </b-table-column>
-          </template>
+          <b-table-column v-slot="{row: consultation}" :label="$t('number-annotation-creations')" field="countCreatedAnnotations" centered sortable>
+            {{ consultation.countCreatedAnnotations }}
+          </b-table-column>
 
           <template #empty>
             <div class="content has-text-grey has-text-centered">

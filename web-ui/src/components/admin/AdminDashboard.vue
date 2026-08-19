@@ -1,6 +1,6 @@
 <template>
 <div class="admin-dashboard-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <template v-if="!loading">
     <h2>{{$t('currently')}}</h2>
     <b-message v-if="!currentStats" type="is-danger" has-icon icon-size="is-small">

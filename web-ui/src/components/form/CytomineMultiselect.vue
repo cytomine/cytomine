@@ -108,7 +108,7 @@ export default {
 
 <style lang="scss">
 @import 'vue-multiselect/dist/vue-multiselect.min.css';
-@import 'bulma/sass/utilities/initial-variables.sass';
+@import 'bulma/sass/utilities/initial-variables';
 
 .multiselect--active, .multiselect__content-wrapper {
   z-index: 50 !important;

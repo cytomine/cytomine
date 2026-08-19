@@ -4,7 +4,7 @@
       v-for="input in taskInputs"
       :key="input.id"
       :parameter="input"
-      :value="inputs[input.name].value"
+      :value="inputs[input.name]?.value"
       @input="onInputChange(input.name, $event)"
     />
   </div>

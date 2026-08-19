@@ -1,15 +1,13 @@
-import Vue from 'vue';
+import { mount } from '@vue/test-utils';
 
 import i18n from '@/lang.js';
 
-Vue.use(i18n);
-
 const LOCALES = ['en', 'fr', 'es', 'nl'];
 
+// Returns the component instance, so the suite keeps using the legacy-i18n
+// `$t` / `$i18n` / `$el` / `$nextTick` it exposes on every component.
 function mountText(template) {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return new Vue({ render: h => h({ template }) }).$mount(el);
+  return mount({ template }, { global: { plugins: [i18n] } }).vm;
 }
 
 function flatten(messages, prefix = '') {

@@ -393,9 +393,6 @@ export default {
   color: grey;
 }
 
-/**
- * TODO: use :deep(.class) when moving to Vue3
- */
 :deep(ul.pagination-list) {
   justify-content: flex-end;
 }

@@ -20,7 +20,10 @@ public class AnnotationTools {
     WebDriverUtils webDriverUtils;
 
     private void selectDrawTool(Wait<WebDriver> wait, String iconClass) {
-        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, '" + iconClass + "')]]");
+        webDriverUtils.xpathClick(
+            wait,
+            "//div[contains(@class,'draw-tools')]//button[.//i[contains(@class,'"  + iconClass + "')]]"
+        );
         webDriverUtils.byIsDisplayed(
             wait,
             By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, '" + iconClass + "')]]")

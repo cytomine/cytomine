@@ -56,8 +56,6 @@
 <script>
 import Multiselect from 'vue-multiselect';
 
-Multiselect.compatConfig = { MODE: 3 }; // TODO remove when @vue/compat is removed
-
 export default {
   name: 'cytomine-multiselect',
   components: { Multiselect },

@@ -140,11 +140,9 @@ describe('Buefy 3 component API', () => {
     });
   });
 
-  describe('the v-model contract, with @vue/compat in MODE 2', () => {
-    // src/utils/buefy-compat.js stamps `compatConfig: {MODE: 3}` on every Buefy
-    // component. Without it compat rewrites `modelValue` back to the Vue 2
-    // `value` prop for every component in the tree, and `v-model` on a `<b-*>`
-    // becomes a one-way binding that never updates.
+  describe('the v-model contract', () => {
+    // Buefy 3 declares `modelValue` and emits `update:modelValue`, the Vue 3
+    // v-model contract, so `v-model` on a `<b-*>` two-way binds natively.
     it('round-trips v-model on b-input', async () => {
       const wrapper = mountWith(
         '<b-input v-model="text" />',

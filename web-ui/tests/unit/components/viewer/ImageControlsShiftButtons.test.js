@@ -9,7 +9,7 @@ describe('ImageControlsShiftButtons.vue', () => {
   const VDropdown = {
     name: 'VDropdown',
     render() {
-      return [this.$scopedSlots.default(), this.$scopedSlots.popper()];
+      return [this.$slots.default(), this.$slots.popper()];
     },
   };
 

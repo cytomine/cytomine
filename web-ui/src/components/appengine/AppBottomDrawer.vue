@@ -197,7 +197,6 @@ export default {
 
     setInterval(async () => {
       for (let taskRun of this.trackedTaskRuns) {
-        console.log(this.trackedTaskRuns);
         if (taskRun.isTerminalState()) {
           continue;
         }

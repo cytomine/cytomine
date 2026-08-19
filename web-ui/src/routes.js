@@ -1,4 +1,4 @@
-import VueRouter from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 import AppConfigurationPage from '@/components/appengine/AppConfigurationPage.vue';
 import AppDashboardPage from '@/components/appengine/AppDashboardPage.vue';
@@ -115,7 +115,7 @@ const routes = [
         component: ProjectConfiguration
       },
       {
-        path: '*',
+        path: ':pathMatch(.*)*',
         component: PageNotFound
       }
     ]
@@ -188,12 +188,13 @@ const routes = [
   // -----
 
   {
-    path: '*',
+    path: '/:pathMatch(.*)*',
     component: PageNotFound
   }
 ];
 
-const router = new VueRouter({
+const router = createRouter({
+  history: createWebHistory(),
   routes: routes,
   linkActiveClass: 'is-active'
 });

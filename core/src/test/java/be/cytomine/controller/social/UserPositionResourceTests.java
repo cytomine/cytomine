@@ -268,7 +268,7 @@ public class UserPositionResourceTests {
 
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Long imageId = imageInstance.getId();
-        Long currentUserId = currentUserService.getCurrentUser().getId();
+        Long currentUserId = currentUserService.getCurrentUser().id();
         String currentUserAndImageId = currentUserId + "/" + imageId.toString();
 
         WebSocketUserPositionHandler.sessionsBroadcast.put(currentUserAndImageId, sessionDecoratorA);
@@ -356,7 +356,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void addPosition() throws Exception {
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 

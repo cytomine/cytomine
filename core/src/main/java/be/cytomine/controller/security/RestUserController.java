@@ -116,7 +116,7 @@ public class RestUserController extends RestCytomineController {
         @PathVariable Long id
     ) {
         log.debug("REST request to list user from ontology {}", id);
-        OntologyResponse ontology = ontologyHttpContract.get(id, currentUserService.getCurrentUser().getId())
+        OntologyResponse ontology = ontologyHttpContract.get(id, currentUserService.getCurrentUser().id())
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
         return responseSuccess(userService.listUsers(ontology.id()), isFilterRequired());
     }
@@ -407,7 +407,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        if (!Objects.equals(currentUserService.getCurrentUser().getId(), user.getId())) {
+        if (!Objects.equals(currentUserService.getCurrentUser().id(), user.getId())) {
             securityACLService.check(project, ADMINISTRATION);
         }
         projectMemberService.deleteUserFromProject(user, project, true);

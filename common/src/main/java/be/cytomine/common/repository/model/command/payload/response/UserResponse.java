@@ -40,8 +40,4 @@ public record UserResponse(long id,
     public DataType getDataType() {
         return DataType.USER;
     }
-
-    public long getId() {
-        return id;
-    }
 }

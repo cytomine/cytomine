@@ -9,8 +9,6 @@ import router from './routes.js';
 import store from './store/store.js';
 
 import Buefy from 'buefy';
-import optOutBuefyFromVue2Compat from '@/utils/buefy-compat.js';
-optOutBuefyFromVue2Compat();
 
 import Notifications from '@kyvg/vue3-notification';
 

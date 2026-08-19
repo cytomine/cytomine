@@ -8,7 +8,7 @@
       </b-message>
       <template v-else>
         <div class="info" v-if="copiedAnnot.group"
-             v-html="$tc('count-copied-annot-links', nbAlreadyLinkedAnnotations, {count: nbAlreadyLinkedAnnotations})"></div>
+             v-html="$t('count-copied-annot-links', nbAlreadyLinkedAnnotations, {count: nbAlreadyLinkedAnnotations})"></div>
         <annotation-links-preview
             :size="64"
             :main-color="mainColor"
@@ -21,7 +21,7 @@
 
         <div v-if="imagesInGroupInViewer.length > 0">
           <div class="field header">
-            <b-checkbox :value="allCheckedInViewer" @change.native="checkAllInViewer()">
+            <b-checkbox :value="allCheckedInViewer" @update:model-value="checkAllInViewer()">
               {{$t('eligible-images-in-this-viewer', {imageGroup: imageGroup.name})}}
             </b-checkbox>
           </div>
@@ -42,7 +42,7 @@
         </div>
         <div v-if="imagesInGroupNotInViewer.length > 0">
           <div class="field header">
-            <b-checkbox :value="allCheckedNotInViewer" @change.native="checkAllNotInViewer()">
+            <b-checkbox :value="allCheckedNotInViewer" @update:model-value="checkAllNotInViewer()">
               {{$t('eligible-images-not-in-this-viewer', {imageGroup: imageGroup.name})}}
             </b-checkbox>
           </div>

@@ -8,10 +8,10 @@
 
       <cytomine-table
         :collection="imageCollection"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
+        v-model:currentPage="currentPage"
+        v-model:perPage="perPage"
+        v-model:sort="sortField"
+        v-model:order="sortOrder"
         :detailed="false"
       >
         <template #default="{row: image}">

@@ -32,8 +32,8 @@
 
       <!-- Display other groups to linked with -->
       <tr v-for="{images, index, number} in otherGroups" :key="`group${number}`">
-        <td>
-          <b-checkbox :value="false" @change.native="event => handleCheckboxChange(event, index)"/>
+        <td @change="event => handleCheckboxChange(event, index)">
+          <b-checkbox :value="false"/>
         </td>
         <td>
           {{$t('link-group', {number})}}
@@ -49,8 +49,8 @@
 
       <!-- Display unlinked images -->
       <tr v-for="{image, index, number} in otherSoloImages" :key="index">
-        <td>
-          <b-checkbox :value="false" @change.native="event => handleCheckboxChange(event, null, index)"/>
+        <td @change="event => handleCheckboxChange(event, null, index)">
+          <b-checkbox :value="false"/>
         </td>
         <td>
           {{$t('viewer-view', {number})}} (<image-name :image="image" />)

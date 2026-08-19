@@ -1,7 +1,5 @@
 package be.cytomine.config.security;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -9,6 +7,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,7 +34,6 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     private final Logger log = LoggerFactory.getLogger(ApiKeyFilter.class);
 
     private final UserRepository secUserRepository;
-
 
     public ApiKeyFilter(UserRepository secUserRepository) {
         this.secUserRepository = secUserRepository;
@@ -119,7 +118,6 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             return false;
         }
     }
-
 
     /**
      * Rebuild an Authentication for the given username and register it in the security context. Typically used after

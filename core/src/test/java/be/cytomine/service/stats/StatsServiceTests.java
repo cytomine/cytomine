@@ -277,7 +277,7 @@ public class StatsServiceTests {
 
         when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
             Pageable.unpaged())).thenReturn(
-            new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 0))));
+                new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 0))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().id()).isEqualTo(term.getId());
@@ -290,7 +290,7 @@ public class StatsServiceTests {
 
         when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
             Pageable.unpaged())).thenReturn(
-            new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 1))));
+                new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 1))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().id()).isEqualTo(term.getId());
@@ -335,7 +335,7 @@ public class StatsServiceTests {
 
         when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), eq(Optional.empty()),
             eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(
-            new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 1))));
+                new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 1))));
         results = statsService.statTerm(project, null, null, false);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().getId()).isEqualTo(annotationTerm.getTerm().getId());
@@ -348,7 +348,7 @@ public class StatsServiceTests {
 
         when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), eq(Optional.empty()),
             eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(
-            new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 2))));
+                new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 2))));
         results = statsService.statTerm(project, null, null, false);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().getId()).isEqualTo(annotationTerm.getTerm().getId());
@@ -356,7 +356,7 @@ public class StatsServiceTests {
 
         when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(), any(),
             eq(Pageable.unpaged()))).thenReturn(
-            new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 0))));
+                new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 0))));
         results = statsService.statTerm(project, DateUtils.addDays(new Date(), -40), DateUtils.addDays(new Date(), -20),
             false);
         assertThat(results).hasSize(1);
@@ -380,7 +380,7 @@ public class StatsServiceTests {
 
         when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), eq(Optional.empty()),
             eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(
-            new PageImpl<>(List.of(new StatPerTermAndImage(imageId, termId, 1L))));
+                new PageImpl<>(List.of(new StatPerTermAndImage(imageId, termId, 1L))));
         results = statsService.statPerTermAndImage(project, null, null);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().termId()).isEqualTo(annotationTerm.getTerm().getId());
@@ -395,7 +395,7 @@ public class StatsServiceTests {
 
         when(statsHttpContract.findPerTermAndImageByProject(eq(project.getId()), eq(Optional.empty()),
             eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(
-            new PageImpl<>(List.of(new StatPerTermAndImage(imageId, termId, 2L))));
+                new PageImpl<>(List.of(new StatPerTermAndImage(imageId, termId, 2L))));
         results = statsService.statPerTermAndImage(project, null, null);
         assertThat(results).hasSize(1);
         assertThat(results.getFirst().termId()).isEqualTo(annotationTerm.getTerm().getId());
@@ -428,8 +428,8 @@ public class StatsServiceTests {
         User superAdmin = builder.givenSuperAdmin();
         when(statsHttpContract.findUserTermsByProject(project.getId(), superAdmin.getId(),
             Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(
-            new FlatStatUserTerm(superAdmin.getId(), superAdmin.getUsername(),
-                new StatTerm(term.getId(), term.getName(), term.getColor(), 2)))));
+                new FlatStatUserTerm(superAdmin.getId(), superAdmin.getUsername(),
+                    new StatTerm(term.getId(), term.getName(), term.getColor(), 2)))));
 
         Set<StatTerm> terms;
 

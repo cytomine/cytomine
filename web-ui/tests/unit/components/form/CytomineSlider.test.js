@@ -17,7 +17,7 @@ vi.mock('vue-slider-component', () => ({
 
 describe('CytomineSlider.vue', () => {
   const createWrapper = (props = {}) => mount(CytomineSlider, {
-    props: { value: 20, min: 0, max: 100, ...props },
+    props: { modelValue: 20, min: 0, max: 100, ...props },
     global: { plugins: [Buefy] },
   });
 
@@ -26,7 +26,7 @@ describe('CytomineSlider.vue', () => {
     return wrapper.find('input');
   };
 
-  const committed = (wrapper) => (wrapper.emitted('input') ?? [])
+  const committed = (wrapper) => (wrapper.emitted('update:modelValue') ?? [])
     .filter(([payload]) => !(payload instanceof Event));
 
   it('commits the edited value when Enter is pressed', async () => {
@@ -52,12 +52,23 @@ describe('CytomineSlider.vue', () => {
   });
 
   it('commits the right bound of a range slider', async () => {
-    const wrapper = createWrapper({ value: [10, 80] });
+    const wrapper = createWrapper({ modelValue: [10, 80] });
 
     const input = await edit(wrapper, 1);
     await input.setValue('90');
     await input.trigger('keyup.enter');
 
     expect(committed(wrapper)).toEqual([[[10, 90]]]);
+  });
+
+  it('focuses the field when edit mode opens', async () => {
+    const focus = vi.spyOn(CytomineSlider.methods, 'focus').mockImplementation(() => {});
+    const wrapper = createWrapper();
+
+    expect(focus).not.toHaveBeenCalled();
+    await edit(wrapper);
+
+    expect(focus).toHaveBeenCalled();
+    focus.mockRestore();
   });
 });

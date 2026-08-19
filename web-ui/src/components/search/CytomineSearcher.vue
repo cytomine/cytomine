@@ -24,8 +24,9 @@
         :key="project.id"
         :to="`/project/${project.id}`"
         class="navbar-item"
-        v-html="highlightedName(project.name)"
-      />
+      >
+        <span v-html="highlightedName(project.name)"></span>
+      </router-link>
       <a v-if="moreProjects" class="navbar-item">...</a>
     </p>
     <span v-else class="navbar-item no-result">{{$t('no-project')}}</span>
@@ -37,8 +38,9 @@
         :key="img.id"
         :to="`/project/${img.project}/image/${img.id}`"
         class="navbar-item"
-        v-html="htmlImageName(img)"
-      />
+      >
+        <span v-html="htmlImageName(img)"></span>
+      </router-link>
       <a v-if="moreImages" class="navbar-item">...</a>
     </p>
     <span v-else class="navbar-item no-result">{{$t('no-image')}}</span>

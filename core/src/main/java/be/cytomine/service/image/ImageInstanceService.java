@@ -30,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -172,7 +173,7 @@ public class ImageInstanceService extends ModelService {
         Optional<ImageInstance> imageInstance = imageInstanceRepository.findById(id);
         String token = authHeader.replace("Bearer ", "");
         String username = TokenUtils.getUsernameFromToken(token);
-        User user = currentUserService.getCurrentUser(username);
+        UserResponse user = currentUserService.getCurrentUser(username);
         imageInstance.ifPresent(image -> securityACLService.check(image.container(), READ, user));
         return imageInstance;
     }
@@ -180,7 +181,6 @@ public class ImageInstanceService extends ModelService {
     public ImageInstance get(Long id) {
         return find(id).orElse(null);
     }
-
 
     public Optional<ImageInstance> next(ImageInstance imageInstance) {
         return imageInstanceRepository.findTopByProjectAndCreatedLessThanOrderByCreatedDesc(
@@ -237,7 +237,6 @@ public class ImageInstanceService extends ModelService {
                 parameter.setProperty("countImageAnnotations");
             }
         }
-
 
         List<SearchParameterEntry> validParameters = SQLSearchParameter.getDomainAssociatedSearchParameters(
             ImageInstance.class,
@@ -321,7 +320,6 @@ public class ImageInstanceService extends ModelService {
         String imageInstanceAlias = "ui";
         String abstractImageAlias = "ai";
 
-
         if (sortColumn == null) {
             sortColumn = "created";
         }
@@ -345,13 +343,13 @@ public class ImageInstanceService extends ModelService {
 
         String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null
             ? imageInstanceAlias
-              + "."
-              + sortColumn
+            + "."
+            + sortColumn
             : null;
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(AbstractImage.class, sortColumn) != null ? abstractImageAlias
-                                                                                                  + "."
-                                                                                                  + sortColumn : null;
+                + "."
+                + sortColumn : null;
         }
         if (sortedProperty == null) {
             throw new CytomineMethodNotYetImplementedException("ImageInstance list sorted by "
@@ -375,7 +373,6 @@ public class ImageInstanceService extends ModelService {
             .filter(x -> x.getProperty().equals("ui.instanceFilename"))
             .forEach(searchParameterEntry -> searchParameterEntry.setProperty("name"));
 
-
         final String finalSortedProperty = sortedProperty;
         boolean joinAI = validatedSearchParameters.stream()
             .anyMatch(x -> x.getProperty().contains(abstractImageAlias + ".") || finalSortedProperty.contains(
@@ -388,7 +385,6 @@ public class ImageInstanceService extends ModelService {
             .filter(x -> x.getProperty().equals("name"))
             .findFirst()
             .orElse(null);
-
 
         String imageInstanceCondition = sqlSearchConditions.getData()
             .stream()
@@ -456,7 +452,6 @@ public class ImageInstanceService extends ModelService {
                 "COALESCE(" + imageInstanceAlias + ".instance_filename, " + abstractImageAlias + ".original_filename)"
             );
         }
-
 
         if (sortedProperty.contains(imageInstanceAlias + ".instance_filename")) {
             joinAI = true;
@@ -577,11 +572,10 @@ public class ImageInstanceService extends ModelService {
             sortColumn = "countImageReviewedAnnotations";
         }
 
-
         String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null
             ? imageInstanceAlias
-              + "."
-              + sortColumn
+            + "."
+            + sortColumn
             : null;
         if (sortColumn.equals("blindedName")) {
             sortedProperty = imageInstanceAlias + ".baseImageId";
@@ -589,13 +583,13 @@ public class ImageInstanceService extends ModelService {
 
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(AbstractImage.class, sortColumn) != null ? abstractImageAlias
-                                                                                                  + "."
-                                                                                                  + sortColumn : null;
+                + "."
+                + sortColumn : null;
         }
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(UploadedFile.class, sortColumn) != null ? contentTypeAlias
-                                                                                                 + "."
-                                                                                                 + sortColumn : null;
+                + "."
+                + sortColumn : null;
         }
         if (sortedProperty == null) {
             throw new CytomineMethodNotYetImplementedException("ImageInstance list sorted by "
@@ -848,13 +842,12 @@ public class ImageInstanceService extends ModelService {
         return PageUtils.buildPageFromPageResults(results, max, offset, count);
     }
 
-
-    public List<Map<String, Object>> listLight(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
+    public List<Map<String, Object>> listLight(UserResponse user) {
+        securityACLService.checkIsSameUser(currentUserService.getCurrentUser().getId(), user);
         boolean isAdmin = currentRoleService.isAdminByNow(user);
         String request = "select * from user_image where user_image_id = :id order by instance_filename";
         Query query = getEntityManager().createNativeQuery(request, Tuple.class);
-        query.setParameter("id", user.getId());
+        query.setParameter("id", user.id());
         List<Tuple> resultList = query.getResultList();
 
         List<Map<String, Object>> results = new ArrayList<>();
@@ -880,7 +873,6 @@ public class ImageInstanceService extends ModelService {
         }
         return results;
     }
-
 
     public List<Map<String, Object>> listLight(Project project) {
         securityACLService.check(project, READ);
@@ -978,12 +970,10 @@ public class ImageInstanceService extends ModelService {
         return sliceInstanceRepository.findByBaseSliceAndImage(abstractSlice, imageInstance).orElse(null);
     }
 
-
     /**
      * Add the new domain with JSON data
      *
      * @param json New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     public CommandResponse add(JsonObject json) {
@@ -993,13 +983,13 @@ public class ImageInstanceService extends ModelService {
         if (json.isMissing("project")) {
             throw new WrongArgumentException("project not set");
         }
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(json.getJSONAttrLong("project"), Project.class, READ);
         securityACLService.checkIsNotReadOnly(json.getJSONAttrLong("project"), Project.class);
 
-        json.put("user", currentUser.getId());
-        return executeCommand(new AddCommand(currentUser), null, json);
+        json.put("user", currentUser.id());
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
 
     }
 
@@ -1032,18 +1022,16 @@ public class ImageInstanceService extends ModelService {
 
     }
 
-
     /**
      * Update this domain with new data from json
      *
      * @param domain      Domain to update
      * @param jsonNewData New domain datas
-     *
      * @return Response structure (new domain data, old domain data..)
      */
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), READ);
         securityACLService.checkUser(currentUser);
         securityACLService.check(jsonNewData.getJSONAttrLong("project"), Project.class, READ);
@@ -1055,7 +1043,7 @@ public class ImageInstanceService extends ModelService {
 
         JsonObject attributes = domain.toJsonObject(urlApi);
         CommandResponse commandResponse = executeCommand(
-            new EditCommand(currentUser, transaction),
+            new EditCommand(currentUser.id(), transaction),
             domain,
             jsonNewData
         );
@@ -1080,7 +1068,6 @@ public class ImageInstanceService extends ModelService {
         return commandResponse;
     }
 
-
     /**
      * Delete this domain
      *
@@ -1088,12 +1075,11 @@ public class ImageInstanceService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
 
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
@@ -1103,7 +1089,7 @@ public class ImageInstanceService extends ModelService {
         if (Lock.getInstance().lockProject(project)) {
             try {
                 log.debug("Delete image " + domain.getId());
-                Command c = new DeleteCommand(currentUser, transaction);
+                Command c = new DeleteCommand(currentUser.id(), transaction);
                 return executeCommand(c, domain, null);
             } finally {
                 Lock.getInstance().unlockProject(project);
@@ -1131,7 +1117,6 @@ public class ImageInstanceService extends ModelService {
         deleteDependentTrack(imageInstance, transaction, task);
     }
 
-
     private void deleteDependentReviewedAnnotation(ImageInstance image, Transaction transaction, Task task) {
         for (ReviewedAnnotation reviewedAnnotation : reviewedAnnotationRepository.findAllByImage(image)) {
             reviewedAnnotationService.delete(reviewedAnnotation, transaction, task, false);
@@ -1144,7 +1129,6 @@ public class ImageInstanceService extends ModelService {
             userAnnotationService.delete(userAnnotation, transaction, task, false);
         }
     }
-
 
     private void deleteDependentAnnotationAction(ImageInstance image) {
         annotationActionRepository.deleteAllByImage(image.getId());
@@ -1191,7 +1175,6 @@ public class ImageInstanceService extends ModelService {
         );
     }
 
-
     @Override
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         // TODO: with new session?
@@ -1212,7 +1195,7 @@ public class ImageInstanceService extends ModelService {
     public void startReview(ImageInstance imageInstance) {
         securityACLService.checkFullOrRestrictedForOwner(imageInstance, imageInstance.getUser());
         imageInstance.setReviewStart(new Date());
-        imageInstance.setReviewUser(currentUserService.getCurrentUser());
+        imageInstance.setReviewUser(currentUserService.getCurrentUserOld());
         saveDomain(imageInstance);
     }
 
@@ -1223,9 +1206,10 @@ public class ImageInstanceService extends ModelService {
                 + " and image.reviewUser="
                 + imageInstance.getReviewUser());
         }
-        if (!currentUserService.getCurrentUser().getId().equals(imageInstance.getReviewUser().getId())) {
-            throw new WrongArgumentException("Review can only be validate or stop by " + imageInstance.getReviewUser()
-                .getUsername());
+        if (!(Objects.equals(currentUserService.getCurrentUser().username(),
+            imageInstance.getReviewUser().getUsername()))) {
+            throw new WrongArgumentException(
+                "Review can only be validated or stopped by " + imageInstance.getReviewUser().getUsername());
         }
 
         if (cancelReview) {

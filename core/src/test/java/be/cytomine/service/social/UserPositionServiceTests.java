@@ -22,7 +22,9 @@ import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorato
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.security.User;
@@ -40,8 +42,9 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class UserPositionServiceTests {
 
     public static final AreaDTO USER_VIEW = new AreaDTO(
@@ -88,7 +91,7 @@ public class UserPositionServiceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,
@@ -381,7 +384,7 @@ public class UserPositionServiceTests {
         );
         Date date = new Date();
 
-        userPositionService.add(date, user, sliceInstance, imageInstance, area, 0, (double) 0, true);
+        userPositionService.add(date, user.getId(), sliceInstance, imageInstance, area, 0, (double) 0, true);
     }
 
     @Test

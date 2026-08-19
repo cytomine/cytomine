@@ -96,7 +96,7 @@ public abstract class Command extends CytomineDomain {
         returnArray.put("serviceName", ((Command) domain).getServiceName());
         returnArray.put(
             "action",
-            command.getActionMessage() + " by " + (command.getUserId() != null ? command.getUserId() : "")
+            command.getActionMessage() + " by user with id " + command.getUserId()
         );
         returnArray.put("data", command.getData());
         returnArray.put("user", command.getUserId());

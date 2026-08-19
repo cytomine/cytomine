@@ -98,7 +98,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     public ResponseEntity<String> countByUser(@PathVariable(value = "idUser") Long idUser) {
         log.debug("REST request to count reviewed annotation for current user");
         return responseSuccess(
-            JsonObject.of("total", reviewedAnnotationService.count(currentUserService.getCurrentUser()))
+            JsonObject.of("total", reviewedAnnotationService.count(currentUserService.getCurrentUser().id()))
         );
     }
 

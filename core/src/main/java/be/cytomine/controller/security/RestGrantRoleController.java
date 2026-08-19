@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.auth.AuthInformation;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
@@ -51,7 +51,7 @@ public class RestGrantRoleController extends RestCytomineController {
 
 
     public AuthInformation getCurrentRole() {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         AuthInformation authInformation = new AuthInformation();
         authInformation.setAdmin(currentRoleService.isAdmin(user));
         authInformation.setUser(!authInformation.getAdmin() && currentRoleService.isUser(user));

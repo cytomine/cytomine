@@ -13,6 +13,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.meta.Description;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.AlreadyExistException;
@@ -20,12 +21,13 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class DescriptionServiceTests {
 

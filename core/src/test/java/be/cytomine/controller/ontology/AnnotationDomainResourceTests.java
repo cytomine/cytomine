@@ -66,6 +66,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -992,6 +993,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void shouldReturnGeoJsonContentType() throws Exception {
+        wiremockRepository.stubTermsByProject(project.getId(), term);
         restAnnotationDomainControllerMockMvc.perform(get(
                 "/api/project/{projectId}/annotations/export",
                 project.getId()
@@ -1001,6 +1003,18 @@ public class AnnotationDomainResourceTests {
             .andExpect(header().string("Content-Disposition", containsString(".geojson")))
             .andExpect(content().contentTypeCompatibleWith("application/geo+json"))
             .andExpect(content().json("{}"));
+    }
+
+    @Test
+    public void shouldExportTermNameAsPathClassNameProperty() throws Exception {
+        wiremockRepository.stubTermsByProject(project.getId(), term);
+        restAnnotationDomainControllerMockMvc.perform(get(
+                "/api/project/{projectId}/annotations/export",
+                project.getId()
+            ))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.type").value("FeatureCollection"))
+            .andExpect(jsonPath("$.features[*].properties.path_class_name", hasItem(term.getName())));
     }
 
     @Test

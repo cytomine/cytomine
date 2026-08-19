@@ -19,6 +19,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.utils.ReportFormatService;
 import be.cytomine.utils.JsonObject;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 @ExtendWith(MockitoExtension.class)
 public class ReportServiceTests {

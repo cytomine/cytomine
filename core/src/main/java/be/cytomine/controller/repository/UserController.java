@@ -88,8 +88,9 @@ public class UserController {
 
     @PutMapping("/user/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateUser updateUser) {
-        log.debug("REST request to update User : {} with info {}", id, updateUser);
+        log.debug("REST request to update User : {}", id);
         long userId = currentUserService.getCurrentUser().getId();
+        log.debug("REST request to update User : {} with info {}", id, updateUser);
         accountService.update(toAccount(updateUser));
         return userHttpContract.update(id, userId, updateUser)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));

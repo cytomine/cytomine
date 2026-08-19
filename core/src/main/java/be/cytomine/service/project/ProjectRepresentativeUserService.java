@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -92,7 +93,7 @@ public class ProjectRepresentativeUserService extends ModelService {
 
     @Override
     public CommandResponse add(JsonObject jsonObject) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(jsonObject.getJSONAttrLong("project"), Project.class, WRITE);
         Long userId = jsonObject.getJSONAttrLong("user");
         User user = userRepository.findById(userId)
@@ -102,7 +103,7 @@ public class ProjectRepresentativeUserService extends ModelService {
 
         securityACLService.checkIsUserInProject(user, project);
 
-        return executeCommand(new AddCommand(currentUser), null, jsonObject);
+        return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
     }
 
     public CommandResponse add(JsonObject jsonObject, User adminAsCurrent) {
@@ -114,7 +115,7 @@ public class ProjectRepresentativeUserService extends ModelService {
 
         securityACLService.checkIsUserInProject(user, project);
 
-        return executeCommand(new AddCommand(adminAsCurrent), null, jsonObject);
+        return executeCommand(new AddCommand(adminAsCurrent.getId()), null, jsonObject);
     }
 
 
@@ -124,18 +125,16 @@ public class ProjectRepresentativeUserService extends ModelService {
             throw new WrongArgumentException(
                 "You cannot remove the last representative role. Add someone else as representative");
         }
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), WRITE);
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 
     public CommandResponse deleteWithAdmin(
         CytomineDomain domain,
         Transaction transaction,
-        Task task,
-        boolean printMessage,
-        User currentAsAdmin) {
+        long currentAsAdmin) {
         if (listByProject(((ProjectRepresentativeUser) domain).getProject()).size() < 2) {
             throw new WrongArgumentException("You cannot remove the last representative role. "
                 + "Add someone else as representative");

@@ -12,6 +12,7 @@ WORKDIR /app
 
 COPY ./package.json /app/package.json
 COPY ./package-lock.json /app/package-lock.json
+COPY ./.npmrc /app/.npmrc
 
 COPY ./src /app/src
 COPY ./public /app/public

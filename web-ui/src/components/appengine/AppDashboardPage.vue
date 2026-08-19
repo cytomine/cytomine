@@ -124,7 +124,7 @@ export default {
       );
     },
     async onDetailsOpen(taskRun) {
-      this.$set(taskRun, '_activeTab', taskRun._activeTab ?? 0);
+      taskRun._activeTab = taskRun._activeTab ?? 0;
 
       if (!taskRun.inputs) {
         await taskRun.fetchInputs();
@@ -155,7 +155,7 @@ export default {
       return map[state.toLowerCase()] ?? 'is-light';
     },
     async handleViewLogs(run) {
-      this.$set(run, '_activeTab', 1);
+      run._activeTab = 1;
       await this.onDetailsOpen(run);
       this.$refs.table.openDetailRow(run);
     },

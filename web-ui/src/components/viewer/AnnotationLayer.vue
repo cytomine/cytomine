@@ -1,15 +1,14 @@
 <template>
-  <vl-layer-vector :visible="layer.visible" :extent="imageExtent" :update-while-interacting="false">
+  <ol-vector-layer :visible="layer.visible" :extent="imageExtent" :update-while-interacting="false" ref="olLayer">
 
-    <vl-source-vector ref="olSource" :loader-factory="loaderFactory" :strategy-factory="strategyFactory" url="-">
-      <!-- HACK because loader factory not used if URL not specified -->
-      <vl-style-func :factory="styleFunctionFactory" />
-    </vl-source-vector>
+    <ol-source-vector ref="olSource" :loader="loader" :strategy="strategy" />
 
-  </vl-layer-vector>
+  </ol-vector-layer>
 </template>
 
 <script>
+import { markRaw } from 'vue';
+
 import eventBus from '@/utils/event-bus';
 
 import WKT from 'ol/format/WKT';
@@ -26,6 +25,9 @@ export default {
   data() {
     return {
       format: new WKT(),
+
+      olLayerObject: null,
+      olSourceObject: null,
 
       resolution: null,
       lastExtent: null,
@@ -65,9 +67,7 @@ export default {
     terms() {
       return this.imageWrapper.style.terms || [];
     },
-    styleFunctionFactory() {
-      // Force computed property update when one of those properties change (leading to new style function =>
-      // rerendering - see https://github.com/ghettovoice/vuelayers/issues/68#issuecomment-404223423)
+    styleFunction() {
       this.imageWrapper.selectedFeatures.selectedFeatures;
       this.imageWrapper.style.layersOpacity;
       this.terms.forEach(term => {
@@ -84,9 +84,8 @@ export default {
         track.color;
       });
 
-      return () => {
-        return this.$store.getters[this.imageModule + 'genStyleFunction'];
-      };
+      let genStyleFunction = this.$store.getters[this.imageModule + 'genStyleFunction'];
+      return (feature, resolution) => genStyleFunction(feature, resolution);
     },
     reviewMode() {
       return this.imageWrapper.review.reviewMode;
@@ -95,13 +94,18 @@ export default {
   watch: {
     reviewMode() { // in review mode, reviewed annotation no longer displayed => need to force reload
       this.clearFeatures();
+    },
+    styleFunction(styleFunction) {
+      if (this.olLayerObject) {
+        this.olLayerObject.setStyle(styleFunction);
+      }
     }
   },
   methods: {
     clearFeatures(cache = true) {
-      if (this.$refs.olSource) {
+      if (this.olSourceObject) {
         this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', { layer: this.layer, cache });
-        this.$refs.olSource.clearFeatures();
+        this.olSourceObject.refresh();
       }
     },
 
@@ -110,13 +114,13 @@ export default {
     },
 
     addAnnotationHandler(annot) {
-      if (this.annotBelongsToLayer(annot) && this.$refs.olSource) {
-        this.$refs.olSource.addFeature(this.createFeature(annot));
+      if (this.annotBelongsToLayer(annot) && this.olSourceObject) {
+        this.olSourceObject.addFeature(this.createFeature(annot));
       }
     },
     selectAnnotationHandler({ annot, index }) {
-      if (index === this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
-        let olFeature = this.$refs.olSource.getFeatureById(annot.id);
+      if (index === this.index && this.annotBelongsToLayer(annot) && this.olSourceObject) {
+        let olFeature = this.olSourceObject.getFeatureById(annot.id);
         if (!olFeature) {
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
         } else {
@@ -142,8 +146,8 @@ export default {
       }
     },
     editAnnotationHandler(annot) {
-      if (this.annotBelongsToLayer(annot) && this.$refs.olSource) {
-        let olFeature = this.$refs.olSource.getFeatureById(annot.id);
+      if (this.annotBelongsToLayer(annot) && this.olSourceObject) {
+        let olFeature = this.olSourceObject.getFeatureById(annot.id);
         if (!olFeature) {
           return;
         }
@@ -160,12 +164,12 @@ export default {
       }
     },
     deleteAnnotationHandler(annot) {
-      if (this.annotBelongsToLayer(annot) && this.$refs.olSource) {
-        let olFeature = this.$refs.olSource.getFeatureById(annot.id);
+      if (this.annotBelongsToLayer(annot) && this.olSourceObject) {
+        let olFeature = this.olSourceObject.getFeatureById(annot.id);
         if (!olFeature) {
           return;
         }
-        this.$refs.olSource.removeFeature(olFeature);
+        this.olSourceObject.removeFeature(olFeature);
 
         if (this.selectedFeatures.some(ftr => ftr.id === annot.id)) {
           this.$store.commit(this.imageModule + 'clearSelectedFeatures');
@@ -173,20 +177,18 @@ export default {
       }
     },
 
-    strategyFactory() {
-      return (extent, resolution) => {
-        this.lastExtent = extent;
+    strategy(extent, resolution) {
+      this.lastExtent = extent;
 
-        if (this.$refs.olSource && this.resolution && this.clustered !== null && ( // some features have already been loaded
-          !this.clustered && resolution > this.maxResolutionNoClusters // recluster
-          || resolution !== this.resolution && this.clustered)) { // change of resolution while clustering
+      if (this.olSourceObject && this.resolution && this.clustered !== null && ( // some features have already been loaded
+        !this.clustered && resolution > this.maxResolutionNoClusters // recluster
+        || resolution !== this.resolution && this.clustered)) { // change of resolution while clustering
 
-          // clear loaded extents to force reloading features
-          this.$refs.olSource.$source.loadedExtentsRtree_.clear();
-        }
+        // clear loaded extents to force reloading features
+        this.olSourceObject.loadedExtentsRtree_.clear();
+      }
 
-        return [extent];
-      };
+      return [extent];
     },
 
     async fetchAnnotations() {
@@ -236,7 +238,7 @@ export default {
       let isFeatureSelected = indexSelectedFeature !== -1;
 
       if (!annot) {
-        this.$refs.olSource.removeFeature(feature);
+        this.olSourceObject.removeFeature(feature);
         if (isFeatureSelected) {
           this.$store.commit(this.imageModule + 'clearSelectedFeatures');
         }
@@ -296,7 +298,7 @@ export default {
         return;
       }
 
-      if (!this.$refs.olSource) {
+      if (!this.olSourceObject) {
         return;
       }
 
@@ -317,8 +319,8 @@ export default {
       if (wasClustered !== null && wasClustered !== this.clustered) {
         this.clearFeatures(); // clearing features will retrigger the loader
       } else {
-        let features = this.clustered ? this.$refs.olSource.$source.getFeatures()
-          : this.$refs.olSource.$source.getFeaturesInExtent(extent);
+        let features = this.clustered ? this.olSourceObject.getFeatures()
+          : this.olSourceObject.getFeaturesInExtent(extent);
 
         features.forEach(feature => {
           this.updateFeature(feature, annots[feature.getId()]);
@@ -328,13 +330,9 @@ export default {
 
       arrayAnnots.forEach(annot => {
         if (!seenAnnots.includes(annot.id)) {
-          this.$refs.olSource.addFeature(this.createFeature(annot));
+          this.olSourceObject.addFeature(this.createFeature(annot));
         }
       });
-    },
-
-    loaderFactory() {
-      return (extent, resolution) => this.loader(extent, resolution);
     },
 
     createFeature(annot) {
@@ -357,6 +355,14 @@ export default {
     }
   },
   mounted() {
+    if (this.$refs.olLayer) {
+      this.olLayerObject = markRaw(this.$refs.olLayer.vectorLayer);
+      this.olLayerObject.setStyle(this.styleFunction);
+    }
+    if (this.$refs.olSource) {
+      this.olSourceObject = markRaw(this.$refs.olSource.source);
+    }
+
     eventBus.on('addAnnotation', this.addAnnotationHandler);
     eventBus.on('selectAnnotationInLayer', this.selectAnnotationHandler);
     eventBus.on('reloadAnnotations', this.reloadAnnotationsHandler);

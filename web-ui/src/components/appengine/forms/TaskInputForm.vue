@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import Vue from 'vue';
-
 import AppEngineField from '@/components/appengine/forms/fields/AppEngineField.vue';
 import Task from '@/utils/appengine/task';
 import { hasBinaryType } from '@/utils/app';
@@ -73,7 +71,7 @@ export default {
           }
         })();
 
-        Vue.set(inputs, input.name, { value, type: input.type });
+        inputs[input.name] = { value, type: input.type };
       };
 
       for (let input of this.taskInputs) {

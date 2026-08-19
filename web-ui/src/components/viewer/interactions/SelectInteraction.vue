@@ -1,25 +1,34 @@
 <template>
-<vl-interaction-select
-  :ident="`select-target-${index}`"
+<ol-interaction-select
   :filter="filterFunction"
-  v-model:features="selectedFeatures"
   :toggle-condition="never"
   :remove-condition="shiftKeyOnly"
-  :multi=true
-  ref="interactionSelect"
->
-  <vl-style-func :factory="styleFunctionFactory" />
-</vl-interaction-select>
+  :multi="true"
+  ref="olSelect"
+/>
 </template>
 
 <script>
+import { markRaw } from 'vue';
+
 import { isCluster } from '@/utils/style-utils.js';
 import { never, shiftKeyOnly } from 'ol/events/condition';
 
+import { createGeoJsonFmt } from '@/viewer-ol/geojson.js';
+import { injectViewerContext } from '@/viewer-ol/context.js';
+
 export default {
   name: 'select-interaction',
+  inject: injectViewerContext,
   props: {
     index: String
+  },
+  data() {
+    return {
+      olSelectObject: null,
+      applyingStoreSelection: false,
+      format: markRaw(createGeoJsonFmt())
+    };
   },
   computed: {
     imageModule() {
@@ -27,6 +36,9 @@ export default {
     },
     imageWrapper() {
       return this.$store.getters['currentProject/currentViewer'].images[this.index];
+    },
+    selectTargetName() {
+      return `select-target-${this.index}`;
     },
     selectedFeatures: {
       get() {
@@ -94,7 +106,7 @@ export default {
     terms() {
       return this.imageWrapper.style.terms || [];
     },
-    styleFunctionFactory() {
+    styleFunction() {
       this.imageWrapper.selectedFeatures.selectedFeatures;
       this.imageWrapper.style.layersOpacity;
       this.terms.forEach(term => {
@@ -113,9 +125,9 @@ export default {
           track.color;
         });
       }
-      return () => {
-        return this.$store.getters[this.imageModule + 'genStyleFunction'];
-      };
+
+      let genStyleFunction = this.$store.getters[this.imageModule + 'genStyleFunction'];
+      return (feature, resolution) => genStyleFunction(feature, resolution);
     },
     filterFunction() {
       return feature => !isCluster(feature);
@@ -128,11 +140,100 @@ export default {
     }
   },
   watch: {
-    async styleFunctionFactory() {
-      // HACK: style function is not called again when redefined => force the update of style for selected features
-      if (this.$refs.interactionSelect && this.$refs.interactionSelect.$interaction) {
-        await this.$refs.interactionSelect.$interaction.getFeatures().forEach(ft => ft.changed());
+    styleFunction(styleFunction) {
+      this.applySelectStyle(styleFunction);
+    },
+    selectedFeatures(value) {
+      this.applyStoreSelection(value);
+    }
+  },
+  methods: {
+    applySelectStyle(styleFunction) {
+      if (!this.olSelectObject) {
+        return;
       }
+      this.olSelectObject.style_ = styleFunction;
+      this.olSelectObject.getFeatures().forEach(feature => feature.setStyle(styleFunction));
+    },
+    selectionChanged() {
+      if (this.applyingStoreSelection) {
+        return;
+      }
+      this.selectedFeatures = this.olSelectObject.getFeatures().getArray()
+        .map(feature => this.format.writeFeatureObject(feature));
+    },
+    applyStoreSelection(value) {
+      if (!this.olSelectObject) {
+        return;
+      }
+
+      if (value.some(feature => feature.id === undefined)) {
+        return;
+      }
+
+      let collection = this.olSelectObject.getFeatures();
+      let wantedIds = value.map(feature => feature.id);
+
+      this.applyingStoreSelection = true;
+      try {
+        for (let i = collection.getLength() - 1; i >= 0; i--) {
+          if (!wantedIds.includes(collection.item(i).getId())) {
+            collection.removeAt(i);
+          }
+        }
+
+        let selectedIds = collection.getArray().map(feature => feature.getId());
+        wantedIds.forEach(id => {
+          if (selectedIds.includes(id)) {
+            return;
+          }
+          let olFeature = this.findFeatureById(id);
+          if (olFeature) {
+            collection.push(olFeature);
+          }
+        });
+      } finally {
+        this.applyingStoreSelection = false;
+      }
+    },
+
+    findFeatureById(id) {
+      let map = this.olSelectObject.getMap();
+      if (!map) {
+        return null;
+      }
+
+      let found = null;
+      map.getLayers().forEach(layer => {
+        if (found || typeof layer.getSource !== 'function') {
+          return;
+        }
+        let source = layer.getSource();
+        if (source && typeof source.getFeatureById === 'function') {
+          found = source.getFeatureById(id);
+        }
+      });
+
+      return found;
+    }
+  },
+  mounted() {
+    this.olSelectObject = markRaw(this.$refs.olSelect.select);
+
+    if (this.viewerContext) {
+      this.viewerContext.register(this.selectTargetName, this.olSelectObject.getFeatures());
+    }
+
+    this.applySelectStyle(this.styleFunction);
+    this.olSelectObject.getFeatures().on(['add', 'remove'], this.selectionChanged);
+    this.applyStoreSelection(this.selectedFeatures);
+  },
+  beforeUnmount() {
+    if (this.olSelectObject) {
+      this.olSelectObject.getFeatures().un(['add', 'remove'], this.selectionChanged);
+    }
+    if (this.viewerContext) {
+      this.viewerContext.unregister(this.selectTargetName);
     }
   }
 };

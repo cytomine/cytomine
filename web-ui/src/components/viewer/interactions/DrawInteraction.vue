@@ -1,19 +1,17 @@
 <template>
 <div>
-  <vl-layer-vector>
-    <vl-source-vector :ident="drawSourceName" ref="olSourceDrawTarget" />
-  </vl-layer-vector>
-
-  <vl-interaction-draw
-    v-if="nbActiveLayers > 0 || drawCorrection"
-    ref="olDrawInteraction"
-    :source="drawSourceName"
-    :type="drawType"
-    :freehand="drawFreehand"
-    :freehand-condition="undefined"
-    :geometry-function="drawGeometryFunction"
-    @drawend="drawEndHandler"
-  />
+  <ol-vector-layer>
+    <ol-source-vector ref="olSourceDrawTarget">
+      <ol-interaction-draw
+        v-if="nbActiveLayers > 0 || drawCorrection"
+        ref="olDrawInteraction"
+        :type="drawType"
+        :freehand="drawFreehand"
+        :geometry-function="drawGeometryFunction"
+        @drawend="drawEndHandler"
+      />
+    </ol-source-vector>
+  </ol-vector-layer>
 </div>
 </template>
 
@@ -131,15 +129,6 @@ export default {
     },
     nbActiveLayers() {
       return this.activeLayers.length;
-    },
-    drawSourceName() {
-      return `draw-target-${this.index}`;
-    }
-  },
-
-  watch: {
-    activeTool() {
-      this.$refs.olDrawInteraction.scheduleRecreate();
     }
   },
 
@@ -151,7 +140,9 @@ export default {
     },
 
     clearDrawnFeatures() {
-      this.$refs.olSourceDrawTarget.clear(true);
+      if (this.$refs.olSourceDrawTarget) {
+        this.$refs.olSourceDrawTarget.source.clear(true);
+      }
     },
 
     async drawEndHandler({ feature }) {

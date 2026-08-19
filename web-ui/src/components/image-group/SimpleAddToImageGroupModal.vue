@@ -8,32 +8,31 @@
           {{$t('create-image-group')}}
         </b-radio>
       </b-field>
-      <template v-if="imageGroup === 'NEW'">
-        <b-field :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-          <b-input v-model="name" name="name" v-validate="'required'" />
+      <field v-if="imageGroup === 'NEW'" :form="form" name="name" :validators="requiredRule" v-slot="{field, state}">
+        <b-field :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+          <b-input :model-value="state.value" @update:model-value="field.handleChange" />
         </b-field>
-      </template>
+      </field>
       <b-field>
         <b-radio v-model="imageGroup" native-value="EXISTING">
           {{$t('use-existing-image-group')}}
         </b-radio>
       </b-field>
 
-      <template v-if="imageGroup === 'EXISTING'">
-        <b-field :type="{'is-danger': errors.has('imageGroup')}" :message="errors.first('imageGroup')">
+      <field v-if="imageGroup === 'EXISTING'" :form="form" name="imageGroup" :validators="requiredRule" v-slot="{field, state}">
+        <b-field :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
           <b-select
-              v-model="selectedImageGroup"
+              :model-value="state.value"
+              @update:model-value="field.handleChange"
               :placeholder="$t('select-image-group')"
-              name="imageGroup"
-              v-validate="'required'"
               expanded
           >
-            <option v-for="imageGroup in imageGroups" :value="imageGroup.id" :key="imageGroup.id">
-              {{imageGroup.name}}
+            <option v-for="group in imageGroups" :value="group.id" :key="group.id">
+              {{group.name}}
             </option>
           </b-select>
         </b-field>
-      </template>
+      </field>
 
     </template>
 
@@ -43,7 +42,7 @@
       <button class="button" type="button" @click="$emit('update:active', false)">
         {{$t('button-cancel')}}
       </button>
-      <button class="button is-link" :disabled="errors.any()">
+      <button class="button is-link" :disabled="!isValid">
         {{$t('button-save')}}
       </button>
     </template>
@@ -52,9 +51,12 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 
 import { ImageGroupCollection, ImageGroup, ImageGroupImageInstance } from '@/api';
+import { required, rules, validateForm } from '@/utils/form.js';
 
 export default {
   name: 'add-to-image-group-modal',
@@ -62,13 +64,18 @@ export default {
     active: { type: Boolean },
     image: { type: Object }
   },
-  components: { CytomineModal },
-  $_veeValidate: { validator: 'new' },
+  components: { CytomineModal, Field },
+  setup() {
+    const form = useForm({ defaultValues: { name: '', imageGroup: null } });
+    return {
+      form,
+      isValid: form.useStore(state => state.isValid),
+      requiredRule: { onChange: rules(required) }
+    };
+  },
   data() {
     return {
-      name: '',
       imageGroup: 'NEW',
-      selectedImageGroup: null,
       imageGroups: [],
       loading: true
     };
@@ -84,27 +91,28 @@ export default {
   watch: {
     active(val) {
       if (val) {
-        this.name = '';
+        this.form.reset({ name: '', imageGroup: null });
         this.imageGroup = 'NEW';
-        this.selectedImageGroup = null;
         this.fetchImageGroups(); // TODO: improve
       }
     }
   },
   methods: {
     async addToImageGroup() {
-      let result = await this.$validator.validateAll();
-      if (!result) {
+      if (!await validateForm(this.form)) {
         return;
       }
 
       try {
         let idImageGroup;
         if (this.imageGroup === 'NEW') {
-          let imageGroup = await new ImageGroup({ name: this.name, project: this.image.project }).save();
+          let imageGroup = await new ImageGroup({
+            name: this.form.state.values.name,
+            project: this.image.project
+          }).save();
           idImageGroup = imageGroup.id;
         } else if (this.imageGroup === 'EXISTING') {
-          idImageGroup = this.selectedImageGroup;
+          idImageGroup = this.form.state.values.imageGroup;
         }
 
         let link = await new ImageGroupImageInstance({ image: this.image.id, group: idImageGroup }).save();

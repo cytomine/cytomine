@@ -11,7 +11,7 @@
         backend-sorting
         :total="total"
         :per-page="perPage"
-        :current-page.sync="currentPage"
+        v-model:current-page="currentPage"
         :default-sort="[sortField, sortOrder]"
         pagination-size="is-small"
         @sort="onSort"

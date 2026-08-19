@@ -1,6 +1,6 @@
 <template>
   <b-table
-    :current-page.sync="currentPage"
+    v-model:current-page="currentPage"
     :data="taskRuns"
     :paginated="taskRuns.length > 5"
     :show-table="false"

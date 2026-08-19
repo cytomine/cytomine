@@ -19,11 +19,11 @@ import be.cytomine.utils.CommandResponse;
 public class AddCommand extends Command {
 
     public AddCommand(User currentUser) {
-        this.user = currentUser;
+        this.userId = currentUser.getId();
     }
 
     public AddCommand(User currentUser, Transaction transaction) {
-        this.user = currentUser;
+        this.userId = currentUser.getId();
         this.transaction = transaction;
     }
 

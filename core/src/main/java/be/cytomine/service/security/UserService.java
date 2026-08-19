@@ -896,11 +896,11 @@ public class UserService extends ModelService {
 
     @Override
     protected void beforeDelete(CytomineDomain domain) {
-        User user = (User) domain;
-        commandHistoryRepository.deleteAllByUser(user);
-        redoStackItemRepository.deleteAllByUser(user);
-        undoStackItemRepository.deleteAllByUser(user);
-        commandRepository.deleteAllByUser(user);
+        long userId = domain.getId();
+        commandHistoryRepository.deleteAllByUserId(userId);
+        redoStackItemRepository.deleteAllByUserId(userId);
+        undoStackItemRepository.deleteAllByUserId(userId);
+        commandRepository.deleteAllByUserId(userId);
     }
 
     protected void afterAdd(CytomineDomain domain, CommandResponse response) {

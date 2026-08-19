@@ -27,7 +27,7 @@ public class DeleteCommand extends Command {
     boolean linkProject = true;
 
     public DeleteCommand(User currentUser, Transaction transaction) {
-        this.user = currentUser;
+        this.userId = currentUser.getId();
         this.transaction = transaction;
     }
 

@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.meta.AttachedFile;
@@ -32,6 +32,7 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
@@ -62,7 +63,7 @@ import static org.springframework.security.acls.domain.BasePermission.ADMINISTRA
 @Transactional
 public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
-    private static WireMockServer wireMockServer;
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
     @Autowired
@@ -85,6 +86,10 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     private ImageInstanceService imageInstanceService;
     @Autowired
     private UserAnnotationService userAnnotationService;
+
+    @Autowired
+    private UserMapper userMapper;
+
     @Autowired
     private UrlApi urlApi;
     private Project project = null;
@@ -121,15 +126,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
-
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach
@@ -155,7 +152,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void userWithAtLeastReadPermissionCanListProjects() {
         assertThat(projectService.list(
-                userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get(),
+                userMapper.map(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get()),
                 new ProjectSearchExtension(),
                 new ArrayList<>(),
                 "created",

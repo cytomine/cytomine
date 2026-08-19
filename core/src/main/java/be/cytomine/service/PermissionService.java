@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.security.AclRepository;
 
@@ -96,16 +95,17 @@ public class PermissionService {
     }
 
     public void addPermission(CytomineDomain domain, String username, Permission permission) {
-        addPermission(domain, username, permission, currentUserService.getCurrentUser());
+        addPermission(domain, username, permission, currentUserService.getCurrentUser().username());
     }
 
-    public void addPermission(CytomineDomain domain, String username, Permission permission, User user) {
+    public void addPermission(CytomineDomain domain, String username, Permission permission,
+        String currentUserUsername) {
         if (!hasExactACLPermission(domain, username, permission)) {
             //get domain class id
             Long aclClassId = getAclClassId(domain);
 
             //get acl sid for current user (run request)
-            Long sidCurrentUser = getAclSid(user.getUsername());
+            Long sidCurrentUser = getAclSid(currentUserUsername);
 
             //get acl object id
             Long aclObjectIdentity = getAclObjectIdentity(domain, aclClassId, sidCurrentUser);

@@ -138,7 +138,10 @@ public class RestAnnotationDomainController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
         String filename = reportService.getAnnotationReportFileName(ReportType.GEOJSON.getLabel(), project.getName());
-        Map<String, Object> geoJson = annotationReportService.exportAnnotations(projectId);
+        Map<String, Object> geoJson = annotationReportService.exportAnnotations(
+            projectId,
+            currentUserService.getCurrentUser().getId()
+        );
 
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)

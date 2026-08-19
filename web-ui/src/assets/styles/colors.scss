@@ -1,9 +1,9 @@
-@import "bulma/sass/utilities";
+@import "bulma/sass/utilities/_all";
 
 $primary: #61b2e8;
-$primary-invert: bulmaFindColorInvert($primary);
+$primary-invert: findColorInvert($primary);
 $dark-primary: #2778ad;
-$dark-primary-invert: bulmaFindColorInvert($dark-primary);
+$dark-primary-invert: findColorInvert($dark-primary);
 
 // Setup $colors to use as bulma classes (e.g. 'is-twitter')
 $custom_colors: (

@@ -163,6 +163,7 @@ import { MyAccount, User } from '@/api';
 import { email, required, rules, validateForm } from '@/utils/form.js';
 import { rolesMapping } from '@/utils/role-utils';
 import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
+import { getKeycloak } from '@/keycloak.js';
 import copyToClipboard from 'copy-to-clipboard';
 import { formatMomentDate } from '@/utils/date';
 
@@ -201,8 +202,8 @@ export default {
     currentAccount: get('currentUser/account'),
     role() {
       // Guest > User > Admin
-      let key = this.$keycloak.hasResourceRole(KeycloakRole.ADMIN) ? UserRole.ADMIN
-        : this.$keycloak.hasResourceRole(KeycloakRole.USER) ? UserRole.USER : UserRole.GUEST;
+      let key = getKeycloak().hasResourceRole(KeycloakRole.ADMIN) ? UserRole.ADMIN
+        : getKeycloak().hasResourceRole(KeycloakRole.USER) ? UserRole.USER : UserRole.GUEST;
       return rolesMapping[key];
     },
 
@@ -239,7 +240,7 @@ export default {
     },
 
     updatePassword() {
-      this.$keycloak.login({ action: this.passwordCredentials.updateAction });
+      getKeycloak().login({ action: this.passwordCredentials.updateAction });
     },
 
 

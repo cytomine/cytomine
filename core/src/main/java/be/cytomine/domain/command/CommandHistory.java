@@ -23,6 +23,7 @@ public class CommandHistory extends CytomineDomain {
     @JoinColumn(name = "command_id", nullable = true)
     protected Command command;
 
+    @Column(name = "user_id")
     protected Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -74,7 +75,7 @@ public class CommandHistory extends CytomineDomain {
             "command", commandHistory.getCommand() != null ? commandHistory.getCommand().toJsonObject(urlApi) : null
         );
         returnArray.put("prefixAction", commandHistory.prefixAction);
-        returnArray.put("user", commandHistory.userId);
+        returnArray.put("user", commandHistory.getUserId());
         return returnArray;
     }
 

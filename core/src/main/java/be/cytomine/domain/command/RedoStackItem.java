@@ -1,5 +1,6 @@
 package be.cytomine.domain.command;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
@@ -21,6 +22,7 @@ public class RedoStackItem extends CytomineDomain {
     @JoinColumn(name = "command_id", nullable = false)
     protected Command command;
 
+    @Column(name = "user_id")
     protected Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -137,7 +137,7 @@ public class CommandService {
             //Its a transaction, many other command will be deleted
             List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user.getId(), transaction);
             for (UndoStackItem undoStack : undoStacks) {
-                //browse all command and undo it while its the same transaction
+                //browse all command and undo it while it's the same transaction
                 if (undoStack.getCommand().isRefuseUndo()) {
                     //undo delete project is not possible
                     //responseError(new ObjectNotFoundException("You cannot delete your last operation!"))

@@ -68,7 +68,7 @@ import App from './App.vue';
 Vue.config.productionTip = false;
 
 // Load configuration before initializing Keycloak
-axios.get('configuration.json').then(response => {
+axios.get('/configuration.json').then(response => {
   const settings = response.data;
   for (let i in settings) {
     if (Object.prototype.hasOwnProperty.call(constants, i)

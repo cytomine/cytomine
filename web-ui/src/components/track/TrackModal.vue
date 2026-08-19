@@ -7,10 +7,10 @@
         </b-field>
       </field>
 
-      <sketch-picker :value="color" @input="color = $event" :presetColors="presetColors" />
+      <sketch-picker v-model="color" :presetColors="presetColors" :disable-alpha="true" />
 
       <template #footer>
-        <button class="button" type="button" @click="$parent.close()">
+        <button class="button" type="button" @click="$emit('close')">
           {{$t('button-cancel')}}
         </button>
         <button class="button is-link" :disabled="!isValid">
@@ -23,7 +23,7 @@
 
 <script>
 import { Field, useForm } from '@tanstack/vue-form';
-import { Sketch } from 'vue-color';
+import { SketchPicker, tinycolor } from 'vue-color';
 
 import { Track } from '@/api';
 import { required, rules, validateForm } from '@/utils/form.js';
@@ -36,7 +36,7 @@ export default {
     image: Object
   },
   components: {
-    'sketch-picker': Sketch,
+    SketchPicker,
     CytomineModalCard,
     Field
   },
@@ -89,12 +89,12 @@ export default {
       try {
         let track = await new Track({
           name: this.form.state.values.name,
-          color: this.color.hex,
+          color: tinycolor(this.color).toHexString(),
           image: this.image.id
         }).save();
         this.$notify({ type: 'success', text: this.$t('notif-success-track-creation') });
         this.$emit('newTrack', track);
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-track-creation') });
@@ -102,13 +102,13 @@ export default {
     },
     async update() {
       let track = new Track(this.track);
-      track.color = this.color.hex;
+      track.color = tinycolor(this.color).toHexString();
       track.name = this.form.state.values.name;
       try {
         await track.save();
         this.$notify({ type: 'success', text: this.$t('notif-success-track-update') });
         this.$emit('updateTrack', track);
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-track-update') });
@@ -116,41 +116,22 @@ export default {
     }
   },
   created() {
-    this.color = { hex: this.track ? this.track.color : this.randomColor() };
+    this.color = this.track ? this.track.color : this.randomColor();
   }
 };
 </script>
 
 <style>
-  .track-modal .vc-sketch {
+  .track-modal .vc-sketch-picker {
     width: auto;
     box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   }
 
-  .track-modal .vc-sketch-active-color {
+  .track-modal .vc-sketch-picker .active-color {
     box-shadow: inset 0 0 0 1px rgba(10, 10, 10, 0.1);
   }
 
-  .track-modal .vc-sketch-saturation-wrap {
+  .track-modal .vc-sketch-picker .saturation {
     padding-bottom: 15vh;
-  }
-
-  /* hide alpha channel */
-  .track-modal .vc-sketch-field--single:last-child {
-    display: none;
-  }
-  /* --- */
-
-  .track-modal .vc-sketch-sliders {
-    display: flex;
-    align-items: center;
-  }
-
-  .track-modal .vc-sketch-hue-wrap {
-    flex-grow: 1;
-  }
-
-  .track-modal .vc-sketch-alpha-wrap {
-    display: none;
   }
 </style>

@@ -1,0 +1,40 @@
+.v-popper {
+  display: inline-block;
+}
+
+.v-popper__popper {
+  z-index: 1000;
+}
+
+.v-popper--theme-tooltip .v-popper__inner,
+.v-popper--theme-dropdown .v-popper__inner {
+  background: white;
+  color: inherit;
+  border-radius: 5px;
+  padding: 0.5rem 1rem 0.4rem;
+  box-shadow: 0 0 3px hsla(0, 0%, 4%, .1), 0 0 0 1px hsla(0, 0%, 4%, .1);
+  font-size: 0.85rem;
+  max-width: 50vw;
+  max-height: 80vh;
+  overflow: auto;
+}
+
+.v-popper--theme-dropdown .v-popper__inner {
+  min-width: 50px;
+  min-height: 2rem;
+}
+
+.v-popper--theme-tooltip .v-popper__arrow-outer,
+.v-popper--theme-dropdown .v-popper__arrow-outer {
+  border-color: hsla(0, 0%, 4%, .25);
+}
+
+.v-popper--theme-tooltip .v-popper__arrow-inner,
+.v-popper--theme-dropdown .v-popper__arrow-inner {
+  visibility: visible;
+  border-color: white;
+}
+
+.v-popper--theme-tooltip.v-popper__popper {
+  pointer-events: none;
+}

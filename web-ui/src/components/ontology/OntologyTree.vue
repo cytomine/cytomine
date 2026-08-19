@@ -1,41 +1,51 @@
 <template>
 <div class="ontology-tree" :class="{selector: allowSelection, draggable: allowDrag, editable: allowEdition}">
-  <sl-vue-tree :value="treeNodes" @input="treeNodes = $event" :allowMultiselect="false" @select="select" @drop="drop" ref="tree">
-    <template #toggle="{node}">
-      <template v-if="!node.data.hidden && !node.isLeaf && node.children.length > 0">
-        <i :class="['tree-toggle', 'fas', node.isExpanded ? 'fa-angle-down' : 'fa-angle-right']"></i>
-      </template>
-      <div class="sl-vue-tree-gap"></div>
-    </template>
+  <Draggable
+    ref="tree"
+    :key="treeKey"
+    v-model="treeNodes"
+    children-key="children"
+    :indent="20"
+    :default-open="true"
+    :disable-drag="!allowDrag"
+    @after-drop="onAfterDrop"
+    v-slot="{ node, stat, indentStyle }"
+  >
+    <div v-if="!node.hidden" class="tree-node-item" :class="{'is-selected': isSelected(node)}" :style="indentStyle">
+      <span class="tree-toggle-wrap" @click.stop="stat.open = !stat.open">
+        <i
+          v-if="stat.children.length > 0"
+          :class="['tree-toggle', 'fas', stat.open ? 'fa-angle-down' : 'fa-angle-right']"
+        ></i>
+      </span>
 
-    <template #title="{node}">
-      <div v-if="!node.data.hidden" class="tree-selector">
+      <div class="tree-selector" @click="toggleSelect(node)">
         <i class="tree-checkbox"
           v-if="allowSelection"
           :class="classNames(node)">
         </i>
-        <cytomine-term :term="node.data" />
+        <cytomine-term :term="node" />
       </div>
-      <div v-else></div>
-    </template>
 
-    <template #sidebar="{node}">
-      <slot v-if="!node.data.hidden" name="custom-sidebar" :term="node.data">
-        <div v-if="allowEdition" class="buttons">
-          <button class="button is-small" @click="startTermUpdate(node)">
-            <span class="icon is-small">
-              <i class="fas fa-edit"></i>
-            </span>
-          </button>
-          <button class="button is-small" @click="confirmTermDeletion(node)" :data-delete-term="node.data.name">
-            <span class="icon is-small">
-              <i class="far fa-trash-alt"></i>
-            </span>
-          </button>
-        </div>
-      </slot>
-    </template>
-  </sl-vue-tree>
+      <div class="tree-sidebar">
+        <slot name="custom-sidebar" :term="node">
+          <div v-if="allowEdition" class="buttons">
+            <button class="button is-small" @click.stop="startTermUpdate(node)">
+              <span class="icon is-small">
+                <i class="fas fa-edit"></i>
+              </span>
+            </button>
+            <button class="button is-small" @click.stop="confirmTermDeletion(node)" :data-delete-term="node.name">
+              <span class="icon is-small">
+                <i class="far fa-trash-alt"></i>
+              </span>
+            </button>
+          </div>
+        </slot>
+      </div>
+    </div>
+    <div v-else></div>
+  </Draggable>
 
   <slot v-if="noResult" name="no-result">
     <em class="has-text-grey no-result">{{$t('no-result')}}</em>
@@ -49,7 +59,10 @@
 </template>
 
 <script>
-import SlVueTree from 'sl-vue-tree';
+import { Draggable, dragContext } from '@he-tree/vue';
+
+Draggable.compatConfig = { MODE: 3 };  // TODO: remove when removing @vue/compat
+
 import CytomineTerm from './CytomineTerm.vue';
 import TermModal from './TermModal.vue';
 import { Term } from '@/api';
@@ -72,12 +85,13 @@ export default {
     hiddenNodes: { type: Array, default: () => [] }
   },
   components: {
-    SlVueTree,
-    CytomineTerm
+    CytomineTerm,
+    Draggable,
   },
   data() {
     return {
       treeNodes: [],
+      treeKey: 0,
       internalSelectedNodes: [],
       editedNode: null
     };
@@ -87,7 +101,7 @@ export default {
       return getWildcardRegexp(this.searchString);
     },
     noResult() {
-      return this.treeNodes.every(node => node.data.hidden);
+      return this.treeNodes.every(node => node.hidden);
     }
   },
   watch: {
@@ -99,7 +113,6 @@ export default {
     },
     selectedNodes() {
       this.internalSelectedNodes = this.selectedNodes.slice();
-      this.refreshNodeSelection();
     },
     regexp() {
       this.filter();
@@ -110,11 +123,12 @@ export default {
   },
   methods: {
     makeTree() {
-      let nodes = (this.ontology) ? this.createSubTree(this.ontology.children.array.slice()) : [];
+      let nodes = (this.ontology && this.ontology.children) ? this.createSubTree(this.ontology.children.array.slice()) : [];
       let additionalNodes = this.createSubTree(this.additionalNodes.slice());
       this.treeNodes = this.startWithAdditionalNodes ? additionalNodes.concat(nodes) : nodes.concat(additionalNodes);
 
       this.filter();
+      this.treeKey++;
     },
 
     createSubTree(terms) {
@@ -123,89 +137,78 @@ export default {
 
     createNode(term) {
       return {
-        title: term.name,
-        isLeaf: false, // all terms can be used as parent for drag and drop
-        isDraggable: this.allowDrag,
-        isExpanded: true,
-        isSelected: this.internalSelectedNodes.includes(term.id),
-        data: {
-          id: term.id,
-          name: term.name,
-          color: term.color,
-          parent: term.parent,
-          ontology: (this.ontology) ? this.ontology.id : null,
-          hidden: false
-        },
+        id: term.id,
+        name: term.name,
+        color: term.color,
+        parent: term.parent,
+        ontology: (this.ontology) ? this.ontology.id : null,
+        hidden: false,
         children: term.children && term.children.length > 0 ? this.createSubTree(term.children) : []
       };
     },
 
     filter() {
       this.applyToAllNodes(node => {
-        let match = this.regexp.test(node.title) && !this.hiddenNodes.includes(node.data.id);
-        if (node.children) {
-          let matchInChildren = node.children.some(child => !child.data.hidden); // OK because applyToAllNodes performs bottom-up operations
-          node.isExpanded = matchInChildren;
+        let match = this.regexp.test(node.name) && !this.hiddenNodes.includes(node.id);
+        if (node.children && node.children.length > 0) {
+          let matchInChildren = node.children.some(child => !child.hidden); // OK because applyToAllNodes performs bottom-up operations
           match = match || matchInChildren;
         }
-        node.data.hidden = !match;
+        node.hidden = !match;
       });
+      this.refreshExpansion();
+    },
+
+    refreshExpansion() {
+      let tree = this.$refs.tree;
+      if (!tree || !tree.statsFlat) {
+        return;
+      }
+      tree.statsFlat.forEach(stat => {
+        if (stat.children.length > 0) {
+          stat.open = stat.children.some(child => !child.data.hidden);
+        }
+      });
+    },
+
+    isSelected(node) {
+      return node.id != null && this.internalSelectedNodes.includes(node.id);
     },
 
     classNames(node) {
+      let selected = this.isSelected(node);
       if (this.multipleSelection) {
-        return node.isSelected ? ['fas', 'fa-check-square'] : ['far', 'fa-square'];
+        return selected ? ['fas', 'fa-check-square'] : ['far', 'fa-square'];
       } else {
-        return node.isSelected ? ['fas', 'fa-dot-circle'] : ['far', 'fa-circle'];
+        return selected ? ['fas', 'fa-dot-circle'] : ['far', 'fa-circle'];
       }
     },
 
-    select(nodes, event) {
+    toggleSelect(node) {
       if (!this.allowSelection) {
         return;
       }
 
-      if (this.clickOnTreeSelector(event.target)) {
-        nodes.forEach(node => {
-          if (this.multipleSelection) {
-            let indexSelected = this.internalSelectedNodes.indexOf(node.data.id);
-            if (indexSelected >= 0) {
-              this.internalSelectedNodes.splice(indexSelected, 1);
-              this.$emit('unselect', node.data.id);
-            } else {
-              this.internalSelectedNodes.push(node.data.id);
-              this.$emit('select', node.data.id);
-            }
-          } else {
-            if (this.internalSelectedNodes.includes(node.data.id)) {
-              this.internalSelectedNodes = [];
-            } else {
-              this.internalSelectedNodes = [node.data.id];
-            }
-
-            this.$emit('select', node.data.id);
-          }
-        });
-        this.$emit('update:selectedNodes', this.internalSelectedNodes);
+      if (this.multipleSelection) {
+        let indexSelected = this.internalSelectedNodes.indexOf(node.id);
+        if (indexSelected >= 0) {
+          this.internalSelectedNodes.splice(indexSelected, 1);
+          this.$emit('unselect', node.id);
+        } else {
+          this.internalSelectedNodes.push(node.id);
+          this.$emit('select', node.id);
+        }
+      } else {
+        if (this.internalSelectedNodes.includes(node.id)) {
+          this.internalSelectedNodes = [];
+        } else {
+          this.internalSelectedNodes = [node.id];
+        }
+        this.$emit('select', node.id);
       }
+      this.$emit('update:selectedNodes', this.internalSelectedNodes);
+    },
 
-      this.refreshNodeSelection();
-    },
-    refreshNodeSelection() {
-      if (!this.allowSelection) {
-        return;
-      }
-
-      this.applyToAllNodes(node => {
-        node.isSelected = this.internalSelectedNodes.some(id => id === node.data.id);
-      });
-    },
-    clickOnTreeSelector(elem) {
-      if (elem.classList.contains('tree-selector')) {
-        return true;
-      }
-      return elem.parentElement ? this.clickOnTreeSelector(elem.parentElement) : false;
-    },
     applyToAllNodes(fct, nodes = this.treeNodes) {
       nodes.forEach(node => {
         if (node.children) {
@@ -215,12 +218,40 @@ export default {
       });
     },
 
+    async onAfterDrop() {
+      let dragNode = dragContext.dragNode;
+      if (!dragNode) {
+        return;
+      }
+      let node = dragNode.data;
+      let newParentId = dragNode.parent ? dragNode.parent.data.id : null;
+
+      if ((node.parent ?? null) === newParentId) {
+        this.$notify({ type: 'warn', text: this.$t('notif-warn-ontology-tree-order-not-persisted') });
+        return;
+      }
+
+      try {
+        await new Term({
+          id: node.id,
+          name: node.name,
+          color: node.color,
+          parent: node.parent,
+          ontology: node.ontology
+        }).changeParent(newParentId);
+        node.parent = newParentId;
+      } catch (error) {
+        console.log(error);
+        this.$notify({ type: 'error', text: this.$t('notif-error-ontology-tree-update') });
+      }
+    },
+
     startTermCreation() {
       this.editedNode = null;
       this.openModal();
     },
     createTerm(term) {
-      this.treeNodes.push(this.createNode(term));
+      this.$refs.tree.add(this.createNode(term));
       this.$emit('newTerm', term);
     },
 
@@ -229,15 +260,14 @@ export default {
       this.openModal();
     },
     updateTerm(term) {
-      this.$refs.tree.updateNode(this.editedNode.path, { data: { ...term } });
+      Object.assign(this.editedNode, { name: term.name, color: term.color });
     },
 
     openModal() {
       this.$buefy.modal.open({
-        parent: this,
         component: TermModal,
         props: {
-          term: this.editedNode ? this.editedNode.data : null,
+          term: this.editedNode ? this.editedNode : null,
           ontology: this.ontology
         },
         events: {
@@ -248,31 +278,10 @@ export default {
       });
     },
 
-    drop(nodes, position) {
-      nodes.forEach(async node => {
-        let idParent = (position.placement === 'inside') ? position.node.data.id : position.node.data.parent;
-        if (node.data.parent !== idParent) {
-          try {
-            await new Term(node.data).changeParent(idParent);
-            this.applyToAllNodes(tmp => {
-              if (tmp.data.id === node.data.id) {
-                tmp.data.parent = idParent;
-              }
-            });
-          } catch (error) {
-            console.log(error);
-            this.$notify({ type: 'error', text: this.$t('notif-error-ontology-tree-update') });
-          }
-        } else {
-          this.$notify({ type: 'warn', text: this.$t('notif-warn-ontology-tree-order-not-persisted') });
-        }
-      });
-    },
-
     confirmTermDeletion(node) {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
-        message: this.$t('confirm-deletion-term', { name: node.data.name }),
+        message: this.$t('confirm-deletion-term', { name: node.name }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -281,8 +290,8 @@ export default {
     },
     async deleteTerm(node) {
       try {
-        await Term.delete(node.data.id);
-        this.$refs.tree.remove([node.path]);
+        await Term.delete(node.id);
+        this.$refs.tree.remove(this.$refs.tree.getStat(node));
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-term-deletion') });
@@ -310,35 +319,56 @@ export default {
   padding: 0 0 2px 0;
 }
 
+.ontology-tree .tree-node-item {
+  display: flex;
+  align-items: center;
+  line-height: 2.2;
+  font-size: 0.9rem;
+}
+
+.ontology-tree .tree-toggle-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.ontology-tree.selector .tree-toggle-wrap {
+  width: 24px;
+}
+
+.ontology-tree .tree-toggle {
+  cursor: pointer;
+}
+
 .ontology-tree .tree-checkbox {
   margin-right: 10px;
   color: rgba(0, 0, 0, 0.2);
   font-size: 1rem;
 }
 
-.ontology-tree.selector .sl-vue-tree-node-item:hover {
+.ontology-tree.selector .tree-node-item:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
-.ontology-tree.selector .sl-vue-tree-selected > .sl-vue-tree-node-item {
+.ontology-tree.selector .tree-node-item.is-selected {
   background: rgba(0, 0, 0, 0.05);
   font-weight: 600;
 }
 
-.ontology-tree .sl-vue-tree-selected > .sl-vue-tree-node-item .tree-checkbox {
+.ontology-tree .tree-node-item.is-selected .tree-checkbox {
   color: #61b2e8;
-}
-
-.ontology-tree.selector .sl-vue-tree-gap {
-  width: 24px;
 }
 
 .ontology-tree.selector .tree-selector {
   cursor: pointer;
-  flex-grow: 1;
 }
 
 .ontology-tree .tree-selector {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
   min-width: 0; /* to allow correct handling of overflow-wrap */
 }
 
@@ -356,13 +386,10 @@ export default {
   margin-bottom: 0 !important;
 }
 
-.ontology-tree.editable .sl-vue-tree-sidebar {
+.ontology-tree.editable .tree-sidebar {
   width: 100px;
   padding-left: 20px;
   flex-shrink: 0;
-}
-
-.ontology-tree.editable .sl-vue-tree-sidebar {
   display: flex;
   align-items: top;
 }

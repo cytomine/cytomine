@@ -16,7 +16,7 @@
       v-if="terms && terms.length > 0"
       class="buttons has-addons are-small term-selection"
       :class="{'has-preview': termsToAssociate.length > 0}"
-      v-click-outside="() => showTermSelector = false"
+      v-on-click-outside="() => showTermSelector = false"
     >
       <button
         v-tooltip="$t('terms-new-annotation')"
@@ -46,7 +46,7 @@
       v-if="tracks && maxRank > 1"
       class="buttons has-addons are-small track-selection"
       :class="{'has-preview': tracksToAssociate.length > 0}"
-      v-click-outside="() => showTrackSelector = false"
+      v-on-click-outside="() => showTrackSelector = false"
     >
       <button
         v-tooltip="$t('tracks-new-annotation')"
@@ -339,7 +339,7 @@
     >
       <span class="icon is-small"><i class="fas fa-paste"></i></span>
     </button>
-    <div class="special-paste-selection" v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
+    <div class="special-paste-selection" v-on-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
       <button
         :disabled="disabledPaste"
         v-tooltip="$t('paste-repeat')"
@@ -370,7 +370,7 @@
 
       </div>
     </div>
-    <div class="special-paste-selection" v-click-outside="() => showPasteAndLinkModal = false" v-if="isInImageGroup">
+    <div class="special-paste-selection" v-on-click-outside="() => showPasteAndLinkModal = false" v-if="isInImageGroup">
       <button
         :disabled="disabledPaste || !linkableCopiedAnnot"
         v-tooltip="$t('paste-with-link')"
@@ -387,7 +387,7 @@
 
   <div class="buttons has-addons are-small"
        v-if="isInImageGroup && (isToolDisplayed('link') || isToolDisplayed('unlink'))">
-    <div class="special-paste-selection" v-click-outside="() => showAnnotationLinkSelector = false">
+    <div class="special-paste-selection" v-on-click-outside="() => showAnnotationLinkSelector = false">
       <button
           :disabled="isToolDisabled('link')"
           v-tooltip="$t('link')"
@@ -784,7 +784,6 @@ export default {
     openPasteWithLinkModal() {
       this.$buefy.modal.open({
         component: PasteAnnotationWithLinkModal,
-        parent: this,
         hasModalCard: true,
         props: {
           index: this.index
@@ -1368,7 +1367,7 @@ $colorActiveIcon: #fff;
       padding: 0.75em 0;
     }
 
-    .sl-vue-tree-sidebar {
+    .tree-sidebar {
       margin-right: 1.5em;
     }
   }

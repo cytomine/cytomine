@@ -7,10 +7,10 @@
       </b-field>
     </field>
 
-    <sketch-picker :value="color" @input="color = $event" :presetColors="presetColors" />
+    <sketch-picker v-model="color" :presetColors="presetColors" :disable-alpha="true" />
 
     <template #footer>
-      <button class="button" type="button" @click="$parent.close()">
+      <button class="button" type="button" @click="$emit('close')">
         {{$t('button-cancel')}}
       </button>
       <button class="button is-link" :disabled="!isValid">
@@ -23,7 +23,7 @@
 
 <script>
 import { Field, useForm } from '@tanstack/vue-form';
-import { Sketch } from 'vue-color';
+import { SketchPicker, tinycolor } from 'vue-color';
 
 import { Term } from '@/api';
 import { required, rules, validateForm } from '@/utils/form.js';
@@ -36,7 +36,7 @@ export default {
     ontology: Object
   },
   components: {
-    'sketch-picker': Sketch,
+    SketchPicker,
     CytomineModalCard,
     Field
   },
@@ -89,12 +89,12 @@ export default {
       try {
         let term = await new Term({
           name: this.form.state.values.name,
-          color: this.color.hex,
+          color: tinycolor(this.color).toHexString(),
           ontology: this.ontology.id
         }).save();
         this.$notify({ type: 'success', text: this.$t('notif-success-term-creation') });
         this.$emit('newTerm', term);
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-term-creation') });
@@ -102,13 +102,13 @@ export default {
     },
     async update() {
       let term = new Term(this.term);
-      term.color = this.color.hex;
+      term.color = tinycolor(this.color).toHexString();
       term.name = this.form.state.values.name;
       try {
         await term.save();
         this.$notify({ type: 'success', text: this.$t('notif-success-term-update') });
         this.$emit('updateTerm', term);
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-term-update') });
@@ -116,41 +116,22 @@ export default {
     }
   },
   created() {
-    this.color = { hex: this.term ? this.term.color : this.randomColor() };
+    this.color = this.term ? this.term.color : this.randomColor();
   }
 };
 </script>
 
 <style>
-.term-modal .vc-sketch {
+.term-modal .vc-sketch-picker {
   width: auto;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
 }
 
-.term-modal .vc-sketch-active-color {
+.term-modal .vc-sketch-picker .active-color {
   box-shadow: inset 0 0 0 1px rgba(10, 10, 10, 0.1);
 }
 
-.term-modal .vc-sketch-saturation-wrap {
+.term-modal .vc-sketch-picker .saturation {
   padding-bottom: 15vh;
-}
-
-/* hide alpha channel */
-.term-modal .vc-sketch-field--single:last-child {
-  display: none;
-}
-/* --- */
-
-.term-modal .vc-sketch-sliders {
-  display: flex;
-  align-items: center;
-}
-
-.term-modal .vc-sketch-hue-wrap {
-  flex-grow: 1;
-}
-
-.term-modal .vc-sketch-alpha-wrap {
-  display: none;
 }
 </style>

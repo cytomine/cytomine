@@ -1,8 +1,8 @@
 <template>
-<v-popover
+<VDropdown
   placement="right"
-  trigger="manual"
-  :open="opened"
+  :triggers="[]"
+  :shown="opened"
   :auto-hide="false"
 > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
@@ -23,9 +23,9 @@
     </template>
   </div>
 
-  <template #popover>
+  <template #popper>
     <annotation-details
-      v-click-outside.capture="(event) => close(event)"
+      v-on-click-outside="(event) => close(event)"
       :annotation="annot"
       :terms="terms"
       :users="users"
@@ -44,7 +44,7 @@
     /> <!-- Display component only if it is the currently displayed annotation
             (prevents fetching unnecessary information) -->
   </template>
-</v-popover>
+</VDropdown>
 </template>
 
 <script>

@@ -293,7 +293,6 @@ export default {
       this.refreshData();
       this.addImageGroupModal = false;
       this.$buefy.modal.open({
-        parent: this,
         component: AddToImageGroupModal,
         hasModalCard: true,
         props: { imageGroup, programmatic: true, active: true },

@@ -1,19 +1,16 @@
 <template>
   <div class="annotation-details-playground" ref="playground">
-    <vue-draggable-resizable
-      v-if="selectedFeature && selectedFeature.properties && reload"
+    <div
+      v-if="selectedFeature && selectedFeature.properties"
       v-show="displayAnnotDetails"
-      class="draggable"
-      :parent="true"
-      :resizable="false"
-      drag-handle=".drag"
-      @dragstop="dragStop"
-      :w="width" h='auto' :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
       ref="detailsPanel"
+      class="draggable"
+      :class="{ dragging: isDragging }"
+      :style="[dragStyle, { width: width + 'px' }]"
     >
       <div class="actions">
         <h1>{{ $t('current-selection') }}</h1>
-        <button class="drag button is-small close">
+        <button class="drag button is-small close" ref="dragHandle">
           <i class="fas fa-arrows-alt"></i>
         </button>
         <button class="button is-small close" @click="displayAnnotDetails = false">
@@ -64,14 +61,16 @@
         :images="images"
         @select="$emit('select', $event)"
       />
-    </vue-draggable-resizable>
+    </div>
   </div>
 </template>
 
 <script>
+import { ref, getCurrentInstance } from 'vue';
+import { useDraggable } from '@vueuse/core';
+
 import eventBus from '@/utils/event-bus';
 
-import VueDraggableResizable from 'vue-draggable-resizable';
 import { Cytomine, UserCollection } from '@/api';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails.vue';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
@@ -83,16 +82,29 @@ export default {
     AnnotationDetails,
     AnnotationLinksPreview,
     AnnotationSimpleDetails,
-    VueDraggableResizable,
   },
   props: {
     index: String,
+  },
+  setup() {
+    const instance = getCurrentInstance();
+    const playground = ref(null);
+    const detailsPanel = ref(null);
+    const dragHandle = ref(null);
+    const { x: dragX, y: dragY, style: dragStyle, isDragging } = useDraggable(detailsPanel, {
+      handle: dragHandle,
+      containerElement: playground,
+      initialValue: () => instance.proxy.positionAnnotDetails ?? { x: 0, y: 0 },
+      onEnd: ({ x, y }) => {
+        instance.proxy.positionAnnotDetails = { x, y };
+      },
+    });
+    return { playground, detailsPanel, dragHandle, dragX, dragY, dragStyle, isDragging };
   },
   data() {
     return {
       width: 320,
       projectUsers: [],
-      reload: true,
       showComments: false
     };
   },
@@ -178,28 +190,18 @@ export default {
       this.projectUsers = (await collection.fetchAll()).array;
     },
 
-    dragStop(x, y) {
-      this.positionAnnotDetails = { x, y };
-    },
-
     async handleResize() {
       await this.$nextTick(); // wait for update of clientWidth and clientHeight to their new values
 
-      if (this.$refs.playground) {
-        let maxX = Math.max(this.$refs.playground.clientWidth - this.width, 0);
-        let height = 500;
-        if (this.$refs.detailsPanel) {
-          height = this.$refs.detailsPanel.height;
-        }
-        let maxY = Math.max(this.$refs.playground.clientHeight - height, 0);
+      if (this.playground) {
+        let maxX = Math.max(this.playground.clientWidth - this.width, 0);
+        let height = this.detailsPanel ? this.detailsPanel.offsetHeight : 500;
+        let maxY = Math.max(this.playground.clientHeight - height, 0);
         let x = Math.min(this.positionAnnotDetails.x, maxX);
         let y = Math.min(this.positionAnnotDetails.y, maxY);
         this.positionAnnotDetails = { x, y };
-
-        // HACK to force the component to recreate and take into account new (x,y) ; should no longer be
-        // necessary with version 2 of vue-draggable-resizable
-        this.reload = false;
-        this.$nextTick(() => this.reload = true);
+        this.dragX = x;
+        this.dragY = y;
       }
     },
     async searchSimilarAnnotations() {
@@ -244,6 +246,7 @@ export default {
 }
 
 .draggable {
+  position: absolute;
   background: #f2f2f2;
   display: flex;
   flex-direction: column;

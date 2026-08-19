@@ -1,5 +1,5 @@
 <template>
-<div :class="['navbar-item', 'search', displayResults ? 'is-active' : '']" v-click-outside="deactivate">
+<div :class="['navbar-item', 'search', displayResults ? 'is-active' : '']" v-on-click-outside="deactivate">
   <b-field class="no-margin" :type="error ? 'is-danger' : null">
     <b-input
       class="global-search"

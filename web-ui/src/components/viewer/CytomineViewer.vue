@@ -24,9 +24,6 @@
         </div>
 
         <ImageSelector />
-
-        <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
-        <div class="hidden" v-shortkey.once="shortkeysMapping" @shortkey="shortkeyEvent"></div>
       </div>
 
       <AppBottomDrawer />
@@ -46,7 +43,8 @@ import AppBottomDrawer from '@/components/appengine/AppBottomDrawer.vue';
 import viewerModuleModel from '@/store/modules/project_modules/viewer';
 
 import constants from '@/utils/constants.js';
-import shortcuts from '@/utils/shortcuts.js';
+import { viewerShortkeys } from '@/utils/shortcuts.js';
+import useShortkeys from '@/utils/use-shortkeys.js';
 
 import { ImageInstance, SliceInstance, Annotation } from '@/api';
 
@@ -56,6 +54,9 @@ export default {
     AppBottomDrawer,
     CytomineImage,
     ImageSelector,
+  },
+  setup() {
+    useShortkeys(viewerShortkeys, srcKey => eventBus.emit('shortkeyEvent', srcKey));
   },
   data() {
     return {
@@ -115,29 +116,6 @@ export default {
     },
     elementWidth() {
       return 100 / this.nbHorizontalCells;
-    },
-    shortkeysMapping() {
-      let allowed = ['nav-next-image', 'nav-previous-image', 'nav-next-slice', 'nav-previous-slice', 'nav-next-t',
-        'nav-previous-t', 'nav-next-c', 'nav-previous-c', 'nav-first-slice', 'nav-last-slice', 'nav-first-t',
-        'nav-last-t', 'nav-first-z', 'nav-last-z', 'nav-first-c', 'nav-last-c', 'nav-next-image-in-group',
-        'nav-previous-image-in-group', 'nav-next-annot-link', 'nav-previous-annot-link',
-        'tool-select', 'tool-point', 'tool-line', 'tool-freehand-line', 'tool-rectangle', 'tool-circle', 'tool-polygon',
-        'tool-freehand-polygon', 'tool-screenshot', 'tool-fill', 'tool-correct-add', 'tool-correct-remove', 'tool-modify', 'tool-rescale',
-        'tool-move', 'tool-rotate', 'tool-delete', 'tool-undo', 'tool-redo', 'tool-review-accept', 'tool-review-reject',
-        'toggle-review-layer', 'toggle-all-review-layer', 'toggle-selected-layers', 'toggle-all-selected-layers',
-        'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-information',
-        'toggle-zoom', 'toggle-filters', 'toggle-layers', 'toggle-ontology', 'toggle-properties', 'toggle-broadcast',
-        'toggle-review', 'toggle-overview', 'toggle-annotations', 'toggle-current', 'toggle-add-image', 'toggle-link',
-        'nav-next-z', 'nav-previous-z', 'tool-copy', 'tool-paste', 'tool-review-reject', 'tool-review-toggle',
-        'tool-go-to-slice-t', 'tool-go-to-slice-z', 'tool-go-to-slice-c', 'toggle-all-information', 'toggle-all-zoom',
-        'toggle-all-filters', 'toggle-all-layers', 'toggle-all-ontology', 'toggle-all-properties',
-        'toggle-all-broadcast', 'toggle-all-review', 'toggle-all-overview', 'toggle-all-annotations',
-        'toggle-all-current', 'toggle-all-link'];
-
-      return Object.keys(shortcuts).filter(key => allowed.includes(key.replace('viewer-', ''))).reduce((object, key) => {
-        object[key.replace('viewer-', '')] = shortcuts[key];
-        return object;
-      }, {});
     }
   },
   watch: {
@@ -294,9 +272,6 @@ export default {
       }
     },
 
-    shortkeyEvent(event) {
-      eventBus.emit('shortkeyEvent', event.srcKey);
-    },
   },
   async created() {
     this.findIdViewer();

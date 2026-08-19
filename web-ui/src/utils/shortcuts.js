@@ -3,8 +3,7 @@ import { detect } from 'detect-browser';
 const browser = detect();
 const shortkey = (browser && browser.os === 'Mac OS') ? 'meta' : 'ctrl';
 
-// Key list reference: https://github.com/iFgR/vue-shortkey#key-list
-export default Object.freeze({
+const shortcuts = Object.freeze({
   'general-close-modal': ['esc'], // Handled by Bulma
   'general-shortcuts-modal': ['shift', '?'],
   // 'navbar-dashboard': ['g', 'd'],
@@ -110,3 +109,93 @@ export default Object.freeze({
   'text-editor-italic': [shortkey, 'i'], // Handled by Quill editor
   'text-editor-underline': [shortkey, 'u'], // Handled by Quill editor
 });
+
+export default shortcuts;
+
+const VIEWER_SHORTKEYS = [
+  'nav-first-c',
+  'nav-first-slice',
+  'nav-first-t',
+  'nav-first-z',
+  'nav-last-c',
+  'nav-last-slice',
+  'nav-last-t',
+  'nav-last-z',
+  'nav-next-annot-link',
+  'nav-next-c',
+  'nav-next-image',
+  'nav-next-image-in-group',
+  'nav-next-slice',
+  'nav-next-t',
+  'nav-next-z',
+  'nav-previous-annot-link',
+  'nav-previous-c',
+  'nav-previous-image',
+  'nav-previous-image-in-group',
+  'nav-previous-slice',
+  'nav-previous-t',
+  'nav-previous-z',
+  'toggle-add-image',
+  'toggle-all-annotations',
+  'toggle-all-broadcast',
+  'toggle-all-current',
+  'toggle-all-filters',
+  'toggle-all-information',
+  'toggle-all-layers',
+  'toggle-all-link',
+  'toggle-all-ontology',
+  'toggle-all-overview',
+  'toggle-all-properties',
+  'toggle-all-review',
+  'toggle-all-review-layer',
+  'toggle-all-selected-layers',
+  'toggle-all-zoom',
+  'toggle-annotations',
+  'toggle-broadcast',
+  'toggle-current',
+  'toggle-filters',
+  'toggle-information',
+  'toggle-layers',
+  'toggle-link',
+  'toggle-ontology',
+  'toggle-overview',
+  'toggle-properties',
+  'toggle-review',
+  'toggle-review-layer',
+  'toggle-selected-layers',
+  'toggle-zoom',
+  'tool-circle',
+  'tool-copy',
+  'tool-correct-add',
+  'tool-correct-remove',
+  'tool-delete',
+  'tool-fill',
+  'tool-freehand-line',
+  'tool-freehand-polygon',
+  'tool-go-to-slice-c',
+  'tool-go-to-slice-t',
+  'tool-go-to-slice-z',
+  'tool-line',
+  'tool-modify',
+  'tool-move',
+  'tool-paste',
+  'tool-point',
+  'tool-polygon',
+  'tool-rectangle',
+  'tool-redo',
+  'tool-rescale',
+  'tool-review-accept',
+  'tool-review-reject',
+  'tool-review-toggle',
+  'tool-rotate',
+  'tool-screenshot',
+  'tool-select',
+  'tool-undo',
+];
+
+export const viewerShortkeys = Object.keys(shortcuts)
+  .filter(key => VIEWER_SHORTKEYS.includes(key.replace('viewer-', '')))
+  .reduce((object, key) => {
+    object[key.replace('viewer-', '')] = shortcuts[key];
+    return object;
+  }, {});

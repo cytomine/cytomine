@@ -24,7 +24,7 @@
   </field>
 
   <template #footer>
-    <button class="button" @click="$parent.close()">
+    <button class="button" @click="$emit('close')">
       {{$t('button-cancel')}}
     </button>
     <button class="button is-link" :disabled="!selectedFile || !isValid" @click="save()">
@@ -80,7 +80,7 @@ export default {
         ).save();
         this.$emit('addAttachedFile', attached);
         this.$notify({ type: 'success', text: this.$t('notif-success-attached-file-creation') });
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-attached-file-creation') });

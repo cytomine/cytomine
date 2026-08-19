@@ -63,7 +63,7 @@
               @click="removeTerm(term.id, user.id)">
             </button>
           </b-tag>
-          <div class="add-term-wrapper" v-if="canEditTerms" v-click-outside="() => showTermSelector = false">
+          <div class="add-term-wrapper" v-if="canEditTerms" v-on-click-outside="() => showTermSelector = false">
             <b-field>
               <b-input
                 size="is-small"
@@ -101,7 +101,7 @@
                     @click="removeTrack(track.id)">
             </button>
           </b-tag>
-          <div class="add-track-wrapper" v-if="canEditTerms" v-click-outside="() => showTrackSelector = false">
+          <div class="add-track-wrapper" v-if="canEditTerms" v-on-click-outside="() => showTrackSelector = false">
             <b-field>
               <b-input
                 size="is-small"
@@ -520,7 +520,6 @@ export default {
 
     openCommentsModal() {
       this.$buefy.modal.open({
-        parent: this,
         component: AnnotationCommentsModal,
         props: { annotation: this.annotation, comments: this.comments },
         hasModalCard: true,
@@ -542,7 +541,6 @@ export default {
 
     openProfileModal(spatialAxis) {
       this.$buefy.modal.open({
-        parent: this,
         component: ProfileModal,
         props: { annotation: this.annotation, image: this.image, spatialAxis },
         hasModalCard: true
@@ -650,7 +648,7 @@ a.is-fullwidth {
   margin-top: 4px;
 }
 
-:deep(.sl-vue-tree-node-item) {
+:deep(.tree-node-item) {
   font-size: 0.9em;
 }
 

@@ -6,10 +6,10 @@ import ImageControlsShiftButtons from '@/components/viewer/ImageControlsShiftBut
 describe('ImageControlsShiftButtons.vue', () => {
   const commit = vi.fn();
 
-  const VPopover = {
-    name: 'v-popover',
+  const VDropdown = {
+    name: 'VDropdown',
     render() {
-      return [this.$scopedSlots.default(), this.$scopedSlots.popover()];
+      return [this.$scopedSlots.default(), this.$scopedSlots.popper()];
     },
   };
 
@@ -17,8 +17,8 @@ describe('ImageControlsShiftButtons.vue', () => {
     props: { index: '0', forward: true, current: 0, size: 10, dimension: 'slice' },
     global: {
       plugins: [Buefy],
-      stubs: { 'v-popover': VPopover },
-      directives: { 'click-outside': {} },
+      stubs: { VDropdown },
+      directives: { 'on-click-outside': {} },
       mocks: {
         $t: key => key,
         $store: {

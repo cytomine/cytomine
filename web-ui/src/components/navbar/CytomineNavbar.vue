@@ -1,7 +1,7 @@
 <template>
 <nav class="navbar is-light" role="navigation">
   <div class="navbar-brand">
-    <router-link to="/" exact class="navbar-item">
+    <router-link to="/" class="navbar-item">
       <img src="@/assets/logo.svg" id="logo" alt="Cytomine">
     </router-link>
     <a role="" class="navbar-burger" :class="{'is-active':openedTopMenu}" @click="openedTopMenu=!openedTopMenu">

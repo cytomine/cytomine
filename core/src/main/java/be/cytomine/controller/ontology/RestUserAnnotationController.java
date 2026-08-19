@@ -89,7 +89,7 @@ public class RestUserAnnotationController extends RestCytomineController {
             project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
         }
-        return responseSuccess(JsonObject.of("total", userAnnotationService.count(user, project)));
+        return responseSuccess(JsonObject.of("total", userAnnotationService.count(user.getId(), project)));
     }
 
     @GetMapping("/project/{idProject}/userannotation/count.json")

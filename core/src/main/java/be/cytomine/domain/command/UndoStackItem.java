@@ -21,7 +21,7 @@ public class UndoStackItem extends CytomineDomain {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "command_id", nullable = false)
     protected Command command;
-    
+
     @Column(name = "user_id")
     protected Long userId;
 

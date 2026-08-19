@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
@@ -26,8 +25,8 @@ public class DeleteCommand extends Command {
      */
     boolean linkProject = true;
 
-    public DeleteCommand(User currentUser, Transaction transaction) {
-        this.userId = currentUser.getId();
+    public DeleteCommand(long currentUser, Transaction transaction) {
+        this.userId = currentUser;
         this.transaction = transaction;
     }
 

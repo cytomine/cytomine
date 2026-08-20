@@ -163,7 +163,7 @@ import { MyAccount, User } from '@/api';
 import { email, required, rules, validateForm } from '@/utils/form.js';
 import { rolesMapping } from '@/utils/role-utils';
 import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
-import copyToClipboard from 'copy-to-clipboard';
+import { useClipboard } from '@vueuse/core';
 import { formatMomentDate } from '@/utils/date';
 
 export default {
@@ -173,7 +173,9 @@ export default {
   mixins: [changeLanguageMixin],
   setup() {
     const form = useForm({ defaultValues: { lastName: '', firstName: '', email: '' } });
+    const { copy } = useClipboard({ legacy: true });
     return {
+      copyToClipboard: copy,
       form,
       isValid: form.useStore(state => state.isValid),
       requiredRule: { onChange: rules(required) },
@@ -244,7 +246,7 @@ export default {
 
 
     copy(value) {
-      copyToClipboard(value);
+      this.copyToClipboard(value);
       this.$notify({ type: 'success', text: this.$t('notif-success-key-copied') });
     },
 

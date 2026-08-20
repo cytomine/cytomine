@@ -91,7 +91,7 @@ export default {
       return (this.forward) ? 'left' : 'right';
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener('contextmenu', this.onContextmenuOutside, true);
   },
   methods: {

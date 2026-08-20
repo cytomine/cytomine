@@ -44,7 +44,7 @@ allowed-formats-upload-info,Supported image file formats:,Formats d'image suppor
 already-in-other-image-group,Already in another image group,Déjà dans un autre groupe d'images,Ya en otro grupo de imágenes,Al in een andere beeldgroep
 already-in-project,Already in project,Déjà dans le projet,Ya en proyecto,Reeds in het project
 already-in-this-image-group,Already in this image group,Déjà dans ce groupe d'images,Ya en este grupo de imágenes,Al in deze beeldgroep
-and-count-others,- | and one other | and {count} others,- | et un autre | et {count} autres,- | y otro | y {cuenta} otros,- | en nog een | en {tel} anderen
+and-count-others,- | and one other | and {count} others,- | et un autre | et {count} autres,- | y otro | y {count} otros,- | en nog een | en {count} anderen
 already-linked,Already linked,Déjà lié,Ya vinculado,Reeds gekoppeld
 annotated-images-vs-contributor,Annotated images VS. contributor,Images annotées VS. contributeur,Imágenes anotadas por colaborador,Geannoteerde afbeeldingen VS. bijdrager
 annotated-images-vs-contributors-chart-info-message,This chart presents the number of images annotated by each project member. Only annotations created during the selected period are taken into account.,ce graphique présente le nombre d'images annotées par chaque membre. Seules les annotations créées durant la période sélectionnée sont prises en compte.,Este gráfico presenta el número de imágenes anotadas por cada miembro del proyecto. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"deze grafiek toont het aantal afbeeldingen dat door elk lid is geannoteerd. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
@@ -95,7 +95,7 @@ appengine-not-enabled-title,App Engine is not enabled,App Engine n'est pas activ
 appengine-not-enabled-description,App Engine is not enabled on your Cytomine instance,App Engine n'est pas activé sur votre instance Cytomine,App Engine no está habilitado en su instancia de Cytomine,App Engine is niet ingeschakeld op uw Cytomine-instantie
 area,Area,Aire,Zona,Gebied
 associate-tags,Associate tags,Associer des tags,Etiquetas asociadas,Tags koppelen
-associated-by,associated by {username},associé par {username},asociado por {username},geassocieerd door {usersnaam}
+associated-by,associated by {username},associé par {username},asociado por {username},geassocieerd door {username}
 at,at,au,en,bij
 attached-files,Attached files,Fichiers joints,Archivos adjuntos,Bijlagen files
 average,Average,Moyenne,Promedio,Gemiddeld
@@ -226,7 +226,7 @@ confirm-annotation-group-merge,The two annotations you are about to link already
 confirm-close-project-message,Do you really want to close this project? The {viewers} it contains will be closed as well,Êtes-vous sûr de vouloir fermer ce projet ? Les {viewers} qu'il contient seront également fermés.,¿Está seguro de cerrar este proyecto? Los {viewers} que contiene también se cerrarán,"Bent u zeker dat u dit project wilt sluiten? De {viewers} die het bevat, worden ook gesloten."
 confirm-annotation-link,Confirm annotation linking,Confirmer la création des liens entre annotations,Confirmar vinculación de anotaciones,Bevestig het koppelen van annotaties
 confirm-close-project,Close project,Fermer le projet,Cerrar proyecto,Project afsluiten
-confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,"Actuellement, aucune annotation de ce projet n'est associée à une propriété ayant pour clé '{key}'.<br> Êtes-vous sûr de vouloir l'utiliser comme propriété par défaut",&#39;{clave}&#39; no se utiliza actualmente como una clave de propiedad de anotación en este proyecto. <br> ¿Seguro que quiere usarla como propiedad predeterminada?,Momenteel zijn er geen annotaties in dit project gekoppeld aan een eigenschap met sleutel '{key}'.<br>Weet u zeker dat u deze als de standaardeigenschap wilt gebruiken
+confirm-default-property-not-used-in-project,'{key}' is currently not used as an annotation property key in this project.<br> Are you sure you want to use it as default property?,"Actuellement, aucune annotation de ce projet n'est associée à une propriété ayant pour clé '{key}'.<br> Êtes-vous sûr de vouloir l'utiliser comme propriété par défaut",&#39;{key}&#39; no se utiliza actualmente como una clave de propiedad de anotación en este proyecto. <br> ¿Seguro que quiere usarla como propiedad predeterminada?,Momenteel zijn er geen annotaties in dit project gekoppeld aan een eigenschap met sleutel '{key}'.<br>Weet u zeker dat u deze als de standaardeigenschap wilt gebruiken
 confirm-default-property,Confirm default property,Confirmer la propriété par défaut,Confirme la propiedad predeterminada,Eigenschap bevestigen door uitsluiting
 confirm-deletion-annotation,Are you sure you want to delete this annotation?,Êtes-vous sûr de vouloir supprimer cette annotation?,¿Estás seguro de que deseas eliminar esta anotación?,Bent u zeker dat u deze annotatie wilt verwijderen?
 confirm-deletion,Confirm deletion,Confirmer la suppression,Confirmar la eliminación,Verwijdering bevestigen
@@ -259,14 +259,14 @@ copy,Copy,Copier,,Kopiëren
 core-cannot-be-reached,Error of communication with Cytomine core,Erreur de communication avec le backend de Cytomine,Error de comunicación con el núcleo de Cytomine,Communicatiefout met Cytomine-backend
 count-active-users,no active user | one active user | {count} active users,aucun utilisateur actif | un utilisateur actif | {count} utilisateurs actifs,sin usuario activo | un usuario activo | {count} usuarios activos,geen actieve user | een actieve user | {count} actieve users
 count-annotation-terms,0 term associated to an annotation | 1 term associated to an annotation | {count} terms associated to annotations,0 association de terme | 1 association de terme | {count} associations de terme,0 término asociado a una anotación | 1 término asociado a una anotación | {count} términos asociados a anotaciones,0 termassociatie | 1 termassociatie | {count} termassociaties
-count-annotations,0 annotation | 1 annotation | {count} annotations,0 annotation | 1 annotation | {count} annotations,0 anotación | 1 anotación | {count} anotaciones,0 annotatie | 1 annotatie | {tel} annotaties
-count-bands,- | 1 band | {count} bands,- | 1 bande | {count} bandes,,- | 1 bandje | {tel} bands
+count-annotations,0 annotation | 1 annotation | {count} annotations,0 annotation | 1 annotation | {count} annotations,0 anotación | 1 anotación | {count} anotaciones,0 annotatie | 1 annotatie | {count} annotaties
+count-bands,- | 1 band | {count} bands,- | 1 bande | {count} bandes,,- | 1 bandje | {count} bands
 count-copied-annot-links,Copied annotation has no other link.|Copied annotation already has <strong>one</strong> link.|Copied annotation already has <strong>{count}</strong> links.,L'annotation copiée n'a pas de lien.|L'annotation copiée a déjà <strong>un</strong> lien.|L'annotation copiée a déjà <strong>{count}</strong> liens.,La anotación copiada no tiene otro enlace.|La anotación copiada ya tiene <strong>uno</strong> enlace.|La anotación copiada ya tiene <strong>{count}</strong> enlaces.,Gekopieerde annotatie heeft geen andere link.|Gekopieerde annotatie heeft al <strong>één</strong> link.|Gekopieerde annotatie heeft al <strong>{count}</strong> links.
 count-files,0 file | 1 file | {count} files,0 fichier | 1 fichier | {count} fichiers,0 archivo | 1 archivo | {count} archivos,0 file| 1 file | {count} files
-count-frames,- | 1 frame | {count} frames,- | 1 frame | {count} frames,,- | 1 frame | {tel} frames
+count-frames,- | 1 frame | {count} frames,- | 1 frame | {count} frames,,- | 1 frame | {count} frames
 count-per-page,{count} per page,{count} par page,{count} por página,{count} per pagina
 count-reviewed-annotations,0 reviewed annotation | 1 reviewed annotation | {count} reviewed annotations,0 annotation validée | 1 annotation validée | {count} annotations validées,0 anotación revisada | 1 anotación revisada | {count} anotaciones revisadas,0 annotatie gevalideerd | 1 annotatie gevalideerd | {count} gevalideerde annotaties
-count-slices,- | 1 slice | {count} slices,- | 1 plan | {count} plans,,- | plan | {tel} plannen
+count-slices,- | 1 slice | {count} slices,- | 1 plan | {count} plans,,- | plan | {count} plannen
 count-viewers,no viewer | viewer | {count} viewers,aucun visualisateur | visualisateurs | {count} visualisateurs,sin visores | visor | {count} visores,geen kijker | kijkers | {count} kijkers
 create-image-group,Create new image group,Créer un nouveau groupe d'images,Crear nuevo grupo de imágenes,Maak een nieuwe afbeeldingsgroep
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet,Crear ontología usando el nombre del proyecto,Maak een ontologie met dezelfde naam als het project
@@ -307,7 +307,7 @@ delete-project-confirmation-message,Do you really want to delete project {projec
 delete-image-group,Delete image group,Supprimer le groupe d'images,Eliminar grupo de imágenes,Afbeeldingsgroep verwijderen
 delete-project,Delete project,Supprimer le projet,Eliminar proyecto,Project verwijderen
 delete-image-group-confirmation-message,Do you really want to delete image group {groupName}? <br> All annotation links will be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir supprimer le groupe d'images {groupName} ? <br> Cette action ne pourra être annulée,¿Realmente desea eliminar el grupo de imágenes {groupName}? <br> ¡Se eliminarán todos los enlaces de anotaciones! ¡Esta operación no será recuperable con el botón de deshacer!,Weet je zeker dat je afbeeldingsgroep {groupName} wilt verwijderen? <br> Alle annotatielinks worden verwijderd! Deze bewerking kan niet worden hersteld met de knop Ongedaan maken!
-delete-tag-confirmation-message,Do you really want to delete tag {tagName}? <br> All associations will be deleted!,Êtes-vous sûr de vouloir supprimer le tag {projectName} ? <br> Toutes les associations seront irrémédiablement perdues,¿Realmente desea eliminar la etiqueta {tagName}? <br> ¡Todas las asociaciones serán eliminadas!,Bent u zeker dat u de {projectName}-tag wilt verwijderen? <br> Alle verenigingen gaan onherstelbaar verloren
+delete-tag-confirmation-message,Do you really want to delete tag {tagName}? <br> All associations will be deleted!,Êtes-vous sûr de vouloir supprimer le tag {tagName} ? <br> Toutes les associations seront irrémédiablement perdues,¿Realmente desea eliminar la etiqueta {tagName}? <br> ¡Todas las asociaciones serán eliminadas!,Bent u zeker dat u de {tagName}-tag wilt verwijderen? <br> Alle verenigingen gaan onherstelbaar verloren
 delete-image-group-link,Remove image from its image group,Retirer l'image de son groupe d'images,Eliminar imagen de su grupo de imágenes,Afbeelding uit de afbeeldingsgroep verwijderen
 delete-tag,Delete tag,Supprimer le tag,Eliminar etiqueta,Tag verwijderen
 delete-image-group-link-confirmation-message,Do you really want to remove image {imageName} from its image group? <br> All related annotation links be deleted! This operation will not be recoverable with undo button!,Êtes-vous sûr de vouloir retirer l'image {imageName} de son groupe d'images ? <br> Cette action ne pourra être annulée,¿Realmente desea eliminar la imagen {imageName} de su grupo de imágenes? <br> ¡Se eliminarán todos los enlaces de anotaciones relacionados! ¡Esta operación no será recuperable con el botón de deshacer!,Weet u zeker dat u afbeelding {imageName} uit de afbeeldingsgroep wilt verwijderen? <br> Alle gerelateerde annotatielinks worden verwijderd! Deze bewerking kan niet worden hersteld met de knop Ongedaan maken!
@@ -448,19 +448,19 @@ image-filters,Image filters,Filtres d'images,Filtros de imagen,Afbeeldingsfilter
 image-group,Image group,Groupe d'images,Grupo de imágenes,Beeld groep
 image-height,Height,Hauteur,,Hoogte
 image-groups,Image groups,Groupes d'images,Grupos de imágenes,Beeldgroepen
-image-in-review-by-since,This image is reviewed by {user} since {date},Cette image est en cours de validation par depuis le {date},{User} revisa esta imagen desde {date},Deze afbeelding wordt gevalideerd door sinds {date}
+image-in-review-by-since,This image is reviewed by {user} since {date},Cette image est en cours de validation par {user} depuis le {date},{user} revisa esta imagen desde {date},Deze afbeelding wordt gevalideerd door {user} sinds {date}
 image-metadata,Image metadata,Métadonnées de l'image,Metadatos de imagen,Metagegevens van de afbeelding
 image-not-reviewed,This image has not been reviewed,Cette image n'a pas été validée,Esta imagen no ha sido revisada,Deze afbeelding is niet gevalideerd
 image-size,Image size,Taille de l'image,Tamaño de imagen,Afbeeldingsgrootte
 image-time,Duration,Durée,,Duur
-image-validated-by-on,This image has been validated by {user} on {date},Cette image a été validée par {user} le {date},Esta imagen ha sido validada por {usuario} el {fecha},Deze afbeelding is gevalideerd door {user} op {date}
+image-validated-by-on,This image has been validated by {user} on {date},Cette image a été validée par {user} le {date},Esta imagen ha sido validada por {user} el {date},Deze afbeelding is gevalideerd door {user} op {date}
 image-width,Width,Largeur,,Breedte
 images_downloadable_by_contributor-explanation,"If this is enabled, contributors will be able to download the images of this project","Avec cette option, les contributeurs pourront télécharger les images de ce projet","Si esta opción está habilitada, los colaboradores podrán descargar las imágenes de este proyecto.",Met deze optie kunnen bijdragers de afbeeldingen van dit project downloaden
 images,Images,Images,Imágenes,Afbeeldingen
 images_downloadable_by_contributor,Images downloadable by contributor,Images téléchargeables par les contributeurs,Imágenes descargables por los colaboradores,Afbeeldingen die kunnen worden gedownload door bijdragers
 images-in-projects,Images in projects,Images au sein des projets,,Afbeeldingen binnen projecten
 important-notes,Important notes,Remarques importantes,Notas importantes,Belangrijke opmerkingen
-in-project,in {projectName},dans {projectName},en {projectName},in {projectnaam}
+in-project,in {projectName},dans {projectName},en {projectName},in {projectName}
 in-queue,In queue,Dans la file,En cola,In de wachtrij
 in-review,In review,En cours de validation,En revisión,Review in proces
 in-this-image,in this image,dans cette image,,op deze afbeelding
@@ -500,7 +500,7 @@ length,Length,Longueur,Longitud,Lengte
 line,Line,Ligne,Línea,Lijn
 linear,Linear,Linéaire,,Lineair
 link,Link,Lier,Enlace,Koppeling
-link-group,Group {number},Groupe {number},Grupo {number},Groep {nummer}
+link-group,Group {number},Groupe {number},Grupo {number},Groep {number}
 link-images,Link images,Synchronisation d'images,Enlace de imágenes,afbeeldingsynchronisatie
 link-mode,Mode,Mode,,Mode
 link-other-images-to-this-group,Link this group with additional images...,Synchroniser ce groupe avec d'autres images...,Vincula este grupo con imágenes adicionales ...,Synchroniseer deze groep met andere afbeeldingen...
@@ -579,7 +579,7 @@ no-profile,No profile,Pas de profil,,Geen profiel
 no-project-connection,No project connection,Aucune connexion au projet,Ninguna conexión del proyecto,Geen projectverbinding
 no-project,No project to display,Aucun projet à afficher,No hay proyectos que mostrar,Geen projecten om weer te geven
 no-properties,No property,Aucune propriété,Ninguna propiedad,Geen eigenschappen
-no-property-matching-search-string,No existing property matching {searchString},Aucune propriété ne correspond au texte recherché,Ninguna propiedad existente coincide con {searchString},Er komen geen eigenschappen overeen met de gezochte tekst
+no-property-matching-search-string,No existing property matching {searchString},Aucune propriété ne correspond à {searchString},Ninguna propiedad existente coincide con {searchString},Er komen geen eigenschappen overeen met {searchString}
 no-recent-image,No image recently opened,Aucune image consultée récemment,No hay imagen abierta recientemente,Geen recent bekeken afbeeldingen
 no-recent-project,No project recently opened,Aucun projet consulté récemment,Ningún proyecto abierto recientemente,Geen recent bekeken projecten
 no-record,No record,Aucune entrée,Sin registros,Geen toegang
@@ -635,7 +635,7 @@ notif-error-default-layer-delete,Failed to delete default layer,Une erreur a emp
 notif-error-default-layer-update,Error during update of default layer,Une erreur a empêché de mettre à jour le calque par défaut,Error durante la actualización de la capa predeterminada,Door een fout kon de defaultlaag niet worden bijgewerkt
 notif-error-default-property-update,Failed to update the default property,Une erreur a empêché la modification de la propriété par défaut,Error al actualizar la propiedad predeterminada,Door een fout kon de eigenschap door uitsluiting niet worden gewijzigd
 notif-error-delete-uploaded-file,Failed to delete the uploaded file (unexpected error),Une erreur a empêché de supprimer le fichier,Error al eliminar el archivo cargado (error inesperado),Een fout verhinderde het verwijderen van het bestand
-notif-error-delete-used-uploaded-file,This image has instances in active projects ({projects}) under the following names: {names},Cette image est utilisée dans des projets ({projects}) sous les noms suivants : {names},Esta imagen tiene instancias en proyectos activos ({proyectos}) con los siguientes nombres: {names},Deze afbeelding wordt gebruikt in projecten ({projects}) onder de volgende namen: {names}
+notif-error-delete-used-uploaded-file,This image has instances in active projects ({projects}) under the following names: {names},Cette image est utilisée dans des projets ({projects}) sous les noms suivants : {names},Esta imagen tiene instancias en proyectos activos ({projects}) con los siguientes nombres: {names},Deze afbeelding wordt gebruikt in projecten ({projects}) onder de volgende namen: {names}
 notif-error-fetch-annotation-comments,Failed to retrieve the comments of this annotation,Erreur lors de la récupération des commentaires,Error al recuperar los comentarios de esta anotación,Fout bij het ophalen van opmerkingen
 notif-error-fetch-annotations-viewer,An error occurred while fetching annotations,Erreur lors du chargement des annotations,Se produjo un error al recuperar anotaciones,Fout bij het laden van annotaties
 notif-error-fetch-next-image,Failed to load next image,Une erreur a empêché de charger l'image suivante,Error al cargar la siguiente imagen,Een fout verhinderde het laden van de volgende afbeelding
@@ -649,7 +649,7 @@ notif-error-image-deletion,Failed to delete image {imageName},Une erreur a empê
 notif-error-image-group-creation,Failed to create image group,Une erreur a empêché la création du groupe d'images,No se pudo crear el grupo de imágenes,Kan afbeeldingsgroep niet maken
 notif-error-image-rename,Failed to rename image {imageName},Une erreur a empêché de renommer l'image {imageName},Error al cambiar el nombre de la imagen {imageName},Een fout verhinderde het hernoemen van de afbeelding {imageName}
 notif-error-image-group-deletion,Failed to delete image group {groupName},Une erreur a empêché la suppression du groupe d'images {groupName},Error al eliminar el grupo de imágenes {groupName},Kan afbeeldingsgroep {groupName} niet verwijderen
-notif-error-invalid-key-prefix,The property key cannot start by {prefix}: this prefix is reserved for internal use,La clé ne peut commencer par {prefix} : ce préfixe est réservé par Cytomine pour une utilisation interne.,La clave de propiedad no puede comenzar por {prefijo}: este prefijo está reservado para uso interno,De sleutel mag niet beginnen met {prefix}: dit voorvoegsel is door Cytomine gereserveerd voor intern gebruik.
+notif-error-invalid-key-prefix,The property key cannot start by {prefix}: this prefix is reserved for internal use,La clé ne peut commencer par {prefix} : ce préfixe est réservé par Cytomine pour une utilisation interne.,La clave de propiedad no puede comenzar por {prefix}: este prefijo está reservado para uso interno,De sleutel mag niet beginnen met {prefix}: dit voorvoegsel is door Cytomine gereserveerd voor intern gebruik.
 notif-error-image-group-link-creation,Failed to add image {imageName} to an image group,Une erreur a empêché l'ajout de l'image {imageName} à un groupe d'images,Error al agregar la imagen {imageName} a un grupo de imágenes,Kan afbeelding {imageName} niet toevoegen aan een afbeeldingsgroep
 notif-error-keys-not-regenerated,Error during the regeneration of API keys,Une erreur a empêché de regénérer les clés API,Error durante la regeneración de claves API,Een fout verhinderde het opnieuw genereren van API-sleutels
 notif-error-image-group-link-deletion,Failed to remove image {imageName} from its image group,Une erreur a empêché le retrait de l'image {imageName} de son groupe d'images,No se pudo eliminar la imagen {imageName} de su grupo de imágenes,Kan afbeelding {imageName} niet verwijderen uit de afbeeldingsgroep
@@ -732,7 +732,7 @@ notif-success-magnification-update,Magnification of image {imageName} was correc
 notif-success-new-comment,Your comment was successfully send by email,Votre commentaire a bien été envoyé par e-mail,Su comentario fue enviado con éxito por correo electrónico.,Uw commentaar is per e-mail verzonden
 notif-success-ontology-creation,The ontology was successfully created,L'ontologie a bien été créée,La ontología se creó con éxito.,De ontologie is gecreëerd
 notif-success-ontology-deletion,Ontology {name} was successfully deleted,L'ontologie {name} a bien été supprimée,La ontología {name} se eliminó correctamente,Ontologie {name} succesvol verwijderd
-notif-success-ontology-rename,Ontology {name} was successfully renamed,L'ontologie {name} a bien été renommée,Ontology {name} fue renombrado exitosamente,De naam van de ontologie {naam} is succesvol gewijzigd
+notif-success-ontology-rename,Ontology {name} was successfully renamed,L'ontologie {name} a bien été renommée,Ontology {name} fue renombrado exitosamente,De naam van de ontologie {name} is succesvol gewijzigd
 notif-success-password-saved,Password correctly updated,Mot de passe mis à jour avec succès,La contraseña se ha actualizado correctamente,paswoord succesvol bijgewerkt
 notif-success-project-creation,The project was successfully created,Le projet a bien été créé,El proyecto fue creado exitosamente,Het project is succesvol aangemaakt
 notif-success-project-deletion,Project {projectName} was successfully deleted,Le projet {projectName} a été supprimé,El proyecto {projectName} se ha eliminado correctamente,Het project {projectName} is verwijderd
@@ -796,7 +796,7 @@ open-image-group-by-batch-of,Open by batch of,Ouvrir par lot de,Abierto por lote
 open-in-viewer,Open in viewer,Ouvrir dans le visualisateur,Abrir en visor,Openen in de viewer
 open-image-index,Open image {index},Ouvrir l'image {index},Abrir imagen {index},Afbeelding {index} openen
 operating-system,Operating system,Système d'exploitation,Sistema operativo,Operating systeem
-open-images-from-to,Open images from {from} to {to},Ouvrir les images {from} à {to},Abrir imágenes de {from} a {to},Afbeeldingen openen van {van} tot {tot}
+open-images-from-to,Open images from {from} to {to},Ouvrir les images {from} à {to},Abrir imágenes de {from} a {to},Afbeeldingen openen van {from} tot {to}
 optional-parameters,Optional parameters,Paramètres optionnels,Parámetros opcionales,Optionele parameters
 open-source-project,Open-source project,Projet open-source,Proyecto de código abierto,Open source-project
 operation,Operation,Opération,Operación,Bewerking
@@ -948,7 +948,7 @@ select-ontology,Select ontology,Choisir l'ontologie,Seleccione ontología,Kies o
 select-options,Select options,Sélectionner les options,Seleccione opciones,Selecteer opties
 select-project,Select a project,Sélectionner un project,Seleccione un proyecto,Selecteer een project
 send-to-all-project-members,Send to all project members,Envoyer à tous les membres du projet,Enviar a todos los miembros del proyecto,Stuur naar alle projectleden
-selection-in-view,Selection in view {number},Sélection dans la vue {number},Selección a la vista {number},Selectie in weergave {nummer}
+selection-in-view,Selection in view {number},Sélection dans la vue {number},Selección a la vista {number},Selectie in weergave {number}
 send-to-some-members,Send to some project members only,Envoyer à certains membres seulement,Enviar solo a algunos miembros del proyecto,Alleen naar bepaalde projectleden verzenden
 services,Services,Services,Servicios,Diensten
 set-magnification,Set magnification,Changer le grossissement,Establecer nivel de aumento,De vergroting veranderen
@@ -1081,7 +1081,7 @@ time-period,Time period,Période de temps,Periodo de tiempo,Periode
 to-convert,To convert,À convertir,A convertir,Te converteren
 to,To,Jusqu'à,Hasta,Tot
 to-deploy,To deploy,À déployer,Desplegar,Te implementeren
-too-much-categories-to-display,There are too much categories to display ({toDisplay}). Only {displayed} first ones are shown.,,,Er zijn te veel categorieën om weer te geven ({toDisplay}). Alleen {weergegeven} eerste worden weergegeven.
+too-much-categories-to-display,There are too much categories to display ({toDisplay}). Only {displayed} first ones are shown.,,,Er zijn te veel categorieën om weer te geven ({toDisplay}). Alleen {displayed} eerste worden weergegeven.
 total,Total,Total,Total,Totaal
 tracks-new-annotation,Track(s) to associate to new annotations,Trace(s) à associer à de nouvelles annotations,,Track(en) om te associëren met nieuwe annotaties
 tracks,Tracks,Traces,Pistas,Tracks
@@ -1140,7 +1140,7 @@ view-logs,View logs,Voir les journaux,Ver registros,Logs bekijken
 viewer-center-position,viewer center position,centre du visualisateur,posición central del espectador,positie van de kijker in het midden
 viewer-group,Viewer group ({nbImages} images),Groupe d'images ({nbImages} images),Grupo de espectadores ({nbImages} imágenes),Groep afbeeldingen ({nbImages} afbeeldingen)
 viewer-panels,Viewer panels,Visualisateur d'images,Paneles del visor,Afbeeldingsviewer
-viewer-view,View {number},Image {number},Ver {number},Afbeelding {nummer}
+viewer-view,View {number},Image {number},Ver {number},Afbeelding {number}
 vms-mrxs-upload-info,VMS and MRXS must be zipped (the VMS/MRXS/VSI file and their nested files). One ZIP per image.,Les fichiers VMS et MRXS doivent être compressées dans un ZIP (le ZIP doit contenir le fichier VMS/MRXS/VSI ainsi que les fichiers associés).,Las imágenes en formato VMS y MRXS deben estar comprimidas en único ZIP que contenga tanto el archivo VMS/MRXS/VSI como sus archivos anidados.,VMS- en MRXS-files moeten worden gecomprimeerd in een ZIP (de ZIP moet zowel het VMS/MRXS/VSI-file als de bijbehorende files bevatten).
 wait,Wait,En attente,Espere,In de wacht
 warning-cannot-draw-multiple-slices,Cannot draw on multiple channels simultaneously,Impossible de dessiner sur plusieurs canaux simultanément,,Kan niet op meerdere kanalen tegelijk tekenen
@@ -1159,7 +1159,7 @@ yellow,Yellow,Jaune,Amarillo,Geel
 yes,Yes,Oui,Sí,Ja
 yes-one-group-per-line,"Yes, one per line","Oui, un par ligne","Sí, uno por línea","Ja, één per regel"
 you-are-reviewing-image-since,You are reviewing this image since {date},Cette image est en cours de validation depuis le {date},Estás revisando esta imagen desde {date},Deze afbeelding wordt gevalideerd sinds {date}
-you-have-validated-image-on,You have validated this image on {date},Vous avez validé cette image le {date},Usted ha validado esta imagen el {fecha},U hebt deze afbeelding gevalideerd op {date}
+you-have-validated-image-on,You have validated this image on {date},Vous avez validé cette image le {date},Usted ha validado esta imagen el {date},U hebt deze afbeelding gevalideerd op {date}
 z-resolution,Z resolution,Résolution Z,,Z-resolutie
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
 delete-user,Delete User,Supprimer l'utilisateur,Eliminar usuario,Gebruiker verwijderen

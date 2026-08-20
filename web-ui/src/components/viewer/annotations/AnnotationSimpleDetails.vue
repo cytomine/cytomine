@@ -62,7 +62,7 @@ export default {
   methods: {
     formatMomentDate,
     copyURL() {
-      copyToClipboard(window.location.origin + '/#' + this.annotationURL);
+      copyToClipboard(window.location.origin + this.annotationURL);
       this.$notify({ type: 'success', text: this.$t('notif-success-annot-URL-copied') });
     },
     isPropDisplayed(prop) {

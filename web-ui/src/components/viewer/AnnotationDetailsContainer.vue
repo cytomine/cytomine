@@ -1,19 +1,16 @@
 <template>
   <div class="annotation-details-playground" ref="playground">
-    <vue-draggable-resizable
-      v-if="selectedFeature && selectedFeature.properties && reload"
+    <div
+      v-if="selectedFeature && selectedFeature.properties"
       v-show="displayAnnotDetails"
       class="draggable"
-      :parent="true"
-      :resizable="false"
-      drag-handle=".drag"
-      @dragstop="dragStop"
-      :w="width" h='auto' :x="positionAnnotDetails.x" :y="positionAnnotDetails.y"
+      :class="{ dragging: isDragging }"
+      :style="panelStyle"
       ref="detailsPanel"
     >
       <div class="actions">
         <h1>{{ $t('current-selection') }}</h1>
-        <button class="drag button is-small close">
+        <button class="drag button is-small close" ref="dragHandle">
           <i class="fas fa-arrows-alt"></i>
         </button>
         <button class="button is-small close" @click="displayAnnotDetails = false">
@@ -64,18 +61,22 @@
         :images="images"
         @select="$emit('select', $event)"
       />
-    </vue-draggable-resizable>
+    </div>
   </div>
 </template>
 
 <script>
+import { ref, computed, onMounted, onUnmounted, nextTick, getCurrentInstance } from 'vue';
+import { useDraggable } from '@vueuse/core';
+
 import eventBus from '@/utils/event-bus';
 
-import VueDraggableResizable from 'vue-draggable-resizable';
 import { Cytomine, UserCollection } from '@/api';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails.vue';
 import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
 import AnnotationSimpleDetails from '@/components/viewer/annotations/AnnotationSimpleDetails.vue';
+
+const PANEL_WIDTH = 320;
 
 export default {
   name: 'annotations-details-container',
@@ -83,16 +84,66 @@ export default {
     AnnotationDetails,
     AnnotationLinksPreview,
     AnnotationSimpleDetails,
-    VueDraggableResizable,
   },
   props: {
     index: String,
   },
+  setup() {
+    const { proxy } = getCurrentInstance();
+
+    const playground = ref(null);
+    const detailsPanel = ref(null);
+    const dragHandle = ref(null);
+
+    const { position, isDragging } = useDraggable(detailsPanel, {
+      handle: dragHandle,
+      containerElement: playground,
+      onEnd: ({ x, y }) => {
+        proxy.positionAnnotDetails = { x, y };
+      },
+    });
+
+    const panelStyle = computed(() => ({
+      position: 'absolute',
+      left: `${position.value.x}px`,
+      top: `${position.value.y}px`,
+      width: `${PANEL_WIDTH}px`,
+    }));
+
+    const handleResize = async () => {
+      await nextTick(); // wait for update of clientWidth and clientHeight to their new values
+
+      if (!playground.value) {
+        return;
+      }
+
+      const maxX = Math.max(playground.value.clientWidth - PANEL_WIDTH, 0);
+      const height = detailsPanel.value ? detailsPanel.value.offsetHeight : 500;
+      const maxY = Math.max(playground.value.clientHeight - height, 0);
+      const current = proxy.positionAnnotDetails;
+      const x = Math.min(current.x, maxX);
+      const y = Math.min(current.y, maxY);
+
+      proxy.positionAnnotDetails = { x, y };
+      position.value = { x, y };
+    };
+
+    onMounted(() => {
+      position.value = { ...proxy.positionAnnotDetails };
+      window.addEventListener('resize', handleResize);
+      eventBus.on('updateMapSize', handleResize);
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', handleResize);
+      eventBus.off('updateMapSize', handleResize);
+    });
+
+    return { playground, detailsPanel, dragHandle, panelStyle, isDragging };
+  },
   data() {
     return {
-      width: 320,
       projectUsers: [],
-      reload: true,
       showComments: false
     };
   },
@@ -178,30 +229,6 @@ export default {
       this.projectUsers = (await collection.fetchAll()).array;
     },
 
-    dragStop(x, y) {
-      this.positionAnnotDetails = { x, y };
-    },
-
-    async handleResize() {
-      await this.$nextTick(); // wait for update of clientWidth and clientHeight to their new values
-
-      if (this.$refs.playground) {
-        let maxX = Math.max(this.$refs.playground.clientWidth - this.width, 0);
-        let height = 500;
-        if (this.$refs.detailsPanel) {
-          height = this.$refs.detailsPanel.height;
-        }
-        let maxY = Math.max(this.$refs.playground.clientHeight - height, 0);
-        let x = Math.min(this.positionAnnotDetails.x, maxX);
-        let y = Math.min(this.positionAnnotDetails.y, maxY);
-        this.positionAnnotDetails = { x, y };
-
-        // HACK to force the component to recreate and take into account new (x,y) ; should no longer be
-        // necessary with version 2 of vue-draggable-resizable
-        this.reload = false;
-        this.$nextTick(() => this.reload = true);
-      }
-    },
     async searchSimilarAnnotations() {
       let data = (await Cytomine.instance.api.get(
         'retrieval/search',
@@ -219,14 +246,6 @@ export default {
   },
   created() {
     this.fetchUsers();
-  },
-  mounted() {
-    window.addEventListener('resize', this.handleResize);
-    eventBus.on('updateMapSize', this.handleResize);
-  },
-  destroyed() {
-    window.removeEventListener('resize', this.handleResize);
-    eventBus.off('updateMapSize', this.handleResize);
   }
 };
 </script>

@@ -433,11 +433,7 @@ public class CytomineSteps {
     }
 
     public void runTask(Wait<WebDriver> wait, WebDriver driver) {
-        webDriverUtils.xpathClick(
-            wait,
-            "//button[contains(@class,'start-button')][.//span[.=' Run Task ']]"
-        );
-
+        webDriverUtils.clickButtonByText(wait, "Run Task");
         Wait<WebDriver> longWait = new WebDriverWait(driver, Duration.ofSeconds(300));
         webDriverUtils.byIsDisplayed(longWait, By.cssSelector(".is-success .fa-check-circle"));
     }
@@ -540,10 +536,7 @@ public class CytomineSteps {
         ReportType format
     ) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
-        webDriverUtils.byClick(
-            wait,
-            By.xpath("//button[normalize-space()='Download " + format + "']")
-        );
+        webDriverUtils.clickButtonByText(wait, "Download " + format);
 
         String filenameSuffix = "_" + projectName + "_annotations." + format.getLabel();
         Instant end = Instant.now().plus(Duration.ofSeconds(5));

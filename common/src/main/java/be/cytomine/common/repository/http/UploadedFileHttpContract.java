@@ -1,5 +1,6 @@
 package be.cytomine.common.repository.http;
 
+import java.util.List;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
@@ -19,9 +20,7 @@ import be.cytomine.common.repository.model.command.payload.response.UploadedFile
 import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 
-import static be.cytomine.common.repository.http.UploadedFileHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(UploadedFileHttpContract.ROOT_PATH)
 public interface UploadedFileHttpContract {
     String ROOT_PATH = "/uploaded-files";
 
@@ -45,5 +44,9 @@ public interface UploadedFileHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
     @GetExchange("/all")
-    Page<UploadedFileResponse> getAll(@RequestParam long userId, Pageable pageable);
+    Page<UploadedFileResponse> getAll(
+        @RequestParam long userId,
+        @RequestParam(required = false) List<Long> uploadedFileIds,
+        Pageable pageable
+    );
 }

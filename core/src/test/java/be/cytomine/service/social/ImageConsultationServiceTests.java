@@ -21,7 +21,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.UserAnnotation;
@@ -40,8 +42,9 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class ImageConsultationServiceTests {
 
     @Autowired
@@ -75,7 +78,7 @@ public class ImageConsultationServiceTests {
             sliceCoordinatesService.getReferenceSlice(imageInstance),
             USER_VIEW
         );
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
     PersistentUserPosition givenAPersistentUserPosition(
@@ -86,7 +89,7 @@ public class ImageConsultationServiceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,
@@ -111,7 +114,6 @@ public class ImageConsultationServiceTests {
 
         consultation = givenAPersistentImageConsultation(user, imageInstance, new Date());
 
-
         Optional<PersistentImageConsultation>
             connectionOptional
             = persistentImageConsultationRepository.findAllByUserAndImageAndCreatedLessThan(
@@ -122,7 +124,6 @@ public class ImageConsultationServiceTests {
         AssertionsForClassTypes.assertThat(connectionOptional.get().getSession()).isEqualTo("xxx");
         AssertionsForClassTypes.assertThat(connectionOptional.get().getTime()).isEqualTo(0);
     }
-
 
     @Test
     void fillProjectConnectionUpdateAnnotationsCounter() {
@@ -186,7 +187,6 @@ public class ImageConsultationServiceTests {
         givenAPersistentImageConsultation(user, imageInstance1, new Date());
         givenAPersistentImageConsultation(user, imageInstance1, new Date());
 
-
         List<JsonObject> results = imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
             imageInstance1.getProject(), user);
         assertThat(results).hasSize(1);
@@ -226,7 +226,6 @@ public class ImageConsultationServiceTests {
         assertThat(results.get(1).get("user")).isEqualTo(user1.getId());
         assertThat(results.get(1).get("image")).isEqualTo(imageInstance2.getId());
 
-
         results = imageConsultationService.lastImageOfUsersByProject(
             imageInstance1.getProject(),
             List.of(user1.getId()),
@@ -249,7 +248,6 @@ public class ImageConsultationServiceTests {
         assertThat(results).hasSize(1);
 
     }
-
 
     @Test
     void shouldReturnLastConsultedImagePerUserForProject() {

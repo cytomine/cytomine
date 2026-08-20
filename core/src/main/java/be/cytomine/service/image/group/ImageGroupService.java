@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.DeleteCommand;
@@ -19,7 +20,6 @@ import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.repository.image.group.ImageGroupImageInstanceRepository;
 import be.cytomine.repository.image.group.ImageGroupRepository;
 import be.cytomine.repository.ontology.AnnotationGroupRepository;
@@ -54,6 +54,8 @@ public class ImageGroupService extends ModelService {
     private final SecurityACLService securityACLService;
 
     private final TransactionService transactionService;
+
+    private final UrlApi urlApi;
 
     @Override
     public Class currentDomain() {
@@ -90,7 +92,7 @@ public class ImageGroupService extends ModelService {
                 images.add(Map.of(
                     "id", igii.getImage().getId(),
                     "instanceFilename", igii.getImage().getBlindInstanceFilename(),
-                    "thumb", UrlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
+                    "thumb", urlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
                     "width", igii.getImage().getBaseImage().getWidth(),
                     "height", igii.getImage().getBaseImage().getHeight()
                 ));
@@ -103,29 +105,29 @@ public class ImageGroupService extends ModelService {
 
     public CommandResponse add(JsonObject json) {
         transactionService.start();
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(json.getJSONAttrLong("project"), Project.class, READ);
 
-        return executeCommand(new AddCommand(currentUser), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
     }
 
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new DeleteCommand(currentUser, transaction), domain, null);
+        return executeCommand(new DeleteCommand(currentUser.id(), transaction), domain, null);
     }
 
     protected void beforeDelete(CytomineDomain domain) {

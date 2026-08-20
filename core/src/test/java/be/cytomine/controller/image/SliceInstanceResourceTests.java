@@ -11,8 +11,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +26,13 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.SliceInstance;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
@@ -52,28 +53,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class SliceInstanceResourceTests {
 
     @Autowired
+    private UrlApi urlApi;
+    @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restSliceInstanceControllerMockMvc;
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     @Test
     @Transactional
@@ -138,7 +130,7 @@ public class SliceInstanceResourceTests {
         SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
         restSliceInstanceControllerMockMvc.perform(post("/api/sliceinstance.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(sliceInstance.toJSON()))
+                .content(sliceInstance.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -153,7 +145,7 @@ public class SliceInstanceResourceTests {
     @Transactional
     public void editValidSliceInstance() throws Exception {
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        JsonObject jsonObject = sliceInstance.toJsonObject();
+        JsonObject jsonObject = sliceInstance.toJsonObject(urlApi);
         restSliceInstanceControllerMockMvc.perform(put("/api/sliceinstance/{id}.json", sliceInstance.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonObject.toJsonString()))
@@ -190,7 +182,7 @@ public class SliceInstanceResourceTests {
             .toString()
             .getBytes();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -223,7 +215,7 @@ public class SliceInstanceResourceTests {
         byte[] mockResponse = UUID.randomUUID()
             .toString()
             .getBytes();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -264,17 +256,20 @@ public class SliceInstanceResourceTests {
     public void getSliceInstanceCrop() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/annotation/crop";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))"
+                + "\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
 
@@ -305,15 +300,18 @@ public class SliceInstanceResourceTests {
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/window";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))"
+                + "\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(equalTo(body))
@@ -321,7 +319,6 @@ public class SliceInstanceResourceTests {
                 aResponse().withBody(mockResponse)
             )
         );
-
 
         MvcResult mvcResult = restSliceInstanceControllerMockMvc.perform(get(
                 "/api/sliceinstance/{id}/window-10-20-30-40.png",
@@ -334,13 +331,12 @@ public class SliceInstanceResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void histograms() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         System.out.println("/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/histogram/per-plane/z/0/t/0?n_bins=256&channels=0");
@@ -387,14 +383,12 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.collection[0].histogram[0]").value(900));
     }
 
-
     @Test
     @Transactional
     public void histogramsBounds() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
-
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -414,13 +408,12 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.collection[0].color").value("#f00"));
     }
 
-
     @Test
     @Transactional
     public void channelHistograms() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         System.out.println("/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/histogram/per-plane/z/0/t/0?n_bins=256");
@@ -460,14 +453,12 @@ public class SliceInstanceResourceTests {
             .andExpect(jsonPath("$.collection[0].type").value("FAST"));
     }
 
-
     @Test
     @Transactional
     public void channelHistogramsBounds() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
-
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8

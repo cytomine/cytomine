@@ -30,7 +30,7 @@
       <template #popover>
         <div
           v-click-outside="() => stopEdition()"
-          v-click-outside:contextmenu.capture="() => stopEdition()"
+          ref="stepSelector"
           class="step-selector"
         >
           <b-input :placeholder="$t('step')" size="is-small"
@@ -78,7 +78,7 @@ export default {
       },
       set(value) {
         this.$store.commit(this.imageModule + 'setStep',
-          {dimension: this.dimension, value: Number(value)});
+          { dimension: this.dimension, value: Number(value) });
       }
     },
     canShift() {
@@ -90,6 +90,9 @@ export default {
     selectorPlacement() {
       return (this.forward) ? 'left' : 'right';
     }
+  },
+  beforeDestroy() {
+    document.removeEventListener('contextmenu', this.onContextmenuOutside, true);
   },
   methods: {
     shiftOne() {
@@ -103,14 +106,22 @@ export default {
     startEdition() {
       this.editedValue = this.step;
       this.opened = true;
+      document.addEventListener('contextmenu', this.onContextmenuOutside, true);
     },
     stopEdition() {
       this.opened = false;
+      document.removeEventListener('contextmenu', this.onContextmenuOutside, true);
       if (!this.editedValue || isNaN(this.editedValue)) {
         return;
       }
 
       this.step = parseInt(this.editedValue);
+    },
+    onContextmenuOutside(event) {
+      let selector = this.$refs.stepSelector;
+      if (selector && !selector.contains(event.target)) {
+        this.stopEdition();
+      }
     },
     focus() {
       this.$refs.inputStepSelector.focus();

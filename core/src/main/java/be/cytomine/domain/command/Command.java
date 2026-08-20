@@ -1,21 +1,5 @@
 package be.cytomine.domain.command;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -31,8 +15,8 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
@@ -58,12 +42,8 @@ public abstract class Command extends CytomineDomain {
     @Transient
     protected CytomineDomain domain;
 
-    /**
-     * User who launch command
-     */
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = true)
-    protected User user;
+    @Column(name = "user_id")
+    protected Long userId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "transaction_id", nullable = true)
@@ -99,37 +79,9 @@ public abstract class Command extends CytomineDomain {
     protected String serviceName;
 
     /**
-     * If command is save on undo stack, refuse undo Usefull for project delete (cannot undo)
+     * If command is saved on undo stack, refuse undo Usefull for project delete (cannot undo)
      */
     protected boolean refuseUndo = false;
-
-    public String toString() {
-        return this.getClass().getSimpleName() + " " + this.id + "[" + this.created + "]";
-    }
-
-    /**
-     * Add command info for the new domain concerned by the command
-     *
-     * @param newObject New domain
-     * @param message   Message build for the command
-     */
-    protected void fillCommandInfo(CytomineDomain newObject, String message) {
-        data = newObject.toJSON();
-        actionMessage = message;
-    }
-
-    /**
-     * Add command info for the new domain concerned by the command
-     *
-     * @param newObject New json domain
-     * @param message   Message build for the command
-     */
-    protected void fillCommandInfoJSON(String newObject, String message) {
-        data = newObject;
-        actionMessage = message;
-    }
-
-    public abstract CommandResponse execute(ModelService service);
 
     /**
      * Define fields available for JSON response
@@ -144,10 +96,10 @@ public abstract class Command extends CytomineDomain {
         returnArray.put("serviceName", ((Command) domain).getServiceName());
         returnArray.put(
             "action",
-            command.getActionMessage() + " by " + (command.getUser() != null ? command.getUser().getUsername() : "")
+            command.getActionMessage() + " by user with id " + command.getUserId()
         );
         returnArray.put("data", command.getData());
-        returnArray.put("user", command.getUser().getId());
+        returnArray.put("user", command.getUserId());
         String type = "UNKNOWN";
         if (domain instanceof AddCommand) {
             type = "ADD";
@@ -160,13 +112,41 @@ public abstract class Command extends CytomineDomain {
         return returnArray;
     }
 
+    public String toString() {
+        return this.getClass().getSimpleName() + " " + this.id + "[" + this.created + "]";
+    }
+
+    /**
+     * Add command info for the new domain concerned by the command
+     *
+     * @param newObject New domain
+     * @param message   Message build for the command
+     */
+    protected void fillCommandInfo(CytomineDomain newObject, String message, UrlApi urlApi) {
+        data = newObject.toJSON(urlApi);
+        actionMessage = message;
+    }
+
+    /**
+     * Add command info for the new domain concerned by the command
+     *
+     * @param newObject New json domain
+     * @param message   Message build for the command
+     */
+    protected void fillCommandInfoJSON(String newObject, String message) {
+        data = newObject;
+        actionMessage = message;
+    }
+
+    public abstract CommandResponse execute(ModelService service, UrlApi urlApi);
+
     @Override
-    public String toJSON() {
+    public String toJSON(UrlApi urlApi) {
         return getDataFromDomain(this).toJsonString();
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 }

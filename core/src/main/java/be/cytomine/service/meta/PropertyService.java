@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -26,6 +27,7 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.meta.PropertyRepository;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.security.SecurityACLService;
@@ -49,6 +51,8 @@ public class PropertyService extends ModelService {
     private final PropertyRepository propertyRepository;
 
     private final AnnotationDomainRepository annotationDomainRepository;
+
+    private final UserRepository userRepository;
 
     @Override
     public Class currentDomain() {
@@ -88,7 +92,7 @@ public class PropertyService extends ModelService {
     }
 
     public CommandResponse add(JsonObject jsonObject, Transaction transaction, Task task) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         CytomineDomain domain = getCytomineDomain(
             jsonObject.getJSONAttrStr("domainClassName"),
             jsonObject.getJSONAttrLong("domainIdent")
@@ -99,7 +103,8 @@ public class PropertyService extends ModelService {
             //TODO when is this used ?
             securityACLService.checkUser(currentUser);
         }
-        Command command = new AddCommand(currentUser, transaction);
+
+        Command command = new AddCommand(currentUser.id(), transaction);
         return executeCommand(command, null, jsonObject);
     }
 
@@ -108,7 +113,7 @@ public class PropertyService extends ModelService {
         Long domainIdent,
         String key,
         String value,
-        User user,
+        long userId,
         Transaction transaction
     ) {
         JsonObject jsonObject = JsonObject.of(
@@ -117,12 +122,12 @@ public class PropertyService extends ModelService {
             "key", key,
             "value", value
         );
-        return executeCommand(new AddCommand(user, transaction), null, jsonObject);
+        return executeCommand(new AddCommand(userId, transaction), null, jsonObject);
     }
 
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         CytomineDomain parentDomain = getCytomineDomain(
             ((Property) domain).getDomainClassName(),
             ((Property) domain).getDomainIdent()
@@ -133,12 +138,13 @@ public class PropertyService extends ModelService {
             //TODO when is this used ?
             securityACLService.checkUser(currentUser);
         }
-        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), transaction),
+            domain, jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         CytomineDomain parentDomain = getCytomineDomain(
             ((Property) domain).getDomainClassName(),
             ((Property) domain).getDomainIdent()
@@ -149,7 +155,7 @@ public class PropertyService extends ModelService {
             //TODO when is this used ?
             securityACLService.checkUser(currentUser);
         }
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 

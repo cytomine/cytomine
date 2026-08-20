@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="card" :class="{'full-height-card': fullHeightCard}">
   <router-link class="card-image recent-image" :to="`/project/${idProject}/image/${idImage}`">
@@ -34,18 +20,18 @@
 </template>
 
 <script>
-import {changeImageUrlFormat} from '@/utils/image-utils';
-import {get} from '@/utils/store-helpers';
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import { changeImageUrlFormat } from '@/utils/image-utils';
+import { get } from '@/utils/store-helpers';
+import { appendShortTermToken } from '@/utils/token-utils.js';
 
 export default {
   name: 'image-preview',
   props: {
-    image: {type: Object},
-    project: {type: Object, default: null},
-    fullHeightCard: {type: Boolean, default: true},
-    showProject: {type: Boolean, default: false},
-    blindMode: {type: Boolean, default: false},
+    image: { type: Object },
+    project: { type: Object, default: null },
+    fullHeightCard: { type: Boolean, default: true },
+    showProject: { type: Boolean, default: false },
+    blindMode: { type: Boolean, default: false },
   },
   computed: {
     shortTermToken: get('currentUser/shortTermToken'),
@@ -65,7 +51,7 @@ export default {
       return changeImageUrlFormat(this.rawPreviewUrl);
     },
     figureStyle() {
-      return {backgroundImage: `url("${appendShortTermToken(this.previewUrl, this.shortTermToken)}")`};
+      return { backgroundImage: `url("${appendShortTermToken(this.previewUrl, this.shortTermToken)}")` };
     }
   },
 };

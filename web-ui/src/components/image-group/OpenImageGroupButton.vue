@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import ImageName from '@/components/image/ImageName';
+import ImageName from '@/components/image/ImageName.vue';
 export default {
   name: 'open-image-group-button',
   components: {
@@ -64,7 +64,7 @@ export default {
     };
   },
   props: {
-    imageGroup: {type: Object},
+    imageGroup: { type: Object },
   },
   computed: {
     images() {
@@ -77,10 +77,10 @@ export default {
       return this.images.length;
     },
     batches() {
-      return Array.from({length: Math.ceil(this.images.length / this.batchSize)}, (v, i) => {
+      return Array.from({ length: Math.ceil(this.images.length / this.batchSize) }, (v, i) => {
         let start = i * this.batchSize;
         let end = Math.min(start + this.batchSize, this.images.length);
-        return {start, end, images: this.images.slice(start, end)};
+        return { start, end, images: this.images.slice(start, end) };
       });
     }
   },

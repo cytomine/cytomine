@@ -19,9 +19,7 @@ import be.cytomine.common.repository.model.command.payload.response.StorageRespo
 import be.cytomine.common.repository.model.storage.payload.CreateStorage;
 import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
 
-import static be.cytomine.common.repository.http.StorageHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(StorageHttpContract.ROOT_PATH)
 public interface StorageHttpContract {
     String ROOT_PATH = "/storages";
 

@@ -20,9 +20,7 @@ import be.cytomine.common.repository.model.command.payload.response.TermResponse
 import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
-import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(TermHttpContract.ROOT_PATH)
 public interface TermHttpContract {
     String ROOT_PATH = "/terms";
 

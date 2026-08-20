@@ -17,7 +17,7 @@
 <script>
 import AppSidebar from '@/components/appengine/AppSidebar.vue';
 import constants from '@/utils/constants.js';
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 
 export default {
   name: 'AppLayout',

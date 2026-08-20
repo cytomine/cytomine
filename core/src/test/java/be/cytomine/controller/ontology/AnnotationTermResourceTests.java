@@ -1,21 +1,5 @@
 package be.cytomine.controller.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,9 +18,11 @@ import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.AnnotationTermService;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -47,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class AnnotationTermResourceTests {
 
@@ -65,6 +51,8 @@ public class AnnotationTermResourceTests {
 
     @Autowired
     private WiremockRepository wiremockRepository;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     @Transactional
@@ -101,7 +89,6 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
-
     @Test
     @Transactional
     public void listByReviewedAnnotation() throws Exception {
@@ -114,7 +101,6 @@ public class AnnotationTermResourceTests {
                 + reviewedAnnotation.getTerms().get(0).getId()
                 + "')]").exists());
     }
-
 
     @Test
     @Transactional
@@ -195,7 +181,7 @@ public class AnnotationTermResourceTests {
                 annotationTerm.getTerm().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationTerm.toJSON()))
+                .content(annotationTerm.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -207,7 +193,6 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.annotationterm.term").exists());
 
     }
-
 
     @Test
     @Transactional
@@ -222,7 +207,7 @@ public class AnnotationTermResourceTests {
                 annotationTerm.getTerm().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationTerm.toJSON()))
+                .content(annotationTerm.toJSON(urlApi)))
             .andExpect(status().isBadRequest());
 
     }
@@ -233,7 +218,7 @@ public class AnnotationTermResourceTests {
         AnnotationTerm
             annotationTerm
             = builder.givenANotPersistedAnnotationTerm(builder.givenAUserAnnotation());
-        JsonObject jsonObject = annotationTerm.toJsonObject().withChange("userannotation", 0);
+        JsonObject jsonObject = annotationTerm.toJsonObject(urlApi).withChange("userannotation", 0);
         restAnnotationTermControllerMockMvc.perform(post(
                 "/api/annotation/{idAnnotation}/term/{idTerm}.json",
                 annotationTerm.getUserAnnotation().getId(),
@@ -258,11 +243,10 @@ public class AnnotationTermResourceTests {
                 0
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationTerm.toJSON()))
+                .content(annotationTerm.toJSON(urlApi)))
             .andExpect(status().isBadRequest());
 
     }
-
 
     @Test
     @Transactional
@@ -296,7 +280,7 @@ public class AnnotationTermResourceTests {
                 annotationTerm.getUserAnnotation().getId(), annotationTerm.getTerm().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationTerm.toJSON()))
+                .content(annotationTerm.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -351,7 +335,7 @@ public class AnnotationTermResourceTests {
             )
                 .param("clearForAll", "true")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationTerm.toJSON()))
+                .content(annotationTerm.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -361,7 +345,6 @@ public class AnnotationTermResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.annotationterm.id").exists())
             .andExpect(jsonPath("$.annotationterm.term").exists());
-
 
         assertThat(annotationTermRepository.findByUserAnnotationIdAndTermIdAndUserId(
                 previousAnnotationTerm.getUserAnnotation().getId(),
@@ -377,7 +360,6 @@ public class AnnotationTermResourceTests {
         ).isPresent();
     }
 
-
     @Test
     @Transactional
     public void deleteAnnotationTermWithUser() throws Exception {
@@ -390,7 +372,7 @@ public class AnnotationTermResourceTests {
                 annotationTerm.getUser().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationTerm.toJSON()))
+                .content(annotationTerm.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -411,7 +393,7 @@ public class AnnotationTermResourceTests {
                 annotationTerm.getUserAnnotation().getId(), annotationTerm.getTerm().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationTerm.toJSON()))
+                .content(annotationTerm.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

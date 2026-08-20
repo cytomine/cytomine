@@ -157,14 +157,14 @@ import {
   UploadedFile,
   User,
 } from '@/api';
-import {UploadedFileStatus} from '@/constants/UploadedFileStatus';
+import { UploadedFileStatus } from '@/constants/UploadedFileStatus';
 
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 import constants from '@/utils/constants.js';
 
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import ListUploadedFiles from '@/components/storage/ListUploadedFiles';
-import UploadedFileStatusComponent from '@/components/storage/UploadedFileStatus';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
+import ListUploadedFiles from '@/components/storage/ListUploadedFiles.vue';
+import UploadedFileStatusComponent from '@/components/storage/UploadedFileStatus.vue';
 
 export default {
   name: 'cytomine-storage',
@@ -348,7 +348,7 @@ export default {
       });
     },
     filesize(size) {
-      return (size) ? filesize(size, {base: 10}) : null;
+      return (size) ? filesize(size, { base: 10 }) : null;
     },
 
     startUpload(fileWrapper) {

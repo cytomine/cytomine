@@ -8,6 +8,7 @@ requires-python = ">=3.10"
 license = "Apache-2.0"
 dependencies = [
   "aiofiles==23.1.0",
+  "bigpicture-metadata-interface",
   "celery==5.2.7",
   "cytomine-python-client",
   "fastapi==0.110.3",
@@ -15,12 +16,13 @@ dependencies = [
   "geojson>=3.2.0",
   "gunicorn==22.0.0",
   "importlib-metadata==6.0.0",
-  "lxml==6.1.0",
+  "lxml==6.1.1",
   "matplotlib==3.7.1",
+  "meilisearch==0.42.0",
   "numpy==1.24.4",
   "orjson==3.11.6",
   "pathvalidate==2.5.2",
-  "pillow==12.2.0",
+  "pillow==12.3.0",
   "pint==0.20.1",
   "pydantic==2.7.3",
   "pydantic-extra-types==2.8.0",
@@ -49,3 +51,4 @@ dev = [
 
 [tool.uv.sources]
 cytomine-python-client = { path = "../clients/python" }
+bigpicture-metadata-interface = { path = "./resources/bigpicture_metadata_interface" }

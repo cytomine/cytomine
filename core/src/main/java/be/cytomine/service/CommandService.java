@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
 import be.cytomine.domain.command.CommandHistory;
@@ -20,7 +21,6 @@ import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.RedoStackItem;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.command.UndoStackItem;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.command.CommandRepository;
@@ -35,31 +35,26 @@ import be.cytomine.utils.JsonObject;
 @Transactional
 public class CommandService {
 
-    private final BeanFactory beanFactory;
-
-    private final EntityManager entityManager;
-
-    private final CommandRepository commandRepository;
-
-    private final CurrentUserService currentUserService;
-
-    private final ResponseService responseService;
-
-    private final SecurityACLService securityACLService;
-
     static final int SUCCESS_ADD_CODE = 200;
     static final int SUCCESS_EDIT_CODE = 200;
     static final int SUCCESS_DELETE_CODE = 200;
+    private final BeanFactory beanFactory;
+    private final EntityManager entityManager;
+    private final CommandRepository commandRepository;
+    private final CurrentUserService currentUserService;
+    private final ResponseService responseService;
+    private final SecurityACLService securityACLService;
+    private final UrlApi urlApi;
 
     CommandResponse processCommand(Command c, ModelService service) throws CytomineException {
         if (c instanceof AddCommand) {
-            return processCommand(c, service, SUCCESS_ADD_CODE);
+            return processCommand(c, service, urlApi, SUCCESS_ADD_CODE);
         }
         if (c instanceof EditCommand) {
-            return processCommand(c, service, SUCCESS_EDIT_CODE);
+            return processCommand(c, service, urlApi, SUCCESS_EDIT_CODE);
         }
         if (c instanceof DeleteCommand) {
-            return processCommand(c, service, SUCCESS_DELETE_CODE);
+            return processCommand(c, service, urlApi, SUCCESS_DELETE_CODE);
         }
         throw new ObjectNotFoundException("Command not supported");
     }
@@ -68,10 +63,11 @@ public class CommandService {
      * Execute a 'command' c with json data Store command in undo stack if necessary and in command history if success,
      * put http response code as successCode
      */
-    CommandResponse processCommand(Command c, ModelService service, int successCode) throws CytomineException {
+    CommandResponse processCommand(Command c, ModelService service, UrlApi urlApi, int successCode)
+        throws CytomineException {
         //execute command
         log.debug("processCommand");
-        CommandResponse result = c.execute(service);
+        CommandResponse result = c.execute(service, urlApi);
         if (result.getStatus() == successCode) {
             if ((service instanceof ProjectService && c instanceof DeleteCommand)) {
                 // project has been deleted in this command, so we cannot link the command to the deleted project
@@ -86,7 +82,7 @@ public class CommandService {
             if (c.isSaveOnUndoRedoStack()) {
                 UndoStackItem item = new UndoStackItem();
                 item.setCommand(c);
-                item.setUser(c.getUser());
+                item.setUserId(c.getUserId());
                 item.setTransaction(c.getTransaction());
                 entityManager.persist(item);
                 //entityManager.flush();
@@ -101,12 +97,13 @@ public class CommandService {
     }
 
     public List<CommandResponse> undo(Long commandId) {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         Optional<UndoStackItem> lastUndoStackItem;
         if (commandId != null) {
-            lastUndoStackItem = commandRepository.findLastUndoStackItem(user, commandRepository.getById(commandId));
+            lastUndoStackItem =
+                commandRepository.findLastUndoStackItem(user.id(), commandRepository.getById(commandId));
         } else {
-            lastUndoStackItem = commandRepository.findLastUndoStackItem(user);
+            lastUndoStackItem = commandRepository.findLastUndoStackItem(user.id());
         }
 
         if (lastUndoStackItem.isEmpty()) {
@@ -121,7 +118,7 @@ public class CommandService {
         }
     }
 
-    public List<CommandResponse> undo(UndoStackItem undoItem, User user) {
+    public List<CommandResponse> undo(UndoStackItem undoItem, UserResponse user) {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
@@ -138,9 +135,9 @@ public class CommandService {
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user, transaction);
+            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user.id(), transaction);
             for (UndoStackItem undoStack : undoStacks) {
-                //browse all command and undo it while its the same transaction
+                //browse all command and undo it while it's the same transaction
                 if (undoStack.getCommand().isRefuseUndo()) {
                     //undo delete project is not possible
                     //responseError(new ObjectNotFoundException("You cannot delete your last operation!"))
@@ -183,7 +180,7 @@ public class CommandService {
         return redo(null);
     }
 
-    public List<CommandResponse> redo(RedoStackItem redoItem, User user) {
+    public List<CommandResponse> redo(RedoStackItem redoItem, long userId) {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
@@ -200,7 +197,7 @@ public class CommandService {
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(user, transaction);
+            List<RedoStackItem> redoStacks = commandRepository.findAllRedoOrderByCreatedDesc(userId, transaction);
             for (RedoStackItem redoStack : redoStacks) {
                 //Redo each command from the same transaction
                 result = performRedo(redoStack.getCommand());
@@ -212,12 +209,13 @@ public class CommandService {
     }
 
     public List<CommandResponse> redo(Long commandId) {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         Optional<RedoStackItem> lastRedoStackItem;
         if (commandId != null) {
-            lastRedoStackItem = commandRepository.findLastRedoStackItem(user, commandRepository.getById(commandId));
+            lastRedoStackItem =
+                commandRepository.findLastRedoStackItem(user.id(), commandRepository.getById(commandId));
         } else {
-            lastRedoStackItem = commandRepository.findLastRedoStackItem(user);
+            lastRedoStackItem = commandRepository.findLastRedoStackItem(user.id());
         }
 
         if (lastRedoStackItem.isEmpty()) {
@@ -228,7 +226,7 @@ public class CommandService {
             return List.of(commandResponse);
         } else {
             RedoStackItem redoStackItem = lastRedoStackItem.get();
-            return this.redo(redoStackItem, user);
+            return this.redo(redoStackItem, user.id());
         }
     }
 

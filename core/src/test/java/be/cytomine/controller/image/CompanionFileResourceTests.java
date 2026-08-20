@@ -1,29 +1,11 @@
 package be.cytomine.controller.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,9 +20,12 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.CompanionFile;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
@@ -59,29 +44,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class CompanionFileResourceTests {
 
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restCompanionFileControllerMockMvc;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
-
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     @Transactional
@@ -155,7 +129,7 @@ public class CompanionFileResourceTests {
         CompanionFile companionFile = builder.givenANotPersistedCompanionFile(builder.givenAnAbstractImage());
         restCompanionFileControllerMockMvc.perform(post("/api/companionfile.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(companionFile.toJSON()))
+                .content(companionFile.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -169,7 +143,7 @@ public class CompanionFileResourceTests {
     @Transactional
     public void editValidCompanionFile() throws Exception {
         CompanionFile companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
-        JsonObject jsonObject = companionFile.toJsonObject();
+        JsonObject jsonObject = companionFile.toJsonObject(urlApi);
         jsonObject.put("filename", "toto");
         restCompanionFileControllerMockMvc.perform(put("/api/companionfile/{id}.json", companionFile.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -226,7 +200,7 @@ public class CompanionFileResourceTests {
         companionFile.getUploadedFile().setOriginalFilename("CMU-2.mrxs");
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/file/" + URLEncoder.encode(
                 companionFile.getPath(),
                 StandardCharsets.UTF_8

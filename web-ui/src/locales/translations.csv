@@ -3,6 +3,7 @@ about-cytomine,About Cytomine,À propos de Cytomine,Sobre Cytomine,Over Cytomine
 absolute-link-mode,Absolute,Absolu,,Absoluut
 access-denied,Access denied,Accès non autorisé,Acceso denegado,Verboden Acces
 account,Account,Compte,Cuenta,Rekening
+action,Action,Action,Acción,Actie
 actions,Actions,Actions,Acciones,Acties
 active-projects,Active projects,Projets actifs,Proyectos activos,Actieve projecten
 activity-chart-info-message,This chart presents the activity performed in the selected period,Ce graphique présente un résumé de l'activité ayant eu lieu durant la période sélectionnée,Este gráfico presenta la actividad en el período seleccionado,Deze grafiek toont een samenvatting van de activiteit die plaatsvond tijdens de geselecteerde periode
@@ -88,7 +89,7 @@ app-engine.task.upload,Upload tasks,Téléverser des tâches,Cargar tareas,Taken
 app-engine.task.no-description,No description,Pas de description,Sin descripción,Geen beschrijving
 app-engine.tasks.installed,Installed Tasks,Tâches installées,Tareas instaladas,Geïnstalleerde taken
 app-engine.tasks.name,Tasks,Tâches,Tareas,Taken
-app-name,App Name,app-name,App Name,Nom de l'application,Nombre de la aplicación,App-naam
+app-name,App Name,Nom de l'application,Nombre de la aplicación,App-naam
 app-store,App Store,App Store,App Store,App Store
 appengine-not-enabled-title,App Engine is not enabled,App Engine n'est pas activé,App Engine no está habilitado,App Engine is niet ingeschakeld
 appengine-not-enabled-description,"App Engine is not enabled on your Cytomine instance. Either contact an administrator, or contact sales@cytomine.com for requesting an upgrade of your instance.",App Engine n'est pas activé sur votre instance Cytomine. Contactez un administrateur ou envoyez un e-mail à sales@cytomine.com pour demander une mise à niveau de votre instance.,App Engine no está habilitado en su instancia de Cytomine. Póngase en contacto con un administrador o envíe un correo a sales@cytomine.com para solicitar una actualización de su instancia.,App Engine is niet ingeschakeld op uw Cytomine-instantie. Neem contact op met een beheerder of stuur een e-mail naar sales@cytomine.com om een upgrade van uw instantie aan te vragen.
@@ -150,7 +151,6 @@ button-hide,Hide,Masquer,Ocultar,Verbergen
 button-kill,Kill,Arrêter,Abortar,Stoppen
 button-less,Less,Moins,Menos,Minder
 button-load-more,Load more,Plus,Cargar más,Meer loaden knop
-button-lock,Lock,Verrouiller,Bloquear,blokkeren
 button-manage-members,Manage members,Gestion des membres,Administrar miembros,Leden managen
 button-metadata,Metadata,Métadonnées,Metadatos,Metagegevens
 button-more-info,More information,Plus d'informations,Más información,Meer informatie
@@ -188,7 +188,6 @@ button-start,Start,Uploader,Comenzar,Uploaden
 button-switch-histogram-scale-to-linear,Switch to linear histogram,Utiliser un histogramme linéaire,Cambiar a histograma lineal,Schakel over naar lineair histogram
 button-unlink,Unlink,Séparer,Desconectar,Scheiden
 button-switch-histogram-scale-to-log,Switch to log histogram,Utiliser un histogramme log,Cambiar a histograma de registro,Schakel over naar loghistogram
-button-unlock,Unlock,Déverrouiller,Desbloquear,Unlock
 button-unvalidate-and-continue-review,Unvalidate and continue my review,Annuler la validation,Anular y continuar mi reseña,Validatie annuleren
 button-unvalidate-review,Unvalidate my review,Annuler la validation,Anular mi reseña,Validatie annuleren knop
 button-validate-review,Validate my review,Valider l'image,Validar mi reseña,Review valideren
@@ -699,13 +698,10 @@ notif-error-track-creation,Failed to create the track,Erreur durant la création
 notif-error-track-deletion,Failed to delete the track.,Erreur lors de la suppression de la trace,,Fout bij verwijderen van de track
 notif-error-track-update,Failed to update the track,Erreur durant la modification de la trace,,Fout bij het wijzigen van de track
 notif-error-tracked-user-position,Failed to retrieve the position of the followed user,Erreur lors de la récupération de la position de l'utilisateur suivi,Error al recuperar la posición del usuario seguido,Fout bij het ophalen van de positie van de gevolgde user
-notif-error-undo,Failed to undo last action,Une erreur a empêché d'annuler la dernière action,No se pudo deshacer la última acción,Een fout verhinderde het ongedaan maken van de laatste actie
 notif-error-unvalidate-review,Failed to unvalidate the image review,Une erreur a empêché d'annuler la validation de l'image,No se pudo invalidar la revisión de la imagen,Een fout verhinderde het ongedaan maken van de afbeeldingsreview
 notif-error-update-description,Failed to update description,Une erreur a empêché de sauvegarder la description,Error al actualizar la descripción,Een fout verhinderde het opslaan van de beschrijving
 notif-error-user-creation,Failed to create the user,Une erreur a empêché la création de l'utilisateur,Error al crear el usuario,Een fout verhinderde het aanmaken van de user
 notif-error-user-details-not-saved,Error during update of user details,Une erreur a empêché la mise à jour du profil,A ocurrido un error durante la actualización de los detalles del usuario,Door een fout kon het profiel niet worden bijgewerkt
-notif-error-user-lock,Failed to lock the user,Une erreur a empêché de verrouiler l'utilisateur,Error al bloquear el usuario,Een fout verhinderde het uitsluiten van de user
-notif-error-user-unlock,Failed to unlock the user,Une erreur a empêché de déverrouiler l'utilisateur,Error al desbloquear el usuario,Door een fout kon de user niet worden ontgrendeld
 notif-error-user-update,Failed to update the user,Une erreur a empêché la modification de l'utilisateur,Error al actualizar al usuario,Een fout verhinderde de wijziging van de user
 notif-error-validate-review,Failed to validate the image,Une erreur a empêché la validation de l'image,Error al validar la imagen,Een fout verhinderde de review van de afbeelding
 notif-success-add-image,Image {imageName} was successfully added to project {projectName},L'image {imageName} a été ajoutée au projet {projectName},La imagen {imageName} se agregó correctamente al proyecto {projectName},De afbeelding {imageName} is toegevoegd aan het project {projectName}
@@ -759,13 +755,16 @@ notify-error-app-deletion,Failed to delete the app,Échec de la suppression de l
 notify-error-app-deletion-forbidden,Only admin can delete apps,Seul l'administrateur peut supprimer des applications,Solo el administrador puede eliminar aplicaciones,Alleen admin kan apps verwijderen
 notify-error-app-installation,Failed to install the app,Échec de l'installation de l'application,Error al instalar la aplicación,Installatie van de app mislukt
 notify-error-empty-list,The list is empty,La liste est vide,La lista está vacía,De lijst is leeg
+notify-error-fetch-tag,Failed to fetch the tags,Une erreur a empêché de récupérer les tags,Error al obtener las etiquetas,Een fout verhinderde het ophalen van de tags
 notify-error-not-enough-item,Not enough items provided,Pas assez d'éléments fournis,No se han proporcionado suficientes elementos,Niet genoeg items verstrekt
+notify-error-undo,Failed to undo last action,Une erreur a empêché d'annuler la dernière action,No se pudo deshacer la última acción,Een fout verhinderde het ongedaan maken van de laatste actie
 notify-success-app-deletion,App deleted successfully,Application supprimée avec succès,Aplicación eliminada con éxito,App succesvol verwijderd
 notify-success-app-installation,App installed successfully,Application installée avec succès,Aplicación instalada con éxito,App succesvol geïnstalleerd
 notify-success-app-store-addition,App store added successfully,Magasin d'applications ajouté avec succès,Tienda de aplicaciones añadida con éxito,App store succesvol toegevoegd
 notify-success-app-store-deletion,App store deleted successfully,Magasin d'applications supprimé avec succès,Tienda de aplicaciones eliminada con éxito,App store succesvol verwijderd
 notify-success-create-array-inputs,The array was successfully provisioned,Le tableau a été approvisionné avec succès,La matriz se aprovisionó correctamente,De array is succesvol ingericht
 notify-success-task-upload,The task has been successfully uploaded,La tâche a été chargée avec succès,La tarea se ha cargado con éxito,De taak is succesvol geüpload
+notify-success-undo,Action undone,Action annulée,Acción deshecha,Actie ongedaan gemaakt
 number-annotation-creations,Number of annotation creations,Nombre d'annotations créées,Número de anotaciones creadas,Aantal aangemaakte annotaties
 number,Number,Nombre,Número,Nummer
 number-annotations-chart-info-message,This chart presents the number of annotation creations during the selected period,Ce graphique présente le nombre d'annotations créées durant la période sélectionnée,Este gráfico presenta el número de anotaciones creadas durante el período seleccionado.,Deze grafiek toont het aantal annotaties dat tijdens de geselecteerde periode is gemaakt
@@ -800,6 +799,7 @@ operating-system,Operating system,Système d'exploitation,Sistema operativo,Oper
 open-images-from-to,Open images from {from} to {to},Ouvrir les images {from} à {to},Abrir imágenes de {from} a {to},Afbeeldingen openen van {van} tot {tot}
 optional-parameters,Optional parameters,Paramètres optionnels,Parámetros opcionales,Optionele parameters
 open-source-project,Open-source project,Projet open-source,Proyecto de código abierto,Open source-project
+operation,Operation,Opération,Operación,Bewerking
 orange,Orange,Orange,Naranja,Oranje
 open-view-select-annot-to-link,Open another view with an image from the same image group and select annotation to link with.,Une nouvelle vue avec une image du même groupe d'images doit être ouverte avec l'annotation à lier sélectionnée.,Abra otra vista con una imagen del mismo grupo de imágenes y seleccione la anotación para vincularla.,Open een andere weergave met een afbeelding uit dezelfde afbeeldingsgroep en selecteer een annotatie om mee te linken.
 original-no-filter,Original (no filter),Pas de filtre,Original (sin filtro),Geen filter
@@ -1116,8 +1116,9 @@ use-existing-image-group,Use existing image group,Utiliser un groupe d'images ex
 use-existing-ontology,Use existing ontology,Utiliser une ontologie existante,Usar ontología existente,Gebruik een bestaande ontologie
 used-in-project-no-access,Used in projects that you are not allowed to see,Utilisée dans des projets auxquels vous n'avez pas accès,Usado en proyectos que no puedes ver,Wordt gebruikt in projecten waartoe u geen toegang heeft
 used-storage-space,Used storage space,Espace de stockage utilisé,Espacio de almacenamiento utilizado,Opslagruimte gebruikt
-user-annotations,Manual Annotations,Annotations manuelles,Anotaciones manuales,Handmatige annotaties
 user,User,Utilisateur,Usuario,Users
+user-annotations,Manual Annotations,Annotations manuelles,Anotaciones manuales,Handmatige annotaties
+user-history,User history,Historique de l'utilisateur,Historial del usuario,Gebruikersgeschiedenis van de gebruiker
 username,Username,Nom d'utilisateur,Nombre de usuario,Usersnaam
 users,Users,Utilisateurs,Usuarios,Users
 validate-annotation,Validate annotation,Valider l'annotation,Validar anotación,Annotatie valideren
@@ -1161,3 +1162,7 @@ you-are-reviewing-image-since,You are reviewing this image since {date},Cette im
 you-have-validated-image-on,You have validated this image on {date},Vous avez validé cette image le {date},Usted ha validado esta imagen el {fecha},U hebt deze afbeelding gevalideerd op {date}
 z-resolution,Z resolution,Résolution Z,,Z-resolutie
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
+delete-user,Delete User,Supprimer l'utilisateur,Eliminar usuario,Gebruiker verwijderen
+delete-user-confirmation,Are you sure you want to delete user {username}?,Êtes-vous sûr de vouloir supprimer l'utilisateur {username} ?,¿Está seguro de que desea eliminar el usuario {username}?,Weet u zeker dat u gebruiker {username} wilt verwijderen?
+notif-success-user-deletion,User successfully deleted,L'utilisateur a été supprimé avec succès,El usuario fue eliminado exitosamente,Gebruiker met succes verwijderd
+notif-error-user-deletion,Error deleting user,Erreur lors de la suppression de l'utilisateur,Error al eliminar el usuario,Fout bij het verwijderen van gebruiker

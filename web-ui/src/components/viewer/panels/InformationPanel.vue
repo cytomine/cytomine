@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div>
   <h1>
@@ -133,10 +119,12 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import ImageName from '@/components/image/ImageName';
-import CalibrationModal from '@/components/image/CalibrationModal';
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import eventBus from '@/utils/event-bus';
+
+import { get } from '@/utils/store-helpers';
+import ImageName from '@/components/image/ImageName.vue';
+import CalibrationModal from '@/components/image/CalibrationModal.vue';
+import { appendShortTermToken } from '@/utils/token-utils.js';
 
 export default {
   name: 'information-panel',
@@ -195,8 +183,8 @@ export default {
   methods: {
     appendShortTermToken,
     setResolution(resolution) {
-      this.$store.dispatch(this.viewerModule + 'setImageResolution', {idImage: this.image.id, resolution});
-      this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id}); // refresh the sources to update perimeter/area
+      this.$store.dispatch(this.viewerModule + 'setImageResolution', { idImage: this.image.id, resolution });
+      eventBus.emit('reloadAnnotations', { idImage: this.image.id }); // refresh the sources to update perimeter/area
     },
     download(image) {
       window.location.assign(appendShortTermToken(image.downloadURL, this.shortTermToken));
@@ -205,30 +193,30 @@ export default {
       try {
         let prev = await this.image.fetchPrevious();
         if (!prev.id) {
-          this.$notify({type: 'error', text: this.$t('notif-error-first-image')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-first-image') });
           this.isFirstImage = true;
         } else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', { image: prev, slices: [slice] });
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-previous-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-previous-image') });
       }
     },
     async nextImage() {
       try {
         let next = await this.image.fetchNext();
         if (!next.id) {
-          this.$notify({type: 'error', text: this.$t('notif-error-last-image')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-last-image') });
           this.isLastImage = true;
         } else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', { image: next, slices: [slice] });
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-next-image') });
       }
     },
     async previousImageInGroup() {
@@ -239,14 +227,14 @@ export default {
       try {
         let prev = await this.imageGroupLink.fetchPrevious();
         if (!prev.id) {
-          this.$notify({type: 'error', text: this.$t('notif-error-first-image')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-first-image') });
         } else {
           let slice = await prev.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: prev, slices: [slice]});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', { image: prev, slices: [slice] });
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-previous-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-previous-image') });
       }
     },
     async nextImageInGroup() {
@@ -257,14 +245,14 @@ export default {
       try {
         let next = await this.imageGroupLink.fetchNext();
         if (!next.id) {
-          this.$notify({type: 'error', text: this.$t('notif-error-last-image')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-last-image') });
         } else {
           let slice = await next.fetchReferenceSlice();
-          await this.$store.dispatch(this.imageModule + 'setImageInstance', {image: next, slices: [slice]});
+          await this.$store.dispatch(this.imageModule + 'setImageInstance', { image: next, slices: [slice] });
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-next-image')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-next-image') });
       }
     },
 
@@ -285,10 +273,10 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>

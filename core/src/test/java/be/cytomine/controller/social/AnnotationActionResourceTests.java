@@ -1,21 +1,5 @@
 package be.cytomine.controller.social;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Date;
 
 import org.apache.commons.lang3.time.DateUtils;
@@ -35,13 +19,16 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.AnnotationAction;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.social.AnnotationActionService;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,8 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class AnnotationActionResourceTests {
 
     @Autowired
@@ -66,6 +53,9 @@ public class AnnotationActionResourceTests {
 
     @Autowired
     private AnnotationActionService annotationActionService;
+
+    @Autowired
+    private CurrentUserService currentUserService;
 
     @BeforeEach
     public void cleanDB() {
@@ -89,7 +79,7 @@ public class AnnotationActionResourceTests {
     @Test
     public void addActionForAnnotation() throws Exception {
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(0);
-        User user = builder.givenSuperAdmin();
+        long userId = currentUserService.getCurrentUser().id();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         JsonObject jsonObject = new JsonObject();
@@ -104,17 +94,16 @@ public class AnnotationActionResourceTests {
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.social.AnnotationAction"))
             .andExpect(jsonPath("$.id").exists())
             .andExpect(jsonPath("$.created").exists())
-            .andExpect(jsonPath("$.user").value(user.getId()))
+            .andExpect(jsonPath("$.user").value(userId))
             .andExpect(jsonPath("$.image").value(annotationDomain.getImage().getId()))
             .andExpect(jsonPath("$.project").value(annotationDomain.getProject().getId()))
             .andExpect(jsonPath("$.action").value("select"))
             .andExpect(jsonPath("$.annotationIdent").value(annotationDomain.getId()))
             .andExpect(jsonPath("$.annotationClassName").value(annotationDomain.getClass().getName()))
-            .andExpect(jsonPath("$.annotationCreator").value(user.getId()));
+            .andExpect(jsonPath("$.annotationCreator").value(annotationDomain.user().getId()));
 
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(1);
     }
-
 
     @Test
     @Transactional

@@ -1,21 +1,5 @@
 package be.cytomine.controller.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -60,7 +44,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
@@ -69,8 +55,10 @@ import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
@@ -96,35 +84,58 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class ImageInstanceResourceTests {
-
-    @Autowired
-    private BasicInstanceBuilder builder;
-
-    @Autowired
-    private MockMvc restImageInstanceControllerMockMvc;
-
-    @Autowired
-    private ApplicationProperties applicationProperties;
-
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
-    private static RSAKey rsaKey;
 
     private static final String KEY_ID = "some random string";
 
+    private static RSAKey rsaKey;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    private BasicInstanceBuilder builder;
+    @Autowired
+    private MockMvc restImageInstanceControllerMockMvc;
+    @Autowired
+    private ApplicationProperties applicationProperties;
+
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
+
+    private static final WireMockServer jwkMockServer = new WireMockServer(8888);
+
+
+    @Autowired
+    private UrlApi urlApi;
+
     @BeforeAll
     public static void beforeAll() throws JOSEException {
-        configureWireMock(wireMockServer);
-        wireMockServer.start();
+        configureWireMock(jwkMockServer);
+        jwkMockServer.start();
     }
 
     @AfterAll
     public static void afterAll() {
-        wireMockServer.stop();
+        jwkMockServer.stop();
+    }
+
+    public static void configureWireMock(WireMockServer wireMockServer) throws JOSEException {
+        rsaKey = new RSAKeyGenerator(2048)
+            .keyUse(KeyUse.SIGNATURE)
+            .algorithm(new Algorithm("RS256"))
+            .keyID(KEY_ID)
+            .generate();
+
+        RSAKey rsaPublicJWK = rsaKey.toPublicJWK();
+        String jwkResponse = String.format("{\"keys\": [%s]}", rsaPublicJWK.toJSONString());
+
+        wireMockServer.stubFor(com.github.tomakehurst.wiremock.client.WireMock.get(urlMatching("/"))
+            .willReturn(aResponse()
+                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(jwkResponse)));
+
     }
 
     private ImageInstance givenTestImageInstance() {
@@ -205,7 +216,6 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.width").value(109240));
     }
 
-
     @Test
     @Transactional
     public void getAnImageInstanceNotExist() throws Exception {
@@ -213,7 +223,6 @@ public class ImageInstanceResourceTests {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors.message").exists());
     }
-
 
     @Test
     @Transactional
@@ -225,7 +234,6 @@ public class ImageInstanceResourceTests {
             ))
             .andExpect(status().isOk());
     }
-
 
     @Test
     @Transactional
@@ -252,9 +260,6 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.format.list", contains(image.getBaseImage().getContentType())));
 
     }
-
-    @Autowired
-    UserRepository userRepository;
 
     @WithMockUser(username = "list_image_instance_by_user")
     @Test
@@ -288,7 +293,6 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").doesNotExist());
     }
 
-
     @WithMockUser(username = "list_image_instance_light_by_user")
     @Test
     @Transactional
@@ -299,7 +303,6 @@ public class ImageInstanceResourceTests {
         User user = builder.givenAUser("list_image_instance_light_by_user");
         builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
 
-
         restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance/light.json", user.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists())
@@ -308,7 +311,6 @@ public class ImageInstanceResourceTests {
                 + ")]").doesNotExist());
 
     }
-
 
     @Test
     @Transactional
@@ -322,7 +324,6 @@ public class ImageInstanceResourceTests {
             anotherProject
         );
 
-
         restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project1.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + imageInProject1.getId() + ")]").exists())
@@ -334,9 +335,7 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + imageInProject1.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id==" + imageInAnotherProject.getId() + ")]").doesNotExist());
 
-
     }
-
 
     @Test
     @Transactional
@@ -350,7 +349,6 @@ public class ImageInstanceResourceTests {
             anotherProject
         );
 
-
         restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project1.getId())
                 .param("light", "true"))
             .andExpect(status().isOk())
@@ -359,7 +357,6 @@ public class ImageInstanceResourceTests {
                 imageInProject1.getBlindInstanceFilename()))
             .andExpect(jsonPath("$.collection[?(@.id==" + imageInAnotherProject.getId() + ")]").doesNotExist());
     }
-
 
     @Test
     @Transactional
@@ -381,7 +378,6 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.collection[0].filename").isEmpty());
     }
 
-
     @Test
     @Transactional
     public void listImageInstanceByProjectsTree() throws Exception {
@@ -390,7 +386,6 @@ public class ImageInstanceResourceTests {
 
         ImageInstance image1InProject1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project1);
         ImageInstance image2InProject1 = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project1);
-
 
         restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project1.getId())
                 .param("tree", "true"))
@@ -402,7 +397,6 @@ public class ImageInstanceResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.children", hasSize(1)));
     }
-
 
     @Test
     @Transactional
@@ -461,7 +455,6 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + image2.getId() + ")]").exists());
     }
 
-
     @Test
     @Transactional
     public void listImageInstanceByProjectWithPagination() throws Exception {
@@ -493,7 +486,6 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.size").value(3))
             .andExpect(jsonPath("$.totalPages").value(1));
 
-
         restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project.getId())
                 .param("offset", "0")
                 .param("max", "1")
@@ -506,7 +498,6 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.perPage").value(1))
             .andExpect(jsonPath("$.size").value(3))
             .andExpect(jsonPath("$.totalPages").value(3));
-
 
         restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project.getId())
                 .param("offset", "1")
@@ -534,7 +525,6 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.size").value(3))
             .andExpect(jsonPath("$.totalPages").value(1));
 
-
         restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project.getId())
                 .param("offset", "0")
                 .param("max", "500")
@@ -549,7 +539,6 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.size").value(3))
             .andExpect(jsonPath("$.totalPages").value(1));
 
-
         restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project.getId())
                 .param("offset", "500")
                 .param("max", "0")
@@ -561,7 +550,6 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.size").value(3))
             .andExpect(jsonPath("$.totalPages").value(1));
     }
-
 
     @Test
     @Transactional
@@ -603,14 +591,13 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$").isEmpty());
     }
 
-
     @Test
     @Transactional
     public void addValidImageInstance() throws Exception {
         ImageInstance imageInstance = builder.givenANotPersistedImageInstance();
         restImageInstanceControllerMockMvc.perform(post("/api/imageinstance.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(imageInstance.toJSON()))
+                .content(imageInstance.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -626,7 +613,7 @@ public class ImageInstanceResourceTests {
     public void editValidImageInstance() throws Exception {
         Project project = builder.givenAProject();
         ImageInstance imageInstance = builder.givenAnImageInstance();
-        JsonObject jsonObject = imageInstance.toJsonObject();
+        JsonObject jsonObject = imageInstance.toJsonObject(urlApi);
         jsonObject.put("project", project.getId());
         restImageInstanceControllerMockMvc.perform(put("/api/imageinstance/{id}.json", imageInstance.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -641,9 +628,7 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.imageinstance.id").exists())
             .andExpect(jsonPath("$.imageinstance.project").value(project.getId()));
 
-
     }
-
 
     @Test
     @Transactional
@@ -659,20 +644,19 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.imageinstance.id").exists());
 
-
     }
-
 
     @Test
     @Transactional
     @Disabled("Randomly fails")
     public void getImageInstanceThumb() throws Exception {
         ImageInstance image = givenTestImageInstance();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getBaseImage().getPath(),
@@ -709,13 +693,14 @@ public class ImageInstanceResourceTests {
     @Transactional
     public void getImageInstancePreview() throws Exception {
         ImageInstance image = givenTestImageInstance();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getBaseImage().getPath(),
                 StandardCharsets.UTF_8
@@ -735,19 +720,19 @@ public class ImageInstanceResourceTests {
         assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
-
     @Test
     @Transactional
     public void getImageInstanceAssocietedLabel() throws Exception {
         ImageInstance image = givenTestImageInstance();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 "1636379100999/CMU-2/CMU-2.mrxs",
                 StandardCharsets.UTF_8
             ).replace("%2F", "/") + "/info/associated"))
                 .willReturn(
                     aResponse().withBody(
-                        "{\"items\": [{\"name\":\"macro\"},{\"name\":\"thumbnail\"},{\"name\":\"label\"}], \"size\": 0}")
+                        "{\"items\": [{\"name\":\"macro\"},{\"name\":\"thumbnail\"},{\"name\":\"label\"}], \"size\": "
+                            + "0}")
                 )
         );
         restImageInstanceControllerMockMvc.perform(get("/api/imageinstance/{id}/associated.json", image.getId()))
@@ -756,16 +741,16 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.collection", containsInAnyOrder("label", "macro", "thumbnail")));
     }
 
-
     @Test
     @Transactional
     public void getImageInstanceAssocietedLabelMacro() throws Exception {
         ImageInstance image = givenTestImageInstance();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode(image.getBaseImage().getPath(), StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/associated/macro?length=512";
@@ -789,24 +774,26 @@ public class ImageInstanceResourceTests {
         AssertionsForClassTypes.assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
-
     @Disabled("Randomly fail with ProxyExchange, need to find a solution")
     @Test
     @Transactional
     public void getImageInstanceCrop() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode(image.getBaseImage().getPath(), StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/annotation/crop";
         String
             body
-            = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1)"
+                + ")\"}],\"timepoints\":0,\"background_transparency\":0}";
 
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(
                     body
@@ -833,17 +820,20 @@ public class ImageInstanceResourceTests {
     public void getImageInstanceWindow() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
-            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url and return the content
+            .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
+        // and return the content
 
         String url = "/image/" + URLEncoder.encode(image.getBaseImage().getPath(), StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/window";
         String
             body
-            = "{\"level\":0,\"z_slices\":0,\"timepoints\":0,\"region\":{\"left\":10,\"top\":20,\"width\":30,\"height\":40}}";
+            =
+            "{\"level\":0,\"z_slices\":0,\"timepoints\":0,\"region\":{\"left\":10,\"top\":20,\"width\":30,"
+                + "\"height\":40}}";
         System.out.println(url);
         System.out.println(body);
         stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url)).withRequestBody(WireMock.equalTo(body))
@@ -863,37 +853,46 @@ public class ImageInstanceResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void getImageInstanceMetadata() throws Exception {
         ImageInstance image = givenTestImageInstance();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getBaseImage().getPath(),
                 StandardCharsets.UTF_8
             ).replace("%2F", "/") + "/metadata"))
                 .willReturn(
                     aResponse().withBody(
-                        "{\"size\":11,\"items\":[{\"key\":\"JFIFVersion\",\"value\":1.01,\"type\":\"DECIMAL\",\"namespace\":\"JFIF\"},"
+                        "{\"size\":11,\"items\":[{\"key\":\"JFIFVersion\",\"value\":1.01,\"type\":\"DECIMAL\","
+                            + "\"namespace\":\"JFIF\"},"
                             +
-                            "{\"key\":\"ResolutionUnit\",\"value\":\"inches\",\"type\":\"STRING\",\"namespace\":\"JFIF\"},{\"key\":\"XResolution\","
+                            "{\"key\":\"ResolutionUnit\",\"value\":\"inches\",\"type\":\"STRING\","
+                            + "\"namespace\":\"JFIF\"},{\"key\":\"XResolution\","
                             +
-                            "\"value\":300,\"type\":\"INTEGER\",\"namespace\":\"JFIF\"},{\"key\":\"YResolution\",\"value\":300,\"type\":\"INTEGER\","
+                            "\"value\":300,\"type\":\"INTEGER\",\"namespace\":\"JFIF\"},{\"key\":\"YResolution\","
+                            + "\"value\":300,\"type\":\"INTEGER\","
                             +
-                            "\"namespace\":\"JFIF\"},{\"key\":\"ProfileCMMType\",\"value\":\"Little CMS\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "\"namespace\":\"JFIF\"},{\"key\":\"ProfileCMMType\",\"value\":\"Little CMS\","
+                            + "\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ProfileVersion\",\"value\":\"4.3.0\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "{\"key\":\"ProfileVersion\",\"value\":\"4.3.0\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ProfileClass\",\"value\":\"Display Device Profile\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "{\"key\":\"ProfileClass\",\"value\":\"Display Device Profile\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ColorSpaceData\",\"value\":\"RGB\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "{\"key\":\"ColorSpaceData\",\"value\":\"RGB\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ProfileConnectionSpace\",\"value\":\"XYZ\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "{\"key\":\"ProfileConnectionSpace\",\"value\":\"XYZ\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ProfileDateTime\",\"value\":\"2021:03:02 20:40:36\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"},"
+                            "{\"key\":\"ProfileDateTime\",\"value\":\"2021:03:02 20:40:36\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"},"
                             +
-                            "{\"key\":\"ProfileFileSignature\",\"value\":\"acsp\",\"type\":\"STRING\",\"namespace\":\"ICC_PROFILE\"}]}")
+                            "{\"key\":\"ProfileFileSignature\",\"value\":\"acsp\",\"type\":\"STRING\","
+                            + "\"namespace\":\"ICC_PROFILE\"}]}")
                 )
         );
         restImageInstanceControllerMockMvc.perform(get("/api/imageinstance/{id}/metadata.json", image.getId()))
@@ -902,14 +901,13 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.collection[?(@.key==\"ProfileClass\")]").exists());
     }
 
-
     @Test
     @Disabled("Randomly fails")
     public void downloadImageInstance() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getBaseImage().getPath(),
                 StandardCharsets.UTF_8
@@ -937,7 +935,6 @@ public class ImageInstanceResourceTests {
         assertThat(mvcResult.getResponse().getContentAsByteArray()).isEqualTo(mockResponse);
     }
 
-
     @Test
     @WithMockUser("download_image_instance_cannot_download")
     @Disabled("Randomly fails")
@@ -949,7 +946,7 @@ public class ImageInstanceResourceTests {
         image.getProject().setAreImagesDownloadable(true);
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getBaseImage().getPath(),
                 StandardCharsets.UTF_8
@@ -982,7 +979,7 @@ public class ImageInstanceResourceTests {
     public void histograms() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         System.out.println("/image/" + URLEncoder.encode(image.getBaseImage().getPath(), StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/histogram/per-plane/z/0/t/0?n_bins=256&channels=0");
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -1026,7 +1023,7 @@ public class ImageInstanceResourceTests {
     public void histogramsBounds() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getBaseImage().getPath(),
@@ -1045,14 +1042,12 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.type").value("FAST"));
     }
 
-
     @Test
     @Transactional
     public void channelHistograms() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
-
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         System.out.println("/image/" + URLEncoder.encode(image.getBaseImage().getPath(), StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/histogram/per-channels?n_bins=256");
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
@@ -1074,14 +1069,12 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.collection[0].lastBin").value(255));
     }
 
-
     @Test
     @Transactional
     public void channelHistogramsBounds() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
-
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getBaseImage().getPath(),
                 StandardCharsets.UTF_8
@@ -1138,24 +1131,6 @@ public class ImageInstanceResourceTests {
         );
         signedJWT.sign(signer);
         return signedJWT.serialize();
-    }
-
-    public static void configureWireMock(WireMockServer wireMockServer) throws JOSEException {
-        rsaKey = new RSAKeyGenerator(2048)
-            .keyUse(KeyUse.SIGNATURE)
-            .algorithm(new Algorithm("RS256"))
-            .keyID(KEY_ID)
-            .generate();
-
-        RSAKey rsaPublicJWK = rsaKey.toPublicJWK();
-        String jwkResponse = String.format("{\"keys\": [%s]}", rsaPublicJWK.toJSONString());
-
-        wireMockServer.stubFor(com.github.tomakehurst.wiremock.client.WireMock.get(urlMatching("/"))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(jwkResponse)));
-
-
     }
 
 }

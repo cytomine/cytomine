@@ -16,9 +16,12 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.group.ImageGroup;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,14 +31,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class ImageGroupResourceTests {
 
     @Autowired
+    private UrlApi urlApi;
+    @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restImageGroupControllerMockMvc;
 
@@ -79,7 +83,7 @@ public class ImageGroupResourceTests {
         ImageGroup imageGroup = builder.givenANotPersistedImagegroup();
         restImageGroupControllerMockMvc.perform(post("/api/imagegroup.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(imageGroup.toJSON()))
+                .content(imageGroup.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -93,7 +97,7 @@ public class ImageGroupResourceTests {
     @Transactional
     public void editValidImagegroup() throws Exception {
         ImageGroup imageGroup = builder.givenAnImageGroup();
-        JsonObject jsonObject = imageGroup.toJsonObject();
+        JsonObject jsonObject = imageGroup.toJsonObject(urlApi);
         String name = UUID.randomUUID().toString();
         jsonObject.put("name", name);
         restImageGroupControllerMockMvc.perform(put("/api/imagegroup/{id}.json", imageGroup.getId())

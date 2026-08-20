@@ -10,10 +10,12 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import WKT from 'ol/format/WKT';
-import {AnnotationCollection, Cytomine} from '@/api';
-import {annotBelongsToLayer} from '@/utils/annotation-utils';
-import {get} from '@/utils/store-helpers';
+import { AnnotationCollection, Cytomine } from '@/api';
+import { annotBelongsToLayer } from '@/utils/annotation-utils';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'annotation-layer',
@@ -98,7 +100,7 @@ export default {
   methods: {
     clearFeatures(cache = true) {
       if (this.$refs.olSource) {
-        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache});
+        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', { layer: this.layer, cache });
         this.$refs.olSource.clearFeatures();
       }
     },
@@ -112,7 +114,7 @@ export default {
         this.$refs.olSource.addFeature(this.createFeature(annot));
       }
     },
-    selectAnnotationHandler({annot, index}) {
+    selectAnnotationHandler({ annot, index }) {
       if (index === this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
         let olFeature = this.$refs.olSource.getFeatureById(annot.id);
         if (!olFeature) {
@@ -122,7 +124,7 @@ export default {
         }
       }
     },
-    reloadAnnotationsHandler({idImage, clear = false, hard = false} = {}) {
+    reloadAnnotationsHandler({ idImage, clear = false, hard = false } = {}) {
       if (!idImage || idImage === this.image.id) {
         if (clear) {
           this.clearFeatures();
@@ -290,7 +292,7 @@ export default {
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-annotations-viewer')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-annotations-viewer') });
         return;
       }
 
@@ -355,21 +357,21 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$on('selectAnnotationInLayer', this.selectAnnotationHandler);
-    this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$on('reviewAnnotation', this.reviewAnnotationHandler);
-    this.$eventBus.$on('editAnnotation', this.editAnnotationHandler);
-    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationHandler);
+    eventBus.on('addAnnotation', this.addAnnotationHandler);
+    eventBus.on('selectAnnotationInLayer', this.selectAnnotationHandler);
+    eventBus.on('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.on('reviewAnnotation', this.reviewAnnotationHandler);
+    eventBus.on('editAnnotation', this.editAnnotationHandler);
+    eventBus.on('deleteAnnotation', this.deleteAnnotationHandler);
   },
   beforeDestroy() {
     // unsubscribe from all events
-    this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$off('selectAnnotationInLayer', this.selectAnnotationHandler);
-    this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$off('reviewAnnotation', this.reviewAnnotationHandler);
-    this.$eventBus.$off('editAnnotation', this.editAnnotationHandler);
-    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationHandler);
+    eventBus.off('addAnnotation', this.addAnnotationHandler);
+    eventBus.off('selectAnnotationInLayer', this.selectAnnotationHandler);
+    eventBus.off('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.off('reviewAnnotation', this.reviewAnnotationHandler);
+    eventBus.off('editAnnotation', this.editAnnotationHandler);
+    eventBus.off('deleteAnnotation', this.deleteAnnotationHandler);
   }
 };
 </script>

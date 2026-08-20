@@ -18,14 +18,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.SecRole;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.meta.PropertyService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
@@ -54,13 +55,14 @@ public class CustomUIController extends RestCytomineController {
     private final ApplicationProperties applicationProperties;
 
     static String CUSTOM_UI_PROJECT = "@CUSTOM_UI_PROJECT";
+    private final UrlApi urlApi;
 
     @GetMapping("/custom-ui/config.json")
     public ResponseEntity<String> retrieveUIConfig(
         @RequestParam(value = "project", defaultValue = "0") Long projectId
     ) {
         log.debug("REST request to retrieve custom UI");
-        Set<SecRole> roles = currentRoleService.findCurrentRole(currentUserService.getCurrentUser());
+        Set<RoleResponse> roles = currentRoleService.findCurrentRole(currentUserService.getCurrentUser());
         Project project = projectService.get(projectId);
 
         JsonObject config = new JsonObject();
@@ -100,10 +102,10 @@ public class CustomUIController extends RestCytomineController {
                     property.setValue(jsonObject.toJsonString());
                     property.setDomain(project);
 
-                    CommandResponse result = propertyService.add(property.toJsonObject());
+                    CommandResponse result = propertyService.add(property.toJsonObject(urlApi));
                     responseSuccess((String) ((LinkedHashMap) result.getData().get("property")).get("value"));
                 } else {
-                    JsonObject jsonEdit = optionalProperty.get().toJsonObject()
+                    JsonObject jsonEdit = optionalProperty.get().toJsonObject(urlApi)
                         .withChange("value", jsonObject.toJsonString());
 
                     CommandResponse result = propertyService.update(optionalProperty.get(), jsonEdit);
@@ -121,9 +123,9 @@ public class CustomUIController extends RestCytomineController {
         }
     }
 
-    public JsonObject getGlobalConfig(Set<SecRole> roles) {
+    public JsonObject getGlobalConfig(Set<RoleResponse> roles) {
         JsonObject globalConfig = new JsonObject();
-        Set<String> authorities = roles.stream().map(SecRole::getAuthority).collect(Collectors.toSet());
+        Set<String> authorities = roles.stream().map(RoleResponse::authority).collect(Collectors.toSet());
 
         for (Map.Entry<String, List<String>> it : applicationProperties.getCustomUI().getGlobal().entrySet()) {
             boolean print;
@@ -164,7 +166,7 @@ public class CustomUIController extends RestCytomineController {
     }
 
     private Map<String, Boolean> getProjectConfigCurrentUser(Project project) {
-        boolean isProjectAdmin = projectService.listByAdmin(currentUserService.getCurrentUser())
+        boolean isProjectAdmin = projectService.listByAdmin(currentUserService.getCurrentUserOld())
             .stream()
             .anyMatch(x -> x.getId().equals(project.getId()));
         boolean isAdminByNow = currentRoleService.isAdminByNow(currentUserService.getCurrentUser());

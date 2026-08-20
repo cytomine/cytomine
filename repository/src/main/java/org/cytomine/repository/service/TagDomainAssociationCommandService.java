@@ -1,7 +1,11 @@
 package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +18,7 @@ import org.cytomine.repository.persistence.entity.TagDomainAssociationEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.TagDomainAssociationCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.CreateTagDomainAssociationCommand;
@@ -139,5 +144,13 @@ public class TagDomainAssociationCommandService implements
     @Override
     public boolean canDeleteAclId(long userId, long aclId) {
         return aclService.isAdmin(userId);
+    }
+
+    public Set<HttpCommandResponse> deleteByTagId(long userId, long tagId, LocalDateTime now, UUID parentCommandId) {
+        return tagDomainAssociationRepository.findAllIdsByTagId(tagId)
+            .stream()
+            .map(associationId -> delete(userId, associationId, now, Optional.of(parentCommandId)))
+            .flatMap(Optional::stream)
+            .collect(Collectors.toSet());
     }
 }

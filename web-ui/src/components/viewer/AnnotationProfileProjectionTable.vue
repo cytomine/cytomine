@@ -82,16 +82,16 @@
 <script>
 import constants from '@/utils/constants';
 import AnnotationProfileProjectionChart from '@/components/charts/AnnotationProfileProjectionChart';
-import {SliceInstanceCollection} from '@/api';
-import {formatMinutesSeconds} from '@/utils/slice-utils';
+import { SliceInstanceCollection } from '@/api';
+import { formatMinutesSeconds } from '@/utils/slice-utils';
 
 export default {
   name: 'AnnotationProfileProjectionTable',
-  components: {AnnotationProfileProjectionChart},
+  components: { AnnotationProfileProjectionChart },
   props: {
     annotation: Object,
     image: Object,
-    spatialAxis: {type: Boolean, default: false}
+    spatialAxis: { type: Boolean, default: false }
   },
   data() {
     return {

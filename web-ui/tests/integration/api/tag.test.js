@@ -1,5 +1,5 @@
 import * as utils from './utils.js';
-import {Tag, TagCollection} from '@/index.js';
+import { Tag, TagCollection } from '@/index.js';
 
 describe('Tag', () => {
 
@@ -19,7 +19,7 @@ describe('Tag', () => {
 
   describe('Create', () => {
     it('Create', async () => {
-      tag = new Tag({name, user});
+      tag = new Tag({ name, user });
       tag = await tag.save();
       id = tag.id;
       expect(id).toBeDefined();
@@ -35,7 +35,7 @@ describe('Tag', () => {
     });
 
     it('Fetch with instance method', async () => {
-      let fetchedTag = await new Tag({id}).fetch();
+      let fetchedTag = await new Tag({ id }).fetch();
       expect(fetchedTag).toBeInstanceOf(Tag);
       expect(fetchedTag.name).toEqual(name);
     });
@@ -76,7 +76,7 @@ describe('Tag', () => {
     beforeAll(async () => {
       let tagPromises = [];
       for (let i = 0; i < nbTags; i++) {
-        tagPromises.push(new Tag({name: utils.randomString(), user}).save());
+        tagPromises.push(new Tag({ name: utils.randomString(), user }).save());
       }
       tags = await Promise.all(tagPromises);
     });
@@ -101,7 +101,7 @@ describe('Tag', () => {
       });
 
       it('Fetch with several requests', async () => {
-        let collection = await TagCollection.fetchAll({nbPerPage: Math.ceil(totalNb / 3)});
+        let collection = await TagCollection.fetchAll({ nbPerPage: Math.ceil(totalNb / 3) });
         expect(collection).toBeInstanceOf(TagCollection);
         expect(collection).toHaveLength(totalNb);
       });
@@ -132,19 +132,19 @@ describe('Tag', () => {
       let nbPerPage = 1;
 
       it('Fetch arbitrary page', async () => {
-        let collection = new TagCollection({nbPerPage});
+        let collection = new TagCollection({ nbPerPage });
         await collection.fetchPage(2);
         expect(collection).toHaveLength(nbPerPage);
       });
 
       it('Fetch next page', async () => {
-        let collection = new TagCollection({nbPerPage});
+        let collection = new TagCollection({ nbPerPage });
         await collection.fetchNextPage();
         expect(collection).toHaveLength(nbPerPage);
       });
 
       it('Fetch previous page', async () => {
-        let collection = new TagCollection({nbPerPage});
+        let collection = new TagCollection({ nbPerPage });
         collection.curPage = 2;
         await collection.fetchPreviousPage();
         expect(collection).toHaveLength(nbPerPage);

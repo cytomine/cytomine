@@ -2,7 +2,7 @@
 
 > Cytomine-python-client is an open-source Cytomine client written in Python. This client is a Python wrapper around Cytomine REST API gateway.
 
-[![GitHub release](https://img.shields.io/github/release/cytomine/Cytomine-python-client.svg)](https://github.com/cytomine/Cytomine-python-client/releases)
+[![PyPI version](https://img.shields.io/pypi/v/cytomine-python-client.svg)](https://pypi.org/project/cytomine-python-client/)
 
 ## Overview
 

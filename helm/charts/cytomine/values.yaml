@@ -102,6 +102,7 @@ images:
   mongodb: mongo:5.0-focal
   pims_cache: redis:7
   redis: redis:7
+  meilisearch: getmeili/meilisearch:v1.43.0
   iam: keycloak/keycloak:26.3
   e2e_tests: cytomine/e2e-tests:latest
   selenium: selenium/standalone-firefox
@@ -234,11 +235,21 @@ iam:
   # the URL of the LSAAI instance
   lsaaiEndpoint:
 
+# Content-based image retrieval
 cbir:
-  port: 6000  # https://github.com/cytomine/cytomine/blob/8e5a14bf70b22e9f96a253d6402f793e8a37ce3e/cbir/Dockerfile#L37
+  port: 6000
   storage:
     size: 1Gi
     storageClassName:
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 1000m
+      ephemeral-storage: 512Mi
+    limits:
+      memory: 2Gi
+      cpu: 4000m
+      ephemeral-storage: 1Gi
 
 app_engine:
   port: 8080
@@ -261,6 +272,22 @@ app_engine:
 
 sam:
   port: 8000
+
+# MeiliSearch - Full-text search engine
+meilisearch:
+  deploy: true
+  port: 7700
+  storage: 1Gi
+  storageClassName:
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 1000m
+      ephemeral-storage: 320Mi
+    limits:
+      memory: 1Gi
+      cpu: 1000m
+      ephemeral-storage: 1Gi
 
 # Repository - Storage and artifact repository microservice
 repository:
@@ -306,4 +333,4 @@ test:
   ingressIP:
   # Number of e2e tests (used for SE_DRAIN_AFTER_SESSION_COUNT)
   # This is automatically set by CI from counting @Test annotations
-  e2eTestCount: 27
+  e2eTestCount: 32

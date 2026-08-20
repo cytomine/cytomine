@@ -1,21 +1,5 @@
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
-import {Cytomine, MyAccount, User} from '@/api';
-import {updateToken} from '@/utils/token-utils';
+import { Cytomine, MyAccount, User } from '@/api';
+import { updateToken } from '@/utils/token-utils';
 
 function getDefaultState() {
   return {
@@ -54,7 +38,7 @@ export default {
   },
 
   actions: {
-    async fetchUser({commit}) {
+    async fetchUser({ commit }) {
       const [user, account] = await Promise.all([
         User.fetchCurrent(), MyAccount.fetch()
       ]);
@@ -72,18 +56,18 @@ export default {
       }
     },
 
-    async updateAccount({dispatch}, account) {
+    async updateAccount({ dispatch }, account) {
       // Need to be sequential because the token needs to be refreshed to send updated claims to core.
       await account.update();
       await updateToken(-1);
       await dispatch('fetchUser');
     },
 
-    async openAdminSession({commit}) {
+    async openAdminSession({ commit }) {
       await Cytomine.instance.openAdminSession();
       commit('setAdminByNow', true);
     },
-    async closeAdminSession({dispatch}) {
+    async closeAdminSession({ dispatch }) {
       await Cytomine.instance.closeAdminSession();
       await dispatch('fetchUser');
     },

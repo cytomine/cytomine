@@ -1,23 +1,8 @@
 package be.cytomine.controller.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -44,9 +29,12 @@ import be.cytomine.common.repository.model.command.payload.response.TermRelation
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.RelationTerm;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
@@ -59,8 +47,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class RelationTermResourceTests {
 
     @Autowired
@@ -75,13 +63,17 @@ public class RelationTermResourceTests {
     @MockitoBean
     private TermRelationHttpContract termRelationHttpContract;
 
+    @Autowired
+    private CurrentUserService currentUserService;
+
     private TermRelationResponse buildResponse(RelationTerm relationTerm) {
         return new TermRelationResponse(
             relationTerm.getId(), relationTerm.getTerm1().getId(),
             relationTerm.getTerm2().getId(), relationTerm.getRelation().getId(),
             Optional.empty(),
             Optional.empty(),
-            LocalDateTime.ofInstant(relationTerm.getCreated().toInstant(), ZoneId.systemDefault()),
+            LocalDateTime.ofInstant(relationTerm.getCreated().toInstant(), ZoneId.systemDefault())
+                .truncatedTo(ChronoUnit.SECONDS),
             relationTerm.getRelation().getName()
         );
     }
@@ -90,7 +82,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void getATermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = currentUserService.getCurrentUser().id();
         TermRelationResponse expected = buildResponse(relationTerm);
         when(termRelationHttpContract.findTermRelationByID(eq(relationTerm.getId()), eq(userId)))
             .thenReturn(Optional.of(expected));
@@ -106,7 +98,7 @@ public class RelationTermResourceTests {
     @Test
     @Transactional
     public void getATermRelationNotFoundReturns404() throws Exception {
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = currentUserService.getCurrentUser().id();
         when(termRelationHttpContract.findTermRelationByID(eq(999L), eq(userId))).thenReturn(Optional.empty());
 
         restRelationTermControllerMockMvc.perform(get("/api/relation/term/{id}.json", 999L))
@@ -117,7 +109,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void addTermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         CreateTermRelation createTermRelation = new CreateTermRelation(
             relationTerm.getTerm1().getId(),
@@ -145,7 +137,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void addTermRelationWithNoWriteAccessReturnsEmpty() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = currentUserService.getCurrentUser().id();
         CreateTermRelation createTermRelation = new CreateTermRelation(
             relationTerm.getTerm1().getId(),
             relationTerm.getTerm2().getId(), RelationTerm.PARENT
@@ -168,7 +160,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void editTermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         UpdateTermRelation updateTermRelation = new UpdateTermRelation(
             Optional.of(relationTerm.getTerm1().getId()),
@@ -197,7 +189,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void editTermRelationWithNoWriteAccessReturnsNotFound() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = currentUserService.getCurrentUser().id();
         UpdateTermRelation updateTermRelation = new UpdateTermRelation(
             Optional.of(relationTerm.getTerm1().getId()),
             Optional.of(relationTerm.getTerm2().getId()), Optional.empty()
@@ -218,7 +210,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void deleteTermRelation() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         HttpCommandResponse expected = new HttpCommandResponse(
             true, buildResponse(relationTerm),
@@ -238,7 +230,7 @@ public class RelationTermResourceTests {
     @Transactional
     public void deleteTermRelationWithNoDeleteAccessReturnsNotFound() throws Exception {
         RelationTerm relationTerm = builder.givenARelationTerm();
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = currentUserService.getCurrentUser().id();
         when(termRelationHttpContract.delete(eq(relationTerm.getId()), eq(userId))).thenReturn(Optional.empty());
 
         restRelationTermControllerMockMvc.perform(delete("/api/relation/term/{id}.json", relationTerm.getId()))

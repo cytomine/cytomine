@@ -89,7 +89,7 @@ public class UserPositionService {
 
     public PersistentUserPosition add(
         Date created,
-        User user,
+        long userId,
         SliceInstance sliceInstance,
         ImageInstance imageInstance,
         AreaDTO area,
@@ -100,7 +100,7 @@ public class UserPositionService {
         //TODO: no ACL???
         LastUserPosition position = new LastUserPosition();
         position.setId(sequenceService.generateID());
-        position.setUser(user.getId());
+        position.setUser(userId);
         position.setImage(imageInstance.getId());
         position.setSlice(sliceInstance.getId());
         position.setProject(imageInstance.getProject().getId());
@@ -116,7 +116,7 @@ public class UserPositionService {
 
         PersistentUserPosition persistedPosition = new PersistentUserPosition();
         persistedPosition.setId(sequenceService.generateID());
-        persistedPosition.setUser(user.getId());
+        persistedPosition.setUser(userId);
         persistedPosition.setImage(imageInstance.getId());
         persistedPosition.setSlice(sliceInstance.getId());
         persistedPosition.setProject(imageInstance.getProject().getId());

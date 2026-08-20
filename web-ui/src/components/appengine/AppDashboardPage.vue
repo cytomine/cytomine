@@ -91,8 +91,9 @@
 <script>
 import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
-import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable';
-import {get} from '@/utils/store-helpers';
+import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable.vue';
+import { get } from '@/utils/store-helpers';
+import { formatDate } from '@/utils/date';
 
 export default {
   name: 'AppDashboardPage',
@@ -116,9 +117,9 @@ export default {
       taskRuns.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
       this.taskRuns = await Promise.all(
-        taskRuns.map(async ({project, taskRunId, user}) => {
+        taskRuns.map(async ({ project, taskRunId, user }) => {
           let taskRun = await Task.fetchTaskRunStatus(this.currentProject.id, taskRunId);
-          return new TaskRun({...taskRun, project, user});
+          return new TaskRun({ ...taskRun, project, user });
         })
       );
     },
@@ -138,16 +139,7 @@ export default {
       }
     },
     formatDate(date) {
-      return new Intl.DateTimeFormat(
-        this.$i18n.locale,
-        {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        }
-      ).format(new Date(date));
+      return formatDate(date, this.$i18n.locale);
     },
     stateClass(state) {
       const map = {

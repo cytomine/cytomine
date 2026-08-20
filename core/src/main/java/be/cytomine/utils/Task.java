@@ -3,6 +3,8 @@ package be.cytomine.utils;
 import lombok.Getter;
 import lombok.Setter;
 
+import be.cytomine.service.UrlApi;
+
 /**
  * A task provide info about a command. The main info is the progress status THIS CLASS CANNOT BE A DOMAIN! Because it
  * cannot works with hibernate transaction.
@@ -30,8 +32,7 @@ public class Task {
 
     private boolean printInActivity = false;
 
-
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         JsonObject map = new JsonObject();
         map.put("id", id);
         map.put("progress", progress);

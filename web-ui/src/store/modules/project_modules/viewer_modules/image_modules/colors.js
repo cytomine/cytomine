@@ -1,20 +1,3 @@
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
-
 export default {
   state() {
     return {
@@ -70,24 +53,24 @@ export default {
       state.apparentChannels = apparentChannels;
     },
 
-    setApparentChannelVisibility(state, {indexApparentChannel, visible}) {
+    setApparentChannelVisibility(state, { indexApparentChannel, visible }) {
       let channel = state.apparentChannels[indexApparentChannel];
       channel.visible = visible;
     },
-    setApparentChannelColor(state, {indexApparentChannel, color, isColormap}) {
+    setApparentChannelColor(state, { indexApparentChannel, color, isColormap }) {
       let channel = state.apparentChannels[indexApparentChannel];
       channel.color = color;
       channel.isColormap = isColormap;
     },
-    setApparentChannelBounds(state, {indexApparentChannel, bounds}) {
+    setApparentChannelBounds(state, { indexApparentChannel, bounds }) {
       let channel = state.apparentChannels[indexApparentChannel];
       channel.bounds = bounds;
     },
-    setApparentChannelGamma(state, {indexApparentChannel, gamma}) {
+    setApparentChannelGamma(state, { indexApparentChannel, gamma }) {
       let channel = state.apparentChannels[indexApparentChannel];
       channel.gamma = gamma;
     },
-    setApparentChannelInverted(state, {indexApparentChannel, inverted}) {
+    setApparentChannelInverted(state, { indexApparentChannel, inverted }) {
       let channel = state.apparentChannels[indexApparentChannel];
       channel.inverted = inverted;
     },
@@ -123,7 +106,7 @@ export default {
         }
       });
     },
-    adjustToSlice(state, {indexApparentChannel, bounds}) {
+    adjustToSlice(state, { indexApparentChannel, bounds }) {
       let channel = state.apparentChannels[indexApparentChannel];
       channel.bounds = bounds;
     },
@@ -150,21 +133,21 @@ export default {
   },
 
   actions: {
-    async initialize({commit, dispatch}, {image, slices}) {
+    async initialize({ commit, dispatch }, { image, slices }) {
       commit('setIdImage', image.id);
       commit('setNbBitsPerSample', image.bitPerSample);
       commit('setNbSamplesPerChannel', image.samplePerPixel);
-      await dispatch('refreshApparentChannels', {image});
+      await dispatch('refreshApparentChannels', { image });
       let channels = slices.map(slice => slice.channel);
       commit('setChannelsVisibility', channels);
     },
-    async setImageInstance({commit, dispatch}, {image}) {
+    async setImageInstance({ commit, dispatch }, { image }) {
       commit('setIdImage', image.id);
       commit('setNbBitsPerSample', image.bitPerSample);
       commit('setNbSamplesPerChannel', image.samplePerPixel);
-      await dispatch('refreshApparentChannels', {image});
+      await dispatch('refreshApparentChannels', { image });
     },
-    async refreshApparentChannels({commit}, {image}) {
+    async refreshApparentChannels({ commit }, { image }) {
       let apparentChannels = formatApparentChannels(
         await fetchApparentChannels(image),
         image.bitPerSample
@@ -172,31 +155,31 @@ export default {
       commit('setApparentChannels', apparentChannels);
     },
 
-    resetColorManipulation({commit}) {
+    resetColorManipulation({ commit }) {
       commit('resetApparentChannels');
       commit('resetImageColorManipulationSettings');
       commit('setFilter', null);
     },
 
-    setApparentChannelVisibility({commit, state, dispatch}, {indexApparentChannel, visible}) {
+    setApparentChannelVisibility({ commit, state, dispatch }, { indexApparentChannel, visible }) {
       let apparentChannel = state.apparentChannels[indexApparentChannel];
       let count = state.apparentChannels.filter(ac =>
         ac.visible && ac.channel === apparentChannel.channel
       ).length;
       if (visible && count === 0) {
-        dispatch('addActiveSliceChannel', {channel: apparentChannel.channel});
+        dispatch('addActiveSliceChannel', { channel: apparentChannel.channel });
       } else if (!visible && count === 1) {
-        dispatch('removeActiveSliceChannel', {channel: apparentChannel.channel});
+        dispatch('removeActiveSliceChannel', { channel: apparentChannel.channel });
       }
-      commit('setApparentChannelVisibility', {indexApparentChannel, visible});
+      commit('setApparentChannelVisibility', { indexApparentChannel, visible });
     },
-    async setActiveSlice({commit}, slice) {
+    async setActiveSlice({ commit }, slice) {
       commit('setChannelsVisibility', [slice.channel]);
     },
-    async setActiveSliceByPosition({commit}, {channel}) {
+    async setActiveSliceByPosition({ commit }, { channel }) {
       commit('setChannelsVisibility', [channel]);
     },
-    async setActiveSlicesByPosition({commit}, {channels}) {
+    async setActiveSlicesByPosition({ commit }, { channels }) {
       commit('setChannelsVisibility', channels);
     },
     // async setActiveSliceByRank({dispatch}, rank) {
@@ -221,9 +204,7 @@ export default {
       }
       if (visibleApparentChannels.length > 0) {
         params.channels = [];
-        // eslint-disable-next-line camelcase
         params.minIntensities = [];
-        // eslint-disable-next-line camelcase
         params.maxIntensities = [];
         params.gammas = [];
         params.colormaps = [];
@@ -252,14 +233,14 @@ function formatColormapRequestParam(color, inverted) {
 }
 
 function defaultBounds(nBits) {
-  return {min: 0, max: 2 ** nBits - 1};
+  return { min: 0, max: 2 ** nBits - 1 };
 }
 
-function autoAdjustBounds(nBits, {min, max}) {
+function autoAdjustBounds(nBits, { min, max }) {
   if (nBits > 8) {
-    return {min, max};
+    return { min, max };
   }
-  return {min: 0, max:255};
+  return { min: 0, max:255 };
 }
 
 async function fetchApparentChannels(image) {
@@ -277,7 +258,7 @@ function formatApparentChannels(apparentChannels, nBits) {
 }
 
 function formatApparentChannel(apparentChannel, nBits) {
-  let result = {index: apparentChannel.apparentChannel};
+  let result = { index: apparentChannel.apparentChannel };
   result.channel = apparentChannel.channel;
   result.sample = apparentChannel.sample;
 

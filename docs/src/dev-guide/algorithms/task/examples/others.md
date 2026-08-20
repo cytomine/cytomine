@@ -44,7 +44,7 @@ It aligns multiple whole-slide images onto a common coordinate space, enabling c
 
 Repository: [cytomine/task-stardist](https://github.com/cytomine/task-stardist)
 
-Detects and segments cell nuclei using the [StarDist](https://github.com/stardist/stardist) deep learning model.
+Detects and segments cell nuclei using the [StarDist](https://github.com/stardist/stardist) deep learning model developed by Uwe Schmidt et al.
 StarDist represents nuclei as star-convex polygons, making it well-suited for densely packed nuclei in fluorescence and H&E images.
 
 ### TIA Centre Cytomine tasks

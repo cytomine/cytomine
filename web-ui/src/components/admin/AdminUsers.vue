@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div>
   <b-loading :is-full-page="false" :active="loading" />
@@ -67,11 +53,11 @@
           </b-table-column>
 
           <b-table-column field="created" :label="$t('created')" sortable width="150">
-            {{Number(user.created) | moment('ll LT')}}
+            {{formatMomentDate(Number(user.created), 'll LT')}}
           </b-table-column>
 
           <b-table-column field="updated" :label="$t('updated')" sortable width="150">
-            <template v-if="user.updated">{{Number(user.updated) | moment('ll LT')}}</template>
+            <template v-if="user.updated">{{formatMomentDate(Number(user.updated), 'll LT')}}</template>
             <template v-else>-</template>
           </b-table-column>
 
@@ -80,12 +66,9 @@
               <button class="button is-link is-small" @click="startUserEdition(user)">
                 {{$t('button-edit')}}
               </button>
-<!--              <button v-if="user.enabled" class="button is-danger is-small" @click="lock(user)">-->
-<!--                {{$t('button-lock')}}-->
-<!--              </button>-->
-<!--              <button v-else class="button is-success is-small" @click="unlock(user)">-->
-<!--                {{$t('button-unlock')}}-->
-<!--              </button>-->
+              <button class="button is-link is-danger is-small" @click="deleteUser(user)" v-if="canDelete(user)">
+                {{$t('button-delete')}}
+              </button>
             </div>
           </b-table-column>
         </template>
@@ -109,11 +92,12 @@
 
 <script>
 
-import CytomineTable from '@/components/utils/CytomineTable';
-import {UserCollection} from '@/api';
-import UserModal from './UserModal';
-import UserDetails from './UserDetails';
-import {rolesMapping} from '@/utils/role-utils';
+import CytomineTable from '@/components/utils/CytomineTable.vue';
+import { UserCollection } from '@/api';
+import UserModal from './UserModal.vue';
+import UserDetails from './UserDetails.vue';
+import { rolesMapping } from '@/utils/role-utils';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'admin-users',
@@ -155,6 +139,11 @@ export default {
     }
   },
   methods: {
+    formatMomentDate,
+    canDelete(user) {
+      const protectedUsers = ['admin', 'ImageServer1'];
+      return !protectedUsers.includes(user.username);
+    },
     displayMemberOrigin(member) {
       let key;
       if (member.origin === 'BOOTSTRAP') {
@@ -167,23 +156,6 @@ export default {
     },
     getRoleData(user) {
       return this.roles[user.role];
-    },
-    // TODO IAM
-    async lock(user) {
-      try {
-        await user.lock();
-      } catch (error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-user-lock')});
-      }
-    },
-    async unlock(user) {
-      try {
-        await user.unlock();
-      } catch (error) {
-        console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-user-unlock')});
-      }
     },
     startUserCreation() {
       this.editedUser = null;
@@ -199,6 +171,25 @@ export default {
     updateUser(user) {
       this.revision++;
       this.editedUser.populate(user);
+    },
+    async deleteUser(user) {
+      this.$buefy.dialog.confirm({
+        title: this.$t('delete-user'),
+        message: this.$t('delete-user-confirmation', { username: user.username }),
+        confirmText: this.$t('button-delete'),
+        type: 'is-danger',
+        hasIcon: true,
+        onConfirm: async () => {
+          try {
+            await user.delete();
+            this.$notify({ type: 'success', text: this.$t('notif-success-user-deletion') });
+            this.refreshUsers();
+          } catch (error) {
+            console.log(error);
+            this.$notify({ type: 'error', text: this.$t('notif-error-user-deletion') });
+          }
+        }
+      });
     }
   },
   async created() {

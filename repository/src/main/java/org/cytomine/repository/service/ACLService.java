@@ -48,6 +48,22 @@ public class ACLService {
         return isAdmin(userId) || hasPermission(userId, storageId, STORAGE_CLASS, DELETE_MASK);
     }
 
+    public boolean canWriteRole(long userId) {
+        return isAdmin(userId);
+    }
+
+    public boolean canDeleteRole(long userId) {
+        return isAdmin(userId);
+    }
+
+    public boolean canWriteUserRole(long userId) {
+        return isAdmin(userId);
+    }
+
+    public boolean canDeleteUserRole(long userId) {
+        return isAdmin(userId);
+    }
+
     public List<Long> getAccessibleStorageIds(long userId) {
         if (isAdmin(userId)) {
             return null;

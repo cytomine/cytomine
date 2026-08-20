@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
   <form @submit.prevent="save()">
     <cytomine-modal-card :title="$t(track ? 'update-track' : 'create-track')" class="track-modal">
@@ -34,9 +20,9 @@
 </template>
 
 <script>
-import {Track} from '@/api';
-import {Sketch} from 'vue-color';
-import CytomineModalCard from '@/components/utils/CytomineModalCard';
+import { Track } from '@/api';
+import { Sketch } from 'vue-color';
+import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
   name: 'track-modal',
@@ -48,7 +34,7 @@ export default {
     'sketch-picker': Sketch,
     CytomineModalCard
   },
-  $_veeValidate: {validator: 'new'},
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       name: '',
@@ -90,13 +76,13 @@ export default {
     },
     async create() {
       try {
-        let track = await new Track({name: this.name, color: this.color.hex, image: this.image.id}).save();
-        this.$notify({type: 'success', text: this.$t('notif-success-track-creation')});
+        let track = await new Track({ name: this.name, color: this.color.hex, image: this.image.id }).save();
+        this.$notify({ type: 'success', text: this.$t('notif-success-track-creation') });
         this.$emit('newTrack', track);
         this.$parent.close();
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-track-creation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-track-creation') });
       }
     },
     async update() {
@@ -105,18 +91,18 @@ export default {
       track.name = this.name;
       try {
         await track.save();
-        this.$notify({type: 'success', text: this.$t('notif-success-track-update')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-track-update') });
         this.$emit('updateTrack', track);
         this.$parent.close();
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-track-update')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-track-update') });
       }
     }
   },
   created() {
     this.name = this.track ? this.track.name : '';
-    this.color = {hex: this.track ? this.track.color : this.randomColor()};
+    this.color = { hex: this.track ? this.track.color : this.randomColor() };
   }
 };
 </script>

@@ -1,21 +1,5 @@
 package be.cytomine.domain.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -218,22 +202,22 @@ public class UserAnnotation extends AnnotationDomain implements Serializable {
     }
 
     @Override
-    public JsonObject toJsonObject() {
-        return getDataFromDomain(this);
+    public JsonObject toJsonObject(UrlApi urlApi) {
+        return getDataFromDomain(this, urlApi);
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
         JsonObject returnArray = AnnotationDomain.getDataFromDomain(domain);
         UserAnnotation annotation = (UserAnnotation) domain;
-        returnArray.put("cropURL", UrlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put("cropURL", urlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
         returnArray.put(
             "smallCropURL",
-            UrlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
+            urlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
         );
-        returnArray.put("url", UrlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put("url", urlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
         returnArray.put(
             "imageURL",
-            UrlApi.getAnnotationURL(
+            urlApi.getAnnotationURL(
                 annotation.getImage().getProject().getId(),
                 annotation.getImage().getId(),
                 annotation.getId()

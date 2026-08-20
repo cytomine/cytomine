@@ -32,6 +32,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.OntologyMapper;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
@@ -52,6 +53,7 @@ import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
 import be.cytomine.repositorynosql.social.ProjectConnectionRepository;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.database.SequenceService;
 import be.cytomine.service.social.ImageConsultationService;
@@ -59,6 +61,7 @@ import be.cytomine.service.social.ProjectConnectionService;
 import be.cytomine.service.social.UserPositionService;
 import be.cytomine.service.social.UserPositionServiceTests;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
@@ -78,7 +81,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class UserResourceTests {
 
@@ -119,6 +122,12 @@ public class UserResourceTests {
     private BasicInstanceBuilder builder;
 
     @Autowired
+    private CurrentUserService currentUserService;
+
+    @Autowired
+    private WiremockRepository wiremockRepository;
+
+    @Autowired
     private MockMvc restUserControllerMockMvc;
 
     @Autowired
@@ -145,7 +154,7 @@ public class UserResourceTests {
         User user, Project project,
         Date created
     ) {
-        return projectConnectionService.add(user, project, "xxx", "linux", "chrome", "123", created);
+        return projectConnectionService.add(user.getId(), project, "xxx", "linux", "chrome", "123", created);
     }
 
     PersistentImageConsultation givenAPersistentImageConsultation(
@@ -153,7 +162,7 @@ public class UserResourceTests {
         ImageInstance imageInstance,
         Date created
     ) {
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
     PersistentUserPosition givenAPersistentUserPosition(
@@ -162,7 +171,7 @@ public class UserResourceTests {
         AreaDTO areaDTO
     ) {
         return userPositionService.add(
-            creation, user, sliceInstance, sliceInstance.getImage(),
+            creation, user.getId(), sliceInstance, sliceInstance.getImage(),
             areaDTO,
             1,
             5.0,
@@ -214,6 +223,7 @@ public class UserResourceTests {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
+        wiremockRepository.stubUser(projectAdmin);
 
         restUserControllerMockMvc.perform(get("/api/project/{id}/admin.json", project.getId()).with(
                 user(projectAdmin.getUsername())))
@@ -323,83 +333,6 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    public void getUserAsSuperadmin() throws Exception {
-        User currentUser = builder.givenSuperAdmin();
-
-        restUserControllerMockMvc.perform(get("/api/user/{id}.json", builder.givenSuperAdmin().getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(currentUser.getId()))
-            .andExpect(jsonPath("$.username").value(currentUser.getUsername()))
-            .andExpect(jsonPath("$.name").value(currentUser.getName()))
-            .andExpect(jsonPath("$.fullName").value(currentUser.getFullName()))
-            .andExpect(jsonPath("$.origin").doesNotExist())
-            .andExpect(jsonPath("$.admin").doesNotExist())
-            .andExpect(jsonPath("$.publicKey").doesNotExist())
-            .andExpect(jsonPath("$.privateKey").doesNotExist())
-            .andExpect(jsonPath("$.password").doesNotExist())
-            .andExpect(jsonPath("$.guest").doesNotExist())
-            .andExpect(jsonPath("$.passwordExpired").doesNotExist())
-            .andExpect(jsonPath("$.user").doesNotExist());
-    }
-
-    @Test
-    @Transactional
-    @WithMockUser(username = "user")
-    public void getUserAsCurrentUser() throws Exception {
-        User currentUser = builder.givenDefaultUser();
-
-        restUserControllerMockMvc.perform(get("/api/user/{id}.json", currentUser.getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(currentUser.getId()))
-            .andExpect(jsonPath("$.username").value(currentUser.getUsername()))
-            .andExpect(jsonPath("$.name").value(currentUser.getName()))
-            .andExpect(jsonPath("$.fullName").value(currentUser.getFullName()))
-            .andExpect(jsonPath("$.firstname").doesNotExist())
-            .andExpect(jsonPath("$.origin").doesNotExist())
-            .andExpect(jsonPath("$.admin").doesNotExist())
-            .andExpect(jsonPath("$.publicKey").doesNotExist())
-            .andExpect(jsonPath("$.lastname").doesNotExist())
-            .andExpect(jsonPath("$.privateKey").doesNotExist())
-            .andExpect(jsonPath("$.password").doesNotExist())
-            .andExpect(jsonPath("$.guest").doesNotExist())
-            .andExpect(jsonPath("$.passwordExpired").doesNotExist())
-            .andExpect(jsonPath("$.user").doesNotExist())
-            .andExpect(jsonPath("$.email").doesNotExist());
-    }
-
-    @Test
-    @Transactional
-    @WithMockUser(username = "user")
-    public void getUserAsAnotherUser() throws Exception {
-        User currentUser = builder.givenAUser();
-
-        restUserControllerMockMvc.perform(get("/api/user/{id}.json", builder.givenSuperAdmin().getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().getId()))
-            .andExpect(jsonPath("$.username").value(builder.givenSuperAdmin().getUsername()))
-            .andExpect(jsonPath("$.name").value(builder.givenSuperAdmin().getName()))
-            .andExpect(jsonPath("$.fullName").value(builder.givenSuperAdmin().getFullName()))
-            .andExpect(jsonPath("$.origin").doesNotExist())
-            .andExpect(jsonPath("$.admin").doesNotExist())
-            .andExpect(jsonPath("$.publicKey").doesNotExist())
-            .andExpect(jsonPath("$.privateKey").doesNotExist())
-            .andExpect(jsonPath("$.password").doesNotExist())
-            .andExpect(jsonPath("$.guest").doesNotExist())
-            .andExpect(jsonPath("$.passwordExpired").doesNotExist())
-            .andExpect(jsonPath("$.user").doesNotExist());
-    }
-
-    @Test
-    @Transactional
-    public void getUserWithItsUsername() throws Exception {
-        User currentUser = builder.givenSuperAdmin();
-        restUserControllerMockMvc.perform(get("/api/user/{id}.json", builder.givenSuperAdmin().getUsername()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.username").value(currentUser.getUsername()));
-    }
-
-    @Test
-    @Transactional
     public void getUserWithItsUserKey() throws Exception {
         User currentUser = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(get(
@@ -423,6 +356,7 @@ public class UserResourceTests {
     @Transactional
     @WithMockUser(username = "user")
     public void getKeysFromOtherUserIsForbidden() throws Exception {
+        wiremockRepository.stubUser(builder.givenDefaultUser());
         User user = builder.givenSuperAdmin();
         restUserControllerMockMvc.perform(get("/api/user/{id}/keys.json", user.getId()))
             .andExpect(status().isForbidden());
@@ -435,6 +369,7 @@ public class UserResourceTests {
     @WithMockUser(username = "user")
     public void getSignature() throws Exception {
         User user = builder.givenDefaultUser();
+        wiremockRepository.stubUser(user);
         restUserControllerMockMvc.perform(get("/api/signature.json").param("method", "GET"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.publicKey").value(user.getPublicKey()))
@@ -444,12 +379,12 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void getCurrentUserKeys() throws Exception {
-        User currentUser = builder.givenSuperAdmin();
+        UserResponse currentUser = currentUserService.getCurrentUser();
 
         restUserControllerMockMvc.perform(get("/api/user/current/keys"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.primaryKey").value(currentUser.getPublicKey()))
-            .andExpect(jsonPath("$.secondaryKey").value(currentUser.getPrivateKey()));
+            .andExpect(jsonPath("$.primaryKey").value(currentUser.publicKey().orElseThrow()))
+            .andExpect(jsonPath("$.secondaryKey").value(currentUser.privateKey().orElseThrow()));
     }
 
     @Test
@@ -469,7 +404,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void getCurrentUser() throws Exception {
-        User currentUser = builder.givenSuperAdmin();
+        User currentUser = currentUserService.getCurrentUserOld();
 
         restUserControllerMockMvc.perform(get("/api/user/current.json"))
             .andExpect(status().isOk())
@@ -520,7 +455,7 @@ public class UserResourceTests {
     //        User user = builder.given_a_user();
     //        restUserControllerMockMvc.perform(post("/api/user.json")
     //                        .contentType(MediaType.APPLICATION_JSON)
-    //                        .content(user.toJSON()))
+    //                        .content(user.toJSON(urlApi)))
     //                .andDo(print())
     //                .andExpect(status().isConflict())
     //                .andExpect(jsonPath("$.success").value(false));
@@ -557,7 +492,7 @@ public class UserResourceTests {
     //
     //        User user = userRepository.findByUsernameLikeIgnoreCase("TEST_CREATE").get();
     //
-    //        JsonObject jsonObject = user.toJsonObject();
+    //        JsonObject jsonObject = user.toJsonObject(urlApi);
     //        jsonObject.put("name", "TEST_CREATE_CHANGE");
     //
     //        restUserControllerMockMvc.perform(put("/api/user/{id}.json", jsonObject.getId())
@@ -579,7 +514,7 @@ public class UserResourceTests {
     //        User user = builder.given_a_user();
     //        restUserControllerMockMvc.perform(delete("/api/user/{id}.json", user.getId())
     //                        .contentType(MediaType.APPLICATION_JSON)
-    //                        .content(user.toJSON()))
+    //                        .content(user.toJSON(urlApi)))
     //                .andDo(print())
     //                .andExpect(status().isOk())
     //                .andExpect(jsonPath("$.printMessage").value(true))

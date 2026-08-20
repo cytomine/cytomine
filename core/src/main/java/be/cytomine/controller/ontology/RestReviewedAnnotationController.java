@@ -30,6 +30,7 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
@@ -73,6 +74,8 @@ public class RestReviewedAnnotationController extends RestCytomineController {
 
     private final TermHttpContract termHttpContract;
 
+    private final UrlApi urlApi;
+
     @GetMapping("/reviewedannotation.json")
     public ResponseEntity<String> list(
     ) throws IOException {
@@ -95,7 +98,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
     public ResponseEntity<String> countByUser(@PathVariable(value = "idUser") Long idUser) {
         log.debug("REST request to count reviewed annotation for current user");
         return responseSuccess(
-            JsonObject.of("total", reviewedAnnotationService.count(currentUserService.getCurrentUser()))
+            JsonObject.of("total", reviewedAnnotationService.count(currentUserService.getCurrentUser().id()))
         );
     }
 
@@ -171,7 +174,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         return responseSuccess(JsonObject.of(
             "message",
             imageInstance.getReviewUser().getUsername() + " start reviewing on " + imageInstance.getInstanceFilename(),
-            "imageinstance", ImageInstance.getDataFromDomain(imageInstance)
+            "imageinstance", ImageInstance.getDataFromDomain(imageInstance, urlApi)
         ));
     }
 
@@ -195,7 +198,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
 
         return responseSuccess(JsonObject.of(
             "message", message,
-            "imageinstance", ImageInstance.getDataFromDomain(imageInstance)
+            "imageinstance", ImageInstance.getDataFromDomain(imageInstance, urlApi)
         ));
     }
 
@@ -276,7 +279,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
 
         terms =
             terms == null || terms.isBlank()
-                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().getId())
+                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().id())
                 .stream().map(String::valueOf).collect(
                     Collectors.joining(",")) :
                 terms;
@@ -284,7 +287,7 @@ public class RestReviewedAnnotationController extends RestCytomineController {
         JsonObject params = mergeQueryParamsAndBodyParams();
         params.put("reviewed", true);
         byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, users, params, terms, format,
-            currentUserService.getCurrentUser().getId());
+            currentUserService.getCurrentUser().id());
         responseReportFile(reportService.getAnnotationReportFileName(format, idProject), report, format);
     }
 

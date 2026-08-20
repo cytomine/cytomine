@@ -19,9 +19,7 @@ import be.cytomine.common.repository.model.command.payload.response.TermRelation
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
-import static be.cytomine.common.repository.http.TermRelationHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(TermRelationHttpContract.ROOT_PATH)
 public interface TermRelationHttpContract {
     String ROOT_PATH = "/term_relations";
 

@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import AnnotationSelection from '@/components/annotations/AnnotationSelection';
+import AnnotationSelection from '@/components/annotations/AnnotationSelection.vue';
 
 export default {
   name: 'GeometryField',
@@ -34,7 +34,7 @@ export default {
     AnnotationSelection,
   },
   props: {
-    parameter: {type: Object, required: true},
+    parameter: { type: Object, required: true },
     value: {},
   },
   data() {

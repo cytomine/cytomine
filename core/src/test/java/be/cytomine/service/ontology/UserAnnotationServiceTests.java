@@ -1,21 +1,5 @@
 package be.cytomine.service.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,6 +24,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.SliceInstance;
@@ -58,6 +43,7 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
@@ -68,25 +54,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class UserAnnotationServiceTests {
-
-    @Autowired
-    UserAnnotationService userAnnotationService;
-
-    @Autowired
-    UserAnnotationRepository userAnnotationRepository;
-
-    @Autowired
-    BasicInstanceBuilder builder;
-
-    @Autowired
-    CommandService commandService;
-
-    @Autowired
-    EntityManager entityManager;
-
-    @Autowired
-    WiremockRepository wiremockRepository;
 
     static Map<String, String> POLYGONES = Map.of(
         "a", "POLYGON ((1 1, 2 1, 2 2, 1 2, 1 1))",
@@ -96,6 +65,20 @@ public class UserAnnotationServiceTests {
         "e", "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))"
         //e intersect a,b and c
     );
+    @Autowired
+    UserAnnotationService userAnnotationService;
+    @Autowired
+    UserAnnotationRepository userAnnotationRepository;
+    @Autowired
+    BasicInstanceBuilder builder;
+    @Autowired
+    CommandService commandService;
+    @Autowired
+    EntityManager entityManager;
+    @Autowired
+    WiremockRepository wiremockRepository;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void getUserAnnotationWithSuccess() {
@@ -246,7 +229,7 @@ public class UserAnnotationServiceTests {
     @Test
     void addValidUserAnnotationWithSuccess() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        CommandResponse commandResponse = userAnnotationService.add(userAnnotation.toJsonObject());
+        CommandResponse commandResponse = userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -265,7 +248,7 @@ public class UserAnnotationServiceTests {
     @Test
     void addValidGuestAnnotationWithSuccess() {
         UserAnnotation userAnnotation = builder.givenANotPersistedGuestAnnotation();
-        CommandResponse commandResponse = userAnnotationService.add(userAnnotation.toJsonObject());
+        CommandResponse commandResponse = userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -288,7 +271,7 @@ public class UserAnnotationServiceTests {
             new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt"))
         );
 
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("maxPoint", 100);
         CommandResponse commandResponse = userAnnotationService.add(jsonObject);
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -299,7 +282,7 @@ public class UserAnnotationServiceTests {
     @Test
     void addTooSmallUserAnnotation() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put(
             "location",
             "POLYGON ((225.73582220103702 306.89723126347087, 225.73582220103702 307"
@@ -317,7 +300,7 @@ public class UserAnnotationServiceTests {
             "LINESTRING( 181.05636403199998 324.87936288, 208.31216076799996 303.464094016)"
         ));
 
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         CommandResponse commandResponse = userAnnotationService.add(jsonObject);
 
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -330,7 +313,7 @@ public class UserAnnotationServiceTests {
     @Test
     void addUserAnnotationWithoutProject() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.remove("project");
         CommandResponse commandResponse = userAnnotationService.add(jsonObject);
         assertThat(commandResponse.getStatus()).isEqualTo(200); // project is retrieve from image/slice
@@ -344,7 +327,7 @@ public class UserAnnotationServiceTests {
         wiremockRepository.stubTerm(term1);
         wiremockRepository.stubTerm(term2);
 
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("term", List.of(term1.getId(), term2.getId()));
 
         CommandResponse commandResponse = userAnnotationService.add(jsonObject);
@@ -371,7 +354,7 @@ public class UserAnnotationServiceTests {
     @Test
     void addUserAnnotationBadGeom() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("location", "POINT(BAD GEOMETRY)");
         Assertions.assertThrows(WrongArgumentException.class, () -> userAnnotationService.add(jsonObject));
     }
@@ -385,7 +368,7 @@ public class UserAnnotationServiceTests {
             + userAnnotation.getImage().getBaseImage().getHeight() + ","
             + userAnnotation.getImage().getBaseImage().getWidth() + " 0,"
             + "-1 -1))"));
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
 
         CommandResponse commandResponse = userAnnotationService.add(jsonObject);
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -403,7 +386,7 @@ public class UserAnnotationServiceTests {
     @Test
     void addUserAnnotationEmptyPolygon() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("location", "POLYGON EMPTY");
         Assertions.assertThrows(WrongArgumentException.class, () -> userAnnotationService.add(jsonObject));
     }
@@ -411,7 +394,7 @@ public class UserAnnotationServiceTests {
     @Test
     void addUserAnnotationNullGeometry() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.remove("location");
         Assertions.assertThrows(WrongArgumentException.class, () -> userAnnotationService.add(jsonObject));
     }
@@ -419,7 +402,7 @@ public class UserAnnotationServiceTests {
     @Test
     void addUserAnnotationSliceNotExists() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("slice", -1);
         Assertions.assertThrows(ObjectNotFoundException.class, () -> userAnnotationService.add(jsonObject));
     }
@@ -428,7 +411,7 @@ public class UserAnnotationServiceTests {
     void addUserAnnotationSliceNullRetrieveReferenceSlice() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("slice", null);
         CommandResponse commandResponse = userAnnotationService.add(jsonObject);
 
@@ -438,7 +421,7 @@ public class UserAnnotationServiceTests {
     @Test
     void addUserAnnotationSliceNullAndImageNotExistsFail() {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("slice", null);
         jsonObject.put("image", -1);
         Assertions.assertThrows(ObjectNotFoundException.class, () -> userAnnotationService.add(jsonObject));
@@ -454,7 +437,7 @@ public class UserAnnotationServiceTests {
         builder.persistAndReturn(userAnnotation);
         CommandResponse commandResponse = userAnnotationService.update(
             userAnnotation,
-            userAnnotation.toJsonObject().withChange("location", newLocation)
+            userAnnotation.toJsonObject(urlApi).withChange("location", newLocation)
         );
 
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
@@ -483,7 +466,7 @@ public class UserAnnotationServiceTests {
             + userAnnotation.getImage().getBaseImage().getWidth() + 5 + " "
             + userAnnotation.getImage().getBaseImage().getHeight() + ","
             + userAnnotation.getImage().getBaseImage().getWidth() + " 0, -1 -1))"));
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         CommandResponse commandResponse = userAnnotationService.update(userAnnotation, jsonObject);
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
@@ -500,7 +483,7 @@ public class UserAnnotationServiceTests {
     @Test
     void editUserAnnotationEmptyPolygon() {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("location", "POINT (BAD GEOMETRY)");
         Assertions.assertThrows(WrongArgumentException.class, () -> userAnnotationService.add(jsonObject));
     }
@@ -532,7 +515,7 @@ public class UserAnnotationServiceTests {
         wiremockRepository.stubTerm(term1);
         wiremockRepository.stubTerm(term2);
 
-        JsonObject jsonObject = userAnnotation.toJsonObject();
+        JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
         jsonObject.put("term", List.of(term1.getId(), term2.getId()));
 
         CommandResponse commandResponse = userAnnotationService.add(jsonObject);

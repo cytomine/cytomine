@@ -16,9 +16,9 @@
 </template>
 
 <script>
-import {AnnotationCollection} from '@/api';
-import {get} from '@/utils/store-helpers';
-import SelectableAnnotation from '@/components/annotations/SelectableAnnotation';
+import { AnnotationCollection } from '@/api';
+import { get } from '@/utils/store-helpers';
+import SelectableAnnotation from '@/components/annotations/SelectableAnnotation.vue';
 
 export default {
   name: 'AnnotationMultiSelect',

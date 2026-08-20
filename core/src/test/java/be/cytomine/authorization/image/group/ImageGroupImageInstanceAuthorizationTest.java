@@ -17,6 +17,7 @@ import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
 import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.group.ImageGroupImageInstanceService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -27,13 +28,13 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTest {
 
-    private ImageGroupImageInstance igii = null;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     ImageGroupImageInstanceService imageGroupImageInstanceService;
+    @Autowired
+    private UrlApi urlApi;
+    private ImageGroupImageInstance igii = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -55,7 +56,7 @@ public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTe
         imageGroupImageInstanceService.add(builder.givenANotPersistedImageGroupImageInstance(
             igii.getGroup(),
             igii.getImage()
-        ).toJsonObject());
+        ).toJsonObject(urlApi));
     }
 
     @Override

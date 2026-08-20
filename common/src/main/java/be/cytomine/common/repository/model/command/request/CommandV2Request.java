@@ -1,5 +1,6 @@
 package be.cytomine.common.repository.model.command.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -26,9 +27,21 @@ import be.cytomine.common.repository.model.command.payload.request.UpdateCommand
     @JsonSubTypes.Type(value = CreateUploadedFileCommand.class, name = "INSERT_UPLOADED_FILE_COMMAND"),
     @JsonSubTypes.Type(value = UpdateUploadedFileCommand.class, name = "UPDATE_UPLOADED_FILE_COMMAND"),
     @JsonSubTypes.Type(value = DeleteUploadedFileCommand.class, name = "DELETE_UPLOADED_FILE_COMMAND"),
+    @JsonSubTypes.Type(value = CreateTagCommand.class, name = "INSERT_TAG_COMMAND"),
+    @JsonSubTypes.Type(value = UpdateTagCommand.class, name = "UPDATE_TAG_COMMAND"),
+    @JsonSubTypes.Type(value = DeleteTagCommand.class, name = "DELETE_TAG_COMMAND"),
     @JsonSubTypes.Type(value = CreateTagDomainAssociationCommand.class, name = "INSERT_TAG_DOMAIN_ASSOCIATION_COMMAND"),
     @JsonSubTypes.Type(value = UpdateTagDomainAssociationCommand.class, name = "UPDATE_TAG_DOMAIN_ASSOCIATION_COMMAND"),
     @JsonSubTypes.Type(value = DeleteTagDomainAssociationCommand.class, name = "DELETE_TAG_DOMAIN_ASSOCIATION_COMMAND"),
+    @JsonSubTypes.Type(value = CreateRoleCommand.class, name = "INSERT_ROLE_COMMAND"),
+    @JsonSubTypes.Type(value = UpdateRoleCommand.class, name = "UPDATE_ROLE_COMMAND"),
+    @JsonSubTypes.Type(value = DeleteRoleCommand.class, name = "DELETE_ROLE_COMMAND"),
+    @JsonSubTypes.Type(value = CreateUserRoleCommand.class, name = "INSERT_USER_ROLE_COMMAND"),
+    @JsonSubTypes.Type(value = UpdateUserRoleCommand.class, name = "UPDATE_USER_ROLE_COMMAND"),
+    @JsonSubTypes.Type(value = DeleteUserRoleCommand.class, name = "DELETE_USER_ROLE_COMMAND"),
+    @JsonSubTypes.Type(value = CreateUserCommand.class, name = "INSERT_USER_COMMAND"),
+    @JsonSubTypes.Type(value = UpdateUserCommand.class, name = "UPDATE_USER_COMMAND"),
+    @JsonSubTypes.Type(value = DeleteUserCommand.class, name = "DELETE_USER_COMMAND"),
     @JsonSubTypes.Type(value = UndoCreateCommand.class, name = "UNDO_CREATE_COMMAND"),
     @JsonSubTypes.Type(value = UndoDeleteCommand.class, name = "UNDO_DELETE_COMMAND"),
     @JsonSubTypes.Type(value = UndoUpdateCommand.class, name = "UNDO_UPDATE_COMMAND"),
@@ -42,9 +55,11 @@ public sealed interface CommandV2Request<T extends HasLongId & HasAclId>
 
     CommandType getCommandType();
 
+    @JsonIgnore
     String getActionMessage();
 
     long id();
 
+    @JsonIgnore
     String getCommand();
 }

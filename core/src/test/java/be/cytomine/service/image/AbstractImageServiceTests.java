@@ -1,21 +1,5 @@
 package be.cytomine.service.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +20,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.UploadedFile;
@@ -48,20 +34,22 @@ import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class AbstractImageServiceTests {
 
     @Autowired
@@ -84,6 +72,8 @@ public class AbstractImageServiceTests {
 
     @Autowired
     ImageInstanceService imageInstanceService;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void listAllImageByFilters() {
@@ -223,7 +213,6 @@ public class AbstractImageServiceTests {
         AssertionsForClassTypes.assertThat(abstractImageService.find(0L)).isEmpty();
     }
 
-
     @Test
     void detectIfUnusedAbstractImageIsUnused() {
         AbstractImage abstractImage = builder.givenAnAbstractImage();
@@ -248,12 +237,11 @@ public class AbstractImageServiceTests {
         assertThat(abstractImageService.listUnused()).doesNotContain(imageInstance.getBaseImage());
     }
 
-
     @Test
     void addValidAbstractImageWithSuccess() {
         AbstractImage abstractImage = builder.givenANotPersistedAbstractImage();
 
-        CommandResponse commandResponse = abstractImageService.add(abstractImage.toJsonObject());
+        CommandResponse commandResponse = abstractImageService.add(abstractImage.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -267,7 +255,7 @@ public class AbstractImageServiceTests {
         abstractImage.setWidth(0);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                abstractImageService.add(abstractImage.toJsonObject());
+                abstractImageService.add(abstractImage.toJsonObject(urlApi));
             }
         );
     }
@@ -278,7 +266,7 @@ public class AbstractImageServiceTests {
         abstractImage.setHeight(0);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                abstractImageService.add(abstractImage.toJsonObject());
+                abstractImageService.add(abstractImage.toJsonObject(urlApi));
             }
         );
     }
@@ -289,7 +277,7 @@ public class AbstractImageServiceTests {
         abstractImage.setDepth(0);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                abstractImageService.add(abstractImage.toJsonObject());
+                abstractImageService.add(abstractImage.toJsonObject(urlApi));
             }
         );
     }
@@ -300,7 +288,7 @@ public class AbstractImageServiceTests {
         abstractImage.setDuration(0);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                abstractImageService.add(abstractImage.toJsonObject());
+                abstractImageService.add(abstractImage.toJsonObject(urlApi));
             }
         );
     }
@@ -311,7 +299,7 @@ public class AbstractImageServiceTests {
         abstractImage.setChannels(0);
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                abstractImageService.add(abstractImage.toJsonObject());
+                abstractImageService.add(abstractImage.toJsonObject(urlApi));
             }
         );
     }
@@ -325,7 +313,7 @@ public class AbstractImageServiceTests {
         abstractImage.setOriginalFilename("OLDNAME");
         abstractImage = builder.persistAndReturn(abstractImage);
 
-        JsonObject jsonObject = abstractImage.toJsonObject();
+        JsonObject jsonObject = abstractImage.toJsonObject(urlApi);
         jsonObject.put("height", 90000);
         jsonObject.put("width", 9000);
         jsonObject.put("duration", 2);
@@ -351,7 +339,7 @@ public class AbstractImageServiceTests {
         assertThat(imageInstance.getPhysicalSizeX()).isEqualTo(abstractImage.getPhysicalSizeX());
         assertThat(imageInstance.getMagnification()).isEqualTo(abstractImage.getMagnification());
 
-        JsonObject jsonObject = abstractImage.toJsonObject();
+        JsonObject jsonObject = abstractImage.toJsonObject(urlApi);
         jsonObject.put("physicalSizeX", 2.5d);
         jsonObject.put("magnification", 20);
 
@@ -370,7 +358,7 @@ public class AbstractImageServiceTests {
         assertThat(imageInstance.getPhysicalSizeX()).isEqualTo(2.5);
         assertThat(imageInstance.getMagnification()).isEqualTo(20);
 
-        jsonObject = imageInstance.toJsonObject();
+        jsonObject = imageInstance.toJsonObject(urlApi);
         jsonObject.put("magnification", 40);
 
         commandResponse = imageInstanceService.update(imageInstance, jsonObject);
@@ -382,7 +370,7 @@ public class AbstractImageServiceTests {
         assertThat(imageInstance.getPhysicalSizeX()).isEqualTo(2.5);
         assertThat(imageInstance.getMagnification()).isEqualTo(40);
 
-        jsonObject = abstractImage.toJsonObject();
+        jsonObject = abstractImage.toJsonObject(urlApi);
         jsonObject.put("physicalSizeX", 6);
         jsonObject.put("magnification", 10);
 
@@ -431,6 +419,5 @@ public class AbstractImageServiceTests {
             }
         );
     }
-
 
 }

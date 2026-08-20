@@ -1,28 +1,12 @@
 package be.cytomine.domain.command;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
 /**
@@ -33,12 +17,12 @@ import be.cytomine.utils.CommandResponse;
 @DiscriminatorValue("be.cytomine.domain.command.AddCommand")
 public class AddCommand extends Command {
 
-    public AddCommand(User currentUser) {
-        this.user = currentUser;
+    public AddCommand(long currentUser) {
+        this.userId = currentUser;
     }
 
-    public AddCommand(User currentUser, Transaction transaction) {
-        this.user = currentUser;
+    public AddCommand(long currentUser, Transaction transaction) {
+        this.userId = currentUser;
         this.transaction = transaction;
     }
 
@@ -51,7 +35,7 @@ public class AddCommand extends Command {
      *
      * @return Message
      */
-    public CommandResponse execute(ModelService service) {
+    public CommandResponse execute(ModelService service, UrlApi urlApi) {
         //Create new domain from json data
         json.put("id", null);
         CytomineDomain newDomain = service.createFromJSON(json);
@@ -59,7 +43,7 @@ public class AddCommand extends Command {
         CommandResponse response = service.create(newDomain, printMessage);
         //Init command domain
         newDomain = response.getObject();
-        fillCommandInfo(newDomain, (String) response.getData().get("message"));
+        fillCommandInfo(newDomain, (String) response.getData().get("message"), urlApi);
         if (newDomain != null) {
             CytomineDomain container = newDomain.container();
             if (container != null && container instanceof Project) {

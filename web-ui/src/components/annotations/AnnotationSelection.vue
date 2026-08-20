@@ -37,16 +37,18 @@
 </template>
 
 <script>
-import {AnnotationCollection} from '@/api';
-import {get} from '@/utils/store-helpers';
+import eventBus from '@/utils/event-bus';
 
-import CytomineModal from '@/components/utils/CytomineModal';
-import SelectableAnnotation from '@/components/annotations/SelectableAnnotation';
+import { AnnotationCollection } from '@/api';
+import { get } from '@/utils/store-helpers';
+
+import CytomineModal from '@/components/utils/CytomineModal.vue';
+import SelectableAnnotation from '@/components/annotations/SelectableAnnotation.vue';
 
 export default {
   name: 'AnnotationSelection',
   props: {
-    active: {type: Boolean, default: false},
+    active: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -110,7 +112,7 @@ export default {
     },
     selectAnnotation() {
       if (!this.selectedAnnotation) {
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-select')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-select') });
         return;
       }
 
@@ -136,24 +138,24 @@ export default {
     this.loading = false;
   },
   async mounted() {
-    this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
+    eventBus.on('addAnnotation', this.addAnnotationHandler);
   },
   async beforeDestroy() {
-    this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
+    eventBus.off('addAnnotation', this.addAnnotationHandler);
   },
 };
 </script>
 
 <style scoped>
-::v-deep(.pagination-list li) {
+:deep(.pagination-list li) {
   margin: 0;
 }
 
-::v-deep(.pagination li::marker) {
+:deep(.pagination li::marker) {
   content: none;
 }
 
-::v-deep ul.pagination-list {
+:deep(ul.pagination-list) {
   justify-content: flex-end;
   margin: auto;
 }

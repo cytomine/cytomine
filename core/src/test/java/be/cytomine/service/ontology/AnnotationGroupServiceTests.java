@@ -15,19 +15,22 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class AnnotationGroupServiceTests {
 
@@ -36,6 +39,9 @@ public class AnnotationGroupServiceTests {
 
     @Autowired
     AnnotationGroupService annotationGroupService;
+
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void findAnnotationGroupWithSuccess() {
@@ -89,7 +95,7 @@ public class AnnotationGroupServiceTests {
     void addValidAnnotationGroupWithSuccess() {
         AnnotationGroup annotationGroup = builder.givenANotPersistedAnnotationGroup();
 
-        CommandResponse commandResponse = annotationGroupService.add(annotationGroup.toJsonObject());
+        CommandResponse commandResponse = annotationGroupService.add(annotationGroup.toJsonObject(urlApi));
 
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -102,7 +108,7 @@ public class AnnotationGroupServiceTests {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         Assertions.assertThrows(
             ObjectNotFoundException.class,
-            () -> annotationGroupService.add(annotationGroup.toJsonObject().withChange("project", null))
+            () -> annotationGroupService.add(annotationGroup.toJsonObject(urlApi).withChange("project", null))
         );
     }
 
@@ -113,7 +119,7 @@ public class AnnotationGroupServiceTests {
         ImageGroup imageGroup = builder.givenAnImageGroup(project1);
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup(project1, imageGroup);
 
-        JsonObject jsonObject = annotationGroup.toJsonObject();
+        JsonObject jsonObject = annotationGroup.toJsonObject(urlApi);
         jsonObject.put("project", project2.getId());
 
         CommandResponse commandResponse = annotationGroupService.edit(jsonObject, true);
@@ -146,7 +152,7 @@ public class AnnotationGroupServiceTests {
 
         CommandResponse commandResponse = annotationGroupService.merge(
             annotationGroup.getId(),
-            annotationGroupToMerge.getId()
+            annotationGroupToMerge.getId(), 1
         );
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -154,4 +160,3 @@ public class AnnotationGroupServiceTests {
         AssertionsForClassTypes.assertThat(annotationGroupService.find(annotationGroup.getId()).isPresent());
     }
 }
-

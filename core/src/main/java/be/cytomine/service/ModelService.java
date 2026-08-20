@@ -1,21 +1,5 @@
 package be.cytomine.service;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +69,9 @@ public abstract class ModelService<T extends CytomineDomain> {
 
     @Autowired
     TagDomainAssociationService tagDomainAssociationService;
+
+    @Autowired
+    private UrlApi urlApi;
 
     /**
      * Save a domain on database, throw error if cannot save
@@ -186,7 +173,7 @@ public abstract class ModelService<T extends CytomineDomain> {
             //Create a backup (for 'undo' op)
             //We create before for deleteCommand to keep data from HasMany inside json (data will
             // be deleted later)
-            Object backup = domainToDelete.toJSON();
+            Object backup = domainToDelete.toJSON(urlApi);
             ((DeleteCommand) c).setBackup(backup);
             this.deleteDependencies(domainToDelete, c.getTransaction(), task);
 
@@ -271,7 +258,6 @@ public abstract class ModelService<T extends CytomineDomain> {
         return response;
     }
 
-
     /**
      * Edit domain from database
      *
@@ -318,7 +304,6 @@ public abstract class ModelService<T extends CytomineDomain> {
         afterUpdate(domain, response);
         return response;
     }
-
 
     /**
      * Destroy domain from database
@@ -504,7 +489,8 @@ public abstract class ModelService<T extends CytomineDomain> {
         return entityManager;
     }
 
-    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {}
+    public void deleteDependencies(CytomineDomain domain, Transaction transaction, Task task) {
+    }
 
     public CytomineDomain getCytomineDomain(String domainClassName, Long domainId) {
         try {

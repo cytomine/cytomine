@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
 import be.cytomine.common.repository.model.command.request.CommandV2Request;
 
-@Mapper(componentModel = "spring", uses = {BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
 public interface CommandMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -24,6 +24,10 @@ public interface CommandMapper {
     );
 
     default CommandV2Response<?> map(CommandV2Entity commandV2Entity) {
-        return new CommandV2Response<>(commandV2Entity.getId(), commandV2Entity.getData());
+        return new CommandV2Response<>(
+            commandV2Entity.getId(),
+            commandV2Entity.getData(),
+            commandV2Entity.getCreated()
+        );
     }
 }

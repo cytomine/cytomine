@@ -23,6 +23,7 @@ import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.utils.JsonObject;
 
@@ -32,13 +33,13 @@ import be.cytomine.utils.JsonObject;
 @Transactional
 public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
-    private ReviewedAnnotation reviewedAnnotation = null;
-
     @Autowired
     ReviewedAnnotationService reviewedAnnotationService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
+    private ReviewedAnnotation reviewedAnnotation = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -65,7 +66,6 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(() -> reviewedAnnotationService.reviewAnnotation(annotation.getId(), null));
     }
 
-
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void userCannotReviewAnnotationIfNotReviewer() {
@@ -89,7 +89,8 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         reviewedAnnotation.getImage().setReviewStart(new Date());
         reviewedAnnotation.getImage().setReviewUser(builder.givenSuperAdmin());
         reviewedAnnotation.setReviewUser(userRepository.findByUsernameLikeIgnoreCase(CREATOR).get());
-        expectOK(() -> reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject(), null));
+        expectOK(
+            () -> reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject(urlApi), null));
     }
 
     @Test
@@ -112,13 +113,13 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @Override
     protected void whenIAddDomain() {
         JsonObject jsonObject = builder.givenANotPersistedReviewedAnnotation(this.reviewedAnnotation.getProject())
-            .toJsonObject();
+            .toJsonObject(urlApi);
         reviewedAnnotationService.add(jsonObject);
     }
 
     @Override
     public void whenIEditDomain() {
-        reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject());
+        reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject(urlApi));
     }
 
     @Override
@@ -128,7 +129,6 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         );
         reviewedAnnotationService.delete(annotation, null, null, true);
     }
-
 
     @Override
     protected Optional<Permission> minimalPermissionForCreate() {
@@ -144,7 +144,6 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(BasePermission.READ);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

@@ -44,7 +44,7 @@ export default {
       this.minVal = min;
       this.maxVal = max;
 
-      this.$emit('setBounds', {min, max});
+      this.$emit('setBounds', { min, max });
     },
   },
 };

@@ -16,6 +16,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.processing.ImageFilterProject;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.processing.ImageFilterProjectService;
 
 @AutoConfigureMockMvc
@@ -23,13 +24,13 @@ import be.cytomine.service.processing.ImageFilterProjectService;
 @Transactional
 public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
 
-    private ImageFilterProject imageFilterProject = null;
-
     @Autowired
     ImageFilterProjectService imageFilterProjectService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
+    private ImageFilterProject imageFilterProject = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -80,7 +81,7 @@ public class ImageFilterProjectAuthorizationTest extends CRDAuthorizationTest {
             builder.givenANotPersistedImageFilterProject(
                 builder.givenAnImageFilter(),
                 imageFilterProject.getProject()
-            ).toJsonObject()
+            ).toJsonObject(urlApi)
         );
     }
 

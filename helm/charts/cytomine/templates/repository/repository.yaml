@@ -1,3 +1,5 @@
+{{- $secretObj := (lookup "v1" "Secret" .Release.Namespace "core-secret") | default dict }}
+{{- $secretData := (get $secretObj "data") | default dict }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -89,6 +91,17 @@ spec:
               value: {{ .Values.postgresql.user }}
             - name: POSTGIS_DB_NAME
               value: {{ .Values.postgresql.database }}
+            - name:  IMAGE_SERVER_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: core-secret
+                  key: IMAGE_SERVER_PRIVATE_KEY
+            - name: IMAGE_SERVER_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: core-secret
+                  key: IMAGE_SERVER_PUBLIC_KEY
+
           volumeMounts:
             - name: temp
               mountPath: /tmp

@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
 
       - name: Load versions
         id: versions
@@ -22,7 +22,7 @@ jobs:
           java-version: ${{ steps.versions.outputs.java-version }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.3.0
         with:
           gradle-version: ${{ steps.versions.outputs.gradle-version }}
 

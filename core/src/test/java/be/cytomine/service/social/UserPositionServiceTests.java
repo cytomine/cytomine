@@ -22,7 +22,9 @@ import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorato
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.security.User;
@@ -40,19 +42,29 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class UserPositionServiceTests {
 
+    public static final AreaDTO USER_VIEW = new AreaDTO(
+        new be.cytomine.dto.image.Point(1000d, 1000d),
+        new be.cytomine.dto.image.Point(4000d, 1000d),
+        new be.cytomine.dto.image.Point(4000d, 4000d),
+        new be.cytomine.dto.image.Point(1000d, 4000d)
+    );
+    public static final AreaDTO ANOTHER_USER_VIEW = new AreaDTO(
+        new be.cytomine.dto.image.Point(3000d, 3000d),
+        new be.cytomine.dto.image.Point(9000d, 3000d),
+        new be.cytomine.dto.image.Point(9000d, 9000d),
+        new be.cytomine.dto.image.Point(3000d, 9000d)
+    );
     @Autowired
     UserPositionService userPositionService;
-
     @Autowired
     LastUserPositionRepository lastUserPositionRepository;
-
     @Autowired
     PersistentUserPositionRepository persistentUserPositionRepository;
-
     @Autowired
     BasicInstanceBuilder builder;
 
@@ -67,20 +79,6 @@ public class UserPositionServiceTests {
         UserPositionService.broadcasters = new ConcurrentHashMap<>();
     }
 
-    public static final AreaDTO USER_VIEW = new AreaDTO(
-        new be.cytomine.dto.image.Point(1000d, 1000d),
-        new be.cytomine.dto.image.Point(4000d, 1000d),
-        new be.cytomine.dto.image.Point(4000d, 4000d),
-        new be.cytomine.dto.image.Point(1000d, 4000d)
-    );
-
-    public static final AreaDTO ANOTHER_USER_VIEW = new AreaDTO(
-        new be.cytomine.dto.image.Point(3000d, 3000d),
-        new be.cytomine.dto.image.Point(9000d, 3000d),
-        new be.cytomine.dto.image.Point(9000d, 9000d),
-        new be.cytomine.dto.image.Point(3000d, 9000d)
-    );
-
     PersistentUserPosition givenAPersistentUserPosition(Date creation, User user, SliceInstance sliceInstance) {
         return givenAPersistentUserPosition(creation, user, sliceInstance, USER_VIEW);
     }
@@ -93,7 +91,7 @@ public class UserPositionServiceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,
@@ -166,13 +164,11 @@ public class UserPositionServiceTests {
             .containsExactlyInAnyOrder(mainUser.getId(), anotherUser.getId());
     }
 
-
     @Test
     public void listUsersPosition() {
         User mainUser = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
-
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
         Date oldPosition = DateUtils.addMonths(freshPosition, -1);
@@ -265,7 +261,6 @@ public class UserPositionServiceTests {
         User anotherUser = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
-
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
         Date oldPosition = DateUtils.addMonths(freshPosition, -1);
 
@@ -285,7 +280,6 @@ public class UserPositionServiceTests {
         );
         assertThat(summarize).isNotEmpty();
 
-
     }
 
     @Test
@@ -293,7 +287,6 @@ public class UserPositionServiceTests {
         User mainUser = builder.givenSuperAdmin();
         User anotherUser = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
-
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
         Date oldPosition = DateUtils.addMonths(freshPosition, -1);
@@ -331,9 +324,7 @@ public class UserPositionServiceTests {
         assertThat(second).isPresent();
         assertThat(second.get().get("frequency")).isEqualTo(1);
 
-
     }
-
 
     @Test
     public void summerizeAfterThan() {
@@ -393,7 +384,7 @@ public class UserPositionServiceTests {
         );
         Date date = new Date();
 
-        userPositionService.add(date, user, sliceInstance, imageInstance, area, 0, (double) 0, true);
+        userPositionService.add(date, user.getId(), sliceInstance, imageInstance, area, 0, (double) 0, true);
     }
 
     @Test
@@ -408,11 +399,11 @@ public class UserPositionServiceTests {
         WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId().toString() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
             sessionDecorator,
-            new ConcurrentWebSocketSessionDecorator[]{new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
+            new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
         );
         WebSocketUserPositionHandler.sessions.put(
             user.getId().toString(),
-            new ConcurrentWebSocketSessionDecorator[]{new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
+            new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
         );
 
         List<String> users = userPositionService.listFollowers(user.getId(), 514L);
@@ -433,11 +424,11 @@ public class UserPositionServiceTests {
         WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId().toString() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
             sessionDecorator,
-            new ConcurrentWebSocketSessionDecorator[]{new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
+            new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
         );
         WebSocketUserPositionHandler.sessions.put(
             user.getId().toString(),
-            new ConcurrentWebSocketSessionDecorator[]{new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
+            new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
         );
         UserPositionService.broadcasters.put("89/514", List.of(user));
 
@@ -488,7 +479,7 @@ public class UserPositionServiceTests {
         ImageInstance imageInstance = builder.givenAnImageInstance();
 
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
-        String trackerAndImageId = broadcaster.getId().toString() + "/" + imageInstance.getId().toString();
+        String trackerAndImageId = broadcaster.getId().toString() + "/" + imageInstance.getId();
         UserPositionService.followers.put(followerAndImageId, false);
         UserPositionService.broadcasters.put(trackerAndImageId, List.of(follower));
 

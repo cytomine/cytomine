@@ -46,8 +46,8 @@
 import axios from 'axios';
 import filesize from 'filesize';
 
-import {Cytomine} from '@/api';
-import {UploadStatus} from '@/utils/app';
+import { Cytomine } from '@/api';
+import { UploadStatus } from '@/utils/app';
 import UploadErrorMessage from '@/components/appengine/UploadErrorMessage.vue';
 
 export default {
@@ -56,7 +56,7 @@ export default {
     UploadErrorMessage,
   },
   props: {
-    file: {type: File, required: true},
+    file: { type: File, required: true },
   },
   data() {
     return {
@@ -83,7 +83,7 @@ export default {
       };
     },
     formattedFileSize() {
-      return this.file.size ? filesize(this.file.size, {base: 10}) : this.$t('unknown');
+      return this.file.size ? filesize(this.file.size, { base: 10 }) : this.$t('unknown');
     },
   },
   methods: {

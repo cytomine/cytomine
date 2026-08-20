@@ -89,7 +89,7 @@ public class RestUserAnnotationController extends RestCytomineController {
             project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
         }
-        return responseSuccess(JsonObject.of("total", userAnnotationService.count(user, project)));
+        return responseSuccess(JsonObject.of("total", userAnnotationService.count(user.getId(), project)));
     }
 
     @GetMapping("/project/{idProject}/userannotation/count.json")
@@ -125,13 +125,13 @@ public class RestUserAnnotationController extends RestCytomineController {
             .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
         terms =
             terms == null || terms.isBlank()
-                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().getId())
+                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().id())
                 .stream().map(String::valueOf).collect(
                     Collectors.joining(",")) :
                 terms;
         JsonObject params = mergeQueryParamsAndBodyParams();
         byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format,
-            currentUserService.getCurrentUser().getId());
+            currentUserService.getCurrentUser().id());
         responseReportFile(reportService.getAnnotationReportFileName(format, idProject), report, format);
     }
 

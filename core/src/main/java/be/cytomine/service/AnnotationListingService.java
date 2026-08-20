@@ -38,6 +38,8 @@ public class AnnotationListingService {
 
     private final SecurityACLService securityACLService;
 
+    private final UrlApi urlApi;
+
     public List listGeneric(AnnotationListing al) {
         securityACLService.check(al.container(), READ);
         if ((al.getKmeans() != null && al.getKmeans()) && al.getKmeansValue() == null) {
@@ -97,7 +99,6 @@ public class AnnotationListingService {
             "annotationLinks", "linkedAnnotations", "linkedImages", "linkedUpdated"
         );
 
-
         Query nativeQuery = entityManager.createNativeQuery(request, Tuple.class);
         List<Tuple> resultList = nativeQuery.getResultList();
 
@@ -140,7 +141,6 @@ public class AnnotationListingService {
                         tuple.get(columnName) != null ? tuple.get(columnName) : tuple.get(columnName.toLowerCase())
                     );
                 }
-
 
                 if (al.getColumnsToPrint().contains("term")) {
                     termAsked = true;
@@ -205,16 +205,16 @@ public class AnnotationListingService {
                     if (al.getClass().getName().contains("UserAnnotation")) {
                         item.put(
                             "cropURL",
-                            UrlApi.getUserAnnotationCropWithAnnotationId((Long) tuple.get("id"), "png")
+                            urlApi.getUserAnnotationCropWithAnnotationId((Long) tuple.get("id"), "png")
                         );
                         item.put(
                             "smallCropURL",
-                            UrlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize((Long) tuple.get("id"), 256, "png")
+                            urlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize((Long) tuple.get("id"), 256, "png")
                         );
-                        item.put("url", UrlApi.getUserAnnotationCropWithAnnotationId((Long) tuple.get("id"), "png"));
+                        item.put("url", urlApi.getUserAnnotationCropWithAnnotationId((Long) tuple.get("id"), "png"));
                         item.put(
                             "imageURL",
-                            UrlApi.getAnnotationURL(
+                            urlApi.getAnnotationURL(
                                 (Long) tuple.get("project"),
                                 (Long) tuple.get("image"),
                                 (Long) tuple.get("id")
@@ -223,11 +223,11 @@ public class AnnotationListingService {
                     } else if (al.getClass().getName().contains("ReviewedAnnotation")) {
                         item.put(
                             "cropURL",
-                            UrlApi.getReviewedAnnotationCropWithAnnotationId((Long) tuple.get("id"), "png")
+                            urlApi.getReviewedAnnotationCropWithAnnotationId((Long) tuple.get("id"), "png")
                         );
                         item.put(
                             "smallCropURL",
-                            UrlApi.getReviewedAnnotationCropWithAnnotationIdWithMaxSize(
+                            urlApi.getReviewedAnnotationCropWithAnnotationIdWithMaxSize(
                                 (Long) tuple.get("id"),
                                 256,
                                 "png"
@@ -235,11 +235,11 @@ public class AnnotationListingService {
                         );
                         item.put(
                             "url",
-                            UrlApi.getReviewedAnnotationCropWithAnnotationId((Long) tuple.get("id"), "png")
+                            urlApi.getReviewedAnnotationCropWithAnnotationId((Long) tuple.get("id"), "png")
                         );
                         item.put(
                             "imageURL",
-                            UrlApi.getAnnotationURL(
+                            urlApi.getAnnotationURL(
                                 (Long) tuple.get("project"),
                                 (Long) tuple.get("image"),
                                 (Long) tuple.get("id")

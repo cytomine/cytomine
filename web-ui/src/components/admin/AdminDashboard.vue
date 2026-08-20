@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="admin-dashboard-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -131,13 +117,13 @@
 </template>
 
 <script>
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 import moment from 'moment';
 
 export default {
   name: 'admin-dashboard',
-  components: {LastConnectionsChart},
+  components: { LastConnectionsChart },
   data() {
     return {
       loading: true,
@@ -164,10 +150,10 @@ export default {
   },
   created() {
     let chartOptions = [
-      {interval: 'day', period: 'hour'},
-      {interval: 'week', period: 'day'},
-      {interval: 'month', period: 'week'},
-      {interval: 'year', period: 'week'}
+      { interval: 'day', period: 'hour' },
+      { interval: 'week', period: 'day' },
+      { interval: 'month', period: 'week' },
+      { interval: 'year', period: 'week' }
     ];
     this.chartOptions = chartOptions.map(option => {
       let startDate = moment()
@@ -175,7 +161,7 @@ export default {
         .subtract(1, option.interval + 's')
         .startOf(option.period)
         .valueOf();
-      return {label: this.$t(`last-${option.interval}`), period: option.period, startDate};
+      return { label: this.$t(`last-${option.interval}`), period: option.period, startDate };
     });
     this.selectedChartOption = this.chartOptions[0];
   },
@@ -217,7 +203,7 @@ td:first-child {
   position: relative;
 }
 
->>> .chart {
+:deep(.chart) {
   position: absolute;
   height: 100%;
   width: 100%;

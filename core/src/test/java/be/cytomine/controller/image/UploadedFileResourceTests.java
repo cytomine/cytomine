@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import be.cytomine.BasicInstanceBuilder;
@@ -33,10 +34,15 @@ import be.cytomine.common.repository.utils.SpringPage;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.service.MeiliSearchService;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.ADMIN;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -46,7 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "admin")
+@WithMockUser(username = ADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 class UploadedFileResourceTests {
@@ -57,6 +63,8 @@ class UploadedFileResourceTests {
     private BasicInstanceBuilder builder;
     @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private MeiliSearchService meiliSearchService;
 
     @Test
     void shouldListUploadedFiles() throws Exception {
@@ -81,6 +89,39 @@ class UploadedFileResourceTests {
     }
 
     @Test
+    void shouldFilterUploadedFilesByMetadata() throws Exception {
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
+        long abstractImageId = abstractImage.getId();
+        long uploadedFileId = abstractImage.getUploadedFile().getId();
+
+        when(meiliSearchService.searchImageIds(any(), any())).thenReturn(Set.of(abstractImageId));
+
+        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all")).willReturn(
+            aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .withBody(pageJson(anUploadedFileResponse(uploadedFileId)))));
+
+        mockMvc.perform(get("/api/uploadedfile.json").param("metadataFilter", "specimens.biological_being.sex:Male"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(1)))
+            .andExpect(jsonPath("$.collection[0].id").value(uploadedFileId));
+
+        WiremockRepository.SERVER.verify(getRequestedFor(urlPathEqualTo("/uploaded-files/all"))
+            .withQueryParam("uploadedFileIds", WireMock.equalTo(String.valueOf(uploadedFileId))));
+    }
+
+    @Test
+    void shouldReturnEmptyCollectionWhenMetadataMatchesNoUploadedFile() throws Exception {
+        when(meiliSearchService.searchImageIds(any(), any())).thenReturn(Set.of(-999L));
+
+        mockMvc.perform(get("/api/uploadedfile.json").param("metadataFilter", "specimens.biological_being.sex:Male"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(0)))
+            .andExpect(jsonPath("$.size").value(0));
+
+        WiremockRepository.SERVER.verify(0, getRequestedFor(urlPathEqualTo("/uploaded-files/all")));
+    }
+
+    @Test
     void shouldReturnEmptyCollectionWhenNoUploadedFiles() throws Exception {
         WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all")).willReturn(
             aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
@@ -98,7 +139,8 @@ class UploadedFileResourceTests {
 
         mockMvc.perform(get("/api/uploadedfile/{id}.json", 42)).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(42)).andExpect(jsonPath("$.filename").value("file_42.tif"))
-            .andExpect(jsonPath("$.originalFilename").value("original_42.tif"));
+            .andExpect(jsonPath("$.originalFilename").value("original_42.tif"))
+            .andExpect(jsonPath("$.created").value("2024-01-01T00:00:00"));
     }
 
     @Test

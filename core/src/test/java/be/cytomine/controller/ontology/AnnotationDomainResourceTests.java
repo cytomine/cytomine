@@ -51,9 +51,11 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.ReportType;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static be.cytomine.service.utils.SimplifyGeometryServiceTests.getPointMultiplyByGeometriesOrInteriorRings;
@@ -64,6 +66,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -76,34 +79,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class AnnotationDomainResourceTests {
-
-    @Autowired
-    private EntityManager em;
-
-    @Autowired
-    private BasicInstanceBuilder builder;
-
-    @Autowired
-    private UserAnnotationRepository userAnnotationRepository;
-
-    @Autowired
-    private MockMvc restAnnotationDomainControllerMockMvc;
-
-    @Autowired
-    private AnnotationDomainRepository annotationDomainRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private WireMockServer wireMockServer;
-
-    @Autowired
-    private WiremockRepository wiremockRepository;
 
     Project project;
     ImageInstance image;
@@ -122,6 +101,40 @@ public class AnnotationDomainResourceTests {
     ReviewedAnnotation r4;
     ReviewedAnnotation r5;
     ReviewedAnnotation r6;
+    @Autowired
+    private EntityManager em;
+    @Autowired
+    private BasicInstanceBuilder builder;
+    @Autowired
+    private UserAnnotationRepository userAnnotationRepository;
+    @Autowired
+    private MockMvc restAnnotationDomainControllerMockMvc;
+    @Autowired
+    private AnnotationDomainRepository annotationDomainRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private WireMockServer wireMockServer;
+    @Autowired
+    private WiremockRepository wiremockRepository;
+    @Autowired
+    private UrlApi urlApi;
+
+    private static void checkForProperties(
+        String response,
+        List<String> expectedProperties,
+        List<String> unexpectedProperties
+    ) {
+        Map<String, Object> firstResult = ((List<Map<String, Object>>) JsonObject.toMap(response)
+            .get("collection")).get(0);
+        for (String property : expectedProperties) {
+            assertThat(firstResult).containsKey(property);
+        }
+
+        for (String property : unexpectedProperties) {
+            assertThat(firstResult).doesNotContainKey(property);
+        }
+    }
 
     void createAnnotationSet() throws ParseException {
         project = builder.givenAProject();
@@ -192,7 +205,6 @@ public class AnnotationDomainResourceTests {
             List.of("term", "created", "area", "project")
         );
 
-
         result = restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString())
                 .param("showDefault", "true")
@@ -248,7 +260,6 @@ public class AnnotationDomainResourceTests {
             .andReturn();
     }
 
-
     @Test
     @Transactional
     public void listAnnotationSearchWithNoTerms() throws Exception {
@@ -301,7 +312,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + a4.getId() + ")]").doesNotExist())
             .andReturn();
 
-
     }
 
     @Test
@@ -320,7 +330,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + a3.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id==" + a4.getId() + ")]").exists())
             .andReturn();
-
 
     }
 
@@ -409,7 +418,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + a3.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id==" + a4.getId() + ")]").doesNotExist()) //no term
             .andReturn();
-
 
     }
 
@@ -534,7 +542,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[0].id").value(a8.getId().intValue()))
             .andExpect(jsonPath("$.collection[4].id").value(a4.getId().intValue()))
             .andReturn();
-
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation/search.json")
                 .param("project", project.getId().toString())
@@ -676,7 +683,6 @@ public class AnnotationDomainResourceTests {
             List.of("term", "created", "area", "project")
         );
 
-
         result = restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString())
                 .param("showDefault", "true")
@@ -721,7 +727,6 @@ public class AnnotationDomainResourceTests {
             .andReturn();
     }
 
-
     @Test
     @Transactional
     public void listReviewedAnnotationWithParametersImage() throws Exception {
@@ -736,7 +741,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + r4.getId() + ")]").doesNotExist())
             .andReturn();
     }
-
 
     @Test
     @Transactional
@@ -793,7 +797,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + r4.getId() + ")]").doesNotExist())
             .andReturn();
 
-
     }
 
     @Test
@@ -814,7 +817,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + r4.getId() + ")]").exists())
             .andReturn();
 
-
     }
 
     @Test
@@ -825,7 +827,6 @@ public class AnnotationDomainResourceTests {
         r2.setLocation(new WKTReader().read("POLYGON ((1 3, 2 3, 2 5, 1 5, 1 3))"));
         r3.setLocation(new WKTReader().read("POLYGON ((3 1, 5 1,  5 3, 3 3, 3 1))"));
         r4.setLocation(new WKTReader().read("POLYGON ((4 4,8 4, 8 7,4 7,4 4))"));
-
 
         // intersect a,b and c
         String polygonIncludingA1A2A3 = "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))";
@@ -843,7 +844,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + r3.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id==" + r4.getId() + ")]").doesNotExist())
             .andReturn();
-
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -891,7 +891,6 @@ public class AnnotationDomainResourceTests {
             .andReturn();
     }
 
-
     @Test
     @Transactional
     public void listReviewedAnnotationSearchByImageAndReviewerAndTerm() throws Exception {
@@ -926,7 +925,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + r2.getId() + ")]").doesNotExist()) //wrong user
             .andReturn();
     }
-
 
     @Test
     @Transactional
@@ -993,24 +991,9 @@ public class AnnotationDomainResourceTests {
             .andReturn();
     }
 
-    private static void checkForProperties(
-        String response,
-        List<String> expectedProperties,
-        List<String> unexpectedProperties
-    ) {
-        Map<String, Object> firstResult = ((List<Map<String, Object>>) JsonObject.toMap(response)
-            .get("collection")).get(0);
-        for (String property : expectedProperties) {
-            assertThat(firstResult).containsKey(property);
-        }
-
-        for (String property : unexpectedProperties) {
-            assertThat(firstResult).doesNotContainKey(property);
-        }
-    }
-
     @Test
     public void shouldReturnGeoJsonContentType() throws Exception {
+        wiremockRepository.stubTermsByProject(project.getId(), term);
         restAnnotationDomainControllerMockMvc.perform(get(
                 "/api/project/{projectId}/annotations/export",
                 project.getId()
@@ -1020,6 +1003,18 @@ public class AnnotationDomainResourceTests {
             .andExpect(header().string("Content-Disposition", containsString(".geojson")))
             .andExpect(content().contentTypeCompatibleWith("application/geo+json"))
             .andExpect(content().json("{}"));
+    }
+
+    @Test
+    public void shouldExportTermNameAsPathClassNameProperty() throws Exception {
+        wiremockRepository.stubTermsByProject(project.getId(), term);
+        restAnnotationDomainControllerMockMvc.perform(get(
+                "/api/project/{projectId}/annotations/export",
+                project.getId()
+            ))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.type").value("FeatureCollection"))
+            .andExpect(jsonPath("$.features[*].properties.path_class_name", hasItem(term.getName())));
     }
 
     @Test
@@ -1150,7 +1145,9 @@ public class AnnotationDomainResourceTests {
             .replace("%2F", "/") + "/annotation/crop";
         String
             body
-            = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1)"
+                + ")\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
         wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url))
@@ -1182,7 +1179,9 @@ public class AnnotationDomainResourceTests {
             .replace("%2F", "/") + "/annotation/crop";
         String
             body
-            = "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1))\"}],\"timepoints\":0,\"background_transparency\":0}";
+            =
+            "{\"length\":512,\"z_slices\":0,\"annotations\":[{\"geometry\":\"POLYGON ((1 1, 50 10, 50 50, 10 50, 1 1)"
+                + ")\"}],\"timepoints\":0,\"background_transparency\":0}";
         System.out.println(url);
         System.out.println(body);
         wireMockServer.stubFor(WireMock.post(urlEqualTo(IMS_API_BASE_PATH + url))
@@ -1232,7 +1231,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -1243,7 +1242,6 @@ public class AnnotationDomainResourceTests {
             .andExpect(jsonPath("$.annotation.id").exists());
     }
 
-
     @Test
     @Transactional
     public void addMultipleValidUserAnnotation() throws Exception {
@@ -1253,9 +1251,9 @@ public class AnnotationDomainResourceTests {
         restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonObject.toJsonString(List.of(
-                    userAnnotation1.toJsonObject(),
-                    userAnnotation2.toJsonObject(),
-                    userAnnotation3.toJsonObject()
+                    userAnnotation1.toJsonObject(urlApi),
+                    userAnnotation2.toJsonObject(urlApi),
+                    userAnnotation3.toJsonObject(urlApi)
                 ))))
             .andExpect(status().isOk());
     }
@@ -1266,7 +1264,7 @@ public class AnnotationDomainResourceTests {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -1284,7 +1282,7 @@ public class AnnotationDomainResourceTests {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         restAnnotationDomainControllerMockMvc.perform(put("/api/annotation/{id}.json", reviewedAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
+                .content(reviewedAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -1307,7 +1305,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(delete("/api/annotation/{id}.json", userAnnotation.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(userAnnotation.toJSON()))
+                .content(userAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -1327,7 +1325,7 @@ public class AnnotationDomainResourceTests {
                 reviewedAnnotation.getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(reviewedAnnotation.toJSON()))
+                .content(reviewedAnnotation.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -1342,7 +1340,8 @@ public class AnnotationDomainResourceTests {
     @Transactional
     public void simplifyAnnotationWhileCreatingIt() throws Exception {
         AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
-        annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
+        annotation.setLocation(
+            new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
         assertThat(annotation.getLocation().getNumPoints()).isGreaterThanOrEqualTo(500);
 
         int maxPoint;
@@ -1354,7 +1353,7 @@ public class AnnotationDomainResourceTests {
         MvcResult mvcResult = restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
                 .param("minPoint", String.valueOf(minPoint)).param("maxPoint", String.valueOf(maxPoint))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotation.toJSON()))
+                .content(annotation.toJSON(urlApi)))
             .andExpect(status().isOk()).andReturn();
         Map<String, Object> annotationResponse = (Map<String, Object>) JsonObject.toMap(mvcResult.getResponse()
             .getContentAsString()).get("annotation");
@@ -1368,12 +1367,13 @@ public class AnnotationDomainResourceTests {
 
         maxPoint = 150;
         minPoint = 100;
-        annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
+        annotation.setLocation(
+            new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
 
         mvcResult = restAnnotationDomainControllerMockMvc.perform(post("/api/annotation.json")
                 .param("minPoint", String.valueOf(minPoint)).param("maxPoint", String.valueOf(maxPoint))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotation.toJSON()))
+                .content(annotation.toJSON(urlApi)))
             .andExpect(status().isOk()).andReturn();
         annotationResponse = (Map<String, Object>) JsonObject.toMap(mvcResult.getResponse().getContentAsString())
             .get("annotation");
@@ -1391,7 +1391,8 @@ public class AnnotationDomainResourceTests {
     public void simplifyAnnotation() throws Exception {
 
         AnnotationDomain annotation = builder.givenAUserAnnotation();
-        annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
+        annotation.setLocation(
+            new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
         assertThat(annotation.getLocation().getNumPoints()).isGreaterThanOrEqualTo(500);
         builder.persistAndReturn(annotation);
         int maxPoint;
@@ -1406,7 +1407,7 @@ public class AnnotationDomainResourceTests {
             )
                 .param("minPoint", String.valueOf(minPoint)).param("maxPoint", String.valueOf(maxPoint))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotation.toJSON()))
+                .content(annotation.toJSON(urlApi)))
             .andExpect(status().isOk()).andReturn();
 
         assertThat(annotation.getLocation().getNumPoints()).isLessThanOrEqualTo(
@@ -1416,13 +1417,13 @@ public class AnnotationDomainResourceTests {
 
     }
 
-
     @Test
     @Transactional
     public void retrieveSimplifyAnnotation() throws Exception {
 
         AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
-        annotation.setLocation(new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
+        annotation.setLocation(
+            new WKTReader().read(TestUtils.getResourceFileAsString("dataset/very_big_annotation.txt")));
         assertThat(annotation.getLocation().getNumPoints()).isGreaterThanOrEqualTo(500);
         builder.persistAndReturn(annotation);
         int maxPoint;
@@ -1454,7 +1455,8 @@ public class AnnotationDomainResourceTests {
     @Transactional
     public void fillUserAnnotation() throws Exception {
         String annotationWithHole =
-            "POLYGON ((4980 4980, 5516 4932, 5476 4188, 4956 4204, 4980 4980), (5100 4316, 5100 4804, 5404 4780, 5364 4316, 5100 4316))";
+            "POLYGON ((4980 4980, 5516 4932, 5476 4188, 4956 4204, 4980 4980), (5100 4316, 5100 4804, 5404 4780, 5364"
+                + " 4316, 5100 4316))";
 
         AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
         annotation.setLocation(new WKTReader().read(annotationWithHole));
@@ -1474,7 +1476,8 @@ public class AnnotationDomainResourceTests {
     @Transactional
     public void shouldRemoveHoleFromReviewedAnnotationGeometry() throws Exception {
         String annotationWithHole =
-            "POLYGON ((4980 4980, 5516 4932, 5476 4188, 4956 4204, 4980 4980), (5100 4316, 5100 4804, 5404 4780, 5364 4316, 5100 4316))";
+            "POLYGON ((4980 4980, 5516 4932, 5476 4188, 4956 4204, 4980 4980), (5100 4316, 5100 4804, 5404 4780, 5364"
+                + " 4316, 5100 4316))";
 
         AnnotationDomain annotation = builder.givenAReviewedAnnotation();
         annotation.setLocation(new WKTReader().read(annotationWithHole));
@@ -1537,7 +1540,6 @@ public class AnnotationDomainResourceTests {
                 \s
                  )""";
 
-
         AnnotationDomain annotation = builder.givenANotPersistedUserAnnotation();
         annotation.setLocation(new WKTReader().read(multiPolygon));
         annotation.getImage().getBaseImage().setWidth(500000);
@@ -1557,7 +1559,6 @@ public class AnnotationDomainResourceTests {
             .isEqualTo(multiPolygonWithoutBlank.replaceAll(" ", "").replaceAll("\n", ""));
     }
 
-
     @Test
     public void testFreehandAnnotationCorrectionUserAdd() throws Exception {
         doFreeHandAnnotationAdd(builder.givenAUserAnnotation(), false);
@@ -1567,7 +1568,6 @@ public class AnnotationDomainResourceTests {
     public void testFreehandAnnotationCorrectionReviewedAdd() throws Exception {
         doFreeHandAnnotationAdd(builder.givenAReviewedAnnotation(), true);
     }
-
 
     private void doFreeHandAnnotationAdd(AnnotationDomain annotation, boolean reviewMode) throws Exception {
         String basedLocation = "POLYGON ((0 0, 0 5000, 10000 5000, 10000 0, 0 0))";
@@ -1596,7 +1596,6 @@ public class AnnotationDomainResourceTests {
     public void testFreehandAnnotationCorrectionReviewedAddBadGeom() throws Exception {
         doFreeHandAnnotationAddWithSelfIntersectPolygon(builder.givenAReviewedAnnotation(), true);
     }
-
 
     private void doFreeHandAnnotationAddWithSelfIntersectPolygon(AnnotationDomain annotation, boolean reviewMode)
         throws Exception {
@@ -1632,7 +1631,6 @@ public class AnnotationDomainResourceTests {
         String basedLocation = "POLYGON ((0 0, 0 10000, 10000 10000, 10000 0, 0 0))";
         String removedLocation = "POLYGON ((0 5000, 10000 5000, 10000 10000, 0 10000, 0 5000))";
         String expectedLocation = "POLYGON ((0 0, 0 5000, 10000 5000, 10000 0, 0 0))";
-
 
         //add annotation with empty space inside it
         annotation.setLocation(new WKTReader().read(basedLocation));

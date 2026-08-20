@@ -8,17 +8,17 @@ function CSVToArray(strData, strDelim = ',') {
   let objPattern = new RegExp((
     // Delimiters.
     '(\\' + strDelim + '|\\r?\\n|\\r|^)' +
-    // Quoted fields.
-    '(?:"([^"]*(?:""[^"]*)*)"|' +
-    // Standard fields.
-    '([^"\\' + strDelim + '\\r\\n]*))'
+        // Quoted fields.
+        '(?:"([^"]*(?:""[^"]*)*)"|' +
+        // Standard fields.
+        '([^"\\' + strDelim + '\\r\\n]*))'
   ), 'gi');
   let arrData = [[]];
-  let arrMatches = objPattern.exec(strData);
+  let arrMatches = null;
 
-  while (arrMatches) {
+  while ((arrMatches = objPattern.exec(strData)) !== null) {
     // Get the delimiter that was found.
-    let strMatchedDelimiter = arrMatches[1];
+    let strMatchedDelimiter = arrMatches[ 1 ];
 
     // Check to see if the given delimiter has a length (is not the start of string) and if it matches
     // field delimiter. If id does not, then we know that this delimiter is a row delimiter.
@@ -31,16 +31,15 @@ function CSVToArray(strData, strDelim = ',') {
 
     // Now that we have our delimiter out of the way, let's check to see which kind of value we
     // captured (quoted or unquoted).
-    if (arrMatches[2]) {
+    if (arrMatches[ 2 ]) {
       // We found a quoted value. When we capture this value, unescape any double quotes.
-      strMatchedValue = arrMatches[2].replace(new RegExp('""', 'g'), '"');
+      strMatchedValue = arrMatches[2].replace(new RegExp('""', 'g'),'"');
     } else {
+        
       strMatchedValue = arrMatches[3]; // We found a non-quoted value.
     }
     // Now that we have our value string, let's add // it to the data array.
     arrData[arrData.length - 1].push(strMatchedValue);
-
-    arrMatches = objPattern.exec(strData);
   }
 
   // Return the parsed data.
@@ -57,7 +56,7 @@ function createDeepField(obj, keys, value, overwrite = false) {
     }
     obj[key] = value;
     return;
-  }
+  } 
   let currKey = keys[0];
   if (!(currKey in obj)) {
     obj[currKey] = {};
@@ -70,7 +69,7 @@ export function makeI18nJsons(csvPath, destPath) {
     if (err) {
       throw err;
     }
-
+    
     let csvContent = CSVToArray(content, ',');
     let headers = csvContent[0];
     let data = csvContent.slice(1);
@@ -96,9 +95,9 @@ export function makeI18nJsons(csvPath, destPath) {
 
     for (let langIndex in languages) {
       let lang = languages[langIndex];
-      writeFile(join(destPath, lang + '.i18n.json'), JSON.stringify(i18n[lang]), (writeErr) => {
-        if (writeErr) {
-          throw writeErr;
+      writeFile(join(destPath, lang + '.i18n.json'), JSON.stringify(i18n[lang]), (err) => {
+        if (err) {
+          throw err;
         }
       });
     }

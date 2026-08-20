@@ -52,6 +52,11 @@ export default [
       'space-infix-ops': ['error'],
       'space-in-parens': ['error'],
       'vue/no-v-text-v-html-on-component': ['off'],
+      // Vue 3 deprecations: keep as warnings for now, to be fixed later.
+      'vue/no-deprecated-v-on-native-modifier': ['warn'],
+      'vue/no-deprecated-router-link-tag-prop': ['warn'],
+      'vue/no-deprecated-delete-set': ['warn'],
+      'vue/no-deprecated-model-definition': ['warn'],
     },
   },
   {

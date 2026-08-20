@@ -48,7 +48,7 @@
 
       <b-pagination
         :total="nbAnnotations"
-        v-model:current="currentPage"
+        :current.sync="currentPage"
         size="is-small"
         :per-page="nbPerPage"
       />

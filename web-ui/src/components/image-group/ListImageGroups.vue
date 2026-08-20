@@ -65,12 +65,12 @@
       <b-table
           :data="filteredImageGroups"
           :paginated="true"
-          v-model:current-page="currentPage"
+          :current-page.sync="currentPage"
           :per-page="perPage"
           pagination-size="is-small"
           detailed
           detail-key="id"
-          v-model:opened-detailed="openedDetails"
+          :opened-detailed.sync="openedDetails"
           :default-sort="sort.field"
           :default-sort-direction="sort.order"
           @sort="updateSort"
@@ -146,7 +146,7 @@
       </b-table>
     </div>
 
-    <add-image-group-modal v-model:active="addImageGroupModal" @newImageGroup="newImageGroup" />
+    <add-image-group-modal :active.sync="addImageGroupModal" @newImageGroup="newImageGroup" />
   </div>
 </div>
 </template>

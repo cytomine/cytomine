@@ -252,29 +252,29 @@
   <rename-modal
     :title="$t('rename-image')"
     :currentName="image.instanceFilename"
-    v-model:active="isRenameModalActive"
+    :active.sync="isRenameModalActive"
     @rename="rename"
   />
 
   <magnification-modal
     :image="image"
-    v-model:active="isMagnificationModalActive"
+    :active.sync="isMagnificationModalActive"
     @setMagnification="(event) => $emit('setMagnification', event)"
   />
 
   <calibration-modal
     :image="image"
-    v-model:active="isCalibrationModalActive"
+    :active.sync="isCalibrationModalActive"
     @setResolution="(event) => $emit('setResolution', event)"
   />
 
   <image-metadata-modal
-    v-model:active="isMetadataModalActive"
+    :active.sync="isMetadataModalActive"
     :image="image"
   />
 
   <simple-add-to-image-group-modal
-    v-model:active="isAddToImageGroupModalActive"
+    :active.sync="isAddToImageGroupModalActive"
     :image="image"
     @addToImageGroup="(event) => imageGroupLinks.push(event)"
   />

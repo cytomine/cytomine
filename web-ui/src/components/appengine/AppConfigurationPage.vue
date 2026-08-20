@@ -43,7 +43,7 @@
       </section>
     </div>
 
-    <AppStoreAddModal v-model:active="showModal" @add-store="handleAdd($event)" />
+    <AppStoreAddModal :active.sync="showModal" @add-store="handleAdd($event)" />
   </div>
 </template>
 

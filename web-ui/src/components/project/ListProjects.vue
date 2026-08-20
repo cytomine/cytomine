@@ -115,11 +115,11 @@
         :collection="projectCollection"
         :is-empty="nbEmptyFilters > 0"
         class="table-projects"
-        v-model:currentPage="currentPage"
-        v-model:perPage="perPage"
-        v-model:openedDetailed="openedDetails"
-        v-model:sort="sortField"
-        v-model:order="sortOrder"
+        :currentPage.sync="currentPage"
+        :perPage.sync="perPage"
+        :openedDetailed.sync="openedDetails"
+        :sort.sync="sortField"
+        :order.sync="sortOrder"
         :revision="revision"
       >
         <template #default="{row: project}">
@@ -193,7 +193,7 @@
     </div>
   </div>
 
-  <add-project-modal v-model:active="creationModal" :ontologies="ontologies" />
+  <add-project-modal :active.sync="creationModal" :ontologies="ontologies" />
 </div>
 </template>
 

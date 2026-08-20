@@ -21,7 +21,7 @@
       </b-tooltip>
     </div>
 
-    <annotation-selection v-model:active="selectAnnotation" @select-annotation="input = $event"/>
+    <annotation-selection :active.sync="selectAnnotation" @select-annotation="input = $event"/>
   </div>
 </template>
 

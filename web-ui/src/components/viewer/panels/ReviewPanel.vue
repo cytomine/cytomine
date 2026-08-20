@@ -48,7 +48,7 @@
               </div>
             </div>
 
-            <cytomine-task v-else v-model:task="taskReviewAll" />
+            <cytomine-task v-else :task.sync="taskReviewAll" />
           </div>
 
           <div class="buttons are-small">

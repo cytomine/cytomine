@@ -12,9 +12,9 @@
     >
 
       <vl-view
-        v-model:center="center"
-        v-model:zoom="zoom"
-        v-model:rotation="rotation"
+        :center.sync="center"
+        :zoom.sync="zoom"
+        :rotation.sync="rotation"
         :max-zoom="maxZoom"
         :max-resolution="Math.pow(2, image.zoom)"
         :extent="extent"

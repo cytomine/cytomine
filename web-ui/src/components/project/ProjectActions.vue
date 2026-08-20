@@ -3,7 +3,7 @@
   <rename-modal
     :title="$t('rename-project')"
     :currentName="project.name"
-    v-model:active="isRenameModalActive"
+    :active.sync="isRenameModalActive"
     @rename="rename"
   />
 

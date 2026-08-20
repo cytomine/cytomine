@@ -6,7 +6,7 @@
       <section class="panel-block">
         <b-table
           ref="table"
-          v-model:current="currentPage"
+          :current.sync="currentPage"
           :data="taskRuns"
           :paginated="true"
           :per-page="perPage"

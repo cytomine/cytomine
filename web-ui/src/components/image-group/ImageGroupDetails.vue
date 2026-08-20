@@ -98,12 +98,12 @@
   <rename-modal
       :title="$t('rename-image-group')"
       :currentName="imageGroup.name"
-      v-model:active="isRenameModalActive"
+      :active.sync="isRenameModalActive"
       @rename="rename"
   />
 
   <add-to-image-group-modal
-    v-model:active="isAddToModalActive"
+    :active.sync="isAddToModalActive"
     :image-group="imageGroup"
     @addToImageGroup="$emit('addToImageGroup', $event)"
   />

@@ -21,10 +21,10 @@
 
       <cytomine-table
         :collection="userCollection"
-        v-model:currentPage="currentPage"
-        v-model:perPage="perPage"
-        v-model:sort="sortField"
-        v-model:order="sortOrder"
+        :currentPage.sync="currentPage"
+        :perPage.sync="perPage"
+        :sort.sync="sortField"
+        :order.sync="sortOrder"
         :detailed=true
         :revision="revision"
       >
@@ -84,7 +84,7 @@
         </template>
       </cytomine-table>
 
-      <user-modal v-model:active="modal" :user="editedUser" @addUser="refreshUsers" @updateUser="updateUser" />
+      <user-modal :active.sync="modal" :user="editedUser" @addUser="refreshUsers" @updateUser="updateUser" />
     </template>
   </template>
 </div>

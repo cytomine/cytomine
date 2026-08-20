@@ -18,7 +18,7 @@
       </div>
 
       <b-table
-        v-model:current-page="currentPage"
+        :current-page.sync="currentPage"
         :data="filteredTags"
         :default-sort="[sortField, sortOrder]"
         :loading="loading"
@@ -68,7 +68,7 @@
         </template>
       </b-table>
 
-      <tag-modal v-model:active="modal" :tag="editedTag" @addTag="addTag" @updateTag="updateTag" />
+      <tag-modal :active.sync="modal" :tag="editedTag" @addTag="addTag" @updateTag="updateTag" />
     </template>
   </div>
 </template>

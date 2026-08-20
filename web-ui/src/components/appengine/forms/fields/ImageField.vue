@@ -27,9 +27,9 @@
       </b-tooltip>
     </div>
 
-    <annotation-selection v-model:active="selectAnnotation" @select-annotation="selectInput($event, 'annotation')" />
+    <annotation-selection :active.sync="selectAnnotation" @select-annotation="selectInput($event, 'annotation')" />
 
-    <image-selection v-model:active="selectImage" @select-image="selectInput($event, 'image')" />
+    <image-selection :active.sync="selectImage" @select-image="selectInput($event, 'image')" />
   </div>
 </template>
 

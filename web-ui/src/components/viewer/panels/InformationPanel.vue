@@ -112,7 +112,7 @@
 
   <calibration-modal
     :image="image"
-    v-model:active="calibrationModal"
+    :active.sync="calibrationModal"
     @setResolution="setResolution"
   />
 </div>

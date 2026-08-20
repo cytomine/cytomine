@@ -2,7 +2,7 @@
 <vl-interaction-select
   :ident="`select-target-${index}`"
   :filter="filterFunction"
-  v-model:features="selectedFeatures"
+  :features.sync="selectedFeatures"
   :toggle-condition="never"
   :remove-condition="shiftKeyOnly"
   :multi=true

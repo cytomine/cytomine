@@ -15,7 +15,7 @@
     backend-pagination
     :total="total"
     :per-page="internalPerPage"
-    v-model:current-page="internalCurrentPage"
+    :current-page.sync="internalCurrentPage"
     pagination-size="is-small"
     :detailed="detailed"
     :detail-key="detailKey"
@@ -24,7 +24,7 @@
     :default-sort="sort"
     :default-sort-direction="order"
     :checkable="checkable"
-    v-model:checked-rows="internalCheckedRows"
+    :checked-rows.sync="internalCheckedRows"
     :is-row-checkable="isRowCheckable"
     @sort="updateSort"
   >

@@ -23,7 +23,7 @@
     </div>
 
     <array-modal
-      v-model:active="selectParameters"
+      :active.sync="selectParameters"
       :max-size="maxSize"
       :min-size="minSize"
       :type="subType"

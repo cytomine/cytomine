@@ -452,7 +452,7 @@ public class CytomineSteps {
     public void addUserToProject(Wait<WebDriver> wait, String projectUrl, String username) {
         webDriverUtils.goTo(wait, projectUrl);
         webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
-        webDriverUtils.byClick(wait, By.cssSelector("button.button.is-link.add-member"));
+        webDriverUtils.clickButtonByText(wait, "Add members");
         By searchInput = By.xpath("//input[@placeholder='Search user...']");
         webDriverUtils.byClick(wait, searchInput);
         webDriverUtils.bySendKeys(wait, searchInput, username);
@@ -476,14 +476,8 @@ public class CytomineSteps {
             By.xpath("//td[@data-label='Username' and normalize-space(text())='" + username + "']"
                 + "/preceding-sibling::td[contains(@class,'checkbox-cell')]//label[contains(@class,'b-checkbox')]")
         );
-        webDriverUtils.byClick(
-            wait,
-            By.xpath("//button[contains(@class,'is-danger') and normalize-space(text())='Remove selected members']")
-        );
-        webDriverUtils.byClick(
-            wait,
-            By.xpath("//button[contains(@class,'is-danger') and normalize-space(text())='Confirm']")
-        );
+        webDriverUtils.clickButtonByText(wait, "Remove selected members");
+        webDriverUtils.clickButtonByText(wait, "Confirm");
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
     }
 

@@ -832,21 +832,21 @@ public class CytomineSteps {
             By.xpath("//a[contains(@class,'active')][.//i[contains(@class,'fa-check-circle')]]")
         );
 
-        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Start review']]");
+        webDriverUtils.clickButtonByText(wait, "Start review");
         webDriverUtils.byIsDisplayed(wait, validateButton);
         webDriverUtils.byIsDisplayed(wait, rejectButton);
 
-        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Accept all']]");
-        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Reject all']]");
-        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Continue my review later']]");
-        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Continue review']]");
+        webDriverUtils.clickButtonByText(wait, "Accept all");
+        webDriverUtils.clickButtonByText(wait, "Reject all");
+        webDriverUtils.clickButtonByText(wait, "Continue my review later");
+        webDriverUtils.clickButtonByText(wait, "Continue review");
 
-        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Cancel my review']]");
+        webDriverUtils.clickButtonByText(wait, "Cancel my review");
 
-        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Start review']]");
-        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Validate my review']]");
+        webDriverUtils.clickButtonByText(wait, "Start review");
+        webDriverUtils.clickButtonByText(wait, "Validate my review");
 
-        webDriverUtils.xpathClick(wait, "//button[.//span[normalize-space()='Unvalidate and continue my review']]");
+        webDriverUtils.clickButtonByText(wait, "Unvalidate and continue my review");
     }
 
     public void createImageGroup(

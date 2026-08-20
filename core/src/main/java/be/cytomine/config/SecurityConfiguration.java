@@ -19,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.config.security.TokenFromParameterFilter;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.utils.JwtAuthConverter;
 
@@ -29,9 +30,12 @@ public class SecurityConfiguration {
 
     private final JwtAuthConverter customJwtAuthConverter;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public SecurityConfiguration(UserRepository userRepository, JwtAuthConverter customJwtAuthConverter) {
+    public SecurityConfiguration(UserRepository userRepository, UserMapper userMapper,
+        JwtAuthConverter customJwtAuthConverter) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
         this.customJwtAuthConverter = customJwtAuthConverter;
     }
 
@@ -53,7 +57,7 @@ public class SecurityConfiguration {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             // Deprecated. Kept as transitional in 2024.2
-            .addFilterBefore(new ApiKeyFilter(userRepository), BasicAuthenticationFilter.class)
+            .addFilterBefore(new ApiKeyFilter(userRepository, userMapper), BasicAuthenticationFilter.class)
             .exceptionHandling((exceptionHandling) ->
                 exceptionHandling
                     .authenticationEntryPoint(

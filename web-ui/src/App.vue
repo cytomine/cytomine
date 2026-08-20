@@ -108,7 +108,7 @@ export default {
   async created() {
     let settings;
     await axios
-      .get('configuration.json')
+      .get('/configuration.json')
       .then(response => (settings = response.data));
 
     for (let i in settings) {

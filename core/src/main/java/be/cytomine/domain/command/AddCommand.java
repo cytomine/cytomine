@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
@@ -18,12 +17,12 @@ import be.cytomine.utils.CommandResponse;
 @DiscriminatorValue("be.cytomine.domain.command.AddCommand")
 public class AddCommand extends Command {
 
-    public AddCommand(User currentUser) {
-        this.userId = currentUser.getId();
+    public AddCommand(long currentUser) {
+        this.userId = currentUser;
     }
 
-    public AddCommand(User currentUser, Transaction transaction) {
-        this.userId = currentUser.getId();
+    public AddCommand(long currentUser, Transaction transaction) {
+        this.userId = currentUser;
         this.transaction = transaction;
     }
 

@@ -438,7 +438,7 @@ export default {
       window.location.assign(appendShortTermToken(annotation.url + '?draw=true&complete=true&increaseArea=1.25', this.shortTermToken), '_blank');
     },
     copyURL() {
-      copyToClipboard(window.location.origin + '/#' + this.annotationURL);
+      copyToClipboard(window.location.origin + this.annotationURL);
       this.$notify({ type: 'success', text: this.$t('notif-success-annot-URL-copied') });
     },
 

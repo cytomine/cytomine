@@ -413,10 +413,7 @@ public class CytomineSteps {
     }
 
     public void selectAnnotationForGeometryInput(Wait<WebDriver> wait) {
-        webDriverUtils.xpathClick(
-            wait,
-            "//div[contains(@class,'field')][.//span[.=' input ']]//button[.//span[.=' Select ']]"
-        );
+        webDriverUtils.clickButtonByText(wait, "Select");
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card .annotation-content"));
         wait.until(d -> !d.findElements(By.cssSelector(".annotation-content > div")).isEmpty());
 

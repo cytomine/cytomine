@@ -29,7 +29,7 @@ export default [
     rules: {
       'array-bracket-spacing': ['error', 'never'],
       'brace-style': ['error', '1tbs'],
-      'camelcase': ['error', { allow: ['$_veeValidate'] }],
+      'camelcase': ['error'],
       'curly': ['error', 'all'],
       'eqeqeq': ['error', 'smart'],
       'indent': ['error', 2, { 'SwitchCase': 1, 'ignoredNodes': ['TemplateLiteral'] }],

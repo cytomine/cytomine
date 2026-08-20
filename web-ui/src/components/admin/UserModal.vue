@@ -5,38 +5,44 @@
     <input id="username" class="hidden" type="text">
     <input id="password" class="hidden" type="password">
 
-    <b-field
-      :key="'username'"
-      :label="$t('username')"
-      horizontal
-      :type="{'is-danger': errors.has('username')}"
-      :message="errors.first('username')"
-    >
-      <b-input
-        v-model="internalUser['username']"
-        :name="'username'"
-        v-validate="'required'"
-        :type="'text'"
-        :disabled="internalUser.id"
-      />
-    </b-field>
+    <field :form="form" name="username" :validators="requiredRule" v-slot="{field, state}">
+      <b-field
+        :label="$t('username')"
+        horizontal
+        :type="{'is-danger': !!state.meta.errors.length}"
+        :message="state.meta.errors[0]"
+      >
+        <b-input
+          :model-value="state.value"
+          @update:model-value="field.handleChange"
+          :type="'text'"
+          :disabled="editionMode"
+        />
+      </b-field>
+    </field>
 
-    <b-field
-      v-for="{field, validationRules} in editableFields"
-      :key="field"
-      :label="$t(field === 'password' && editionMode ? 'password-new' : field)"
-      horizontal
-      :type="{'is-danger': errors.has(field)}"
-      :message="errors.first(field)"
+    <field
+      v-for="{name, validators} in editableFields"
+      :key="name"
+      :form="form"
+      :name="name"
+      :validators="validators"
+      v-slot="{field, state}"
     >
-      <b-input
-        v-model="internalUser[field]"
-        :name="field"
-        v-validate="validationRules"
-        :type="field === 'password' ? 'password': 'text'"
-        :password-reveal="field === 'password'"
-      />
-    </b-field>
+      <b-field
+        :label="$t(name === 'password' && editionMode ? 'password-new' : name)"
+        horizontal
+        :type="{'is-danger': !!state.meta.errors.length}"
+        :message="state.meta.errors[0]"
+      >
+        <b-input
+          :model-value="state.value"
+          @update:model-value="field.handleChange"
+          :type="name === 'password' ? 'password': 'text'"
+          :password-reveal="name === 'password'"
+        />
+      </b-field>
+    </field>
 
     <b-field :label="$t('role')" horizontal>
       <b-select v-model="selectedRole">
@@ -71,7 +77,7 @@
       <button class="button" type="button" @click="$emit('update:active', false)">
         {{$t('button-cancel')}}
       </button>
-      <button class="button is-link" :disabled="errors.any() || !isAdminConfirmed()">
+      <button class="button is-link" :disabled="!isValid || !isAdminConfirmed()">
         {{$t('button-save')}}
       </button>
     </template>
@@ -80,10 +86,15 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+
 import { User } from '@/api';
+import { email, min, required, rules, validateForm } from '@/utils/form.js';
 import { rolesMapping } from '@/utils/role-utils';
 import { UserRole } from '@/constants/UserRole.js';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
+
+const emptyUser = { username: '', firstname: '', lastname: '', email: '', password: '' };
 
 const defaultRole = UserRole.GUEST;
 const defaultLanguage = { value: 'EN', name:'English' };
@@ -94,8 +105,15 @@ export default {
     active: Boolean,
     user: Object
   },
-  components: { CytomineModal },
-  $_veeValidate: { validator: 'new' },
+  components: { CytomineModal, Field },
+  setup() {
+    const form = useForm({ defaultValues: { ...emptyUser } });
+    return {
+      form,
+      isValid: form.useStore(state => state.isValid),
+      requiredRule: { onChange: rules(required) }
+    };
+  },
   data() {
     return {
       internalUser: {},
@@ -122,10 +140,15 @@ export default {
     },
     editableFields() {
       return [
-        { field: 'firstname', validationRules: 'required' },
-        { field: 'lastname', validationRules: 'required' },
-        { field: 'email', validationRules: 'required|email' },
-        { field: 'password', validationRules: this.editionMode ? 'min:8' : 'required|min:8' }
+        { name: 'firstname', validators: this.requiredRule },
+        { name: 'lastname', validators: this.requiredRule },
+        { name: 'email', validators: { onChange: rules(required, email) } },
+        {
+          name: 'password',
+          validators: {
+            onChange: this.editionMode ? rules(min(8)) : rules(required, min(8))
+          }
+        }
       ];
     },
   },
@@ -140,6 +163,15 @@ export default {
         this.internalUser.language = this.user ? this.user.language : defaultLanguage.value;
         this.displayErrors = false;
         this.adminConfirm = false;
+        this.form.reset({
+          ...emptyUser,
+          ...(this.user ? {
+            username: this.user.username,
+            firstname: this.user.firstname,
+            lastname: this.user.lastname,
+            email: this.user.email
+          } : {})
+        });
       }
     }
   },
@@ -156,13 +188,17 @@ export default {
     },
 
     async save() {
-      let result = await this.$validator.validateAll();
-      if (!result) {
+      if (!await validateForm(this.form)) {
         return;
       }
 
+      let { password, ...profile } = this.form.state.values;
       let labelTranslation = this.editionMode ? 'update' : 'creation';
-      this.internalUser.name = `${this.internalUser.firstname} ${this.internalUser.lastname}`;
+      Object.assign(this.internalUser, profile);
+      if (password) {
+        this.internalUser.password = password;
+      }
+      this.internalUser.name = `${profile.firstname} ${profile.lastname}`;
       this.internalUser.reference = crypto.randomUUID();
       this.internalUser.role = this.selectedRole;
       try {
@@ -172,7 +208,7 @@ export default {
           this.internalUser.role = this.selectedRole; // for correct rendering in list
         }
 
-        this.internalUser.password = ''; // reinitialize password so that if modal reopened, field empty
+        this.form.setFieldValue('password', ''); // so that if modal reopened, field empty
         this.$notify({ type: 'success', text: this.$t('notif-success-user-' + labelTranslation) });
         this.$emit('update:active', false);
         this.$emit(this.editionMode ? 'updateUser' : 'addUser', this.internalUser);

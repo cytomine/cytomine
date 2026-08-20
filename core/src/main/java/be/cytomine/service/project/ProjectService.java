@@ -220,8 +220,8 @@ public class ProjectService extends ModelService {
             List<DatedCytomineDomain> unopened = data.isEmpty()
                 ? projectRepository.listLastCreated()
                 : projectRepository.listLastCreated(data.stream()
-                    .map(x -> (Long) x.get("id"))
-                    .collect(Collectors.toList()));
+                .map(x -> (Long) x.get("id"))
+                .collect(Collectors.toList()));
             for (DatedCytomineDomain datedCytomineDomain : unopened) {
                 data.add(JsonObject.of(
                     "id", datedCytomineDomain.getId(),

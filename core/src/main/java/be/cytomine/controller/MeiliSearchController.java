@@ -15,6 +15,7 @@ import be.cytomine.dto.meilisearch.MeiliSearchFacetsResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchImageResponse;
 import be.cytomine.service.MeiliSearchService;
 
+
 @RestController
 @RequestMapping("/api/meilisearch")
 @RequiredArgsConstructor

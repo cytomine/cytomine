@@ -905,7 +905,7 @@ public class UserService extends ModelService {
 
     @Override
     protected void beforeDelete(CytomineDomain domain) {
-        Long userId = domain.getId();
+        long userId = domain.getId();
         commandHistoryRepository.deleteAllByUserId(userId);
         redoStackItemRepository.deleteAllByUserId(userId);
         undoStackItemRepository.deleteAllByUserId(userId);

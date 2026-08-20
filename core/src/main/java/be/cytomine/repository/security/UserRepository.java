@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.security.User;
 
-
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     @EntityGraph(attributePaths = "roles")
@@ -36,7 +35,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     )
     List<User> findAllAdminsByProjectId(Long projectId);
 
-
     default List<User> findAllUsersByProjectId(Long projectId) {
         return findAllUsersByContainer(projectId);
     }
@@ -53,7 +51,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
         + "and aclSid.sid = user.username"
     )
     List<User> findAllUsersByContainer(Long containerId);
-
 
     @Query(
         value = "SELECT DISTINCT sec_user.id "
@@ -95,4 +92,3 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     Optional<User> findByUsernameLikeIgnoreCase(String username);
 }
-

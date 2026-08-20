@@ -110,7 +110,7 @@ public class AnnotationTrackService extends ModelService {
         jsonObject.put("annotationIdent", annotation.getId());
         jsonObject.put("annotationClassName", annotation.getClass().getName());
 
-        return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUser().id()), null, jsonObject);
     }
 
     public CommandResponse addAnnotationTrack(
@@ -126,8 +126,7 @@ public class AnnotationTrackService extends ModelService {
             "track", idTrack,
             "slice", idSlice
         );
-        UserResponse currentUser = currentUserService.getCurrentUser();
-        return executeCommand(new AddCommand(currentUser.id(), transaction), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUser().id(), transaction), null, jsonObject);
     }
 
     /**

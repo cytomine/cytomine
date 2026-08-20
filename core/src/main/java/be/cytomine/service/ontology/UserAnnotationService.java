@@ -154,7 +154,6 @@ public class UserAnnotationService extends ModelService {
         return annotationListingService.executeRequest(userAnnotationListing);
     }
 
-
     public Long count(long userId, Project project) {
         if (project != null) {
             securityACLService.checkIsSameUserOrAdminContainer(project, userId, currentUserService.getCurrentUser());
@@ -164,7 +163,6 @@ public class UserAnnotationService extends ModelService {
             return userAnnotationRepository.countByUserId(userId);
         }
     }
-
 
     public Long countByProject(Project project) {
         return countByProject(project, null, null);
@@ -189,7 +187,6 @@ public class UserAnnotationService extends ModelService {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         return userAnnotationRepository.listLight(urlApi);
     }
-
 
     /**
      * Add the new domain with JSON data
@@ -254,7 +251,6 @@ public class UserAnnotationService extends ModelService {
         if (!annotationShape.isValid()) {
             throw new WrongArgumentException("Annotation location is not valid");
         }
-
 
         Envelope envelope = annotationShape.getEnvelopeInternal();
         boolean isSizeDefined = image.getBaseImage().getWidth() != null && image.getBaseImage().getHeight() != null;
@@ -329,7 +325,6 @@ public class UserAnnotationService extends ModelService {
             return commandResponse;
         }
 
-
         // Add annotation-term if any
         List<Long> termIds = new ArrayList<>();
         termIds.addAll(jsonObject.getJSONAttrListLong("term", new ArrayList<>()));
@@ -352,7 +347,6 @@ public class UserAnnotationService extends ModelService {
             "term",
             terms.stream().map(x -> x.toJsonObject(urlApi).getId()).toList()
         );
-
 
         // Add properties if any
         Map<String, String> properties = new HashMap<>();
@@ -515,12 +509,10 @@ public class UserAnnotationService extends ModelService {
                 validateGeometryService.tryToMakeItValidIfNotValid(jsonNewData.getJSONAttrStr("location"))
             );
         }
-        CommandResponse result =
-            executeCommand(new EditCommand(currentUser.id(), null), domain, jsonNewData);
+        CommandResponse result = executeCommand(new EditCommand(currentUser.id(), null), domain, jsonNewData);
 
         return result;
     }
-
 
     protected void afterUpdate(CytomineDomain domain, CommandResponse response) {
         String query = "UPDATE annotation_link SET updated = NOW() WHERE annotation_ident = " + domain.getId();
@@ -529,7 +521,6 @@ public class UserAnnotationService extends ModelService {
         response.getData().put("annotation", response.getData().get("userannotation"));
         response.getData().remove("userannotation");
     }
-
 
     /**
      * Delete this domain
@@ -592,7 +583,7 @@ public class UserAnnotationService extends ModelService {
     public List<String> getStringParamsI18n(CytomineDomain domain) {
         UserAnnotation annotation = (UserAnnotation) domain;
         return List.of(
-            currentUserService.getCurrentUser().username(),
+            currentUserService.getCurrentUser().id(),
             annotation.getImage().getBlindInstanceFilename(),
             ((UserAnnotation) domain).getUser().getUsername()
         );
@@ -604,7 +595,6 @@ public class UserAnnotationService extends ModelService {
         deleteDependentAnnotationTrack((UserAnnotation) domain, transaction, task);
         deleteDependentMetadata(domain, transaction, task);
     }
-
 
     public void deleteDependentAnnotationTerm(UserAnnotation ua, Transaction transaction) {
         for (AnnotationTerm annotationTerm : annotationTermService.list(ua)) {
@@ -697,6 +687,5 @@ public class UserAnnotationService extends ModelService {
         }
         return result;
     }
-
 
 }

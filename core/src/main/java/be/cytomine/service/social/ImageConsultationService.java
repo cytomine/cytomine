@@ -118,7 +118,6 @@ public class ImageConsultationService {
             persistentProjectConnectionRepository.findAllByUserAndProject(userId, imageInstance.getProject().getId(),
                 PageRequest.of(0, 1, Sort.Direction.DESC, "created")).stream().findFirst();
 
-
         consultation.setProjectConnection(
             persistentImageConsultation.map(PersistentProjectConnection::getId).orElse(null));
 
@@ -507,7 +506,6 @@ public class ImageConsultationService {
 
         MongoCollection<Document> persistentImageConsultation =
             mongoClient.getDatabase(mongoDatabaseName).getCollection("persistentImageConsultation");
-
 
         List<Document> results = persistentImageConsultation.aggregate(requests).into(new ArrayList<>());
         for (Document result : results) {

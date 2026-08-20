@@ -118,7 +118,7 @@ public class CommandService {
         }
     }
 
-    public List<CommandResponse> undo(UndoStackItem undoItem, long userId) {
+    public List<CommandResponse> undo(UndoStackItem undoItem, UserResponse user) {
         CommandResponse result;
         List<CommandResponse> results = new ArrayList<>();
 
@@ -135,7 +135,7 @@ public class CommandService {
         } else {
             log.debug("Transaction in progress");
             //Its a transaction, many other command will be deleted
-            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(userId, transaction);
+            List<UndoStackItem> undoStacks = commandRepository.findAllUndoOrderByCreatedDesc(user.id(), transaction);
             for (UndoStackItem undoStack : undoStacks) {
                 //browse all command and undo it while it's the same transaction
                 if (undoStack.getCommand().isRefuseUndo()) {

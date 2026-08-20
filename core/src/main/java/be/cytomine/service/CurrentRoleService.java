@@ -81,8 +81,8 @@ public class CurrentRoleService {
         // role super admin don't need to open a admin session, so we don't remove the role admin from the current role
         return !currentAdmins.containsKey(user.username()) && !isSuperAdmin
             ? user.roles().stream()
-                .filter(role -> !role.authority().equals("ROLE_ADMIN"))
-                .collect(Collectors.toSet()) : user.roles();
+            .filter(role -> !role.authority().equals("ROLE_ADMIN"))
+            .collect(Collectors.toSet()) : user.roles();
     }
 
     public Set<String> findCurrentAuthorities(UserResponse user) {
@@ -125,7 +125,6 @@ public class CurrentRoleService {
     public boolean isGuest(UserResponse user) {
         return findRealAuthorities(user).contains("ROLE_GUEST");
     }
-
 
     public boolean hasCurrentUserAdminRole(UserResponse user) {
         Set<String> authorities = user.roles().stream().map(RoleResponse::authority).collect(Collectors.toSet());

@@ -83,8 +83,8 @@ public class ImageFilterProjectService extends ModelService {
             .orElseThrow(() -> new ObjectNotFoundException("ImageFilter", jsonObject.getJSONAttrStr("imageFilter")));
 
         securityACLService.check(project, ADMINISTRATION);
-        UserResponse currentUser = currentUserService.getCurrentUser();
-        return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
+
+        return executeCommand(new AddCommand(currentUserService.getCurrentUser().id()), null, jsonObject);
     }
 
     @Override

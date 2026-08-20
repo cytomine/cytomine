@@ -59,7 +59,7 @@ public abstract class AbstractAuthorizationTest {
         // This code is called every execution of an authorization (a lot...)
         // So it is a "ugly" implementation of the 'addPermission' that is very fast.
 
-        UserResponse user =  currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
 
         Long aclClassId = permissionService.getAclClassId(container);
         //get acl sid for current user (run request)

@@ -118,8 +118,7 @@ public class ImageGroupService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new EditCommand(currentUser.id(), transaction), domain,
-            jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     @Override

@@ -125,13 +125,13 @@ public class RestUserAnnotationController extends RestCytomineController {
             .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
         terms =
             terms == null || terms.isBlank()
-                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().getId())
+                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().id())
                 .stream().map(String::valueOf).collect(
                     Collectors.joining(",")) :
                 terms;
         JsonObject params = mergeQueryParamsAndBodyParams();
         byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format,
-            currentUserService.getCurrentUser().getId());
+            currentUserService.getCurrentUser().id());
         responseReportFile(reportService.getAnnotationReportFileName(format, idProject), report, format);
     }
 

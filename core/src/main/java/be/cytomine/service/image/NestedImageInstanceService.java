@@ -103,8 +103,7 @@ public class NestedImageInstanceService extends ModelService {
         securityACLService.check(jsonNewData.getJSONAttrLong("project"), Project.class, READ);
         securityACLService.checkIsNotReadOnly(domain.container());
         securityACLService.checkIsNotReadOnly(jsonNewData.getJSONAttrLong("project"), Project.class);
-        return executeCommand(
-            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     /**

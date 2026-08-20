@@ -1047,7 +1047,6 @@ public class ImageInstanceResourceTests {
     public void channelHistograms() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
-
         configureFor("localhost", wireMockServer.port());
         System.out.println("/image/" + URLEncoder.encode(image.getBaseImage().getPath(), StandardCharsets.UTF_8)
             .replace("%2F", "/") + "/histogram/per-channels?n_bins=256");
@@ -1074,7 +1073,6 @@ public class ImageInstanceResourceTests {
     @Transactional
     public void channelHistogramsBounds() throws Exception {
         ImageInstance image = givenTestImageInstance();
-
 
         configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(

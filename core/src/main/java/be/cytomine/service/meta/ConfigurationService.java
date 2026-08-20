@@ -98,8 +98,7 @@ public class ConfigurationService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
         UserResponse currentUser = currentUserService.getCurrentUser();
-        return executeCommand(
-            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     @Override

@@ -104,7 +104,6 @@ public class PropertyService extends ModelService {
             securityACLService.checkUser(currentUser);
         }
 
-
         Command command = new AddCommand(currentUser.id(), transaction);
         return executeCommand(command, null, jsonObject);
     }

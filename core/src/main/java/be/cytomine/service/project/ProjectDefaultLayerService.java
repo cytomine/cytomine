@@ -98,8 +98,7 @@ public class ProjectDefaultLayerService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         securityACLService.check(domain, WRITE);
         UserResponse currentUser = currentUserService.getCurrentUser();
-        return executeCommand(
-            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     @Override

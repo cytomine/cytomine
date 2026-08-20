@@ -27,6 +27,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AuthenticationException;
 import be.cytomine.exceptions.ForbiddenException;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.UserRepository;
 
 @Deprecated
@@ -36,15 +37,16 @@ public class ApiKeyFilter extends OncePerRequestFilter {
 
     private final UserRepository secUserRepository;
 
+    private final UserMapper userMapper;
 
-    public ApiKeyFilter(UserRepository secUserRepository) {
+    public ApiKeyFilter(UserRepository secUserRepository, UserMapper userMapper) {
         this.secUserRepository = secUserRepository;
+        this.userMapper = userMapper;
     }
 
     public static String generateKeys(String method, String contentMd5, String contentType, String date,
         String privatekey) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
         String canonicalHeaders = method + "\n" + contentMd5 + "\n" + contentType + "\n" + date;
-
 
         SecretKeySpec signingKey = new SecretKeySpec(privatekey.getBytes(), "HmacSHA1");
         // get an hmac_sha1 Mac instance and initialize with the signing key
@@ -122,7 +124,6 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         }
     }
 
-
     /**
      * Rebuild an Authentication for the given username and register it in the security context. Typically used after
      * updating a user's authorities or other auth-cached info.
@@ -134,7 +135,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         UsernamePasswordAuthenticationToken authenticationToken =
             new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(),
                 userDetails.getAuthorities());
-        authenticationToken.setDetails(secUser);
+        authenticationToken.setDetails(userMapper.map(secUser));
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }

@@ -388,7 +388,6 @@ public class SliceInstanceResourceTests {
     public void histogramsBounds() throws Exception {
         SliceInstance image = givenTestSliceInstance();
 
-
         configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
@@ -458,7 +457,6 @@ public class SliceInstanceResourceTests {
     @Transactional
     public void channelHistogramsBounds() throws Exception {
         SliceInstance image = givenTestSliceInstance();
-
 
         configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(

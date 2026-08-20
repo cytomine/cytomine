@@ -51,7 +51,6 @@ import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
 import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.search.ImageSearchExtension;
 import be.cytomine.service.social.AnnotationActionService;
@@ -80,6 +79,8 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @MockedUser
 public class ImageInstanceServiceTests {
 
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     ImageInstanceService imageInstanceService;
     @Autowired
@@ -99,9 +100,9 @@ public class ImageInstanceServiceTests {
     @Autowired
     CurrentUserService currentUserService;
     @Autowired
+    CurrentUserService currentUserService;
+    @Autowired
     PersistentImageConsultationRepository persistentImageConsultationRepository;
-
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private UrlApi urlApi;
 
@@ -287,7 +288,7 @@ public class ImageInstanceServiceTests {
         Date consultation = new Date();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
-        imageConsultationService.add(currentUserService.getCurrentUser().getId(), imageInstance1.getId(), "xxx", "view",
+        imageConsultationService.add(currentUserService.getCurrentUser().id(), imageInstance1.getId(), "xxx", "view",
             consultation);
 
         ImageSearchExtension imageSearchExtension = new ImageSearchExtension();

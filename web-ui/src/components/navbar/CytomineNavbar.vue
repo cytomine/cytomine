@@ -72,7 +72,6 @@
       </navbar-dropdown>
     </div>
   </div>
-  <div class="hidden" v-shortkey.once="openHotkeysModalShortcut" @shortkey="openHotkeysModal"></div>
 </nav>
 </template>
 
@@ -87,6 +86,8 @@ import AboutCytomineModal from './AboutCytomineModal.vue';
 import CytomineSearcher from '@/components/search/CytomineSearcher.vue';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
+import { useShortkeys } from '@/utils/use-shortkeys.js';
+import { getCurrentInstance } from 'vue';
 import { KeycloakRole } from '@/constants/UserRole.js';
 
 export default {
@@ -97,6 +98,13 @@ export default {
     CytomineSearcher
   },
   mixins: [changeLanguageMixin],
+  setup() {
+    const instance = getCurrentInstance();
+    useShortkeys(
+      { 'general-shortcuts-modal': shortcuts['general-shortcuts-modal'] },
+      () => instance.proxy.openHotkeysModal()
+    );
+  },
   data() {
     return {
       openedTopMenu: false,
@@ -111,9 +119,6 @@ export default {
     },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
-    },
-    openHotkeysModalShortcut() {
-      return shortcuts['general-shortcuts-modal'];
     }
   },
   watch: {

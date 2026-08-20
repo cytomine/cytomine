@@ -843,7 +843,7 @@ public class ImageInstanceService extends ModelService {
     }
 
     public List<Map<String, Object>> listLight(UserResponse user) {
-        securityACLService.checkIsSameUser(currentUserService.getCurrentUser().getId(), user);
+        securityACLService.checkIsSameUser(currentUserService.getCurrentUser().id(), user);
         boolean isAdmin = currentRoleService.isAdminByNow(user);
         String request = "select * from user_image where user_image_id = :id order by instance_filename";
         Query query = getEntityManager().createNativeQuery(request, Tuple.class);
@@ -935,7 +935,7 @@ public class ImageInstanceService extends ModelService {
         );
 
         List<Bson> requests = new ArrayList<>();
-        requests.add(match(eq("user", currentUserService.getCurrentUser().getId())));
+        requests.add(match(eq("user", currentUserService.getCurrentUser().id())));
         requests.add(sort(descending("created")));
         requests.add(group("$image", Accumulators.max("created", "$created"), Accumulators.first("user", "$user")));
         requests.add(sort(ascending("_id")));

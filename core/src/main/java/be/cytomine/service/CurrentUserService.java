@@ -40,9 +40,9 @@ public class CurrentUserService {
     private static CurrentUser extractCurrentUser(Authentication authentication) {
         if (authentication == null) {
             return null;
-        } else if (authentication.getDetails() instanceof User) {
+        } else if (authentication.getDetails() instanceof UserResponse user) {
             FullCurrentUser fullCurrentUser = new FullCurrentUser();
-            fullCurrentUser.setUser((UserResponse) authentication.getDetails());
+            fullCurrentUser.setUser(user);
             return fullCurrentUser;
         } else if (authentication.getPrincipal() instanceof String) {
             PartialCurrentUser partialCurrentUser = new PartialCurrentUser();

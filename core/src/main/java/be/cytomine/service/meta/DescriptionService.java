@@ -116,8 +116,7 @@ public class DescriptionService extends ModelService {
             ((Description) domain).getDomainIdent()
         );
         securityACLService.checkUserAccessRightsForMeta(parentDomain, currentUser);
-        return executeCommand(new EditCommand(currentUser.id(), transaction), domain,
-            jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     @Override

@@ -134,7 +134,7 @@ public class AnnotationLinkService extends ModelService {
             "group", groupId,
             "image", imageId
         );
-        UserResponse currentUser = currentUserService.getCurrentUser();
-        return executeCommand(new AddCommand(currentUser.id(), transaction), null, jsonObject);
+
+        return executeCommand(new AddCommand(currentUserService.getCurrentUser().id(), transaction), null, jsonObject);
     }
 }

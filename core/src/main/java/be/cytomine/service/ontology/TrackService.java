@@ -135,8 +135,7 @@ public class TrackService extends ModelService {
 
         jsonNewData.put("project", imageInstance.getProject().getId());
 
-        return executeCommand(
-            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     /**

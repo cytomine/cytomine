@@ -107,8 +107,7 @@ public class CompanionFileService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), WRITE);
-        return executeCommand(
-            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     /**

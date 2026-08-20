@@ -79,7 +79,7 @@ public class AnnotationActionResourceTests {
     @Test
     public void addActionForAnnotation() throws Exception {
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(0);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         JsonObject jsonObject = new JsonObject();

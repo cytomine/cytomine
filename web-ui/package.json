@@ -1,7 +1,7 @@
 {
   "name": "cytomine-web-ui",
   "description": "A web-based user interface for interacting with Cytomine.",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "type": "module",
   "homepage": "https://uliege.cytomine.org/",
   "license": "Apache-2.0",

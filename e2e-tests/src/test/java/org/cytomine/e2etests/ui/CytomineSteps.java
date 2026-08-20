@@ -559,7 +559,7 @@ public class CytomineSteps {
 
     public void exportAnnotations(Wait<WebDriver> wait, String projectUrl, String projectName) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
-        webDriverUtils.byClick(wait, By.xpath("//button[normalize-space()='Export annotations']"));
+        webDriverUtils.clickButtonByText(wait, "Export annotations");
 
         String filenameSuffix = "_" + projectName + "_annotations." + ReportType.GEOJSON.getLabel();
         Instant end = Instant.now().plus(Duration.ofSeconds(5));
@@ -582,7 +582,7 @@ public class CytomineSteps {
 
     public void exportOntology(Wait<WebDriver> wait, String ontologyUrl, String ontologyName) {
         webDriverUtils.goTo(wait, ontologyUrl);
-        webDriverUtils.byClick(wait, By.xpath("//button[normalize-space()='Export ontology']"));
+        webDriverUtils.clickButtonByText(wait, "Export ontology");
 
         String filename = ontologyName + "." + ReportType.JSON.getLabel();
         Instant end = Instant.now().plus(Duration.ofSeconds(5));

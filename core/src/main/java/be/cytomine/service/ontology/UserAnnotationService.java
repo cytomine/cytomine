@@ -583,7 +583,7 @@ public class UserAnnotationService extends ModelService {
     public List<String> getStringParamsI18n(CytomineDomain domain) {
         UserAnnotation annotation = (UserAnnotation) domain;
         return List.of(
-            currentUserService.getCurrentUser().id(),
+            currentUserService.getCurrentUser().id() + "",
             annotation.getImage().getBlindInstanceFilename(),
             ((UserAnnotation) domain).getUser().getUsername()
         );

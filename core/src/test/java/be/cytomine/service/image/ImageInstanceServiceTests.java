@@ -80,7 +80,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 public class ImageInstanceServiceTests {
 
     private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
+
     @Autowired
     ImageInstanceService imageInstanceService;
     @Autowired
@@ -97,8 +97,6 @@ public class ImageInstanceServiceTests {
     PersistentUserPositionRepository persistentUserPositionRepository;
     @Autowired
     ImageConsultationService imageConsultationService;
-    @Autowired
-    CurrentUserService currentUserService;
     @Autowired
     CurrentUserService currentUserService;
     @Autowired

@@ -7,7 +7,7 @@
       :placeholder="$t('search-placeholder')"
       type="search"
       icon="search"
-      @click.native="activate()"
+      @focus="activate()"
       :loading="loading"
       :disabled="error"
     />
@@ -24,9 +24,10 @@
         :key="project.id"
         :to="`/project/${project.id}`"
         class="navbar-item"
-        v-html="highlightedName(project.name)"
         @click.native="deactivate"
-      />
+      >
+        <span v-html="highlightedName(project.name)" />
+      </router-link>
       <a v-if="moreProjects" class="navbar-item">...</a>
     </p>
     <span v-else class="navbar-item no-result">{{$t('no-project')}}</span>
@@ -39,8 +40,9 @@
         :to="`/project/${img.project}/image/${img.id}`"
         class="navbar-item"
         @click.native="deactivate"
-        v-html="htmlImageName(img)"
-      />
+      >
+        <span v-html="htmlImageName(img)" />
+      </router-link>
       <a v-if="moreImages" class="navbar-item">...</a>
     </p>
     <span v-else class="navbar-item no-result">{{$t('no-image')}}</span>

@@ -16,34 +16,32 @@
         pagination-size="is-small"
         @sort="onSort"
       >
-        <template #default="{row}">
-          <b-table-column field="created" :label="$t('date')" sortable>
-            {{ formatDate(row.created) }}
-          </b-table-column>
+        <b-table-column field="created" :label="$t('date')" sortable v-slot="{ row }">
+          {{ formatDate(row.created) }}
+        </b-table-column>
 
-          <b-table-column :label="$t('operation')">
-            <b-tag :type="operationTag(row)">{{ operationLabel(row) }}</b-tag>
-          </b-table-column>
+        <b-table-column :label="$t('operation')" v-slot="{ row }">
+          <b-tag :type="operationTag(row)">{{ operationLabel(row) }}</b-tag>
+        </b-table-column>
 
-          <b-table-column :label="$t('domain')">
-            {{ domainLabel(row) }}
-          </b-table-column>
+        <b-table-column :label="$t('domain')" v-slot="{ row }">
+          {{ domainLabel(row) }}
+        </b-table-column>
 
-          <b-table-column :label="$t('description')">
-            {{ description(row) }}
-          </b-table-column>
+        <b-table-column :label="$t('description')" v-slot="{ row }">
+          {{ description(row) }}
+        </b-table-column>
 
-          <b-table-column :label="$t('actions')" centered>
-            <b-button
-              size="is-small"
-              icon-left="undo"
-              :loading="undoing === row.id"
-              @click="undo(row)"
-            >
-              {{ $t('undo') }}
-            </b-button>
-          </b-table-column>
-        </template>
+        <b-table-column :label="$t('actions')" centered v-slot="{ row }">
+          <b-button
+            size="is-small"
+            icon-left="undo"
+            :loading="undoing === row.id"
+            @click.native="undo(row)"
+          >
+            {{ $t('undo') }}
+          </b-button>
+        </b-table-column>
 
         <template #empty>
           <div class="content has-text-grey has-text-centered">

@@ -92,7 +92,7 @@ app-engine.tasks.name,Tasks,Tâches,Tareas,Taken
 app-name,App Name,Nom de l'application,Nombre de la aplicación,App-naam
 app-store,App Store,App Store,App Store,App Store
 appengine-not-enabled-title,App Engine is not enabled,App Engine n'est pas activé,App Engine no está habilitado,App Engine is niet ingeschakeld
-appengine-not-enabled-description,"App Engine is not enabled on your Cytomine instance. Either contact an administrator, or contact sales@cytomine.com for requesting an upgrade of your instance.",App Engine n'est pas activé sur votre instance Cytomine. Contactez un administrateur ou envoyez un e-mail à sales@cytomine.com pour demander une mise à niveau de votre instance.,App Engine no está habilitado en su instancia de Cytomine. Póngase en contacto con un administrador o envíe un correo a sales@cytomine.com para solicitar una actualización de su instancia.,App Engine is niet ingeschakeld op uw Cytomine-instantie. Neem contact op met een beheerder of stuur een e-mail naar sales@cytomine.com om een upgrade van uw instantie aan te vragen.
+appengine-not-enabled-description,App Engine is not enabled on your Cytomine instance,App Engine n'est pas activé sur votre instance Cytomine,App Engine no está habilitado en su instancia de Cytomine,App Engine is niet ingeschakeld op uw Cytomine-instantie
 area,Area,Aire,Zona,Gebied
 associate-tags,Associate tags,Associer des tags,Etiquetas asociadas,Tags koppelen
 associated-by,associated by {username},associé par {username},asociado por {username},geassocieerd door {usersnaam}
@@ -794,7 +794,7 @@ opacity,Opacity,Opacité,Opacidad,ondoorzichtigheid
 open-admin-session,Open admin session,Ouvrir une session admin,Abrir sesión de administrador,Een adminsessie openen
 open-image-group-by-batch-of,Open by batch of,Ouvrir par lot de,Abierto por lote de,Open per batch van
 open-in-viewer,Open in viewer,Ouvrir dans le visualisateur,Abrir en visor,Openen in de viewer
-open-image-index,Open image {index},Ouvrir l'image {index},Abrir imagen {índice},Afbeelding {index} openen
+open-image-index,Open image {index},Ouvrir l'image {index},Abrir imagen {index},Afbeelding {index} openen
 operating-system,Operating system,Système d'exploitation,Sistema operativo,Operating systeem
 open-images-from-to,Open images from {from} to {to},Ouvrir les images {from} à {to},Abrir imágenes de {from} a {to},Afbeeldingen openen van {van} tot {tot}
 optional-parameters,Optional parameters,Paramètres optionnels,Parámetros opcionales,Optionele parameters
@@ -948,7 +948,7 @@ select-ontology,Select ontology,Choisir l'ontologie,Seleccione ontología,Kies o
 select-options,Select options,Sélectionner les options,Seleccione opciones,Selecteer opties
 select-project,Select a project,Sélectionner un project,Seleccione un proyecto,Selecteer een project
 send-to-all-project-members,Send to all project members,Envoyer à tous les membres du projet,Enviar a todos los miembros del proyecto,Stuur naar alle projectleden
-selection-in-view,Selection in view {number},Sélection dans la vue {number},Selección a la vista {número},Selectie in weergave {nummer}
+selection-in-view,Selection in view {number},Sélection dans la vue {number},Selección a la vista {number},Selectie in weergave {nummer}
 send-to-some-members,Send to some project members only,Envoyer à certains membres seulement,Enviar solo a algunos miembros del proyecto,Alleen naar bepaalde projectleden verzenden
 services,Services,Services,Servicios,Diensten
 set-magnification,Set magnification,Changer le grossissement,Establecer nivel de aumento,De vergroting veranderen

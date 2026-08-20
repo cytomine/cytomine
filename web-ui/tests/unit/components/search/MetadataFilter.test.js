@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
@@ -40,14 +40,13 @@ const emptySelection = Object.fromEntries(Object.keys(facets).map((key) => [key,
 const advance = async (ms) => vi.advanceTimersByTimeAsync(ms);
 
 const createWrapper = async (options = {}) => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
-
   const wrapper = mount(MetadataFilter, {
-    localVue,
-    mocks: {
-      $t: (message) => message,
-      $tc: (message) => message,
+    global: {
+      plugins: [Buefy],
+      mocks: {
+        $t: (message) => message,
+        $tc: (message) => message,
+      },
     },
     ...options,
   });

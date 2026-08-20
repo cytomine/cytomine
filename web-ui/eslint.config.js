@@ -57,6 +57,7 @@ export default [
       'vue/no-deprecated-router-link-tag-prop': ['warn'],
       'vue/no-deprecated-delete-set': ['warn'],
       'vue/no-deprecated-model-definition': ['warn'],
+      'vue/no-deprecated-v-bind-sync': ['warn'],
     },
   },
   {

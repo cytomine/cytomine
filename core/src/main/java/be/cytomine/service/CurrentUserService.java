@@ -17,7 +17,6 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.mapper.UserMapper;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.security.current.CurrentUser;
 import be.cytomine.security.current.FullCurrentUser;
 import be.cytomine.security.current.PartialCurrentUser;
@@ -28,7 +27,6 @@ import be.cytomine.security.current.PartialCurrentUser;
 @Service
 public class CurrentUserService {
 
-    private final UserRepository userRepository;
     private final UserHttpContract userHttpContract;
     private final UserMapper userMapper;
 

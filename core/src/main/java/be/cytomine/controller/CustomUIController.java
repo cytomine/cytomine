@@ -42,19 +42,13 @@ import static org.springframework.security.acls.domain.BasePermission.ADMINISTRA
 @RestController
 public class CustomUIController extends RestCytomineController {
 
-    private final CurrentRoleService currentRoleService;
-
-    private final CurrentUserService currentUserService;
-
-    private final ProjectService projectService;
-
-    private final SecurityACLService securityACLService;
-
-    private final PropertyService propertyService;
-
-    private final ApplicationProperties applicationProperties;
-
     static String CUSTOM_UI_PROJECT = "@CUSTOM_UI_PROJECT";
+    private final CurrentRoleService currentRoleService;
+    private final CurrentUserService currentUserService;
+    private final ProjectService projectService;
+    private final SecurityACLService securityACLService;
+    private final PropertyService propertyService;
+    private final ApplicationProperties applicationProperties;
     private final UrlApi urlApi;
 
     @GetMapping("/custom-ui/config.json")
@@ -166,7 +160,7 @@ public class CustomUIController extends RestCytomineController {
     }
 
     private Map<String, Boolean> getProjectConfigCurrentUser(Project project) {
-        boolean isProjectAdmin = projectService.listByAdmin(currentUserService.getCurrentUserOld())
+        boolean isProjectAdmin = projectService.listByAdminId(currentUserService.getCurrentUser().id())
             .stream()
             .anyMatch(x -> x.getId().equals(project.getId()));
         boolean isAdminByNow = currentRoleService.isAdminByNow(currentUserService.getCurrentUser());

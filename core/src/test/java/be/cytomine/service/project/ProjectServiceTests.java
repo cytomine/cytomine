@@ -657,13 +657,16 @@ public class ProjectServiceTests {
         builder.addUserToProject(project1, admin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project1, user.getUsername(), READ);
 
-        assertThat(projectService.listByCreator(creator)).contains(new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByCreator(admin)).doesNotContain(new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByCreator(user)).doesNotContain(new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByAdmin(creator)).contains(new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByAdmin(admin)).contains(new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByAdmin(user)).doesNotContain(new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByUser(user)).contains(new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByCreatorId(creator.getId())).contains(new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByCreatorId(admin.getId())).doesNotContain(
+            new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByCreatorId(user.getId())).doesNotContain(
+            new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByAdminId(creator.getId())).contains(new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByAdminId(admin.getId())).contains(new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByAdminId(user.getId())).doesNotContain(
+            new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByUserId(user.getId())).contains(new NamedCytomineDomain(project1.getId()));
     }
 
     @Test

@@ -154,7 +154,7 @@ import { changeLanguageMixin } from '@/lang.js';
 import { MyAccount, User } from '@/api';
 import { rolesMapping } from '@/utils/role-utils';
 import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
-import copyToClipboard from 'copy-to-clipboard';
+import { useClipboard } from '@vueuse/core';
 import { formatMomentDate } from '@/utils/date';
 
 export default {
@@ -162,6 +162,10 @@ export default {
   name: 'Account',
   $_veeValidate: { validator: 'new' },
   mixins: [changeLanguageMixin],
+  setup() {
+    const { copy } = useClipboard({ legacy: true });
+    return { copyToClipboard: copy };
+  },
   data() {
     return {
       updatedAccount: this.$store.state.currentUser.account.clone(),
@@ -226,7 +230,7 @@ export default {
 
 
     copy(value) {
-      copyToClipboard(value);
+      this.copyToClipboard(value);
       this.$notify({ type: 'success', text: this.$t('notif-success-key-copied') });
     },
 

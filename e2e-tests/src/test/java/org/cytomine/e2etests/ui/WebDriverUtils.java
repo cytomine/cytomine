@@ -18,6 +18,10 @@ public class WebDriverUtils {
         return wait.until(d -> d.findElements(by)).isEmpty();
     }
 
+    void clickButtonByText(Wait<WebDriver> wait, String text) {
+        xpathClick(wait, String.format("//button[contains(., '%s')]", text));
+    }
+
     void xpathClick(Wait<WebDriver> wait, String xpath) {
         byClick(wait, By.xpath(xpath));
     }

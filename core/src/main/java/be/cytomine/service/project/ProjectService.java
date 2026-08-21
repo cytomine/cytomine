@@ -656,19 +656,19 @@ public class ProjectService extends ModelService {
         );
     }
 
-    public List<NamedCytomineDomain> listByCreator(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return projectRepository.listByCreator(user);
+    public List<NamedCytomineDomain> listByCreatorId(long userId) {
+        securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
+        return projectRepository.listByCreator(userId);
     }
 
-    public List<NamedCytomineDomain> listByAdmin(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return projectRepository.listByAdminId(user.getId());
+    public List<NamedCytomineDomain> listByAdminId(long userId) {
+        securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
+        return projectRepository.listByAdmin(userId);
     }
 
-    public List<NamedCytomineDomain> listByUser(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return projectRepository.listByUser(user);
+    public List<NamedCytomineDomain> listByUserId(long userId) {
+        securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
+        return projectRepository.listByUser(userId);
     }
 
     @Override

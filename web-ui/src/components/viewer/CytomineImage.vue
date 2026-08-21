@@ -813,7 +813,7 @@ export default {
     eventBus.on('close-metadata', this.closeMetadataHandler);
     this.setInitialZoom();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('updateMapSize', this.updateMapSize);
     eventBus.off('shortkeyEvent', this.shortkeyHandler);
     eventBus.off('selectAnnotation', this.selectAnnotationHandler);

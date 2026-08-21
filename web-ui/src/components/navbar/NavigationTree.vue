@@ -10,12 +10,11 @@
       <a class="delete is-small" @click.stop.prevent="closeProject(project)"></a>
     </router-link>
 
-    <template v-for="(viewer, idViewer) in project.viewers">
+    <template v-for="(viewer, idViewer) in project.viewers" :key="idViewer">
       <router-link
         v-if="nbImages(viewer)"
         class="navbar-item viewer-item"
         :to="viewerPath(project.id, idViewer)"
-        :key="idViewer"
         exact
       >
         <div class="viewer-name">
@@ -89,7 +88,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import 'bulma/sass/utilities/mixins.sass';
+@import 'bulma/sass/utilities/mixins';
 
 .project-item {
   color: #333;

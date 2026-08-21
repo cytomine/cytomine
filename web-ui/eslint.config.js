@@ -14,7 +14,7 @@ export default [
     ],
   },
   js.configs.recommended,
-  ...pluginVue.configs['flat/vue2-essential'],
+  ...pluginVue.configs['flat/essential'],
   {
     files: ['**/*.js', '**/*.vue'],
     languageOptions: {
@@ -29,7 +29,7 @@ export default [
     rules: {
       'array-bracket-spacing': ['error', 'never'],
       'brace-style': ['error', '1tbs'],
-      'camelcase': ['error', { allow: ['$_veeValidate'] }],
+      'camelcase': ['error'],
       'curly': ['error', 'all'],
       'eqeqeq': ['error', 'smart'],
       'indent': ['error', 2, { 'SwitchCase': 1, 'ignoredNodes': ['TemplateLiteral'] }],
@@ -52,6 +52,12 @@ export default [
       'space-infix-ops': ['error'],
       'space-in-parens': ['error'],
       'vue/no-v-text-v-html-on-component': ['off'],
+      // Vue 3 deprecations: keep as warnings for now, to be fixed later.
+      'vue/no-deprecated-v-on-native-modifier': ['warn'],
+      'vue/no-deprecated-router-link-tag-prop': ['warn'],
+      'vue/no-deprecated-delete-set': ['warn'],
+      'vue/no-deprecated-model-definition': ['warn'],
+      'vue/no-deprecated-v-bind-sync': ['warn'],
     },
   },
   {

@@ -1,5 +1,5 @@
 <template>
-<div id="app" class="wrapper">
+<div class="wrapper">
   <notifications position="top center" width="30%" :max="5">
     <template #body="props">
       <div class="notification vue-notification" :class="props.item.type">
@@ -23,9 +23,11 @@
     <template v-else-if="currentUser">
       <cytomine-navbar />
       <div class="bottom">
-        <keep-alive include="cytomine-storage">
-          <router-view v-if="currentUser" />
-        </keep-alive>
+        <router-view v-if="currentUser" v-slot="{ Component }">
+          <keep-alive include="cytomine-storage">
+            <component :is="Component" v-if="Component" />
+          </keep-alive>
+        </router-view>
       </div>
     </template>
   </template>
@@ -160,6 +162,10 @@ export default {
 @font-face {
   font-family: 'cytomine';
   src: url('assets/cytomine-font.woff') format('woff');
+}
+
+#app {
+  height: 100%;
 }
 
 html, body {

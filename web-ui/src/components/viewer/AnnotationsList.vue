@@ -306,7 +306,7 @@ export default {
     eventBus.on('deleteAnnotation', this.deleteAnnotationHandler);
     eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // unsubscribe from all events
     eventBus.off('addAnnotation', this.addAnnotationHandler);
     eventBus.off('reloadAnnotations', this.reloadAnnotationsHandler);

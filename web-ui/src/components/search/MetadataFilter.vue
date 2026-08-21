@@ -5,8 +5,8 @@
 
       <b-field label="Search from metadata">
         <b-input
-          :value="searchString"
-          @input="debounceSearchString"
+          :model-value="searchString"
+          @update:model-value="debounceSearchString"
           icon="search"
           :placeholder="$t('search-placeholder')"
         />
@@ -23,7 +23,7 @@
         </b-field>
       </div>
 
-      <b-button icon-left="times" @click="clear()">{{ $t('button-clear') }}</b-button>
+      <b-button icon-left="times" @click.native="clear()">{{ $t('button-clear') }}</b-button>
     </template>
   </div>
 </template>

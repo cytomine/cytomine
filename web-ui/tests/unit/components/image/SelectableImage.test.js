@@ -13,13 +13,19 @@ describe('SelectableImage.vue', () => {
 
   beforeEach(() => {
     wrapper = shallowMount(SelectableImage, {
-      propsData: {
+      props: {
         image: mockImage,
         isSelected: false,
       },
-      computed: {
-        shortTermToken: () => 'mock-token',
-      },
+      global: {
+        mocks: {
+          $store: {
+            state: {
+              currentUser: { shortTermToken: 'mock-token' },
+            },
+          },
+        },
+      }
     });
   });
 
@@ -41,7 +47,7 @@ describe('SelectableImage.vue', () => {
     const imageThumbnail = wrapper.findComponent(ImageThumbnail);
 
     expect(imageThumbnail.exists()).toBe(true);
-    expect(imageThumbnail.props('image')).toBe(mockImage);
+    expect(imageThumbnail.props('image')).toEqual(mockImage);
     expect(imageThumbnail.props('size')).toBe(128);
   });
 

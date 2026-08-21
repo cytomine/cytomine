@@ -594,7 +594,7 @@ export default {
 
     eventBus.emit('hide-similar-annotations');
   },
-  destroyed() {
+  unmounted() {
     eventBus.emit('hide-similar-annotations');
   },
 };

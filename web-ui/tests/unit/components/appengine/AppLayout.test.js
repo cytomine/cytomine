@@ -1,5 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import VueRouter from 'vue-router';
+import { shallowMount } from '@vue/test-utils';
 
 import AppLayout from '@/components/appengine/AppLayout.vue';
 import AppSidebar from '@/components/appengine/AppSidebar.vue';
@@ -29,22 +28,24 @@ const BMessage = {
   props: ['title', 'type'],
 };
 
-const localVue = createLocalVue();
-localVue.use(VueRouter);
 
 describe('AppLayout.vue', () => {
   const createWrapper = (options = {}) => {
     return shallowMount(AppLayout, {
-      localVue,
-      store,
-      components: {
-        AppSidebar,
-        'b-message': BMessage,
-      },
-      mocks: {
-        $t: (key) => key,
-      },
       ...options,
+      global: {
+        plugins: [store],
+        components: {
+          AppSidebar,
+          'b-message': BMessage,
+        },
+        stubs: {
+          'router-view': true,
+        },
+        mocks: {
+          $t: (key) => key,
+        }
+      }
     });
   };
 

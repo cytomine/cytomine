@@ -1,34 +1,21 @@
-import Vue from 'vue';
+import Vue, { createApp } from 'vue';
 import axios from 'axios';
 import constants from '@/utils/constants.js';
 
-import VueRouter from 'vue-router';
-import router from './routes.js';
-Vue.use(VueRouter);
+Vue.configureCompat({ MODE: 2, COMPONENT_V_MODEL: false }); // TODO: remove when migration is done
 
 import i18n from './lang.js';
-
+import router from './routes.js';
 import store from './store/store.js';
 
 import Buefy from 'buefy';
-Vue.use(Buefy, { defaultIconPack: 'fas' });
+import optOutBuefyFromVue2Compat from '@/utils/buefy-compat.js';
+optOutBuefyFromVue2Compat();
 
-import VeeValidate, { Validator } from 'vee-validate';
-Validator.extend('positive', value => Number(value) > 0);
-Vue.use(VeeValidate, {
-  i18nRootKey: 'validations',
-  i18n,
-  inject: false
-});
-
-import Notifications from 'vue-notification';
-Vue.use(Notifications);
+import Notifications from '@kyvg/vue3-notification';
 
 import VTooltip from 'v-tooltip';
 Vue.use(VTooltip);
-
-import VueHtml2Canvas from 'vue-html2canvas';
-Vue.use(VueHtml2Canvas);
 
 import { vOnClickOutside } from '@vueuse/components';
 Vue.directive('click-outside', vOnClickOutside);
@@ -74,12 +61,13 @@ axios.get('/configuration.json').then(response => {
         onLoad: 'login-required'
       })
       .then(() => {
-        new Vue({
-          render: h => h(App),
-          router,
-          store,
-          i18n
-        }).$mount('#app');
+        const app = createApp(App);
+        app.use(i18n);
+        app.use(router);
+        app.use(store);
+        app.use(Buefy, { defaultIconPack: 'fas' });
+        app.use(Notifications);
+        app.mount('#app');
       });
   });
 });

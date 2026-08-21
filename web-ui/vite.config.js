@@ -1,23 +1,30 @@
 import { fileURLToPath, URL } from 'node:url';
 
-import vue2 from '@vitejs/plugin-vue2';
+import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 
 export default defineConfig(({ command }) => ({
-  plugins: [vue2()],
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          compatConfig: { MODE: 2 }
+        }
+      }
+    })
+  ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      vue: '@vue/compat'
     },
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.vue', '.json']
   },
-  // Replaces babel-plugin-transform-remove-console (production only)
   esbuild: command === 'build' ? { drop: ['console'] } : undefined,
   build: {
     commonjsOptions: {
-      // UMD/CJS libraries (vue-slider-component, vue-draggable-resizable, ...) do
-      // require('vue') and expect the Vue constructor, not the ESM namespace
-      requireReturnsDefault: id => id.includes('node_modules/vue/') ? 'preferred' : 'auto'
+      // UMD/CJS libraries (vue-slider-component, ...) require('vue') and expect the Vue constructor, not ESM namespace
+      requireReturnsDefault: id => id.includes('node_modules/@vue/compat/') ? 'preferred' : 'auto'
     }
   },
   server: {

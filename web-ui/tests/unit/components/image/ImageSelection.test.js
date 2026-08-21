@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineModal from '@/components/utils/CytomineModal';
@@ -20,7 +20,6 @@ vi.mock('@/api', () => ({
 }));
 
 describe('ImageSelection.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockImages = [
@@ -29,12 +28,9 @@ describe('ImageSelection.vue', () => {
   ];
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(ImageSelection, {
-      localVue,
-      propsData: {
+      props: {
         active: true,
       },
       data() {
@@ -43,15 +39,20 @@ describe('ImageSelection.vue', () => {
           selectImage: null,
         };
       },
-      computed: {
-        project: () => ({ id: 42 }),
-      },
-      mocks: {
-        $t: (message) => message,
-      },
-      stubs: {
-        SelectableImage: true,
-      },
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (message) => message,
+          $store: {
+            state: {
+              currentProject: { project: { id: 42 } },
+            },
+          },
+        },
+        stubs: {
+          SelectableImage: true,
+        }
+      }
     });
   });
 
@@ -80,7 +81,7 @@ describe('ImageSelection.vue', () => {
   it('Clicking on cancel should reset selectedImage', async () => {
     wrapper.setData({ selectedImage: mockImages[1] });
 
-    expect(wrapper.vm.selectedImage).toBe(mockImages[1]);
+    expect(wrapper.vm.selectedImage).toEqual(mockImages[1]);
 
     wrapper.vm.cancel();
     await wrapper.vm.$nextTick();

@@ -201,7 +201,7 @@ export default {
     this.countTerm();
     this.loading = false;
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('update-suggested-terms', this.countTerm);
   }
 };

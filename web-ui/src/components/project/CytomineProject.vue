@@ -86,7 +86,7 @@ export default {
   mounted() {
     eventBus.on('deleteAnnotation', this.deleteAnnotationEventHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('deleteAnnotation', this.deleteAnnotationEventHandler);
   }
 };

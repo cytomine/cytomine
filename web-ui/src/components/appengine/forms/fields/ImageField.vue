@@ -16,8 +16,8 @@
         </b-button>
       </div>
 
-      <div class="value-container" v-if="value">
-        {{ $t(type) }} {{ value.id }}
+      <div class="value-container" v-if="input">
+        {{ $t(type) }} {{ input.id }}
       </div>
     </b-field>
 
@@ -45,7 +45,7 @@ export default {
   },
   props: {
     parameter: { type: Object, required: true },
-    value: {},
+    modelValue: {},
   },
   data() {
     return {
@@ -57,10 +57,10 @@ export default {
   computed: {
     input: {
       get() {
-        return this.value;
+        return this.modelValue;
       },
       set(value) {
-        this.$emit('input', value);
+        this.$emit('update:modelValue', value);
       }
     },
   },

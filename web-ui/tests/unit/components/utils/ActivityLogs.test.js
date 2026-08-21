@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ActivityLogs from '@/components/utils/ActivityLogs';
@@ -12,12 +12,9 @@ vi.mock('@/api', () => ({
 }));
 
 describe('ActivityLogs.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
-
-  localVue.component('b-message', {
-    template: '<div><slot/></div>'
-  });
+  const stubs = {
+    'b-message': { template: '<div><slot/></div>' }
+  };
 
   const mocks = {
     $t: message => message
@@ -29,13 +26,16 @@ describe('ActivityLogs.vue', () => {
     Project.fetchCommandHistory.mockResolvedValue([]);
 
     wrapper = shallowMount(ActivityLogs, {
-      localVue,
-      mocks,
-      propsData: {
+      props: {
         startDate: 1622505600000,
         endDate: 1625097600000,
         idUser: 1,
         project: { id: 123 }
+      },
+      global: {
+        plugins: [Buefy],
+        mocks,
+        stubs
       }
     });
   });

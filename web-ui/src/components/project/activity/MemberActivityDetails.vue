@@ -324,7 +324,7 @@ export default {
     await this.fetchData();
     this.loading = false;
   },
-  destroyed() {
+  unmounted() {
     clearTimeout(this.timeout);
   }
 };

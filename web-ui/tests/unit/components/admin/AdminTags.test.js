@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AdminTags from '@/components/admin/AdminTags';
@@ -30,23 +30,23 @@ const createTag = (id, name, creatorName) => ({
 let tags;
 
 const createWrapper = async (options = {}) => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
 
   const wrapper = mount(AdminTags, {
-    localVue,
-    stubs: { 'tag-modal': true },
-    mocks: {
-      $t: (message) => message,
-      $i18n: { locale: 'en' },
-      $notify: vi.fn(),
-      $buefy: {
-        dialog: {
-          confirm: vi.fn((params) => params.onConfirm()),
-        },
-      },
-    },
     ...options,
+    global: {
+      plugins: [Buefy],
+      stubs: { 'tag-modal': true },
+      mocks: {
+        $t: (message) => message,
+        $i18n: { locale: 'en' },
+        $notify: vi.fn(),
+        $buefy: {
+          dialog: {
+            confirm: vi.fn((params) => params.onConfirm()),
+          },
+        },
+      }
+    }
   });
   await flushPromises();
   return wrapper;

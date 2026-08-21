@@ -85,8 +85,8 @@
         </tr>
       </thead>
       <tbody>
-        <template v-for="mc in filteredManipulableChannels">
-          <tr :key="`channel-${image.id}-${mc.index}`">
+        <template v-for="mc in filteredManipulableChannels" :key="`channel-${image.id}-${mc.index}`">
+          <tr>
             <td class="checkbox-column">
               <b-checkbox
                 size="is-small"

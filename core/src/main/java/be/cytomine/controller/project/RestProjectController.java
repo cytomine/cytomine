@@ -192,7 +192,7 @@ public class RestProjectController extends RestCytomineController {
     ) {
         log.debug("REST request to list project with user {}", id);
         long currentUserId = currentUserService.getCurrentUser().id();
-        long requestedUserId = userHttpContract.get(currentUserId, id)
+        long requestedUserId = userHttpContract.get(id, currentUserId)
             .orElseThrow(() -> new ObjectNotFoundException("User", id)).id();
 
         if (creator) {

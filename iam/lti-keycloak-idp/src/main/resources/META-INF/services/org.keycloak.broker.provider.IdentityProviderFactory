@@ -1,0 +1,2 @@
+com.cytomine.keycloak.lti.LTIIdentityProviderFactory
+com.cytomine.keycloak.lti.LTI11IdentityProviderFactory

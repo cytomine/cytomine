@@ -246,22 +246,22 @@
       {{ $t('button-center-view-on-annot') }}
     </a>
 
-    <div class="level">
-      <a @click="openCrop(annotation)" class="level-item button is-small">
+    <div class="buttons">
+      <button @click="openCrop(annotation)" class="button is-small">
         {{ $t('button-view-crop') }}
-      </a>
+      </button>
 
-      <button class="level-item button is-small" @click="copyURL()">
+      <button class="button is-small" @click="copyURL()">
         {{ $t('button-copy-url') }}
       </button>
 
-      <button v-if="isPropDisplayed('comments') && comments" class="level-item button is-small"
+      <button v-if="isPropDisplayed('comments') && comments" class="button is-small"
         @click="openCommentsModal()"
       >
         {{ $t('button-comments') }} ({{comments.length}})
       </button>
 
-      <button v-if="canEdit" class="level-item button is-small is-danger" @click="confirmDeletion()">
+      <button v-if="canEdit" class="button is-small is-danger" @click="confirmDeletion()">
         {{ $t('button-delete') }}
       </button>
     </div>
@@ -624,8 +624,23 @@ h5 {
 }
 
 .actions .button {
-  margin: 3px;
   box-sizing: border-box;
+}
+
+.actions .button.is-fullwidth {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.actions .buttons {
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.actions .buttons .button {
+  margin: 0;
 }
 
 a.is-fullwidth {

@@ -17,10 +17,8 @@ import Notifications from '@kyvg/vue3-notification';
 import FloatingVue from 'floating-vue';
 
 import { vOnClickOutside } from '@vueuse/components';
-Vue.directive('click-outside', vOnClickOutside);
 
 import ViewerOpenLayers from './viewer-ol';
-Vue.use(ViewerOpenLayers);
 
 import 'chart.js/auto';
 import 'vue-color/style.css';
@@ -28,8 +26,6 @@ import optOutVueColorFromVue2Compat from '@/utils/vue-color-compat.js';
 optOutVueColorFromVue2Compat(); // TODO: to delete when removing @vue/compat
 
 import App from './App.vue';
-
-Vue.config.productionTip = false;
 
 // Load configuration before initializing Keycloak
 axios.get('/configuration.json').then(response => {
@@ -51,6 +47,8 @@ axios.get('/configuration.json').then(response => {
     app.use(Buefy, { defaultIconPack: 'fas' });
     app.use(FloatingVue);
     app.use(Notifications);
+    app.use(ViewerOpenLayers);
+    app.directive('click-outside', vOnClickOutside);
     app.mount('#app');
   });
 });

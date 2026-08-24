@@ -6,7 +6,7 @@
     <cytomine-modal :active="active" :title="$t('create-project')" @close="$emit('update:active', false)">
       <field :form="form" name="name" :validators="requiredRule" v-slot="{field, state}">
         <b-field :label="$t('name')" :type="{ 'is-danger': !!state.meta.errors.length }" :message="state.meta.errors[0]">
-          <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+          <b-input name="name" :model-value="state.value" @update:model-value="field.handleChange" />
         </b-field>
       </field>
 

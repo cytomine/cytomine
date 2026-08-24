@@ -612,12 +612,13 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
         webDriverUtils.clickButtonByText(wait, "New user");
-        webDriverUtils.byIsDisplayed(wait, By.name("username"));
-        webDriverUtils.bySendKeys(wait, By.name("username"), username);
-        webDriverUtils.bySendKeys(wait, By.name("firstname"), firstname);
-        webDriverUtils.bySendKeys(wait, By.name("lastname"), lastname);
-        webDriverUtils.bySendKeys(wait, By.name("email"), email);
-        webDriverUtils.bySendKeys(wait, By.name("password"), password);
+        By usernameInput = By.xpath("//label[.='Username']/../..//input");
+        webDriverUtils.byIsDisplayed(wait, usernameInput);
+        webDriverUtils.bySendKeys(wait, usernameInput, username);
+        webDriverUtils.bySendKeys(wait, By.xpath("//label[.='First name']/../..//input"), firstname);
+        webDriverUtils.bySendKeys(wait, By.xpath("//label[.='Last name']/../..//input"), lastname);
+        webDriverUtils.bySendKeys(wait, By.xpath("//label[.='Email address']/../..//input"), email);
+        webDriverUtils.bySendKeys(wait, By.xpath("//label[.='Password']/../..//input"), password);
         webDriverUtils.clickButtonByText(wait, "Save");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully created')]"));
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[normalize-space(text())='" + username + "']"));
@@ -636,11 +637,13 @@ public class CytomineSteps {
             wait,
             "//tr[.//td[normalize-space(text())='" + username + "']]//button[contains(text(), 'Edit')]"
         );
-        webDriverUtils.byIsDisplayed(wait, By.name("firstname"));
-        webDriverUtils.byClear(wait, By.name("firstname"));
-        webDriverUtils.bySendKeys(wait, By.name("firstname"), newFirstname);
-        webDriverUtils.byClear(wait, By.name("lastname"));
-        webDriverUtils.bySendKeys(wait, By.name("lastname"), newLastname);
+        By firstnameInput = By.xpath("//label[.='First name']/../..//input");
+        webDriverUtils.byIsDisplayed(wait, firstnameInput);
+        webDriverUtils.byClear(wait, firstnameInput);
+        webDriverUtils.bySendKeys(wait, firstnameInput, newFirstname);
+        By lastnameInput = By.xpath("//label[.='Last name']/../..//input");
+        webDriverUtils.byClear(wait, lastnameInput);
+        webDriverUtils.bySendKeys(wait, lastnameInput, newLastname);
         webDriverUtils.clickButtonByText(wait, "Save");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully updated')]"));
         webDriverUtils.byIsDisplayed(
@@ -662,8 +665,7 @@ public class CytomineSteps {
         );
         webDriverUtils.xpathClick(
             wait,
-            "//div[contains(@class, 'modal')]//footer//button[contains(@class, 'is-danger') "
-            + "and contains(text(), 'Delete')]"
+            "//div[contains(@class, 'modal')]//footer//button[contains(@class, 'is-danger') and contains(., 'Delete')]"
         );
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully deleted')]"));
         wait.until(ExpectedConditions.invisibilityOfElementLocated(

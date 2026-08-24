@@ -20,14 +20,16 @@
             :searchable="false" label="label" track-by="value"/>
         </div>
       </div>
-      <div class="column is-one-half has-text-right-desktop buttons">
-        <button class="button is-link add-member" @click="addMemberModal = true">
-          {{$t('button-add-members')}}
-        </button>
+      <div class="column is-one-half">
+        <div class="buttons is-right">
+          <button class="button is-link add-member" @click="addMemberModal = true">
+            {{$t('button-add-members')}}
+          </button>
 
-        <button class="button is-danger" @click="confirmMembersRemoval()" :disabled="selectedMembers.length === 0">
-          {{$t('button-remove-selected-members')}}
-        </button>
+          <button class="button is-danger" @click="confirmMembersRemoval()" :disabled="selectedMembers.length === 0">
+            {{$t('button-remove-selected-members')}}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -259,9 +261,6 @@ export default {
         this.$notify({ type: 'error', text: this.$t('notif-error-change-role', { username: member.fullName }) });
       }
     },
-  },
-  mounted() {
-    appendShortTermToken();
   },
   async created() {
     this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];

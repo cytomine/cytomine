@@ -1,13 +1,13 @@
 <template>
 <form @submit.prevent="save()">
   <cytomine-modal-card :title="$t(term ? 'update-term' : 'create-term')" class="term-modal">
-    <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
-      <b-field :label="$t('name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
-        <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+    <field :form="form" name="name" :validators="nameRules" v-slot="{field}">
+      <b-field :label="$t('name')" :type="{'is-danger': !!field.state.meta.errors.length}" :message="field.state.meta.errors[0]">
+        <b-input name="name" :model-value="field.state.value" @update:model-value="field.handleChange" @blur="field.handleBlur" />
       </b-field>
     </field>
 
-    <sketch-picker v-model="color" :presetColors="presetColors" />
+    <SketchPicker v-model="color" :presetColors="presetColors" :disable-alpha="true" />
 
     <template #footer>
       <button class="button" type="button" @click="$parent.close()">
@@ -23,7 +23,7 @@
 
 <script>
 import { Field, useForm } from '@tanstack/vue-form';
-import { Sketch } from 'vue-color';
+import { SketchPicker, tinycolor } from 'vue-color';
 
 import { Term } from '@/api';
 import { required, rules, validateForm } from '@/utils/form.js';
@@ -36,9 +36,9 @@ export default {
     ontology: Object
   },
   components: {
-    'sketch-picker': Sketch,
     CytomineModalCard,
-    Field
+    Field,
+    SketchPicker,
   },
   setup(props) {
     const form = useForm({ defaultValues: { name: props.term ? props.term.name : '' } });
@@ -89,7 +89,7 @@ export default {
       try {
         let term = await new Term({
           name: this.form.state.values.name,
-          color: this.color.hex,
+          color: tinycolor(this.color).toHexString(),
           ontology: this.ontology.id
         }).save();
         this.$notify({ type: 'success', text: this.$t('notif-success-term-creation') });
@@ -102,7 +102,7 @@ export default {
     },
     async update() {
       let term = new Term(this.term);
-      term.color = this.color.hex;
+      term.color = tinycolor(this.color).toHexString();
       term.name = this.form.state.values.name;
       try {
         await term.save();
@@ -116,41 +116,14 @@ export default {
     }
   },
   created() {
-    this.color = { hex: this.term ? this.term.color : this.randomColor() };
+    this.color = this.term ? this.term.color : this.randomColor();
   }
 };
 </script>
 
 <style>
-.term-modal .vc-sketch {
+.term-modal .vc-sketch-picker {
   width: auto;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
-}
-
-.term-modal .vc-sketch-active-color {
-  box-shadow: inset 0 0 0 1px rgba(10, 10, 10, 0.1);
-}
-
-.term-modal .vc-sketch-saturation-wrap {
-  padding-bottom: 15vh;
-}
-
-/* hide alpha channel */
-.term-modal .vc-sketch-field--single:last-child {
-  display: none;
-}
-/* --- */
-
-.term-modal .vc-sketch-sliders {
-  display: flex;
-  align-items: center;
-}
-
-.term-modal .vc-sketch-hue-wrap {
-  flex-grow: 1;
-}
-
-.term-modal .vc-sketch-alpha-wrap {
-  display: none;
 }
 </style>

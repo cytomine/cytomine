@@ -1,13 +1,13 @@
 <template>
   <form @submit.prevent="save()">
     <cytomine-modal-card :title="$t(track ? 'update-track' : 'create-track')" class="track-modal">
-      <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
-        <b-field :label="$t('name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
-          <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+      <field :form="form" name="name" :validators="nameRules" v-slot="{field}">
+        <b-field :label="$t('name')" :type="{'is-danger': !!field.state.meta.errors.length}" :message="field.state.meta.errors[0]">
+          <b-input name="name" :model-value="field.state.value" @update:model-value="field.handleChange" @blur="field.handleBlur" />
         </b-field>
       </field>
 
-      <sketch-picker v-model="color" :presetColors="presetColors" />
+      <SketchPicker v-model="color" :presetColors="presetColors" :disable-alpha="true" />
 
       <template #footer>
         <button class="button" type="button" @click="$parent.close()">
@@ -23,7 +23,7 @@
 
 <script>
 import { Field, useForm } from '@tanstack/vue-form';
-import { Sketch } from 'vue-color';
+import { SketchPicker, tinycolor } from 'vue-color';
 
 import { Track } from '@/api';
 import { required, rules, validateForm } from '@/utils/form.js';
@@ -36,9 +36,9 @@ export default {
     image: Object
   },
   components: {
-    'sketch-picker': Sketch,
     CytomineModalCard,
-    Field
+    Field,
+    SketchPicker,
   },
   setup(props) {
     const form = useForm({ defaultValues: { name: props.track ? props.track.name : '' } });
@@ -89,7 +89,7 @@ export default {
       try {
         let track = await new Track({
           name: this.form.state.values.name,
-          color: this.color.hex,
+          color: tinycolor(this.color).toHexString(),
           image: this.image.id
         }).save();
         this.$notify({ type: 'success', text: this.$t('notif-success-track-creation') });
@@ -102,7 +102,7 @@ export default {
     },
     async update() {
       let track = new Track(this.track);
-      track.color = this.color.hex;
+      track.color = tinycolor(this.color).toHexString();
       track.name = this.form.state.values.name;
       try {
         await track.save();
@@ -116,41 +116,14 @@ export default {
     }
   },
   created() {
-    this.color = { hex: this.track ? this.track.color : this.randomColor() };
+    this.color = this.track ? this.track.color : this.randomColor();
   }
 };
 </script>
 
 <style>
-  .track-modal .vc-sketch {
+  .track-modal .vc-sketch-picker {
     width: auto;
     box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
-  }
-
-  .track-modal .vc-sketch-active-color {
-    box-shadow: inset 0 0 0 1px rgba(10, 10, 10, 0.1);
-  }
-
-  .track-modal .vc-sketch-saturation-wrap {
-    padding-bottom: 15vh;
-  }
-
-  /* hide alpha channel */
-  .track-modal .vc-sketch-field--single:last-child {
-    display: none;
-  }
-  /* --- */
-
-  .track-modal .vc-sketch-sliders {
-    display: flex;
-    align-items: center;
-  }
-
-  .track-modal .vc-sketch-hue-wrap {
-    flex-grow: 1;
-  }
-
-  .track-modal .vc-sketch-alpha-wrap {
-    display: none;
   }
 </style>

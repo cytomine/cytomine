@@ -918,7 +918,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("projectDeleteUser project=" + project.getId() + " user=" + optionalUser.get().getId());
-                projectMemberService.deleteUserFromProject(optionalUser.get(), project, admin);
+                projectMemberService.deleteUserFromProject(optionalUser.get().getUsername(), project, admin);
                 log.info("changeProjectUser " + permissionService.hasACLPermission(
                     project,
                     optionalUser.get().getUsername(),

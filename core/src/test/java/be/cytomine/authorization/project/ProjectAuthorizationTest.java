@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -177,22 +178,22 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void adminCanAddUserToProject() {
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), true));
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), false));
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void userWithAdminRigthCanManageUserInProject() {
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), true));
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), false));
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void userWithReadAclCannotManageUserInProject() {
-        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAUser(), true));
-        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAUser(), false));
+        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, true));
+        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, false));
     }
 
     @Test
@@ -201,8 +202,8 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
         expectOK(this::whenIEditDomain);
 
-        User user = builder.givenAUser();
-        expectOK(() -> projectMemberService.addUserToProject(user, false));
+        UserResponse user = builder.givenAUser();
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
         expectOK(() -> projectMemberService.addUserToProject(user, true));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, true));
@@ -242,7 +243,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(this::whenIEditDomain);
 
         User user = builder.givenAUser();
-        expectForbidden(() -> projectMemberService.addUserToProject(user, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
         expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
         expectForbidden(() -> projectMemberService.addUserToProject(user, true));
         expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, true));
@@ -577,7 +578,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(this::whenIEditDomain);
 
         User user = builder.givenAUser();
-        expectOK(() -> projectMemberService.addUserToProject(user, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
         expectOK(() -> projectMemberService.addUserToProject(user, true));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, true));
@@ -620,7 +621,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(this::whenIEditDomain);
 
         User user = builder.givenAUser();
-        expectForbidden(() -> projectMemberService.addUserToProject(user, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
         expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
         expectForbidden(() -> projectMemberService.addUserToProject(user, true));
         expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, true));
@@ -946,7 +947,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(this::whenIEditDomain);
 
         User user = builder.givenAUser();
-        expectOK(() -> projectMemberService.addUserToProject(user, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
         expectOK(() -> projectMemberService.addUserToProject(user, true));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, true));
@@ -988,7 +989,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(this::whenIEditDomain);
 
         User user = builder.givenAUser();
-        expectForbidden(() -> projectMemberService.addUserToProject(user, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
         expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
         expectForbidden(() -> projectMemberService.addUserToProject(user, true));
         expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, true));

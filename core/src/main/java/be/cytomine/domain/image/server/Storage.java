@@ -27,7 +27,7 @@ public class Storage extends CytomineDomain {
     protected String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "user_id")
     protected User user;
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {

@@ -261,6 +261,9 @@ export default {
               if (tmp.data.id === node.data.id) {
                 tmp.data.parent = idParent;
               }
+              if (position.placement === 'inside' && tmp.data.id === idParent) {
+                tmp.isExpanded = true;
+              }
             });
           } catch (error) {
             console.log(error);

@@ -3,14 +3,12 @@ import os
 
 from setuptools import setup, find_packages
 
-# Package meta-data.
 NAME = 'pims-plugin-format-dicom'
 REQUIRES_PYTHON = '>=3.10.0'
 
-# What packages are required for this module to be executed?
 REQUIRED = [
     'pims',
-    'wsidicom>=0.21.0',
+    'wsidicom==0.34.0',
 ]
 
 DEPENDENCY_LINKS = []

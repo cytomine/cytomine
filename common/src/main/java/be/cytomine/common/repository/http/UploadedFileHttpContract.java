@@ -1,5 +1,6 @@
 package be.cytomine.common.repository.http;
 
+import java.util.List;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
@@ -43,5 +44,9 @@ public interface UploadedFileHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
     @GetExchange("/all")
-    Page<UploadedFileResponse> getAll(@RequestParam long userId, Pageable pageable);
+    Page<UploadedFileResponse> getAll(
+        @RequestParam long userId,
+        @RequestParam(required = false) List<Long> uploadedFileIds,
+        Pageable pageable
+    );
 }

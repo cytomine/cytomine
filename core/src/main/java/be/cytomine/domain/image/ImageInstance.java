@@ -215,7 +215,6 @@ public class ImageInstance extends CytomineDomain {
         imageInstance.reviewStart = json.getJSONAttrDate("reviewStart");
         imageInstance.reviewStop = json.getJSONAttrDate("reviewStart");
         imageInstance.reviewUser = (User) json.getJSONAttrDomain(entityManager, "reviewUser", new User(), false);
-
         imageInstance.magnification = json.getJSONAttrInteger("magnification", null);
         imageInstance.physicalSizeX = json.getJSONAttrDouble("physicalSizeX", null);
         imageInstance.physicalSizeY = json.getJSONAttrDouble("physicalSizeY", null);

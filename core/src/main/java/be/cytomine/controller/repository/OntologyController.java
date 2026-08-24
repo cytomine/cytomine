@@ -51,7 +51,7 @@ public class OntologyController {
     @GetMapping("/ontology/{id}.json")
     public OntologyResponse show(@PathVariable long id) {
         log.debug("REST request to get Ontology : {}", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return ontologyHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_ONTOLOGY, id)));
     }
@@ -59,14 +59,14 @@ public class OntologyController {
     @GetMapping("/ontology_light.json")
     public CollectionResponse<OntologyLight> getAllLightForUser(Pageable pageable) {
         log.debug("REST request to get Ontologies");
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return pageMapper.toCollectionResponse(ontologyHttpContract.getAllLightForUser(userId, pageable));
     }
 
     @GetMapping("/ontology.json")
     public CollectionResponse<OntologyResponse> getAll(Pageable pageable) {
         log.debug("REST request to get Ontologies");
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return pageMapper.toCollectionResponse(ontologyHttpContract.getAllForUser(userId, pageable));
     }
 
@@ -74,7 +74,7 @@ public class OntologyController {
     public ResponseEntity<OntologyExport> export(@PathVariable Long id) {
         log.debug("GET /ontology/{}/export", id);
 
-        Long userId = currentUserService.getCurrentUser().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         OntologyLight ontology = ontologyHttpContract.getLight(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_ONTOLOGY, id)));
 
@@ -90,14 +90,14 @@ public class OntologyController {
     @PostMapping("/ontology.json")
     public Optional<HttpCommandResponse> add(@RequestBody CreateOntology createOntology) {
         log.debug("REST request to save Ontology");
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return ontologyHttpContract.create(userId, createOntology);
     }
 
     @PutMapping("/ontology/{id}.json")
     public HttpCommandResponse edit(@PathVariable long id, @RequestBody UpdateOntology updateOntology) {
         log.debug("REST request to edit Ontology : {}", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return ontologyHttpContract.update(id, userId, updateOntology)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_ONTOLOGY, id)));
     }
@@ -105,7 +105,7 @@ public class OntologyController {
     @DeleteMapping("/ontology/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("REST request to delete Ontology : {}", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return ontologyHttpContract.delete(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_ONTOLOGY, id)));
     }

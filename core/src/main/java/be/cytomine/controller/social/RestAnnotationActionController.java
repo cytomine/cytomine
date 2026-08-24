@@ -63,7 +63,7 @@ public class RestAnnotationActionController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", json.getJSONAttrStr("annotationIdent")));
         return responseSuccess(
             annotationActionService.add(
-                annotationDomain, currentUserService.getCurrentUser(), json.getJSONAttrStr("action"), new Date()
+                annotationDomain, currentUserService.getCurrentUserOld(), json.getJSONAttrStr("action"), new Date()
             )
         );
     }

@@ -1,7 +1,7 @@
 <template>
 <nav class="navbar is-light" role="navigation">
   <div class="navbar-brand">
-    <router-link to="/" exact class="navbar-item">
+    <router-link to="/" class="navbar-item">
       <img src="@/assets/logo.svg" id="logo" alt="Cytomine">
     </router-link>
     <a role="" class="navbar-burger" :class="{'is-active':openedTopMenu}" @click="openedTopMenu=!openedTopMenu">
@@ -72,7 +72,6 @@
       </navbar-dropdown>
     </div>
   </div>
-  <div class="hidden" v-shortkey.once="openHotkeysModalShortcut" @shortkey="openHotkeysModal"></div>
 </nav>
 </template>
 
@@ -87,6 +86,8 @@ import AboutCytomineModal from './AboutCytomineModal.vue';
 import CytomineSearcher from '@/components/search/CytomineSearcher.vue';
 import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
+import { useShortkeys } from '@/utils/use-shortkeys.js';
+import { getCurrentInstance } from 'vue';
 import { KeycloakRole } from '@/constants/UserRole.js';
 
 export default {
@@ -97,6 +98,13 @@ export default {
     CytomineSearcher
   },
   mixins: [changeLanguageMixin],
+  setup() {
+    const instance = getCurrentInstance();
+    useShortkeys(
+      { 'general-shortcuts-modal': shortcuts['general-shortcuts-modal'] },
+      () => instance.proxy.openHotkeysModal()
+    );
+  },
   data() {
     return {
       openedTopMenu: false,
@@ -111,9 +119,6 @@ export default {
     },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
-    },
-    openHotkeysModalShortcut() {
-      return shortcuts['general-shortcuts-modal'];
     }
   },
   watch: {
@@ -174,9 +179,5 @@ export default {
 .navbar {
   font-weight: 600;
   z-index: 500 !important;
-
-  .fas, .far {
-    padding-right: 0.5rem;
-  }
 }
 </style>

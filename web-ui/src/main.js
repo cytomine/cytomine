@@ -17,23 +17,23 @@ import Notifications from '@kyvg/vue3-notification';
 import VTooltip from 'v-tooltip';
 Vue.use(VTooltip);
 
-import VueShortKey from 'vue-shortkey';
-Vue.use(VueShortKey, {
-  prevent: [
-    'input[type=text]',
-    'input[type=password]',
-    'input[type=search]',
-    'input[type=email]',
-    'textarea',
-    '.ql-editor'
-  ]
-});
+import { vOnClickOutside } from '@vueuse/components';
+Vue.directive('click-outside', vOnClickOutside);
 
-import * as vClickOutside from 'v-click-outside-x';
-Vue.use(vClickOutside);
-
-import ViewerOpenLayers from './viewer-ol';
-Vue.use(ViewerOpenLayers);
+import VueLayers from 'vuelayers';
+import CytomineSource from './vuelayers-suppl/cytomine-source';
+import RasterSource from './vuelayers-suppl/raster-source';
+import TranslateInteraction from './vuelayers-suppl/translate-interaction';
+import RotateInteraction from './vuelayers-suppl/rotate-interaction';
+import ModifyInteraction from './vuelayers-suppl/modify-interaction';
+import RescaleInteraction from './vuelayers-suppl/rescale-interaction';
+Vue.use(VueLayers);
+Vue.use(CytomineSource);
+Vue.use(RasterSource);
+Vue.use(TranslateInteraction);
+Vue.use(RotateInteraction);
+Vue.use(ModifyInteraction);
+Vue.use(RescaleInteraction);
 
 import 'chart.js/auto';
 
@@ -42,7 +42,7 @@ import App from './App.vue';
 Vue.config.productionTip = false;
 
 // Load configuration before initializing Keycloak
-axios.get('configuration.json').then(response => {
+axios.get('/configuration.json').then(response => {
   const settings = response.data;
   for (let i in settings) {
     if (Object.prototype.hasOwnProperty.call(constants, i)

@@ -190,8 +190,8 @@ public class RestUserController extends RestCytomineController {
     public ResponseEntity<String> getCurrentUserKeys() {
         UserResponse user = currentUserService.getCurrentUser();
         return responseSuccess(JsonObject.of(
-            "primaryKey", user.publicKey().orElse(null),
-            "secondaryKey", user.privateKey().orElse(null)
+                "primaryKey", user.publicKey().orElse(null),
+                "secondaryKey", user.privateKey().orElse(null)
             )
         );
     }
@@ -253,7 +253,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user.getUsername(), project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -287,7 +287,7 @@ public class RestUserController extends RestCytomineController {
 
         for (User user : users) {
             try {
-                projectMemberService.addUserToProject(user, project, false);
+                projectMemberService.addUserToProject(user.getUsername(), project, false);
             } catch (Exception e) {
                 errors.add(user.getId().toString());
             }
@@ -393,7 +393,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.addUserToProject(user, project, true);
+        projectMemberService.addUserToProject(user.getUsername(), project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 

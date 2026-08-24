@@ -1102,12 +1102,12 @@ public class UserServiceTests {
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
 
-        projectMemberService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user, false);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
 
-        projectMemberService.addUserToProject(user, project, true);
+        projectMemberService.addUserToProject(user, true);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isTrue();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
@@ -1118,7 +1118,7 @@ public class UserServiceTests {
         User user = builder.givenAUser();
         Project project = builder.givenAProject();
 
-        projectMemberService.addUserToProject(user, project, true);
+        projectMemberService.addUserToProject(user, true);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isTrue();
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
@@ -1142,7 +1142,7 @@ public class UserServiceTests {
         User user = builder.givenAUser();
         Project project = builder.givenAProject();
 
-        projectMemberService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user, false);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
@@ -1158,14 +1158,14 @@ public class UserServiceTests {
         User user = builder.givenAUser();
         Project project = builder.givenAProject();
 
-        projectMemberService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user, false);
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
 
         Project projectWithSameOntology = builder.givenAProject();
         projectWithSameOntology.setOntology(project.getOntology());
-        projectMemberService.addUserToProject(user, projectWithSameOntology, false);
+        projectMemberService.addUserToProject(user, false);
 
         projectMemberService.deleteUserFromProject(user, project, false);
 

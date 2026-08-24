@@ -706,7 +706,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("addUserToProject project=" + project.getId() + " user=" + optionalUser.get().getId());
-                projectMemberService.addUserToProject(optionalUser.get(), project, false);
+                projectMemberService.addUserToProject(optionalUser.get().getUsername(), project, false);
                 progress = progress + (40 / users.size());
                 taskService.updateTask(
                     task,
@@ -724,7 +724,7 @@ public class ProjectService extends ModelService {
             )) {
                 // current user is already in project
                 log.info("addUserToProject (admin) project=" + project.getId() + " user=" + optionalUser.get().getId());
-                projectMemberService.addUserToProject(optionalUser.get(), project, true);
+                projectMemberService.addUserToProject(optionalUser.get().getUsername(), project, true);
                 progress = progress + (40 / admins.size());
                 taskService.updateTask(
                     task,
@@ -904,7 +904,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("addUserToProject project=" + project.getId() + " user=" + optionalUser.get().getId());
-                projectMemberService.addUserToProject(optionalUser.get(), project, admin);
+                projectMemberService.addUserToProject(optionalUser.get().getUsername(), project, admin);
                 progress = progress + (40 / projectAddUser.size());
                 taskService.updateTask(
                     task,

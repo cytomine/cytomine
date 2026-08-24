@@ -182,7 +182,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     public void shouldAddAndRemoveUserFromProjectWhenAdmin() {
         User user = builder.givenAUser();
         Project project = builder.givenAProject();
-        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user, false));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
     }
 
@@ -192,7 +192,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         User user = builder.givenAUser();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_ADMIN, ADMINISTRATION);
-        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user, false));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
     }
 
@@ -202,7 +202,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         User user = builder.givenAUser();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_READ, READ);
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user, false));
         expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
     }
 

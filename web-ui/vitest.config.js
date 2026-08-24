@@ -12,6 +12,7 @@ export default mergeConfig(
       environment: 'jsdom',
       globals: true,
       clearMocks: true,
+      setupFiles: ['tests/setup.js'],
       silent: 'passed-only',
       include: ['tests/unit/**/*.js'],
       reporters: ['default'],

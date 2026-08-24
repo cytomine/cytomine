@@ -3,11 +3,11 @@
   <cytomine-modal-card :title="$t(term ? 'update-term' : 'create-term')" class="term-modal">
     <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
       <b-field :label="$t('name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
-        <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+        <b-input name="name" :model-value="state.value" @update:model-value="field.handleChange" />
       </b-field>
     </field>
 
-    <sketch-picker v-model="color" :presetColors="presetColors" :disable-alpha="true" />
+    <SketchPicker v-model="color" :presetColors="presetColors" :disable-alpha="true" />
 
     <template #footer>
       <button class="button" type="button" @click="$emit('close')">
@@ -123,7 +123,8 @@ export default {
 
 <style>
 .term-modal .vc-sketch-picker {
-  width: auto;
+  width: 100% !important;
+  box-sizing: border-box !important;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
 }
 

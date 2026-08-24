@@ -158,18 +158,15 @@ export default {
       this.editedTag = null;
       this.modal = true;
     },
-    addTag(tag) {
-      this.tags.push(tag);
+    addTag() {
+      this.fetchTags();
     },
     startTagEdition(tag) {
       this.editedTag = tag;
       this.modal = true;
     },
-    updateTag(tag) {
-      const index = this.tags.indexOf(this.editedTag);
-      if (index !== -1) {
-        this.tags.splice(index, 1, { ...this.editedTag, ...tag });
-      }
+    updateTag() {
+      this.fetchTags();
     },
 
     deleteTagDialog(tag) {
@@ -185,7 +182,7 @@ export default {
     async deleteTag(tag) {
       try {
         await Cytomine.instance.api.delete(`/tag/${tag.id}.json`);
-        this.tags.splice(this.tags.indexOf(tag), 1);
+        this.fetchTags();
         this.$notify({
           type: 'success',
           text: this.$t('notif-success-tag-delete', { tagName: tag.name })

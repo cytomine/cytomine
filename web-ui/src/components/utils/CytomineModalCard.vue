@@ -26,3 +26,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.modal-card-foot {
+  gap: 0.5em;
+}
+</style>

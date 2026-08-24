@@ -12,6 +12,8 @@
         icon="search"
       />
 
+      <MetadataFilter @filter-change="onMetadataFilterChange" />
+
       <cytomine-table
         :collection="uploadedFileCollection"
         sort="created" order="desc"
@@ -67,6 +69,7 @@ import { UploadedFileCollection, UploadedFile } from '@/api';
 import filesize from 'filesize';
 import _ from 'lodash';
 import CytomineTable from '@/components/utils/CytomineTable.vue';
+import MetadataFilter from '@/components/search/MetadataFilter.vue';
 import UploadedFileStatusComponent from './UploadedFileStatus.vue';
 import { appendShortTermToken } from '@/utils/token-utils';
 import { formatDate } from '@/utils/date';
@@ -76,12 +79,15 @@ export default {
   components: {
     CytomineTable,
     ImageThumbnail,
+    MetadataFilter,
     'uploaded-file-status': UploadedFileStatusComponent
   },
   data() {
     return {
       loading: true,
       searchString: '',
+      metadataSearch: '',
+      metadataFilters: [],
       openedDetails: [],
     };
   },
@@ -98,8 +104,9 @@ export default {
     shortTermToken: get('currentUser/shortTermToken'),
     uploadedFileCollection() {
       return new UploadedFileCollection({
-        onlyRootsWithDetails: true,
-        originalFilename: { ilike: encodeURIComponent(this.searchString) }
+        originalFilename: { ilike: encodeURIComponent(this.searchString) },
+        metadataSearch: this.metadataSearch || null,
+        metadataFilter: this.metadataFilters.length ? this.metadataFilters.join(' AND ') : null,
       });
     }
   },
@@ -113,6 +120,10 @@ export default {
     debounceSearchString: _.debounce(async function (value) {
       this.searchString = value;
     }, 500),
+    onMetadataFilterChange({ query, filters }) {
+      this.metadataSearch = query;
+      this.metadataFilters = filters;
+    },
     updatedTree() {
       this.$emit('update:revision', this.revision + 1); // updating the table will result in new files objects => the uf details will also be updated
     },

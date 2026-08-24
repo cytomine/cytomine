@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.DatedCytomineDomain;
 import be.cytomine.dto.NamedCytomineDomain;
 
@@ -40,28 +39,28 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
 
     @Query(value = "select id, name from creator_project where user_id = :userId", nativeQuery = true)
-    List<Tuple> listByCreator(Long userId);
+    List<Tuple> listByCreatorId(long userId);
 
-    default List<NamedCytomineDomain> listByCreator(User user) {
-        return listByCreator(user.getId()).stream()
+    default List<NamedCytomineDomain> listByCreator(long userId) {
+        return listByCreatorId(userId).stream()
             .map(x -> new NamedCytomineDomain(((Long) x.get(0)), (String) x.get(1)))
             .collect(Collectors.toList());
     }
 
     @Query(value = "select id, name from admin_project where user_id = :userId", nativeQuery = true)
-    List<Tuple> listByAdmin(Long userId);
+    List<Tuple> listByAdminId(long userId);
 
-    default List<NamedCytomineDomain> listByAdmin(User user) {
-        return listByAdmin(user.getId()).stream()
+    default List<NamedCytomineDomain> listByAdmin(long userId) {
+        return listByAdminId(userId).stream()
             .map(x -> new NamedCytomineDomain(((Long) x.get(0)), (String) x.get(1)))
             .collect(Collectors.toList());
     }
 
     @Query(value = "select id, name from user_project where user_id = :userId", nativeQuery = true)
-    List<Tuple> listByUser(Long userId);
+    List<Tuple> listByUserId(Long userId);
 
-    default List<NamedCytomineDomain> listByUser(User user) {
-        return listByUser(user.getId()).stream().map(x -> new NamedCytomineDomain(((Long) x.get(0)), (String) x.get(1)))
+    default List<NamedCytomineDomain> listByUser(long userId) {
+        return listByUserId(userId).stream().map(x -> new NamedCytomineDomain(((Long) x.get(0)), (String) x.get(1)))
             .collect(Collectors.toList());
     }
 

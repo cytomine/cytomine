@@ -40,21 +40,21 @@ public class TermController {
 
     @PostMapping("term.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateTerm createTerm) {
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return termHttpContract.create(userId, createTerm);
     }
 
     @GetMapping("term/{id}.json")
     public TermResponse term(@PathVariable long id) {
         log.debug("REST request to get term {}", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return termHttpContract.findTermByID(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM, id)));
     }
 
     @PutMapping("term/{id}.json")
     public HttpCommandResponse update(@PathVariable Long id, @RequestBody UpdateTerm updateTerm) {
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
 
         return termHttpContract.update(id, userId, updateTerm)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM, id)));
@@ -63,21 +63,21 @@ public class TermController {
     @DeleteMapping("term/{id}.json")
     public HttpCommandResponse delete(@PathVariable Long id) {
         log.debug("REST request to delete term {}", id);
-        return termHttpContract.delete(id, currentUserService.getCurrentUser().getId())
+        return termHttpContract.delete(id, currentUserService.getCurrentUser().id())
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM, id)));
     }
 
     @GetMapping("project/{id}/term.json")
     public CollectionResponse<TermResponse> listByProject(@PathVariable Long id, Pageable pageable) {
         log.debug("REST request to list terms for project {}", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return pageMapper.toCollectionResponse(termHttpContract.findTermsByProject(id, userId, pageable));
     }
 
     @GetMapping("ontology/{id}/term.json")
     public CollectionResponse<TermResponse> listByOntology(@PathVariable Long id, Pageable pageable) {
         log.debug("REST request to list terms for ontology {}", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return pageMapper.toCollectionResponse(termHttpContract.findTermsByOntology(id, userId, pageable));
     }
 }

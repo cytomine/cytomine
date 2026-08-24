@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.SecRole;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.CurrentRoleService;
@@ -42,19 +42,13 @@ import static org.springframework.security.acls.domain.BasePermission.ADMINISTRA
 @RestController
 public class CustomUIController extends RestCytomineController {
 
-    private final CurrentRoleService currentRoleService;
-
-    private final CurrentUserService currentUserService;
-
-    private final ProjectService projectService;
-
-    private final SecurityACLService securityACLService;
-
-    private final PropertyService propertyService;
-
-    private final ApplicationProperties applicationProperties;
-
     static String CUSTOM_UI_PROJECT = "@CUSTOM_UI_PROJECT";
+    private final CurrentRoleService currentRoleService;
+    private final CurrentUserService currentUserService;
+    private final ProjectService projectService;
+    private final SecurityACLService securityACLService;
+    private final PropertyService propertyService;
+    private final ApplicationProperties applicationProperties;
     private final UrlApi urlApi;
 
     @GetMapping("/custom-ui/config.json")
@@ -62,7 +56,7 @@ public class CustomUIController extends RestCytomineController {
         @RequestParam(value = "project", defaultValue = "0") Long projectId
     ) {
         log.debug("REST request to retrieve custom UI");
-        Set<SecRole> roles = currentRoleService.findCurrentRole(currentUserService.getCurrentUser());
+        Set<RoleResponse> roles = currentRoleService.findCurrentRole(currentUserService.getCurrentUser());
         Project project = projectService.get(projectId);
 
         JsonObject config = new JsonObject();
@@ -123,9 +117,9 @@ public class CustomUIController extends RestCytomineController {
         }
     }
 
-    public JsonObject getGlobalConfig(Set<SecRole> roles) {
+    public JsonObject getGlobalConfig(Set<RoleResponse> roles) {
         JsonObject globalConfig = new JsonObject();
-        Set<String> authorities = roles.stream().map(SecRole::getAuthority).collect(Collectors.toSet());
+        Set<String> authorities = roles.stream().map(RoleResponse::authority).collect(Collectors.toSet());
 
         for (Map.Entry<String, List<String>> it : applicationProperties.getCustomUI().getGlobal().entrySet()) {
             boolean print;
@@ -166,7 +160,7 @@ public class CustomUIController extends RestCytomineController {
     }
 
     private Map<String, Boolean> getProjectConfigCurrentUser(Project project) {
-        boolean isProjectAdmin = projectService.listByAdmin(currentUserService.getCurrentUser())
+        boolean isProjectAdmin = projectService.listByAdminId(currentUserService.getCurrentUser().id())
             .stream()
             .anyMatch(x -> x.getId().equals(project.getId()));
         boolean isAdminByNow = currentRoleService.isAdminByNow(currentUserService.getCurrentUser());

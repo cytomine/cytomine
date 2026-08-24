@@ -163,7 +163,7 @@ import { MyAccount, User } from '@/api';
 import { email, required, rules, validateForm } from '@/utils/form.js';
 import { rolesMapping } from '@/utils/role-utils';
 import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
-import copyToClipboard from 'copy-to-clipboard';
+import { useClipboard } from '@vueuse/core';
 import { formatMomentDate } from '@/utils/date';
 
 export default {
@@ -174,11 +174,13 @@ export default {
   setup() {
     // Seeded from the account in `created()`: the store is not reachable here.
     const form = useForm({ defaultValues: { lastName: '', firstName: '', email: '' } });
+    const { copy } = useClipboard({ legacy: true });
     return {
       form,
       isValid: form.useStore(state => state.isValid),
       requiredRule: { onChange: rules(required) },
-      emailRules: { onChange: rules(required, email) }
+      emailRules: { onChange: rules(required, email) },
+      copyToClipboard: copy
     };
   },
   data() {
@@ -245,7 +247,7 @@ export default {
 
 
     copy(value) {
-      copyToClipboard(value);
+      this.copyToClipboard(value);
       this.$notify({ type: 'success', text: this.$t('notif-success-key-copied') });
     },
 

@@ -21,20 +21,8 @@ import Notifications from '@kyvg/vue3-notification';
 import VTooltip from 'v-tooltip';
 Vue.use(VTooltip);
 
-import VueShortKey from 'vue-shortkey';
-Vue.use(VueShortKey, {
-  prevent: [
-    'input[type=text]',
-    'input[type=password]',
-    'input[type=search]',
-    'input[type=email]',
-    'textarea',
-    '.ql-editor'
-  ]
-});
-
-import * as vClickOutside from 'v-click-outside-x';
-Vue.use(vClickOutside);
+import { vOnClickOutside } from '@vueuse/components';
+Vue.directive('click-outside', vOnClickOutside);
 
 import ViewerOpenLayers from './viewer-ol';
 Vue.use(ViewerOpenLayers);
@@ -46,7 +34,7 @@ import App from './App.vue';
 Vue.config.productionTip = false;
 
 // Load configuration before initializing Keycloak
-axios.get('configuration.json').then(response => {
+axios.get('/configuration.json').then(response => {
   const settings = response.data;
   for (let i in settings) {
     if (Object.prototype.hasOwnProperty.call(constants, i)

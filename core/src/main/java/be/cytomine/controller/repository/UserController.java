@@ -44,7 +44,7 @@ public class UserController {
     @GetMapping("/user/{id}.json")
     public UserResponse show(@PathVariable long id) {
         log.debug("REST request to get User : {}", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return userHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
     }
@@ -53,7 +53,7 @@ public class UserController {
     @PostMapping("/user.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateUser createUser) {
         log.debug("REST request to save User");
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         accountService.createAccount(toAccount(createUser));
         return userHttpContract.create(userId, createUser);
     }
@@ -88,8 +88,9 @@ public class UserController {
 
     @PutMapping("/user/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateUser updateUser) {
+        log.debug("REST request to update User : {}", id);
+        long userId = currentUserService.getCurrentUser().id();
         log.debug("REST request to update User : {} with info {}", id, updateUser);
-        long userId = currentUserService.getCurrentUser().getId();
         accountService.update(toAccount(updateUser));
         return userHttpContract.update(id, userId, updateUser)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
@@ -98,7 +99,7 @@ public class UserController {
     @DeleteMapping("/user/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("REST request to delete User : {}", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         UserResponse response = userHttpContract.get(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
         String userName = response.username();

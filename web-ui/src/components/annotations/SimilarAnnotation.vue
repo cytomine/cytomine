@@ -1,14 +1,10 @@
 <template>
-  <div class="similar-annotations-playground">
-    <vue-draggable-resizable
+  <div class="similar-annotations-playground" ref="playground">
+    <div
       class="draggable"
       v-show="displayAnnotDetails && selectedFeature && showSimilarAnnotations"
-      :parent="false"
-      :resizable="false"
-      :x="350"
-      :y="0"
-      :h="'auto'"
-      :w="450"
+      :style="panelStyle"
+      ref="panel"
     >
       <b-loading :is-full-page="false" :model-value="loading"/>
 
@@ -68,30 +64,49 @@
           </div>
         </div>
       </div>
-    </vue-draggable-resizable>
+    </div>
   </div>
 </template>
 
 <script>
+import { ref, computed } from 'vue';
+import { useDraggable } from '@vueuse/core';
+
 import eventBus from '@/utils/event-bus';
 
 import { Annotation, AnnotationTerm } from '@/api';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 import CytomineTerm from '@/components/ontology/CytomineTerm.vue';
-import VueDraggableResizable from 'vue-draggable-resizable';
 
 export default {
   name: 'SimilarAnnotation',
   components: {
     AnnotationPreview,
     CytomineTerm,
-    VueDraggableResizable,
   },
   props: {
     image: { type: Object },
     index: { type: String, required: true },
     size: { type: Number, default: 64 },
+  },
+  setup() {
+    const playground = ref(null);
+    const panel = ref(null);
+
+    const { position } = useDraggable(panel, {
+      containerElement: playground,
+      initialValue: { x: 350, y: 0 },
+    });
+
+    const panelStyle = computed(() => ({
+      position: 'absolute',
+      left: `${position.value.x}px`,
+      top: `${position.value.y}px`,
+      width: '450px',
+    }));
+
+    return { playground, panel, panelStyle };
   },
   data() {
     return {

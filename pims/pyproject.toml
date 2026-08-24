@@ -8,6 +8,7 @@ requires-python = ">=3.10"
 license = "Apache-2.0"
 dependencies = [
   "aiofiles==23.1.0",
+  "bigpicture-metadata-interface",
   "celery==5.2.7",
   "cytomine-python-client",
   "fastapi==0.110.3",
@@ -15,7 +16,9 @@ dependencies = [
   "geojson>=3.2.0",
   "gunicorn==22.0.0",
   "importlib-metadata==6.0.0",
+  "lxml==6.1.1",
   "matplotlib==3.7.1",
+  "meilisearch==0.42.0",
   "numpy==1.24.4",
   "orjson==3.11.6",
   "pathvalidate==2.5.2",
@@ -38,9 +41,6 @@ dependencies = [
   "typing-inspect==0.9.0",
   "uvicorn[standard]==0.29.0",
   "zarr==2.14.2",
-  "meilisearch==0.42.0", # Added lxml
-  "lxml==6.1.1",
-  "bigpicture-metadata-interface",
 ]
 
 [dependency-groups]

@@ -40,7 +40,7 @@ public class TagDomainAssociationController {
     @GetMapping("/tag_domain_association.json")
     public CollectionResponse<TagDomainAssociationResponse> readAll(Pageable pageable) {
         log.debug("GET /tag_domain_association.json");
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return pageMapper.toCollectionResponse(httpContract.readAll(userId, pageable));
     }
 
@@ -51,7 +51,7 @@ public class TagDomainAssociationController {
         Pageable pageable
     ) {
         log.debug("GET /domain/{}/{}/tag_domain_association.json", domainClassName, domainId);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return pageMapper.toCollectionResponse(
             httpContract.readAllByDomain(
                 domainClassName,
@@ -68,14 +68,14 @@ public class TagDomainAssociationController {
     })
     public Optional<HttpCommandResponse> create(@RequestBody CreateTagDomainAssociation payload) {
         log.debug("POST /tag_domain_association.json - {}", payload);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return httpContract.create(userId, payload);
     }
 
     @GetMapping("/tag_domain_association/{id}.json")
     TagDomainAssociationResponse read(@PathVariable long id) {
         log.debug("GET /tag_domain_association/{}.json", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return httpContract.read(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TDA, id)));
     }
@@ -83,7 +83,7 @@ public class TagDomainAssociationController {
     @DeleteMapping("/tag_domain_association/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("DELETE /tag_domain_association/{}.json", id);
-        long userId = currentUserService.getCurrentUser().getId();
+        long userId = currentUserService.getCurrentUser().id();
         return httpContract.delete(id, userId)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TDA, id)));
     }

@@ -36,7 +36,6 @@ Vue.use(ModifyInteraction);
 Vue.use(RescaleInteraction);
 
 import 'chart.js/auto';
-import 'vue-color/style.css';
 
 import App from './App.vue';
 

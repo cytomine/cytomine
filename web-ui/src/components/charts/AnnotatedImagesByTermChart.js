@@ -1,3 +1,4 @@
+import { h } from 'vue';
 import { Bar } from 'vue-chartjs';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -89,14 +90,12 @@ export default {
   async mounted() {
     await this.updateData();
   },
-  render(h) {
+  render() {
     return h('div', { class: this.cssClasses }, [
       h(Bar, {
-        props: {
-          data: this.chartData,
-          options: this.chartOptions,
-          plugins: [ChartDataLabels],
-        },
+        data: this.chartData,
+        options: this.chartOptions,
+        plugins: [ChartDataLabels],
       }),
     ]);
   },

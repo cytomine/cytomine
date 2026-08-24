@@ -105,13 +105,13 @@ public class CurrentRoleServiceTests {
         assertThat(currentRoleService.findCurrentAuthorities(userMapper.map(builder.givenAGuest())))
             .containsExactlyInAnyOrder("ROLE_GUEST");
 
-        assertThat(currentRoleService.isAdminByNow(userMapper.map(builder.givenDefaultGuest()))).isFalse();
-        assertThat(currentRoleService.isUserByNow(userMapper.map(builder.givenDefaultGuest()))).isFalse();
-        assertThat(currentRoleService.isGuestByNow(userMapper.map(builder.givenDefaultGuest()))).isTrue();
-        assertThat(currentRoleService.isAdmin(userMapper.map(builder.givenDefaultGuest()))).isFalse();
-        assertThat(currentRoleService.isUser(userMapper.map(builder.givenDefaultGuest()))).isFalse();
-        assertThat(currentRoleService.isGuest(userMapper.map(builder.givenDefaultGuest()))).isTrue();
-        assertThat(currentRoleService.hasCurrentUserAdminRole(userMapper.map(builder.givenDefaultGuest()))).isFalse();
+        assertThat(currentRoleService.isAdminByNow(builder.givenDefaultGuest())).isFalse();
+        assertThat(currentRoleService.isUserByNow(builder.givenDefaultGuest())).isFalse();
+        assertThat(currentRoleService.isGuestByNow(builder.givenDefaultGuest())).isTrue();
+        assertThat(currentRoleService.isAdmin(builder.givenDefaultGuest())).isFalse();
+        assertThat(currentRoleService.isUser(builder.givenDefaultGuest())).isFalse();
+        assertThat(currentRoleService.isGuest(builder.givenDefaultGuest())).isTrue();
+        assertThat(currentRoleService.hasCurrentUserAdminRole(builder.givenDefaultGuest())).isFalse();
     }
 
     @Test

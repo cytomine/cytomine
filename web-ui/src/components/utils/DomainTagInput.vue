@@ -4,6 +4,7 @@
   @update:model-value="$emit('update:modelValue', $event)"
   :data="filteredDomains"
   autocomplete
+  keep-first
   :open-on-focus="true"
   :append-to-body="true"
   :field="displayedProperty"

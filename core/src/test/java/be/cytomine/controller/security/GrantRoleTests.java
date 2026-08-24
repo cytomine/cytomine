@@ -12,15 +12,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.ADMIN;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "admin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = ADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class GrantRoleTests {
 
     protected MockHttpSession session;
@@ -28,7 +30,7 @@ public class GrantRoleTests {
     private MockMvc restGrandRoleControllerMockMvc;
 
     @Test
-    @WithMockUser(username = "admin")
+    @WithMockUser(username = ADMIN)
     public void openCloseAdminSessionAsAdmin() throws Exception {
         startSession();
 

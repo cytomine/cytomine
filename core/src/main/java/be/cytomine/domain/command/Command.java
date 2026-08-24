@@ -15,7 +15,6 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
@@ -43,12 +42,8 @@ public abstract class Command extends CytomineDomain {
     @Transient
     protected CytomineDomain domain;
 
-    /**
-     * User who launch command
-     */
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = true)
-    protected User user;
+    @Column(name = "user_id")
+    protected Long userId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "transaction_id", nullable = true)
@@ -101,10 +96,10 @@ public abstract class Command extends CytomineDomain {
         returnArray.put("serviceName", ((Command) domain).getServiceName());
         returnArray.put(
             "action",
-            command.getActionMessage() + " by " + (command.getUser() != null ? command.getUser().getUsername() : "")
+            command.getActionMessage() + " by user with id " + command.getUserId()
         );
         returnArray.put("data", command.getData());
-        returnArray.put("user", command.getUser().getId());
+        returnArray.put("user", command.getUserId());
         String type = "UNKNOWN";
         if (domain instanceof AddCommand) {
             type = "ADD";

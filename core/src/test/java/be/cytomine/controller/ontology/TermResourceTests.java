@@ -27,10 +27,13 @@ import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,8 +49,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class TermResourceTests {
 
     @Autowired
@@ -59,11 +62,14 @@ public class TermResourceTests {
     @MockitoBean
     private TermHttpContract termHttpContract;
 
+    @Autowired
+    private CurrentUserService currentUserService;
+
     @Test
     @Transactional
     public void getATerm() throws Exception {
         Term term = builder.givenATerm();
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
                 LocalDateTime.ofInstant(term.getCreated().toInstant(), ZoneId.systemDefault()), Optional.empty(),
@@ -79,7 +85,7 @@ public class TermResourceTests {
     @Transactional
     public void getATermWithWrongUserReturnsNotFound() throws Exception {
         Term term = builder.givenATerm();
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         Long wrongUserId = userId + 1;
         when(termHttpContract.findTermByID(eq(term.getId()), eq(userId))).thenReturn(Optional.of(
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
@@ -94,7 +100,7 @@ public class TermResourceTests {
     @Transactional
     public void listTermsByOntology() throws Exception {
         Term term = builder.givenATerm();
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId),
             any(Pageable.class))).thenReturn(new PageImpl<>(
             List.of(new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
@@ -111,7 +117,7 @@ public class TermResourceTests {
     @Transactional
     public void listTermsByOntologyWithWrongUserReturnsEmpty() throws Exception {
         Term term = builder.givenATerm();
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         when(termHttpContract.findTermsByOntology(eq(term.getOntology().getId()), eq(userId),
             any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
@@ -124,7 +130,7 @@ public class TermResourceTests {
     public void listTermsByProject() throws Exception {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(term.getOntology());
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         when(termHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(Pageable.class))).thenReturn(
             new PageImpl<>(List.of(
                 new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
@@ -142,7 +148,7 @@ public class TermResourceTests {
     public void listTermsByProjectWithWrongUserReturnsEmpty() throws Exception {
         Term term = builder.givenATerm();
         Project project = builder.givenAProjectWithOntology(term.getOntology());
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         when(termHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(Pageable.class))).thenReturn(
             new PageImpl<>(List.of()));
 
@@ -154,7 +160,7 @@ public class TermResourceTests {
     @Transactional
     public void addValidTerm() throws Exception {
         Term term = builder.givenATerm();
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
@@ -177,7 +183,7 @@ public class TermResourceTests {
     @Transactional
     public void addTermWithNoWriteAccessReturnsEmpty() throws Exception {
         Term term = builder.givenATerm();
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         when(termHttpContract.create(eq(userId), any())).thenReturn(Optional.empty());
 
         String createTermJson =
@@ -192,7 +198,7 @@ public class TermResourceTests {
     @Transactional
     public void editValidTerm() throws Exception {
         Term term = builder.givenATerm();
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.update(eq(term.getId()), eq(userId), any())).thenReturn(Optional.of(
             new HttpCommandResponse(true,
@@ -215,7 +221,7 @@ public class TermResourceTests {
     @Transactional
     public void editTermWithNoWriteAccessReturnsNotFound() throws Exception {
         Term term = builder.givenATerm();
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         when(termHttpContract.update(eq(term.getId()), eq(userId), any())).thenReturn(Optional.empty());
 
         String updateTermJson = JsonObject.of("name", term.getName(), "color", term.getColor()).toJsonString();
@@ -229,7 +235,7 @@ public class TermResourceTests {
     @Transactional
     public void deleteTerm() throws Exception {
         Term term = builder.givenATerm();
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.of(new HttpCommandResponse(true,
             new TermResponse(term.getId(), term.getName(), term.getColor(), term.getOntology().getId(),
@@ -248,7 +254,7 @@ public class TermResourceTests {
     @Transactional
     public void deleteTermWithNoDeleteAccessReturnsNotFound() throws Exception {
         Term term = builder.givenATerm();
-        Long userId = builder.givenSuperAdmin().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         when(termHttpContract.delete(eq(term.getId()), eq(userId))).thenReturn(Optional.empty());
 
         restTermControllerMockMvc.perform(delete("/api/term/{id}.json", term.getId())).andExpect(status().isNotFound());

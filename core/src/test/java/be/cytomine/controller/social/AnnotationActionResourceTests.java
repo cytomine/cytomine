@@ -19,13 +19,16 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.AnnotationAction;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.social.AnnotationActionService;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,8 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class AnnotationActionResourceTests {
 
     @Autowired
@@ -50,6 +53,9 @@ public class AnnotationActionResourceTests {
 
     @Autowired
     private AnnotationActionService annotationActionService;
+
+    @Autowired
+    private CurrentUserService currentUserService;
 
     @BeforeEach
     public void cleanDB() {
@@ -73,7 +79,7 @@ public class AnnotationActionResourceTests {
     @Test
     public void addActionForAnnotation() throws Exception {
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(0);
-        User user = builder.givenSuperAdmin();
+        long userId = currentUserService.getCurrentUser().id();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         JsonObject jsonObject = new JsonObject();
@@ -88,13 +94,13 @@ public class AnnotationActionResourceTests {
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.social.AnnotationAction"))
             .andExpect(jsonPath("$.id").exists())
             .andExpect(jsonPath("$.created").exists())
-            .andExpect(jsonPath("$.user").value(user.getId()))
+            .andExpect(jsonPath("$.user").value(userId))
             .andExpect(jsonPath("$.image").value(annotationDomain.getImage().getId()))
             .andExpect(jsonPath("$.project").value(annotationDomain.getProject().getId()))
             .andExpect(jsonPath("$.action").value("select"))
             .andExpect(jsonPath("$.annotationIdent").value(annotationDomain.getId()))
             .andExpect(jsonPath("$.annotationClassName").value(annotationDomain.getClass().getName()))
-            .andExpect(jsonPath("$.annotationCreator").value(user.getId()));
+            .andExpect(jsonPath("$.annotationCreator").value(annotationDomain.user().getId()));
 
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(1);
     }

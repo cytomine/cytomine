@@ -15,4 +15,5 @@ RUN npm run build
 
 FROM ${PROXY_CACHE}/nginx:${NGINX_VERSION}-alpine
 
+COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/src/.vuepress/dist /usr/share/nginx/html

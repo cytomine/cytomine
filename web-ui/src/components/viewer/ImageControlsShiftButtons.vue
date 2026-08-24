@@ -30,7 +30,7 @@
       <template #popover>
         <div
           v-click-outside="() => stopEdition()"
-          v-click-outside:contextmenu.capture="() => stopEdition()"
+          ref="stepSelector"
           class="step-selector"
           @keyup.enter="stopEdition()"
         >
@@ -91,6 +91,9 @@ export default {
       return (this.forward) ? 'left' : 'right';
     }
   },
+  beforeUnmount() {
+    document.removeEventListener('contextmenu', this.onContextmenuOutside, true);
+  },
   methods: {
     shiftOne() {
       this.$emit('shift', this.shiftDirection);
@@ -103,14 +106,22 @@ export default {
     startEdition() {
       this.editedValue = this.step;
       this.opened = true;
+      document.addEventListener('contextmenu', this.onContextmenuOutside, true);
     },
     stopEdition() {
       this.opened = false;
+      document.removeEventListener('contextmenu', this.onContextmenuOutside, true);
       if (!this.editedValue || isNaN(this.editedValue)) {
         return;
       }
 
       this.step = parseInt(this.editedValue);
+    },
+    onContextmenuOutside(event) {
+      let selector = this.$refs.stepSelector;
+      if (selector && !selector.contains(event.target)) {
+        this.stopEdition();
+      }
     },
     focus() {
       this.$refs.inputStepSelector.focus();

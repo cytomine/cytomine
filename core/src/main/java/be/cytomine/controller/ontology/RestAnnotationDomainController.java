@@ -138,7 +138,10 @@ public class RestAnnotationDomainController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
         String filename = reportService.getAnnotationReportFileName(ReportType.GEOJSON.getLabel(), project.getName());
-        Map<String, Object> geoJson = annotationReportService.exportAnnotations(projectId);
+        Map<String, Object> geoJson = annotationReportService.exportAnnotations(
+            projectId,
+            currentUserService.getCurrentUser().id()
+        );
 
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
@@ -172,7 +175,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         JsonObject parameters = new JsonObject(bodyMap);
         byte[] report = annotationReportService.downloadDocumentByProject(parameters, project,
-            currentUserService.getCurrentUser().getId());
+            currentUserService.getCurrentUser().id());
         String filename = reportService.getAnnotationReportFileName(reportType.getLabel(), project.getName());
 
         return buildReportResponse(filename, report, reportType);
@@ -279,7 +282,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         //get term
         List<Long> terms = paramsService.getParamsTermList(params.getJSONAttrStr("terms"), image.getProject(),
-            currentUserService.getCurrentUser().getId());
+            currentUserService.getCurrentUser().id());
 
         List response;
         if (user == null) {

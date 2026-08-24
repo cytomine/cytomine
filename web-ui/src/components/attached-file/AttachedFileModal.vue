@@ -17,15 +17,27 @@
     </b-upload>
   </b-field>
 
-  <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-    <b-input v-model="name" :disabled="!selectedFile" name="name" v-validate="'required'" />
-  </b-field>
+  <Field :form="form" name="name" :validators="{ onChange: requiredValidator }" v-slot="{ field }">
+    <b-field
+      :label="$t('name')"
+      :type="{'is-danger': field.state.meta.errors.length > 0}"
+      :message="field.state.meta.errors[0]"
+    >
+      <b-input
+        name="name"
+        :disabled="!selectedFile"
+        :model-value="field.state.value"
+        @update:model-value="field.handleChange"
+        @blur="field.handleBlur"
+      />
+    </b-field>
+  </Field>
 
   <template #footer>
     <button class="button" @click="$parent.close()">
       {{$t('button-cancel')}}
     </button>
-    <button class="button is-link" :disabled="!selectedFile || errors.any()" @click="save()">
+    <button class="button is-link" :disabled="!selectedFile || !canSubmit" @click="save()">
       {{$t('button-save')}}
     </button>
   </template>
@@ -33,38 +45,49 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+
 import { AttachedFile } from '@/api';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
   name: 'attached-file-modal',
+  components: { CytomineModalCard, Field },
   props: {
     object: Object
   },
-  components: { CytomineModalCard },
-  $_veeValidate: { validator: 'new' },
+  setup() {
+    const form = useForm({
+      defaultValues: { name: '' }
+    });
+    const canSubmit = form.useStore(state => state.canSubmit);
+    return { form, canSubmit };
+  },
   data() {
     return {
-      selectedFile: null,
-      name: ''
+      selectedFile: null
     };
   },
   watch: {
     selectedFile(file) {
       if (file) {
-        this.name = file.name;
+        this.form.setFieldValue('name', file.name);
       }
     }
   },
   methods: {
+    requiredValidator({ value }) {
+      return value && String(value).trim().length > 0 ? undefined : 'This field is required';
+    },
     async save() {
-      let result = await this.$validator.validateAll('password');
-      if (!this.selectedFile || !result) {
+      await this.form.validateAllFields('submit');
+      if (!this.selectedFile || !this.form.state.isValid) {
         return;
       }
 
       try {
-        let attached = await new AttachedFile({ file: this.selectedFile, filename: this.name }, this.object).save();
+        let filename = this.form.state.values.name;
+        let attached = await new AttachedFile({ file: this.selectedFile, filename }, this.object).save();
         this.$emit('addAttachedFile', attached);
         this.$notify({ type: 'success', text: this.$t('notif-success-attached-file-creation') });
         this.$parent.close();
@@ -74,7 +97,6 @@ export default {
       }
     },
   }
-
 };
 </script>
 
@@ -92,5 +114,3 @@ export default {
   width: 80%;
 }
 </style>
-
-

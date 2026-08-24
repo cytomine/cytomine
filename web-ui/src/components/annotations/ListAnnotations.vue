@@ -844,4 +844,12 @@ export default {
   display: block;
   margin: auto;
 }
+
+.buttons {
+  gap: 0.25rem;
+}
+
+.buttons .button {
+  margin: 0;
+}
 </style>

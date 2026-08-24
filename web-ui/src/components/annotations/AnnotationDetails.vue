@@ -152,16 +152,14 @@
         </td>
       </tr>
 
-      <template>
-        <tr>
-          <td colspan="2">
-            <h5>{{ $t('similar-annotations') }}</h5>
-            <button class="button is-small is-fullwidth" @click="$emit('searchSimilarAnnotations')">
-              {{ $t('search-similar-annotation') }}
-            </button>
-          </td>
-        </tr>
-      </template>
+      <tr>
+        <td colspan="2">
+          <h5>{{ $t('similar-annotations') }}</h5>
+          <button class="button is-small is-fullwidth" @click="$emit('searchSimilarAnnotations')">
+            {{ $t('search-similar-annotation') }}
+          </button>
+        </td>
+      </tr>
 
       <template v-if="isPropDisplayed('linked-annotations')">
         <tr>

@@ -37,7 +37,7 @@
             size="is-small"
             icon-left="undo"
             :loading="undoing === row.id"
-            @click.native="undo(row)"
+            @click="undo(row)"
           >
             {{ $t('undo') }}
           </b-button>

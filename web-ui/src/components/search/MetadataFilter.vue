@@ -23,7 +23,7 @@
         </b-field>
       </div>
 
-      <b-button icon-left="times" @click.native="clear()">{{ $t('button-clear') }}</b-button>
+      <b-button icon-left="times" @click="clear()">{{ $t('button-clear') }}</b-button>
     </template>
   </div>
 </template>

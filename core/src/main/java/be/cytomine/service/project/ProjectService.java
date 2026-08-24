@@ -838,7 +838,7 @@ public class ProjectService extends ModelService {
         if (representatives != null) {
             List<Long> projectOldReprs = projectRepresentativeUserService.listByProject(project)
                 .stream()
-                .map(x -> x.getUser().getId())
+                .map(x -> x.getUserId())
                 .sorted()
                 .collect(Collectors.toList()); //[a,b,c]
             List<Long> projectNewReprs = representatives.stream()
@@ -861,7 +861,7 @@ public class ProjectService extends ModelService {
                     log.info("projectAddReprs project=" + project + " user=" + optionalUser.get().getId());
                     ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                     pru.setProject(project);
-                    pru.setUser(optionalUser.get());
+                    pru.setUserId(optionalUser.get().getId());
                     projectRepresentativeUserService.add(pru.toJsonObject(urlApi));
                 }
             }
@@ -872,7 +872,7 @@ public class ProjectService extends ModelService {
                     log.info("projectDeleteReprs project=" + project + " user=" + optionalUser.get().getId());
                     Optional<ProjectRepresentativeUser> repr = projectRepresentativeUserService.find(
                         project,
-                        optionalUser.get()
+                        optionalUser.get().getId()
                     );
                     repr.ifPresent(x -> projectRepresentativeUserService.delete(x, transaction, task, false));
                 }
@@ -1011,7 +1011,7 @@ public class ProjectService extends ModelService {
             );
         }
 
-        if (projectRepresentativeUserService.find((Project) domain, currentUserService.getCurrentUserOld())
+        if (projectRepresentativeUserService.find((Project) domain, currentUserService.getCurrentUser().id())
             .isEmpty()) {
             log.info("add creator "
                 + currentUserService.getCurrentUsername()
@@ -1019,7 +1019,7 @@ public class ProjectService extends ModelService {
                 + domain);
             ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
             pru.setProject((Project) domain);
-            pru.setUser(currentUserService.getCurrentUserOld());
+            pru.setUserId(currentUserService.getCurrentUser().id());
             projectRepresentativeUserService.add(pru.toJsonObject(urlApi));
         }
 

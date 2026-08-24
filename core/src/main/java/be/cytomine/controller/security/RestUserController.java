@@ -94,7 +94,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Project", id));
         return responseSuccess(
             projectRepresentativeUserService.listByProject(project)
-                .stream().map(ProjectRepresentativeUser::getUser)
+                .stream().map(ProjectRepresentativeUser::getUserId)
                 .collect(Collectors.toList()), isFilterRequired()
         );
     }

@@ -83,12 +83,8 @@ public class BasicInstanceBuilder {
     UserRepository userRepository;
     UserMapper userMapper;
 
-    public BasicInstanceBuilder(
-        EntityManager em,
-        UserRepository userRepository,
-        PermissionService permissionService,
-        SecRoleRepository secRoleRepository
-    ) {
+    public BasicInstanceBuilder(EntityManager em, UserRepository userRepository, PermissionService permissionService,
+        SecRoleRepository secRoleRepository) {
         this.em = em;
         this.userRepository = userRepository;
         this.permissionService = permissionService;
@@ -107,15 +103,11 @@ public class BasicInstanceBuilder {
         return userMapper.map(getUser("guest"));
     }
 
-    public User givenAUser(String username) {
-        User user = persistAndReturn(givenANotPersistedUser());
-        user.setUsername(username);
-        user = persistAndReturn(user);
-        addRole(user, ROLE_USER);
-        return user;
+    public UserResponse givenAUser(String username) {
+        return userMapper.map(getUser("guest"));
     }
 
-    public User givenAUser() {
+    public UserResponse givenAUser() {
         return givenAUser(randomString());
     }
 
@@ -162,10 +154,8 @@ public class BasicInstanceBuilder {
     }
 
     public User givenCurrentUser() {
-        return CurrentUserService.getSecurityCurrentUser()
-            .map(currentUser -> currentUser.getUser().username())
-            .flatMap(userRepository::findByUsernameLikeIgnoreCase)
-            .orElseGet(this::givenSuperAdmin);
+        return CurrentUserService.getSecurityCurrentUser().map(currentUser -> currentUser.getUser().username())
+            .flatMap(userRepository::findByUsernameLikeIgnoreCase).orElseGet(this::givenSuperAdmin);
     }
 
     public User givenANotPersistedUser() {
@@ -814,21 +804,25 @@ public class BasicInstanceBuilder {
     }
 
     public ProjectRepresentativeUser givenAProjectRepresentativeUser() {
-        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin()));
+        return persistAndReturn(
+            givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin().getUsername(),
+                givenSuperAdmin().getId()));
     }
 
     public ProjectRepresentativeUser givenAProjectRepresentativeUser(Project project, User user) {
-        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(project, user));
+        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(project, user.getUsername(), user.getId()));
     }
 
     public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser() {
-        return givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin());
+        return givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin().getUsername(),
+            givenSuperAdmin().getId());
     }
 
-    public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser(Project project, User user) {
-        addUserToProject(project, user.getUsername());
+    public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser(Project project, String username,
+        long userId) {
+        addUserToProject(project, username);
         ProjectRepresentativeUser projectRepresentativeUser = new ProjectRepresentativeUser();
-        projectRepresentativeUser.setUser(user);
+        projectRepresentativeUser.setUserId(userId);
         projectRepresentativeUser.setProject(project);
         return projectRepresentativeUser;
     }

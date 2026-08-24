@@ -149,8 +149,7 @@ public class ProjectMemberService {
             boolean isLastRepresentative = projectRepresentativeUserService.listByProject(project).size() == 1
                 && projectRepresentativeUserService.listByProject(project)
                 .get(0)
-                .getUser()
-                .getId()
+                .getUserId()
                 .equals(user.getId());
             if (hasLostAccessToProject && isLastRepresentative) {
                 if (!securityACLService.getProjectList(currentUserService.getCurrentUser(), null).contains(project)) {
@@ -163,10 +162,10 @@ public class ProjectMemberService {
                     + project.getId());
                 ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                 pru.setProject(project);
-                pru.setUser(currentUserService.getCurrentUserOld());
+                pru.setUserId(currentUserService.getCurrentUser().id());
                 projectRepresentativeUserService.add(pru.toJsonObject(urlApi));
 
-                projectRepresentativeUserService.find(project, user)
+                projectRepresentativeUserService.find(project, user.getId())
                     .ifPresent(x -> projectRepresentativeUserService.delete(x, null, null, false));
 
             }
@@ -215,7 +214,7 @@ public class ProjectMemberService {
                 && !permissionService.hasACLPermission(project, user.getUsername(), READ));
             boolean isLastRepresentative = projectRepresentativeUserService.listByProjectWithAdmin(project).size() == 1
                 && projectRepresentativeUserService
-                .listByProjectWithAdmin(project).get(0).getUser().getId().equals(user.getId());
+                .listByProjectWithAdmin(project).get(0).getUserId().equals(user.getId());
             if (hasLostAccessToProject && isLastRepresentative) {
                 if (!securityACLService.getProjectList(userMapper.map(adminUser), null).contains(project)) {
                     // if current user is not in project (= SUPERADMIN), add to the project
@@ -228,11 +227,11 @@ public class ProjectMemberService {
                     + project.getId());
                 ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                 pru.setProject(project);
-                pru.setUser((User) adminUser);
+                pru.setUserId(adminUser.getId());
                 projectRepresentativeUserService.add(pru.toJsonObject(urlApi), adminUser);
 
                 Optional<ProjectRepresentativeUser> foundRepOptional = projectRepresentativeUserService
-                    .find(project, (User) user);
+                    .find(project, user.getId());
                 if (foundRepOptional.isPresent()) {
                     ProjectRepresentativeUser foundRep = foundRepOptional.get();
                     projectRepresentativeUserService.deleteWithAdmin(foundRep, null, adminUser.getId());

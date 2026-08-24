@@ -14,7 +14,7 @@ import be.cytomine.domain.security.User;
 public interface ProjectRepresentativeUserRepository extends JpaRepository<ProjectRepresentativeUser, Long> {
 
 
-    Optional<ProjectRepresentativeUser> findByProjectAndUser(Project project, User user);
+    Optional<ProjectRepresentativeUser> findByProjectAndUserId(Project project, long userId);
 
     List<ProjectRepresentativeUser> findAllByProject(Project project);
 

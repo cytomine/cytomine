@@ -579,6 +579,7 @@ public class CytomineSteps {
 
     public void exportOntology(Wait<WebDriver> wait, String ontologyUrl, String ontologyName) {
         webDriverUtils.goTo(wait, ontologyUrl);
+        webDriverUtils.xpathClick(wait, String.format("//a[contains(., '%s')]", ontologyName));
         webDriverUtils.clickButtonByText(wait, "Export ontology");
 
         String filename = ontologyName + "." + ReportType.JSON.getLabel();

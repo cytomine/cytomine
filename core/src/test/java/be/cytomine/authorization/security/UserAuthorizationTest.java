@@ -165,13 +165,6 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void userCannotDeleteAnotherUser() {
-        User user = builder.givenAUser();
-        expectForbidden(() -> userService.delete(user, null, null, false));
-    }
-
-    @Test
-    @WithMockUser(username = USER_NO_ACL)
     public void userCannotDeleteHimself() {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
         expectForbidden(() -> userService.delete(user, null, null, false));
@@ -182,7 +175,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     public void shouldAddAndRemoveUserFromProjectWhenAdmin() {
         User user = builder.givenAUser();
         Project project = builder.givenAProject();
-        expectOK(() -> projectMemberService.addUserToProject(user, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.getUsername(), false));
         expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
     }
 

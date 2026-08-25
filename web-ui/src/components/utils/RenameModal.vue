@@ -3,7 +3,7 @@
   <cytomine-modal :title="title" :active="active" @close="close()">
     <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
       <b-field :label="$t('new-name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
-        <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+        <b-input name="name" :model-value="state.value" @update:model-value="field.handleChange" />
       </b-field>
     </field>
     <template #footer>

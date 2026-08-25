@@ -208,6 +208,10 @@ public class UserService extends ModelService {
         return userRepository.findById(id);
     }
 
+    public Optional<UserResponse> findUserResponse(long id) {
+        return find(id).map(userMapper::map);
+    }
+
     public Optional<User> find(UUID sub) {
         return userRepository.findByReference(String.valueOf(sub));
     }
@@ -300,7 +304,6 @@ public class UserService extends ModelService {
         Map<String, Object> mapParams = new HashMap<>();
 
         where += " AND u.deleted IS NULL ";
-
 
         if (multiSearch.isPresent()) {
             String value = ((String) multiSearch.get().getValue()).toLowerCase();

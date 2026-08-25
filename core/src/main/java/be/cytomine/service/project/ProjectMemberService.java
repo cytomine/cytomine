@@ -99,7 +99,7 @@ public class ProjectMemberService {
         }
     }
 
-    public void deleteUserFromProject(String username,long userId, Project project, boolean admin) {
+    public void deleteUserFromProject(String username, long userId, Project project, boolean admin) {
         if (!Objects.equals(currentUserService.getCurrentUser().id(), userId)) {
             securityACLService.check(project, ADMINISTRATION);
         }
@@ -124,7 +124,7 @@ public class ProjectMemberService {
                     READ));
             if (!permissionService.hasACLPermission(project, username, READ)
                 && project.getOntology() != null) {
-                removeOntologyRightIfNecessary(project, userMapper.map(user), admin);
+                removeOntologyRightIfNecessary(project, userId, username, admin);
             }
             // if no representative, add current user as a representative
             boolean hasLostAccessToProject = (!permissionService.hasACLPermission(project, username, READ)
@@ -180,7 +180,7 @@ public class ProjectMemberService {
                     READ));
             if (!permissionService.hasACLPermission(project, user.getUsername(), READ)
                 && project.getOntology() != null) {
-                removeOntologyRightIfNecessary(project, userMapper.map(adminUser), admin);
+                removeOntologyRightIfNecessary(project, user.getId(), user.getUsername(), admin);
             }
 
             // if no representative, add current user as a representative
@@ -217,7 +217,8 @@ public class ProjectMemberService {
 
     private void removeOntologyRightIfNecessary(Project project, long userId, String username, boolean admin) {
         // we remove the right ONLY if user has no other project with this ontology
-        List<Project> projects = securityACLService.getProjectList(userId, project.getOntology().getId());
+        UserResponse user = userService.findUserResponse(userId).orElseThrow();
+        List<Project> projects = securityACLService.getProjectList(user, project.getOntology().getId());
         List<Project> otherProjects = new ArrayList<>(projects);
         otherProjects.remove(project);
 

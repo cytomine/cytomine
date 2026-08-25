@@ -204,20 +204,22 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
         UserResponse user = builder.givenAUser();
         expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
-        expectOK(() -> projectMemberService.addUserToProject(user, true));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, true));
-        expectOK(() -> projectMemberService.addUserToProject(user, true));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
             project,
-            user
+            user.username(), user.id()
         );
 
         // add another representative so that we can delete the first one
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenSuperAdmin(), false));
+        User superAdmin = builder.givenSuperAdmin();
+        expectOK(() -> projectMemberService.addUserToProject(superAdmin.getUsername(),
+            project, false));
         expectOK(() -> projectRepresentativeUserService.add(builder.givenANotPersistedProjectRepresentativeUser(
-            project, builder.givenSuperAdmin()
+            project, superAdmin.getUsername(), superAdmin.getId()
         ).toJsonObject(urlApi)));
 
         expectOK(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));

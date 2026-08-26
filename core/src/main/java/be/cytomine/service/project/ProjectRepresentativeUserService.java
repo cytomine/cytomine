@@ -70,10 +70,10 @@ public class ProjectRepresentativeUserService extends ModelService {
         return optionalProjectRepresentativeUser;
     }
 
-    public Optional<ProjectRepresentativeUser> find(Project project, User user) {
+    public Optional<ProjectRepresentativeUser> find(Project project, long userId) {
         Optional<ProjectRepresentativeUser>
             optionalProjectRepresentativeUser
-            = projectRepresentativeUserRepository.findByProjectAndUser(project, user);
+            = projectRepresentativeUserRepository.findByProjectAndUserId(project, userId);
         optionalProjectRepresentativeUser.ifPresent(projectRepresentativeUser -> securityACLService.check(
             projectRepresentativeUser,
             READ
@@ -151,20 +151,20 @@ public class ProjectRepresentativeUserService extends ModelService {
     }
 
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
-        User user = ((ProjectRepresentativeUser) domain).getUser();
-        return List.of(domain.getId(), user.getFullName());
+        long userId = ((ProjectRepresentativeUser) domain).getUserId();
+        return List.of(domain.getId(), userId);
     }
 
 
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         ProjectRepresentativeUser projectRepresentativeUser = (ProjectRepresentativeUser) domain;
         if (projectRepresentativeUser != null) {
-            if (projectRepresentativeUserRepository.findByProjectAndUser(
+            if (projectRepresentativeUserRepository.findByProjectAndUserId(
                 projectRepresentativeUser.getProject(),
-                projectRepresentativeUser.getUser()
+                projectRepresentativeUser.getUserId()
             ).stream().anyMatch(x -> !Objects.equals(x.getId(), projectRepresentativeUser.getId()))) {
                 throw new AlreadyExistException("User "
-                    + projectRepresentativeUser.getUser().getId()
+                    + projectRepresentativeUser.getUserId()
                     + " is already representative of the project "
                     + projectRepresentativeUser.getProject().getId());
             }

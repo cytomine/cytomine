@@ -48,7 +48,6 @@ import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Track;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.ImageInstanceBounds;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
@@ -303,19 +302,19 @@ public class ImageInstanceService extends ModelService {
         return validParameters;
     }
 
-    public Page<Map<String, Object>> list(User user, List<SearchParameterEntry> searchParameters) {
-        return list(user, searchParameters, "created", "desc", 0L, 0L);
+    public Page<Map<String, Object>> list(long userId, List<SearchParameterEntry> searchParameters) {
+        return list(userId, searchParameters, "created", "desc", 0L, 0L);
     }
 
     public Page<Map<String, Object>> list(
-        User user,
+        long userId,
         List<SearchParameterEntry> searchParameters,
         String sortColumn,
         String sortDirection,
         Long max,
         Long offset
     ) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
+        securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
 
         String imageInstanceAlias = "ui";
         String abstractImageAlias = "ai";
@@ -409,7 +408,7 @@ public class ImageInstanceService extends ModelService {
 
         select = "SELECT distinct " + imageInstanceAlias + ".* ";
         from = "FROM user_image " + imageInstanceAlias + " ";
-        where = "WHERE user_image_id = " + user.getId() + " ";
+        where = "WHERE user_image_id = " + userId + " ";
         search = "";
 
         if (!imageInstanceCondition.isBlank()) {

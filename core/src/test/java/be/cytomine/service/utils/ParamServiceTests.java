@@ -13,13 +13,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.utils.JsonObject;
 
@@ -45,18 +45,18 @@ public class ParamServiceTests {
     @Test
     public void paramsUser() {
         Project project = builder.givenAProject();
-        User userInProject = builder.givenAUser();
-        builder.addUserToProject(project, userInProject.getUsername());
-        User userNotInProject = builder.givenAUser();
+        UserResponse userInProject = builder.givenAUser();
+        builder.addUserToProject(project, userInProject.username());
+        UserResponse userNotInProject = builder.givenAUser();
 
         assertThat(paramsService.getParamsUserList(null, project))
-            .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
+            .contains(userInProject.id()).doesNotContain(userNotInProject.id());
         assertThat(paramsService.getParamsUserList("null", project))
-            .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
-        assertThat(paramsService.getParamsUserList(userInProject.getId() + "_" + userNotInProject.getId(), project))
-            .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
-        assertThat(paramsService.getParamsUserList(userNotInProject.getId() + "", project))
-            .doesNotContain(userInProject.getId(), userNotInProject.getId());
+            .contains(userInProject.id()).doesNotContain(userNotInProject.id());
+        assertThat(paramsService.getParamsUserList(userInProject.id() + "_" + userNotInProject.id(), project))
+            .contains(userInProject.id()).doesNotContain(userNotInProject.id());
+        assertThat(paramsService.getParamsUserList(userNotInProject.id() + "", project))
+            .doesNotContain(userInProject.id(), userNotInProject.id());
     }
 
     @Test

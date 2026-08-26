@@ -21,6 +21,7 @@ import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 
+import static be.cytomine.BasicInstanceBuilder.DEFAULT_USER;
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -55,7 +56,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void loadCustomUiDefaultConfig() {
         assertThat(applicationProperties.getCustomUI()
             .getProject()
@@ -88,7 +89,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void retrieveGlobalCustomUiAsUser() throws Exception {
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json"))
             .andExpect(status().isOk())
@@ -117,10 +118,10 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void retrieveProjectCustomUiAsContributor() throws Exception {
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, "user", READ);
+        builder.addUserToProject(project, DEFAULT_USER, READ);
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                 .param("project", project.getId().toString()))
             .andExpect(status().isOk())
@@ -129,10 +130,10 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void retrieveProjectCustomUiAsManager() throws Exception {
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, "user", ADMINISTRATION);
+        builder.addUserToProject(project, DEFAULT_USER, ADMINISTRATION);
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                 .param("project", project.getId().toString()))
             .andExpect(status().isOk())

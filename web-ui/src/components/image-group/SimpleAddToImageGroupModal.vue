@@ -10,7 +10,7 @@
       </b-field>
       <field v-if="imageGroup === 'NEW'" :form="form" name="name" :validators="requiredRule" v-slot="{field, state}">
         <b-field :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
-          <b-input :model-value="state.value" @update:model-value="field.handleChange" />
+          <b-input name="name" :model-value="state.value" @update:model-value="field.handleChange" />
         </b-field>
       </field>
       <b-field>

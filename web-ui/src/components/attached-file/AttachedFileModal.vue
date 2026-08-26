@@ -19,7 +19,7 @@
 
   <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
     <b-field :label="$t('name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
-      <b-input :model-value="state.value" :disabled="!selectedFile" @update:model-value="field.handleChange" />
+      <b-input name="name" :model-value="state.value" :disabled="!selectedFile" @update:model-value="field.handleChange" />
     </b-field>
   </field>
 

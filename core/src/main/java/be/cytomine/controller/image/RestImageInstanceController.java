@@ -97,7 +97,7 @@ public class RestImageInstanceController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
         RequestParams requestParams = retrievePageableParameters();
         return responseSuccess(imageInstanceService.list(
-            user,
+            user.getId(),
             retrieveSearchParameters(),
             requestParams.getSort(),
             requestParams.getOrder(),

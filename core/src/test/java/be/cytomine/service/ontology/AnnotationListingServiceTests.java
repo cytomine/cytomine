@@ -279,8 +279,8 @@ public class AnnotationListingServiceTests {
     void searchReviewedAnnotationByTerms() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenAUser();
-        User user2 = builder.givenAUser();
+        User user1 = builder.givenDefaultUser();
+        User user2 = builder.givenDefaultAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -324,8 +324,8 @@ public class AnnotationListingServiceTests {
     void searchReviewedAnnotationByBbox() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenAUser();
-        User user2 = builder.givenAUser();
+        User user1 = builder.givenDefaultUser();
+        User user2 = builder.givenDefaultAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -355,8 +355,8 @@ public class AnnotationListingServiceTests {
     void searchReviewedAnnotationByImageAndReviewUser() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenAUser();
-        User user2 = builder.givenAUser();
+        User user1 = builder.givenDefaultUser();
+        User user2 = builder.givenDefaultAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());

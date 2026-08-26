@@ -116,7 +116,7 @@ public class UserPositionServiceTests {
     @Test
     void retrieveLastPositionForUser() {
         User mainUser = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         PersistentUserPosition persistentUserPosition = givenAPersistentUserPosition(
@@ -145,7 +145,7 @@ public class UserPositionServiceTests {
     @Test
     public void listUsersOnlineOnImage() {
         User mainUser = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         PersistentUserPosition persistentUserPosition = givenAPersistentUserPosition(
@@ -168,7 +168,7 @@ public class UserPositionServiceTests {
     @Test
     public void listUsersPosition() {
         User mainUser = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
@@ -259,7 +259,7 @@ public class UserPositionServiceTests {
     @Test
     public void summerize() {
         User mainUser = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
@@ -395,20 +395,20 @@ public class UserPositionServiceTests {
 
         UserResponse user = builder.givenAUser();
 
-        WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId().toString() + "/514", sessionDecorator);
+        WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
             sessionDecorator,
             new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
         );
         WebSocketUserPositionHandler.sessions.put(
-            user.getId().toString(),
+            String.valueOf(user.getId()),
             new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
         );
 
         List<String> users = userPositionService.listFollowers(user.getId(), 514L);
 
         assertThat(users.size()).isEqualTo(1);
-        assertThat(users).contains(user.getId().toString());
+        assertThat(users).contains(String.valueOf(user.getId()));
     }
 
     @Test
@@ -418,9 +418,9 @@ public class UserPositionServiceTests {
 
         ConcurrentWebSocketSessionDecorator sessionDecorator = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
 
-        UserResponse user = builder.givenAUser();
+        User user = builder.givenDefaultUser();
 
-        WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId().toString() + "/514", sessionDecorator);
+        WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
             sessionDecorator,
             new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
@@ -447,8 +447,8 @@ public class UserPositionServiceTests {
 
     @Test
     public void addingUsersAsFollowers() {
-        User broadcaster = builder.givenAUser();
-        User follower = builder.givenAUser();
+        User broadcaster = builder.givenDefaultUser();
+        User follower = builder.givenDefaultAdmin();
         ImageInstance imageInstance = builder.givenAnImageInstance();
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
 
@@ -459,8 +459,8 @@ public class UserPositionServiceTests {
 
     @Test
     public void updatingUsersFollowers() {
-        User broadcaster = builder.givenAUser();
-        User follower = builder.givenAUser();
+        User broadcaster = builder.givenDefaultUser();
+        User follower = builder.givenDefaultAdmin();
         ImageInstance imageInstance = builder.givenAnImageInstance();
 
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
@@ -473,8 +473,8 @@ public class UserPositionServiceTests {
 
     @Test
     public void removeUsersFollowersThatDidNotFetchPosition() {
-        User broadcaster = builder.givenAUser();
-        User follower = builder.givenAUser();
+        User broadcaster = builder.givenDefaultUser();
+        User follower = builder.givenDefaultAdmin();
         ImageInstance imageInstance = builder.givenAnImageInstance();
 
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();

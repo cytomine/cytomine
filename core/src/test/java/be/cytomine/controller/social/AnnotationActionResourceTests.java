@@ -66,12 +66,12 @@ public class AnnotationActionResourceTests {
     AnnotationAction givenAPersistentAnnotationAction(
         Date creation,
         AnnotationDomain annotationDomain,
-        User user,
+        long userId,
         String action
     ) {
         return annotationActionService.add(
             annotationDomain,
-            user,
+            userId,
             action,
             creation
         );
@@ -112,7 +112,7 @@ public class AnnotationActionResourceTests {
         UserResponse user = builder.givenAUser();
 
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
-        givenAPersistentAnnotationAction(new Date(), annotationDomain, user, "select");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain, user.id(), "select");
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/annotation_action.json",
@@ -137,7 +137,7 @@ public class AnnotationActionResourceTests {
         UserResponse user = builder.givenAUser();
 
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
-        givenAPersistentAnnotationAction(new Date(), annotationDomain, user, "select");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain, user.id(), "select");
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/sliceinstance/{image}/annotation_action.json",
@@ -161,7 +161,7 @@ public class AnnotationActionResourceTests {
     public void countAnnotationByProject() throws Exception {
         User user = builder.givenSuperAdmin();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
-        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -2), annotationDomain, user, "select");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -2), annotationDomain, user.getId(), "select");
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/project/{project}/annotation_action/count.json",

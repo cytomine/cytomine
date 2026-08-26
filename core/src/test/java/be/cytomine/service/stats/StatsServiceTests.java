@@ -139,7 +139,7 @@ public class StatsServiceTests {
 
     AnnotationAction givenAPersistentAnnotationAction(Date creation, AnnotationDomain annotationDomain, User user,
         String action) {
-        return annotationActionService.add(annotationDomain, user, action, creation);
+        return annotationActionService.add(annotationDomain, user.getId(), action, creation);
     }
 
     @Test

@@ -56,7 +56,7 @@ public class AnnotationActionServiceTests {
     ) {
         AnnotationAction annotationAction = annotationActionService.add(
             annotationDomain,
-            user,
+            user.getId(),
             action,
             creation
         );
@@ -91,7 +91,7 @@ public class AnnotationActionServiceTests {
         assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.givenSuperAdmin(), null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.givenAUser(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.givenDefaultUser(), null, null))
             .hasSize(0);
 
         assertThat(annotationActionService.list(
@@ -127,7 +127,7 @@ public class AnnotationActionServiceTests {
         assertThat(annotationActionService.list(annotationDomain.getImage(), builder.givenSuperAdmin(), null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getImage(), builder.givenAUser(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getImage(), builder.givenDefaultUser(), null, null))
             .hasSize(0);
 
         assertThat(annotationActionService.list(

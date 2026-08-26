@@ -441,13 +441,13 @@ public class SecurityACLService {
         }
     }
 
-    public boolean isUserInProject(User user, Project project) {
+    public boolean isUserInProject(long userId, Project project) {
         this.check(project, READ);
-        return (aclRepository.countEntries(project.getId(), user.getId()) > 0);
+        return (aclRepository.countEntries(project.getId(), userId) > 0);
     }
 
     public void checkIsUserInProject(User user, Project project) {
-        boolean result = isUserInProject(user, project);
+        boolean result = isUserInProject(user.getId(), project);
         if (!result) {
             throw new ConstraintException("Error: the user "
                 + user.getId()

@@ -156,7 +156,7 @@ public class StatsResourceTests {
     ) {
         return annotationActionService.add(
             annotationDomain,
-            user,
+            user.getId(),
             action,
             creation
         );

@@ -75,11 +75,11 @@ public class ProjectRepresentativeServiceTests {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser()
+            projectRepresentativeUser.getUserId()
         ).isPresent());
         assertThat(projectRepresentativeUser).isEqualTo(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser()
+            projectRepresentativeUser.getUserId()
         ).get());
     }
 
@@ -87,7 +87,7 @@ public class ProjectRepresentativeServiceTests {
     void findUnexistingProjectRepresentativeUserWithProjectAndUserReturnEmpty() {
         assertThat(projectRepresentativeUserService.find(
             builder.givenAProject(),
-            builder.givenSuperAdmin()
+            builder.givenSuperAdmin().getId()
         )).isEmpty();
     }
 
@@ -198,14 +198,15 @@ public class ProjectRepresentativeServiceTests {
         );
         builder.addUserToProject(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser().getUsername(),
+            user.getUsername(),
             ADMINISTRATION
         );
 
         assertThat(projectRepresentativeUserService.listByProject(projectRepresentativeUser.getProject())).hasSize(1);
 
         projectMemberService.deleteUserFromProject(
-            projectRepresentativeUser.getUser(),
+            user.getUsername(),
+            user.getId(),
             projectRepresentativeUser.getProject(),
             true
         );
@@ -213,11 +214,11 @@ public class ProjectRepresentativeServiceTests {
         assertThat(projectRepresentativeUserService.listByProject(projectRepresentativeUser.getProject())).hasSize(1);
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser()
+            projectRepresentativeUser.getUserId()
         )).isEmpty();
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            builder.givenSuperAdmin()
+            builder.givenSuperAdmin().getId()
         )).isPresent();
     }
 }

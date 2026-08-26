@@ -180,7 +180,7 @@ public class ReviewedAnnotationServiceTests {
     void statsGroupByUser() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         User reviewer = reviewedAnnotation.getReviewUser();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         List<ReviewedAnnotationStatsEntry> results = reviewedAnnotationService.statsGroupByUser(
             reviewedAnnotation.getImage()
@@ -200,8 +200,8 @@ public class ReviewedAnnotationServiceTests {
     @Test
     void listIncluded() throws ParseException {
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenAUser();
-        User user2 = builder.givenAUser();
+        User user1 = builder.givenDefaultUser();
+        User user2 = builder.givenDefaultAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -446,7 +446,7 @@ public class ReviewedAnnotationServiceTests {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
-        image.setReviewUser(builder.givenAUser());
+        image.setReviewUser(builder.givenDefaultUser());
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(image.getProject());
         userAnnotation.setImage(image);
         builder.persistAndReturn(userAnnotation);
@@ -552,7 +552,7 @@ public class ReviewedAnnotationServiceTests {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
         imageInstanceService.startReview(userAnnotation.getImage());
-        userAnnotation.getImage().setReviewUser(builder.givenAUser());
+        userAnnotation.getImage().setReviewUser(builder.givenDefaultUser());
 
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -639,7 +639,7 @@ public class ReviewedAnnotationServiceTests {
     void reviewAllUserLayersUserIsNotReviewer() {
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
-        image.setReviewUser(builder.givenAUser());
+        image.setReviewUser(builder.givenDefaultUser());
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
                 reviewedAnnotationService.reviewLayer(image.getId(), List.of(image.getUser().getId()), null);

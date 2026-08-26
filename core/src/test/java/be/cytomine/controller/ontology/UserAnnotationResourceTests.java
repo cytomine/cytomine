@@ -167,7 +167,7 @@ public class UserAnnotationResourceTests {
         UserResponse newUser = builder.givenAUser();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
-                newUser.getId()
+                newUser.id()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(0));

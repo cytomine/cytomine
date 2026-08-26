@@ -117,7 +117,7 @@ public class ProjectConnectionResourceTests {
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/userconnection/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(2))));
@@ -157,7 +157,7 @@ public class ProjectConnectionResourceTests {
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].user").value(user.getId()));
+            .andExpect(jsonPath("$.collection[0].user").value(user.id()));
     }
 
     @Test
@@ -172,11 +172,11 @@ public class ProjectConnectionResourceTests {
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/lastConnection/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].user").value(user.getId()));
+            .andExpect(jsonPath("$.collection[0].user").value(user.id()));
     }
 
     @Test
@@ -240,7 +240,7 @@ public class ProjectConnectionResourceTests {
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionFrequency/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk());
     }
@@ -257,7 +257,7 @@ public class ProjectConnectionResourceTests {
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionFrequency/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ).param("heatmap", "true"))
             .andExpect(status().isOk());
     }
@@ -274,7 +274,7 @@ public class ProjectConnectionResourceTests {
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionFrequency/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ).param("period", "week"))
             .andExpect(status().isOk());
     }
@@ -336,7 +336,7 @@ public class ProjectConnectionResourceTests {
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionHistory/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk());
     }
@@ -355,7 +355,7 @@ public class ProjectConnectionResourceTests {
         MvcResult mvcResult = restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionHistory/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ).param("export", "csv"))
             .andExpect(status().isOk()).andReturn();
 

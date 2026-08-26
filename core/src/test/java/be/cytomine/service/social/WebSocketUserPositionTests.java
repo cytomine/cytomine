@@ -97,7 +97,7 @@ public class WebSocketUserPositionTests {
     public void addTrackSessionToNotTrackedUser() {
         ConcurrentWebSocketSessionDecorator sessionDecorator = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = String.valueOf(builder.givenAUser().getId());
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
@@ -123,7 +123,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = String.valueOf(builder.givenAUser().getId());
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
@@ -153,7 +153,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
         when(followerSession.getId()).thenReturn("5678");
 
-        String userId = String.valueOf(builder.givenAUser().getId());
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
@@ -220,7 +220,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = String.valueOf(builder.givenAUser().getId());
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
@@ -248,7 +248,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = String.valueOf(builder.givenAUser().getId());
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
@@ -274,7 +274,7 @@ public class WebSocketUserPositionTests {
 
     @Test
     public void updatePositionOfTrackedUserSendMessageWorks() throws IOException {
-        String userId = String.valueOf(builder.givenAUser().getId());
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
 
         WebSocketSession session = mock(WebSocketSession.class);
@@ -296,7 +296,7 @@ public class WebSocketUserPositionTests {
 
     @Test
     public void updatePositionOfNotTrackedUserDoNothing() {
-        String userId = String.valueOf(builder.givenAUser().getId());
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         assertDoesNotThrow(() -> webSocketUserPositionHandler.sendPositionToFollowers(
             userId,
@@ -311,7 +311,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = String.valueOf(builder.givenAUser().getId());
+        String userId = String.valueOf(builder.givenAUser().id());
         String userAndImageId = userId + "/imageId";
         connectSession(session, userId, "imageId", "false");
         initFollowingSession(userAndImageId, broadcastSession, followerSession);

@@ -246,7 +246,7 @@ public class ProjectServiceTests {
                 project.setCountJobAnnotations((long) intChoices.get(i));
                 project.setCountImages((long) intChoices.get(i));
                 for (int j = 0; j < intChoices.size(); j++) {
-                    builder.addUserToProject(project, builder.givenAUser().getUsername());
+                    builder.addUserToProject(project, builder.givenAUser().username());
                 }
                 builder.persistAndReturn(project);
             }
@@ -656,18 +656,18 @@ public class ProjectServiceTests {
 
         builder.addUserToProject(project1, creator.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project1, admin.getUsername(), ADMINISTRATION);
-        builder.addUserToProject(project1, user.getUsername(), READ);
+        builder.addUserToProject(project1, user.username(), READ);
 
         assertThat(projectService.listByCreatorId(creator.getId())).contains(new NamedCytomineDomain(project1.getId()));
         assertThat(projectService.listByCreatorId(admin.getId())).doesNotContain(
             new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByCreatorId(user.getId())).doesNotContain(
+        assertThat(projectService.listByCreatorId(user.id())).doesNotContain(
             new NamedCytomineDomain(project1.getId()));
         assertThat(projectService.listByAdminId(creator.getId())).contains(new NamedCytomineDomain(project1.getId()));
         assertThat(projectService.listByAdminId(admin.getId())).contains(new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByAdminId(user.getId())).doesNotContain(
+        assertThat(projectService.listByAdminId(user.id())).doesNotContain(
             new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByUserId(user.getId())).contains(new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByUserId(user.id())).contains(new NamedCytomineDomain(project1.getId()));
     }
 
     @Test
@@ -700,7 +700,7 @@ public class ProjectServiceTests {
         User admin = builder.givenDefaultAdmin();
 
         CommandResponse commandResponse = projectService.add(
-            project.toJsonObject(urlApi).withChange("users", List.of(user.getId()))
+            project.toJsonObject(urlApi).withChange("users", List.of(user.id()))
                 .withChange("admins", List.of(admin.getId())));
 
         assertThat(commandResponse).isNotNull();
@@ -711,13 +711,13 @@ public class ProjectServiceTests {
 
         assertThat(permissionService.hasACLPermission(projectCreated, builder.givenSuperAdmin().getUsername(),
             ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(projectCreated, user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated, user.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(projectCreated, user.username(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(projectCreated, admin.getUsername(), ADMINISTRATION)).isTrue();
         assertThat(permissionService.hasACLPermission(projectCreated, admin.getUsername(), READ)).isTrue();
 
         // check ontology access
-        assertThat(permissionService.hasACLPermission(projectCreated.getOntology(), user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated.getOntology(), user.username(), READ)).isTrue();
         assertThat(
             permissionService.hasACLPermission(projectCreated.getOntology(), admin.getUsername(), READ)).isTrue();
     }
@@ -726,7 +726,7 @@ public class ProjectServiceTests {
     void updateProjectName() {
         Project project = builder.givenAProject();
         UserResponse user = builder.givenAUser();
-        builder.addUserToProject(project, user.getUsername());
+        builder.addUserToProject(project, user.username());
 
         CommandResponse commandResponse =
             projectService.update(project, project.toJsonObject(urlApi).withChange("name", "NEW NAME"));
@@ -736,7 +736,7 @@ public class ProjectServiceTests {
         assertThat(projectService.find(commandResponse.getObject().getId())).isPresent();
         Project edited = projectService.find(commandResponse.getObject().getId()).get();
         assertThat(edited.getName()).isEqualTo("NEW NAME");
-        assertThat(securityACLService.isUserInProject(user.getId(), project)).isTrue(); // no impact on users
+        assertThat(securityACLService.isUserInProject(user.id(), project)).isTrue(); // no impact on users
     }
 
     @Test

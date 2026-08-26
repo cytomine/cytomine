@@ -121,8 +121,8 @@ public class ImageConsultationResourceTests {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        givenAPersistentImageConsultation(user.getId(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentImageConsultation(user.getId(), imageInstance2, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentImageConsultation(user.id(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.id(), imageInstance2, DateUtils.addSeconds(new Date(), -2));
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{image}/lastImages.json",
@@ -195,7 +195,7 @@ public class ImageConsultationResourceTests {
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{project}/user/{user}/imageconsultation.json",
-                imageInstance1.getProject().getId().toString(), String.valueOf(builder.givenAUser().getId())
+                imageInstance1.getProject().getId().toString(), String.valueOf(builder.givenAUser().id())
             ).param("distinctImages", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));

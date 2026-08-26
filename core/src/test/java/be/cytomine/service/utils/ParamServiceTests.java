@@ -46,17 +46,17 @@ public class ParamServiceTests {
     public void paramsUser() {
         Project project = builder.givenAProject();
         UserResponse userInProject = builder.givenAUser();
-        builder.addUserToProject(project, userInProject.getUsername());
+        builder.addUserToProject(project, userInProject.username());
         UserResponse userNotInProject = builder.givenAUser();
 
         assertThat(paramsService.getParamsUserList(null, project))
-            .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
+            .contains(userInProject.id()).doesNotContain(userNotInProject.id());
         assertThat(paramsService.getParamsUserList("null", project))
-            .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
-        assertThat(paramsService.getParamsUserList(userInProject.getId() + "_" + userNotInProject.getId(), project))
-            .contains(userInProject.getId()).doesNotContain(userNotInProject.getId());
-        assertThat(paramsService.getParamsUserList(userNotInProject.getId() + "", project))
-            .doesNotContain(userInProject.getId(), userNotInProject.getId());
+            .contains(userInProject.id()).doesNotContain(userNotInProject.id());
+        assertThat(paramsService.getParamsUserList(userInProject.id() + "_" + userNotInProject.id(), project))
+            .contains(userInProject.id()).doesNotContain(userNotInProject.id());
+        assertThat(paramsService.getParamsUserList(userNotInProject.id() + "", project))
+            .doesNotContain(userInProject.id(), userNotInProject.id());
     }
 
     @Test

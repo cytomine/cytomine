@@ -363,7 +363,7 @@ public class ImageInstanceServiceTests {
     void listByUserWithSearch() {
         UserResponse user = builder.givenAUser("list_by_user_with_search");
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, user.getUsername(), BasePermission.ADMINISTRATION);
+        builder.addUserToProject(project, user.username(), BasePermission.ADMINISTRATION);
         ImageInstance img1 = builder.givenAnImageInstance(project);
         img1.getBaseImage().setWidth(499);
         img1.setInstanceFilename("TEST");
@@ -493,7 +493,7 @@ public class ImageInstanceServiceTests {
     void listByProjectWithSearchWithBlindMode() {
         UserResponse user = builder.givenAUser("list_by_project_with_search_with_blind_mode");
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, user.getUsername(), BasePermission.WRITE);
+        builder.addUserToProject(project, user.username(), BasePermission.WRITE);
         project.setBlindMode(true);
         ImageInstance img1 = builder.givenAnImageInstance(project);
         img1.setInstanceFilename("TEST");

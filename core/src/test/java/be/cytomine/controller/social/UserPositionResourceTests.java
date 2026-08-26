@@ -131,12 +131,12 @@ public class UserPositionResourceTests {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
-        givenAPersistentUserPosition(new Date(), user.getId(), sliceInstance, false);
+        givenAPersistentUserPosition(new Date(), user.id(), sliceInstance, false);
 
         restUserPositionControllerMockMvc.perform(get("/api/imageinstance/{image}/online.json", imageInstance.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.users", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.users[0]").value(user.getId()));
+            .andExpect(jsonPath("$.users[0]").value(user.id()));
     }
 
     @Test
@@ -146,13 +146,13 @@ public class UserPositionResourceTests {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
-        givenAPersistentUserPosition(new Date(), user.getId(), sliceInstance, true);
+        givenAPersistentUserPosition(new Date(), user.id(), sliceInstance, true);
 
         restUserPositionControllerMockMvc.perform(get("/api/imageinstance/{image}/online.json", imageInstance.getId())
                 .param("broadcast", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.users", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.users[0]").value(user.getId()));
+            .andExpect(jsonPath("$.users[0]").value(user.id()));
     }
 
     @Test
@@ -162,7 +162,7 @@ public class UserPositionResourceTests {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
-        givenAPersistentUserPosition(new Date(), user.getId(), sliceInstance, false);
+        givenAPersistentUserPosition(new Date(), user.id(), sliceInstance, false);
 
         restUserPositionControllerMockMvc.perform(get("/api/imageinstance/{image}/online.json", imageInstance.getId())
                 .param("broadcast", "true"))
@@ -177,7 +177,7 @@ public class UserPositionResourceTests {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
-        givenAPersistentUserPosition(new Date(), user.getId(), sliceInstance, false);
+        givenAPersistentUserPosition(new Date(), user.id(), sliceInstance, false);
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/positions.json",
@@ -186,24 +186,24 @@ public class UserPositionResourceTests {
                 .param("showDetails", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].user").value(user.getId()));
+            .andExpect(jsonPath("$.collection[0].user").value(user.id()));
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/positions.json",
                 imageInstance.getId()
             )
                 .param("showDetails", "true")
-                .param("user", String.valueOf(user.getId())))
+                .param("user", String.valueOf(user.id())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].user").value(user.getId()));
+            .andExpect(jsonPath("$.collection[0].user").value(user.id()));
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/positions.json",
                 imageInstance.getId()
             )
                 .param("showDetails", "true")
-                .param("user", String.valueOf(builder.givenAUser().getId())))
+                .param("user", String.valueOf(builder.givenAUser().id())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
     }
@@ -215,7 +215,7 @@ public class UserPositionResourceTests {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
-        givenAPersistentUserPosition(DateUtils.addDays(new Date(), -5), user.getId(), sliceInstance, false);
+        givenAPersistentUserPosition(DateUtils.addDays(new Date(), -5), user.id(), sliceInstance, false);
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/positions.json",
@@ -239,7 +239,7 @@ public class UserPositionResourceTests {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
-        givenAPersistentUserPosition(DateUtils.addDays(new Date(), -5), user.getId(), sliceInstance, false);
+        givenAPersistentUserPosition(DateUtils.addDays(new Date(), -5), user.id(), sliceInstance, false);
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/positions.json",
@@ -302,7 +302,7 @@ public class UserPositionResourceTests {
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/followers/{user}.json",
                 imageId,
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isForbidden());
     }
@@ -314,11 +314,11 @@ public class UserPositionResourceTests {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
-        givenAPersistentUserPosition(DateUtils.addMinutes(new Date(), -5), user.getId(), sliceInstance, USER_VIEW,
+        givenAPersistentUserPosition(DateUtils.addMinutes(new Date(), -5), user.id(), sliceInstance, USER_VIEW,
             false);
-        givenAPersistentUserPosition(DateUtils.addMinutes(new Date(), -4), user.getId(), sliceInstance, USER_VIEW,
+        givenAPersistentUserPosition(DateUtils.addMinutes(new Date(), -4), user.id(), sliceInstance, USER_VIEW,
             false);
-        givenAPersistentUserPosition(DateUtils.addMinutes(new Date(), -3), user.getId(), sliceInstance, USER_VIEW,
+        givenAPersistentUserPosition(DateUtils.addMinutes(new Date(), -3), user.id(), sliceInstance, USER_VIEW,
             false);
         givenAPersistentUserPosition(
             DateUtils.addMinutes(new Date(), -2),
@@ -331,7 +331,7 @@ public class UserPositionResourceTests {
         MvcResult mvcResult = restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/positions.json",
                 imageInstance.getId()
-            ).param("user", String.valueOf(user.getId())))
+            ).param("user", String.valueOf(user.id())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(2)))).andReturn();
         List<Map<String, Object>> response = (List<Map<String, Object>>) (JsonObject.toMap(mvcResult.getResponse()
@@ -352,7 +352,7 @@ public class UserPositionResourceTests {
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/positions.json",
                 imageInstance.getId()
-            ).param("user", String.valueOf(builder.givenAUser().getId())))
+            ).param("user", String.valueOf(builder.givenAUser().id())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
     }
@@ -467,7 +467,7 @@ public class UserPositionResourceTests {
         UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
-        String userAndImageId = user.getId() + "/" + imageInstance.getId().toString();
+        String userAndImageId = user.id() + "/" + imageInstance.getId().toString();
         String followerAndImageId = admin.getId().toString() + "/" + imageInstance.getId();
 
         UserPositionService.broadcasters.put(userAndImageId, new ArrayList<>(Collections.singleton(admin)));
@@ -476,7 +476,7 @@ public class UserPositionResourceTests {
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/position/{user}.json",
                 imageInstance.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk());
         assertThat(UserPositionService.broadcasters.get(userAndImageId).size()).isEqualTo(1);

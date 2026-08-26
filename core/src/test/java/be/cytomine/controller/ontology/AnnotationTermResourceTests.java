@@ -115,7 +115,7 @@ public class AnnotationTermResourceTests {
 
         restAnnotationTermControllerMockMvc.perform(get(
                 "/api/annotation/{idAnnotation}/notuser/{idNotUser}/term.json",
-                annotationTerm.getUserAnnotation().getId(), builder.givenAUser().getId()
+                annotationTerm.getUserAnnotation().getId(), builder.givenAUser().id()
             )) // this user has not defined anything
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(1)))

@@ -383,7 +383,7 @@ public class UserPositionServiceTests {
         );
         Date date = new Date();
 
-        userPositionService.add(date, user.getId(), sliceInstance, imageInstance, area, 0, (double) 0, true);
+        userPositionService.add(date, user.id(), sliceInstance, imageInstance, area, 0, (double) 0, true);
     }
 
     @Test
@@ -395,20 +395,20 @@ public class UserPositionServiceTests {
 
         UserResponse user = builder.givenAUser();
 
-        WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId() + "/514", sessionDecorator);
+        WebSocketUserPositionHandler.sessionsBroadcast.put(user.id() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
             sessionDecorator,
             new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
         );
         WebSocketUserPositionHandler.sessions.put(
-            String.valueOf(user.getId()),
+            String.valueOf(user.id()),
             new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
         );
 
-        List<String> users = userPositionService.listFollowers(user.getId(), 514L);
+        List<String> users = userPositionService.listFollowers(user.id(), 514L);
 
         assertThat(users.size()).isEqualTo(1);
-        assertThat(users).contains(String.valueOf(user.getId()));
+        assertThat(users).contains(String.valueOf(user.id()));
     }
 
     @Test
@@ -441,7 +441,7 @@ public class UserPositionServiceTests {
     public void listFollowersForNotFollowedUser() {
         UserResponse user = builder.givenAUser();
         ImageInstance imageInstance = builder.givenAnImageInstance();
-        List<String> users = userPositionService.listFollowers(user.getId(), imageInstance.getId());
+        List<String> users = userPositionService.listFollowers(user.id(), imageInstance.getId());
         assertThat(users.size()).isEqualTo(0);
     }
 

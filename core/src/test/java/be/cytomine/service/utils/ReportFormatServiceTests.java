@@ -262,19 +262,19 @@ public class ReportFormatServiceTests {
         String name2 = user2.name().orElseThrow();
         expectedDataObject = new Object[][] {
             {"Username", "Name"},
-            {user1.getUsername(), name1},
-            {user2.getUsername(), name2},
+            {user1.username(), name1},
+            {user2.username(), name2},
         };
         if (!isComplete) {
             expectedDataObject[1][1] = "";
             return new ArrayList<>(List.of(
-                Map.of("username", user1.getUsername()),
-                Map.of("username", user2.getUsername(), "name", name2)
+                Map.of("username", user1.username()),
+                Map.of("username", user2.username(), "name", name2)
             ));
         } else {
             return new ArrayList<>(List.of(
-                Map.of("username", user1.getUsername(), "name", name1),
-                Map.of("username", user2.getUsername(), "name", name2)
+                Map.of("username", user1.username(), "name", name1),
+                Map.of("username", user2.username(), "name", name2)
             ));
         }
     }

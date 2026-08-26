@@ -237,8 +237,8 @@ public class SecurityAclServiceTests {
     void checkIsUserInProject() {
         Project project = builder.givenAProject();
         UserResponse user = builder.givenAUser();
-        assertThat(securityACLService.isUserInProject(user.getId(), project)).isFalse();
-        builder.addUserToProject(project, user.getUsername());
-        assertThat(securityACLService.isUserInProject(user.getId(), project)).isTrue();
+        assertThat(securityACLService.isUserInProject(user.id(), project)).isFalse();
+        builder.addUserToProject(project, user.username());
+        assertThat(securityACLService.isUserInProject(user.id(), project)).isTrue();
     }
 }

@@ -269,23 +269,23 @@ public class ImageInstanceResourceTests {
         image.getBaseImage().setWidth(500);
         ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
         UserResponse user = builder.givenAUser("list_image_instance_by_user");
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.getId()))
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id=="
                 + imageFromOtherProjectNotAccessibleForUser.getId()
                 + ")]").doesNotExist());
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.getId()).param(
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.id()).param(
                 "width[lte]",
                 "500"
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists());
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.getId()).param(
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.id()).param(
                 "width[gte]",
                 "501"
             ))
@@ -303,7 +303,7 @@ public class ImageInstanceResourceTests {
         UserResponse user = builder.givenAUser("list_image_instance_light_by_user");
         builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance/light.json", user.getId()))
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance/light.json", user.id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id=="
@@ -365,7 +365,7 @@ public class ImageInstanceResourceTests {
         UserResponse user = builder.givenAUser("list_image_instance_by_projects_blind_filenames");
         ImageInstance image = givenTestImageInstance();
 
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
         image.getProject().setBlindMode(true);
 
@@ -942,7 +942,7 @@ public class ImageInstanceResourceTests {
         UserResponse user = builder.givenAUser("download_image_instance_cannot_download");
 
         ImageInstance image = givenTestImageInstance();
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE);
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE);
         image.getProject().setAreImagesDownloadable(true);
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();

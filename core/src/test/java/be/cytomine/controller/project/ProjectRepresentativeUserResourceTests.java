@@ -146,7 +146,7 @@ public class ProjectRepresentativeUserResourceTests {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         UserResponse user = builder.givenAUser();
         builder.givenAProjectRepresentativeUser(
-            projectRepresentativeUser.getProject(), user.getUsername(), user.getId()
+            projectRepresentativeUser.getProject(), user.username(), user.id()
         );
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative/{id}.json",
@@ -168,7 +168,7 @@ public class ProjectRepresentativeUserResourceTests {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         UserResponse user = builder.givenAUser();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
-            projectRepresentativeUser.getProject(), user.getUsername(), user.getId()
+            projectRepresentativeUser.getProject(), user.username(), user.id()
         );
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative.json",

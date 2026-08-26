@@ -269,7 +269,7 @@ public class AnnotationListingServiceTests {
 
         reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setImages(Collections.singletonList(reviewedAnnotation.getImage().getId()));
-        reviewedAnnotationListing.setUser(builder.givenAUser().getId());
+        reviewedAnnotationListing.setUser(builder.givenAUser().id());
         assertThat(annotationListingService.listGeneric(reviewedAnnotationListing)
             .stream().map(x -> ((AnnotationResult) x).get("id")))
             .doesNotContain(reviewedAnnotation.getId());

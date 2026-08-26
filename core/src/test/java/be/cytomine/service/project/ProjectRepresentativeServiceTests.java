@@ -164,8 +164,8 @@ public class ProjectRepresentativeServiceTests {
         UserResponse user = builder.givenAUser();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser1.getProject(),
-            user.getUsername(),
-            user.getId()
+            user.username(),
+            user.id()
         );
         CommandResponse commandResponse = projectRepresentativeUserService.delete(
             projectRepresentativeUser1,
@@ -194,19 +194,19 @@ public class ProjectRepresentativeServiceTests {
     void deletingLastRepresentativeUserFromProjectWillGrantCurrentUserAsRepresentative() {
         UserResponse user = builder.givenAUser();
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser(
-            builder.givenAProject(), user.getUsername(), user.getId()
+            builder.givenAProject(), user.username(), user.id()
         );
         builder.addUserToProject(
             projectRepresentativeUser.getProject(),
-            user.getUsername(),
+            user.username(),
             ADMINISTRATION
         );
 
         assertThat(projectRepresentativeUserService.listByProject(projectRepresentativeUser.getProject())).hasSize(1);
 
         projectMemberService.deleteUserFromProject(
-            user.getUsername(),
-            user.getId(),
+            user.username(),
+            user.id(),
             projectRepresentativeUser.getProject(),
             true
         );

@@ -237,7 +237,7 @@ public class ProjectResourceTests {
         Project projectWithoutCriteria = builder.givenAProject();
 
         builder.addUserToProject(projectWithCriteria, currentUserService.getCurrentUsername());
-        builder.addUserToProject(projectWithCriteria, builder.givenAUser().getUsername());
+        builder.addUserToProject(projectWithCriteria, builder.givenAUser().username());
 
         builder.addUserToProject(projectWithoutCriteria, currentUserService.getCurrentUsername());
 
@@ -592,8 +592,8 @@ public class ProjectResourceTests {
         restProjectControllerMockMvc.perform(post("/api/project.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(project.toJsonObject(urlApi)
-                    .withChange("users", List.of(user.getId()))
-                    .withChange("admins", List.of(admin.getId()))
+                    .withChange("users", List.of(user.id()))
+                    .withChange("admins", List.of(admin.id()))
                     .toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
@@ -613,16 +613,16 @@ public class ProjectResourceTests {
             currentUsername,
             ADMINISTRATION
         )).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(projectCreated, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, admin.getUsername(), ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, admin.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated, user.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(projectCreated, user.username(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated, admin.username(), ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated, admin.username(), READ)).isTrue();
 
         // check ontology access
-        assertThat(permissionService.hasACLPermission(projectCreated.getOntology(), user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated.getOntology(), user.username(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(
             projectCreated.getOntology(),
-            admin.getUsername(),
+            admin.username(),
             READ
         )).isTrue();
     }
@@ -679,11 +679,11 @@ public class ProjectResourceTests {
 
         UserResponse previousUser = builder.givenAUser();
         UserResponse newUser = builder.givenAUser();
-        builder.addUserToProject(project, previousUser.getUsername(), READ);
+        builder.addUserToProject(project, previousUser.username(), READ);
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi).withChange("users", List.of(newUser.getId())).toJsonString()))
+                .content(project.toJsonObject(urlApi).withChange("users", List.of(newUser.id())).toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -693,8 +693,8 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists());
 
-        assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, newUser.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, previousUser.username(), READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, newUser.username(), READ)).isTrue();
     }
 
     @Test
@@ -704,11 +704,11 @@ public class ProjectResourceTests {
 
         UserResponse previousUser = builder.givenAUser();
         UserResponse newUser = builder.givenAUser();
-        builder.addUserToProject(project, previousUser.getUsername(), READ);
+        builder.addUserToProject(project, previousUser.username(), READ);
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi).withChange("admins", List.of(newUser.getId())).toJsonString()))
+                .content(project.toJsonObject(urlApi).withChange("admins", List.of(newUser.id())).toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -718,10 +718,10 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists());
 
-        assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, newUser.getUsername(), ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, newUser.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, previousUser.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, previousUser.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, newUser.username(), ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, newUser.username(), READ)).isTrue();
     }
 
     @Test
@@ -975,7 +975,7 @@ public class ProjectResourceTests {
         project.setCountAnnotations(20);
         project.setCountJobAnnotations(30);
         project.setCountReviewedAnnotations(40);
-        builder.addUserToProject(project, builder.givenAUser().getUsername());
+        builder.addUserToProject(project, builder.givenAUser().username());
         builder.addUserToProject(project, currentUserService.getCurrentUsername());
         builder.persistAndReturn(project);
         Project project2 = builder.givenAProject();

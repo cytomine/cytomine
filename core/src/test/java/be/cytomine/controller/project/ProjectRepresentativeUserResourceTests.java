@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
@@ -73,7 +74,7 @@ public class ProjectRepresentativeUserResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(projectRepresentativeUser.getId().intValue()))
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.project.ProjectRepresentativeUser"))
-            .andExpect(jsonPath("$.user").value(projectRepresentativeUser.getUser().getId()))
+            .andExpect(jsonPath("$.user").value(projectRepresentativeUser.getUserId()))
             .andExpect(jsonPath("$.project").value(projectRepresentativeUser.getProject().getId()));
     }
 
@@ -143,8 +144,9 @@ public class ProjectRepresentativeUserResourceTests {
     @Transactional
     public void deleteProjectRepresentativeUser() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
-        ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
-            projectRepresentativeUser.getProject(), projectRepresentativeUser.getUser()
+        UserResponse user = builder.givenAUser();
+        builder.givenAProjectRepresentativeUser(
+            projectRepresentativeUser.getProject(), user.username(), user.id()
         );
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative/{id}.json",
@@ -164,14 +166,15 @@ public class ProjectRepresentativeUserResourceTests {
     @Transactional
     public void deleteProjectRepresentativeUserWithUserParameter() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
+        UserResponse user = builder.givenAUser();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
-            projectRepresentativeUser.getProject(), builder.givenAUser()
+            projectRepresentativeUser.getProject(), user.username(), user.id()
         );
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative.json",
                 projectRepresentativeUser.getProject().getId()
             )
-                .param("user", projectRepresentativeUser.getUser().getId().toString())
+                .param("user", projectRepresentativeUser.getUserId().toString())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(projectRepresentativeUser.toJSON(urlApi)))
             .andExpect(status().isOk())

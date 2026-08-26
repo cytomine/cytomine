@@ -203,7 +203,7 @@ public class ImageConsultationServiceTests {
     @Test
     void listImageOfUsersByProject() {
         User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
+        User user2 = builder.givenDefaultUser();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
@@ -252,8 +252,8 @@ public class ImageConsultationServiceTests {
     @Test
     void shouldReturnLastConsultedImagePerUserForProject() {
         User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
-        User userWithNoConsultation = builder.givenAUser();
+        User user2 = builder.givenDefaultUser();
+        User userWithNoConsultation = builder.givenDefaultAdmin();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
@@ -306,7 +306,7 @@ public class ImageConsultationServiceTests {
     @Test
     void shouldReturnUserImagesConsultedWithinDateRange() {
         User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
+        User user2 = builder.givenDefaultUser();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
@@ -359,7 +359,7 @@ public class ImageConsultationServiceTests {
     @Test
     void shouldReturnConsultationFrequencyPerImageForUserInProject() {
         User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
+        User user2 = builder.givenDefaultUser();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
@@ -398,7 +398,7 @@ public class ImageConsultationServiceTests {
     void totalNumberOfConsultationByProjectWithDates() {
         Project projet = builder.givenAProject();
         User user1 = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance(projet).getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(projet).getImage();

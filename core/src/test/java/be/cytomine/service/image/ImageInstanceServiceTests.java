@@ -30,6 +30,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -43,7 +44,6 @@ import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.ImageInstanceBounds;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.WrongArgumentException;
@@ -361,9 +361,9 @@ public class ImageInstanceServiceTests {
     @Test
     @WithMockUser("list_by_user_with_search")
     void listByUserWithSearch() {
-        User user = builder.givenAUser("list_by_user_with_search");
+        UserResponse user = builder.givenAUser("list_by_user_with_search");
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, user.getUsername(), BasePermission.ADMINISTRATION);
+        builder.addUserToProject(project, user.username(), BasePermission.ADMINISTRATION);
         ImageInstance img1 = builder.givenAnImageInstance(project);
         img1.getBaseImage().setWidth(499);
         img1.setInstanceFilename("TEST");
@@ -372,7 +372,7 @@ public class ImageInstanceServiceTests {
         ImageInstance img2 = builder.givenAnImageInstance(project);
         img2.getBaseImage().setWidth(501);
 
-        assertThat(imageInstanceService.list(user, new ArrayList<>()).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), new ArrayList<>()).stream().map(x -> x.get("id")))
             .contains(img1.getId(), img2.getId());
 
         List<SearchParameterEntry> searchParameterEntryList =
@@ -381,14 +381,14 @@ public class ImageInstanceServiceTests {
                 new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000)
             )
             );
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
                 new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 1))
             );
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
@@ -397,35 +397,35 @@ public class ImageInstanceServiceTests {
                 new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000L)
             )
             );
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
                 new SearchParameterEntry("width", SearchOperation.lte, 1000)
             ));
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId(), img2.getId());
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
                 new SearchParameterEntry("width", SearchOperation.gte, 1000)
             ));
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .doesNotContain(img1.getId(), img2.getId());
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
                 new SearchParameterEntry("baseImage", SearchOperation.equals, img1.getBaseImage().getId())
             ));
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
                 new SearchParameterEntry("name", SearchOperation.ilike, img1.getInstanceFilename())
             ));
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
     }
 
@@ -491,9 +491,9 @@ public class ImageInstanceServiceTests {
     @Test
     @WithMockUser("list_by_project_with_search_with_blind_mode")
     void listByProjectWithSearchWithBlindMode() {
-        User user = builder.givenAUser("list_by_project_with_search_with_blind_mode");
+        UserResponse user = builder.givenAUser("list_by_project_with_search_with_blind_mode");
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, user.getUsername(), BasePermission.WRITE);
+        builder.addUserToProject(project, user.username(), BasePermission.WRITE);
         project.setBlindMode(true);
         ImageInstance img1 = builder.givenAnImageInstance(project);
         img1.setInstanceFilename("TEST");
@@ -750,7 +750,7 @@ public class ImageInstanceServiceTests {
         );
         AttachedFile attachedFile = builder.givenAnAttachedFile(imageInstance);
 
-        annotationActionService.add(userAnnotation, builder.givenSuperAdmin(), "view", new Date());
+        annotationActionService.add(userAnnotation, builder.givenSuperAdmin().getId(), "view", new Date());
         userPositionService.add(
             new Date(),
             builder.givenSuperAdmin().getId(),

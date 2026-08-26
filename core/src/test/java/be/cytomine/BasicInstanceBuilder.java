@@ -84,11 +84,12 @@ public class BasicInstanceBuilder {
     UserMapper userMapper;
 
     public BasicInstanceBuilder(EntityManager em, UserRepository userRepository, PermissionService permissionService,
-        SecRoleRepository secRoleRepository) {
+        SecRoleRepository secRoleRepository, UserMapper userMapper) {
         this.em = em;
         this.userRepository = userRepository;
         this.permissionService = permissionService;
         this.secRoleRepository = secRoleRepository;
+        this.userMapper = userMapper;
     }
 
     public User givenDefaultUser() {

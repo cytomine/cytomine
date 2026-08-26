@@ -1043,8 +1043,7 @@ public class UserService extends ModelService {
     public void deleteDependentProjectRepresentativeUser(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
             for (ProjectRepresentativeUser projectRepresentativeUser :
-                projectRepresentativeUserRepository.findAllByUser(
-                    user)) {
+                projectRepresentativeUserRepository.findAllByUserId(user.getId())) {
                 projectRepresentativeUserService.delete(projectRepresentativeUser, transaction, null, false);
             }
         }

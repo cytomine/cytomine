@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import constants from '@/utils/constants.js';
+import { getKeycloak } from '@/keycloak.js';
 
 import VueRouter from 'vue-router';
 import router from './routes.js';
@@ -64,22 +65,18 @@ axios.get('/configuration.json').then(response => {
     }
   }
 
-  // Now import and initialize Keycloak with loaded config
-  import('./keycloak').then(module => {
-    const Keycloak = module.default;
-    Vue.use(Keycloak);
-
-    Vue.$keycloak
-      .init({
-        onLoad: 'login-required'
-      })
-      .then(() => {
-        new Vue({
-          render: h => h(App),
-          router,
-          store,
-          i18n
-        }).$mount('#app');
-      });
-  });
+  // Now initialize Keycloak with loaded config
+  const keycloak = getKeycloak();
+  keycloak
+    .init({
+      onLoad: 'login-required'
+    })
+    .then(() => {
+      new Vue({
+        render: h => h(App),
+        router,
+        store,
+        i18n
+      }).$mount('#app');
+    });
 });

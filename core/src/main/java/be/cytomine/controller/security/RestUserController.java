@@ -92,11 +92,10 @@ public class RestUserController extends RestCytomineController {
         log.debug("REST request to list representatives from project {}", id);
         Project project = projectService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("Project", id));
-        return responseSuccess(
-            projectRepresentativeUserService.listByProject(project)
-                .stream().map(ProjectRepresentativeUser::getUserId)
-                .collect(Collectors.toList()), isFilterRequired()
-        );
+        List<Long> userIds = projectRepresentativeUserService.listByProject(project)
+            .stream().map(ProjectRepresentativeUser::getUserId)
+            .collect(Collectors.toList());
+        return responseSuccess(userService.list(userIds), isFilterRequired());
     }
 
     @GetMapping("/project/{id}/creator.json")

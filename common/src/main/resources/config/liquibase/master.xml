@@ -142,4 +142,7 @@
 
     <include file="/config/liquibase/changelog/2026-08-18-seed-test-users-role-hierarchy.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-08-26-seed-test-users-user-guest.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

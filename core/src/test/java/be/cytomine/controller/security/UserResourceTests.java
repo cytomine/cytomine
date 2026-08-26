@@ -223,7 +223,7 @@ public class UserResourceTests {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, projectAdmin.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.getUsername(), READ);
-        // wiremockRepository.stubUser(projectAdmin);
+        wiremockRepository.stubUser(projectAdmin);
 
         restUserControllerMockMvc.perform(get("/api/project/{id}/admin.json", project.getId()).with(
                 user(projectAdmin.getUsername())))

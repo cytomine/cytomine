@@ -105,7 +105,11 @@ public class BasicInstanceBuilder {
     }
 
     public UserResponse givenAUser(String username) {
-        return userMapper.map(getUser("guest"));
+        User user = persistAndReturn(givenANotPersistedUser());
+        user.setUsername(username);
+        user = persistAndReturn(user);
+        addRole(user, ROLE_USER);
+        return userMapper.map(user);
     }
 
     public UserResponse givenAUser() {

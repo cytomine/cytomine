@@ -522,8 +522,9 @@ public class UserService extends ModelService {
 
         String select = "select distinct user ";
         String from =
-            "from ProjectRepresentativeUser r right outer join r.user user ON (r.project.id = " + project.getId()
-                + "), " + "AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid ";
+            "from ProjectRepresentativeUser r right outer join User user ON (r.userId = user.id and r.project.id = "
+                + project.getId() + "), "
+                + "AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid ";
         String where =
             "where aclObjectId.objectId = " + project.getId() + " " + "and aclEntry.aclObjectIdentity = aclObjectId "
                 + "and aclEntry.sid = aclSid " + "and aclSid.sid = user.username ";

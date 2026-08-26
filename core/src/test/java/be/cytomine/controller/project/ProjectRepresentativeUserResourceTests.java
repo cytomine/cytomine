@@ -144,6 +144,10 @@ public class ProjectRepresentativeUserResourceTests {
     @Transactional
     public void deleteProjectRepresentativeUser() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
+        UserResponse user = builder.givenAUser();
+        builder.givenAProjectRepresentativeUser(
+            projectRepresentativeUser.getProject(), user.getUsername(), user.getId()
+        );
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative/{id}.json",
                 projectRepresentativeUser.getProject().getId(), projectRepresentativeUser.getId()

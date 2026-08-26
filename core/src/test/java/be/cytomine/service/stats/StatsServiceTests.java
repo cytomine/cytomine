@@ -139,7 +139,7 @@ public class StatsServiceTests {
 
     AnnotationAction givenAPersistentAnnotationAction(Date creation, AnnotationDomain annotationDomain, User user,
         String action) {
-        return annotationActionService.add(annotationDomain, user, action, creation);
+        return annotationActionService.add(annotationDomain, user.getId(), action, creation);
     }
 
     @Test
@@ -249,7 +249,7 @@ public class StatsServiceTests {
         assertThat(results.getFirst().getId()).isEqualTo(builder.givenSuperAdmin().getId());
         assertThat(results.getFirst().get("value")).isEqualTo(2L);
 
-        builder.addUserToProject(project, builder.givenAUser().getUsername());
+        builder.addUserToProject(project, builder.givenAUser().username());
 
         results = statsService.statUserSlide(project, null, null);
 

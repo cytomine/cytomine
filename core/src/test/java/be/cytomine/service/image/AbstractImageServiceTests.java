@@ -20,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -29,7 +30,6 @@ import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.UploadedFileRepository;
@@ -166,8 +166,8 @@ public class AbstractImageServiceTests {
     @Test
     @WithMockUser(username = "list_all_image_by_user_storage")
     void listAllImageByUserStorage() {
-        User user = builder.givenAUser("list_all_image_by_user_storage");
-        Storage storage = builder.givenAStorage(user);
+        UserResponse user = builder.givenAUser("list_all_image_by_user_storage");
+        Storage storage = builder.givenAStorage(builder.getUser(user.username()));
         UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setStorage(storage);
 

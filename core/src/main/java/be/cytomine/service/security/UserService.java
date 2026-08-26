@@ -224,6 +224,10 @@ public class UserService extends ModelService {
         return userRepository.findAllByReferenceIn(ids);
     }
 
+    public Optional<UserResponse> findUserResponse(long id) {
+        return find(id).map(userMapper::map);
+    }
+
     public Optional<User> findUser(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return userRepository.findById(id);
@@ -300,7 +304,6 @@ public class UserService extends ModelService {
         Map<String, Object> mapParams = new HashMap<>();
 
         where += " AND u.deleted IS NULL ";
-
 
         if (multiSearch.isPresent()) {
             String value = ((String) multiSearch.get().getValue()).toLowerCase();
@@ -519,8 +522,9 @@ public class UserService extends ModelService {
 
         String select = "select distinct user ";
         String from =
-            "from ProjectRepresentativeUser r right outer join r.user user ON (r.project.id = " + project.getId()
-                + "), " + "AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid ";
+            "from ProjectRepresentativeUser r right outer join User user ON (r.userId = user.id and r.project.id = "
+                + project.getId() + "), "
+                + "AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid ";
         String where =
             "where aclObjectId.objectId = " + project.getId() + " " + "and aclEntry.aclObjectIdentity = aclObjectId "
                 + "and aclEntry.sid = aclSid " + "and aclSid.sid = user.username ";
@@ -1040,8 +1044,7 @@ public class UserService extends ModelService {
     public void deleteDependentProjectRepresentativeUser(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
             for (ProjectRepresentativeUser projectRepresentativeUser :
-                projectRepresentativeUserRepository.findAllByUser(
-                    user)) {
+                projectRepresentativeUserRepository.findAllByUserId(user.getId())) {
                 projectRepresentativeUserService.delete(projectRepresentativeUser, transaction, null, false);
             }
         }

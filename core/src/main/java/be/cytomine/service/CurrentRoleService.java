@@ -78,7 +78,7 @@ public class CurrentRoleService {
     public Set<RoleResponse> findCurrentRole(UserResponse user) {
 
         boolean isSuperAdmin = user.roles().stream().anyMatch(role -> role.authority().equals("ROLE_SUPER_ADMIN"));
-        // role super admin don't need to open a admin session, so we don't remove the role admin from the current role
+        // role super admin don't need to open an admin session, so we don't remove the role admin from the current role
         return !currentAdmins.containsKey(user.username()) && !isSuperAdmin
             ? user.roles().stream()
             .filter(role -> !role.authority().equals("ROLE_ADMIN"))

@@ -103,7 +103,7 @@ public class ProjectConnectionServiceTests {
     void findLastUserConnectionInProject() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         Optional<PersistentProjectConnection> persistentProjectConnection =
             projectConnectionService.lastConnectionInProject(projet, user.getId(), "created", "desc");
@@ -131,7 +131,7 @@ public class ProjectConnectionServiceTests {
 
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         List<JsonObject> maps =
             projectConnectionService.lastConnectionInProject(projet, new ArrayList<Long>(), "created", "desc", 0L, 0L);
@@ -198,7 +198,7 @@ public class ProjectConnectionServiceTests {
     void findLastConnectionsOfUsersInProject() {
         Project project = builder.givenAProject();
         User user = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         givenAPersistentConnectionInProject(user, project);
 
@@ -272,7 +272,7 @@ public class ProjectConnectionServiceTests {
     void getConnectionByUserAndProject() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         givenAPersistentConnectionInProject(user, projet);
         givenAPersistentConnectionInProject(user, projet);
@@ -295,7 +295,7 @@ public class ProjectConnectionServiceTests {
     void numberOfConnectionsByProjectAndUser() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         givenAPersistentConnectionInProject(user, projet);
         givenAPersistentConnectionInProject(user, projet);
@@ -317,7 +317,7 @@ public class ProjectConnectionServiceTests {
     void numberOfConnectionsByProjectAndUsers() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         List<JsonObject> results;
 
@@ -350,7 +350,7 @@ public class ProjectConnectionServiceTests {
     void numberOfConnectionsByProjectAndUsersFillEmptyUsers() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         List<JsonObject> results;
 
@@ -389,7 +389,7 @@ public class ProjectConnectionServiceTests {
     void totalNumberOfConnectionsByProject() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         List<JsonObject> results;
 
@@ -411,7 +411,7 @@ public class ProjectConnectionServiceTests {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         List<JsonObject> results =
             projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(projet, new Date().getTime());
@@ -448,7 +448,7 @@ public class ProjectConnectionServiceTests {
     void totalNumberOfConnectionsByProjectWithDates() {
         Project projet = builder.givenAProject();
         User user = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         List<JsonObject> results;
 

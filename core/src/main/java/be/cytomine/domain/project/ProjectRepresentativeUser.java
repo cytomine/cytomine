@@ -1,5 +1,6 @@
 package be.cytomine.domain.project;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
@@ -19,10 +20,9 @@ import be.cytomine.utils.JsonObject;
 @Setter
 public class ProjectRepresentativeUser extends CytomineDomain {
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+
+    @Column(name = "user_id")
+    private Long userId;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
@@ -39,7 +39,7 @@ public class ProjectRepresentativeUser extends CytomineDomain {
             new Project(),
             true
         ));
-        projectRepresentativeUser.setUser((User) json.getJSONAttrDomain(entityManager, "user", new User(), true));
+        projectRepresentativeUser.setUserId(json.getJSONAttrDomain(entityManager, "user", new User(), true).getId());
         return projectRepresentativeUser;
     }
 
@@ -47,7 +47,7 @@ public class ProjectRepresentativeUser extends CytomineDomain {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         ProjectRepresentativeUser projectRepresentativeUser = (ProjectRepresentativeUser) domain;
         returnArray.put("project", projectRepresentativeUser.getProject().getId());
-        returnArray.put("user", projectRepresentativeUser.getUser().getId());
+        returnArray.put("user", projectRepresentativeUser.getUserId());
         return returnArray;
     }
 

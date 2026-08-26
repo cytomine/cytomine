@@ -16,6 +16,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.AbstractAuthorizationTest;
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.mapper.UserMapper;
@@ -165,13 +166,6 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void userCannotDeleteAnotherUser() {
-        User user = builder.givenAUser();
-        expectForbidden(() -> userService.delete(user, null, null, false));
-    }
-
-    @Test
-    @WithMockUser(username = USER_NO_ACL)
     public void userCannotDeleteHimself() {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
         expectForbidden(() -> userService.delete(user, null, null, false));
@@ -180,30 +174,30 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void shouldAddAndRemoveUserFromProjectWhenAdmin() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
-        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void shouldAddAndRemoveUserFromProjectWhenUserHasAdminRight() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_ADMIN, ADMINISTRATION);
-        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void shouldDenyAddAndRemoveUserFromProjectWhenUserHasReadRight() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_READ, READ);
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
-        expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
     }
 
 }

@@ -361,7 +361,7 @@ public class ImageInstanceServiceTests {
     @Test
     @WithMockUser("list_by_user_with_search")
     void listByUserWithSearch() {
-        User user = builder.givenAUser("list_by_user_with_search");
+        UserResponse user = builder.givenAUser("list_by_user_with_search");
         Project project = builder.givenAProject();
         builder.addUserToProject(project, user.getUsername(), BasePermission.ADMINISTRATION);
         ImageInstance img1 = builder.givenAnImageInstance(project);
@@ -491,7 +491,7 @@ public class ImageInstanceServiceTests {
     @Test
     @WithMockUser("list_by_project_with_search_with_blind_mode")
     void listByProjectWithSearchWithBlindMode() {
-        User user = builder.givenAUser("list_by_project_with_search_with_blind_mode");
+        UserResponse user = builder.givenAUser("list_by_project_with_search_with_blind_mode");
         Project project = builder.givenAProject();
         builder.addUserToProject(project, user.getUsername(), BasePermission.WRITE);
         project.setBlindMode(true);

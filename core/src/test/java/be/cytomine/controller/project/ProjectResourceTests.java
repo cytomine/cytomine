@@ -584,7 +584,7 @@ public class ProjectResourceTests {
     @Transactional
     public void addValidProjectWithUsersAdmins() throws Exception {
         String currentUsername = currentUserService.getCurrentUsername();
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         User admin = builder.givenAUser();
 
         Project project = basicInstanceBuilder.givenANotPersistedProject();

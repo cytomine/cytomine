@@ -195,13 +195,13 @@ public class UserServiceTests {
 
     @Test
     void findUserWithSuccess() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         assertThat(userService.findUser(user.getId())).isPresent().contains(user);
     }
 
     @Test
     void findUserByUsername() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         assertThat(userService.findByUsername(user.getUsername())).isPresent().contains(user);
         assertThat(userService.findByUsername(user.getUsername().toUpperCase(Locale.ROOT))).isPresent().contains(user);
         assertThat(userService.findByUsername(user.getUsername().toLowerCase(Locale.ROOT))).isPresent().contains(user);
@@ -209,13 +209,13 @@ public class UserServiceTests {
 
     @Test
     void findUserByPublicKey() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         assertThat(userService.findByPublicKey(user.getPublicKey())).isPresent().contains(user);
     }
 
     @Test
     void getAuthRolesForUser() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isFalse();
         assertThat(authInformation.getUser()).isTrue();
@@ -807,7 +807,7 @@ public class UserServiceTests {
 
     @Test
     void listLayers() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         User anotherUserInProject = builder.givenAUser();
         User anotherUserNotInProject = builder.givenAUser();
 
@@ -1096,7 +1096,7 @@ public class UserServiceTests {
 
     @Test
     void addUserToProject() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
 
         assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
@@ -1115,7 +1115,7 @@ public class UserServiceTests {
 
     @Test
     void removeUserFromProject() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
 
         projectMemberService.addUserToProject(user, true);
@@ -1139,7 +1139,7 @@ public class UserServiceTests {
 
     @Test
     void removeOntologyRightWhenRemovingUserFromProject() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
 
         projectMemberService.addUserToProject(user, false);
@@ -1155,7 +1155,7 @@ public class UserServiceTests {
 
     @Test
     void removeOntologyRightWhenRemovingUserFromProjectKeepRightIfUserHasAnotherProjectWithOntology() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
 
         projectMemberService.addUserToProject(user, false);

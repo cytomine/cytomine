@@ -116,7 +116,7 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void shouldReturnLastConsultedImagePerUserForProject() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 

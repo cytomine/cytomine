@@ -634,7 +634,7 @@ public class UserResourceTests {
     public void addUserToProject() throws Exception {
 
         Project project = builder.givenAProject();
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         restUserControllerMockMvc.perform(
                 post("/api/project/{project}/user/{user}.json", project.getId(), user.getId())
                     .contentType(MediaType.APPLICATION_JSON))
@@ -680,7 +680,7 @@ public class UserResourceTests {
     public void deleteUserFromProject() throws Exception {
 
         Project project = builder.givenAProject();
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         builder.addUserToProject(project, user.getUsername(), READ);
         restUserControllerMockMvc.perform(
                 delete("/api/project/{project}/user/{user}.json", project.getId(), user.getId())
@@ -730,7 +730,7 @@ public class UserResourceTests {
     public void addAdminToProject() throws Exception {
 
         Project project = builder.givenAProject();
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         restUserControllerMockMvc.perform(
                 post("/api/project/{project}/user/{user}/admin.json", project.getId(), user.getId())
                     .contentType(MediaType.APPLICATION_JSON))
@@ -744,7 +744,7 @@ public class UserResourceTests {
     @Transactional
     public void deleteAdminFromProject() throws Exception {
         Project project = builder.givenAProject();
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         builder.addUserToProject(project, user.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, user.getUsername(), READ);
         restUserControllerMockMvc.perform(
@@ -918,7 +918,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void downloadUserListFromProjectXlsDocument() throws Exception {
-        User user = builder.givenAUser("Paul");
+        UserResponse user = builder.givenAUser("Paul");
         Project project = builder.givenAProjectWithUser(user);
         MvcResult mvcResult = performDownload("xls", project, "application/octet-stream");
         checkXLSResult(mvcResult, user);
@@ -927,7 +927,7 @@ public class UserResourceTests {
     @Test
     @Transactional
     public void downloadUserListFromProjectCsvDocument() throws Exception {
-        User user = builder.givenAUser("Paul");
+        UserResponse user = builder.givenAUser("Paul");
         Project project = builder.givenAProjectWithUser(user);
         MvcResult mvcResult = performDownload("csv", project, "text/csv");
         checkResult(";", mvcResult, user);

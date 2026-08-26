@@ -166,7 +166,7 @@ public class AbstractImageServiceTests {
     @Test
     @WithMockUser(username = "list_all_image_by_user_storage")
     void listAllImageByUserStorage() {
-        User user = builder.givenAUser("list_all_image_by_user_storage");
+        UserResponse user = builder.givenAUser("list_all_image_by_user_storage");
         Storage storage = builder.givenAStorage(user);
         UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setStorage(storage);

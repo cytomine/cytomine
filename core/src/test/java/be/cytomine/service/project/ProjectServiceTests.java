@@ -651,7 +651,7 @@ public class ProjectServiceTests {
         Project project1 = builder.givenAProject();
         User creator = builder.givenSuperAdmin();
         User admin = builder.givenAUser();
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
 
         builder.addUserToProject(project1, creator.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project1, admin.getUsername(), ADMINISTRATION);
@@ -694,7 +694,7 @@ public class ProjectServiceTests {
     void addProjectWithUsersAndAdmins() {
         Project project = basicInstanceBuilder.givenANotPersistedProject();
         project.setOntology(builder.givenAnOntology());
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         User admin = builder.givenAUser();
 
         CommandResponse commandResponse = projectService.add(
@@ -723,7 +723,7 @@ public class ProjectServiceTests {
     @Test
     void updateProjectName() {
         Project project = builder.givenAProject();
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         builder.addUserToProject(project, user.getUsername());
 
         CommandResponse commandResponse =

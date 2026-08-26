@@ -126,7 +126,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listLastUserOnImage() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -141,7 +141,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listLastBroadcastUserOnImage() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -157,7 +157,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listEmptyLastBroadcastUserOnImage() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -172,7 +172,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listUserPosition() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -210,7 +210,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listAfterThan() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -234,7 +234,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listBeforeThan() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -297,7 +297,7 @@ public class UserPositionResourceTests {
     public void listFollowersForForbiddenUser() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Long imageId = imageInstance.getId();
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/followers/{user}.json",
                 imageId,
@@ -309,7 +309,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void summarize() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -460,7 +460,7 @@ public class UserPositionResourceTests {
     @Transactional
     public void getLastUserPositionOfUserAlreadyFollowedByCurrentUser() throws Exception {
         User admin = currentUserService.getCurrentUserOld();
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
         String userAndImageId = user.getId().toString() + "/" + imageInstance.getId().toString();
@@ -481,7 +481,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void getLastUserPositionOfUserAlreadyFollowedButNotByCurrentUser() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
         String userAndImageId = user.getId().toString() + "/" + imageInstance.getId().toString();

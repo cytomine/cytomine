@@ -373,7 +373,7 @@ public class UserPositionServiceTests {
 
     @Test
     void shouldSuccessfullyAddPositionWithNewLocation() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = builder.givenAnImageInstance();
         AreaDTO area = new AreaDTO(
@@ -394,7 +394,7 @@ public class UserPositionServiceTests {
 
         ConcurrentWebSocketSessionDecorator sessionDecorator = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
 
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
 
         WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId().toString() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
@@ -419,7 +419,7 @@ public class UserPositionServiceTests {
 
         ConcurrentWebSocketSessionDecorator sessionDecorator = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
 
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
 
         WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId().toString() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
@@ -440,7 +440,7 @@ public class UserPositionServiceTests {
 
     @Test
     public void listFollowersForNotFollowedUser() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         ImageInstance imageInstance = builder.givenAnImageInstance();
         List<String> users = userPositionService.listFollowers(user.getId(), imageInstance.getId());
         assertThat(users.size()).isEqualTo(0);

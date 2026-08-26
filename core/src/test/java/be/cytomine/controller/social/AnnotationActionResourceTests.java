@@ -108,7 +108,7 @@ public class AnnotationActionResourceTests {
     @Test
     @Transactional
     public void listLastUserOnImage() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
 
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
         givenAPersistentAnnotationAction(new Date(), annotationDomain, user, "select");
@@ -133,7 +133,7 @@ public class AnnotationActionResourceTests {
     @Test
     @Transactional
     public void listLastUserOnSlice() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
 
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
         givenAPersistentAnnotationAction(new Date(), annotationDomain, user, "select");

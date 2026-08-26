@@ -20,7 +20,6 @@ import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.utils.JsonObject;
 

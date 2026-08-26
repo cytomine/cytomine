@@ -64,6 +64,7 @@ import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
+import static be.cytomine.BasicInstanceBuilder.DEFAULT_USER;
 import static be.cytomine.authorization.AbstractAuthorizationTest.CREATOR;
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_ADMIN;
@@ -835,7 +836,7 @@ public class UserServiceTests {
             .doesNotContain(anotherUserNotInProject.getId());
     }
 
-    @WithMockUser("user")
+    @WithMockUser(DEFAULT_USER)
     @Test
     void listLayersWithProjectWithPrivateAdminLayer() {
         User user = builder.givenDefaultUser();
@@ -855,7 +856,7 @@ public class UserServiceTests {
             .doesNotContain(adminInProject.getId());
     }
 
-    @WithMockUser("user")
+    @WithMockUser(DEFAULT_USER)
     @Test
     void listLayersWithProjectWithPrivateUserLayer() {
         User user = builder.givenDefaultUser();
@@ -875,7 +876,7 @@ public class UserServiceTests {
             .doesNotContain(userInProject.getId());
     }
 
-    @WithMockUser("user")
+    @WithMockUser(DEFAULT_USER)
     @Test
     void listLayersWithProjectWithPrivateUserLayerWithProjectAdminRole() {
         User user = builder.givenDefaultUser();

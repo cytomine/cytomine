@@ -54,7 +54,6 @@ import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;

@@ -61,6 +61,7 @@ import be.cytomine.service.social.ProjectConnectionService;
 import be.cytomine.service.social.UserPositionService;
 import be.cytomine.service.social.UserPositionServiceTests;
 
+import static be.cytomine.BasicInstanceBuilder.DEFAULT_USER;
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -355,7 +356,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void getKeysFromOtherUserIsForbidden() throws Exception {
         wiremockRepository.stubUser(builder.givenDefaultUser());
         User user = builder.givenSuperAdmin();
@@ -367,7 +368,7 @@ public class UserResourceTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void getSignature() throws Exception {
         User user = builder.givenDefaultUser();
         wiremockRepository.stubUser(user);

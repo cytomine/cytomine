@@ -118,7 +118,7 @@ public class AnnotationActionResourceTests {
                 "/api/imageinstance/{image}/annotation_action.json",
                 annotationDomain.getImage().getId()
             )
-                .param("user", user.getId()+""))
+                .param("user", user.getId() + ""))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))));
 
@@ -126,7 +126,7 @@ public class AnnotationActionResourceTests {
                 "/api/imageinstance/{image}/annotation_action.json",
                 builder.givenAnImageInstance().getId()
             )
-                .param("user", user.getId()+""))
+                .param("user", user.getId() + ""))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
     }
@@ -143,7 +143,7 @@ public class AnnotationActionResourceTests {
                 "/api/sliceinstance/{image}/annotation_action.json",
                 annotationDomain.getSlice().getId()
             )
-                .param("user", user.getId()+""))
+                .param("user", user.getId() + ""))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))));
 
@@ -151,7 +151,7 @@ public class AnnotationActionResourceTests {
                 "/api/sliceinstance/{image}/annotation_action.json",
                 builder.givenASliceInstance().getId()
             )
-                .param("user", user.getId()+""))
+                .param("user", user.getId() + ""))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
     }

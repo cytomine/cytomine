@@ -48,7 +48,6 @@ import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Track;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.ImageInstanceBounds;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
@@ -303,7 +302,7 @@ public class ImageInstanceService extends ModelService {
         return validParameters;
     }
 
-    public Page<Map<String, Object>> list( long userId, List<SearchParameterEntry> searchParameters) {
+    public Page<Map<String, Object>> list(long userId, List<SearchParameterEntry> searchParameters) {
         return list(userId, searchParameters, "created", "desc", 0L, 0L);
     }
 

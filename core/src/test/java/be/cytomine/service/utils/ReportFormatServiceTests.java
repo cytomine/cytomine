@@ -21,7 +21,6 @@ import be.cytomine.common.repository.model.command.payload.response.UserResponse
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.Point;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.utils.JsonObject;

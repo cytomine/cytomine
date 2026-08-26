@@ -77,6 +77,12 @@ public class BasicInstanceBuilder {
 
     public static final String ROLE_GUEST = "ROLE_GUEST";
 
+    public static final String DEFAULT_USER = "ACL_USER_NO_ACL";
+
+    public static final String DEFAULT_ADMIN = "admin";
+
+    public static final String DEFAULT_GUEST = "GUEST_ACL";
+
     EntityManager em;
     PermissionService permissionService;
     SecRoleRepository secRoleRepository;
@@ -93,15 +99,15 @@ public class BasicInstanceBuilder {
     }
 
     public User givenDefaultUser() {
-        return getUser("user");
+        return getUser(DEFAULT_USER);
     }
 
     public User givenDefaultAdmin() {
-        return getUser("admin");
+        return getUser(DEFAULT_ADMIN);
     }
 
     public UserResponse givenDefaultGuest() {
-        return userMapper.map(getUser("guest"));
+        return userMapper.map(getUser(DEFAULT_GUEST));
     }
 
     public UserResponse givenAUser(String username) {

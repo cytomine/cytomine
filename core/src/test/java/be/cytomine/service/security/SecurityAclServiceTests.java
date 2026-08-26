@@ -24,6 +24,7 @@ import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.service.PermissionService;
 
+import static be.cytomine.BasicInstanceBuilder.DEFAULT_USER;
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -48,7 +49,7 @@ public class SecurityAclServiceTests {
     @Autowired
     UserMapper userMapper;
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void checkIsUserAllowed() {
         Project project = builder.givenAProject();
@@ -79,7 +80,7 @@ public class SecurityAclServiceTests {
         securityACLService.check(project, READ);
     }
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void checkIfUserIsContainerAdmin() {
         Project project = builder.givenAProject();
@@ -100,7 +101,7 @@ public class SecurityAclServiceTests {
         securityACLService.checkIsAdminContainer(project, userMapper.map(user));
     }
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void hasUserPermission() {
         Project project = builder.givenAProject();
@@ -117,7 +118,7 @@ public class SecurityAclServiceTests {
         assertThat(securityACLService.hasPermission(project, READ, true)).isTrue();
     }
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void hasRightToReadAbstractImage() {
         Project project = builder.givenAProject();
@@ -132,7 +133,7 @@ public class SecurityAclServiceTests {
 
     }
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void listAuthorizedProjects() {
         Project project = builder.givenAProject();
@@ -148,7 +149,7 @@ public class SecurityAclServiceTests {
 
     }
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void listUserFromProjects() {
         Project project = builder.givenAProject();
@@ -162,7 +163,7 @@ public class SecurityAclServiceTests {
 
     }
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void checkSameUser() {
         User user = builder.givenDefaultUser();
@@ -174,7 +175,7 @@ public class SecurityAclServiceTests {
         securityACLService.checkIsSameUser(user, userMapper.map(builder.givenSuperAdmin()));
     }
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void checkIsAdmin() {
         User user = builder.givenDefaultUser();
@@ -185,7 +186,7 @@ public class SecurityAclServiceTests {
         securityACLService.checkAdmin(userMapper.map(builder.givenSuperAdmin()));
     }
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void checkIsUser() {
         User user = builder.givenDefaultUser();
@@ -199,7 +200,7 @@ public class SecurityAclServiceTests {
         securityACLService.checkUser(userMapper.map(builder.givenSuperAdmin()));
     }
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void checkIsGuest() {
         User user = builder.givenDefaultUser();
@@ -210,7 +211,7 @@ public class SecurityAclServiceTests {
         securityACLService.checkGuest(userMapper.map(builder.givenSuperAdmin()));
     }
 
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     @Test
     void checkNotReadonly() {
         Project project = builder.givenAProject();

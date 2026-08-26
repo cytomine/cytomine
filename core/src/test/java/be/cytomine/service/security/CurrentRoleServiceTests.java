@@ -19,6 +19,7 @@ import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.service.CurrentRoleService;
 
+import static be.cytomine.BasicInstanceBuilder.DEFAULT_USER;
 import static be.cytomine.authorization.AbstractAuthorizationTest.ADMIN;
 import static be.cytomine.authorization.AbstractAuthorizationTest.GUEST;
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
@@ -79,7 +80,7 @@ public class CurrentRoleServiceTests {
     }
 
     @Test
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void findRoleForUser() {
 
         assertThat(currentRoleService.findRealAuthorities(userMapper.map(builder.givenDefaultUser())))
@@ -135,7 +136,7 @@ public class CurrentRoleServiceTests {
     }
 
     @Test
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void openCloseAdminSessionAsUser() {
 
         assertThat(currentRoleService.isAdminByNow(userMapper.map(builder.givenDefaultUser()))).isFalse();

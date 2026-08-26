@@ -30,7 +30,6 @@ import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.UploadedFileRepository;

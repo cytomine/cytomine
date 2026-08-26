@@ -44,7 +44,6 @@ import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.ImageInstanceBounds;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.WrongArgumentException;

@@ -688,7 +688,8 @@ public class ProjectServiceTests {
         assertThat(permissionService.hasACLPermission(projectCreated, builder.givenSuperAdmin().getUsername(),
             ADMINISTRATION)).isTrue();
 
-        assertThat(projectRepresentativeUserService.find(projectCreated, builder.givenSuperAdmin().getId())).isPresent();
+        assertThat(projectRepresentativeUserService.find(projectCreated, builder.givenSuperAdmin().getId()))
+            .isPresent();
     }
 
     @Test

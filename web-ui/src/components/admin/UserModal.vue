@@ -13,10 +13,11 @@
         :message="state.meta.errors[0]"
       >
         <b-input
-          :model-value="state.value"
-          @update:model-value="field.handleChange"
-          :type="'text'"
+          name="username"
           :disabled="editionMode"
+          :model-value="state.value"
+          :type="'text'"
+          @update:model-value="field.handleChange"
         />
       </b-field>
     </field>
@@ -37,9 +38,10 @@
       >
         <b-input
           :model-value="state.value"
-          @update:model-value="field.handleChange"
-          :type="name === 'password' ? 'password': 'text'"
+          :name="name"
           :password-reveal="name === 'password'"
+          :type="name === 'password' ? 'password': 'text'"
+          @update:model-value="field.handleChange"
         />
       </b-field>
     </field>

@@ -118,7 +118,7 @@ public class AnnotationActionResourceTests {
                 "/api/imageinstance/{image}/annotation_action.json",
                 annotationDomain.getImage().getId()
             )
-                .param("user", user.id() + ""))
+                .param("user", String.valueOf(user.id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))));
 

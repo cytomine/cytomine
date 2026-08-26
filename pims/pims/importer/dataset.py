@@ -56,6 +56,7 @@ class BucketParser:
     def children(self) -> list[str]:
         return self.dependency.get(self.parent, [])
 
+    @staticmethod
     def resolve_dataset_dir(path: Path) -> Path | None:
         subdirs = [Path(entry.path) for entry in os.scandir(path) if entry.is_dir()]
         if len(subdirs) != 1:
@@ -67,7 +68,7 @@ class BucketParser:
         return subdirs[0]
 
     def discover(self) -> None:
-        self.dataset_dir = resolve_dataset_dir(self.root)
+        self.dataset_dir = self.resolve_dataset_dir(self.root)
         if self.dataset_dir is None:
             logger.warning(f"Skipping discovery for '{self.root}'.")
             return
@@ -96,8 +97,8 @@ class BucketParser:
                 logger.warning(f"No 'alias' attribute found for <DATASET> in '{metadata_dataset_path}'. Skipping discovery for this bucket.")
                 return
 
-            self.datasets[dataset_name] = self.root  # Store the root of the dataset
-            logger.info(f"Discovered dataset '{dataset_name}' at '{self.root}'.")
+            self.datasets[dataset_name] = self.dataset_dir  # Store the root of the dataset
+            logger.info(f"Discovered dataset '{dataset_name}' at '{self.dataset_dir}'.")
 
             complement = root_xml.find(".//COMPLEMENTS_DATASET_REF")
             if complement is not None:

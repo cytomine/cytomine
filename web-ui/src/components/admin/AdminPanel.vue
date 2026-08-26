@@ -28,8 +28,8 @@
 
 <script>
 import { get } from '@/utils/store-helpers';
-import { KeycloakRole } from '@/constants/UserRole.js';
 import { getKeycloak } from '@/keycloak.js';
+import { KeycloakRole } from '@/constants/UserRole.js';
 
 import AdminDashboard from './AdminDashboard.vue';
 import AdminUsers from './AdminUsers.vue';

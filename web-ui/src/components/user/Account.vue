@@ -162,9 +162,9 @@ import { changeLanguageMixin } from '@/lang.js';
 import { MyAccount, User } from '@/api';
 import { email, required, rules, validateForm } from '@/utils/form.js';
 import { rolesMapping } from '@/utils/role-utils';
+import { getKeycloak } from '@/keycloak.js';
 import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
 import { useClipboard } from '@vueuse/core';
-import { getKeycloak } from '@/keycloak.js';
 import { formatMomentDate } from '@/utils/date';
 
 export default {

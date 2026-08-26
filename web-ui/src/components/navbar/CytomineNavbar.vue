@@ -88,8 +88,8 @@ import constants from '@/utils/constants.js';
 import shortcuts from '@/utils/shortcuts.js';
 import { useShortkeys } from '@/utils/use-shortkeys.js';
 import { getCurrentInstance } from 'vue';
-import { KeycloakRole } from '@/constants/UserRole.js';
 import { getKeycloak } from '@/keycloak.js';
+import { KeycloakRole } from '@/constants/UserRole.js';
 
 export default {
   name: 'cytomine-navbar',

@@ -1,8 +1,8 @@
-import Notifications from '@kyvg/vue3-notification';
 import { vOnClickOutside } from '@vueuse/components';
 import axios from 'axios';
 import Buefy from 'buefy';
 import FloatingVue from 'floating-vue';
+import Notifications from '@kyvg/vue3-notification';
 import { createApp } from 'vue';
 
 import App from '@/App.vue';
@@ -27,8 +27,8 @@ axios.get('/configuration.json').then(response => {
     }
   }
 
+  // Now initialize Keycloak with loaded config
   const keycloak = getKeycloak();
-
   keycloak.init({ onLoad: 'login-required' }).then(() => {
     const app = createApp(App);
     app.use(i18n);

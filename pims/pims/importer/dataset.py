@@ -56,7 +56,7 @@ class BucketParser:
     def children(self) -> list[str]:
         return self.dependency.get(self.parent, [])
 
-    def resolve_dataset_dir(path: Path) -> Path :
+    def resolve_dataset_dir(path: Path) -> Path | None:
         subdirs = [Path(entry.path) for entry in os.scandir(path) if entry.is_dir()]
         if len(subdirs) != 1:
             logger.warning(
@@ -155,7 +155,9 @@ def run_import_datasets(
 
                 parent_dataset = parser.parent
                 dataset_dir = parser.dataset_dir
-
+                if dataset_dir is None:
+                    logger.warning(f"Could not resolve dataset directory for {bucket}, skipping...")
+                    continue
                 validator = MetadataValidator()
                 if validator.validate(dataset_dir / "METADATA"):
                     logger.info(f"'{parent_dataset}' metadata validated successfully.")

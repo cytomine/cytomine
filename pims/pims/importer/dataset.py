@@ -44,6 +44,7 @@ FILE_ROOT_PATH = Path(get_settings().root)
 class BucketParser:
     def __init__(self, root: Path) -> None:
         self.root = root
+        self.dataset_dir = None
         self.datasets = {}
         self.dependency = defaultdict(list)
 
@@ -55,9 +56,22 @@ class BucketParser:
     def children(self) -> list[str]:
         return self.dependency.get(self.parent, [])
 
-    def discover(self) -> None:
+    def resolve_dataset_dir(path: Path) -> Path :
+        subdirs = [Path(entry.path) for entry in os.scandir(path) if entry.is_dir()]
+        if len(subdirs) != 1:
+            logger.warning(
+                f"Expected exactly one dataset subdirectory under '{path}', "
+                f"found {len(subdirs)}."
+            )
+            return None
+        return subdirs[0]
 
-        metadata_dir = self.root / "METADATA"
+    def discover(self) -> None:
+        self.dataset_dir = resolve_dataset_dir(self.root)
+        if self.dataset_dir is None:
+            logger.warning(f"Skipping discovery for '{self.root}'.")
+            return
+        metadata_dir = self.dataset_dir / "METADATA"
         metadata_dataset_path = metadata_dir / "dataset.xml"
 
         if not metadata_dir.is_dir():
@@ -140,15 +154,16 @@ def run_import_datasets(
                     continue
 
                 parent_dataset = parser.parent
+                dataset_dir = parser.dataset_dir
 
                 validator = MetadataValidator()
-                if validator.validate(bucket / "METADATA"):
+                if validator.validate(dataset_dir / "METADATA"):
                     logger.info(f"'{parent_dataset}' metadata validated successfully.")
 
                 project = get_project(parent_dataset, projects)
 
                 image_summary = ImageImporter(
-                    bucket,
+                    dataset_dir,
                     cytomine_auth,
                     c.current_user,
                     storage_id,
@@ -162,7 +177,7 @@ def run_import_datasets(
 
                 for child in parser.children:
 
-                    child_path = bucket / child
+                    child_path = dataset_dir / child
                     ontology = OntologyImporter(child_path).run()
                     ontologies.append(ontology)
 
@@ -174,7 +189,7 @@ def run_import_datasets(
                     annotation_summary[child] = result
 
                 try:
-                    metadata_dir = bucket
+                    metadata_dir = dataset_dir
                     parsed_dataset = BPInterface.parse_xml_files(metadata_dir)
                     logger.info(f"[{parent_dataset}] Metadata parsed by interface for '{metadata_dir}'.")
 

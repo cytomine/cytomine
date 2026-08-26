@@ -24,6 +24,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.SliceInstance;
@@ -53,6 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class UserAnnotationServiceTests {
 
     static Map<String, String> POLYGONES = Map.of(
@@ -104,8 +106,8 @@ public class UserAnnotationServiceTests {
     @Test
     void listIncluded() throws ParseException {
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenAUser();
-        User user2 = builder.givenAUser();
+        User user1 = builder.givenDefaultUser();
+        User user2 = builder.givenDefaultAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());

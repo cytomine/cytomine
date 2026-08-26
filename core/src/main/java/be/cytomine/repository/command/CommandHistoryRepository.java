@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.command.CommandHistory;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 
 @Repository
 public interface CommandHistoryRepository extends JpaRepository<CommandHistory, Long> {
@@ -17,6 +16,6 @@ public interface CommandHistoryRepository extends JpaRepository<CommandHistory, 
 
     void deleteAllByProject(Project project);
 
-    void deleteAllByUser(User user);
+    void deleteAllByUserId(long userId);
 
 }

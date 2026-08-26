@@ -124,8 +124,6 @@ public class UserRoleCommandService implements
         return aclService.canDeleteUserRole(userId);
     }
 
-
-
     public Set<UserRoleResponse> define(long userId, long targetUserId, Role role) {
 
         if (!aclService.isAdmin(userId)) {

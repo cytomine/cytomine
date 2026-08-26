@@ -55,6 +55,7 @@ import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.ReportType;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static be.cytomine.service.utils.SimplifyGeometryServiceTests.getPointMultiplyByGeometriesOrInteriorRings;
@@ -65,6 +66,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -77,7 +79,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class AnnotationDomainResourceTests {
@@ -141,7 +143,7 @@ public class AnnotationDomainResourceTests {
         term = builder.givenATerm(project.getOntology());
 
         me = builder.givenSuperAdmin();
-        randomUser = builder.givenAUser();
+        randomUser = builder.givenDefaultUser();
         builder.addUserToProject(project, me.getUsername());
         builder.addUserToProject(project, randomUser.getUsername());
 
@@ -317,7 +319,7 @@ public class AnnotationDomainResourceTests {
     public void listAnnotationSearchByImageAndUser() throws Exception {
 
         a1.setImage(builder.givenAnImageInstance(project));
-        a2.setUser(builder.givenAUser());
+        a2.setUser(builder.givenDefaultUser());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString())
@@ -403,7 +405,7 @@ public class AnnotationDomainResourceTests {
     public void listAnnotationSearchByImageAndUserAndTerm() throws Exception {
 
         a1.setImage(builder.givenAnImageInstance(project));
-        a2.setUser(builder.givenAUser());
+        a2.setUser(builder.givenDefaultUser());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString())
@@ -596,7 +598,7 @@ public class AnnotationDomainResourceTests {
     public void listUserAnnotationWithSeveralIdenticalTerm() throws Exception {
         AnnotationTerm annotationTerm = new AnnotationTerm();
         annotationTerm.setUserAnnotation(a1);
-        annotationTerm.setUser(builder.givenAUser());
+        annotationTerm.setUser(builder.givenDefaultUser());
         annotationTerm.setTerm(builder.givenATerm(project.getOntology()));
         builder.persistAndReturn(annotationTerm);
         em.refresh(a1);
@@ -802,7 +804,7 @@ public class AnnotationDomainResourceTests {
     public void listReviewedAnnotationSearchByImageAndUser() throws Exception {
 
         r1.setImage(builder.givenAnImageInstance(project));
-        r2.setUser(builder.givenAUser());
+        r2.setUser(builder.givenDefaultUser());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -894,7 +896,7 @@ public class AnnotationDomainResourceTests {
     public void listReviewedAnnotationSearchByImageAndReviewerAndTerm() throws Exception {
 
         r1.setImage(builder.givenAnImageInstance(project));
-        r2.setUser(builder.givenAUser());
+        r2.setUser(builder.givenDefaultUser());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -911,7 +913,7 @@ public class AnnotationDomainResourceTests {
 
         r1.setImage(builder.givenAnImageInstance(project));
         r2.setUser(this.me);
-        r2.setReviewUser(builder.givenAUser());
+        r2.setReviewUser(builder.givenDefaultUser());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
@@ -991,6 +993,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void shouldReturnGeoJsonContentType() throws Exception {
+        wiremockRepository.stubTermsByProject(project.getId(), term);
         restAnnotationDomainControllerMockMvc.perform(get(
                 "/api/project/{projectId}/annotations/export",
                 project.getId()
@@ -1000,6 +1003,18 @@ public class AnnotationDomainResourceTests {
             .andExpect(header().string("Content-Disposition", containsString(".geojson")))
             .andExpect(content().contentTypeCompatibleWith("application/geo+json"))
             .andExpect(content().json("{}"));
+    }
+
+    @Test
+    public void shouldExportTermNameAsPathClassNameProperty() throws Exception {
+        wiremockRepository.stubTermsByProject(project.getId(), term);
+        restAnnotationDomainControllerMockMvc.perform(get(
+                "/api/project/{projectId}/annotations/export",
+                project.getId()
+            ))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.type").value("FeatureCollection"))
+            .andExpect(jsonPath("$.features[*].properties.path_class_name", hasItem(term.getName())));
     }
 
     @Test

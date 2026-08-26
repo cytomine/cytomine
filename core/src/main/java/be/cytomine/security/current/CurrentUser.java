@@ -1,6 +1,6 @@
 package be.cytomine.security.current;
 
-import be.cytomine.domain.security.User;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 
 public interface CurrentUser {
 
@@ -8,5 +8,5 @@ public interface CurrentUser {
 
     boolean isUsernameProvided();
 
-    User getUser();
+    UserResponse getUser();
 }

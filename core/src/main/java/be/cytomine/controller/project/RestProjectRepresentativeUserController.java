@@ -88,7 +88,7 @@ public class RestProjectRepresentativeUserController extends RestCytomineControl
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
             User user = userService.findUser(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
-            projectRepresentativeUser = projectRepresentativeUserService.find(project, user)
+            projectRepresentativeUser = projectRepresentativeUserService.find(project, userId)
                 .orElseThrow(() -> new ObjectNotFoundException(
                     "ProjectRepresentativeUser",
                     JsonObject.of("project", projectId, "user", userId).toJsonString()

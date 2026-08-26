@@ -14,6 +14,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTerm;
@@ -36,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class AnnotationTermServiceTests {
 
     @Autowired
@@ -96,7 +98,7 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
-            builder.givenAUser()
+            builder.givenDefaultUser()
         )).contains(annotationTerm);
     }
 
@@ -153,7 +155,6 @@ public class AnnotationTermServiceTests {
             annotationTerm.getTerm().getId(),
             null,
             annotationTerm.getUser().getId(),
-            annotationTerm.getUser(),
             null
         );
         assertThat(commandResponse).isNotNull();
@@ -212,7 +213,7 @@ public class AnnotationTermServiceTests {
     void addValidAnnotationTermAndDeleteOtherTermsNoImpactForTermsAddedByOtherUser() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
-        annotationTerm.setUser(builder.givenAUser());
+        annotationTerm.setUser(builder.givenDefaultUser());
         builder.persistAndReturn(annotationTerm);
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
@@ -237,7 +238,7 @@ public class AnnotationTermServiceTests {
     void addValidAnnotationTermAndDeleteOtherTermsWithForceForTermsAddedByOther() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
-        annotationTerm.setUser(builder.givenAUser());
+        annotationTerm.setUser(builder.givenDefaultUser());
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
         wiremockRepository.stubTerm(newTerm);

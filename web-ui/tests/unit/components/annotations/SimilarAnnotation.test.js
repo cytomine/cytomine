@@ -1,6 +1,5 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
-import VueDraggableResizable from 'vue-draggable-resizable';
 import Vuex from 'vuex';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview';
@@ -113,8 +112,8 @@ describe('SimilarAnnotation.vue', () => {
   });
 
   it('should render correctly', () => {
-    expect(wrapper.findComponent(VueDraggableResizable).exists()).toBe(true);
     expect(wrapper.find('.similar-annotations-playground').exists()).toBe(true);
+    expect(wrapper.find('.draggable').exists()).toBe(true);
     expect(wrapper.find('h1').text()).toBe('similar-annotations');
     expect(wrapper.vm.showSimilarAnnotations).toBe(true);
   });

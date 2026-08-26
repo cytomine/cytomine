@@ -1,14 +1,18 @@
 import logging
 import os
+import uuid
 from collections import defaultdict
 from collections.abc import Mapping
-from lxml import etree
-from typing import Any
 from dataclasses import fields, is_dataclass
 from datetime import datetime
 from enum import Enum
-import uuid
+from typing import Any
 
+from bigpicture_metadata_interface import BPInterface
+from bigpicture_metadata_interface.model.common import Attributes, Code, CodeAttributes
+from bigpicture_metadata_interface.model.dataset import Dataset
+from bigpicture_metadata_interface.model.image import Image
+from bigpicture_metadata_interface.model.sample import Block, Slide, Specimen
 from cytomine import Cytomine
 from cytomine.models import (
     ImageInstanceCollection,
@@ -16,29 +20,19 @@ from cytomine.models import (
     ProjectCollection,
     Storage,
 )
-
+from lxml import etree
 
 from pims.api.exceptions import AuthenticationException, CytomineProblem
 from pims.api.utils.cytomine_auth import sign_token
 from pims.config import get_settings
 from pims.files.file import Path
 from pims.importer.annotation import AnnotationImporter
-from pims.importer.ontology import OntologyImporter
 from pims.importer.image import ImageImporter
 from pims.importer.metadata import MetadataValidator
+from pims.importer.ontology import OntologyImporter
 from pims.importer.utils import get_project
 from pims.schemas.auth import ApiCredentials, CytomineAuth
 from pims.schemas.operations import ImportResponse, ImportSummary
-
-from bigpicture_metadata_interface import BPInterface
-from bigpicture_metadata_interface.model.dataset import Dataset
-from bigpicture_metadata_interface.model.image import Image
-from bigpicture_metadata_interface.model.sample import (
-    Block,
-    Slide,
-    Specimen,
-)
-from bigpicture_metadata_interface.model.common import Code, CodeAttributes, Attributes
 
 logger = logging.getLogger("pims.app")
 
@@ -50,6 +44,7 @@ FILE_ROOT_PATH = Path(get_settings().root)
 class BucketParser:
     def __init__(self, root: Path) -> None:
         self.root = root
+        self.dataset_dir = None
         self.datasets = {}
         self.dependency = defaultdict(list)
 
@@ -61,9 +56,23 @@ class BucketParser:
     def children(self) -> list[str]:
         return self.dependency.get(self.parent, [])
 
-    def discover(self) -> None:
+    @staticmethod
+    def resolve_dataset_dir(path: Path) -> Path | None:
+        subdirs = [Path(entry.path) for entry in os.scandir(path) if entry.is_dir()]
+        if len(subdirs) != 1:
+            logger.warning(
+                f"Expected exactly one dataset subdirectory under '{path}', "
+                f"found {len(subdirs)}."
+            )
+            return None
+        return subdirs[0]
 
-        metadata_dir = self.root / "METADATA"
+    def discover(self) -> None:
+        self.dataset_dir = self.resolve_dataset_dir(self.root)
+        if self.dataset_dir is None:
+            logger.warning(f"Skipping discovery for '{self.root}'.")
+            return
+        metadata_dir = self.dataset_dir / "METADATA"
         metadata_dataset_path = metadata_dir / "dataset.xml"
 
         if not metadata_dir.is_dir():
@@ -88,8 +97,8 @@ class BucketParser:
                 logger.warning(f"No 'alias' attribute found for <DATASET> in '{metadata_dataset_path}'. Skipping discovery for this bucket.")
                 return
 
-            self.datasets[dataset_name] = self.root  # Store the root of the dataset
-            logger.info(f"Discovered dataset '{dataset_name}' at '{self.root}'.")
+            self.datasets[dataset_name] = self.dataset_dir  # Store the root of the dataset
+            logger.info(f"Discovered dataset '{dataset_name}' at '{self.dataset_dir}'.")
 
             complement = root_xml.find(".//COMPLEMENTS_DATASET_REF")
             if complement is not None:
@@ -146,26 +155,32 @@ def run_import_datasets(
                     continue
 
                 parent_dataset = parser.parent
-
+                dataset_dir = parser.dataset_dir
+                if dataset_dir is None:
+                    logger.warning(f"Could not resolve dataset directory for {bucket}, skipping...")
+                    continue
                 validator = MetadataValidator()
-                if validator.validate(bucket / "METADATA"):
+                if validator.validate(dataset_dir / "METADATA"):
                     logger.info(f"'{parent_dataset}' metadata validated successfully.")
 
                 project = get_project(parent_dataset, projects)
 
                 image_summary = ImageImporter(
-                    bucket,
+                    dataset_dir,
                     cytomine_auth,
                     c.current_user,
                     storage_id,
                 ).run(projects=[project])
 
                 images = ImageInstanceCollection().fetch_with_filter("project", project.id)
+                abstract_image_by_alias = {
+                    image.originalFilename: image.baseImage for image in images
+                }
                 ontologies = OntologyCollection().fetch()
 
                 for child in parser.children:
 
-                    child_path = bucket / child
+                    child_path = dataset_dir / child
                     ontology = OntologyImporter(child_path).run()
                     ontologies.append(ontology)
 
@@ -177,7 +192,7 @@ def run_import_datasets(
                     annotation_summary[child] = result
 
                 try:
-                    metadata_dir = bucket
+                    metadata_dir = dataset_dir
                     parsed_dataset = BPInterface.parse_xml_files(metadata_dir)
                     logger.info(f"[{parent_dataset}] Metadata parsed by interface for '{metadata_dir}'.")
 
@@ -186,6 +201,8 @@ def run_import_datasets(
                     for image in parsed_dataset.images.values():
                         flat_dict = flatten_image(image, parsed_dataset, slide_to_block)
                         flat_dict["id"] = flat_dict["image"]["identifier"] # MeiliSearch requires a unique 'id'
+                        alias = image.reference.alias if image.reference else None
+                        flat_dict["image"]["abstract_image_id"] = abstract_image_by_alias.get(alias)
                         indexing_payload.append(flat_dict)
 
                     logger.info(f"[{parent_dataset}] Prepared {len(indexing_payload)} images for indexing.")
@@ -420,6 +437,7 @@ def _configure_index(index) -> None:
         "policy.allowed_geographical_distribution",
     ]
     filterable_attributes = [
+        "image.abstract_image_id",
         "specimens.biological_being.animal_species.meaning",
         "specimens.anatomical_site.meaning",
         "specimens.biological_being.sex",

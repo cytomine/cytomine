@@ -12,7 +12,6 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,10 @@ import org.springframework.web.context.request.RequestContextHolder;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.image.server.Storage;
@@ -41,6 +43,8 @@ import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.domain.social.PersistentUserPosition;
 import be.cytomine.dto.auth.AuthInformation;
 import be.cytomine.dto.image.AreaDTO;
+import be.cytomine.mapper.UserMapper;
+import be.cytomine.repository.security.UserRepository;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 import be.cytomine.repositorynosql.social.LastUserPositionRepository;
 import be.cytomine.repositorynosql.social.PersistentConnectionRepository;
@@ -60,6 +64,14 @@ import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
+import static be.cytomine.BasicInstanceBuilder.DEFAULT_USER;
+import static be.cytomine.authorization.AbstractAuthorizationTest.CREATOR;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_CREATE;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_DELETE;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_READ;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_WRITE;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
@@ -72,12 +84,13 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
+@MockedUser
 @Transactional
 public class UserServiceTests {
 
-    private static final WireMockServer wireMockServer = new WireMockServer(8888);
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     UserService userService;
     @Autowired
@@ -108,6 +121,10 @@ public class UserServiceTests {
     private PermissionService permissionService;
     @Autowired
     private UserPositionService userPositionService;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private UserRepository userRepository;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -124,15 +141,9 @@ public class UserServiceTests {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer.start();
-        WireMock.configureFor("localhost", 8888);
+        WireMock.configureFor("localhost", wireMockServer.port());
 
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach
@@ -148,7 +159,7 @@ public class UserServiceTests {
 
     PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
         return projectConnectionService.add(
-            user,
+            user.getId(),
             project,
             "xxx",
             "linux",
@@ -163,7 +174,7 @@ public class UserServiceTests {
         ImageInstance imageInstance,
         Date created
     ) {
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
     PersistentConnection givenALastConnection(User user, Long idProject, Date date) {
@@ -192,27 +203,32 @@ public class UserServiceTests {
 
     @Test
     void findUserWithSuccess() {
-        User user = builder.givenAUser();
-        assertThat(userService.findUser(user.getId())).isPresent().contains(user);
+        UserResponse user = builder.givenAUser();
+        User expected = builder.getUser(user.username());
+        assertThat(userService.findUser(user.id())).isPresent().contains(expected);
     }
 
     @Test
     void findUserByUsername() {
-        User user = builder.givenAUser();
-        assertThat(userService.findByUsername(user.getUsername())).isPresent().contains(user);
-        assertThat(userService.findByUsername(user.getUsername().toUpperCase(Locale.ROOT))).isPresent().contains(user);
-        assertThat(userService.findByUsername(user.getUsername().toLowerCase(Locale.ROOT))).isPresent().contains(user);
+        UserResponse user = builder.givenAUser();
+        User expected = builder.getUser(user.username());
+        assertThat(userService.findByUsername(user.username())).isPresent().contains(expected);
+        assertThat(userService.findByUsername(user.username().toUpperCase(Locale.ROOT)))
+            .isPresent().contains(expected);
+        assertThat(userService.findByUsername(user.username().toLowerCase(Locale.ROOT)))
+            .isPresent().contains(expected);
     }
 
     @Test
     void findUserByPublicKey() {
-        User user = builder.givenAUser();
-        assertThat(userService.findByPublicKey(user.getPublicKey())).isPresent().contains(user);
+        UserResponse user = builder.givenAUser();
+        User expected = builder.getUser(user.username());
+        assertThat(userService.findByPublicKey(user.publicKey().orElseThrow())).isPresent().contains(expected);
     }
 
     @Test
     void getAuthRolesForUser() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         AuthInformation authInformation = userService.getAuthenticationRoles(user);
         assertThat(authInformation.getAdmin()).isFalse();
         assertThat(authInformation.getUser()).isTrue();
@@ -226,7 +242,7 @@ public class UserServiceTests {
     @Test
     void getAuthRolesForGuest() {
         User user = builder.givenAGuest();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isFalse();
         assertThat(authInformation.getUser()).isFalse();
         assertThat(authInformation.getGuest()).isTrue();
@@ -239,7 +255,7 @@ public class UserServiceTests {
     @Test
     void getAuthRolesForSuperamdin() {
         User user = builder.givenSuperAdmin();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isTrue();
         assertThat(authInformation.getUser()).isFalse();
         assertThat(authInformation.getGuest()).isFalse();
@@ -252,7 +268,7 @@ public class UserServiceTests {
     @Test
     void getAuthRolesForAdmin() {
         User user = builder.givenAnAdmin();
-        AuthInformation authInformation = userService.getAuthenticationRoles(user);
+        AuthInformation authInformation = userService.getAuthenticationRoles(userMapper.map(user));
         assertThat(authInformation.getAdmin()).isTrue();
         assertThat(authInformation.getUser()).isFalse();
         assertThat(authInformation.getGuest()).isFalse();
@@ -309,14 +325,14 @@ public class UserServiceTests {
 
     @Test
     void listUsersWithSortUsername() {
-        User user1 = builder.givenAUser("list_users_with_sort_username1");
-        User user2 = builder.givenAUser("list_users_with_sort_username2");
+        User user1 = builder.getUser(CREATOR);
+        User user2 = builder.getUser(USER_ACL_CREATE);
 
         Page<Map<String, Object>> list = userService.list(
             new ArrayList<>(List.of(new SearchParameterEntry(
                 "fullName",
                 SearchOperation.like,
-                "list_users_with_sort_username"
+                "creat"
             ))), "username", "asc", 0L, 0L
         );
         assertThat(list.getContent()).hasSize(2);
@@ -327,7 +343,7 @@ public class UserServiceTests {
             new ArrayList<>(List.of(new SearchParameterEntry(
                 "fullName",
                 SearchOperation.like,
-                "list_users_with_sort_username"
+                "creat"
             ))), "username", "desc", 0L, 0L
         );
         assertThat(list.getContent()).hasSize(2);
@@ -337,17 +353,17 @@ public class UserServiceTests {
 
     @Test
     void listUsersWithPage() {
-        User user1 = builder.givenAUser("list_users_with_page1");
-        User user2 = builder.givenAUser("list_users_with_page2");
-        User user3 = builder.givenAUser("list_users_with_page3");
-        User user4 = builder.givenAUser("list_users_with_page4");
-        User user5 = builder.givenAUser("list_users_with_page5");
+        User user1 = builder.getUser(USER_ACL_ADMIN);
+        User user2 = builder.getUser(USER_ACL_CREATE);
+        User user3 = builder.getUser(USER_ACL_DELETE);
+        User user4 = builder.getUser(USER_ACL_READ);
+        User user5 = builder.getUser(USER_ACL_WRITE);
 
         Page<Map<String, Object>> list = userService.list(
             new ArrayList<>(List.of(new SearchParameterEntry(
                 "fullName",
                 SearchOperation.like,
-                "list_users_with_page"
+                "user_acl_"
             ))), "username", "asc", 0L, 0L
         );
         assertThat(list.getContent()).hasSize(5);
@@ -362,7 +378,7 @@ public class UserServiceTests {
             new ArrayList<>(List.of(new SearchParameterEntry(
                 "fullName",
                 SearchOperation.like,
-                "list_users_with_page"
+                "user_acl_"
             ))), "username", "asc", 3L, 0L
         );
         assertThat(list.getContent()).hasSize(3);
@@ -375,7 +391,7 @@ public class UserServiceTests {
             new ArrayList<>(List.of(new SearchParameterEntry(
                 "fullName",
                 SearchOperation.like,
-                "list_users_with_page"
+                "user_acl_"
             ))), "username", "asc", 4L, 2L
         );
         assertThat(list.getContent()).hasSize(3);
@@ -388,7 +404,7 @@ public class UserServiceTests {
             new ArrayList<>(List.of(new SearchParameterEntry(
                 "fullName",
                 SearchOperation.like,
-                "list_users_with_page"
+                "user_acl_"
             ))), "username", "asc", 4L, 4L
         );
         assertThat(list.getContent()).hasSize(1);
@@ -399,7 +415,7 @@ public class UserServiceTests {
             new ArrayList<>(List.of(new SearchParameterEntry(
                 "fullName",
                 SearchOperation.like,
-                "list_users_with_page"
+                "user_acl_"
             ))), "username", "asc", 5L, 6L
         );
         assertThat(list.getContent()).hasSize(0);
@@ -419,7 +435,7 @@ public class UserServiceTests {
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.getUser(USER_ACL_READ);
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
@@ -487,7 +503,7 @@ public class UserServiceTests {
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.getUser(USER_ACL_READ);
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
@@ -571,9 +587,9 @@ public class UserServiceTests {
 
     @Test
     void listUserExtendedWithLastImageName() {
-        User userWhoHasOpenImage = builder.givenAUser();
-        User userWhoHasOpenImageAfter = builder.givenAUser();
-        User userNeverOpenImage = builder.givenAUser();
+        User userWhoHasOpenImage = builder.getUser(USER_ACL_READ);
+        User userWhoHasOpenImageAfter = builder.getUser(USER_ACL_WRITE);
+        User userNeverOpenImage = builder.getUser(USER_ACL_CREATE);
 
         Project project = builder.givenAProject();
 
@@ -612,9 +628,9 @@ public class UserServiceTests {
 
     @Test
     void listUserExtendedWithLastConnection() {
-        User userWhoHasOpenProject = builder.givenAUser();
-        User userWhoHasOpenProjectAfter = builder.givenAUser();
-        User userNeverOpenProject = builder.givenAUser();
+        User userWhoHasOpenProject = builder.getUser(USER_ACL_READ);
+        User userWhoHasOpenProjectAfter = builder.getUser(USER_ACL_WRITE);
+        User userNeverOpenProject = builder.getUser(USER_ACL_CREATE);
 
         Project project = builder.givenAProject();
 
@@ -671,9 +687,9 @@ public class UserServiceTests {
 
     @Test
     void listUserExtendedWithConnectionFrequency() {
-        User userWhoHasOpenOnce = builder.givenAUser();
-        User userWhoHasOpenProject11x = builder.givenAUser();
-        User userNeverOpenProject = builder.givenAUser();
+        User userWhoHasOpenOnce = builder.getUser(USER_ACL_READ);
+        User userWhoHasOpenProject11x = builder.getUser(USER_ACL_WRITE);
+        User userNeverOpenProject = builder.getUser(USER_ACL_CREATE);
 
         Project project = builder.givenAProject();
 
@@ -744,7 +760,7 @@ public class UserServiceTests {
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.getUser(USER_ACL_READ);
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
@@ -765,7 +781,7 @@ public class UserServiceTests {
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.getUser(USER_ACL_READ);
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
@@ -804,27 +820,27 @@ public class UserServiceTests {
 
     @Test
     void listLayers() {
-        User user = builder.givenAUser();
-        User anotherUserInProject = builder.givenAUser();
-        User anotherUserNotInProject = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
+        User anotherUserInProject = builder.getUser(USER_ACL_READ);
+        User anotherUserNotInProject = builder.getUser(USER_ACL_WRITE);
 
         Project project = builder.givenAProject();
 
-        builder.addUserToProject(project, user.getUsername(), WRITE);
+        builder.addUserToProject(project, user.username(), WRITE);
         builder.addUserToProject(project, anotherUserInProject.getUsername(), WRITE);
 
         assertThat(userService.listLayers(project)
             .stream()
             .map(x -> x.getJSONAttrLong("id")))
-            .contains(user.getId(), anotherUserInProject.getId())
+            .contains(user.id(), anotherUserInProject.getId())
             .doesNotContain(anotherUserNotInProject.getId());
     }
 
-    @WithMockUser("user")
+    @WithMockUser(DEFAULT_USER)
     @Test
     void listLayersWithProjectWithPrivateAdminLayer() {
         User user = builder.givenDefaultUser();
-        User adminInProject = builder.givenAUser();
+        User adminInProject = builder.getUser(USER_ACL_ADMIN);
 
         Project project = builder.givenAProject();
         project.setHideAdminsLayers(true);
@@ -840,11 +856,11 @@ public class UserServiceTests {
             .doesNotContain(adminInProject.getId());
     }
 
-    @WithMockUser("user")
+    @WithMockUser(DEFAULT_USER)
     @Test
     void listLayersWithProjectWithPrivateUserLayer() {
         User user = builder.givenDefaultUser();
-        User userInProject = builder.givenAUser();
+        User userInProject = builder.getUser(USER_ACL_READ);
 
         Project project = builder.givenAProject();
         project.setHideUsersLayers(true);
@@ -860,11 +876,11 @@ public class UserServiceTests {
             .doesNotContain(userInProject.getId());
     }
 
-    @WithMockUser("user")
+    @WithMockUser(DEFAULT_USER)
     @Test
     void listLayersWithProjectWithPrivateUserLayerWithProjectAdminRole() {
         User user = builder.givenDefaultUser();
-        User userInProject = builder.givenAUser();
+        User userInProject = builder.getUser(USER_ACL_READ);
 
         Project project = builder.givenAProject();
         project.setHideUsersLayers(true);
@@ -882,7 +898,7 @@ public class UserServiceTests {
     @Test
     void listOnlineUser() {
         User userOnline = builder.givenDefaultUser();
-        User userOffline = builder.givenAUser();
+        User userOffline = builder.getUser(USER_ACL_READ);
 
         assertThat(userService.getAllOnlineUsers()).isEmpty();
         givenALastConnection(userOnline, null, new Date());
@@ -894,8 +910,8 @@ public class UserServiceTests {
     @Test
     void listOnlineUserForProject() {
         User userOnline = builder.givenDefaultUser();
-        User userOnlineButOnDifferentProject = builder.givenAUser();
-        User userOffline = builder.givenAUser();
+        User userOnlineButOnDifferentProject = builder.getUser(USER_ACL_WRITE);
+        User userOffline = builder.getUser(USER_ACL_READ);
 
         Project project = builder.givenAProject();
         Project anotherProject = builder.givenAProject();
@@ -917,8 +933,8 @@ public class UserServiceTests {
     @Test
     void listFriendUsers() {
         User user = builder.givenDefaultUser();
-        User userFriend = builder.givenAUser();
-        User userNotFriend = builder.givenAUser();
+        User userFriend = builder.getUser(USER_ACL_READ);
+        User userNotFriend = builder.getUser(USER_ACL_WRITE);
 
         Project project = builder.givenAProject();
 
@@ -932,8 +948,8 @@ public class UserServiceTests {
     @Test
     void listFriendUsersOffline() {
         User user = builder.givenDefaultUser();
-        User userFriendOnline = builder.givenAUser();
-        User userFriendOffline = builder.givenAUser();
+        User userFriendOnline = builder.getUser(USER_ACL_READ);
+        User userFriendOffline = builder.getUser(USER_ACL_WRITE);
 
         Project project = builder.givenAProject();
 
@@ -951,8 +967,8 @@ public class UserServiceTests {
     @Test
     void listFriendUsersOfflineOnAProject() {
         User user = builder.givenDefaultUser();
-        User userFriendOnline = builder.givenAUser();
-        User userFriendOnlineButOnAnotherProject = builder.givenAUser();
+        User userFriendOnline = builder.getUser(USER_ACL_READ);
+        User userFriendOnlineButOnAnotherProject = builder.getUser(USER_ACL_WRITE);
 
         Project project = builder.givenAProject();
 
@@ -1003,8 +1019,8 @@ public class UserServiceTests {
     @Test
     void listOnlineUserForProjectWitTheirPosition() {
         User userOnline = builder.givenDefaultUser();
-        User userOnlineButOnDifferentProject = builder.givenAUser();
-        User userOffline = builder.givenAUser();
+        User userOnlineButOnDifferentProject = builder.getUser(USER_ACL_WRITE);
+        User userOffline = builder.getUser(USER_ACL_READ);
 
         Project project = builder.givenAProject();
         Project anotherProject = builder.givenAProject();
@@ -1050,7 +1066,7 @@ public class UserServiceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,
@@ -1079,7 +1095,7 @@ public class UserServiceTests {
 
         givenAPersistentImageConsultation(userOnline, builder.givenAnImageInstance(project), new Date());
 
-        JsonObject data = userService.getResumeActivities(project, userOnline);
+        JsonObject data = userService.getResumeActivities(project, userMapper.map(userOnline));
 
         assertThat(data.getJSONAttrDate("firstConnection")).isEqualTo(firstConnection.getCreated());
         assertThat(data.getJSONAttrDate("lastConnection")).isEqualTo(lastConnection.getCreated());
@@ -1093,80 +1109,80 @@ public class UserServiceTests {
 
     @Test
     void addUserToProject() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
 
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, user.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, user.username(), READ)).isFalse();
 
-        projectMemberService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user.username(), project, false);
 
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, user.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, user.username(), READ)).isTrue();
 
-        projectMemberService.addUserToProject(user, project, true);
+        projectMemberService.addUserToProject(user.username(), project, true);
 
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, user.username(), ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, user.username(), READ)).isTrue();
     }
 
     @Test
     void removeUserFromProject() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
 
-        projectMemberService.addUserToProject(user, project, true);
+        projectMemberService.addUserToProject(user.username(), project, true);
 
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, user.username(), ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, user.username(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project.getOntology(), user.username(), READ)).isTrue();
 
-        projectMemberService.deleteUserFromProject(user, project, true);
+        projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true);
 
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, user.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, user.username(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project.getOntology(), user.username(), READ)).isTrue();
 
-        projectMemberService.deleteUserFromProject(user, project, false);
+        projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false);
 
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, user.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, user.username(), READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(project.getOntology(), user.username(), READ)).isFalse();
     }
 
     @Test
     void removeOntologyRightWhenRemovingUserFromProject() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
 
-        projectMemberService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user.username(), project, false);
 
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, user.username(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project.getOntology(), user.username(), READ)).isTrue();
 
-        projectMemberService.deleteUserFromProject(user, project, false);
+        projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false);
 
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, user.username(), READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(project.getOntology(), user.username(), READ)).isFalse();
     }
 
     @Test
     void removeOntologyRightWhenRemovingUserFromProjectKeepRightIfUserHasAnotherProjectWithOntology() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project = builder.givenAProject();
 
-        projectMemberService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user.username(), project, false);
 
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, user.username(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project.getOntology(), user.username(), READ)).isTrue();
 
         Project projectWithSameOntology = builder.givenAProject();
         projectWithSameOntology.setOntology(project.getOntology());
-        projectMemberService.addUserToProject(user, projectWithSameOntology, false);
+        projectMemberService.addUserToProject(user.username(), projectWithSameOntology, false);
 
-        projectMemberService.deleteUserFromProject(user, project, false);
+        projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false);
 
-        assertThat(permissionService.hasACLPermission(project, user.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(project.getOntology(), user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, user.username(), READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(project.getOntology(), user.username(), READ)).isTrue();
     }
 }

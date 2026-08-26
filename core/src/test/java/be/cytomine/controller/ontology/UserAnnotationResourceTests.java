@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +31,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
@@ -47,6 +47,7 @@ import be.cytomine.domain.security.User;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
@@ -66,7 +67,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class UserAnnotationResourceTests {
 
@@ -163,10 +164,10 @@ public class UserAnnotationResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(greaterThan(0)));
 
-        User newUser = builder.givenAUser();
+        UserResponse newUser = builder.givenAUser();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
-                newUser.getId()
+                newUser.id()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(0));
@@ -403,7 +404,7 @@ public class UserAnnotationResourceTests {
         wiremockRepository.stubTerm(term1);
         wiremockRepository.stubTerm(term2);
         JsonObject jsonObject = userAnnotation.toJsonObject(urlApi);
-        jsonObject.put("term", Arrays.asList(term1.getId(), term2.getId()));
+        jsonObject.put("term", List.of(term1.getId(), term2.getId()));
 
         restUserAnnotationControllerMockMvc.perform(post("/api/userannotation.json")
                 .contentType(MediaType.APPLICATION_JSON)

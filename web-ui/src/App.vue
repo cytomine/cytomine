@@ -34,8 +34,7 @@
 
 <script>
 import axios from 'axios';
-import ifvisible from 'ifvisible';
-ifvisible.setIdleDuration(constants.IDLE_DURATION);
+import { useIdle, useDocumentVisibility } from '@vueuse/core';
 
 import { Cytomine } from '@/api';
 import constants from '@/utils/constants.js';
@@ -53,6 +52,11 @@ export default {
   mixins: [
     changeLanguageMixin,
   ],
+  setup() {
+    const { idle } = useIdle(constants.IDLE_DURATION * 1000);
+    const visibility = useDocumentVisibility();
+    return { idle, visibility };
+  },
   data() {
     return {
       communicationError: false,
@@ -63,24 +67,32 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
     currentAccount: get('currentUser/account'),
-    project: get('currentProject/project')
+    project: get('currentProject/project'),
+    isActive() {
+      return this.visibility === 'visible' && !this.idle;
+    },
   },
   watch: {
     $route() {
       // Invoke refresh token if needed when route changes.
       updateToken();
     },
+    isActive(active) {
+      if (active) {
+        this.wakeup();
+      }
+    },
   },
   methods: {
     wakeup: async function () {
-      if (!ifvisible.now()) {
+      if (!this.isActive) {
         return;
       }
       await updateToken();
       await this.ping();
     },
     async ping() {
-      if (!ifvisible.now()) {
+      if (!this.isActive) {
         return; // window not visible or inactive user => stop pinging
       }
       try {
@@ -108,7 +120,7 @@ export default {
   async created() {
     let settings;
     await axios
-      .get('configuration.json')
+      .get('/configuration.json')
       .then(response => (settings = response.data));
 
     for (let i in settings) {
@@ -138,7 +150,6 @@ export default {
 
     await this.ping();
     this.loading = false;
-    ifvisible.on('wakeup', this.wakeup);
   }
 };
 </script>

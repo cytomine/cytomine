@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
@@ -34,7 +34,6 @@ import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 @Transactional
 public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
-    private static WireMockServer wireMockServer;
     @Autowired
     private UrlApi urlApi;
     @Autowired
@@ -42,6 +41,8 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     private UserAnnotationService userAnnotationService;
     private UserAnnotation userAnnotation = null;
+
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     private static void setupStub() {
         /* Simulate call to PIMS */
@@ -67,16 +68,9 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
         WireMock.configureFor("localhost", wireMockServer.port());
 
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach

@@ -45,16 +45,16 @@ spec:
             - sh
             - -c
             - |
-              mkdir -p /data/dataset/test-project/IMAGES
-              mkdir -p /data/dataset/test-project/METADATA
-              cp /tmp/metadata/dataset.xml /data/dataset/test-project/METADATA/dataset.xml
-              cp /tmp/metadata/image.xml /data/dataset/test-project/METADATA/image.xml
-              cp /tmp/metadata/observation.xml /data/dataset/test-project/METADATA/observation.xml
-              cp /tmp/metadata/observer.xml /data/dataset/test-project/METADATA/observer.xml
-              cp /tmp/metadata/sample.xml /data/dataset/test-project/METADATA/sample.xml
-              cp /tmp/metadata/staining.xml /data/dataset/test-project/METADATA/staining.xml
-              cp /tmp/metadata/policy.xml /data/dataset/test-project/METADATA/policy.xml
-              cp -r /tmp/images/wsi /data/dataset/test-project/IMAGES/wsi
+              mkdir -p /data/dataset/aa-test-project/test-project/IMAGES
+              mkdir -p /data/dataset/aa-test-project/test-project/METADATA
+              cp /tmp/metadata/dataset.xml /data/dataset/aa-test-project/test-project/METADATA/dataset.xml
+              cp /tmp/metadata/image.xml /data/dataset/aa-test-project/test-project/METADATA/image.xml
+              cp /tmp/metadata/observation.xml /data/dataset/aa-test-project/test-project/METADATA/observation.xml
+              cp /tmp/metadata/observer.xml /data/dataset/aa-test-project/test-project/METADATA/observer.xml
+              cp /tmp/metadata/sample.xml /data/dataset/aa-test-project/test-project/METADATA/sample.xml
+              cp /tmp/metadata/staining.xml /data/dataset/aa-test-project/test-project/METADATA/staining.xml
+              cp /tmp/metadata/policy.xml /data/dataset/aa-test-project/test-project/METADATA/policy.xml
+              cp -r /tmp/images/wsi /data/dataset/aa-test-project/test-project/IMAGES/wsi
           volumeMounts:
             - mountPath: /data/dataset
               name: dataset-pvc

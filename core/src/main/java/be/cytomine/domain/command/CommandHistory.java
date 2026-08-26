@@ -11,7 +11,6 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
@@ -24,9 +23,8 @@ public class CommandHistory extends CytomineDomain {
     @JoinColumn(name = "command_id", nullable = true)
     protected Command command;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
-    protected User user;
+    @Column(name = "user_id")
+    protected Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = true)
@@ -46,7 +44,7 @@ public class CommandHistory extends CytomineDomain {
         this.setCommand(command);
         this.setPrefixAction("");
         this.setProject(command.getProject());
-        this.setUser(command.getUser());
+        this.setUserId(command.getUserId());
         this.setMessage(command.getActionMessage());
     }
 
@@ -54,7 +52,7 @@ public class CommandHistory extends CytomineDomain {
         this.setCommand(undoStackItem.getCommand());
         this.setPrefixAction("UNDO");
         this.setProject(undoStackItem.getCommand().getProject());
-        this.setUser(undoStackItem.getUser());
+        this.setUserId(undoStackItem.getUserId());
         this.setMessage(undoStackItem.getCommand().getActionMessage());
     }
 
@@ -62,7 +60,7 @@ public class CommandHistory extends CytomineDomain {
         this.setCommand(redoStackItem.getCommand());
         this.setPrefixAction("REDO");
         this.setProject(redoStackItem.getCommand().getProject());
-        this.setUser(redoStackItem.getUser());
+        this.setUserId(redoStackItem.getUserId());
         this.setMessage(redoStackItem.getCommand().getActionMessage());
     }
 
@@ -77,7 +75,7 @@ public class CommandHistory extends CytomineDomain {
             "command", commandHistory.getCommand() != null ? commandHistory.getCommand().toJsonObject(urlApi) : null
         );
         returnArray.put("prefixAction", commandHistory.prefixAction);
-        returnArray.put("user", commandHistory.user);
+        returnArray.put("user", commandHistory.getUserId());
         return returnArray;
     }
 

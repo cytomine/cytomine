@@ -21,7 +21,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.UserAnnotation;
@@ -40,8 +42,9 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class ImageConsultationServiceTests {
 
     @Autowired
@@ -75,7 +78,7 @@ public class ImageConsultationServiceTests {
             sliceCoordinatesService.getReferenceSlice(imageInstance),
             USER_VIEW
         );
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
     PersistentUserPosition givenAPersistentUserPosition(
@@ -86,7 +89,7 @@ public class ImageConsultationServiceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,
@@ -200,7 +203,7 @@ public class ImageConsultationServiceTests {
     @Test
     void listImageOfUsersByProject() {
         User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
+        User user2 = builder.givenDefaultUser();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
@@ -249,8 +252,8 @@ public class ImageConsultationServiceTests {
     @Test
     void shouldReturnLastConsultedImagePerUserForProject() {
         User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
-        User userWithNoConsultation = builder.givenAUser();
+        User user2 = builder.givenDefaultUser();
+        User userWithNoConsultation = builder.givenDefaultAdmin();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
@@ -303,7 +306,7 @@ public class ImageConsultationServiceTests {
     @Test
     void shouldReturnUserImagesConsultedWithinDateRange() {
         User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
+        User user2 = builder.givenDefaultUser();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
@@ -356,7 +359,7 @@ public class ImageConsultationServiceTests {
     @Test
     void shouldReturnConsultationFrequencyPerImageForUserInProject() {
         User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
+        User user2 = builder.givenDefaultUser();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
@@ -395,7 +398,7 @@ public class ImageConsultationServiceTests {
     void totalNumberOfConsultationByProjectWithDates() {
         Project projet = builder.givenAProject();
         User user1 = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        User anotherUser = builder.givenDefaultUser();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance(projet).getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(projet).getImage();

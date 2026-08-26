@@ -16,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.AnnotationAction;
@@ -27,8 +29,9 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class AnnotationActionServiceTests {
 
     @Autowired
@@ -53,7 +56,7 @@ public class AnnotationActionServiceTests {
     ) {
         AnnotationAction annotationAction = annotationActionService.add(
             annotationDomain,
-            user,
+            user.getId(),
             action,
             creation
         );
@@ -88,7 +91,7 @@ public class AnnotationActionServiceTests {
         assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.givenSuperAdmin(), null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.givenAUser(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.givenDefaultUser(), null, null))
             .hasSize(0);
 
         assertThat(annotationActionService.list(
@@ -124,7 +127,7 @@ public class AnnotationActionServiceTests {
         assertThat(annotationActionService.list(annotationDomain.getImage(), builder.givenSuperAdmin(), null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getImage(), builder.givenAUser(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getImage(), builder.givenDefaultUser(), null, null))
             .hasSize(0);
 
         assertThat(annotationActionService.list(

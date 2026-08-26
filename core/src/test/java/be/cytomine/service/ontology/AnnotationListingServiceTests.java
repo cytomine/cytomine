@@ -20,7 +20,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
@@ -42,8 +44,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class AnnotationListingServiceTests {
 
     static Map<String, String> POLYGONES = Map.of(
@@ -266,7 +269,7 @@ public class AnnotationListingServiceTests {
 
         reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setImages(Collections.singletonList(reviewedAnnotation.getImage().getId()));
-        reviewedAnnotationListing.setUser(builder.givenAUser().getId());
+        reviewedAnnotationListing.setUser(builder.givenAUser().id());
         assertThat(annotationListingService.listGeneric(reviewedAnnotationListing)
             .stream().map(x -> ((AnnotationResult) x).get("id")))
             .doesNotContain(reviewedAnnotation.getId());
@@ -276,8 +279,8 @@ public class AnnotationListingServiceTests {
     void searchReviewedAnnotationByTerms() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenAUser();
-        User user2 = builder.givenAUser();
+        User user1 = builder.givenDefaultUser();
+        User user2 = builder.givenDefaultAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -321,8 +324,8 @@ public class AnnotationListingServiceTests {
     void searchReviewedAnnotationByBbox() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenAUser();
-        User user2 = builder.givenAUser();
+        User user1 = builder.givenDefaultUser();
+        User user2 = builder.givenDefaultAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -352,8 +355,8 @@ public class AnnotationListingServiceTests {
     void searchReviewedAnnotationByImageAndReviewUser() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenAUser();
-        User user2 = builder.givenAUser();
+        User user1 = builder.givenDefaultUser();
+        User user2 = builder.givenDefaultAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());

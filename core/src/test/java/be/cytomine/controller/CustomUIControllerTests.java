@@ -14,11 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 
+import static be.cytomine.BasicInstanceBuilder.DEFAULT_USER;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -29,7 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
+@MockedUser
 public class CustomUIControllerTests {
 
     @Autowired
@@ -51,7 +56,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void loadCustomUiDefaultConfig() {
         assertThat(applicationProperties.getCustomUI()
             .getProject()
@@ -66,7 +71,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "superadmin")
+    @WithMockUser(username = SUPERADMIN)
     public void retrieveGlobalCustomUiAsSuperadmin() throws Exception {
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json"))
             .andExpect(status().isOk())
@@ -84,7 +89,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void retrieveGlobalCustomUiAsUser() throws Exception {
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json"))
             .andExpect(status().isOk())
@@ -101,7 +106,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "superadmin")
+    @WithMockUser(username = SUPERADMIN)
     public void retrieveProjectCustomUi() throws Exception {
         Project project = builder.givenAProject();
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
@@ -113,10 +118,10 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void retrieveProjectCustomUiAsContributor() throws Exception {
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, "user", READ);
+        builder.addUserToProject(project, DEFAULT_USER, READ);
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                 .param("project", project.getId().toString()))
             .andExpect(status().isOk())
@@ -125,10 +130,10 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = DEFAULT_USER)
     public void retrieveProjectCustomUiAsManager() throws Exception {
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, "user", ADMINISTRATION);
+        builder.addUserToProject(project, DEFAULT_USER, ADMINISTRATION);
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                 .param("project", project.getId().toString()))
             .andExpect(status().isOk())
@@ -137,7 +142,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "superadmin")
+    @WithMockUser(username = SUPERADMIN)
     public void retrieveProjectCustomUiAsSuperadmin() throws Exception {
         Project project = builder.givenAProject();
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/project/{project}.json", project.getId()))
@@ -149,7 +154,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "superadmin")
+    @WithMockUser(username = SUPERADMIN)
     public void changeProjectCustomUi() throws Exception {
         Project project = builder.givenAProject();
 

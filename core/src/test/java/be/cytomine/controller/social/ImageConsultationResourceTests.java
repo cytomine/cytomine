@@ -21,7 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -43,8 +46,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class ImageConsultationResourceTests {
 
     @Autowired
@@ -68,11 +72,11 @@ public class ImageConsultationResourceTests {
     }
 
     PersistentImageConsultation givenAPersistentImageConsultation(
-        User user,
+        long userId,
         ImageInstance imageInstance,
         Date created
     ) {
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(userId, imageInstance.getId(), "xxx", "mode", created);
     }
 
     @Test
@@ -113,12 +117,12 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void shouldReturnLastConsultedImagePerUserForProject() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentImageConsultation(user, imageInstance2, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentImageConsultation(user.id(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.id(), imageInstance2, DateUtils.addSeconds(new Date(), -2));
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{image}/lastImages.json",
@@ -136,9 +140,12 @@ public class ImageConsultationResourceTests {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        imageConsultationService.add(user, imageInstance1.getId(), "xxx", "mode", DateUtils.addSeconds(new Date(), -3));
-        imageConsultationService.add(user, imageInstance1.getId(), "xxx", "mode", DateUtils.addSeconds(new Date(), -2));
-        imageConsultationService.add(user, imageInstance2.getId(), "xxx", "mode", DateUtils.addSeconds(new Date(), -1));
+        imageConsultationService.add(user.getId(), imageInstance1.getId(), "xxx", "mode",
+            DateUtils.addSeconds(new Date(), -3));
+        imageConsultationService.add(user.getId(), imageInstance1.getId(), "xxx", "mode",
+            DateUtils.addSeconds(new Date(), -2));
+        imageConsultationService.add(user.getId(), imageInstance2.getId(), "xxx", "mode",
+            DateUtils.addSeconds(new Date(), -1));
 
         restImageConsultationControllerMockMvc.perform(get("/api/imageinstance/method/lastopened.json")
                 .param("max", "10"))
@@ -173,9 +180,9 @@ public class ImageConsultationResourceTests {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentImageConsultation(user, imageInstance2, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentImageConsultation(user.getId(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.getId(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.getId(), imageInstance2, DateUtils.addSeconds(new Date(), -2));
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{project}/user/{user}/imageconsultation.json",
@@ -188,7 +195,7 @@ public class ImageConsultationResourceTests {
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{project}/user/{user}/imageconsultation.json",
-                imageInstance1.getProject().getId().toString(), builder.givenAUser().getId().toString()
+                imageInstance1.getProject().getId().toString(), String.valueOf(builder.givenAUser().id())
             ).param("distinctImages", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
@@ -215,8 +222,8 @@ public class ImageConsultationResourceTests {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.getId(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.getId(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
 
         restImageConsultationControllerMockMvc.perform(get("/api/imageconsultation/resume.json")
                 .param("project", imageInstance1.getProject().getId().toString())
@@ -235,8 +242,8 @@ public class ImageConsultationResourceTests {
         builder.givenAUserAnnotation(slice);
 
         Date currentDate = DateUtils.addSeconds(new Date(), -3);
-        givenAPersistentImageConsultation(user, imageInstance1, currentDate);
-        givenAPersistentImageConsultation(user, imageInstance1, currentDate);
+        givenAPersistentImageConsultation(user.getId(), imageInstance1, currentDate);
+        givenAPersistentImageConsultation(user.getId(), imageInstance1, currentDate);
 
         MvcResult mvcResult = restImageConsultationControllerMockMvc.perform(get("/api/imageconsultation/resume.json")
                 .param("project", imageInstance1.getProject().getId().toString())
@@ -267,7 +274,7 @@ public class ImageConsultationResourceTests {
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        givenAPersistentImageConsultation(user, imageInstance2, DateUtils.addDays(new Date(), -2));
+        givenAPersistentImageConsultation(user.getId(), imageInstance2, DateUtils.addDays(new Date(), -2));
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{project}/imageconsultation/count.json",

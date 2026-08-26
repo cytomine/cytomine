@@ -23,7 +23,9 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.doNothing;
@@ -33,8 +35,8 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @ExtendWith(MockitoExtension.class)
 public class WebSocketUserPositionTests {
 
@@ -95,7 +97,7 @@ public class WebSocketUserPositionTests {
     public void addTrackSessionToNotTrackedUser() {
         ConcurrentWebSocketSessionDecorator sessionDecorator = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.givenAUser().getId().toString();
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
@@ -121,7 +123,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.givenAUser().getId().toString();
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
@@ -151,7 +153,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
         when(followerSession.getId()).thenReturn("5678");
 
-        String userId = builder.givenAUser().getId().toString();
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
@@ -181,8 +183,8 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession3 = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId1 = builder.givenAUser().getId().toString();
-        String userId2 = builder.givenAUser().getId().toString();
+        String userId1 = builder.givenDefaultUser().getId().toString();
+        String userId2 = builder.givenDefaultAdmin().getId().toString();
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId1 + "/" + imageInstanceId;
         initFollowingSession(userAndImageId, broadcastSession, followerSession1);
@@ -218,7 +220,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.givenAUser().getId().toString();
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
@@ -246,7 +248,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.givenAUser().getId().toString();
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         String userAndImageId = userId + "/" + imageInstanceId;
 
@@ -272,7 +274,7 @@ public class WebSocketUserPositionTests {
 
     @Test
     public void updatePositionOfTrackedUserSendMessageWorks() throws IOException {
-        String userId = builder.givenAUser().getId().toString();
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
 
         WebSocketSession session = mock(WebSocketSession.class);
@@ -294,7 +296,7 @@ public class WebSocketUserPositionTests {
 
     @Test
     public void updatePositionOfNotTrackedUserDoNothing() {
-        String userId = builder.givenAUser().getId().toString();
+        String userId = String.valueOf(builder.givenAUser().id());
         String imageInstanceId = builder.givenAnImageInstance().getId().toString();
         assertDoesNotThrow(() -> webSocketUserPositionHandler.sendPositionToFollowers(
             userId,
@@ -309,7 +311,7 @@ public class WebSocketUserPositionTests {
         ConcurrentWebSocketSessionDecorator followerSession = mock(ConcurrentWebSocketSessionDecorator.class);
         ConcurrentWebSocketSessionDecorator broadcastSession = mock(ConcurrentWebSocketSessionDecorator.class);
 
-        String userId = builder.givenAUser().getId().toString();
+        String userId = String.valueOf(builder.givenAUser().id());
         String userAndImageId = userId + "/imageId";
         connectSession(session, userId, "imageId", "false");
         initFollowingSession(userAndImageId, broadcastSession, followerSession);

@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.meta.AttachedFile;
@@ -32,6 +33,7 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
@@ -62,7 +64,7 @@ import static org.springframework.security.acls.domain.BasePermission.ADMINISTRA
 @Transactional
 public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
-    private static WireMockServer wireMockServer;
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private BasicInstanceBuilder basicInstanceBuilder;
     @Autowired
@@ -85,6 +87,10 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     private ImageInstanceService imageInstanceService;
     @Autowired
     private UserAnnotationService userAnnotationService;
+
+    @Autowired
+    private UserMapper userMapper;
+
     @Autowired
     private UrlApi urlApi;
     private Project project = null;
@@ -121,15 +127,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
-
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach
@@ -155,7 +153,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void userWithAtLeastReadPermissionCanListProjects() {
         assertThat(projectService.list(
-                userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get(),
+                userMapper.map(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get()),
                 new ProjectSearchExtension(),
                 new ArrayList<>(),
                 "created",
@@ -180,22 +178,22 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void adminCanAddUserToProject() {
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, true));
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, false));
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void userWithAdminRigthCanManageUserInProject() {
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, true));
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, false));
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void userWithReadAclCannotManageUserInProject() {
-        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, true));
-        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAUser(), project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, true));
+        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAUser().username(), project, false));
     }
 
     @Test
@@ -204,27 +202,29 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
         expectOK(this::whenIEditDomain);
 
-        User user = builder.givenAUser();
-        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
-        expectOK(() -> projectMemberService.addUserToProject(user, project, true));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, true));
-        expectOK(() -> projectMemberService.addUserToProject(user, project, true));
+        UserResponse user = builder.givenAUser();
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
             project,
-            user
+            user.username(), user.id()
         );
 
         // add another representative so that we can delete the first one
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenSuperAdmin(), project, false));
+        User superAdmin = builder.givenSuperAdmin();
+        expectOK(() -> projectMemberService.addUserToProject(superAdmin.getUsername(),
+            project, false));
         expectOK(() -> projectRepresentativeUserService.add(builder.givenANotPersistedProjectRepresentativeUser(
-            project, builder.givenSuperAdmin()
+            project, superAdmin.getUsername(), superAdmin.getId()
         ).toJsonObject(urlApi)));
 
         expectOK(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
         expectOK(() -> projectRepresentativeUserService.delete(
-            projectRepresentativeUserService.find(project, user).get(), null, null, false
+            projectRepresentativeUserService.find(project, user.id()).get(), null, null, false
         ));
 
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(project).toJsonObject(urlApi)));
@@ -244,27 +244,28 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     public void classicProjectScenarioForUser() {
         expectForbidden(this::whenIEditDomain);
 
-        User user = builder.givenAUser();
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
-        expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, true));
-        expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, true));
+        UserResponse user = builder.givenAUser();
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
 
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, true));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
-            project, user
+            project, user.username(), user.id()
         );
 
         // add another representative so that we can try to delete the first one
+        User superAdmin = builder.givenSuperAdmin();
         projectRepresentativeUserRepository.save(builder.givenANotPersistedProjectRepresentativeUser(
-            project, builder.givenSuperAdmin()
+            project, superAdmin.getUsername(), superAdmin.getId()
         ));
 
         expectForbidden(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
         builder.persistAndReturn(projectRepresentativeUser);
         expectForbidden(() -> projectRepresentativeUserService.delete(
-            projectRepresentativeUserService.find(project, user).get(), null, null, false
+            projectRepresentativeUserService.find(project, user.id()).get(), null, null, false
         ));
 
         expectForbidden(
@@ -579,27 +580,28 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         builder.persistAndReturn(project);
         expectOK(this::whenIEditDomain);
 
-        User user = builder.givenAUser();
-        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
-        expectOK(() -> projectMemberService.addUserToProject(user, project, true));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, true));
-        expectOK(() -> projectMemberService.addUserToProject(user, project, true));
+        UserResponse user = builder.givenAUser();
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
             project,
-            user
+            user.username(), user.id()
         );
 
         // add another representative so that we can delete the first one
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenSuperAdmin(), project, false));
+        User superAdmin = builder.givenSuperAdmin();
+        expectOK(() -> projectMemberService.addUserToProject(superAdmin.getUsername(), project, false));
         expectOK(() -> projectRepresentativeUserService.add(builder.givenANotPersistedProjectRepresentativeUser(
-            project, builder.givenSuperAdmin()
+            project, superAdmin.getUsername(), superAdmin.getId()
         ).toJsonObject(urlApi)));
 
         expectOK(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
         expectOK(() -> projectRepresentativeUserService.delete(
-            projectRepresentativeUserService.find(project, user).get(), null, null, false
+            projectRepresentativeUserService.find(project, user.id()).get(), null, null, false
         ));
 
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(project).toJsonObject(urlApi)));
@@ -622,21 +624,22 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
         expectForbidden(this::whenIEditDomain);
 
-        User user = builder.givenAUser();
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
-        expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, true));
-        expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, true));
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, true));
+        UserResponse user = builder.givenAUser();
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
             project,
-            user
+            user.username(), user.id()
         );
 
         // add another representative so that we can try to delete the first one
+        User superAdmin = builder.givenSuperAdmin();
         projectRepresentativeUserRepository.save(builder.givenANotPersistedProjectRepresentativeUser(
-            project, builder.givenSuperAdmin()
+            project, superAdmin.getUsername(), superAdmin.getId()
         ));
 
         expectForbidden(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
@@ -948,27 +951,28 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         builder.persistAndReturn(project);
         expectOK(this::whenIEditDomain);
 
-        User user = builder.givenAUser();
-        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
-        expectOK(() -> projectMemberService.addUserToProject(user, project, true));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, true));
-        expectOK(() -> projectMemberService.addUserToProject(user, project, true));
+        UserResponse user = builder.givenAUser();
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
             project,
-            user
+            user.username(), user.id()
         );
 
         // add another representative so that we can delete the first one
-        expectOK(() -> projectMemberService.addUserToProject(builder.givenSuperAdmin(), project, false));
+        User superAdmin = builder.givenSuperAdmin();
+        expectOK(() -> projectMemberService.addUserToProject(superAdmin.getUsername(), project, false));
         expectOK(() -> projectRepresentativeUserService.add(builder.givenANotPersistedProjectRepresentativeUser(
-            project, builder.givenSuperAdmin()
+            project, superAdmin.getUsername(), superAdmin.getId()
         ).toJsonObject(urlApi)));
 
         expectOK(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
         expectOK(() -> projectRepresentativeUserService.delete(
-            projectRepresentativeUserService.find(project, user).get(), null, null, false
+            projectRepresentativeUserService.find(project, user.id()).get(), null, null, false
         ));
 
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(project).toJsonObject(urlApi)));
@@ -990,22 +994,23 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
         expectForbidden(this::whenIEditDomain);
 
-        User user = builder.givenAUser();
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
-        expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, true));
-        expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, true));
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, true));
+        UserResponse user = builder.givenAUser();
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
             project,
-            user
+            user.username(), user.id()
         );
 
         // add another representative so that we can try to delete the first one
+        User superAdmin = builder.givenSuperAdmin();
         projectRepresentativeUserRepository.save(builder.givenANotPersistedProjectRepresentativeUser(
             project,
-            builder.givenSuperAdmin()
+            superAdmin.getUsername(), superAdmin.getId()
         ));
 
         expectForbidden(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
@@ -1321,8 +1326,9 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         User simpleUser = userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get();
 
         //Add a project admin
-        User admin = builder.givenAUser();
-        builder.addUserToProject(project, admin.getUsername(), ADMINISTRATION);
+        UserResponse adminResponse = builder.givenAUser();
+        User admin = builder.getUser(adminResponse.username());
+        builder.addUserToProject(project, adminResponse.username(), ADMINISTRATION);
 
         /*super admin data*/
         //Create an annotation (by superadmin)

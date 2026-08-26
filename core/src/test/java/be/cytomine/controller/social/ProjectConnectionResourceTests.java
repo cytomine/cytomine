@@ -20,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.PersistentProjectConnection;
@@ -39,8 +42,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class ProjectConnectionResourceTests {
 
     @Autowired
@@ -64,9 +68,9 @@ public class ProjectConnectionResourceTests {
         lastConnectionRepository.deleteAll();
     }
 
-    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
+    PersistentProjectConnection givenAPersistentConnectionInProject(long userId, Project project, Date created) {
         return projectConnectionService.add(
-            user,
+            userId,
             project,
             "xxx",
             "linux",
@@ -104,16 +108,16 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getConnectionByUserAndProject() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/userconnection/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(2))));
@@ -122,13 +126,13 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getConnectionByProject() throws Exception {
-        User user = builder.givenAUser();
-        User anotherUser = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
+        UserResponse anotherUser = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(anotherUser, project1, DateUtils.addSeconds(new Date(), -2));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -1));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(anotherUser.id(), project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -1));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/lastConnection.json",
@@ -141,11 +145,11 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getLastConnectionByProject() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/lastConnection.json",
@@ -153,36 +157,36 @@ public class ProjectConnectionResourceTests {
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].user").value(user.getId()));
+            .andExpect(jsonPath("$.collection[0].user").value(user.id()));
     }
 
     @Test
     @Transactional
     public void getLastConnectionByProjectByUser() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/lastConnection/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].user").value(user.getId()));
+            .andExpect(jsonPath("$.collection[0].user").value(user.id()));
     }
 
     @Test
     @Transactional
     public void getNumberConnectionByProject() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionFrequency.json",
@@ -195,11 +199,11 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionByProjectHeatmap() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionFrequency.json",
@@ -211,11 +215,11 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionByProjectWithPeriod() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionFrequency.json",
@@ -227,16 +231,16 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionFrequencyByUser() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionFrequency/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk());
     }
@@ -244,16 +248,16 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionFrequencyByUserWithHeatmap() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionFrequency/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ).param("heatmap", "true"))
             .andExpect(status().isOk());
     }
@@ -261,16 +265,16 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionFrequencyByUserWithPeriod() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionFrequency/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ).param("period", "week"))
             .andExpect(status().isOk());
     }
@@ -278,11 +282,11 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getConnectionFrequency() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get("/api/connectionFrequency.json")
                 .param("period", "week"))
@@ -292,11 +296,11 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void averageEconnection() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get("/api/averageConnections.json")
                 .param("period", "week"))
@@ -307,11 +311,11 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void userConnectionCount() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/userconnection/count.json",
@@ -323,16 +327,16 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void connectionHistory() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentConnectionInProject(user, project1, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -2));
 
         restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionHistory/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk());
     }
@@ -340,18 +344,18 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void connectionHistoryWithExportCsv() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
         Date firstDate = DateUtils.addSeconds(new Date(), -3);
         Date secondDate = DateUtils.addSeconds(new Date(), -2);
-        givenAPersistentConnectionInProject(user, project1, firstDate);
-        givenAPersistentConnectionInProject(user, project1, secondDate);
+        givenAPersistentConnectionInProject(user.id(), project1, firstDate);
+        givenAPersistentConnectionInProject(user.id(), project1, secondDate);
 
         MvcResult mvcResult = restProjectConnectionControllerMockMvc.perform(get(
                 "/api/project/{project}/connectionHistory/{user}.json",
                 project1.getId(),
-                user.getId()
+                user.id()
             ).param("export", "csv"))
             .andExpect(status().isOk()).andReturn();
 
@@ -385,11 +389,11 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void activityDetail() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
         PersistentProjectConnection connection = givenAPersistentConnectionInProject(
-            user,
+            user.id(),
             project1,
             DateUtils.addSeconds(new Date(), -3)
         );
@@ -403,11 +407,11 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void activityDetailWithExportCsv() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenAUser();
         Project project1 = builder.givenAProject();
 
         PersistentProjectConnection connection = givenAPersistentConnectionInProject(
-            user,
+            user.id(),
             project1,
             DateUtils.addSeconds(new Date(), -3)
         );

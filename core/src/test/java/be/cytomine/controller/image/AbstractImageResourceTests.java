@@ -43,7 +43,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
@@ -51,6 +53,7 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
@@ -75,13 +78,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SuppressWarnings("checkstyle:LineLength")
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class AbstractImageResourceTests {
 
     private static final String KEY_ID = "some random string";
-    private static final WireMockServer wireMockServer = new WireMockServer(8888);
+
     private static RSAKey rsaKey;
     @Autowired
     private BasicInstanceBuilder builder;
@@ -89,18 +93,23 @@ public class AbstractImageResourceTests {
     private MockMvc restAbstractImageControllerMockMvc;
     @Autowired
     private ApplicationProperties applicationProperties;
+
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
+
+    private static final WireMockServer jwkMockServer = new WireMockServer(8888);
+
     @Autowired
     private UrlApi urlApi;
 
     @BeforeAll
     public static void beforeAll() throws JOSEException {
-        configureWireMock(wireMockServer);
-        wireMockServer.start();
+        configureWireMock(jwkMockServer);
+        jwkMockServer.start();
     }
 
     @AfterAll
     public static void afterAll() {
-        wireMockServer.stop();
+        jwkMockServer.stop();
     }
 
     public static void configureWireMock(WireMockServer wireMockServer) throws JOSEException {
@@ -576,7 +585,7 @@ public class AbstractImageResourceTests {
 
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -622,7 +631,7 @@ public class AbstractImageResourceTests {
 
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -646,7 +655,7 @@ public class AbstractImageResourceTests {
     @Transactional
     public void getAbstractImageAssocietedLabel() throws Exception {
         AbstractImage image = givenTestAbstractImage();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -669,7 +678,7 @@ public class AbstractImageResourceTests {
         AbstractImage image = givenTestAbstractImage();
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");
         image.getUploadedFile().setContentType("MRXS");
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -708,7 +717,7 @@ public class AbstractImageResourceTests {
         AbstractSlice slice = builder.givenAnAbstractSlice(image, 0, 0, 0);
         slice.setUploadedFile(image.getUploadedFile());
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -759,7 +768,7 @@ public class AbstractImageResourceTests {
             .getBytes(); // we don't care about the response content, we just check that core build a valid ims url
         // and return the content
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
@@ -802,7 +811,7 @@ public class AbstractImageResourceTests {
         AbstractImage image = givenTestAbstractImage();
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -828,7 +837,7 @@ public class AbstractImageResourceTests {
     @Transactional
     public void getAbstractImageMetadata() throws Exception {
         AbstractImage image = givenTestAbstractImage();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -882,7 +891,7 @@ public class AbstractImageResourceTests {
         image.setPhysicalSizeX(2d);
         image.setColorspace("empty");
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8

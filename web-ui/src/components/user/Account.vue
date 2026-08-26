@@ -153,8 +153,9 @@ import { get } from '@/utils/store-helpers';
 import { changeLanguageMixin } from '@/lang.js';
 import { MyAccount, User } from '@/api';
 import { rolesMapping } from '@/utils/role-utils';
+import { getKeycloak } from '@/keycloak.js';
 import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
-import copyToClipboard from 'copy-to-clipboard';
+import { useClipboard } from '@vueuse/core';
 import { formatMomentDate } from '@/utils/date';
 
 export default {
@@ -162,6 +163,10 @@ export default {
   name: 'Account',
   $_veeValidate: { validator: 'new' },
   mixins: [changeLanguageMixin],
+  setup() {
+    const { copy } = useClipboard({ legacy: true });
+    return { copyToClipboard: copy };
+  },
   data() {
     return {
       updatedAccount: this.$store.state.currentUser.account.clone(),
@@ -183,8 +188,8 @@ export default {
     currentAccount: get('currentUser/account'),
     role() {
       // Guest > User > Admin
-      let key = this.$keycloak.hasResourceRole(KeycloakRole.ADMIN) ? UserRole.ADMIN
-        : this.$keycloak.hasResourceRole(KeycloakRole.USER) ? UserRole.USER : UserRole.GUEST;
+      let key = getKeycloak().hasResourceRole(KeycloakRole.ADMIN) ? UserRole.ADMIN
+        : getKeycloak().hasResourceRole(KeycloakRole.USER) ? UserRole.USER : UserRole.GUEST;
       return rolesMapping[key];
     },
 
@@ -221,12 +226,12 @@ export default {
     },
 
     updatePassword() {
-      this.$keycloak.login({ action: this.passwordCredentials.updateAction });
+      getKeycloak().login({ action: this.passwordCredentials.updateAction });
     },
 
 
     copy(value) {
-      copyToClipboard(value);
+      this.copyToClipboard(value);
       this.$notify({ type: 'success', text: this.$t('notif-success-key-copied') });
     },
 

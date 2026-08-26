@@ -271,11 +271,10 @@
 
 <script>
 import eventBus from '@/utils/event-bus';
-
 import { get } from '@/utils/store-helpers';
 
 import { AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack, PropertyCollection } from '@/api';
-import copyToClipboard from 'copy-to-clipboard';
+import { useClipboard } from '@vueuse/core';
 import ImageName from '@/components/image/ImageName.vue';
 import CytomineDescription from '@/components/description/CytomineDescription.vue';
 import CytomineProperties from '@/components/property/CytomineProperties.vue';
@@ -319,6 +318,10 @@ export default {
     showImageInfo: { type: Boolean, default: true },
     showChannelInfo: { type: Boolean, default: false },
     showComments: { type: Boolean, default: false }
+  },
+  setup() {
+    const { copy } = useClipboard({ legacy: true });
+    return { copy };
   },
   data() {
     return {
@@ -438,7 +441,7 @@ export default {
       window.location.assign(appendShortTermToken(annotation.url + '?draw=true&complete=true&increaseArea=1.25', this.shortTermToken), '_blank');
     },
     copyURL() {
-      copyToClipboard(window.location.origin + '/#' + this.annotationURL);
+      this.copy(window.location.origin + this.annotationURL);
       this.$notify({ type: 'success', text: this.$t('notif-success-annot-URL-copied') });
     },
 

@@ -143,7 +143,7 @@ public class AnnotationActionResourceTests {
                 "/api/sliceinstance/{image}/annotation_action.json",
                 annotationDomain.getSlice().getId()
             )
-                .param("user", user.id() + ""))
+                .param("user", String.valueOf(user.id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))));
 

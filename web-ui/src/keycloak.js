@@ -3,7 +3,7 @@ import constants from './utils/constants';
 
 let _keycloak = null;
 
-function getKeycloak() {
+export function getKeycloak() {
   if (!_keycloak) {
     // Strip /realms/cytomine if present, as Keycloak JS adds it automatically
     let url = constants.IAM_URL;
@@ -23,22 +23,3 @@ function getKeycloak() {
   }
   return _keycloak;
 }
-
-const plugin = {
-  install: Vue => {
-    Object.defineProperty(Vue, '$keycloak', {
-      get() {
-        return getKeycloak();
-      }
-    });
-    Object.defineProperties(Vue.prototype, {
-      $keycloak: {
-        get() {
-          return getKeycloak();
-        },
-      },
-    });
-  },
-};
-
-export default plugin;

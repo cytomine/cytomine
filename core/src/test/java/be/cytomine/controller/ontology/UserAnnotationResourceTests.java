@@ -31,6 +31,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
@@ -163,7 +164,7 @@ public class UserAnnotationResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(greaterThan(0)));
 
-        User newUser = builder.givenAUser();
+        UserResponse newUser = builder.givenAUser();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
                 newUser.getId()

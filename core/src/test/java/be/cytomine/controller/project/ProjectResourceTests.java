@@ -585,7 +585,7 @@ public class ProjectResourceTests {
     public void addValidProjectWithUsersAdmins() throws Exception {
         String currentUsername = currentUserService.getCurrentUsername();
         UserResponse user = builder.givenAUser();
-        User admin = builder.givenAUser();
+        UserResponse admin = builder.givenAUser();
 
         Project project = basicInstanceBuilder.givenANotPersistedProject();
         project.setOntology(builder.givenAnOntology());
@@ -678,8 +678,8 @@ public class ProjectResourceTests {
     public void editValidProjectWithUsers() throws Exception {
         Project project = builder.givenAProject();
 
-        User previousUser = builder.givenAUser();
-        User newUser = builder.givenAUser();
+        UserResponse previousUser = builder.givenAUser();
+        UserResponse newUser = builder.givenAUser();
         builder.addUserToProject(project, previousUser.getUsername(), READ);
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
@@ -703,8 +703,8 @@ public class ProjectResourceTests {
     public void editValidProjectWithAdmins() throws Exception {
         Project project = builder.givenAProject();
 
-        User previousUser = builder.givenAUser();
-        User newUser = builder.givenAUser();
+        UserResponse previousUser = builder.givenAUser();
+        UserResponse newUser = builder.givenAUser();
         builder.addUserToProject(project, previousUser.getUsername(), READ);
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())

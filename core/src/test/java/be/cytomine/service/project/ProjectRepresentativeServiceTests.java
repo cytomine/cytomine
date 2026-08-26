@@ -12,6 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -160,9 +161,11 @@ public class ProjectRepresentativeServiceTests {
     @Test
     void deleteProjectRepresentativeUserWithSuccess() {
         ProjectRepresentativeUser projectRepresentativeUser1 = builder.givenAProjectRepresentativeUser();
+        UserResponse user = builder.givenAUser();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser1.getProject(),
-            builder.givenAUser()
+            user.getUsername(),
+            user.getId()
         );
         CommandResponse commandResponse = projectRepresentativeUserService.delete(
             projectRepresentativeUser1,
@@ -189,8 +192,9 @@ public class ProjectRepresentativeServiceTests {
 
     @Test
     void deletingLastRepresentativeUserFromProjectWillGrantCurrentUserAsRepresentative() {
+        UserResponse user = builder.givenAUser();
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser(
-            builder.givenAProject(), builder.givenAUser()
+            builder.givenAProject(), user.getUsername(), user.getId()
         );
         builder.addUserToProject(
             projectRepresentativeUser.getProject(),

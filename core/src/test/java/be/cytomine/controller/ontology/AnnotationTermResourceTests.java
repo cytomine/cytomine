@@ -84,7 +84,7 @@ public class AnnotationTermResourceTests {
                 "/api/annotation/{id}/term.json",
                 annotationTerm.getUserAnnotation().getId()
             )
-                .param("idUser", builder.givenAUser().getId().toString()))
+                .param("idUser", builder.givenAUser().id() + ""))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(0)));
     }
@@ -257,7 +257,7 @@ public class AnnotationTermResourceTests {
         AnnotationTerm
             previousAnnotationTermFromOtherUser
             = builder.givenAnAnnotationTerm(previousAnnotationTerm.getUserAnnotation());
-        previousAnnotationTermFromOtherUser.setUser(builder.givenAUser());
+        previousAnnotationTermFromOtherUser.setUser(builder.givenDefaultUser());
 
         AnnotationTerm
             annotationTerm
@@ -316,7 +316,7 @@ public class AnnotationTermResourceTests {
     public void addValidAnnotationTermCleanBeforeForAllUser() throws Exception {
 
         AnnotationTerm previousAnnotationTerm = builder.givenAnAnnotationTerm();
-        previousAnnotationTerm.setUser(builder.givenAUser());
+        previousAnnotationTerm.setUser(builder.givenDefaultUser());
 
         AnnotationTerm
             annotationTerm

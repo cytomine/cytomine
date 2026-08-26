@@ -248,9 +248,9 @@ public class BasicInstanceBuilder {
         return ontology;
     }
 
-    public Project givenAProjectWithUser(User user) {
+    public Project givenAProjectWithUser(String username) {
         Project project = givenAProject();
-        addUserToProject(project, user.getUsername(), ADMINISTRATION);
+        addUserToProject(project, username, ADMINISTRATION);
         return project;
     }
 
@@ -809,8 +809,8 @@ public class BasicInstanceBuilder {
                 givenSuperAdmin().getId()));
     }
 
-    public ProjectRepresentativeUser givenAProjectRepresentativeUser(Project project, User user) {
-        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(project, user.getUsername(), user.getId()));
+    public ProjectRepresentativeUser givenAProjectRepresentativeUser(Project project, String username, long userId) {
+        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(project, username, userId));
     }
 
     public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser() {

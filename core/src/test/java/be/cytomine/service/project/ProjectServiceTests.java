@@ -178,9 +178,9 @@ public class ProjectServiceTests {
     @Test
     void listLastOpened() {
         User user1 = builder.givenSuperAdmin();
-        Project project1 = builder.givenAProjectWithUser(user1);
-        Project project2 = builder.givenAProjectWithUser(user1);
-        Project project3 = builder.givenAProjectWithUser(user1);
+        Project project1 = builder.givenAProjectWithUser(user1.getUsername());
+        Project project2 = builder.givenAProjectWithUser(user1.getUsername());
+        Project project3 = builder.givenAProjectWithUser(user1.getUsername());
 
         givenAPersistentConnectionInProject(user1, project1, DateUtils.addDays(new Date(), 1));
         givenAPersistentConnectionInProject(user1, project2, DateUtils.addDays(new Date(), 2));
@@ -209,7 +209,7 @@ public class ProjectServiceTests {
     @Test
     void listProjectForCurrentUser() {
         User user1 = builder.givenSuperAdmin();
-        Project project1 = builder.givenAProjectWithUser(user1);
+        Project project1 = builder.givenAProjectWithUser(user1.getUsername());
         Project project2 = builder.givenAProject();
 
         assertThat(projectService.listForCurrentUser()).contains(project1).doesNotContain(project2);
@@ -830,7 +830,7 @@ public class ProjectServiceTests {
         builder.addUserToProject(project, previousUser.getUsername(), ADMINISTRATION);
         builder.addUserToProject(project, newUser.getUsername(), ADMINISTRATION);
 
-        builder.givenAProjectRepresentativeUser(project, previousUser);
+        builder.givenAProjectRepresentativeUser(project, previousUser.getUsername(), previousUser.getId());
 
         assertThat(projectRepresentativeUserService.find(project, previousUser)).isPresent();
         assertThat(projectRepresentativeUserService.find(project, newUser)).isEmpty();
@@ -858,9 +858,9 @@ public class ProjectServiceTests {
     @Test
     void listActiveProjects() {
         User user1 = builder.givenSuperAdmin();
-        Project project1 = builder.givenAProjectWithUser(user1);
-        Project project2 = builder.givenAProjectWithUser(user1);
-        Project project3 = builder.givenAProjectWithUser(user1);
+        Project project1 = builder.givenAProjectWithUser(user1.getUsername());
+        Project project2 = builder.givenAProjectWithUser(user1.getUsername());
+        Project project3 = builder.givenAProjectWithUser(user1.getUsername());
 
         givenAPersistentConnectionInProject(user1, project1, DateUtils.addSeconds(new Date(), -300));
         givenAPersistentConnectionInProject(user1, project2, DateUtils.addSeconds(new Date(), -5));
@@ -872,9 +872,9 @@ public class ProjectServiceTests {
     @Test
     void listActiveProjectsWithNumberOfUsers() {
         User user1 = builder.givenSuperAdmin();
-        Project project1 = builder.givenAProjectWithUser(user1);
-        Project project2 = builder.givenAProjectWithUser(user1);
-        Project project3 = builder.givenAProjectWithUser(user1);
+        Project project1 = builder.givenAProjectWithUser(user1.getUsername());
+        Project project2 = builder.givenAProjectWithUser(user1.getUsername());
+        Project project3 = builder.givenAProjectWithUser(user1.getUsername());
 
         builder.addUserToProject(project2, user1.getUsername());
         builder.addUserToProject(project2, builder.givenSuperAdmin().getUsername());

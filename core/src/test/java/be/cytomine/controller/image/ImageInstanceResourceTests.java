@@ -44,6 +44,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -53,7 +54,6 @@ import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
@@ -201,8 +201,8 @@ public class ImageInstanceResourceTests {
     public void getBlindImageInstance() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
-        User user = builder.givenAUser("get_blind_image_instance");
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
+        UserResponse user = builder.givenAUser("get_blind_image_instance");
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
         image.getProject().setBlindMode(true);
 
@@ -268,24 +268,24 @@ public class ImageInstanceResourceTests {
         ImageInstance image = builder.givenAnImageInstance();
         image.getBaseImage().setWidth(500);
         ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
-        User user = builder.givenAUser("list_image_instance_by_user");
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
+        UserResponse user = builder.givenAUser("list_image_instance_by_user");
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.getId()))
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id=="
                 + imageFromOtherProjectNotAccessibleForUser.getId()
                 + ")]").doesNotExist());
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.getId()).param(
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.id()).param(
                 "width[lte]",
                 "500"
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists());
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.getId()).param(
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.id()).param(
                 "width[gte]",
                 "501"
             ))
@@ -300,10 +300,10 @@ public class ImageInstanceResourceTests {
         ImageInstance image = builder.givenAnImageInstance();
         image.getBaseImage().setWidth(500);
         ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
-        User user = builder.givenAUser("list_image_instance_light_by_user");
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
+        UserResponse user = builder.givenAUser("list_image_instance_light_by_user");
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance/light.json", user.getId()))
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance/light.json", user.id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id=="
@@ -362,10 +362,10 @@ public class ImageInstanceResourceTests {
     @Transactional
     @WithMockUser("list_image_instance_by_projects_blind_filenames")
     public void listImageInstanceByProjectsBlindFilenames() throws Exception {
-        User user = builder.givenAUser("list_image_instance_by_projects_blind_filenames");
+        UserResponse user = builder.givenAUser("list_image_instance_by_projects_blind_filenames");
         ImageInstance image = givenTestImageInstance();
 
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
         image.getProject().setBlindMode(true);
 
@@ -939,10 +939,10 @@ public class ImageInstanceResourceTests {
     @WithMockUser("download_image_instance_cannot_download")
     @Disabled("Randomly fails")
     public void downloadImageInstanceCannotDownload() throws Exception {
-        User user = builder.givenAUser("download_image_instance_cannot_download");
+        UserResponse user = builder.givenAUser("download_image_instance_cannot_download");
 
         ImageInstance image = givenTestImageInstance();
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE);
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE);
         image.getProject().setAreImagesDownloadable(true);
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();

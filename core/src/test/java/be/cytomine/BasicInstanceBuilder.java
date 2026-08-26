@@ -10,10 +10,8 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
@@ -59,6 +57,7 @@ import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
@@ -78,67 +77,48 @@ public class BasicInstanceBuilder {
 
     public static final String ROLE_GUEST = "ROLE_GUEST";
 
+    public static final String DEFAULT_USER = "ACL_USER_NO_ACL";
+
+    public static final String DEFAULT_ADMIN = "admin";
+
+    public static final String DEFAULT_GUEST = "GUEST_ACL";
+
     EntityManager em;
-    TransactionTemplate transactionTemplate;
     PermissionService permissionService;
     SecRoleRepository secRoleRepository;
     UserRepository userRepository;
-    private User aUser;
-    private User anAdmin;
-    private User aGuest;
+    UserMapper userMapper;
 
-    public BasicInstanceBuilder(
-        EntityManager em,
-        TransactionTemplate transactionTemplate,
-        UserRepository userRepository,
-        PermissionService permissionService,
-        SecRoleRepository secRoleRepository
-    ) {
+    public BasicInstanceBuilder(EntityManager em, UserRepository userRepository, PermissionService permissionService,
+        SecRoleRepository secRoleRepository, UserMapper userMapper) {
         this.em = em;
         this.userRepository = userRepository;
         this.permissionService = permissionService;
         this.secRoleRepository = secRoleRepository;
-        this.transactionTemplate = transactionTemplate;
-
-        this.transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                aUser = userRepository.findByUsernameLikeIgnoreCase("user").orElseGet(() -> givenDefaultUser());
-                anAdmin = userRepository.findByUsernameLikeIgnoreCase("admin").orElseGet(() -> givenDefaultAdmin());
-            }
-        });
+        this.userMapper = userMapper;
     }
 
     public User givenDefaultUser() {
-        if (aUser == null) {
-            aUser = givenAUser("user");
-        }
-        return aUser;
+        return getUser(DEFAULT_USER);
     }
 
     public User givenDefaultAdmin() {
-        if (anAdmin == null) {
-            anAdmin = givenAnAdmin("admin");
-        }
-        return anAdmin;
+        return getUser(DEFAULT_ADMIN);
     }
 
-    public User givenDefaultGuest() {
-        if (aGuest == null) {
-            aGuest = givenAGuest("guest");
-        }
-        return aGuest;
+    public UserResponse givenDefaultGuest() {
+        return userMapper.map(getUser(DEFAULT_GUEST));
     }
 
-    public User givenAUser(String username) {
+    public UserResponse givenAUser(String username) {
         User user = persistAndReturn(givenANotPersistedUser());
         user.setUsername(username);
         user = persistAndReturn(user);
         addRole(user, ROLE_USER);
-        return user;
+        return userMapper.map(user);
     }
 
-    public User givenAUser() {
+    public UserResponse givenAUser() {
         return givenAUser(randomString());
     }
 
@@ -176,15 +156,17 @@ public class BasicInstanceBuilder {
     }
 
     public User givenSuperAdmin() {
-        return userRepository.findByUsernameLikeIgnoreCase("superadmin")
-            .orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
+        return getUser("superadmin");
+    }
+
+    public User getUser(String username) {
+        return userRepository.findByUsernameLikeIgnoreCase(username)
+            .orElseThrow(() -> new ObjectNotFoundException(username + " not in db"));
     }
 
     public User givenCurrentUser() {
-        return CurrentUserService.getSecurityCurrentUser()
-            .map(currentUser -> currentUser.getUser().username())
-            .flatMap(userRepository::findByUsernameLikeIgnoreCase)
-            .orElseGet(this::givenSuperAdmin);
+        return CurrentUserService.getSecurityCurrentUser().map(currentUser -> currentUser.getUser().username())
+            .flatMap(userRepository::findByUsernameLikeIgnoreCase).orElseGet(this::givenSuperAdmin);
     }
 
     public User givenANotPersistedUser() {
@@ -273,13 +255,13 @@ public class BasicInstanceBuilder {
     public Ontology givenANotPersistedOntology() {
         Ontology ontology = new Ontology();
         ontology.setName(randomString());
-        ontology.setUser(aUser);
+        ontology.setUserId(givenDefaultUser().getId());
         return ontology;
     }
 
-    public Project givenAProjectWithUser(User user) {
+    public Project givenAProjectWithUser(String username) {
         Project project = givenAProject();
-        addUserToProject(project, user.getUsername(), ADMINISTRATION);
+        addUserToProject(project, username, ADMINISTRATION);
         return project;
     }
 
@@ -833,21 +815,25 @@ public class BasicInstanceBuilder {
     }
 
     public ProjectRepresentativeUser givenAProjectRepresentativeUser() {
-        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin()));
+        return persistAndReturn(
+            givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin().getUsername(),
+                givenSuperAdmin().getId()));
     }
 
-    public ProjectRepresentativeUser givenAProjectRepresentativeUser(Project project, User user) {
-        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(project, user));
+    public ProjectRepresentativeUser givenAProjectRepresentativeUser(Project project, String username, long userId) {
+        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(project, username, userId));
     }
 
     public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser() {
-        return givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin());
+        return givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin().getUsername(),
+            givenSuperAdmin().getId());
     }
 
-    public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser(Project project, User user) {
-        addUserToProject(project, user.getUsername());
+    public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser(Project project, String username,
+        long userId) {
+        addUserToProject(project, username);
         ProjectRepresentativeUser projectRepresentativeUser = new ProjectRepresentativeUser();
-        projectRepresentativeUser.setUser(user);
+        projectRepresentativeUser.setUserId(userId);
         projectRepresentativeUser.setProject(project);
         return projectRepresentativeUser;
     }

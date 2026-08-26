@@ -98,7 +98,7 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
-            builder.givenAUser()
+            builder.givenDefaultUser()
         )).contains(annotationTerm);
     }
 
@@ -213,7 +213,7 @@ public class AnnotationTermServiceTests {
     void addValidAnnotationTermAndDeleteOtherTermsNoImpactForTermsAddedByOtherUser() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
-        annotationTerm.setUser(builder.givenAUser());
+        annotationTerm.setUser(builder.givenDefaultUser());
         builder.persistAndReturn(annotationTerm);
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
@@ -238,7 +238,7 @@ public class AnnotationTermServiceTests {
     void addValidAnnotationTermAndDeleteOtherTermsWithForceForTermsAddedByOther() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
-        annotationTerm.setUser(builder.givenAUser());
+        annotationTerm.setUser(builder.givenDefaultUser());
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
         wiremockRepository.stubTerm(newTerm);

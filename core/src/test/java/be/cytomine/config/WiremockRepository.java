@@ -225,6 +225,11 @@ public class WiremockRepository {
         stubUser(user.getId(), user.getUsername(), ROLE_USER, user.getPublicKey(), user.getPrivateKey());
     }
 
+    public void stubUser(UserResponse user) {
+        stubUser(user.id(), user.username(), ROLE_USER, user.publicKey().orElse(null),
+            user.privateKey().orElse(null));
+    }
+
     @SneakyThrows
     private void stubUser(long id, String username, String role, String publicKey, String privateKey) {
         UserResponse user = new UserResponse(

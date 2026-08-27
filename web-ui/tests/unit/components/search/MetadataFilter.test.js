@@ -99,8 +99,8 @@ describe('MetadataFilter.vue', () => {
 
     const fields = wrapper.findAll('.facet-filters .field');
     expect(fields.length).toBe(5);
-    expect(fields.at(0).find('.label').text()).toBe('block.block_preparation.meaning');
-    expect(fields.at(2).find('.label').text()).toBe(SITE);
+    expect(fields.at(0).find('.label').text()).toBe('Block preparation');
+    expect(fields.at(2).find('.label').text()).toBe('Anatomical site');
 
     const selects = wrapper.findAllComponents(CytomineMultiselect);
     expect(selects.length).toBe(5);
@@ -109,6 +109,13 @@ describe('MetadataFilter.vue', () => {
     expect(selects.at(2).props('options')).toEqual([
       'BONE, STERNUM', 'KIDNEY', 'LARGE INTESTINE, CECUM', 'LIVER',
     ]);
+  });
+
+  it('should prettify the label of an unmapped facet key', async () => {
+    const wrapper = await createWrapper();
+
+    expect(wrapper.vm.facetLabel('specimens.custom_attribute.meaning')).toBe('Custom attribute');
+    expect(wrapper.vm.facetLabel('block.block_preparation.meaning')).toBe('Block preparation');
   });
 
   it('should build no filter when no value is selected', async () => {

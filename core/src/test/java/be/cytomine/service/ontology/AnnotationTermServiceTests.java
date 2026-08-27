@@ -190,23 +190,29 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
 
         commandService.undo();
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
 
         commandService.redo();
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
     }
 
     @Test
@@ -228,7 +234,8 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(annotation, oldTerm, annotationTerm.getUser())).isPresent();
 
@@ -252,7 +259,8 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(annotation, oldTerm, annotationTerm.getUser())).isEmpty();
 

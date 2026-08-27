@@ -384,7 +384,7 @@ public class SecurityACLService {
                 case CLASSIC:
                     return;
                 case RESTRICTED:
-                    log.debug("Owner is " +ownerUserId);
+                    log.debug("Owner is " + ownerUserId);
                     if (ownerUserId != null) {
                         if (!Objects.equals(ownerUserId, currentUserService.getCurrentUser().id())) {
                             throw new ForbiddenException(

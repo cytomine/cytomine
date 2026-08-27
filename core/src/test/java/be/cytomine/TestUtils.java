@@ -20,7 +20,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.utils.StringUtils;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;

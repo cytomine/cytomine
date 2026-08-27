@@ -22,7 +22,6 @@ import be.cytomine.common.repository.model.command.payload.response.UserResponse
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.AnnotationAction;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 import be.cytomine.service.CurrentUserService;

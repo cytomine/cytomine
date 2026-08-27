@@ -20,17 +20,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastConnection;
 import be.cytomine.domain.social.PersistentImageConsultation;
 import be.cytomine.domain.social.PersistentProjectConnection;
@@ -286,7 +285,8 @@ public class ProjectConnectionServiceTests {
         assertThat(results.getContent().get(0).getUser()).isEqualTo(user.id());
         assertThat(results.getContent().get(0).getExtraProperties()).containsEntry("online", true);
 
-        results = projectConnectionService.getConnectionByUserAndProject(builder.getUserEntity(anotherUser), projet, 50, 0);
+        results = projectConnectionService.getConnectionByUserAndProject(builder.getUserEntity(anotherUser), projet,
+            50, 0);
         assertThat(results).isNotEmpty();
         assertThat(results.getContent().get(0).getUser()).isEqualTo(anotherUser.id());
         assertThat(results.getContent().get(0).getExtraProperties()).doesNotContainEntry("online", true);
@@ -301,15 +301,18 @@ public class ProjectConnectionServiceTests {
         givenAPersistentConnectionInProject(user, projet);
         givenAPersistentConnectionInProject(user, projet);
 
-        JsonObject result = projectConnectionService.numberOfConnectionsByProjectAndUser(projet, builder.getUserEntity(user));
+        JsonObject result = projectConnectionService.numberOfConnectionsByProjectAndUser(projet,
+            builder.getUserEntity(user));
         assertThat(result.get("user")).isEqualTo(user.id());
         assertThat(result.get("frequency")).isEqualTo(2L);
 
-        result = projectConnectionService.numberOfConnectionsByProjectAndUser(builder.givenAProject(), builder.getUserEntity(user));
+        result = projectConnectionService.numberOfConnectionsByProjectAndUser(builder.givenAProject(),
+            builder.getUserEntity(user));
         assertThat(result.get("user")).isEqualTo(user.id());
         assertThat(result.get("frequency")).isEqualTo(0L);
 
-        result = projectConnectionService.numberOfConnectionsByProjectAndUser(projet, builder.getUserEntity(anotherUser));
+        result = projectConnectionService.numberOfConnectionsByProjectAndUser(projet,
+            builder.getUserEntity(anotherUser));
         assertThat(result.get("user")).isEqualTo(anotherUser.id());
         assertThat(result.get("frequency")).isEqualTo(0L);
     }
@@ -477,18 +480,21 @@ public class ProjectConnectionServiceTests {
         Project projet = builder.givenAProject();
         UserResponse user = builder.givenSuperAdmin();
 
-        List<JsonObject> results = projectConnectionService.numberOfProjectConnections("day", null, null, projet, builder.getUserEntity(user));
+        List<JsonObject> results = projectConnectionService.numberOfProjectConnections("day", null, null, projet,
+            builder.getUserEntity(user));
         assertThat(results).isEmpty();
 
         givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T12:00:00"));
         givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T12:05:00"));
         givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T13:30:00"));
 
-        results = projectConnectionService.numberOfProjectConnections("day", null, null, projet, builder.getUserEntity(user));
+        results = projectConnectionService.numberOfProjectConnections("day", null, null, projet,
+            builder.getUserEntity(user));
         assertThat(results).hasSize(1);
         assertThat(results.get(0).get("frequency")).isEqualTo(3);
 
-        results = projectConnectionService.numberOfProjectConnections("hour", null, null, projet, builder.getUserEntity(user));
+        results = projectConnectionService.numberOfProjectConnections("hour", null, null, projet,
+            builder.getUserEntity(user));
         assertThat(results).hasSize(2);
         Optional<JsonObject> entry = results.stream().filter(x -> x.get("frequency").equals(2)).findFirst();
         assertThat(entry).isPresent();
@@ -497,7 +503,8 @@ public class ProjectConnectionServiceTests {
 
         givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2021-01-20T03:00:00"));
 
-        results = projectConnectionService.numberOfProjectConnections("week", null, null, projet, builder.getUserEntity(user));
+        results = projectConnectionService.numberOfProjectConnections("week", null, null, projet,
+            builder.getUserEntity(user));
         assertThat(results).hasSize(2);
         entry = results.stream().filter(x -> x.get("frequency").equals(3)).findFirst();
         assertThat(entry).isPresent();

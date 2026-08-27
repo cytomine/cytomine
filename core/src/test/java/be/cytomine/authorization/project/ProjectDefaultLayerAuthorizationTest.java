@@ -17,7 +17,6 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.ProjectDefaultLayer;
-import be.cytomine.domain.security.User;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectDefaultLayerService;
 

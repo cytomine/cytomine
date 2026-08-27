@@ -22,11 +22,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.StatsHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
 import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
@@ -41,7 +41,6 @@ import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.AnnotationAction;
 import be.cytomine.domain.social.PersistentImageConsultation;
 import be.cytomine.domain.social.PersistentProjectConnection;
@@ -138,8 +137,8 @@ public class StatsServiceTests {
         return imageConsultationService.add(user.id(), imageInstance.getId(), "xxx", "mode", created);
     }
 
-    AnnotationAction givenAPersistentAnnotationAction(Date creation, AnnotationDomain annotationDomain, UserResponse user,
-        String action) {
+    AnnotationAction givenAPersistentAnnotationAction(Date creation, AnnotationDomain annotationDomain,
+        UserResponse user, String action) {
         return annotationActionService.add(annotationDomain, user.id(), action, creation);
     }
 

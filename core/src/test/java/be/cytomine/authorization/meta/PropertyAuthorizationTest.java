@@ -112,7 +112,8 @@ public class PropertyAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void userCanAddInRestrictedModeForAnnotationIfOwner() {
         project.setMode(EditingMode.RESTRICTED);
-        ((UserAnnotation) annotationDomain).setUserId(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get().getId());
+        ((UserAnnotation) annotationDomain).setUserId(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get()
+            .getId());
         expectOK(() -> {
             AnnotationDomain annotationDomain = builder.persistAndReturn(builder.givenANotPersistedUserAnnotation(
                 project));

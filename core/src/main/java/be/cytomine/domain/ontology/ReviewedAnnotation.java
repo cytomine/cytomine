@@ -232,6 +232,7 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
     /**
      * Return domain user (annotation user, image user...) By default, a domain has no user. You need to override
      * userDomainCreator() in domain class
+     *
      * @return Domain user
      */
     @Override

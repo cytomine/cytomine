@@ -28,7 +28,6 @@ import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.PersistentImageConsultation;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.service.social.ImageConsultationService;

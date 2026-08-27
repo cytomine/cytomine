@@ -193,7 +193,8 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void userWithReadAclCannotManageUserInProject() {
         expectForbidden(() -> projectMemberService.addUserToProject(builder.givenCreator().username(), project, true));
-        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAclUserNoAcl().username(), project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAclUserNoAcl().username(), project,
+            false));
     }
 
     @Test

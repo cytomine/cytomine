@@ -281,7 +281,8 @@ public class UserPositionResourceTests {
             String.valueOf(userA.id()),
             new ConcurrentWebSocketSessionDecorator[] {sessionDecoratorA}
         );
-        UserPositionService.broadcasters.put(currentUserAndImageId, new ArrayList<>(Collections.singleton(builder.getUserEntity(userB))));
+        UserPositionService.broadcasters.put(currentUserAndImageId,
+            new ArrayList<>(Collections.singleton(builder.getUserEntity(userB))));
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/followers/{user}.json",
@@ -490,7 +491,8 @@ public class UserPositionResourceTests {
         ImageInstance imageInstance = sliceInstance.getImage();
         String userAndImageId = String.valueOf(user.id()) + "/" + imageInstance.getId().toString();
 
-        UserPositionService.broadcasters.put(userAndImageId, new ArrayList<>(Collections.singleton(builder.getUserEntity(user))));
+        UserPositionService.broadcasters.put(userAndImageId,
+            new ArrayList<>(Collections.singleton(builder.getUserEntity(user))));
         assertThat(UserPositionService.broadcasters.get(userAndImageId).size()).isEqualTo(1);
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/position/{user}.json",

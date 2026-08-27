@@ -18,7 +18,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import be.cytomine.domain.security.User;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.DateUtils;
 import be.cytomine.utils.JsonObject;

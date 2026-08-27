@@ -1,6 +1,6 @@
 <template>
-<div class="cytomine-quill-editor">
-  <div id="tooltip-container"></div> <!-- invisible div defining the allowed positions for ql tooltip -->
+  <div class="cytomine-quill-editor">
+    <div id="tooltip-container"></div> <!-- invisible div defining the allowed positions for ql tooltip -->
 
   <div id="toolbar">
     <span class="ql-formats">

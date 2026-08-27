@@ -13,7 +13,7 @@
       </b-field>
 
       <div class="facet-filters">
-        <b-field v-for="item in facets" :key="item.key" :label="item.key">
+        <b-field v-for="item in facets" :key="item.key" :label="facetLabel(item.key)">
           <cytomine-multiselect
             v-model="selectedFacets[item.key]"
             :options="item.values"
@@ -33,6 +33,17 @@ import _ from 'lodash';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
 import { fetchFacets } from '@/utils/search';
+
+const FACET_LABELS = {
+  'specimens.biological_being.animal_species.meaning': 'Animal species',
+  'specimens.anatomical_site.meaning': 'Anatomical site',
+  'specimens.biological_being.sex': 'Sex',
+  'specimens.age_at_extraction.interval_start': 'Age at extraction',
+  'slide.staining.stains.compound.meaning': 'Stain compound',
+  'specimens.fixation_type.meaning': 'Fixation type',
+  'block.block_preparation.meaning': 'Block preparation',
+  'specimens.specimen_type.meaning': 'Specimen type',
+};
 
 export default {
   name: 'MetadataFilter',
@@ -68,6 +79,13 @@ export default {
     },
   },
   methods: {
+    facetLabel(key) {
+      if (FACET_LABELS[key]) {
+        return FACET_LABELS[key];
+      }
+      let segment = key.replace(/\.meaning$/, '').split('.').pop();
+      return segment.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
+    },
     async fetchFacets() {
       let facets = await fetchFacets();
 
@@ -116,7 +134,8 @@ export default {
 .facet-filters .field {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  align-self: start;
   margin-bottom: 0;
   min-width: 0;
 }

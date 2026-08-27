@@ -91,7 +91,7 @@ public abstract class CytomineDomain {
         return null;
     }
 
-    public User userDomainCreator() {
+    public Long userDomainCreator() {
         return null;
     }
 

@@ -186,7 +186,7 @@ public class User extends CytomineDomain {
     }
 
     @Override
-    public User userDomainCreator() {
-        return this;
+    public Long userDomainCreator() {
+        return this.getId();
     }
 }

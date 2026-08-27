@@ -1034,11 +1034,11 @@ public class ImageInstanceService extends ModelService {
         securityACLService.check(domain.container(), READ);
         securityACLService.checkUser(currentUser);
         securityACLService.check(jsonNewData.getJSONAttrLong("project"), Project.class, READ);
-        securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((ImageInstance) domain).getUser());
+        securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((ImageInstance) domain).getUserId());
         securityACLService.checkIsNotReadOnly(domain.container());
         securityACLService.checkIsNotReadOnly(jsonNewData.getJSONAttrLong("project"), Project.class);
 
-        jsonNewData.putIfAbsent("user", ((ImageInstance) domain).getUser().getId());
+        jsonNewData.putIfAbsent("user", ((ImageInstance) domain).getUserId());
 
         JsonObject attributes = domain.toJsonObject(urlApi);
         CommandResponse commandResponse = executeCommand(
@@ -1082,7 +1082,7 @@ public class ImageInstanceService extends ModelService {
 
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
-        securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((ImageInstance) domain).getUser());
+        securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((ImageInstance) domain).getUserId());
 
         Project project = ((ImageInstance) domain).getProject();
         if (Lock.getInstance().lockProject(project)) {
@@ -1124,7 +1124,7 @@ public class ImageInstanceService extends ModelService {
 
     private void deleteDependentUserAnnotation(ImageInstance image, Transaction transaction, Task task) {
         for (UserAnnotation userAnnotation : userAnnotationRepository.findAllByImage(image)) {
-            log.debug("Delete userAnnotation : " + userAnnotation.getUser());
+            log.debug("Delete userAnnotation : " + userAnnotation.getUserId());
             userAnnotationService.delete(userAnnotation, transaction, task, false);
         }
     }
@@ -1192,23 +1192,22 @@ public class ImageInstanceService extends ModelService {
     }
 
     public void startReview(ImageInstance imageInstance) {
-        securityACLService.checkFullOrRestrictedForOwner(imageInstance, imageInstance.getUser());
+        securityACLService.checkFullOrRestrictedForOwner(imageInstance, imageInstance.getUserId());
         imageInstance.setReviewStart(new Date());
         imageInstance.setReviewUser(currentUserService.getCurrentUserOld());
         saveDomain(imageInstance);
     }
 
     public void stopReview(ImageInstance imageInstance, boolean cancelReview) {
-        if (imageInstance.getReviewStart() == null || imageInstance.getReviewUser() == null) {
+        if (imageInstance.getReviewStart() == null || imageInstance.getReviewUserId() == null) {
             throw new WrongArgumentException("Image is not in review mode: image.reviewStart="
                 + imageInstance.getReviewStart()
                 + " and image.reviewUser="
-                + imageInstance.getReviewUser());
+                + imageInstance.getReviewUserId());
         }
-        if (!(Objects.equals(currentUserService.getCurrentUser().username(),
-            imageInstance.getReviewUser().getUsername()))) {
+        if (!(Objects.equals(currentUserService.getCurrentUser().id(), imageInstance.getReviewUserId()))) {
             throw new WrongArgumentException(
-                "Review can only be validated or stopped by " + imageInstance.getReviewUser().getUsername());
+                "Review can only be validated or stopped by " + imageInstance.getReviewUserId());
         }
 
         if (cancelReview) {

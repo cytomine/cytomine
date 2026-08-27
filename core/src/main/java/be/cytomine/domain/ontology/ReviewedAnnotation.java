@@ -49,9 +49,8 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
     /**
      * User that create the annotation that has been reviewed
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "user_id")
+    private Long userId;
 
     /**
      * User that review annotation
@@ -112,11 +111,6 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         return false;
     }
 
-    @Override
-    Long getUserId() {
-        return user.getId();
-    }
-
     /**
      * Check if its a review annotation
      */
@@ -136,7 +130,7 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         annotation.slice = (SliceInstance) json.getJSONAttrDomain(entityManager, "slice", new SliceInstance(), true);
         annotation.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
         annotation.project = annotation.getImage().getProject();
-        annotation.user = (User) json.getJSONAttrDomain(entityManager, "user", new User(), true);
+        annotation.userId = ((User) json.getJSONAttrDomain(entityManager, "user", new User(), true)).getId();
         annotation.reviewUser = (User) json.getJSONAttrDomain(entityManager, "reviewUser", new User(), true);
 
         annotation.status = json.getJSONAttrInteger("status", 0);
@@ -233,19 +227,15 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         return returnArray;
     }
 
-    @Override
-    public User user() {
-        return user;
-    }
+
 
     /**
      * Return domain user (annotation user, image user...) By default, a domain has no user. You need to override
      * userDomainCreator() in domain class
-     *
      * @return Domain user
      */
     @Override
-    public User userDomainCreator() {
-        return reviewUser;
+    public Long userDomainCreator() {
+        return reviewUser.getId();
     }
 }

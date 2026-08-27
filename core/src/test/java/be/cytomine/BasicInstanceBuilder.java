@@ -179,7 +179,7 @@ public class BasicInstanceBuilder {
         return  userMapper.map(user);
     }
 
-    public void addRole(User user, String authority) {
+    public void addRole(UserResponse user, String authority) {
         SecUserSecRole secSecUserSecRole = new SecUserSecRole();
         secSecUserSecRole.setSecUser(user);
         secSecUserSecRole.setSecRole(secRoleRepository.findByAuthority(authority)

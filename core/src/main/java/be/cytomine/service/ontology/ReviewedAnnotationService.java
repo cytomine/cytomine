@@ -319,7 +319,7 @@ public class ReviewedAnnotationService extends ModelService {
         review.setParentIdent(annotation.getId());
         review.setParentClassName(annotation.getClass().getName());
         review.setStatus(1);
-        review.setUser(annotation.user());
+        review.setUserId(annotation.userDomainCreator());
         review.setLocation(annotation.getLocation());
         review.setImage(annotation.getImage());
         review.setSlice(annotation.getSlice());

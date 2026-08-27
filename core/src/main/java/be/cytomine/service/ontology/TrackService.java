@@ -105,7 +105,7 @@ public class TrackService extends ModelService {
         jsonObject.put("project", imageInstance.getProject().getId());
 
         securityACLService.check(imageInstance.getProject(), READ);
-        securityACLService.checkFullOrRestrictedForOwner(imageInstance, imageInstance.getUser());
+        securityACLService.checkFullOrRestrictedForOwner(imageInstance, imageInstance.getUserId());
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
@@ -124,7 +124,7 @@ public class TrackService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         Track track = ((Track) domain);
         securityACLService.check(domain.container(), READ);
-        securityACLService.checkFullOrRestrictedForOwner(track, track.getImage().getUser());
+        securityACLService.checkFullOrRestrictedForOwner(track, track.getImage().getUserId());
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
@@ -152,7 +152,7 @@ public class TrackService extends ModelService {
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
         Track track = ((Track) domain);
         securityACLService.check(domain.container(), READ);
-        securityACLService.checkFullOrRestrictedForOwner(track, track.getImage().getUser());
+        securityACLService.checkFullOrRestrictedForOwner(track, track.getImage().getUserId());
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 

@@ -160,7 +160,7 @@ public class ImageInstance extends CytomineDomain {
             "reviewStop",
             Optional.ofNullable(imageInstance.getReviewStop()).map(x -> String.valueOf(x.getTime())).orElse(null)
         );
-        returnArray.put("reviewUser", Optional.ofNullable(imageInstance.getReviewUser()).map(User::getId).orElse(null));
+        returnArray.put("reviewUser", imageInstance.getReviewUserId());
 
         returnArray.put("reviewed", imageInstance.isReviewed());
         returnArray.put("inReview", imageInstance.isInReviewMode());
@@ -244,8 +244,12 @@ public class ImageInstance extends CytomineDomain {
         return Optional.ofNullable(this.getProject()).map(CytomineDomain::getId).orElse(null);
     }
 
-    private Long getUserId() {
+    public Long getUserId() {
         return Optional.ofNullable(this.getUser()).map(CytomineDomain::getId).orElse(null);
+    }
+
+    public Long getReviewUserId() {
+        return Optional.ofNullable(this.getReviewUser()).map(CytomineDomain::getId).orElse(null);
     }
 
     /**
@@ -282,8 +286,8 @@ public class ImageInstance extends CytomineDomain {
      * @return Domain user
      */
     @Override
-    public User userDomainCreator() {
-        return user;
+    public Long userDomainCreator() {
+        return getUserId();
     }
 
     @Override

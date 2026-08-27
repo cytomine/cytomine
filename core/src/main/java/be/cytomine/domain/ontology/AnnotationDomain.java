@@ -210,7 +210,7 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
         }
     }
 
-    abstract Long getUserId();
+    public abstract Long getUserId();
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
@@ -243,7 +243,5 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
 
         return returnArray;
     }
-
-    public abstract User user();
 
 }

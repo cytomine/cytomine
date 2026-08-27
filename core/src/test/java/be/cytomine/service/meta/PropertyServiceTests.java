@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
@@ -85,7 +86,7 @@ public class PropertyServiceTests {
                 project.getId(),
                 "key",
                 "value",
-                builder.givenSuperAdmin().getId(),
+                builder.givenSuperAdmin().id(),
                 null
             );
         assertThat(commandResponse).isNotNull();
@@ -160,7 +161,7 @@ public class PropertyServiceTests {
 
         assertThat(results.stream().map(x -> (String) x.get("key"))).containsExactly(property.getKey())
             .doesNotContain(projectProperty.getKey());
-        assertThat(results.stream().map(x -> (Long) x.get("user"))).containsExactly(builder.givenSuperAdmin().getId());
+        assertThat(results.stream().map(x -> (Long) x.get("user"))).containsExactly(builder.givenSuperAdmin().id());
     }
 
     @Test
@@ -178,7 +179,7 @@ public class PropertyServiceTests {
     @Test
     public void selectCenterAnnotation() throws ParseException {
         Project project = builder.givenAProject();
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         UserAnnotation annotation = builder.givenAUserAnnotation();
         annotation.setLocation(new WKTReader().read("POLYGON ((0 0, 0 1000, 1000 1000, 1000 0, 0 0))"));
@@ -190,7 +191,7 @@ public class PropertyServiceTests {
         ));
 
         List<Map<String, Object>> results = propertyService.listAnnotationCenterPosition(
-            user,
+            builder.getUserEntity(user),
             imageInstance,
             GeometryUtils.createBoundingBox("0,0,1000,1000"),
             "TestCytomine"

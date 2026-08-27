@@ -237,7 +237,7 @@ public class ProjectResourceTests {
         Project projectWithoutCriteria = builder.givenAProject();
 
         builder.addUserToProject(projectWithCriteria, currentUserService.getCurrentUsername());
-        builder.addUserToProject(projectWithCriteria, builder.givenAUser().username());
+        builder.addUserToProject(projectWithCriteria, builder.givenUserAclRead().username());
 
         builder.addUserToProject(projectWithoutCriteria, currentUserService.getCurrentUsername());
 
@@ -583,8 +583,8 @@ public class ProjectResourceTests {
     @Transactional
     public void addValidProjectWithUsersAdmins() throws Exception {
         String currentUsername = currentUserService.getCurrentUsername();
-        UserResponse user = builder.givenAUser();
-        UserResponse admin = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
+        UserResponse admin = builder.givenUserAclWrite();
 
         Project project = basicInstanceBuilder.givenANotPersistedProject();
         project.setOntology(builder.givenAnOntology());
@@ -677,8 +677,8 @@ public class ProjectResourceTests {
     public void editValidProjectWithUsers() throws Exception {
         Project project = builder.givenAProject();
 
-        UserResponse previousUser = builder.givenAUser();
-        UserResponse newUser = builder.givenAUser();
+        UserResponse previousUser = builder.givenUserAclRead();
+        UserResponse newUser = builder.givenUserAclWrite();
         builder.addUserToProject(project, previousUser.username(), READ);
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
@@ -702,8 +702,8 @@ public class ProjectResourceTests {
     public void editValidProjectWithAdmins() throws Exception {
         Project project = builder.givenAProject();
 
-        UserResponse previousUser = builder.givenAUser();
-        UserResponse newUser = builder.givenAUser();
+        UserResponse previousUser = builder.givenUserAclRead();
+        UserResponse newUser = builder.givenUserAclWrite();
         builder.addUserToProject(project, previousUser.username(), READ);
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
@@ -975,7 +975,7 @@ public class ProjectResourceTests {
         project.setCountAnnotations(20);
         project.setCountJobAnnotations(30);
         project.setCountReviewedAnnotations(40);
-        builder.addUserToProject(project, builder.givenAUser().username());
+        builder.addUserToProject(project, builder.givenUserAclRead().username());
         builder.addUserToProject(project, currentUserService.getCurrentUsername());
         builder.persistAndReturn(project);
         Project project2 = builder.givenAProject();

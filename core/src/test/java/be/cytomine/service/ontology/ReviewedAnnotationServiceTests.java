@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
@@ -111,8 +112,8 @@ public class ReviewedAnnotationServiceTests {
     @Test
     void countReviewedAnnotationWithSuccess() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
-        assertThat(reviewedAnnotationService.count(reviewedAnnotation.getUser().getId())).isGreaterThanOrEqualTo(1L);
-        assertThat(reviewedAnnotationService.count(builder.givenAUser().id())).isEqualTo(0);
+        assertThat(reviewedAnnotationService.count(reviewedAnnotation.getUserId())).isGreaterThanOrEqualTo(1L);
+        assertThat(reviewedAnnotationService.count(builder.givenUserAclRead().id())).isEqualTo(0);
     }
 
     @Test
@@ -180,7 +181,7 @@ public class ReviewedAnnotationServiceTests {
     void statsGroupByUser() {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         User reviewer = reviewedAnnotation.getReviewUser();
-        User anotherUser = builder.givenDefaultUser();
+        UserResponse anotherUser = builder.givenAclUserNoAcl();
 
         List<ReviewedAnnotationStatsEntry> results = reviewedAnnotationService.statsGroupByUser(
             reviewedAnnotation.getImage()
@@ -193,15 +194,15 @@ public class ReviewedAnnotationServiceTests {
         assertThat(resultForUser.get().getReviewed()).isGreaterThanOrEqualTo(1);
         assertThat(resultForUser.get().getAll()).isGreaterThanOrEqualTo(1);
 
-        resultForUser = results.stream().filter(x -> x.getUser().equals(anotherUser.getId())).findFirst();
+        resultForUser = results.stream().filter(x -> x.getUser().equals(anotherUser.id())).findFirst();
         assertThat(resultForUser).isEmpty();
     }
 
     @Test
     void listIncluded() throws ParseException {
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenDefaultUser();
-        User user2 = builder.givenDefaultAdmin();
+        UserResponse user1 = builder.givenAclUserNoAcl();
+        UserResponse user2 = builder.givenAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -446,7 +447,7 @@ public class ReviewedAnnotationServiceTests {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
-        image.setReviewUser(builder.givenDefaultUser());
+        image.setReviewUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(image.getProject());
         userAnnotation.setImage(image);
         builder.persistAndReturn(userAnnotation);
@@ -552,7 +553,7 @@ public class ReviewedAnnotationServiceTests {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
         imageInstanceService.startReview(userAnnotation.getImage());
-        userAnnotation.getImage().setReviewUser(builder.givenDefaultUser());
+        userAnnotation.getImage().setReviewUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
 
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -618,7 +619,7 @@ public class ReviewedAnnotationServiceTests {
 
         List<Long> ids = reviewedAnnotationService.reviewLayer(
             image.getId(),
-            List.of(userAnnotation.getUser().getId()),
+            List.of(userAnnotation.getUserId()),
             null
         );
         assertThat(ids).hasSize(1);
@@ -639,7 +640,7 @@ public class ReviewedAnnotationServiceTests {
     void reviewAllUserLayersUserIsNotReviewer() {
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
-        image.setReviewUser(builder.givenDefaultUser());
+        image.setReviewUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
                 reviewedAnnotationService.reviewLayer(image.getId(), List.of(image.getUser().getId()), null);

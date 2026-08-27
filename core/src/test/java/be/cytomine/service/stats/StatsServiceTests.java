@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
@@ -128,18 +129,18 @@ public class StatsServiceTests {
         persistentUserPositionRepository.deleteAll();
     }
 
-    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
-        return projectConnectionService.add(user.getId(), project, "xxx", "linux", "chrome", "123", created);
+    PersistentProjectConnection givenAPersistentConnectionInProject(UserResponse user, Project project, Date created) {
+        return projectConnectionService.add(user.id(), project, "xxx", "linux", "chrome", "123", created);
     }
 
-    PersistentImageConsultation givenAPersistentImageConsultation(User user, ImageInstance imageInstance,
+    PersistentImageConsultation givenAPersistentImageConsultation(UserResponse user, ImageInstance imageInstance,
         Date created) {
-        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.id(), imageInstance.getId(), "xxx", "mode", created);
     }
 
-    AnnotationAction givenAPersistentAnnotationAction(Date creation, AnnotationDomain annotationDomain, User user,
+    AnnotationAction givenAPersistentAnnotationAction(Date creation, AnnotationDomain annotationDomain, UserResponse user,
         String action) {
-        return annotationActionService.add(annotationDomain, user.getId(), action, creation);
+        return annotationActionService.add(annotationDomain, user.id(), action, creation);
     }
 
     @Test
@@ -233,7 +234,7 @@ public class StatsServiceTests {
         List<JsonObject> results = statsService.statUserSlide(project, null, null);
 
         assertThat(results).hasSize(1);
-        assertThat(results.getFirst().getId()).isEqualTo(builder.givenSuperAdmin().getId());
+        assertThat(results.getFirst().getId()).isEqualTo(builder.givenSuperAdmin().id());
         assertThat(results.getFirst().get("value")).isEqualTo(0);
 
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
@@ -246,10 +247,10 @@ public class StatsServiceTests {
         results = statsService.statUserSlide(project, null, null);
 
         assertThat(results).hasSize(1);
-        assertThat(results.getFirst().getId()).isEqualTo(builder.givenSuperAdmin().getId());
+        assertThat(results.getFirst().getId()).isEqualTo(builder.givenSuperAdmin().id());
         assertThat(results.getFirst().get("value")).isEqualTo(2L);
 
-        builder.addUserToProject(project, builder.givenAUser().username());
+        builder.addUserToProject(project, builder.givenUserAclRead().username());
 
         results = statsService.statUserSlide(project, null, null);
 
@@ -266,7 +267,7 @@ public class StatsServiceTests {
     @Test
     void statsTermSlide() {
         Project project = builder.givenAProject();
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = builder.givenSuperAdmin().id();
 
         when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
             Pageable.unpaged())).thenReturn(new PageImpl<>(List.of()));
@@ -320,7 +321,7 @@ public class StatsServiceTests {
     @Test
     void statsTerm() {
         Project project = builder.givenAProject();
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = builder.givenSuperAdmin().id();
 
         when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), eq(Optional.empty()),
             eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(new PageImpl<>(List.of()));
@@ -425,10 +426,10 @@ public class StatsServiceTests {
         entityManager.refresh(annotation2);
 
         Term term = annotation1.getTerms().getFirst();
-        User superAdmin = builder.givenSuperAdmin();
-        when(statsHttpContract.findUserTermsByProject(project.getId(), superAdmin.getId(),
+        UserResponse superAdmin = builder.givenSuperAdmin();
+        when(statsHttpContract.findUserTermsByProject(project.getId(), superAdmin.id(),
             Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(
-                new FlatStatUserTerm(superAdmin.getId(), superAdmin.getUsername(),
+                new FlatStatUserTerm(superAdmin.id(), superAdmin.username(),
                     new StatTerm(term.getId(), term.getName(), term.getColor(), 2)))));
 
         Set<StatTerm> terms;
@@ -436,7 +437,7 @@ public class StatsServiceTests {
         List<StatUserTerm> results = statsService.statUserAnnotations(project);
 
         assertThat(results).hasSize(1);
-        assertThat(results.getFirst().userId()).isEqualTo(builder.givenSuperAdmin().getId());
+        assertThat(results.getFirst().userId()).isEqualTo(builder.givenSuperAdmin().id());
         terms = results.getFirst().terms();
         assertThat(terms).hasSize(1);
         assertThat(terms.stream().findFirst().get().count()).isEqualTo(2);
@@ -457,7 +458,7 @@ public class StatsServiceTests {
         List<JsonObject> results = statsService.statUser(project, null, null);
 
         assertThat(results).hasSize(1);
-        assertThat(results.getFirst().getId()).isEqualTo(builder.givenSuperAdmin().getId());
+        assertThat(results.getFirst().getId()).isEqualTo(builder.givenSuperAdmin().id());
         assertThat(results.getFirst().getJSONAttrLong("value")).isEqualTo(2);
     }
 

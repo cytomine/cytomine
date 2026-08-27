@@ -362,7 +362,7 @@ public class ReviewedAnnotationService extends ModelService {
         taskService.updateTask(task, 5, "Look for all annotations...");
 
         for (User user : users) {
-            annotations.addAll(userAnnotationRepository.findAllByUserAndImage((User) user, imageInstance));
+            annotations.addAll(userAnnotationRepository.findAllByUserIdAndImage(user.getId(), imageInstance));
         }
 
         //review each annotation
@@ -419,7 +419,7 @@ public class ReviewedAnnotationService extends ModelService {
         List<AnnotationDomain> annotations = new ArrayList<>();
         taskService.updateTask(task, 5, "Look for all annotations...");
         for (User user : users) {
-            annotations.addAll(userAnnotationRepository.findAllByUserAndImage((User) user, imageInstance));
+            annotations.addAll(userAnnotationRepository.findAllByUserIdAndImage(user.getId(), imageInstance));
         }
 
         //unreview each one

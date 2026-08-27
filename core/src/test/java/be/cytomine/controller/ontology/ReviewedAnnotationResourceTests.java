@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
@@ -98,7 +99,7 @@ public class ReviewedAnnotationResourceTests {
     private ImageInstance image;
     private SliceInstance slice;
     private Term term;
-    private User me;
+    private UserResponse me;
     private ReviewedAnnotation reviewedAnnotation;
 
     public static ReviewedAnnotation givenAReviewedAnnotationWithValidImageServer(BasicInstanceBuilder builder)
@@ -136,7 +137,7 @@ public class ReviewedAnnotationResourceTests {
             .andExpect(jsonPath("$.location").value(reviewedAnnotation.getWktLocation()))
             .andExpect(jsonPath("$.image").value(reviewedAnnotation.getImage().getId().intValue()))
             .andExpect(jsonPath("$.project").value(reviewedAnnotation.getProject().getId().intValue()))
-            .andExpect(jsonPath("$.user").value(reviewedAnnotation.getUser().getId()))
+            .andExpect(jsonPath("$.user").value(reviewedAnnotation.getUserId()))
             .andExpect(jsonPath("$.parentIdent").exists())
             .andExpect(jsonPath("$.parentClassName").exists())
             .andExpect(jsonPath("$.centroid.x").exists())
@@ -298,7 +299,7 @@ public class ReviewedAnnotationResourceTests {
             this.me,
             this.term
         );
-        builder.addUserToProject(project, this.me.getUsername());
+        builder.addUserToProject(project, this.me.username());
         wiremockRepository.stubTerm(this.term);
     }
 
@@ -432,7 +433,7 @@ public class ReviewedAnnotationResourceTests {
     public void stopImageReview() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setReviewStart(new Date());
-        imageInstance.setReviewUser(builder.givenCurrentUser());
+        imageInstance.setReviewUser(builder.getUserEntity(builder.givenCurrentUser()));
         assertThat(imageInstance.getReviewStop()).isNull();
         restReviewedAnnotationControllerMockMvc.perform(delete(
                 "/api/imageinstance/{image}/review.json",
@@ -447,7 +448,7 @@ public class ReviewedAnnotationResourceTests {
     public void cancelImageReview() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setReviewStart(new Date());
-        imageInstance.setReviewUser(builder.givenCurrentUser());
+        imageInstance.setReviewUser(builder.getUserEntity(builder.givenCurrentUser()));
         assertThat(imageInstance.getReviewStop()).isNull();
         restReviewedAnnotationControllerMockMvc.perform(delete(
                 "/api/imageinstance/{image}/review.json",
@@ -476,7 +477,7 @@ public class ReviewedAnnotationResourceTests {
     public void addAnnotationReview() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.getImage().setReviewStart(new Date());
-        userAnnotation.getImage().setReviewUser(builder.givenCurrentUser());
+        userAnnotation.getImage().setReviewUser(builder.getUserEntity(builder.givenCurrentUser()));
 
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(userAnnotation);
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isEmpty();
@@ -499,7 +500,7 @@ public class ReviewedAnnotationResourceTests {
     public void addAnnotationReviewWithTermsChange() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.getImage().setReviewStart(new Date());
-        userAnnotation.getImage().setReviewUser(builder.givenCurrentUser());
+        userAnnotation.getImage().setReviewUser(builder.getUserEntity(builder.givenCurrentUser()));
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(userAnnotation);
         Term anotherTerm = builder.givenATerm(userAnnotation.getProject().getOntology());
 
@@ -541,7 +542,7 @@ public class ReviewedAnnotationResourceTests {
     public void reviewFullLayer() throws Exception {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         userAnnotation.getImage().setReviewStart(new Date());
-        userAnnotation.getImage().setReviewUser(builder.givenCurrentUser());
+        userAnnotation.getImage().setReviewUser(builder.getUserEntity(builder.givenCurrentUser()));
         AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm(userAnnotation);
         em.refresh(userAnnotation);
 
@@ -552,7 +553,7 @@ public class ReviewedAnnotationResourceTests {
                 userAnnotation.getImage().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("").param("users", userAnnotation.getUser().getId().toString()))
+                .content("").param("users", userAnnotation.getUserId().toString()))
             .andExpect(status().isOk());
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(userAnnotation.getId())).isPresent();
@@ -563,7 +564,7 @@ public class ReviewedAnnotationResourceTests {
     public void unreviewFullLayer() throws Exception {
         ReviewedAnnotation reviewedAnnotation = builder.givenAReviewedAnnotation();
         reviewedAnnotation.getImage().setReviewStart(new Date());
-        reviewedAnnotation.getImage().setReviewUser(builder.givenCurrentUser());
+        reviewedAnnotation.getImage().setReviewUser(builder.getUserEntity(builder.givenCurrentUser()));
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(reviewedAnnotation.getParentIdent())).isPresent();
 
@@ -572,7 +573,7 @@ public class ReviewedAnnotationResourceTests {
                 reviewedAnnotation.getImage().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("").param("users", reviewedAnnotation.getUser().getId().toString()))
+                .content("").param("users", reviewedAnnotation.getUserId().toString()))
             .andExpect(status().isOk());
 
         assertThat(reviewedAnnotationRepository.findByParentIdent(reviewedAnnotation.getParentIdent())).isEmpty();

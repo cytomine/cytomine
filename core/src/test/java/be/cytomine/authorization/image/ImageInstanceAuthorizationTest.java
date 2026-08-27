@@ -115,7 +115,7 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         imageInstance.setProject(this.imageInstance.getProject());
         imageInstance.setReviewStart(new Date());
-        imageInstance.setReviewUser(builder.givenSuperAdmin());
+        imageInstance.setReviewUser(builder.getUserEntity(builder.givenSuperAdmin()));
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
                 imageInstanceService.stopReview(imageInstance, false);

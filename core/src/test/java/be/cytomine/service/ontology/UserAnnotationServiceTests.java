@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
@@ -106,8 +107,8 @@ public class UserAnnotationServiceTests {
     @Test
     void listIncluded() throws ParseException {
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenDefaultUser();
-        User user2 = builder.givenDefaultAdmin();
+        UserResponse user1 = builder.givenAclUserNoAcl();
+        UserResponse user2 = builder.givenAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -123,7 +124,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            user1,
+            builder.getUserEntity(user1),
             null,
             null,
             null
@@ -137,7 +138,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            user2,
+            builder.getUserEntity(user2),
             List.of(term1.getId(), term2.getId()),
             null,
             null
@@ -151,7 +152,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            user2,
+            builder.getUserEntity(user2),
             List.of(term1.getId()),
             null,
             null
@@ -170,7 +171,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            user1,
+            builder.getUserEntity(user1),
             List.of(term1.getId(), term2.getId()),
             null,
             null

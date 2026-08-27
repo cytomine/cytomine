@@ -17,6 +17,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
@@ -47,7 +48,7 @@ public class AnnotationIndexResourceTests {
     Project project;
     ImageInstance image;
     SliceInstance slice;
-    User me;
+    UserResponse me;
     Term term;
     UserAnnotation a1;
     UserAnnotation a2;
@@ -102,9 +103,9 @@ public class AnnotationIndexResourceTests {
         );
         restAnnotationIndexControllerMockMvc.perform(get("/api/sliceinstance/{id}/annotationindex.json", slice.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection[?(@.user==" + me.getId() + ")]").exists())
-            .andExpect(jsonPath("$.collection[?(@.user==" + me.getId() + ")].slice").value(slice.getId().intValue()))
-            .andExpect(jsonPath("$.collection[?(@.user==" + me.getId() + ")].countAnnotation").value(4))
-            .andExpect(jsonPath("$.collection[?(@.user==" + me.getId() + ")].countReviewedAnnotation").value(0));
+            .andExpect(jsonPath("$.collection[?(@.user==" + me.id() + ")]").exists())
+            .andExpect(jsonPath("$.collection[?(@.user==" + me.id() + ")].slice").value(slice.getId().intValue()))
+            .andExpect(jsonPath("$.collection[?(@.user==" + me.id() + ")].countAnnotation").value(4))
+            .andExpect(jsonPath("$.collection[?(@.user==" + me.id() + ")].countReviewedAnnotation").value(0));
     }
 }

@@ -169,7 +169,7 @@ public class PropertyResourceTests {
             .andExpect(jsonPath("$.collection[?(@.key=='" + property.getKey() + "')]").exists())
             .andExpect(jsonPath("$.collection[?(@.key=='"
                 + property.getKey()
-                + "')].user").value(builder.givenSuperAdmin().getId().intValue()));
+                + "')].user").value((int) builder.givenSuperAdmin().id()));
     }
 
     @Test
@@ -191,7 +191,7 @@ public class PropertyResourceTests {
         Property property = builder.givenAProperty(userAnnotation);
         restPropertyControllerMockMvc.perform(get(
                 "/api/user/{user}/imageinstance/{image}/annotationposition.json",
-                userAnnotation.getUser().getId(), userAnnotation.getImage().getId()
+                userAnnotation.getUserId(), userAnnotation.getImage().getId()
             )
                 .param("key", property.getKey()))
             .andExpect(status().isOk())

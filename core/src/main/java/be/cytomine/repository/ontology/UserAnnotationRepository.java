@@ -22,7 +22,7 @@ public interface UserAnnotationRepository
 
     List<UserAnnotation> findAllByProjectAndUserIdIn(Project project, List<Long> layers);
 
-    List<UserAnnotation> findAllByUserAndImage(User user, ImageInstance imageInstance);
+    List<UserAnnotation> findAllByUserIdAndImage(Long userId, ImageInstance imageInstance);
 
     Long countByProject(Project project);
 
@@ -75,5 +75,5 @@ public interface UserAnnotationRepository
 
     List<UserAnnotation> findAllByImage(ImageInstance image);
 
-    List<UserAnnotation> findAllByUser(User user);
+    List<UserAnnotation> findAllByUserId(Long userId);
 }

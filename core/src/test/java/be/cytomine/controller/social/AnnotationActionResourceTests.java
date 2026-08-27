@@ -101,7 +101,7 @@ public class AnnotationActionResourceTests {
             .andExpect(jsonPath("$.action").value("select"))
             .andExpect(jsonPath("$.annotationIdent").value(annotationDomain.getId()))
             .andExpect(jsonPath("$.annotationClassName").value(annotationDomain.getClass().getName()))
-            .andExpect(jsonPath("$.annotationCreator").value(annotationDomain.user().getId()));
+            .andExpect(jsonPath("$.annotationCreator").value(annotationDomain.getUserId()));
 
         AssertionsForClassTypes.assertThat(annotationActionRepository.count()).isEqualTo(1);
     }
@@ -109,7 +109,7 @@ public class AnnotationActionResourceTests {
     @Test
     @Transactional
     public void listLastUserOnImage() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
 
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
         givenAPersistentAnnotationAction(new Date(), annotationDomain, user.id(), "select");
@@ -134,7 +134,7 @@ public class AnnotationActionResourceTests {
     @Test
     @Transactional
     public void listLastUserOnSlice() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
 
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
         givenAPersistentAnnotationAction(new Date(), annotationDomain, user.id(), "select");
@@ -159,9 +159,9 @@ public class AnnotationActionResourceTests {
     @Test
     @Transactional
     public void countAnnotationByProject() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
-        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -2), annotationDomain, user.getId(), "select");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -2), annotationDomain, user.id(), "select");
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/project/{project}/annotation_action/count.json",

@@ -127,7 +127,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listLastUserOnImage() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -142,7 +142,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listLastBroadcastUserOnImage() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -158,7 +158,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listEmptyLastBroadcastUserOnImage() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -173,7 +173,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listUserPosition() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -203,7 +203,7 @@ public class UserPositionResourceTests {
                 imageInstance.getId()
             )
                 .param("showDetails", "true")
-                .param("user", String.valueOf(builder.givenAUser().id())))
+                .param("user", String.valueOf(builder.givenUserAclWrite().id())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
     }
@@ -211,7 +211,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listAfterThan() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -235,7 +235,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void listBeforeThan() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -264,8 +264,8 @@ public class UserPositionResourceTests {
         ConcurrentWebSocketSessionDecorator sessionDecoratorA = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
         ConcurrentWebSocketSessionDecorator sessionDecoratorB = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
 
-        User userA = builder.givenDefaultUser();
-        User userB = builder.givenDefaultAdmin();
+        UserResponse userA = builder.givenAclUserNoAcl();
+        UserResponse userB = builder.givenAdmin();
 
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Long imageId = imageInstance.getId();
@@ -278,10 +278,10 @@ public class UserPositionResourceTests {
             new ConcurrentWebSocketSessionDecorator[] {sessionDecoratorB}
         );
         WebSocketUserPositionHandler.sessions.put(
-            userA.getId().toString(),
+            String.valueOf(userA.id()),
             new ConcurrentWebSocketSessionDecorator[] {sessionDecoratorA}
         );
-        UserPositionService.broadcasters.put(currentUserAndImageId, new ArrayList<>(Collections.singleton(userB)));
+        UserPositionService.broadcasters.put(currentUserAndImageId, new ArrayList<>(Collections.singleton(builder.getUserEntity(userB))));
 
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/followers/{user}.json",
@@ -298,7 +298,7 @@ public class UserPositionResourceTests {
     public void listFollowersForForbiddenUser() throws Exception {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Long imageId = imageInstance.getId();
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/followers/{user}.json",
                 imageId,
@@ -310,7 +310,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void summarize() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -352,7 +352,7 @@ public class UserPositionResourceTests {
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/positions.json",
                 imageInstance.getId()
-            ).param("user", String.valueOf(builder.givenAUser().id())))
+            ).param("user", String.valueOf(builder.givenUserAclWrite().id())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
     }
@@ -416,7 +416,7 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void addPositionWithSliceInstance() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -445,16 +445,16 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void getLastUserPositionOfNotFollowedUser() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
-        String userAndImageId = user.getId().toString() + "/" + imageInstance.getId().toString();
+        String userAndImageId = String.valueOf(user.id()) + "/" + imageInstance.getId().toString();
 
         assertThat(UserPositionService.broadcasters.get(userAndImageId)).isNull();
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/position/{user}.json",
                 imageInstance.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk());
         assertThat(UserPositionService.broadcasters.get(userAndImageId).size()).isEqualTo(1);
@@ -464,7 +464,7 @@ public class UserPositionResourceTests {
     @Transactional
     public void getLastUserPositionOfUserAlreadyFollowedByCurrentUser() throws Exception {
         User admin = currentUserService.getCurrentUserOld();
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
         String userAndImageId = user.id() + "/" + imageInstance.getId().toString();
@@ -485,17 +485,17 @@ public class UserPositionResourceTests {
     @Test
     @Transactional
     public void getLastUserPositionOfUserAlreadyFollowedButNotByCurrentUser() throws Exception {
-        User user = builder.givenDefaultUser();
+        UserResponse user = builder.givenAclUserNoAcl();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
-        String userAndImageId = user.getId().toString() + "/" + imageInstance.getId().toString();
+        String userAndImageId = String.valueOf(user.id()) + "/" + imageInstance.getId().toString();
 
-        UserPositionService.broadcasters.put(userAndImageId, new ArrayList<>(Collections.singleton(user)));
+        UserPositionService.broadcasters.put(userAndImageId, new ArrayList<>(Collections.singleton(builder.getUserEntity(user))));
         assertThat(UserPositionService.broadcasters.get(userAndImageId).size()).isEqualTo(1);
         restUserPositionControllerMockMvc.perform(get(
                 "/api/imageinstance/{image}/position/{user}.json",
                 imageInstance.getId(),
-                user.getId()
+                user.id()
             ))
             .andExpect(status().isOk());
         assertThat(UserPositionService.broadcasters.get(userAndImageId).size()).isEqualTo(2);

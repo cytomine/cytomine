@@ -178,24 +178,24 @@ public class ProjectServiceTests {
 
     @Test
     void listLastOpened() {
-        User user1 = builder.givenSuperAdmin();
-        Project project1 = builder.givenAProjectWithUser(user1.getUsername());
-        Project project2 = builder.givenAProjectWithUser(user1.getUsername());
-        Project project3 = builder.givenAProjectWithUser(user1.getUsername());
+        UserResponse user1 = builder.givenSuperAdmin();
+        Project project1 = builder.givenAProjectWithUser(user1.username());
+        Project project2 = builder.givenAProjectWithUser(user1.username());
+        Project project3 = builder.givenAProjectWithUser(user1.username());
 
         givenAPersistentConnectionInProject(user1, project1, DateUtils.addDays(new Date(), 1));
         givenAPersistentConnectionInProject(user1, project2, DateUtils.addDays(new Date(), 2));
 
         // connection from another user
-        givenAPersistentConnectionInProject(builder.givenDefaultUser(), project1, DateUtils.addDays(new Date(), -7));
+        givenAPersistentConnectionInProject(builder.givenAclUserNoAcl(), project1, DateUtils.addDays(new Date(), -7));
 
-        List<Map<String, Object>> results = projectService.listLastOpened(user1, 2L);
+        List<Map<String, Object>> results = projectService.listLastOpened(builder.getUserEntity(user1), 2L);
         assertThat(results.get(0).get("id")).isEqualTo(project2.getId());
         assertThat(results.get(0).get("opened")).isEqualTo(true);
         assertThat(results.get(1).get("id")).isEqualTo(project1.getId());
         assertThat(results.get(1).get("opened")).isEqualTo(true);
 
-        results = projectService.listLastOpened(user1, 3L);
+        results = projectService.listLastOpened(builder.getUserEntity(user1), 3L);
 
         assertThat(results).hasSize(3);
         assertThat(results.get(0).get("id")).isEqualTo(project2.getId());
@@ -209,8 +209,8 @@ public class ProjectServiceTests {
 
     @Test
     void listProjectForCurrentUser() {
-        User user1 = builder.givenSuperAdmin();
-        Project project1 = builder.givenAProjectWithUser(user1.getUsername());
+        UserResponse user1 = builder.givenSuperAdmin();
+        Project project1 = builder.givenAProjectWithUser(user1.username());
         Project project2 = builder.givenAProject();
 
         assertThat(projectService.listForCurrentUser()).contains(project1).doesNotContain(project2);
@@ -246,7 +246,7 @@ public class ProjectServiceTests {
                 project.setCountJobAnnotations((long) intChoices.get(i));
                 project.setCountImages((long) intChoices.get(i));
                 for (int j = 0; j < intChoices.size(); j++) {
-                    builder.addUserToProject(project, builder.givenAUser().username());
+                    builder.addUserToProject(project, builder.givenUserAclRead().username());
                 }
                 builder.persistAndReturn(project);
             }
@@ -274,8 +274,8 @@ public class ProjectServiceTests {
     void listUserProjectWithManyFilters() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
-        builder.addUserToProject(project1, builder.givenSuperAdmin().getUsername());
-        builder.addUserToProject(project2, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(project1, builder.givenSuperAdmin().username());
+        builder.addUserToProject(project2, builder.givenSuperAdmin().username());
 
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project2);
         userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
@@ -294,7 +294,7 @@ public class ProjectServiceTests {
         searchParameterEntries.add(new SearchParameterEntry("numberOfReviewedAnnotations", SearchOperation.lte, 10));
         searchParameterEntries.add(new SearchParameterEntry("numberOfImages", SearchOperation.lte, 10));
 
-        Page<JsonObject> page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        Page<JsonObject> page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             searchParameterEntries, "lastActivity", "desc", 10L, 0L);
 
         assertThat(page.getTotalElements()).isEqualTo(2);
@@ -317,24 +317,24 @@ public class ProjectServiceTests {
         userAnnotationService.add(userAnnotation2.toJsonObject(urlApi));
 
         assertThat(
-            projectService.findCommandHistory(List.of(project1, project2), builder.givenSuperAdmin().getId(), 0L, 0L,
+            projectService.findCommandHistory(List.of(project1, project2), builder.givenSuperAdmin().id(), 0L, 0L,
                 true, null, null)).hasSize(2);
 
         assertThat(
             projectService.findCommandHistory(List.of(project1, project2), null, 0L, 0L, true, null, null)).hasSize(2);
 
         assertThat(
-            projectService.findCommandHistory(List.of(project1), builder.givenSuperAdmin().getId(), 0L, 0L, false, null,
+            projectService.findCommandHistory(List.of(project1), builder.givenSuperAdmin().id(), 0L, 0L, false, null,
                 null)).hasSize(1);
 
-        assertThat(projectService.findCommandHistory(List.of(project1), builder.givenSuperAdmin().getId(), 0L, 0L, true,
+        assertThat(projectService.findCommandHistory(List.of(project1), builder.givenSuperAdmin().id(), 0L, 0L, true,
             DateUtils.addSeconds(new Date(), 10).getTime(), null)).hasSize(0);
 
-        assertThat(projectService.findCommandHistory(List.of(project1), builder.givenSuperAdmin().getId(), 0L, 0L, true,
+        assertThat(projectService.findCommandHistory(List.of(project1), builder.givenSuperAdmin().id(), 0L, 0L, true,
             DateUtils.addSeconds(new Date(), -10).getTime(), DateUtils.addSeconds(new Date(), +10).getTime())).hasSize(
             1);
 
-        assertThat(projectService.findCommandHistory(List.of(), builder.givenSuperAdmin().getId(), 0L, 0L, true, null,
+        assertThat(projectService.findCommandHistory(List.of(), builder.givenSuperAdmin().id(), 0L, 0L, true, null,
             null)).hasSize(0);
 
     }
@@ -342,7 +342,7 @@ public class ProjectServiceTests {
     @Test
     void listUserProjectWithAnnotationFilters() {
         Project project1 = builder.givenAProject();
-        builder.addUserToProject(project1, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(project1, builder.givenSuperAdmin().username());
 
         project1.setCountImages(100L);
         project1.setCountAnnotations(200L);
@@ -354,71 +354,71 @@ public class ProjectServiceTests {
         ProjectSearchExtension projectSearchExtension = new ProjectSearchExtension();
         Page<JsonObject> page = null;
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of()), "created", "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(1);
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfImages", SearchOperation.lte, 50))), "created",
             "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(0);
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfImages", SearchOperation.equals, 100))),
             "created", "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent().get(0).get("id")).isEqualTo(project1.getId());
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfImages", SearchOperation.gte, 150))), "created",
             "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(0);
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 150))),
             "created", "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(0);
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfAnnotations", SearchOperation.equals, 200))),
             "created", "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent().get(0).get("id")).isEqualTo(project1.getId());
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 250))),
             "created", "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(0);
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfReviewedAnnotations", SearchOperation.lte, 250))),
             "created", "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(0);
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension, new ArrayList<>(
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(
                 List.of(new SearchParameterEntry("numberOfReviewedAnnotations", SearchOperation.equals, 300))),
             "created",
             "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent().get(0).get("id")).isEqualTo(project1.getId());
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfReviewedAnnotations", SearchOperation.gte, 350))),
             "created", "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(0);
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfJobAnnotations", SearchOperation.lte, 350))),
             "created", "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(0);
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfJobAnnotations", SearchOperation.equals, 400))),
             "created", "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent().get(0).get("id")).isEqualTo(project1.getId());
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("numberOfJobAnnotations", SearchOperation.gte, 450))),
             "created", "desc", 0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(0);
@@ -429,9 +429,9 @@ public class ProjectServiceTests {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
         Project project3 = builder.givenAProject();
-        builder.addUserToProject(project1, builder.givenSuperAdmin().getUsername());
-        builder.addUserToProject(project2, builder.givenSuperAdmin().getUsername());
-        builder.addUserToProject(project3, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(project1, builder.givenSuperAdmin().username());
+        builder.addUserToProject(project2, builder.givenSuperAdmin().username());
+        builder.addUserToProject(project3, builder.givenSuperAdmin().username());
 
         project1.setName("T2");
         project2.setName("S2");
@@ -445,7 +445,7 @@ public class ProjectServiceTests {
 
         Page<JsonObject> page = null;
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             new ArrayList<>(List.of(new SearchParameterEntry("name", SearchOperation.like, "S2"))), "created", "desc",
             0L, 0L);
         assertThat(page.getTotalElements()).isEqualTo(1);
@@ -456,14 +456,14 @@ public class ProjectServiceTests {
     void listUserProjectWithOntologyFilter() {
         Project project1 = builder.givenAProject();
         Project project2 = builder.givenAProject();
-        builder.addUserToProject(project1, builder.givenSuperAdmin().getUsername());
-        builder.addUserToProject(project2, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(project1, builder.givenSuperAdmin().username());
+        builder.addUserToProject(project2, builder.givenSuperAdmin().username());
 
         ProjectSearchExtension projectSearchExtension = new ProjectSearchExtension();
 
         Page<JsonObject> page = null;
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension, new ArrayList<>(
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(
                 List.of(new SearchParameterEntry("ontology", SearchOperation.in,
                     List.of(project2.getOntology().getId())))),
             "created", "desc", 0L, 0L);
@@ -478,17 +478,17 @@ public class ProjectServiceTests {
         Project project3 = builder.givenAProjectWithOntology(project1.getOntology());
         Project project4 = builder.givenAProjectWithOntology(project1.getOntology());
         Project project5 = builder.givenAProjectWithOntology(project1.getOntology());
-        builder.addUserToProject(project1, builder.givenSuperAdmin().getUsername());
-        builder.addUserToProject(project2, builder.givenSuperAdmin().getUsername());
-        builder.addUserToProject(project3, builder.givenSuperAdmin().getUsername());
-        builder.addUserToProject(project4, builder.givenSuperAdmin().getUsername());
-        builder.addUserToProject(project5, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(project1, builder.givenSuperAdmin().username());
+        builder.addUserToProject(project2, builder.givenSuperAdmin().username());
+        builder.addUserToProject(project3, builder.givenSuperAdmin().username());
+        builder.addUserToProject(project4, builder.givenSuperAdmin().username());
+        builder.addUserToProject(project5, builder.givenSuperAdmin().username());
 
         ProjectSearchExtension projectSearchExtension = new ProjectSearchExtension();
 
         Page<JsonObject> page = null;
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension, new ArrayList<>(
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(
                 List.of(new SearchParameterEntry("ontology", SearchOperation.in,
                     List.of(project1.getOntology().getId())))),
             "created", "asc", 0L, 0L);
@@ -500,7 +500,7 @@ public class ProjectServiceTests {
         assertThat(page.getContent().get(3).get("id")).isEqualTo(project4.getId());
         assertThat(page.getContent().get(4).get("id")).isEqualTo(project5.getId());
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension, new ArrayList<>(
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(
                 List.of(new SearchParameterEntry("ontology", SearchOperation.in,
                     List.of(project1.getOntology().getId())))),
             "created", "asc", 3L, 0L);
@@ -510,7 +510,7 @@ public class ProjectServiceTests {
         assertThat(page.getContent().get(1).get("id")).isEqualTo(project2.getId());
         assertThat(page.getContent().get(2).get("id")).isEqualTo(project3.getId());
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension, new ArrayList<>(
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(
                 List.of(new SearchParameterEntry("ontology", SearchOperation.in,
                     List.of(project1.getOntology().getId())))),
             "created", "asc", 3L, 1L);
@@ -520,7 +520,7 @@ public class ProjectServiceTests {
         assertThat(page.getContent().get(1).get("id")).isEqualTo(project3.getId());
         assertThat(page.getContent().get(2).get("id")).isEqualTo(project4.getId());
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension, new ArrayList<>(
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(
                 List.of(new SearchParameterEntry("ontology", SearchOperation.in,
                     List.of(project1.getOntology().getId())))),
             "created", "asc", 3L, 3L);
@@ -529,7 +529,7 @@ public class ProjectServiceTests {
         assertThat(page.getContent().get(0).get("id")).isEqualTo(project4.getId());
         assertThat(page.getContent().get(1).get("id")).isEqualTo(project5.getId());
 
-        page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension, new ArrayList<>(
+        page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension, new ArrayList<>(
                 List.of(new SearchParameterEntry("ontology", SearchOperation.in,
                     List.of(project1.getOntology().getId())))),
             "created", "asc", 3L, 6L);
@@ -570,7 +570,7 @@ public class ProjectServiceTests {
         projectSearchExtension.setWithCurrentUserRoles(true);
         List<SearchParameterEntry> searchParameterEntries = new ArrayList<>();
 
-        Page<JsonObject> page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        Page<JsonObject> page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             searchParameterEntries, "id", "desc", 0L, 0L);
 
         assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(1);
@@ -591,7 +591,7 @@ public class ProjectServiceTests {
         projectSearchExtension.setWithMembersCount(true);
         List<SearchParameterEntry> searchParameterEntries = new ArrayList<>();
 
-        Page<JsonObject> page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        Page<JsonObject> page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             searchParameterEntries, "id", "desc", 0L, 0L);
 
         assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(1);
@@ -614,7 +614,7 @@ public class ProjectServiceTests {
         projectSearchExtension.setWithCurrentUserRoles(true);
         List<SearchParameterEntry> searchParameterEntries = new ArrayList<>();
 
-        Page<JsonObject> page = projectService.list(userMapper.map(builder.givenSuperAdmin()), projectSearchExtension,
+        Page<JsonObject> page = projectService.list(builder.givenSuperAdmin(), projectSearchExtension,
             searchParameterEntries, "id", "desc", 0L, 0L);
 
         assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(1);
@@ -650,21 +650,21 @@ public class ProjectServiceTests {
     @Test
     void listByRoles() {
         Project project1 = builder.givenAProject();
-        User creator = builder.givenSuperAdmin();
-        User admin = builder.givenDefaultAdmin();
-        UserResponse user = builder.givenAUser();
+        UserResponse creator = builder.givenSuperAdmin();
+        UserResponse admin = builder.givenAdmin();
+        UserResponse user = builder.givenUserAclRead();
 
-        builder.addUserToProject(project1, creator.getUsername(), ADMINISTRATION);
-        builder.addUserToProject(project1, admin.getUsername(), ADMINISTRATION);
+        builder.addUserToProject(project1, creator.username(), ADMINISTRATION);
+        builder.addUserToProject(project1, admin.username(), ADMINISTRATION);
         builder.addUserToProject(project1, user.username(), READ);
 
-        assertThat(projectService.listByCreatorId(creator.getId())).contains(new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByCreatorId(admin.getId())).doesNotContain(
+        assertThat(projectService.listByCreatorId(creator.id())).contains(new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByCreatorId(admin.id())).doesNotContain(
             new NamedCytomineDomain(project1.getId()));
         assertThat(projectService.listByCreatorId(user.id())).doesNotContain(
             new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByAdminId(creator.getId())).contains(new NamedCytomineDomain(project1.getId()));
-        assertThat(projectService.listByAdminId(admin.getId())).contains(new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByAdminId(creator.id())).contains(new NamedCytomineDomain(project1.getId()));
+        assertThat(projectService.listByAdminId(admin.id())).contains(new NamedCytomineDomain(project1.getId()));
         assertThat(projectService.listByAdminId(user.id())).doesNotContain(
             new NamedCytomineDomain(project1.getId()));
         assertThat(projectService.listByUserId(user.id())).contains(new NamedCytomineDomain(project1.getId()));
@@ -683,12 +683,12 @@ public class ProjectServiceTests {
         assertThat(projectCreated.getName()).isEqualTo(project.getName());
 
         assertThat(securityACLService.getProjectUsers(projectCreated)).containsExactly(
-            builder.givenSuperAdmin().getUsername());
+            builder.givenSuperAdmin().username());
 
-        assertThat(permissionService.hasACLPermission(projectCreated, builder.givenSuperAdmin().getUsername(),
+        assertThat(permissionService.hasACLPermission(projectCreated, builder.givenSuperAdmin().username(),
             ADMINISTRATION)).isTrue();
 
-        assertThat(projectRepresentativeUserService.find(projectCreated, builder.givenSuperAdmin().getId()))
+        assertThat(projectRepresentativeUserService.find(projectCreated, builder.givenSuperAdmin().id()))
             .isPresent();
     }
 
@@ -696,12 +696,12 @@ public class ProjectServiceTests {
     void addProjectWithUsersAndAdmins() {
         Project project = basicInstanceBuilder.givenANotPersistedProject();
         project.setOntology(builder.givenAnOntology());
-        UserResponse user = builder.givenAUser();
-        User admin = builder.givenDefaultAdmin();
+        UserResponse user = builder.givenUserAclRead();
+        UserResponse admin = builder.givenAdmin();
 
         CommandResponse commandResponse = projectService.add(
             project.toJsonObject(urlApi).withChange("users", List.of(user.id()))
-                .withChange("admins", List.of(admin.getId())));
+                .withChange("admins", List.of(admin.id())));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -709,23 +709,23 @@ public class ProjectServiceTests {
         Project projectCreated = projectService.find(commandResponse.getObject().getId()).get();
         assertThat(projectCreated.getName()).isEqualTo(project.getName());
 
-        assertThat(permissionService.hasACLPermission(projectCreated, builder.givenSuperAdmin().getUsername(),
+        assertThat(permissionService.hasACLPermission(projectCreated, builder.givenSuperAdmin().username(),
             ADMINISTRATION)).isTrue();
         assertThat(permissionService.hasACLPermission(projectCreated, user.username(), ADMINISTRATION)).isFalse();
         assertThat(permissionService.hasACLPermission(projectCreated, user.username(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, admin.getUsername(), ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, admin.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated, admin.username(), ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated, admin.username(), READ)).isTrue();
 
         // check ontology access
         assertThat(permissionService.hasACLPermission(projectCreated.getOntology(), user.username(), READ)).isTrue();
         assertThat(
-            permissionService.hasACLPermission(projectCreated.getOntology(), admin.getUsername(), READ)).isTrue();
+            permissionService.hasACLPermission(projectCreated.getOntology(), admin.username(), READ)).isTrue();
     }
 
     @Test
     void updateProjectName() {
         Project project = builder.givenAProject();
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         builder.addUserToProject(project, user.username());
 
         CommandResponse commandResponse =
@@ -785,84 +785,84 @@ public class ProjectServiceTests {
     @Test
     void updateProjectWithOtherUsers() {
         Project project = builder.givenAProject();
-        User previousUser = builder.givenDefaultUser();
-        User newUser = builder.givenDefaultAdmin();
-        builder.addUserToProject(project, previousUser.getUsername(), READ);
+        UserResponse previousUser = builder.givenAclUserNoAcl();
+        UserResponse newUser = builder.givenAdmin();
+        builder.addUserToProject(project, previousUser.username(), READ);
 
         CommandResponse commandResponse =
-            projectService.update(project, project.toJsonObject(urlApi).withChange("users", List.of(newUser.getId())));
+            projectService.update(project, project.toJsonObject(urlApi).withChange("users", List.of(newUser.id())));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(projectService.find(commandResponse.getObject().getId())).isPresent();
         Project edited = projectService.find(commandResponse.getObject().getId()).get();
 
-        assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, newUser.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, previousUser.username(), READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, newUser.username(), READ)).isTrue();
     }
 
     @Test
     void updateProjectWithOtherAdmins() {
         Project project = builder.givenAProject();
-        User previousUser = builder.givenDefaultUser();
-        User newUser = builder.givenDefaultAdmin();
-        builder.addUserToProject(project, previousUser.getUsername(), ADMINISTRATION);
+        UserResponse previousUser = builder.givenAclUserNoAcl();
+        UserResponse newUser = builder.givenAdmin();
+        builder.addUserToProject(project, previousUser.username(), ADMINISTRATION);
 
         CommandResponse commandResponse =
-            projectService.update(project, project.toJsonObject(urlApi).withChange("admins", List.of(newUser.getId())));
+            projectService.update(project, project.toJsonObject(urlApi).withChange("admins", List.of(newUser.id())));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(projectService.find(commandResponse.getObject().getId())).isPresent();
         Project edited = projectService.find(commandResponse.getObject().getId()).get();
         System.out.println(
-            "User " + previousUser.getUsername() + " right " + ADMINISTRATION.getMask() + " in domain " + project
-                + " => " + permissionService.hasACLPermission(project, previousUser.getUsername(), ADMINISTRATION));
-        assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, newUser.getUsername(), ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, newUser.getUsername(), READ)).isTrue();
+            "User " + previousUser.username() + " right " + ADMINISTRATION.getMask() + " in domain " + project
+                + " => " + permissionService.hasACLPermission(project, previousUser.username(), ADMINISTRATION));
+        assertThat(permissionService.hasACLPermission(project, previousUser.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, previousUser.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, newUser.username(), ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, newUser.username(), READ)).isTrue();
     }
 
     @Test
     void updateProjectWithOtherRepresentatives() {
         Project project = builder.givenAProject();
-        User previousUser = builder.givenDefaultUser();
-        User newUser = builder.givenDefaultAdmin();
-        builder.addUserToProject(project, previousUser.getUsername(), ADMINISTRATION);
-        builder.addUserToProject(project, newUser.getUsername(), ADMINISTRATION);
+        UserResponse previousUser = builder.givenAclUserNoAcl();
+        UserResponse newUser = builder.givenAdmin();
+        builder.addUserToProject(project, previousUser.username(), ADMINISTRATION);
+        builder.addUserToProject(project, newUser.username(), ADMINISTRATION);
 
-        builder.givenAProjectRepresentativeUser(project, previousUser.getUsername(), previousUser.getId());
+        builder.givenAProjectRepresentativeUser(project, previousUser.username(), previousUser.id());
 
-        assertThat(projectRepresentativeUserService.find(project, previousUser.getId())).isPresent();
-        assertThat(projectRepresentativeUserService.find(project, newUser.getId())).isEmpty();
+        assertThat(projectRepresentativeUserService.find(project, previousUser.id())).isPresent();
+        assertThat(projectRepresentativeUserService.find(project, newUser.id())).isEmpty();
 
         CommandResponse commandResponse = projectService.update(project,
-            project.toJsonObject(urlApi).withChange("representatives", List.of(newUser.getId())));
+            project.toJsonObject(urlApi).withChange("representatives", List.of(newUser.id())));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
-        assertThat(projectRepresentativeUserService.find(project, previousUser.getId())).isEmpty();
-        assertThat(projectRepresentativeUserService.find(project, newUser.getId())).isPresent();
+        assertThat(projectRepresentativeUserService.find(project, previousUser.id())).isEmpty();
+        assertThat(projectRepresentativeUserService.find(project, newUser.id())).isPresent();
     }
 
     @Test
     void updateProjectWithOtherRepresentativesNotInProject() {
         Project project = builder.givenAProject();
-        User userNotInProject = builder.givenDefaultUser();
+        UserResponse userNotInProject = builder.givenAclUserNoAcl();
 
         Assertions.assertThrows(ConstraintException.class, () -> projectService.update(project,
-            project.toJsonObject(urlApi).withChange("representatives", List.of(userNotInProject.getId()))));
+            project.toJsonObject(urlApi).withChange("representatives", List.of(userNotInProject.id()))));
 
     }
 
     @Test
     void listActiveProjects() {
-        User user1 = builder.givenSuperAdmin();
-        Project project1 = builder.givenAProjectWithUser(user1.getUsername());
-        Project project2 = builder.givenAProjectWithUser(user1.getUsername());
-        Project project3 = builder.givenAProjectWithUser(user1.getUsername());
+        UserResponse user1 = builder.givenSuperAdmin();
+        Project project1 = builder.givenAProjectWithUser(user1.username());
+        Project project2 = builder.givenAProjectWithUser(user1.username());
+        Project project3 = builder.givenAProjectWithUser(user1.username());
 
         givenAPersistentConnectionInProject(user1, project1, DateUtils.addSeconds(new Date(), -300));
         givenAPersistentConnectionInProject(user1, project2, DateUtils.addSeconds(new Date(), -5));
@@ -873,13 +873,13 @@ public class ProjectServiceTests {
 
     @Test
     void listActiveProjectsWithNumberOfUsers() {
-        User user1 = builder.givenSuperAdmin();
-        Project project1 = builder.givenAProjectWithUser(user1.getUsername());
-        Project project2 = builder.givenAProjectWithUser(user1.getUsername());
-        Project project3 = builder.givenAProjectWithUser(user1.getUsername());
+        UserResponse user1 = builder.givenSuperAdmin();
+        Project project1 = builder.givenAProjectWithUser(user1.username());
+        Project project2 = builder.givenAProjectWithUser(user1.username());
+        Project project3 = builder.givenAProjectWithUser(user1.username());
 
-        builder.addUserToProject(project2, user1.getUsername());
-        builder.addUserToProject(project2, builder.givenSuperAdmin().getUsername());
+        builder.addUserToProject(project2, user1.username());
+        builder.addUserToProject(project2, builder.givenSuperAdmin().username());
 
         givenAPersistentConnectionInProject(builder.givenSuperAdmin(), project1,
             DateUtils.addSeconds(new Date(), -300));
@@ -956,24 +956,24 @@ public class ProjectServiceTests {
         AssertionsForClassTypes.assertThat(entityManager.find(AttachedFile.class, attachedFile.getId())).isNull();
     }
 
-    PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
-        return projectConnectionService.add(user.getId(), project, "xxx", "linux", "chrome", "123", created);
+    PersistentProjectConnection givenAPersistentConnectionInProject(UserResponse user, Project project, Date created) {
+        return projectConnectionService.add(user.id(), project, "xxx", "linux", "chrome", "123", created);
     }
 
     @Test
     void shouldReturnAllUserIdsFromProject() {
         Project project = builder.givenAProject();
-        User user1 = builder.givenDefaultUser();
-        User user2 = builder.givenDefaultAdmin();
+        UserResponse user1 = builder.givenAclUserNoAcl();
+        UserResponse user2 = builder.givenAdmin();
 
-        builder.addUserToProject(project, user1.getUsername());
-        builder.addUserToProject(project, user2.getUsername());
+        builder.addUserToProject(project, user1.username());
+        builder.addUserToProject(project, user2.username());
 
         String userIds = projectService.getUserIdsFromProject(project.getId());
 
         assertThat(userIds.split(",")).containsExactlyInAnyOrder(
-            user1.getId().toString(),
-            user2.getId().toString()
+            String.valueOf(user1.id()),
+            String.valueOf(user2.id())
         );
     }
 }

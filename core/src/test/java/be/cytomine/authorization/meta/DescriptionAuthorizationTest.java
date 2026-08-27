@@ -104,7 +104,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void userCanaddInRestrictedModeForAnnotationIfOwner() {
         annotationDomain.getProject().setMode(EditingMode.RESTRICTED);
-        ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
+        ((UserAnnotation) annotationDomain).setUserId(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get().getId());
         expectOK(this::whenIAddDomain);
     }
 

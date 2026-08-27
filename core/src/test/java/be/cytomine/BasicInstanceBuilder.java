@@ -155,27 +155,28 @@ public class BasicInstanceBuilder {
         return relationTerm;
     }
 
-    public User givenSuperAdmin() {
+    public UserResponse givenSuperAdmin() {
         return getUser("superadmin");
     }
 
-    public User getUser(String username) {
-        return userRepository.findByUsernameLikeIgnoreCase(username)
+    public UserResponse getUser(String username) {
+        return userRepository.findByUsernameLikeIgnoreCase(username).map(user -> userMapper.map(user))
             .orElseThrow(() -> new ObjectNotFoundException(username + " not in db"));
     }
 
-    public User givenCurrentUser() {
+    public UserResponse givenCurrentUser() {
         return CurrentUserService.getSecurityCurrentUser().map(currentUser -> currentUser.getUser().username())
-            .flatMap(userRepository::findByUsernameLikeIgnoreCase).orElseGet(this::givenSuperAdmin);
+            .flatMap(userRepository::findByUsernameLikeIgnoreCase).map(user -> userMapper.map(user))
+            .orElseGet(this::givenSuperAdmin);
     }
 
-    public User givenANotPersistedUser() {
+    public UserResponse givenANotPersistedUser() {
         User user = new User();
         user.setName("firstname lastname");
         user.setReference(UUID.randomUUID().toString());
         user.setUsername(randomString());
         user.generateKeys();
-        return user;
+        return  userMapper.map(user);
     }
 
     public void addRole(User user, String authority) {

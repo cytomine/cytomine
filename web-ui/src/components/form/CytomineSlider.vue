@@ -1,54 +1,54 @@
 <template>
-<div
-  class="cytomine-slider"
-  :class="[size, { 'has-tooltip-margin': tooltip && isArray && !smartTooltipPosition }]"
->
-  <div class="cytomine-slider-rail" @pointerdown="onRailDown">
-    <div class="cytomine-slider-track" ref="track" :style="trackStyle">
-    <div class="cytomine-slider-process" :style="processStyle"></div>
-
-    <div
-      v-for="(value, index) in valueArray"
-      :key="index"
-      class="cytomine-slider-dot"
-      :class="{ 'is-dragging': dragging && dragIndex === index }"
-      :style="dotStyle(index)"
-      tabindex="0"
-      role="slider"
-      :aria-valuemin="min"
-      :aria-valuemax="max"
-      :aria-valuenow="value"
-      @keydown="onKey(index, $event)"
-    >
-      <div class="cytomine-slider-handle"></div>
+  <div
+    class="cytomine-slider"
+    :class="[size, { 'has-tooltip-margin': tooltip && isArray && !smartTooltipPosition }]"
+  >
+    <div class="cytomine-slider-rail" @pointerdown="onRailDown">
+      <div class="cytomine-slider-track" ref="track" :style="trackStyle">
+      <div class="cytomine-slider-process" :style="processStyle"></div>
 
       <div
-        v-if="tooltip"
-        class="cytomine-slider-tooltip"
-        :class="[`is-${tooltipPlacement[index]}`, size]"
-        @pointerdown.stop
-        @mousedown.stop
-        @click.stop="startEdition(index)"
-        @keyup.enter="stopEdition(index)"
+        v-for="(value, index) in valueArray"
+        :key="index"
+        class="cytomine-slider-dot"
+        :class="{ 'is-dragging': dragging && dragIndex === index }"
+        :style="dotStyle(index)"
+        tabindex="0"
+        role="slider"
+        :aria-valuemin="min"
+        :aria-valuemax="max"
+        :aria-valuenow="value"
+        @keydown="onKey(index, $event)"
       >
-        <template v-if="indexEdited !== index">
-          <slot name="default" :value="value">
-            {{ Math.round(value * 1000) / 1000 }}
-          </slot>
-        </template>
-        <b-input
-          v-else
-          type="text"
-          v-model="editedValue"
-          @vue:mounted="focus()"
-          @blur="stopEdition(index)"
-          :size="size"
-        />
+        <div class="cytomine-slider-handle"></div>
+
+        <div
+          v-if="tooltip"
+          class="cytomine-slider-tooltip"
+          :class="[`is-${tooltipPlacement[index]}`, size]"
+          @pointerdown.stop
+          @mousedown.stop
+          @click.stop="startEdition(index)"
+          @keyup.enter="stopEdition(index)"
+        >
+          <template v-if="indexEdited !== index">
+            <slot name="default" :value="value">
+              {{ Math.round(value * 1000) / 1000 }}
+            </slot>
+          </template>
+          <b-input
+            v-else
+            type="text"
+            v-model="editedValue"
+            @vue:mounted="focus()"
+            @blur="stopEdition(index)"
+            :size="size"
+          />
+        </div>
+      </div>
       </div>
     </div>
-    </div>
   </div>
-</div>
 </template>
 
 <script>

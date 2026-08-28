@@ -14,8 +14,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -38,9 +36,8 @@ public class Ontology extends CytomineDomain {
     @Column(nullable = false)
     protected String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
-    protected User user;
+    @Column(name = "user_id")
+    protected Long userId;
 
     @Column()
     protected LocalDateTime deleted;
@@ -73,7 +70,6 @@ public class Ontology extends CytomineDomain {
         } else {
             returnArray.put("children", new ArrayList<>());
         }
-        returnArray.put("user", (ontology.getUser() != null ? ontology.getUser().getId() : null));
         return returnArray;
     }
 
@@ -81,14 +77,10 @@ public class Ontology extends CytomineDomain {
         Ontology ontology = this;
         ontology.id = json.getJSONAttrLong("id", null);
         ontology.name = json.getJSONAttrStr("name", true);
-        ontology.user = (User) json.getJSONAttrDomain(entityManager, "user", new User(), true);
+        ontology.userId = (json.getJSONAttrDomain(entityManager, "user", new User(), true)).getId();
         ontology.created = json.getJSONAttrDate("created");
         ontology.updated = json.getJSONAttrDate("updated");
         return ontology;
-    }
-
-    private Long getUserId() {
-        return (user != null ? user.getId() : null);
     }
 
     /**
@@ -119,7 +111,6 @@ public class Ontology extends CytomineDomain {
      * Get the term branch
      *
      * @param term Root term
-     *
      * @return Branch with all term children as tree
      */
     Map<String, Object> branch(Term term) {

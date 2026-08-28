@@ -28,6 +28,7 @@
 
 <script>
 import { get } from '@/utils/store-helpers';
+import { getKeycloak } from '@/keycloak.js';
 import { KeycloakRole } from '@/constants/UserRole.js';
 
 import AdminDashboard from './AdminDashboard.vue';
@@ -54,7 +55,7 @@ export default {
       return this.$route.query.tab;
     },
     isAdmin() {
-      return this.$keycloak.hasResourceRole(KeycloakRole.ADMIN);
+      return getKeycloak().hasResourceRole(KeycloakRole.ADMIN);
     },
     activeComponent() {
       switch (this.activeTab) {

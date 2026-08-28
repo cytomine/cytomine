@@ -1,7 +1,10 @@
 package be.cytomine.controller.image;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +43,7 @@ import be.cytomine.dto.image.WindowParameter;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.SliceCoordinatesService;
@@ -52,6 +56,8 @@ import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.RequestParams;
+import be.cytomine.utils.filters.SearchOperation;
+import be.cytomine.utils.filters.SearchParameterEntry;
 
 @RestController
 @RequestMapping("/api")
@@ -70,6 +76,8 @@ public class RestImageInstanceController extends RestCytomineController {
     private final ImageGroupImageInstanceService imageGroupImageInstanceService;
 
     private final ImageServerService imageServerService;
+
+    private final MeiliSearchService meiliSearchService;
 
     private final UserService userService;
 
@@ -97,7 +105,7 @@ public class RestImageInstanceController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
         RequestParams requestParams = retrievePageableParameters();
         return responseSuccess(imageInstanceService.list(
-            user,
+            user.getId(),
             retrieveSearchParameters(),
             requestParams.getSort(),
             requestParams.getOrder(),
@@ -131,6 +139,8 @@ public class RestImageInstanceController extends RestCytomineController {
         @RequestParam(value = "light", defaultValue = "false", required = false) Boolean light,
         @RequestParam(value = "tree", defaultValue = "false", required = false) Boolean tree,
         @RequestParam(value = "withLastActivity", defaultValue = "false", required = false) Boolean withLastActivity,
+        @RequestParam(value = "metadataSearch", defaultValue = "", required = false) String metadataSearch,
+        @RequestParam(value = "metadataFilter", defaultValue = "", required = false) String metadataFilter,
         @RequestParam(value = "sort", defaultValue = "created", required = false) String sort,
         @RequestParam(value = "order", defaultValue = "desc", required = false) String order,
         @RequestParam(value = "offset", defaultValue = "0", required = false) Integer offset,
@@ -141,6 +151,8 @@ public class RestImageInstanceController extends RestCytomineController {
         Project project = projectService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("Project", id));
         RequestParams requestParams = retrievePageableParameters();
+        List<SearchParameterEntry> searchParameterEntryList = retrieveSearchParameters();
+        addMetadataFilter(searchParameterEntryList, metadataSearch, metadataFilter);
         if (light) {
             return responseSuccess(
                 imageInstanceService.listLight(project), securityACLService.isFilterRequired(project));
@@ -160,7 +172,7 @@ public class RestImageInstanceController extends RestCytomineController {
                 imageInstanceService.listExtended(
                     project,
                     imageSearchExtension,
-                    retrieveSearchParameters(),
+                    searchParameterEntryList,
                     requestParams.getSort(),
                     requestParams.getOrder(),
                     requestParams.getOffset(),
@@ -172,7 +184,7 @@ public class RestImageInstanceController extends RestCytomineController {
             return responseSuccess(
                 imageInstanceService.list(
                     project,
-                    retrieveSearchParameters(),
+                    searchParameterEntryList,
                     requestParams.getSort(),
                     requestParams.getOrder(),
                     requestParams.getOffset(),
@@ -183,6 +195,24 @@ public class RestImageInstanceController extends RestCytomineController {
                 securityACLService.isFilterRequired(project)
             );
         }
+    }
+
+    private void addMetadataFilter(
+        List<SearchParameterEntry> searchParameterEntryList,
+        String metadataSearch,
+        String metadataFilter
+    ) {
+        boolean hasSearch = !metadataSearch.isBlank();
+        boolean hasFilter = !metadataFilter.isBlank();
+        if (!hasSearch && !hasFilter) {
+            return;
+        }
+
+        List<String> filters = hasFilter ? List.of(metadataFilter) : List.of();
+        Set<Long> abstractImageIds = meiliSearchService.searchImageIds(metadataSearch, filters);
+
+        List<Long> ids = abstractImageIds.isEmpty() ? List.of(-1L) : new ArrayList<>(abstractImageIds);
+        searchParameterEntryList.add(new SearchParameterEntry("include", SearchOperation.in, ids));
     }
 
     @GetMapping("/imageinstance/{id}/next.json")

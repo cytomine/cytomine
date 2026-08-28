@@ -17,10 +17,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.Term;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.Point;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.utils.JsonObject;
@@ -256,23 +256,25 @@ public class ReportFormatServiceTests {
     }
 
     private List<Map<String, Object>> buildUsers(boolean isComplete) {
-        User user1 = builder.givenAUser();
-        User user2 = builder.givenAUser();
+        UserResponse user1 = builder.givenUserAclRead();
+        UserResponse user2 = builder.givenUserAclWrite();
+        String name1 = user1.name().orElseThrow();
+        String name2 = user2.name().orElseThrow();
         expectedDataObject = new Object[][] {
             {"Username", "Name"},
-            {user1.getUsername(), user1.getName()},
-            {user2.getUsername(), user2.getName()},
+            {user1.username(), name1},
+            {user2.username(), name2},
         };
         if (!isComplete) {
             expectedDataObject[1][1] = "";
             return new ArrayList<>(List.of(
-                Map.of("username", user1.getUsername()),
-                Map.of("username", user2.getUsername(), "name", user2.getName())
+                Map.of("username", user1.username()),
+                Map.of("username", user2.username(), "name", name2)
             ));
         } else {
             return new ArrayList<>(List.of(
-                Map.of("username", user1.getUsername(), "name", user1.getName()),
-                Map.of("username", user2.getUsername(), "name", user2.getName())
+                Map.of("username", user1.username(), "name", name1),
+                Map.of("username", user2.username(), "name", name2)
             ));
         }
     }

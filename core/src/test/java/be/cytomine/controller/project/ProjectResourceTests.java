@@ -36,7 +36,6 @@ import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.project.ProjectRepository;
@@ -49,6 +48,11 @@ import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.social.ProjectConnectionService;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_ADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_READ;
+import static be.cytomine.config.WiremockRepository.SUPER_ADMIN_ACL_ID;
+import static be.cytomine.config.WiremockRepository.USER_ACL_ADMIN_ID;
+import static be.cytomine.config.WiremockRepository.USER_ACL_READ_ID;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -233,7 +237,7 @@ public class ProjectResourceTests {
         Project projectWithoutCriteria = builder.givenAProject();
 
         builder.addUserToProject(projectWithCriteria, currentUserService.getCurrentUsername());
-        builder.addUserToProject(projectWithCriteria, builder.givenAUser().getUsername());
+        builder.addUserToProject(projectWithCriteria, builder.givenUserAclRead().username());
 
         builder.addUserToProject(projectWithoutCriteria, currentUserService.getCurrentUsername());
 
@@ -579,8 +583,8 @@ public class ProjectResourceTests {
     @Transactional
     public void addValidProjectWithUsersAdmins() throws Exception {
         String currentUsername = currentUserService.getCurrentUsername();
-        User user = builder.givenAUser();
-        User admin = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
+        UserResponse admin = builder.givenUserAclWrite();
 
         Project project = basicInstanceBuilder.givenANotPersistedProject();
         project.setOntology(builder.givenAnOntology());
@@ -588,8 +592,8 @@ public class ProjectResourceTests {
         restProjectControllerMockMvc.perform(post("/api/project.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(project.toJsonObject(urlApi)
-                    .withChange("users", List.of(user.getId()))
-                    .withChange("admins", List.of(admin.getId()))
+                    .withChange("users", List.of(user.id()))
+                    .withChange("admins", List.of(admin.id()))
                     .toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
@@ -609,16 +613,16 @@ public class ProjectResourceTests {
             currentUsername,
             ADMINISTRATION
         )).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, user.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(projectCreated, user.getUsername(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, admin.getUsername(), ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, admin.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated, user.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(projectCreated, user.username(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated, admin.username(), ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated, admin.username(), READ)).isTrue();
 
         // check ontology access
-        assertThat(permissionService.hasACLPermission(projectCreated.getOntology(), user.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(projectCreated.getOntology(), user.username(), READ)).isTrue();
         assertThat(permissionService.hasACLPermission(
             projectCreated.getOntology(),
-            admin.getUsername(),
+            admin.username(),
             READ
         )).isTrue();
     }
@@ -673,13 +677,13 @@ public class ProjectResourceTests {
     public void editValidProjectWithUsers() throws Exception {
         Project project = builder.givenAProject();
 
-        User previousUser = builder.givenAUser();
-        User newUser = builder.givenAUser();
-        builder.addUserToProject(project, previousUser.getUsername(), READ);
+        UserResponse previousUser = builder.givenUserAclRead();
+        UserResponse newUser = builder.givenUserAclWrite();
+        builder.addUserToProject(project, previousUser.username(), READ);
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi).withChange("users", List.of(newUser.getId())).toJsonString()))
+                .content(project.toJsonObject(urlApi).withChange("users", List.of(newUser.id())).toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -689,8 +693,8 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists());
 
-        assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, newUser.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, previousUser.username(), READ)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, newUser.username(), READ)).isTrue();
     }
 
     @Test
@@ -698,13 +702,13 @@ public class ProjectResourceTests {
     public void editValidProjectWithAdmins() throws Exception {
         Project project = builder.givenAProject();
 
-        User previousUser = builder.givenAUser();
-        User newUser = builder.givenAUser();
-        builder.addUserToProject(project, previousUser.getUsername(), READ);
+        UserResponse previousUser = builder.givenUserAclRead();
+        UserResponse newUser = builder.givenUserAclWrite();
+        builder.addUserToProject(project, previousUser.username(), READ);
 
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi).withChange("admins", List.of(newUser.getId())).toJsonString()))
+                .content(project.toJsonObject(urlApi).withChange("admins", List.of(newUser.id())).toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -714,10 +718,10 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.project.id").exists());
 
-        assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, previousUser.getUsername(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, newUser.getUsername(), ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, newUser.getUsername(), READ)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, previousUser.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, previousUser.username(), ADMINISTRATION)).isFalse();
+        assertThat(permissionService.hasACLPermission(project, newUser.username(), ADMINISTRATION)).isTrue();
+        assertThat(permissionService.hasACLPermission(project, newUser.username(), READ)).isTrue();
     }
 
     @Test
@@ -882,27 +886,22 @@ public class ProjectResourceTests {
     @Transactional
     public void listByCreatorLight() throws Exception {
         Project project = builder.givenAProject();
-        User creator = builder.givenSuperAdmin();
-        User user = builder.givenAUser();
-        User admin = builder.givenAUser();
-        builder.addUserToProject(project, creator.getUsername());
-        builder.addUserToProject(project, user.getUsername(), READ);
-        builder.addUserToProject(project, admin.getUsername(), ADMINISTRATION);
+        String creator = currentUserService.getCurrentUsername();
+        permissionService.addPermission(project, creator, ADMINISTRATION);
+        permissionService.addPermission(project, USER_ACL_READ, READ);
+        permissionService.addPermission(project, USER_ACL_ADMIN, ADMINISTRATION);
 
-        restProjectControllerMockMvc.perform(get(
-                "/api/user/{id}/project/light.json",
-                creator.getId()
-            )
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", SUPER_ADMIN_ACL_ID)
                 .param("creator", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", user.getId())
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_READ_ID)
                 .param("creator", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").doesNotExist());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", admin.getId())
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_ADMIN_ID)
                 .param("creator", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").doesNotExist());
@@ -913,26 +912,21 @@ public class ProjectResourceTests {
     public void listByAdminLight() throws Exception {
         Project project = builder.givenAProject();
         String creator = currentUserService.getCurrentUsername();
-        User user = builder.givenAUser();
-        User admin = builder.givenAUser();
-        builder.addUserToProject(project, creator, ADMINISTRATION);
-        builder.addUserToProject(project, user.getUsername(), READ);
-        builder.addUserToProject(project, admin.getUsername(), ADMINISTRATION);
+        permissionService.addPermission(project, creator, ADMINISTRATION);
+        permissionService.addPermission(project, USER_ACL_READ, READ);
+        permissionService.addPermission(project, USER_ACL_ADMIN, ADMINISTRATION);
 
-        restProjectControllerMockMvc.perform(get(
-                "/api/user/{id}/project/light.json",
-                currentUserService.getCurrentUser().id()
-            )
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", SUPER_ADMIN_ACL_ID)
                 .param("admin", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", user.getId())
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_READ_ID)
                 .param("admin", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").doesNotExist());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", admin.getId())
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_ADMIN_ID)
                 .param("admin", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
@@ -944,26 +938,21 @@ public class ProjectResourceTests {
     public void listBySimpleUserLight() throws Exception {
         Project project = builder.givenAProject();
         String creator = currentUserService.getCurrentUsername();
-        User user = builder.givenAUser();
-        User admin = builder.givenAUser();
-        builder.addUserToProject(project, creator, ADMINISTRATION);
-        builder.addUserToProject(project, user.getUsername(), READ);
-        builder.addUserToProject(project, admin.getUsername(), ADMINISTRATION);
+        permissionService.addPermission(project, creator, ADMINISTRATION);
+        permissionService.addPermission(project, USER_ACL_READ, READ);
+        permissionService.addPermission(project, USER_ACL_ADMIN, ADMINISTRATION);
 
-        restProjectControllerMockMvc.perform(get(
-                "/api/user/{id}/project/light.json",
-                currentUserService.getCurrentUser().id()
-            )
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", SUPER_ADMIN_ACL_ID)
                 .param("user", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", user.getId())
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_READ_ID)
                 .param("user", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", admin.getId())
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_ADMIN_ID)
                 .param("user", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
@@ -986,7 +975,7 @@ public class ProjectResourceTests {
         project.setCountAnnotations(20);
         project.setCountJobAnnotations(30);
         project.setCountReviewedAnnotations(40);
-        builder.addUserToProject(project, builder.givenAUser().getUsername());
+        builder.addUserToProject(project, builder.givenUserAclRead().username());
         builder.addUserToProject(project, currentUserService.getCurrentUsername());
         builder.persistAndReturn(project);
         Project project2 = builder.givenAProject();

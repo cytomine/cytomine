@@ -24,7 +24,6 @@ import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.command.CommandHistory;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentRoleService;
@@ -192,15 +191,16 @@ public class RestProjectController extends RestCytomineController {
         @RequestParam(required = false, defaultValue = "false") Boolean user
     ) {
         log.debug("REST request to list project with user {}", id);
-        User requestedUser = userService.findUser(id)
-            .orElseThrow(() -> new ObjectNotFoundException("User", id));
+        long currentUserId = currentUserService.getCurrentUser().id();
+        long requestedUserId = userHttpContract.get(id, currentUserId)
+            .orElseThrow(() -> new ObjectNotFoundException("User", id)).id();
 
         if (creator) {
-            return responseSuccess(projectService.listByCreator(requestedUser));
+            return responseSuccess(projectService.listByCreatorId(requestedUserId));
         } else if (admin) {
-            return responseSuccess(projectService.listByAdmin(requestedUser));
+            return responseSuccess(projectService.listByAdminId(requestedUserId));
         } else {
-            return responseSuccess(projectService.listByUser(requestedUser));
+            return responseSuccess(projectService.listByUserId(requestedUserId));
         }
     }
 

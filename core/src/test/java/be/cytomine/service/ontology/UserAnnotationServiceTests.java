@@ -24,6 +24,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -36,7 +37,6 @@ import be.cytomine.domain.ontology.AnnotationTrack;
 import be.cytomine.domain.ontology.SharedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationLight;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -106,8 +106,8 @@ public class UserAnnotationServiceTests {
     @Test
     void listIncluded() throws ParseException {
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenAUser();
-        User user2 = builder.givenAUser();
+        UserResponse user1 = builder.givenAclUserNoAcl();
+        UserResponse user2 = builder.givenAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -123,7 +123,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            user1,
+            builder.getUserEntity(user1),
             null,
             null,
             null
@@ -137,7 +137,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            user2,
+            builder.getUserEntity(user2),
             List.of(term1.getId(), term2.getId()),
             null,
             null
@@ -151,7 +151,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            user2,
+            builder.getUserEntity(user2),
             List.of(term1.getId()),
             null,
             null
@@ -170,7 +170,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            user1,
+            builder.getUserEntity(user1),
             List.of(term1.getId(), term2.getId()),
             null,
             null

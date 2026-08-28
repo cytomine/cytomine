@@ -48,6 +48,26 @@ public class WiremockRepository {
 
     public static final WireMockServer SERVER = new WireMockServer(wireMockConfig().dynamicPort());
 
+    public static final long SUPER_ADMIN_ACL_ID = 1001;
+
+    public static final long ADMIN_ACL_ID = 1002;
+
+    public static final long ACL_USER_NO_ACL_ID = 1003;
+
+    public static final long USER_ACL_READ_ID = 1004;
+
+    public static final long USER_ACL_WRITE_ID = 1005;
+
+    public static final long USER_ACL_CREATE_ID = 1006;
+
+    public static final long USER_ACL_DELETE_ID = 1007;
+
+    public static final long USER_ACL_ADMIN_ID = 1008;
+
+    public static final long CREATOR_ID = 1009;
+
+    public static final long GUEST_ACL_ID = 1010;
+
     private static final LocalDateTime CREATION_DATE = LocalDateTime.of(2024, 1, 1, 0, 0);
 
     static {
@@ -185,16 +205,16 @@ public class WiremockRepository {
 
     @PostConstruct
     public void setupUserStubs() {
-        stubTestUser("SUPER_ADMIN_ACL", 1001, ROLE_SUPER_ADMIN);
-        stubTestUser("ADMIN_ACL", 1002, ROLE_ADMIN);
-        stubTestUser("ACL_USER_NO_ACL", 1003, ROLE_USER);
-        stubTestUser("USER_ACL_READ", 1004, ROLE_USER);
-        stubTestUser("USER_ACL_WRITE", 1005, ROLE_USER);
-        stubTestUser("USER_ACL_CREATE", 1006, ROLE_USER);
-        stubTestUser("USER_ACL_DELETE", 1007, ROLE_USER);
-        stubTestUser("USER_ACL_ADMIN", 1008, ROLE_USER);
-        stubTestUser("CREATOR", 1009, ROLE_USER);
-        stubTestUser("GUEST_ACL", 1010, ROLE_GUEST);
+        stubTestUser("SUPER_ADMIN_ACL", SUPER_ADMIN_ACL_ID, ROLE_SUPER_ADMIN);
+        stubTestUser("ADMIN_ACL", ADMIN_ACL_ID, ROLE_ADMIN);
+        stubTestUser("ACL_USER_NO_ACL", ACL_USER_NO_ACL_ID, ROLE_USER);
+        stubTestUser("USER_ACL_READ", USER_ACL_READ_ID, ROLE_USER);
+        stubTestUser("USER_ACL_WRITE", USER_ACL_WRITE_ID, ROLE_USER);
+        stubTestUser("USER_ACL_CREATE", USER_ACL_CREATE_ID, ROLE_USER);
+        stubTestUser("USER_ACL_DELETE", USER_ACL_DELETE_ID, ROLE_USER);
+        stubTestUser("USER_ACL_ADMIN", USER_ACL_ADMIN_ID, ROLE_USER);
+        stubTestUser("CREATOR", CREATOR_ID, ROLE_USER);
+        stubTestUser("GUEST_ACL", GUEST_ACL_ID, ROLE_GUEST);
     }
 
     private void stubTestUser(String username, long id, String role) {
@@ -203,6 +223,11 @@ public class WiremockRepository {
 
     public void stubUser(User user) {
         stubUser(user.getId(), user.getUsername(), ROLE_USER, user.getPublicKey(), user.getPrivateKey());
+    }
+
+    public void stubUser(UserResponse user) {
+        stubUser(user.id(), user.username(), ROLE_USER, user.publicKey().orElse(null),
+            user.privateKey().orElse(null));
     }
 
     @SneakyThrows

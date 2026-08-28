@@ -38,6 +38,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
@@ -48,7 +49,6 @@ import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.service.UrlApi;
@@ -87,8 +87,8 @@ public class AnnotationDomainResourceTests {
     Project project;
     ImageInstance image;
     SliceInstance slice;
-    User me;
-    User randomUser;
+    UserResponse me;
+    UserResponse randomUser;
     Term term;
     UserAnnotation a1;
     UserAnnotation a2;
@@ -143,9 +143,9 @@ public class AnnotationDomainResourceTests {
         term = builder.givenATerm(project.getOntology());
 
         me = builder.givenSuperAdmin();
-        randomUser = builder.givenAUser();
-        builder.addUserToProject(project, me.getUsername());
-        builder.addUserToProject(project, randomUser.getUsername());
+        randomUser = builder.givenAclUserNoAcl();
+        builder.addUserToProject(project, me.username());
+        builder.addUserToProject(project, randomUser.username());
 
         a1 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
         a2 = builder.givenAUserAnnotation(slice, "POLYGON((1 1,5 1,5 5,1 5,1 1))", me, term);
@@ -319,11 +319,11 @@ public class AnnotationDomainResourceTests {
     public void listAnnotationSearchByImageAndUser() throws Exception {
 
         a1.setImage(builder.givenAnImageInstance(project));
-        a2.setUser(builder.givenAUser());
+        a2.setUserId(builder.givenAclUserNoAcl().id());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString())
-                .param("user", this.me.getId().toString()))
+                .param("user", String.valueOf(this.me.id())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + a1.getId() + ")]").doesNotExist())
             .andExpect(jsonPath("$.collection[?(@.id==" + a2.getId() + ")]").doesNotExist())
@@ -346,7 +346,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.a1.getImage().getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("bbox", polygonIncludingA1A2A3)
                 .param("notReviewedOnly", "true")
             )
@@ -359,7 +359,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.a1.getImage().getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("bbox", polygonIncludingA1A2A3)
                 .param("notReviewedOnly", "true")
                 .param("kmeansValue", "1")
@@ -373,7 +373,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.a1.getImage().getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("bbox", polygonIncludingA1A2A3)
                 .param("notReviewedOnly", "true")
                 .param("kmeansValue", "2")
@@ -387,7 +387,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.a1.getImage().getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("bbox", polygonIncludingA1A2A3)
                 .param("notReviewedOnly", "true")
                 .param("kmeansValue", "3")
@@ -405,11 +405,11 @@ public class AnnotationDomainResourceTests {
     public void listAnnotationSearchByImageAndUserAndTerm() throws Exception {
 
         a1.setImage(builder.givenAnImageInstance(project));
-        a2.setUser(builder.givenAUser());
+        a2.setUserId(builder.givenAclUserNoAcl().id());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("image", this.image.getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("term", this.term.getId().toString())
             )
             .andExpect(status().isOk())
@@ -436,7 +436,7 @@ public class AnnotationDomainResourceTests {
                 + image.getId()
                 + "/annotation/included.json")
                 .param("geometry", polygonIncludingA1A2A3)
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("image", this.image.getId().toString())
             )
             .andExpect(status().isOk())
@@ -448,7 +448,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("bbox", polygonIncludingA1A2A3)
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("image", this.image.getId().toString())
             )
             .andExpect(status().isOk())
@@ -467,7 +467,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("bboxAnnotation", intersectAnnotation.getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("image", this.image.getId().toString())
             )
             .andExpect(status().isOk())
@@ -480,7 +480,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("bboxAnnotation", intersectAnnotation.getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("image", this.image.getId().toString())
                 .param("excludedAnnotation", intersectAnnotation.getId().toString())
             )
@@ -563,7 +563,7 @@ public class AnnotationDomainResourceTests {
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("noTerm", "true")
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("image", this.image.getId().toString())
             )
             .andExpect(status().isOk())
@@ -581,7 +581,7 @@ public class AnnotationDomainResourceTests {
         builder.givenAnAnnotationTerm(a1);
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("multipleTerm", "true")
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("image", this.image.getId().toString())
             )
             .andExpect(status().isOk())
@@ -598,13 +598,13 @@ public class AnnotationDomainResourceTests {
     public void listUserAnnotationWithSeveralIdenticalTerm() throws Exception {
         AnnotationTerm annotationTerm = new AnnotationTerm();
         annotationTerm.setUserAnnotation(a1);
-        annotationTerm.setUser(builder.givenAUser());
+        annotationTerm.setUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
         annotationTerm.setTerm(builder.givenATerm(project.getOntology()));
         builder.persistAndReturn(annotationTerm);
         em.refresh(a1);
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("multipleTerm", "true")
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("image", this.image.getId().toString())
             )
             .andExpect(status().isOk())
@@ -636,7 +636,7 @@ public class AnnotationDomainResourceTests {
         jsonObject.put("notReviewedOnly", false);
         jsonObject.put("image", userAnnotation.getImage().getId());
         jsonObject.put("slice", userAnnotation.getSlice().getId());
-        jsonObject.put("user", userAnnotation.getUser().getId());
+        jsonObject.put("user", userAnnotation.getUserId());
         jsonObject.put("kmeans", true);
         jsonObject.put("bbox", "0,0,102400,76288");
         jsonObject.put("showTrack", true);
@@ -804,12 +804,12 @@ public class AnnotationDomainResourceTests {
     public void listReviewedAnnotationSearchByImageAndUser() throws Exception {
 
         r1.setImage(builder.givenAnImageInstance(project));
-        r2.setUser(builder.givenAUser());
+        r2.setUserId(builder.givenAclUserNoAcl().id());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("image", this.image.getId().toString())
-                .param("user", this.me.getId().toString()))
+                .param("user", String.valueOf(this.me.id())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + r1.getId() + ")]").doesNotExist())
             .andExpect(jsonPath("$.collection[?(@.id==" + r2.getId() + ")]").doesNotExist())
@@ -834,7 +834,7 @@ public class AnnotationDomainResourceTests {
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("image", this.r1.getImage().getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("bbox", polygonIncludingA1A2A3)
                 .param("notReviewedOnly", "true")
             )
@@ -848,7 +848,7 @@ public class AnnotationDomainResourceTests {
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("image", this.a1.getImage().getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("bbox", polygonIncludingA1A2A3)
                 .param("notReviewedOnly", "true")
                 .param("kmeansValue", "1")
@@ -863,7 +863,7 @@ public class AnnotationDomainResourceTests {
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("image", this.a1.getImage().getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("bbox", polygonIncludingA1A2A3)
                 .param("notReviewedOnly", "true")
                 .param("kmeansValue", "2")
@@ -878,7 +878,7 @@ public class AnnotationDomainResourceTests {
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("image", this.a1.getImage().getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("bbox", polygonIncludingA1A2A3)
                 .param("notReviewedOnly", "true")
                 .param("kmeansValue", "3")
@@ -896,12 +896,12 @@ public class AnnotationDomainResourceTests {
     public void listReviewedAnnotationSearchByImageAndReviewerAndTerm() throws Exception {
 
         r1.setImage(builder.givenAnImageInstance(project));
-        r2.setUser(builder.givenAUser());
+        r2.setUserId(builder.givenAclUserNoAcl().id());
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("image", this.image.getId().toString())
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("term", this.term.getId().toString())
             )
             .andExpect(status().isOk())
@@ -912,13 +912,13 @@ public class AnnotationDomainResourceTests {
             .andReturn();
 
         r1.setImage(builder.givenAnImageInstance(project));
-        r2.setUser(this.me);
-        r2.setReviewUser(builder.givenAUser());
+        r2.setUserId(this.me.id());
+        r2.setReviewUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("image", this.image.getId().toString())
-                .param("reviewUsers", this.me.getId().toString())
+                .param("reviewUsers", String.valueOf(this.me.id()))
                 .param("term", this.term.getId().toString())
             )
             .andExpect(status().isOk())
@@ -933,7 +933,7 @@ public class AnnotationDomainResourceTests {
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("noTerm", "true")
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("image", this.image.getId().toString())
             )
             .andExpect(status().isOk())
@@ -952,7 +952,7 @@ public class AnnotationDomainResourceTests {
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")
                 .param("multipleTerm", "true")
-                .param("user", this.me.getId().toString())
+                .param("user", String.valueOf(this.me.id()))
                 .param("image", this.image.getId().toString())
             )
             .andExpect(status().isOk())
@@ -982,7 +982,7 @@ public class AnnotationDomainResourceTests {
         jsonObject.put("showWKT", true);
         jsonObject.put("showGIS", true);
         jsonObject.put("showTerm", true);
-        jsonObject.put("user", reviewedAnnotation.getUser().getId());
+        jsonObject.put("user", reviewedAnnotation.getUserId());
         restAnnotationDomainControllerMockMvc.perform(post("/api/annotation/search.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonObject.toJsonString()))
@@ -1028,12 +1028,12 @@ public class AnnotationDomainResourceTests {
 
         List<String> distinctUsers = getUsersFromCsv(csvContent).stream().distinct().toList();
         assertThat(distinctUsers).hasSize(2);
-        assertThat(distinctUsers).containsExactlyInAnyOrder(me.getUsername(), randomUser.getUsername());
+        assertThat(distinctUsers).containsExactlyInAnyOrder(me.username(), randomUser.username());
     }
 
     @Test
     public void shouldReturnCsvWithAnnotationsOnlyForRequestedUser() throws Exception {
-        String csvContent = performDownload(ReportType.CSV, randomUser.getId().toString(), false)
+        String csvContent = performDownload(ReportType.CSV, String.valueOf(randomUser.id()), false)
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
             .andReturn()
@@ -1042,12 +1042,12 @@ public class AnnotationDomainResourceTests {
 
         List<String> users = getUsersFromCsv(csvContent).stream().distinct().toList();
         assertThat(users).hasSize(1);
-        assertThat(users.getFirst()).isEqualTo(randomUser.getUsername());
+        assertThat(users.getFirst()).isEqualTo(randomUser.username());
     }
 
     @Test
     public void shouldReturnCsvWithOnlyReviewedAnnotations() throws Exception {
-        String csvContent = performDownload(ReportType.CSV, randomUser.getId().toString(), true)
+        String csvContent = performDownload(ReportType.CSV, String.valueOf(randomUser.id()), true)
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.parseMediaType("text/csv")))
             .andReturn()
@@ -1060,7 +1060,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void shouldReturnCsvFileWithCorrectContentType() throws Exception {
-        byte[] responseBody = performDownload(ReportType.CSV, me.getId().toString(), false)
+        byte[] responseBody = performDownload(ReportType.CSV, String.valueOf(me.id()), false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
             .andExpect(header().string("Content-Disposition", containsString(".csv")))
@@ -1077,7 +1077,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void shouldReturnXlsFileWithCorrectContentType() throws Exception {
-        byte[] responseBody = performDownload(ReportType.EXCEL, me.getId().toString(), false)
+        byte[] responseBody = performDownload(ReportType.EXCEL, String.valueOf(me.id()), false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
             .andExpect(header().string("Content-Disposition", containsString(".xls")))
@@ -1093,7 +1093,7 @@ public class AnnotationDomainResourceTests {
 
     @Test
     public void shouldReturnPdfFileWithCorrectContentType() throws Exception {
-        byte[] responseBody = performDownload(ReportType.PDF, me.getId().toString(), false)
+        byte[] responseBody = performDownload(ReportType.PDF, String.valueOf(me.id()), false)
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
             .andExpect(header().string("Content-Disposition", containsString(".pdf")))
@@ -1582,7 +1582,7 @@ public class AnnotationDomainResourceTests {
         json.put("image", annotation.getImage().getId());
         json.put("review", reviewMode);
         json.put("remove", false);
-        json.put("layers", List.of(annotation.user().getId()));
+        json.put("layers", List.of(annotation.getUserId()));
 
         MvcResult mvcResult = restAnnotationDomainControllerMockMvc.perform(post("/api/annotationcorrection.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -1610,7 +1610,7 @@ public class AnnotationDomainResourceTests {
         json.put("image", annotation.getImage().getId());
         json.put("review", reviewMode);
         json.put("remove", false);
-        json.put("layers", List.of(annotation.user().getId()));
+        json.put("layers", List.of(annotation.getUserId()));
         MvcResult mvcResult = restAnnotationDomainControllerMockMvc.perform(post("/api/annotationcorrection.json")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.toJsonString()))
@@ -1640,7 +1640,7 @@ public class AnnotationDomainResourceTests {
         json.put("image", annotation.getImage().getId());
         json.put("review", reviewMode);
         json.put("remove", true);
-        json.put("layers", List.of(annotation.user().getId()));
+        json.put("layers", List.of(annotation.getUserId()));
 
         MvcResult mvcResult = restAnnotationDomainControllerMockMvc.perform(post("/api/annotationcorrection.json")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -1687,7 +1687,7 @@ public class AnnotationDomainResourceTests {
         json.put("image", annot1.getImage().getId());
         json.put("review", reviewMode);
         json.put("remove", false);
-        json.put("layers", List.of(annot1.user().getId()));
+        json.put("layers", List.of(annot1.getUserId()));
 
         MvcResult mvcResult = restAnnotationDomainControllerMockMvc.perform(post("/api/annotationcorrection.json")
                 .contentType(MediaType.APPLICATION_JSON)

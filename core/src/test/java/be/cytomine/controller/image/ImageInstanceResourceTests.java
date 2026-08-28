@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -38,12 +39,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -53,12 +56,13 @@ import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_READ;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
@@ -72,6 +76,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -109,6 +115,9 @@ public class ImageInstanceResourceTests {
 
     @Autowired
     private UrlApi urlApi;
+
+    @MockitoBean
+    private MeiliSearchService meiliSearchService;
 
     @BeforeAll
     public static void beforeAll() throws JOSEException {
@@ -197,12 +206,12 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "get_blind_image_instance")
+    @WithMockUser(username = USER_ACL_READ)
     public void getBlindImageInstance() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
-        User user = builder.givenAUser("get_blind_image_instance");
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
+        UserResponse user = builder.givenUserAclRead();
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
         image.getProject().setBlindMode(true);
 
@@ -261,31 +270,31 @@ public class ImageInstanceResourceTests {
 
     }
 
-    @WithMockUser(username = "list_image_instance_by_user")
+    @WithMockUser(username = USER_ACL_READ)
     @Test
     @Transactional
     public void listImageInstanceByUser() throws Exception {
         ImageInstance image = builder.givenAnImageInstance();
         image.getBaseImage().setWidth(500);
         ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
-        User user = builder.givenAUser("list_image_instance_by_user");
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
+        UserResponse user = builder.givenUserAclRead();
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.getId()))
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id=="
                 + imageFromOtherProjectNotAccessibleForUser.getId()
                 + ")]").doesNotExist());
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.getId()).param(
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.id()).param(
                 "width[lte]",
                 "500"
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists());
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.getId()).param(
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.id()).param(
                 "width[gte]",
                 "501"
             ))
@@ -293,17 +302,17 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").doesNotExist());
     }
 
-    @WithMockUser(username = "list_image_instance_light_by_user")
+    @WithMockUser(username = USER_ACL_READ)
     @Test
     @Transactional
     public void listImageInstanceLightByUser() throws Exception {
         ImageInstance image = builder.givenAnImageInstance();
         image.getBaseImage().setWidth(500);
         ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
-        User user = builder.givenAUser("list_image_instance_light_by_user");
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
+        UserResponse user = builder.givenUserAclRead();
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
-        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance/light.json", user.getId()))
+        restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance/light.json", user.id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id=="
@@ -339,6 +348,38 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
+    public void listImageInstanceByProjectFilteredByMetadata() throws Exception {
+        Project project = builder.givenAProject();
+
+        AbstractImage matchingImage = builder.givenAnAbstractImage();
+        ImageInstance imageWithCriteria = builder.givenAnImageInstance(matchingImage, project);
+        ImageInstance imageWithoutCriteria = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
+
+        when(meiliSearchService.searchImageIds(any(), any())).thenReturn(Set.of(matchingImage.getId()));
+
+        restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project.getId())
+                .param("metadataFilter", "specimens.biological_being.sex:Male"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection[?(@.id==" + imageWithCriteria.getId() + ")]").exists())
+            .andExpect(jsonPath("$.collection[?(@.id==" + imageWithoutCriteria.getId() + ")]").doesNotExist());
+    }
+
+    @Test
+    @Transactional
+    public void listImageInstanceByProjectReturnsEmptyWhenMetadataMatchesNoImage() throws Exception {
+        Project project = builder.givenAProject();
+        builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
+
+        when(meiliSearchService.searchImageIds(any(), any())).thenReturn(Set.of(-999L));
+
+        restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project.getId())
+                .param("metadataFilter", "specimens.biological_being.sex:Male"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(0)));
+    }
+
+    @Test
+    @Transactional
     public void listImageInstanceLight() throws Exception {
         Project project1 = builder.givenAProject();
         Project anotherProject = builder.givenAProject();
@@ -360,12 +401,12 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    @WithMockUser("list_image_instance_by_projects_blind_filenames")
+    @WithMockUser(USER_ACL_READ)
     public void listImageInstanceByProjectsBlindFilenames() throws Exception {
-        User user = builder.givenAUser("list_image_instance_by_projects_blind_filenames");
+        UserResponse user = builder.givenUserAclRead();
         ImageInstance image = givenTestImageInstance();
 
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE); // contributor
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
         image.getProject().setBlindMode(true);
 
@@ -939,10 +980,10 @@ public class ImageInstanceResourceTests {
     @WithMockUser("download_image_instance_cannot_download")
     @Disabled("Randomly fails")
     public void downloadImageInstanceCannotDownload() throws Exception {
-        User user = builder.givenAUser("download_image_instance_cannot_download");
+        UserResponse user = builder.givenUserAclRead();
 
         ImageInstance image = givenTestImageInstance();
-        builder.addUserToProject(image.getProject(), user.getUsername(), BasePermission.WRITE);
+        builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE);
         image.getProject().setAreImagesDownloadable(true);
 
         byte[] mockResponse = UUID.randomUUID().toString().getBytes();

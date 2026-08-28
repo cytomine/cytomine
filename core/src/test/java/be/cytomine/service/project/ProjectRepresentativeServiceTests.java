@@ -12,6 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -74,11 +75,11 @@ public class ProjectRepresentativeServiceTests {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser()
+            projectRepresentativeUser.getUserId()
         ).isPresent());
         assertThat(projectRepresentativeUser).isEqualTo(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser()
+            projectRepresentativeUser.getUserId()
         ).get());
     }
 
@@ -86,7 +87,7 @@ public class ProjectRepresentativeServiceTests {
     void findUnexistingProjectRepresentativeUserWithProjectAndUserReturnEmpty() {
         assertThat(projectRepresentativeUserService.find(
             builder.givenAProject(),
-            builder.givenSuperAdmin()
+            builder.givenSuperAdmin().id()
         )).isEmpty();
     }
 
@@ -160,9 +161,11 @@ public class ProjectRepresentativeServiceTests {
     @Test
     void deleteProjectRepresentativeUserWithSuccess() {
         ProjectRepresentativeUser projectRepresentativeUser1 = builder.givenAProjectRepresentativeUser();
+        UserResponse user = builder.givenUserAclRead();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser1.getProject(),
-            builder.givenAUser()
+            user.username(),
+            user.id()
         );
         CommandResponse commandResponse = projectRepresentativeUserService.delete(
             projectRepresentativeUser1,
@@ -189,19 +192,21 @@ public class ProjectRepresentativeServiceTests {
 
     @Test
     void deletingLastRepresentativeUserFromProjectWillGrantCurrentUserAsRepresentative() {
+        UserResponse user = builder.givenUserAclRead();
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser(
-            builder.givenAProject(), builder.givenAUser()
+            builder.givenAProject(), user.username(), user.id()
         );
         builder.addUserToProject(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser().getUsername(),
+            user.username(),
             ADMINISTRATION
         );
 
         assertThat(projectRepresentativeUserService.listByProject(projectRepresentativeUser.getProject())).hasSize(1);
 
         projectMemberService.deleteUserFromProject(
-            projectRepresentativeUser.getUser(),
+            user.username(),
+            user.id(),
             projectRepresentativeUser.getProject(),
             true
         );
@@ -209,11 +214,11 @@ public class ProjectRepresentativeServiceTests {
         assertThat(projectRepresentativeUserService.listByProject(projectRepresentativeUser.getProject())).hasSize(1);
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser()
+            projectRepresentativeUser.getUserId()
         )).isEmpty();
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            builder.givenSuperAdmin()
+            builder.givenSuperAdmin().id()
         )).isPresent();
     }
 }

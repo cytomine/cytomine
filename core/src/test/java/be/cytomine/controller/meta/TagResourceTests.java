@@ -92,7 +92,7 @@ public class TagResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(tag.getId().intValue()))
             .andExpect(jsonPath("$.name").value(tag.getName()))
-            .andExpect(jsonPath("$.creatorName").value(builder.givenSuperAdmin().getUsername()))
+            .andExpect(jsonPath("$.creatorName").value(builder.givenSuperAdmin().username()))
             .andExpect(jsonPath("$.created").exists());
     }
 

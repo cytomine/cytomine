@@ -92,11 +92,10 @@ public class RestUserController extends RestCytomineController {
         log.debug("REST request to list representatives from project {}", id);
         Project project = projectService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("Project", id));
-        return responseSuccess(
-            projectRepresentativeUserService.listByProject(project)
-                .stream().map(ProjectRepresentativeUser::getUser)
-                .collect(Collectors.toList()), isFilterRequired()
-        );
+        List<Long> userIds = projectRepresentativeUserService.listByProject(project)
+            .stream().map(ProjectRepresentativeUser::getUserId)
+            .collect(Collectors.toList());
+        return responseSuccess(userService.list(userIds), isFilterRequired());
     }
 
     @GetMapping("/project/{id}/creator.json")
@@ -190,8 +189,8 @@ public class RestUserController extends RestCytomineController {
     public ResponseEntity<String> getCurrentUserKeys() {
         UserResponse user = currentUserService.getCurrentUser();
         return responseSuccess(JsonObject.of(
-            "primaryKey", user.publicKey().orElse(null),
-            "secondaryKey", user.privateKey().orElse(null)
+                "primaryKey", user.publicKey().orElse(null),
+                "secondaryKey", user.privateKey().orElse(null)
             )
         );
     }
@@ -253,7 +252,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user.getUsername(), project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -287,7 +286,7 @@ public class RestUserController extends RestCytomineController {
 
         for (User user : users) {
             try {
-                projectMemberService.addUserToProject(user, project, false);
+                projectMemberService.addUserToProject(user.getUsername(), project, false);
             } catch (Exception e) {
                 errors.add(user.getId().toString());
             }
@@ -323,7 +322,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.deleteUserFromProject(user, project, false);
+        projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -357,7 +356,7 @@ public class RestUserController extends RestCytomineController {
 
         for (User user : users) {
             try {
-                projectMemberService.deleteUserFromProject(user, project, false);
+                projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, false);
             } catch (Exception e) {
                 errors.add(user.getId().toString());
             }
@@ -393,7 +392,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.addUserToProject(user, project, true);
+        projectMemberService.addUserToProject(user.getUsername(), project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -410,7 +409,7 @@ public class RestUserController extends RestCytomineController {
         if (!Objects.equals(currentUserService.getCurrentUser().id(), user.getId())) {
             securityACLService.check(project, ADMINISTRATION);
         }
-        projectMemberService.deleteUserFromProject(user, project, true);
+        projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 

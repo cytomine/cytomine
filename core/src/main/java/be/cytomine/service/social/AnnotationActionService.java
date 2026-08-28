@@ -38,11 +38,11 @@ public class AnnotationActionService {
 
     private final MongoTemplate mongoTemplate;
 
-    public AnnotationAction add(AnnotationDomain annotation, User user, String action, Date created) {
+    public AnnotationAction add(AnnotationDomain annotation, long userId, String action, Date created) {
         securityACLService.check(annotation, READ);
         AnnotationAction annotationAction = new AnnotationAction();
         annotationAction.setId(sequenceService.generateID());
-        annotationAction.setUser(user.getId());
+        annotationAction.setUser(userId);
         annotationAction.setImage(annotation.getImage().getId());
         annotationAction.setSlice(annotation.getSlice().getId());
         annotationAction.setProject(annotation.getProject().getId());
@@ -50,7 +50,7 @@ public class AnnotationActionService {
         annotationAction.setAction(action);
         annotationAction.setAnnotationIdent(annotation.getId());
         annotationAction.setAnnotationClassName(annotation.getClass().getName());
-        annotationAction.setAnnotationCreator(annotation.user().getId());
+        annotationAction.setAnnotationCreator(annotation.getUserId());
 
         return annotationActionRepository.insert(annotationAction);
     }

@@ -107,7 +107,7 @@ public class SharedAnnotationService extends ModelService {
 
         jsonObject.putIfAbsent("sender", currentUser.id());
 
-        securityACLService.checkFullOrRestrictedForOwner(annotation, annotation.user());
+        securityACLService.checkFullOrRestrictedForOwner(annotation, annotation.getUserId());
         return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
     }
 
@@ -123,7 +123,8 @@ public class SharedAnnotationService extends ModelService {
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((SharedAnnotation) domain).getSender());
+        securityACLService.checkFullOrRestrictedForOwner(domain.container(),
+            ((SharedAnnotation) domain).getSender().getId());
         UserResponse currentUser = currentUserService.getCurrentUser();
         Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);

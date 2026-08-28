@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
-import be.cytomine.domain.security.User;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
 
@@ -72,29 +72,29 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
     public void whenIGetDomain() {
         projectRepresentativeUserService.get(projectRepresentativeUser.getId());
         projectRepresentativeUserService.find(
-            projectRepresentativeUser.getProject(), projectRepresentativeUser.getUser());
+            projectRepresentativeUser.getProject(), projectRepresentativeUser.getUserId());
     }
 
     @Override
     protected void whenIAddDomain() {
-        User user = builder.givenAUser();
-        builder.addUserToProject(projectRepresentativeUser.getProject(), user.getUsername());
+        UserResponse user = builder.givenCreator();
+        builder.addUserToProject(projectRepresentativeUser.getProject(), user.username());
         projectRepresentativeUserService.add(
             builder.givenANotPersistedProjectRepresentativeUser(
-                projectRepresentativeUser.getProject(), user
+                projectRepresentativeUser.getProject(), user.username(), user.id()
             ).toJsonObject(urlApi)
         );
     }
 
     @Override
     protected void whenIDeleteDomain() {
-        User user = projectRepresentativeUser.getUser();
-        builder.addUserToProject(projectRepresentativeUser.getProject(), user.getUsername());
+        UserResponse user = builder.givenCreator();
+        builder.addUserToProject(projectRepresentativeUser.getProject(), user.username());
         ProjectRepresentativeUser
             projectRepresentativeUserToDelete
             = builder.givenANotPersistedProjectRepresentativeUser(
             projectRepresentativeUser.getProject(),
-            user
+            user.username(), user.id()
         );
         builder.persistAndReturn(projectRepresentativeUserToDelete);
         projectRepresentativeUserService.delete(projectRepresentativeUserToDelete, null, null, true);

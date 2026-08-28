@@ -102,7 +102,7 @@ public class AnnotationTrackService extends ModelService {
         AnnotationDomain annotation = annotationDomainRepository.findById(jsonObject.getJSONAttrLong("annotationIdent"))
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", jsonObject.getJSONAttrStr("annotationIdent")));
         securityACLService.check(annotation.container(), READ);
-        securityACLService.checkFullOrRestrictedForOwner(annotation, annotation.user());
+        securityACLService.checkFullOrRestrictedForOwner(annotation, annotation.getUserId());
         securityACLService.checkUser(currentUserService.getCurrentUser());
 
         jsonObject.put("slice", annotation.getSlice().getId());
@@ -145,7 +145,7 @@ public class AnnotationTrackService extends ModelService {
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", annotationTrack.getId()));
 
         securityACLService.check(annotation.container(), READ);
-        securityACLService.checkFullOrRestrictedForOwner(annotation, annotation.user());
+        securityACLService.checkFullOrRestrictedForOwner(annotation, annotation.getUserId());
         securityACLService.checkUser(currentUserService.getCurrentUser());
 
         UserResponse currentUser = currentUserService.getCurrentUser();

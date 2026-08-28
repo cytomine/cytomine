@@ -22,7 +22,6 @@ import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorato
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -36,6 +35,10 @@ import be.cytomine.dto.image.Point;
 import be.cytomine.repositorynosql.social.LastUserPositionRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
 
+import static be.cytomine.BasicInstanceBuilder.ACL_USER_NO_ACL;
+import static be.cytomine.BasicInstanceBuilder.ADMIN;
+import static be.cytomine.BasicInstanceBuilder.SUPER_ADMIN;
+import static be.cytomine.BasicInstanceBuilder.USER_ACL_READ;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -106,7 +109,7 @@ public class UserPositionServiceTests {
     void userPositionCreatePersistentAndExpiredPosition() {
         PersistentUserPosition persistentUserPosition = givenAPersistentUserPosition(
             new Date(),
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             builder.givenASliceInstance()
         );
         assertThat(lastUserPositionRepository.count()).isEqualTo(1);
@@ -115,8 +118,8 @@ public class UserPositionServiceTests {
 
     @Test
     void retrieveLastPositionForUser() {
-        User mainUser = builder.givenSuperAdmin();
-        User anotherUser = builder.givenDefaultUser();
+        User mainUser = builder.getUserEntity(SUPER_ADMIN);
+        User anotherUser = builder.getUserEntity(ACL_USER_NO_ACL);
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         PersistentUserPosition persistentUserPosition = givenAPersistentUserPosition(
@@ -144,8 +147,8 @@ public class UserPositionServiceTests {
 
     @Test
     public void listUsersOnlineOnImage() {
-        User mainUser = builder.givenSuperAdmin();
-        User anotherUser = builder.givenDefaultUser();
+        User mainUser = builder.getUserEntity(SUPER_ADMIN);
+        User anotherUser = builder.getUserEntity(ACL_USER_NO_ACL);
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         PersistentUserPosition persistentUserPosition = givenAPersistentUserPosition(
@@ -167,8 +170,8 @@ public class UserPositionServiceTests {
 
     @Test
     public void listUsersPosition() {
-        User mainUser = builder.givenSuperAdmin();
-        User anotherUser = builder.givenDefaultUser();
+        User mainUser = builder.getUserEntity(SUPER_ADMIN);
+        User anotherUser = builder.getUserEntity(ACL_USER_NO_ACL);
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
@@ -258,8 +261,8 @@ public class UserPositionServiceTests {
 
     @Test
     public void summerize() {
-        User mainUser = builder.givenSuperAdmin();
-        User anotherUser = builder.givenDefaultUser();
+        User mainUser = builder.getUserEntity(SUPER_ADMIN);
+        User anotherUser = builder.getUserEntity(ACL_USER_NO_ACL);
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
@@ -285,7 +288,7 @@ public class UserPositionServiceTests {
 
     @Test
     public void summerizeLocation() {
-        User mainUser = builder.givenSuperAdmin();
+        User mainUser = builder.getUserEntity(SUPER_ADMIN);
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
@@ -328,7 +331,7 @@ public class UserPositionServiceTests {
 
     @Test
     public void summerizeAfterThan() {
-        User mainUser = builder.givenSuperAdmin();
+        User mainUser = builder.getUserEntity(SUPER_ADMIN);
         SliceInstance sliceInstance = builder.givenASliceInstance();
 
         Date freshPosition = DateUtils.addSeconds(new Date(), -1);
@@ -372,7 +375,7 @@ public class UserPositionServiceTests {
 
     @Test
     void shouldSuccessfullyAddPositionWithNewLocation() {
-        UserResponse user = builder.givenAUser();
+        User user = builder.getUserEntity(USER_ACL_READ);
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = builder.givenAnImageInstance();
         AreaDTO area = new AreaDTO(
@@ -383,7 +386,7 @@ public class UserPositionServiceTests {
         );
         Date date = new Date();
 
-        userPositionService.add(date, user.id(), sliceInstance, imageInstance, area, 0, (double) 0, true);
+        userPositionService.add(date, user.getId(), sliceInstance, imageInstance, area, 0, (double) 0, true);
     }
 
     @Test
@@ -393,22 +396,22 @@ public class UserPositionServiceTests {
 
         ConcurrentWebSocketSessionDecorator sessionDecorator = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
 
-        UserResponse user = builder.givenAUser();
+        User user = builder.getUserEntity(USER_ACL_READ);
 
-        WebSocketUserPositionHandler.sessionsBroadcast.put(user.id() + "/514", sessionDecorator);
+        WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
             sessionDecorator,
             new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
         );
         WebSocketUserPositionHandler.sessions.put(
-            String.valueOf(user.id()),
+            String.valueOf(user.getId()),
             new ConcurrentWebSocketSessionDecorator[] {new ConcurrentWebSocketSessionDecorator(session, 0, 0)}
         );
 
-        List<String> users = userPositionService.listFollowers(user.id(), 514L);
+        List<String> users = userPositionService.listFollowers(user.getId(), 514L);
 
         assertThat(users.size()).isEqualTo(1);
-        assertThat(users).contains(String.valueOf(user.id()));
+        assertThat(users).contains(String.valueOf(user.getId()));
     }
 
     @Test
@@ -418,7 +421,7 @@ public class UserPositionServiceTests {
 
         ConcurrentWebSocketSessionDecorator sessionDecorator = new ConcurrentWebSocketSessionDecorator(session, 0, 0);
 
-        User user = builder.givenDefaultUser();
+        User user = builder.getUserEntity(ACL_USER_NO_ACL);
 
         WebSocketUserPositionHandler.sessionsBroadcast.put(user.getId() + "/514", sessionDecorator);
         WebSocketUserPositionHandler.sessionsTracked.put(
@@ -439,16 +442,16 @@ public class UserPositionServiceTests {
 
     @Test
     public void listFollowersForNotFollowedUser() {
-        UserResponse user = builder.givenAUser();
+        User user = builder.getUserEntity(USER_ACL_READ);
         ImageInstance imageInstance = builder.givenAnImageInstance();
-        List<String> users = userPositionService.listFollowers(user.id(), imageInstance.getId());
+        List<String> users = userPositionService.listFollowers(user.getId(), imageInstance.getId());
         assertThat(users.size()).isEqualTo(0);
     }
 
     @Test
     public void addingUsersAsFollowers() {
-        User broadcaster = builder.givenDefaultUser();
-        User follower = builder.givenDefaultAdmin();
+        User broadcaster = builder.getUserEntity(ACL_USER_NO_ACL);
+        User follower = builder.getUserEntity(ADMIN);
         ImageInstance imageInstance = builder.givenAnImageInstance();
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
 
@@ -459,8 +462,8 @@ public class UserPositionServiceTests {
 
     @Test
     public void updatingUsersFollowers() {
-        User broadcaster = builder.givenDefaultUser();
-        User follower = builder.givenDefaultAdmin();
+        User broadcaster = builder.getUserEntity(ACL_USER_NO_ACL);
+        User follower = builder.getUserEntity(ADMIN);
         ImageInstance imageInstance = builder.givenAnImageInstance();
 
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
@@ -473,8 +476,8 @@ public class UserPositionServiceTests {
 
     @Test
     public void removeUsersFollowersThatDidNotFetchPosition() {
-        User broadcaster = builder.givenDefaultUser();
-        User follower = builder.givenDefaultAdmin();
+        User broadcaster = builder.getUserEntity(ACL_USER_NO_ACL);
+        User follower = builder.getUserEntity(ADMIN);
         ImageInstance imageInstance = builder.givenAnImageInstance();
 
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();

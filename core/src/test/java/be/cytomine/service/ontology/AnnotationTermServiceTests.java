@@ -98,7 +98,7 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
-            builder.givenDefaultUser()
+            builder.getUserEntity(builder.givenAclUserNoAcl())
         )).contains(annotationTerm);
     }
 
@@ -114,21 +114,21 @@ public class AnnotationTermServiceTests {
             .findByUserAnnotationAndTermAndUser(
                 annotationTerm.getUserAnnotation(),
                 annotationTerm.getTerm(),
-                builder.givenSuperAdmin()
+                builder.getUserEntity(builder.givenSuperAdmin())
             )).isPresent();
         commandService.undo();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(
                 annotationTerm.getUserAnnotation(),
                 annotationTerm.getTerm(),
-                builder.givenSuperAdmin()
+                builder.getUserEntity(builder.givenSuperAdmin())
             )).isEmpty();
         commandService.redo();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(
                 annotationTerm.getUserAnnotation(),
                 annotationTerm.getTerm(),
-                builder.givenSuperAdmin()
+                builder.getUserEntity(builder.givenSuperAdmin())
             )).isPresent();
     }
 
@@ -190,30 +190,36 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.givenSuperAdmin())).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
 
         commandService.undo();
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.givenSuperAdmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
 
         commandService.redo();
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.givenSuperAdmin())).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
     }
 
     @Test
     void addValidAnnotationTermAndDeleteOtherTermsNoImpactForTermsAddedByOtherUser() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
-        annotationTerm.setUser(builder.givenDefaultUser());
+        annotationTerm.setUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
         builder.persistAndReturn(annotationTerm);
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
@@ -228,7 +234,8 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(annotation, oldTerm, annotationTerm.getUser())).isPresent();
 
@@ -238,7 +245,7 @@ public class AnnotationTermServiceTests {
     void addValidAnnotationTermAndDeleteOtherTermsWithForceForTermsAddedByOther() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
-        annotationTerm.setUser(builder.givenDefaultUser());
+        annotationTerm.setUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
         wiremockRepository.stubTerm(newTerm);
@@ -252,7 +259,8 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(annotation, oldTerm, annotationTerm.getUser())).isEmpty();
 

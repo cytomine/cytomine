@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Getter;
@@ -33,12 +33,10 @@ import be.cytomine.utils.JsonObject;
 @Setter
 public class UserAnnotation extends AnnotationDomain implements Serializable {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
     Integer countReviewedAnnotations = 0;
-
+    @Column(name = "user_id")
+    private Long userId;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "annotation_term",
@@ -62,6 +60,28 @@ public class UserAnnotation extends AnnotationDomain implements Serializable {
         inverseJoinColumns = {@JoinColumn(name = "group_id")}
     )
     private List<AnnotationLink> links = new ArrayList<>();
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
+        JsonObject returnArray = AnnotationDomain.getDataFromDomain(domain);
+        UserAnnotation annotation = (UserAnnotation) domain;
+        returnArray.put("cropURL", urlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put(
+            "smallCropURL",
+            urlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
+        );
+        returnArray.put("url", urlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put(
+            "imageURL",
+            urlApi.getAnnotationURL(
+                annotation.getImage().getProject().getId(),
+                annotation.getImage().getId(),
+                annotation.getId()
+            )
+        );
+        returnArray.put("reviewed", annotation.hasReviewedAnnotation());
+
+        return returnArray;
+    }
 
     @PrePersist
     public void beforeCreate() {
@@ -127,18 +147,12 @@ public class UserAnnotation extends AnnotationDomain implements Serializable {
         return terms().stream().distinct().collect(Collectors.toList());
     }
 
-    @Override
-    Long getUserId() {
-        return user.getId();
-    }
-
     /**
      * Check if its a review annotation
      */
     public boolean isReviewedAnnotation() {
         return false;
     }
-
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         UserAnnotation annotation = this;
@@ -167,9 +181,9 @@ public class UserAnnotation extends AnnotationDomain implements Serializable {
         }
 
         if (json.containsKey("userObject")) {
-            annotation.user = (User) json.get("userObject");
+            annotation.userId = ((User) json.get("userObject")).getId();
         } else {
-            annotation.user = (User) json.getJSONAttrDomain(entityManager, "user", new User(), true);
+            annotation.userId = ((User) json.getJSONAttrDomain(entityManager, "user", new User(), true)).getId();
         }
 
         annotation.project = image.getProject();
@@ -206,35 +220,8 @@ public class UserAnnotation extends AnnotationDomain implements Serializable {
         return getDataFromDomain(this, urlApi);
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
-        JsonObject returnArray = AnnotationDomain.getDataFromDomain(domain);
-        UserAnnotation annotation = (UserAnnotation) domain;
-        returnArray.put("cropURL", urlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
-        returnArray.put(
-            "smallCropURL",
-            urlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
-        );
-        returnArray.put("url", urlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
-        returnArray.put(
-            "imageURL",
-            urlApi.getAnnotationURL(
-                annotation.getImage().getProject().getId(),
-                annotation.getImage().getId(),
-                annotation.getId()
-            )
-        );
-        returnArray.put("reviewed", annotation.hasReviewedAnnotation());
-
-        return returnArray;
-    }
-
     @Override
-    public User user() {
-        return user;
-    }
-
-    @Override
-    public User userDomainCreator() {
-        return user;
+    public Long userDomainCreator() {
+        return userId;
     }
 }

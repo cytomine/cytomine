@@ -52,8 +52,8 @@ public class Tag extends CytomineDomain {
     }
 
     @Override
-    public User userDomainCreator() {
-        return user;
+    public Long userDomainCreator() {
+        return user.getId();
     }
 
 }

@@ -72,7 +72,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void shouldListReadableStorages() throws Exception {
-        Storage storage = builder.givenAStorage(builder.givenDefaultAdmin());
+        Storage storage = builder.givenAStorage(builder.givenAdmin());
         long userId = currentUserService.getCurrentUser().id();
         when(storageHttpContract.getAll(eq(userId), any(Pageable.class))).thenReturn(
             new PageImpl<>(List.of(toResponse(storage))));
@@ -95,7 +95,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void shouldReturnStorageWithExpectedFieldsWhenItExists() throws Exception {
-        Storage storage = builder.givenAStorage(builder.givenDefaultAdmin());
+        Storage storage = builder.givenAStorage(builder.givenAdmin());
         long userId = currentUserService.getCurrentUser().id();
         when(storageHttpContract.get(eq(storage.getId()), eq(userId))).thenReturn(Optional.of(toResponse(storage)));
 
@@ -117,7 +117,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void shouldCreateStorageAndReturnCommandResponse() throws Exception {
-        Storage storage = basicInstanceBuilder.givenANotPersistedStorage(builder.givenDefaultAdmin());
+        Storage storage = basicInstanceBuilder.givenANotPersistedStorage(builder.givenAdmin());
         long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         when(storageHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(true,
@@ -134,7 +134,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void shouldUpdateStorageAndReturnCommandResponse() throws Exception {
-        Storage storage = builder.givenAStorage(builder.givenDefaultAdmin());
+        Storage storage = builder.givenAStorage(builder.givenAdmin());
         long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         when(storageHttpContract.update(eq(storage.getId()), eq(userId), any())).thenReturn(Optional.of(
@@ -151,7 +151,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void shouldReturnNotFoundWhenUpdatingNonExistentStorage() throws Exception {
-        Storage storage = basicInstanceBuilder.givenANotPersistedStorage(builder.givenDefaultAdmin());
+        Storage storage = basicInstanceBuilder.givenANotPersistedStorage(builder.givenAdmin());
         long userId = currentUserService.getCurrentUser().id();
         when(storageHttpContract.update(eq(0L), eq(userId), any())).thenReturn(Optional.empty());
 
@@ -164,7 +164,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void shouldDeleteStorageAndReturnCommandResponse() throws Exception {
-        Storage storage = builder.givenAStorage(builder.givenDefaultAdmin());
+        Storage storage = builder.givenAStorage(builder.givenAdmin());
         long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
         when(storageHttpContract.delete(eq(storage.getId()), eq(userId))).thenReturn(Optional.of(

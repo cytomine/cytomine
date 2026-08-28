@@ -77,7 +77,7 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
 
     @Override
     protected void whenIAddDomain() {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenCreator();
         builder.addUserToProject(projectRepresentativeUser.getProject(), user.username());
         projectRepresentativeUserService.add(
             builder.givenANotPersistedProjectRepresentativeUser(
@@ -88,7 +88,7 @@ public class ProjectRepresentativeUserAuthorizationTest extends CRDAuthorization
 
     @Override
     protected void whenIDeleteDomain() {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenCreator();
         builder.addUserToProject(projectRepresentativeUser.getProject(), user.username());
         ProjectRepresentativeUser
             projectRepresentativeUserToDelete

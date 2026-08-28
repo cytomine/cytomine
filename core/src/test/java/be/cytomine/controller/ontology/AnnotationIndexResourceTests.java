@@ -20,6 +20,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
@@ -28,7 +29,6 @@ import be.cytomine.domain.ontology.AnnotationIndex;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationIndexLightDTO;
 import be.cytomine.repository.ontology.AnnotationIndexRepository;
 
@@ -47,7 +47,7 @@ public class AnnotationIndexResourceTests {
     Project project;
     ImageInstance image;
     SliceInstance slice;
-    User me;
+    UserResponse me;
     Term term;
     UserAnnotation a1;
     UserAnnotation a2;
@@ -102,9 +102,9 @@ public class AnnotationIndexResourceTests {
         );
         restAnnotationIndexControllerMockMvc.perform(get("/api/sliceinstance/{id}/annotationindex.json", slice.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection[?(@.user==" + me.getId() + ")]").exists())
-            .andExpect(jsonPath("$.collection[?(@.user==" + me.getId() + ")].slice").value(slice.getId().intValue()))
-            .andExpect(jsonPath("$.collection[?(@.user==" + me.getId() + ")].countAnnotation").value(4))
-            .andExpect(jsonPath("$.collection[?(@.user==" + me.getId() + ")].countReviewedAnnotation").value(0));
+            .andExpect(jsonPath("$.collection[?(@.user==" + me.id() + ")]").exists())
+            .andExpect(jsonPath("$.collection[?(@.user==" + me.id() + ")].slice").value(slice.getId().intValue()))
+            .andExpect(jsonPath("$.collection[?(@.user==" + me.id() + ")].countAnnotation").value(4))
+            .andExpect(jsonPath("$.collection[?(@.user==" + me.id() + ")].countReviewedAnnotation").value(0));
     }
 }

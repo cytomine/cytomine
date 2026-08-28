@@ -15,11 +15,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.test.web.servlet.MvcResult;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.utils.StringUtils;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -47,7 +47,7 @@ public class TestUtils {
         AnnotationDomain annotationDomain,
         Project project,
         ImageInstance imageInstance,
-        User user,
+        UserResponse user,
         Term term,
         String cropPath,
         String serverUrl
@@ -64,7 +64,7 @@ public class TestUtils {
             .getY()));
         assertThat(userAnnotationResult[5]).isEqualTo(imageInstance.getId().toString());
         assertThat(userAnnotationResult[6]).isEqualTo(imageInstance.getBlindInstanceFilename());
-        assertThat(userAnnotationResult[7]).isEqualTo(user.getUsername());
+        assertThat(userAnnotationResult[7]).isEqualTo(user.username());
         assertThat(userAnnotationResult[8]).isEqualTo(term.getName());
         assertThat(userAnnotationResult[9]).isEqualTo(serverUrl
             + "/api/"
@@ -86,7 +86,7 @@ public class TestUtils {
         AnnotationDomain annotationDomain,
         Project project,
         ImageInstance imageInstance,
-        User user,
+        UserResponse user,
         Term term,
         String cropPath,
         String serverUrl
@@ -115,7 +115,7 @@ public class TestUtils {
             .getY()));
         assertThat((long) cells[5].getNumericCellValue()).isEqualTo(imageInstance.getId());
         assertThat(cells[6].getStringCellValue()).isEqualTo(imageInstance.getBlindInstanceFilename());
-        assertThat(cells[7].getStringCellValue()).isEqualTo(user.getUsername());
+        assertThat(cells[7].getStringCellValue()).isEqualTo(user.username());
         assertThat(cells[8].getStringCellValue()).isEqualTo(term.getName());
         assertThat(cells[9].getStringCellValue()).isEqualTo(serverUrl
             + "/api/"

@@ -62,6 +62,7 @@ import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_READ;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
@@ -205,11 +206,11 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "get_blind_image_instance")
+    @WithMockUser(username = USER_ACL_READ)
     public void getBlindImageInstance() throws Exception {
         ImageInstance image = givenTestImageInstance();
 
-        UserResponse user = builder.givenAUser("get_blind_image_instance");
+        UserResponse user = builder.givenUserAclRead();
         builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
         image.getProject().setBlindMode(true);
@@ -269,14 +270,14 @@ public class ImageInstanceResourceTests {
 
     }
 
-    @WithMockUser(username = "list_image_instance_by_user")
+    @WithMockUser(username = USER_ACL_READ)
     @Test
     @Transactional
     public void listImageInstanceByUser() throws Exception {
         ImageInstance image = builder.givenAnImageInstance();
         image.getBaseImage().setWidth(500);
         ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
-        UserResponse user = builder.givenAUser("list_image_instance_by_user");
+        UserResponse user = builder.givenUserAclRead();
         builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
         restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance.json", user.id()))
@@ -301,14 +302,14 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + image.getId() + ")]").doesNotExist());
     }
 
-    @WithMockUser(username = "list_image_instance_light_by_user")
+    @WithMockUser(username = USER_ACL_READ)
     @Test
     @Transactional
     public void listImageInstanceLightByUser() throws Exception {
         ImageInstance image = builder.givenAnImageInstance();
         image.getBaseImage().setWidth(500);
         ImageInstance imageFromOtherProjectNotAccessibleForUser = builder.givenAnImageInstance();
-        UserResponse user = builder.givenAUser("list_image_instance_light_by_user");
+        UserResponse user = builder.givenUserAclRead();
         builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
 
         restImageInstanceControllerMockMvc.perform(get("/api/user/{id}/imageinstance/light.json", user.id()))
@@ -400,9 +401,9 @@ public class ImageInstanceResourceTests {
 
     @Test
     @Transactional
-    @WithMockUser("list_image_instance_by_projects_blind_filenames")
+    @WithMockUser(USER_ACL_READ)
     public void listImageInstanceByProjectsBlindFilenames() throws Exception {
-        UserResponse user = builder.givenAUser("list_image_instance_by_projects_blind_filenames");
+        UserResponse user = builder.givenUserAclRead();
         ImageInstance image = givenTestImageInstance();
 
         builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE); // contributor
@@ -979,7 +980,7 @@ public class ImageInstanceResourceTests {
     @WithMockUser("download_image_instance_cannot_download")
     @Disabled("Randomly fails")
     public void downloadImageInstanceCannotDownload() throws Exception {
-        UserResponse user = builder.givenAUser("download_image_instance_cannot_download");
+        UserResponse user = builder.givenUserAclRead();
 
         ImageInstance image = givenTestImageInstance();
         builder.addUserToProject(image.getProject(), user.username(), BasePermission.WRITE);

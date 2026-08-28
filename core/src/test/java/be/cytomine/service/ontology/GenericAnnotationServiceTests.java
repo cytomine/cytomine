@@ -63,7 +63,7 @@ public class GenericAnnotationServiceTests {
         anotherAnnotationOutsideTheLocation.setImage(annotation.getImage());
 
         List<AnnotationDomain> results = genericAnnotationService.findAnnotationThatTouch(
-            addedLocation, List.of(annotation.getUser().getId()), annotation.getImage().getId(), "user_annotation"
+            addedLocation, List.of(annotation.getUserId()), annotation.getImage().getId(), "user_annotation"
         );
 
         assertThat(results).contains(annotation).doesNotContain(anotherAnnotationOutsideTheLocation);
@@ -83,7 +83,7 @@ public class GenericAnnotationServiceTests {
         anotherAnnotationOutsideTheLocation.setImage(annotation.getImage());
 
         List<AnnotationDomain> results = genericAnnotationService.findAnnotationThatTouch(
-            addedLocation, List.of(annotation.getUser().getId()), annotation.getImage().getId(), "reviewed_annotation"
+            addedLocation, List.of(annotation.getUserId()), annotation.getImage().getId(), "reviewed_annotation"
         );
 
         assertThat(results).contains(annotation).doesNotContain(anotherAnnotationOutsideTheLocation);

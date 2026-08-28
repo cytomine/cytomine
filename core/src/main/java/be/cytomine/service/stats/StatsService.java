@@ -189,10 +189,10 @@ public class StatsService {
             Predicate endDatePredicate = cb.lessThan(userAnnotationRoot.get("created"), endDate);
             predicatesList.add(endDatePredicate);
         }
-        cq.multiselect(userAnnotationRoot.get("user").get("id"),
+        cq.multiselect(userAnnotationRoot.get("userId"),
                 cb.countDistinct(userAnnotationRoot.get("image").get("id")))
             .where(predicatesList.toArray(Predicate[]::new))
-            .groupBy(userAnnotationRoot.get("user").get("id"));
+            .groupBy(userAnnotationRoot.get("userId"));
 
         TypedQuery<Tuple> q = entityManager.createQuery(cq);
 
@@ -297,9 +297,8 @@ public class StatsService {
             Predicate endDatePredicate = cb.lessThan(userAnnotationRoot.get("created"), endDate);
             predicatesList.add(endDatePredicate);
         }
-        userAnnotationRoot.join("user");
-        cq.multiselect(userAnnotationRoot.get("user").get("id"), cb.countDistinct(userAnnotationRoot.get("id")))
-            .where(predicatesList.toArray(Predicate[]::new)).groupBy(userAnnotationRoot.get("user").get("id"));
+        cq.multiselect(userAnnotationRoot.get("userId"), cb.countDistinct(userAnnotationRoot.get("id")))
+            .where(predicatesList.toArray(Predicate[]::new)).groupBy(userAnnotationRoot.get("userId"));
 
 
         TypedQuery<Tuple> q = entityManager.createQuery(cq);

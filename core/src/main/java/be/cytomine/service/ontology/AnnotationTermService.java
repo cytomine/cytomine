@@ -147,7 +147,7 @@ public class AnnotationTermService extends ModelService {
         //Check if user is admin, the project mode and if is the owner of the annotation
         securityACLService.checkFullOrRestrictedForOwner(
             domain,
-            ((AnnotationTerm) domain).getUserAnnotation().getUser()
+            ((AnnotationTerm) domain).getUserAnnotation().getUserId()
         );
         Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);

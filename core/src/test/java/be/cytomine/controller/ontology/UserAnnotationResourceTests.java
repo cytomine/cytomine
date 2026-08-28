@@ -43,7 +43,6 @@ import be.cytomine.domain.ontology.SharedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
@@ -94,7 +93,7 @@ public class UserAnnotationResourceTests {
     private ImageInstance image;
     private SliceInstance slice;
     private Term term;
-    private User me;
+    private UserResponse me;
     private UserAnnotation userAnnotation;
 
     public static UserAnnotation givenAUserAnnotationWithValidImageServer(BasicInstanceBuilder builder)
@@ -130,7 +129,7 @@ public class UserAnnotationResourceTests {
             .andExpect(jsonPath("$.location").value(userAnnotation.getWktLocation()))
             .andExpect(jsonPath("$.image").value(userAnnotation.getImage().getId().intValue()))
             .andExpect(jsonPath("$.project").value(userAnnotation.getProject().getId().intValue()))
-            .andExpect(jsonPath("$.user").value(userAnnotation.getUser().getId()))
+            .andExpect(jsonPath("$.user").value(userAnnotation.getUserId()))
             .andExpect(jsonPath("$.centroid.x").exists())
             .andExpect(jsonPath("$.centroid.y").exists())
             .andExpect(jsonPath("$.term", hasSize(equalTo(1))))
@@ -159,12 +158,12 @@ public class UserAnnotationResourceTests {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
-                userAnnotation.getUser().getId()
+                userAnnotation.getUserId()
             ))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.total").value(greaterThan(0)));
 
-        UserResponse newUser = builder.givenAUser();
+        UserResponse newUser = builder.givenUserAclRead();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
                 newUser.id()
@@ -179,7 +178,7 @@ public class UserAnnotationResourceTests {
         UserAnnotation userAnnotation = builder.givenAUserAnnotation();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
-                userAnnotation.getUser().getId()
+                userAnnotation.getUserId()
             )
                 .param("project", userAnnotation.getProject().getId().toString()))
             .andExpect(status().isOk())
@@ -188,7 +187,7 @@ public class UserAnnotationResourceTests {
         Project projectWithoutAnnotation = builder.givenAProject();
         restUserAnnotationControllerMockMvc.perform(get(
                 "/api/user/{idUser}/userannotation/count.json",
-                userAnnotation.getUser().getId()
+                userAnnotation.getUserId()
             )
                 .param("project", projectWithoutAnnotation.getId().toString()))
             .andExpect(status().isOk())
@@ -279,7 +278,7 @@ public class UserAnnotationResourceTests {
                 this.project.getId()
             )
                 .param("format", "pdf")
-                .param("users", this.me.getId().toString())
+                .param("users", String.valueOf(this.me.id()))
                 .param("reviewed", "false")
                 .param("terms", this.term.getId().toString())
                 .param("images", this.image.getId().toString()))
@@ -336,7 +335,7 @@ public class UserAnnotationResourceTests {
                 this.project.getId()
             )
                 .param("format", format)
-                .param("users", this.me.getId().toString())
+                .param("users", String.valueOf(this.me.id()))
                 .param("reviewed", "false")
                 .param("terms", this.term.getId().toString())
                 .param("images", this.image.getId().toString()))
@@ -593,7 +592,7 @@ public class UserAnnotationResourceTests {
         JsonObject jsonObject = annotation.toJsonObject(urlApi);
         jsonObject.put("subject", "subject for test mail");
         jsonObject.put("message", "message for test mail");
-        jsonObject.put("users", List.of(builder.givenSuperAdmin().getId()));
+        jsonObject.put("users", List.of(builder.givenSuperAdmin().id()));
 
         restUserAnnotationControllerMockMvc.perform(post(
                 "/api/userannotation/{id}/comment.json",

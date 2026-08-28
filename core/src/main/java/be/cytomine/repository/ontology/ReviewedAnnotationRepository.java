@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.Query;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.ReviewedAnnotationStatsEntry;
 
 
@@ -69,5 +68,5 @@ public interface ReviewedAnnotationRepository
 
     long countAllByProjectAndTermsEmpty(Project project);
 
-    List<ReviewedAnnotation> findAllByUser(User user);
+    List<ReviewedAnnotation> findAllByUserId(Long userId);
 }

@@ -98,7 +98,7 @@ public class SharedAnnotationServiceTests {
         JsonObject json = sharedAnnotation.toJsonObject(urlApi);
         json.put("subject", "subject for test mail");
         json.put("message", "message for test mail");
-        json.put("users", List.of(builder.givenSuperAdmin().getId()));
+        json.put("users", List.of(builder.givenSuperAdmin().id()));
         json.put("annotationIdent", sharedAnnotation.getAnnotationIdent());
         json.put("annotationClassName", sharedAnnotation.getAnnotationClassName());
 

@@ -983,7 +983,7 @@ public class UserService extends ModelService {
 
     public void deleteDependentReviewedAnnotation(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
-            for (ReviewedAnnotation reviewedAnnotation : reviewedAnnotationRepository.findAllByUser((User) user)) {
+            for (ReviewedAnnotation reviewedAnnotation : reviewedAnnotationRepository.findAllByUserId(user.getId())) {
                 reviewedAnnotationService.delete(reviewedAnnotation, transaction, null, false);
             }
         }
@@ -1002,7 +1002,7 @@ public class UserService extends ModelService {
 
     public void deleteDependentUserAnnotation(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
-            for (UserAnnotation userAnnotation : userAnnotationRepository.findAllByUser((User) user)) {
+            for (UserAnnotation userAnnotation : userAnnotationRepository.findAllByUserId(user.getId())) {
                 userAnnotationService.delete(userAnnotation, transaction, null, false);
             }
         }

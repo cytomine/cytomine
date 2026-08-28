@@ -87,7 +87,7 @@ public class ProjectRepresentativeServiceTests {
     void findUnexistingProjectRepresentativeUserWithProjectAndUserReturnEmpty() {
         assertThat(projectRepresentativeUserService.find(
             builder.givenAProject(),
-            builder.givenSuperAdmin().getId()
+            builder.givenSuperAdmin().id()
         )).isEmpty();
     }
 
@@ -161,7 +161,7 @@ public class ProjectRepresentativeServiceTests {
     @Test
     void deleteProjectRepresentativeUserWithSuccess() {
         ProjectRepresentativeUser projectRepresentativeUser1 = builder.givenAProjectRepresentativeUser();
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser1.getProject(),
             user.username(),
@@ -192,7 +192,7 @@ public class ProjectRepresentativeServiceTests {
 
     @Test
     void deletingLastRepresentativeUserFromProjectWillGrantCurrentUserAsRepresentative() {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser(
             builder.givenAProject(), user.username(), user.id()
         );
@@ -218,7 +218,7 @@ public class ProjectRepresentativeServiceTests {
         )).isEmpty();
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            builder.givenSuperAdmin().getId()
+            builder.givenSuperAdmin().id()
         )).isPresent();
     }
 }

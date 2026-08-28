@@ -62,6 +62,7 @@ import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_READ;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static be.cytomine.service.social.UserPositionServiceTests.USER_VIEW;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -359,9 +360,9 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    @WithMockUser("list_by_user_with_search")
+    @WithMockUser(USER_ACL_READ)
     void listByUserWithSearch() {
-        UserResponse user = builder.givenAUser("list_by_user_with_search");
+        UserResponse user = builder.givenUserAclRead();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, user.username(), BasePermission.ADMINISTRATION);
         ImageInstance img1 = builder.givenAnImageInstance(project);
@@ -489,9 +490,9 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    @WithMockUser("list_by_project_with_search_with_blind_mode")
+    @WithMockUser(USER_ACL_READ)
     void listByProjectWithSearchWithBlindMode() {
-        UserResponse user = builder.givenAUser("list_by_project_with_search_with_blind_mode");
+        UserResponse user = builder.givenUserAclRead();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, user.username(), BasePermission.WRITE);
         project.setBlindMode(true);
@@ -750,10 +751,10 @@ public class ImageInstanceServiceTests {
         );
         AttachedFile attachedFile = builder.givenAnAttachedFile(imageInstance);
 
-        annotationActionService.add(userAnnotation, builder.givenSuperAdmin().getId(), "view", new Date());
+        annotationActionService.add(userAnnotation, builder.givenSuperAdmin().id(), "view", new Date());
         userPositionService.add(
             new Date(),
-            builder.givenSuperAdmin().getId(),
+            builder.givenSuperAdmin().id(),
             sliceInstance,
             imageInstance,
             USER_VIEW,
@@ -761,7 +762,7 @@ public class ImageInstanceServiceTests {
             0d,
             false
         );
-        imageConsultationService.add(builder.givenSuperAdmin().getId(), imageInstance.getId(), "xxx", "view",
+        imageConsultationService.add(builder.givenSuperAdmin().id(), imageInstance.getId(), "xxx", "view",
             new Date());
 
         AssertionsForClassTypes.assertThat(entityManager.find(ReviewedAnnotation.class, reviewedAnnotation.getId()))

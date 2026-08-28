@@ -174,7 +174,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = SUPERADMIN)
     public void shouldAddAndRemoveUserFromProjectWhenAdmin() {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenCreator();
         Project project = builder.givenAProject();
         expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
         expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
@@ -183,7 +183,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void shouldAddAndRemoveUserFromProjectWhenUserHasAdminRight() {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenCreator();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_ADMIN, ADMINISTRATION);
         expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
@@ -193,7 +193,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void shouldDenyAddAndRemoveUserFromProjectWhenUserHasReadRight() {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenCreator();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_READ, READ);
         expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));

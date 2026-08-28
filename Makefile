@@ -73,18 +73,18 @@ deploy-helm:
 	@helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install
 
 run-e2e:
-	sudo mkdir -p ./data/dataset/test-project/IMAGES
-	sudo mkdir -p ./data/dataset/test-project/METADATA
-	sudo cp ./e2e-tests/src/test/resources/image.xml ./data/dataset/test-project/METADATA/image.xml
-	sudo cp ./e2e-tests/src/test/resources/policy.xml ./data/dataset/test-project/METADATA/policy.xml
-	sudo cp ./e2e-tests/src/test/resources/dataset.xml ./data/dataset/test-project/METADATA/dataset.xml
-	sudo cp ./e2e-tests/src/test/resources/observer.xml ./data/dataset/test-project/METADATA/observer.xml
-	sudo cp ./e2e-tests/src/test/resources/observation.xml ./data/dataset/test-project/METADATA/observation.xml
-	sudo cp ./e2e-tests/src/test/resources/staining.xml ./data/dataset/test-project/METADATA/staining.xml
-	sudo cp ./e2e-tests/src/test/resources/sample.xml ./data/dataset/test-project/METADATA/sample.xml
+	sudo mkdir -p ./data/dataset/aa-test-project/test-project/IMAGES
+	sudo mkdir -p ./data/dataset/aa-test-project/test-project/METADATA
+	sudo cp ./e2e-tests/src/test/resources/image.xml ./data/dataset/aa-test-project/test-project/METADATA/image.xml
+	sudo cp ./e2e-tests/src/test/resources/policy.xml ./data/dataset/aa-test-project/test-project/METADATA/policy.xml
+	sudo cp ./e2e-tests/src/test/resources/dataset.xml ./data/dataset/aa-test-project/test-project/METADATA/dataset.xml
+	sudo cp ./e2e-tests/src/test/resources/observer.xml ./data/dataset/aa-test-project/test-project/METADATA/observer.xml
+	sudo cp ./e2e-tests/src/test/resources/observation.xml ./data/dataset/aa-test-project/test-project/METADATA/observation.xml
+	sudo cp ./e2e-tests/src/test/resources/staining.xml ./data/dataset/aa-test-project/test-project/METADATA/staining.xml
+	sudo cp ./e2e-tests/src/test/resources/sample.xml ./data/dataset/aa-test-project/test-project/METADATA/sample.xml
 
-	sudo cp -r ./e2e-tests/src/test/resources/wsi ./data/dataset/test-project/IMAGES/wsi
-	sudo cp ./e2e-tests/src/test/resources/cat.png ./data/dataset/test-project/IMAGES/cat.png
+	sudo cp -r ./e2e-tests/src/test/resources/wsi ./data/dataset/aa-test-project/test-project/IMAGES/wsi
+	sudo cp ./e2e-tests/src/test/resources/cat.png ./data/dataset/aa-test-project/test-project/IMAGES/cat.png
 
 	kubectl --kubeconfig=./.kube/shared/config -n cytomine-local create job --from=cronjob/pims-import pims-import-local
 	kubectl --kubeconfig=./.kube/shared/config -n cytomine-local wait --for=condition=complete job/pims-import-local --timeout=120s

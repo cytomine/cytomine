@@ -16,13 +16,15 @@ describe('UploadErrorMessage.vue', () => {
   const createWrapper = (options = {}) => shallowMount(
     UploadErrorMessage,
     {
-      propsData: {
+      props: {
         error: mockError,
       },
-      stubs: {
-        'b-message': true,
-      },
       ...options,
+      global: {
+        stubs: {
+          'b-message': true,
+        }
+      }
     },
   );
 

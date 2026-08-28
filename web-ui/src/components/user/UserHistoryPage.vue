@@ -11,39 +11,37 @@
         backend-sorting
         :total="total"
         :per-page="perPage"
-        :current-page.sync="currentPage"
+        v-model:currentPage="currentPage"
         :default-sort="[sortField, sortOrder]"
         pagination-size="is-small"
         @sort="onSort"
       >
-        <template #default="{row}">
-          <b-table-column field="created" :label="$t('date')" sortable>
-            {{ formatDate(row.created) }}
-          </b-table-column>
+        <b-table-column v-slot="{row}" field="created" :label="$t('date')" sortable>
+          {{ formatDate(row.created) }}
+        </b-table-column>
 
-          <b-table-column :label="$t('operation')">
-            <b-tag :type="operationTag(row)">{{ operationLabel(row) }}</b-tag>
-          </b-table-column>
+        <b-table-column v-slot="{row}" :label="$t('operation')">
+          <b-tag :type="operationTag(row)">{{ operationLabel(row) }}</b-tag>
+        </b-table-column>
 
-          <b-table-column :label="$t('domain')">
-            {{ domainLabel(row) }}
-          </b-table-column>
+        <b-table-column v-slot="{row}" :label="$t('domain')">
+          {{ domainLabel(row) }}
+        </b-table-column>
 
-          <b-table-column :label="$t('description')">
-            {{ description(row) }}
-          </b-table-column>
+        <b-table-column v-slot="{row}" :label="$t('description')">
+          {{ description(row) }}
+        </b-table-column>
 
-          <b-table-column :label="$t('actions')" centered>
-            <b-button
-              size="is-small"
-              icon-left="undo"
-              :loading="undoing === row.id"
-              @click="undo(row)"
-            >
-              {{ $t('undo') }}
-            </b-button>
-          </b-table-column>
-        </template>
+        <b-table-column v-slot="{row}" :label="$t('actions')" centered>
+          <b-button
+            size="is-small"
+            icon-left="undo"
+            :loading="undoing === row.id"
+            @click="undo(row)"
+          >
+            {{ $t('undo') }}
+          </b-button>
+        </b-table-column>
 
         <template #empty>
           <div class="content has-text-grey has-text-centered">

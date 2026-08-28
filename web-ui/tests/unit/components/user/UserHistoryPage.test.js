@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import UserHistoryPage from '@/components/user/UserHistoryPage';
@@ -59,17 +59,17 @@ const undoCommand = {
 const commands = [undoCommand, updateCommand, insertCommand];
 
 const createWrapper = async (options = {}) => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
 
   const wrapper = mount(UserHistoryPage, {
-    localVue,
-    mocks: {
-      $t: (message) => message,
-      $i18n: { locale: 'en' },
-      $notify: vi.fn(),
-    },
     ...options,
+    global: {
+      plugins: [Buefy],
+      mocks: {
+        $t: (message) => message,
+        $i18n: { locale: 'en' },
+        $notify: vi.fn(),
+      }
+    }
   });
   await flushPromises();
   return wrapper;

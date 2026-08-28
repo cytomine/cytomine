@@ -25,10 +25,10 @@
       <tbody>
         <tr v-for="(layer, idx) in selectedLayers" :key="layer.id">
           <td class="checkbox-column">
-            <b-checkbox size="is-small" :value="layer.visible" @input="toggleLayerVisibility(idx)" />
+            <b-checkbox size="is-small" :model-value="layer.visible" @update:model-value="toggleLayerVisibility(idx)" />
           </td>
           <td v-if="!reviewMode" class="checkbox-column">
-            <b-checkbox size="is-small" :value="layer.drawOn" :disabled="!canDraw(layer)" @input="toggleLayerDrawOn(idx)" />
+            <b-checkbox size="is-small" :model-value="layer.drawOn" :disabled="!canDraw(layer)" @update:model-value="toggleLayerDrawOn(idx)" />
           </td>
 
           <td class="name-column">
@@ -350,7 +350,7 @@ export default {
     eventBus.on('shortkeyEvent', this.shortkeyHandler);
     eventBus.on('annotation-layers:refresh', this.fetchLayers);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('addAnnotation', this.addAnnotationEventHandler);
     eventBus.off('deleteAnnotation', this.deleteAnnotationEventHandler);
     eventBus.off('reloadAnnotations', this.reloadAnnotationsHandler);

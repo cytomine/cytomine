@@ -6,7 +6,7 @@
       :style="panelStyle"
       ref="panel"
     >
-      <b-loading :is-full-page="false" :active="loading"/>
+      <b-loading :is-full-page="false" :model-value="loading"/>
 
       <div class="actions">
         <h1>{{ $t('similar-annotations') }}</h1>
@@ -201,7 +201,7 @@ export default {
     this.countTerm();
     this.loading = false;
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('update-suggested-terms', this.countTerm);
   }
 };

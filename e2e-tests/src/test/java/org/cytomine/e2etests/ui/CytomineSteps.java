@@ -82,7 +82,7 @@ public class CytomineSteps {
     public void listImagesInProject(Wait<WebDriver> wait, String projectUrl, Set<String> imageNames) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "images"));
         imageNames.forEach(
-            name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[span[contains(text(), '%s')]]", name)))
+            name -> webDriverUtils.byIsDisplayed(wait, By.xpath(format("//a[contains(., '%s')]", name)))
         );
     }
 
@@ -444,7 +444,7 @@ public class CytomineSteps {
 
     public void addUserToProject(Wait<WebDriver> wait, String projectUrl, String username) {
         webDriverUtils.goTo(wait, projectUrl);
-        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
+        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(.,'Members')]"));
         webDriverUtils.clickButtonByText(wait, "Add members");
         By searchInput = By.xpath("//input[@placeholder='Search user...']");
         webDriverUtils.byClick(wait, searchInput);
@@ -458,12 +458,12 @@ public class CytomineSteps {
                     + "and normalize-space(text())='Add']"
             )
         );
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(.,'" + username + "')]"));
     }
 
     public void removeUserFromProject(Wait<WebDriver> wait, String projectUrl, String username) {
         webDriverUtils.goTo(wait, projectUrl);
-        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
+        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(.,'Members')]"));
         webDriverUtils.byClick(
             wait,
             By.xpath("//td[@data-label='Username' and normalize-space(text())='" + username + "']"
@@ -471,7 +471,7 @@ public class CytomineSteps {
         );
         webDriverUtils.clickButtonByText(wait, "Remove selected members");
         webDriverUtils.clickButtonByText(wait, "Confirm");
-        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(.,'" + username + "')]"));
     }
 
     public void filterProjectByName(
@@ -579,6 +579,7 @@ public class CytomineSteps {
 
     public void exportOntology(Wait<WebDriver> wait, String ontologyUrl, String ontologyName) {
         webDriverUtils.goTo(wait, ontologyUrl);
+        webDriverUtils.xpathClick(wait, String.format("//a[contains(., '%s')]", ontologyName));
         webDriverUtils.clickButtonByText(wait, "Export ontology");
 
         String filename = ontologyName + "." + ReportType.JSON.getLabel();
@@ -662,8 +663,7 @@ public class CytomineSteps {
         );
         webDriverUtils.xpathClick(
             wait,
-            "//div[contains(@class, 'modal')]//footer//button[contains(@class, 'is-danger') "
-            + "and contains(text(), 'Delete')]"
+            "//div[contains(@class, 'modal')]//footer//button[contains(@class, 'is-danger') and contains(., 'Delete')]"
         );
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully deleted')]"));
         wait.until(ExpectedConditions.invisibilityOfElementLocated(

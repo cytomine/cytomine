@@ -5,8 +5,10 @@ import PageNotFound from '@/components/PageNotFound';
 describe('PageNotFound.vue', () => {
   it('should render the component correctly', () => {
     const wrapper = shallowMount(PageNotFound, {
-      mocks: {
-        $t: (msg) => msg
+      global: {
+        mocks: {
+          $t: (msg) => msg
+        }
       }
     });
 
@@ -16,8 +18,10 @@ describe('PageNotFound.vue', () => {
 
   it('should render correctly when $t returns undefined', () => {
     const wrapper = shallowMount(PageNotFound, {
-      mocks: {
-        $t: () => undefined
+      global: {
+        mocks: {
+          $t: () => undefined
+        }
       }
     });
 

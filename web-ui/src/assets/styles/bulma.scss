@@ -1,7 +1,17 @@
+@use 'bulma/sass/themes/light' as bulma-light;
+
 @import './colors.scss';
+@import 'bulma/sass/utilities/mixins';
 @import 'bulma/bulma';
+@import './tiles.scss';
 @import 'buefy/src/scss/buefy';
 @import 'bulma-slider/dist/css/bulma-slider.min.css';
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include bulma-light.light-theme;
+  }
+}
 
 $loadingColor: #bbb;
 
@@ -56,8 +66,10 @@ html {
 /* Panel */
 
 .panel-heading {
+  background-color: #f5f5f5;
   border-radius: 8px 8px 0 0;
   font-weight: 400 !important;
+  color: #363636;
 }
 
 .panel-block {

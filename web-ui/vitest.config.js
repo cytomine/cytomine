@@ -5,13 +5,22 @@ import viteConfig from './vite.config.js';
 export default mergeConfig(
   viteConfig({ command: 'serve', mode: 'test' }),
   defineConfig({
+    resolve: {
+      dedupe: ['vue']
+    },
     test: {
       environment: 'jsdom',
       globals: true,
       clearMocks: true,
+      setupFiles: ['tests/setup.js'],
       silent: 'passed-only',
       include: ['tests/unit/**/*.js'],
       reporters: ['default'],
+      server: {
+        deps: {
+          inline: ['vue3-openlayers']
+        }
+      },
       coverage: {
         provider: 'v8',
         enabled: true,

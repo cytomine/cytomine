@@ -17,15 +17,17 @@
     </b-upload>
   </b-field>
 
-  <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-    <b-input v-model="name" :disabled="!selectedFile" name="name" v-validate="'required'" />
-  </b-field>
+  <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
+    <b-field :label="$t('name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+      <b-input name="name" :model-value="state.value" :disabled="!selectedFile" @update:model-value="field.handleChange" />
+    </b-field>
+  </field>
 
   <template #footer>
-    <button class="button" @click="$parent.close()">
+    <button class="button" @click="$emit('close')">
       {{$t('button-cancel')}}
     </button>
-    <button class="button is-link" :disabled="!selectedFile || errors.any()" @click="save()">
+    <button class="button is-link" :disabled="!selectedFile || !isValid" @click="save()">
       {{$t('button-save')}}
     </button>
   </template>
@@ -33,7 +35,10 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+
 import { AttachedFile } from '@/api';
+import { required, rules, validateForm } from '@/utils/form.js';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
@@ -41,33 +46,44 @@ export default {
   props: {
     object: Object
   },
-  components: { CytomineModalCard },
-  $_veeValidate: { validator: 'new' },
+  components: { CytomineModalCard, Field },
+  setup() {
+    const form = useForm({ defaultValues: { name: '' } });
+    return {
+      form,
+      isValid: form.useStore(state => state.isValid),
+      nameRules: { onChange: rules(required) }
+    };
+  },
   data() {
     return {
-      selectedFile: null,
-      name: ''
+      selectedFile: null
     };
   },
   watch: {
     selectedFile(file) {
       if (file) {
-        this.name = file.name;
+        this.form.setFieldValue('name', file.name);
       }
     }
   },
   methods: {
     async save() {
-      let result = await this.$validator.validateAll('password');
-      if (!this.selectedFile || !result) {
+      // The vee-validate call this replaces named a scope ('password') that no
+      // field ever belonged to, so it validated nothing and always passed. The
+      // `name` rule is really enforced now.
+      if (!this.selectedFile || !await validateForm(this.form)) {
         return;
       }
 
       try {
-        let attached = await new AttachedFile({ file: this.selectedFile, filename: this.name }, this.object).save();
+        let attached = await new AttachedFile(
+          { file: this.selectedFile, filename: this.form.state.values.name },
+          this.object
+        ).save();
         this.$emit('addAttachedFile', attached);
         this.$notify({ type: 'success', text: this.$t('notif-success-attached-file-creation') });
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-attached-file-creation') });

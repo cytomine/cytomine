@@ -1,17 +1,19 @@
 <template>
 <form @submit.prevent="save()">
   <cytomine-modal-card :title="$t(term ? 'update-term' : 'create-term')" class="term-modal">
-    <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-      <b-input v-model="name" name="name" v-validate="'required'" />
-    </b-field>
+    <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
+      <b-field :label="$t('name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+        <b-input name="name" :model-value="state.value" @update:model-value="field.handleChange" />
+      </b-field>
+    </field>
 
-    <sketch-picker v-model="color" :presetColors="presetColors" />
+    <SketchPicker v-model="color" :presetColors="presetColors" :disable-alpha="true" />
 
     <template #footer>
-      <button class="button" type="button" @click="$parent.close()">
+      <button class="button" type="button" @click="$emit('close')">
         {{$t('button-cancel')}}
       </button>
-      <button class="button is-link" :disabled="errors.any()">
+      <button class="button is-link" :disabled="!isValid">
         {{$t('button-save')}}
       </button>
     </template>
@@ -20,8 +22,11 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+import { SketchPicker, tinycolor } from 'vue-color';
+
 import { Term } from '@/api';
-import { Sketch } from 'vue-color';
+import { required, rules, validateForm } from '@/utils/form.js';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
@@ -31,13 +36,20 @@ export default {
     ontology: Object
   },
   components: {
-    'sketch-picker': Sketch,
-    CytomineModalCard
+    SketchPicker,
+    CytomineModalCard,
+    Field
   },
-  $_veeValidate: { validator: 'new' },
+  setup(props) {
+    const form = useForm({ defaultValues: { name: props.term ? props.term.name : '' } });
+    return {
+      form,
+      isValid: form.useStore(state => state.isValid),
+      nameRules: { onChange: rules(required) }
+    };
+  },
   data() {
     return {
-      name: '',
       color: null
     };
   },
@@ -63,8 +75,7 @@ export default {
       return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
     },
     async save() {
-      let result = await this.$validator.validateAll();
-      if (!result) {
+      if (!await validateForm(this.form)) {
         return;
       }
 
@@ -76,10 +87,14 @@ export default {
     },
     async create() {
       try {
-        let term = await new Term({ name: this.name, color: this.color.hex, ontology: this.ontology.id }).save();
+        let term = await new Term({
+          name: this.form.state.values.name,
+          color: tinycolor(this.color).toHexString(),
+          ontology: this.ontology.id
+        }).save();
         this.$notify({ type: 'success', text: this.$t('notif-success-term-creation') });
         this.$emit('newTerm', term);
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-term-creation') });
@@ -87,13 +102,13 @@ export default {
     },
     async update() {
       let term = new Term(this.term);
-      term.color = this.color.hex;
-      term.name = this.name;
+      term.color = tinycolor(this.color).toHexString();
+      term.name = this.form.state.values.name;
       try {
         await term.save();
         this.$notify({ type: 'success', text: this.$t('notif-success-term-update') });
         this.$emit('updateTerm', term);
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-term-update') });
@@ -101,42 +116,23 @@ export default {
     }
   },
   created() {
-    this.name = this.term ? this.term.name : '';
-    this.color = { hex: this.term ? this.term.color : this.randomColor() };
+    this.color = this.term ? this.term.color : this.randomColor();
   }
 };
 </script>
 
 <style>
-.term-modal .vc-sketch {
-  width: auto;
+.term-modal .vc-sketch-picker {
+  width: 100% !important;
+  box-sizing: border-box !important;
   box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
 }
 
-.term-modal .vc-sketch-active-color {
+.term-modal .vc-sketch-picker .active-color {
   box-shadow: inset 0 0 0 1px rgba(10, 10, 10, 0.1);
 }
 
-.term-modal .vc-sketch-saturation-wrap {
+.term-modal .vc-sketch-picker .saturation {
   padding-bottom: 15vh;
-}
-
-/* hide alpha channel */
-.term-modal .vc-sketch-field--single:last-child {
-  display: none;
-}
-/* --- */
-
-.term-modal .vc-sketch-sliders {
-  display: flex;
-  align-items: center;
-}
-
-.term-modal .vc-sketch-hue-wrap {
-  flex-grow: 1;
-}
-
-.term-modal .vc-sketch-alpha-wrap {
-  display: none;
 }
 </style>

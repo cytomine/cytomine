@@ -1,6 +1,6 @@
 <template>
 <cytomine-modal-card :title="$t('associate-tags')" active>
-  <b-loading :is-full-page="false" :active="loading" class="small" />
+  <b-loading :is-full-page="false" :model-value="loading" class="small" />
   <template v-if="!loading">
     <b-field>
       <domain-tag-input v-model="selectedTags" :domains="notAssociatedTags" placeholder="search-or-create-tag" allowNew />
@@ -8,7 +8,7 @@
   </template>
 
   <template #footer>
-    <button class="button" @click="$parent.close()">
+    <button class="button" @click="$emit('close')">
       {{$t('button-cancel')}}
     </button>
     <button class="button is-link" @click="addAssociations">
@@ -48,7 +48,7 @@ export default {
   methods: {
     async addAssociations() {
       this.$emit('addObjects', this.selectedTags);
-      this.$parent.close();
+      this.$emit('close');
     },
     async fetchTags() {
       this.tags = (await TagCollection.fetchAll()).array;

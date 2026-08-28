@@ -152,16 +152,14 @@
         </td>
       </tr>
 
-      <template>
-        <tr>
-          <td colspan="2">
-            <h5>{{ $t('similar-annotations') }}</h5>
-            <button class="button is-small is-fullwidth" @click="$emit('searchSimilarAnnotations')">
-              {{ $t('search-similar-annotation') }}
-            </button>
-          </td>
-        </tr>
-      </template>
+      <tr>
+        <td colspan="2">
+          <h5>{{ $t('similar-annotations') }}</h5>
+          <button class="button is-small is-fullwidth" @click="$emit('searchSimilarAnnotations')">
+            {{ $t('search-similar-annotation') }}
+          </button>
+        </td>
+      </tr>
 
       <template v-if="isPropDisplayed('linked-annotations')">
         <tr>
@@ -246,22 +244,22 @@
       {{ $t('button-center-view-on-annot') }}
     </a>
 
-    <div class="level">
-      <a @click="openCrop(annotation)" class="level-item button is-small">
+    <div class="buttons">
+      <button @click="openCrop(annotation)" class="button is-small">
         {{ $t('button-view-crop') }}
-      </a>
+      </button>
 
-      <button class="level-item button is-small" @click="copyURL()">
+      <button class="button is-small" @click="copyURL()">
         {{ $t('button-copy-url') }}
       </button>
 
-      <button v-if="isPropDisplayed('comments') && comments" class="level-item button is-small"
+      <button v-if="isPropDisplayed('comments') && comments" class="button is-small"
         @click="openCommentsModal()"
       >
         {{ $t('button-comments') }} ({{comments.length}})
       </button>
 
-      <button v-if="canEdit" class="level-item button is-small is-danger" @click="confirmDeletion()">
+      <button v-if="canEdit" class="button is-small is-danger" @click="confirmDeletion()">
         {{ $t('button-delete') }}
       </button>
     </div>
@@ -523,7 +521,6 @@ export default {
 
     openCommentsModal() {
       this.$buefy.modal.open({
-        parent: this,
         component: AnnotationCommentsModal,
         props: { annotation: this.annotation, comments: this.comments },
         hasModalCard: true,
@@ -545,7 +542,6 @@ export default {
 
     openProfileModal(spatialAxis) {
       this.$buefy.modal.open({
-        parent: this,
         component: ProfileModal,
         props: { annotation: this.annotation, image: this.image, spatialAxis },
         hasModalCard: true
@@ -594,7 +590,7 @@ export default {
 
     eventBus.emit('hide-similar-annotations');
   },
-  destroyed() {
+  unmounted() {
     eventBus.emit('hide-similar-annotations');
   },
 };
@@ -626,8 +622,23 @@ h5 {
 }
 
 .actions .button {
-  margin: 3px;
   box-sizing: border-box;
+}
+
+.actions .button.is-fullwidth {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.actions .buttons {
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.actions .buttons .button {
+  margin: 0;
 }
 
 a.is-fullwidth {
@@ -653,7 +664,7 @@ a.is-fullwidth {
   margin-top: 4px;
 }
 
-:deep(.sl-vue-tree-node-item) {
+:deep(.tree-node-item) {
   font-size: 0.9em;
 }
 

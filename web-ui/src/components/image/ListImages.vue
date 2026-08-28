@@ -8,7 +8,7 @@
   <p>{{ $t('unexpected-error-info-message') }}</p>
 </div>
 <div v-else class="content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <div v-if="!loading" class="panel">
     <p class="panel-heading">
       {{$t('images')}}
@@ -37,7 +37,7 @@
         </button>
       </div>
 
-      <b-collapse :open="filtersOpened">
+      <b-collapse :model-value="filtersOpened">
         <div class="filters">
           <div class="columns">
             <div class="column filter is-one-quarter">
@@ -139,53 +139,69 @@
       <cytomine-table
         :collection="imageCollection"
         :is-empty="nbEmptyFilters > 0"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :openedDetailed.sync="openedDetails"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
+        v-model:currentPage="currentPage"
+        v-model:perPage="perPage"
+        v-model:openedDetailed="openedDetails"
+        v-model:sort="sortField"
+        v-model:order="sortOrder"
         :revision="revision"
       >
-        <template #default="{row: image}">
-          <b-table-column :label="$t('overview')" width="100" :visible="isPropDisplayed('overview')">
-            <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken}"/>
-            </router-link>
-          </b-table-column>
+        <b-table-column
+          v-slot="{row: image}"
+          :label="$t('overview')"
+          width="100"
+          :visible="isPropDisplayed('overview')"
+        >
+          <router-link :to="`/project/${image.project}/image/${image.id}`">
+            <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken}"/>
+          </router-link>
+        </b-table-column>
 
-          <b-table-column
-            :field="blindMode ? 'blindedName' : 'instanceFilename'"
-            :label="$t('name')"
-            sortable
-            width="400"
-          >
-            <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <image-name :image="image" showBothNames />
-            </router-link>
-          </b-table-column>
+        <b-table-column
+          v-slot="{row: image}"
+          :field="blindMode ? 'blindedName' : 'instanceFilename'"
+          :label="$t('name')"
+          sortable
+          width="400"
+        >
+          <router-link :to="`/project/${image.project}/image/${image.id}`">
+            <image-name :image="image" showBothNames />
+          </router-link>
+        </b-table-column>
 
-          <b-table-column field="magnification" :label="$t('magnification')" centered sortable width="100">
-            {{ image.magnification || $t('unknown') }}
-          </b-table-column>
+        <b-table-column
+          v-slot="{row: image}"
+          field="magnification"
+          :label="$t('magnification')" centered sortable width="100"
+        >
+          {{ image.magnification || $t('unknown') }}
+        </b-table-column>
 
-          <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="100">
-            <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
-              {{ image.numberOfAnnotations }}
-            </router-link>
-          </b-table-column>
+        <b-table-column
+          v-slot="{row: image}"
+          field="numberOfAnnotations"
+          :label="$t('user-annotations')" centered sortable width="100"
+        >
+          <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=user`">
+            {{ image.numberOfAnnotations }}
+          </router-link>
+        </b-table-column>
 
-          <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="100">
-            <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
-              {{ image.numberOfReviewedAnnotations }}
-            </router-link>
-          </b-table-column>
+        <b-table-column
+          v-slot="{row: image}"
+          field="numberOfReviewedAnnotations"
+          :label="$t('reviewed-annotations')" centered sortable width="100"
+        >
+          <router-link :to="`/project/${image.project}/annotations?image=${image.id}&type=reviewed`">
+            {{ image.numberOfReviewedAnnotations }}
+          </router-link>
+        </b-table-column>
 
-          <b-table-column label=" " centered width="150">
-            <router-link :to="`/project/${image.project}/image/${image.id}`" class="button is-small is-link">
-              {{$t('button-open')}}
-            </router-link>
-          </b-table-column>
-        </template>
+        <b-table-column v-slot="{row: image}" label=" " centered width="150">
+          <router-link :to="`/project/${image.project}/image/${image.id}`" class="button is-small is-link">
+            {{$t('button-open')}}
+          </router-link>
+        </b-table-column>
 
         <template #detail="{row: image}">
           <image-details
@@ -206,7 +222,7 @@
       </cytomine-table>
     </div>
 
-    <add-image-modal :active.sync="addImageModal" @addImage="refreshData" />
+    <add-image-modal v-model:active="addImageModal" @addImage="refreshData" />
   </div>
 </div>
 </template>

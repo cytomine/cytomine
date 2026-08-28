@@ -808,7 +808,7 @@ export default {
         a.click();
       } catch (error) {
         console.log(error);
-        this.$notify({ type: 'error', text: this.$t('notif-error-screenshot') });
+        this.$notify({ type: 'error', text: this.$t('notify-error-screenshot') });
       } finally {
         // Reset container css values as previous
         container.style.height = '';

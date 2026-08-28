@@ -38,15 +38,6 @@
         />
       </vl-layer-tile>
 
-<!--      <vl-layer-image>-->
-<!--        <vl-source-raster-->
-<!--          v-if="baseSource && colorManipulationOn"-->
-<!--          :sources="[baseSource]"-->
-<!--          :operation="operation"-->
-<!--          :lib="lib"-->
-<!--        />-->
-<!--      </vl-layer-image>-->
-
       <annotation-layer
         v-for="layer in selectedLayers"
         :key="'layer-'+layer.id"
@@ -179,6 +170,7 @@ import eventBus from '@/utils/event-bus';
 
 import { get } from '@/utils/store-helpers';
 import _ from 'lodash';
+import domToImage from 'dom-to-image-more';
 
 import ImageName from '@/components/image/ImageName.vue';
 import AnnotationLayer from './AnnotationLayer.vue';
@@ -713,19 +705,25 @@ export default {
       }
     },
     async takeScreenshot() {
-      // Use of css percent values and html2canvas results in strange behavior
+      // Use of css percent values and DOM rasterization results in strange behavior
       // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
-      let containerHeight = document.querySelector('.map-container').clientHeight;
-      document.querySelector('.map-container').style.height = containerHeight + 'px';
+      let container = document.querySelector('.map-container');
+      let containerHeight = container.clientHeight;
+      container.style.height = containerHeight + 'px';
 
-      let a = document.createElement('a');
-      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), { type: 'dataURL' });
-      let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
-      a.download = imageName;
-      a.click();
-
-      // Reset container css values as previous
-      document.querySelector('.map-container').style.height = '';
+      try {
+        let a = document.createElement('a');
+        a.href = await domToImage.toPng(document.querySelector('.ol-unselectable'));
+        let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
+        a.download = imageName;
+        a.click();
+      } catch (error) {
+        console.log(error);
+        this.$notify({ type: 'error', text: this.$t('notif-error-screenshot') });
+      } finally {
+        // Reset container css values as previous
+        container.style.height = '';
+      }
     },
   },
   async created() {

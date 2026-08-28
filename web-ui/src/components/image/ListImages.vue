@@ -131,6 +131,8 @@
 
             <div class="column filter"></div>
           </div>
+
+          <MetadataFilter @filter-change="onMetadataFilterChange" />
         </div>
       </b-collapse>
 
@@ -222,6 +224,7 @@ import CytomineTable from '@/components/utils/CytomineTable.vue';
 import ImageDetails from '@/components/image/ImageDetails.vue';
 import ImageName from '@/components/image/ImageName.vue';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
+import MetadataFilter from '@/components/search/MetadataFilter.vue';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
 const storeOptions = { rootModuleProp: 'storeModule' };
@@ -238,7 +241,8 @@ export default {
     CytomineTable,
     ImageDetails,
     ImageName,
-    ImageThumbnail
+    ImageThumbnail,
+    MetadataFilter
   },
   data() {
     return {
@@ -246,6 +250,8 @@ export default {
       error: false,
       images: [],
       addImageModal: false,
+      metadataSearch: '',
+      metadataFilters: [],
       excludedProperties: [
         'overview',
         'instanceFilename',
@@ -332,6 +338,8 @@ export default {
       let collection = new ImageInstanceCollection({
         filterKey: 'project',
         filterValue: this.project.id,
+        metadataSearch: this.metadataSearch || null,
+        metadataFilter: this.metadataFilters.length ? this.metadataFilters.join(' AND ') : null,
       });
       if (this.searchString) {
         collection['name'] = {
@@ -431,6 +439,10 @@ export default {
 
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
+    },
+    onMetadataFilterChange({ query, filters }) {
+      this.metadataSearch = query;
+      this.metadataFilters = filters;
     },
     isPropDisplayed(prop) {
       return this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] === null || this.configUI[`project-explore-image-${prop}`]);

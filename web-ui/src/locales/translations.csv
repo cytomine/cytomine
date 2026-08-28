@@ -688,7 +688,6 @@ notif-error-review-reject-all,Failed to reject all annotations,Une erreur a emp�
 notif-error-save-image-consultation,Failed to save image consultation,Une erreur empêche de sauvegarder la consultation de l'image,Error al guardar la consulta de imagen,Een fout verhindert het opslaan van de afbeeldingconsultatie
 notif-error-save-prop,Failed to save the property,Une erreur a empêché de créer la propriété,Error al guardar la propiedad,Door een fout kon de eigenschap niet worden gemaakt
 notif-error-save-user-position,Failed to save your position in the image,Une erreur empêche de sauvegarder votre position dans l'image,Error al guardar tu posición en la imagen,Een fout verhindert het opslaan van uw positie in de afbeelding
-notif-error-screenshot,Failed to take a screenshot of the image,Une erreur a empêché de réaliser la capture d'écran de l'image,Error al capturar la pantalla de la imagen,Door een fout kon geen schermafbeelding van de afbeelding worden gemaakt
 notif-error-start-review,Failed to start reviewing the image,Une erreur a empêché de commencer la validation de l'image,Error al comenzar a revisar la imagen,Door een fout kon de afbeeldingsreview niet worden gestart
 notif-error-tag-creation,Failed to create the tag,Une erreur a empêché la création du tag,Error al crear la etiqueta,Door een fout kon de tag niet worden gemaakt
 notif-error-tag-delete,Failed to delete tag {tagName},Une erreur a empêché de supprimer le tag {tagName},Error al eliminar la etiqueta {tagName},Een fout verhinderde het verwijderen van de tag {tagName}
@@ -762,6 +761,7 @@ notify-error-app-installation,Failed to install the app,Échec de l'installation
 notify-error-empty-list,The list is empty,La liste est vide,La lista está vacía,De lijst is leeg
 notify-error-fetch-tag,Failed to fetch the tags,Une erreur a empêché de récupérer les tags,Error al obtener las etiquetas,Een fout verhinderde het ophalen van de tags
 notify-error-not-enough-item,Not enough items provided,Pas assez d'éléments fournis,No se han proporcionado suficientes elementos,Niet genoeg items verstrekt
+notify-error-screenshot,Failed to take a screenshot of the image,Une erreur a empêché de réaliser la capture d'écran de l'image,Error al capturar la pantalla de la imagen,Door een fout kon geen schermafbeelding van de afbeelding worden gemaakt
 notify-error-undo,Failed to undo last action,Une erreur a empêché d'annuler la dernière action,No se pudo deshacer la última acción,Een fout verhinderde het ongedaan maken van de laatste actie
 notify-success-app-deletion,App deleted successfully,Application supprimée avec succès,Aplicación eliminada con éxito,App succesvol verwijderd
 notify-success-app-installation,App installed successfully,Application installée avec succès,Aplicación instalada con éxito,App succesvol geïnstalleerd

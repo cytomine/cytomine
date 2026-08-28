@@ -1,5 +1,8 @@
 package org.cytomine.e2etests.ui;
 
+import java.io.File;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Random;
 
 import lombok.SneakyThrows;
@@ -10,6 +13,8 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Wait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import static org.cytomine.e2etests.configuration.SeleniumDriver.DOWNLOAD_PATH;
 
 @Component
 public class AnnotationTools {
@@ -25,6 +30,33 @@ public class AnnotationTools {
             wait,
             By.xpath("//button[contains(@class, 'is-selected') and .//i[contains(@class, '" + iconClass + "')]]")
         );
+    }
+
+    public void screenshotCurrentView(Wait<WebDriver> wait) {
+        webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
+
+        webDriverUtils.xpathClick(wait, "//button[.//i[contains(@class, 'fa-camera')]]");
+
+        String filenamePrefix = "image_";
+        String filenameSuffix = ".png";
+        Instant end = Instant.now().plus(Duration.ofSeconds(10));
+
+        while (Instant.now().isBefore(end)) {
+            File directory = new File(DOWNLOAD_PATH);
+            File[] matches = directory.listFiles(
+                (d, name) -> name.startsWith(filenamePrefix) && name.endsWith(filenameSuffix)
+            );
+            if (matches != null && matches.length > 0 && matches[0].length() > 0) {
+                return;
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        throw new RuntimeException("Screenshot file starting with " + filenamePrefix + " was not found!");
     }
 
     @SneakyThrows

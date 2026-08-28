@@ -350,11 +350,11 @@ public class SecurityACLService {
             if (domain != null) {
                 checkFullOrRestrictedForOwner(
                     domain,
-                    (owner != null && objectHasProperty(domain, owner) ? (User) fieldValue(
+                    (owner != null && objectHasProperty(domain, owner) ? ((User) fieldValue(
                         domain.getClass(),
                         domain,
                         owner
-                    ) : null)
+                    )).getId() : null)
                 );
             } else {
                 throw new ObjectNotFoundException("ACL error: "
@@ -373,7 +373,7 @@ public class SecurityACLService {
     }
 
     //check if the container (e.g. Project) has the minimal editing mode or is Admin. If not, exception will be thown
-    public void checkFullOrRestrictedForOwner(CytomineDomain domain, User owner) {
+    public void checkFullOrRestrictedForOwner(CytomineDomain domain, Long ownerUserId) {
         if (domain != null) {
             if (permissionService.hasACLPermission(retrieveContainer(domain), ADMINISTRATION)
                 || currentRoleService.isAdminByNow(currentUserService.getCurrentUser())) {
@@ -384,9 +384,9 @@ public class SecurityACLService {
                 case CLASSIC:
                     return;
                 case RESTRICTED:
-                    log.debug("Owner is " + (owner != null ? owner.getUsername() : "null"));
-                    if (owner != null) {
-                        if (!Objects.equals(owner.getId(), currentUserService.getCurrentUser().id())) {
+                    log.debug("Owner is " + ownerUserId);
+                    if (ownerUserId != null) {
+                        if (!Objects.equals(ownerUserId, currentUserService.getCurrentUser().id())) {
                             throw new ForbiddenException(
                                 "You don't have the right to do this. You must be the creator or the container admin");
                         }
@@ -435,7 +435,7 @@ public class SecurityACLService {
     public void checkIsCreator(CytomineDomain domain, UserResponse currentUser) {
         if (!currentRoleService.isAdminByNow(currentUser) && (!Objects.equals(
             currentUser.id(),
-            domain.userDomainCreator().getId()
+            domain.userDomainCreator()
         ))) {
             throw new ForbiddenException("You don't have the right to read this resource! You must be the same user!");
         }

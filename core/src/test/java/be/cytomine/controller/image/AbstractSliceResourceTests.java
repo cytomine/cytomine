@@ -188,7 +188,7 @@ public class AbstractSliceResourceTests {
 
         restAbstractSliceControllerMockMvc.perform(get("/api/abstractslice/{id}/user.json", image.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().getId()));
+            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().id()));
     }
 
     @Test

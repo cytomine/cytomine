@@ -20,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -28,7 +29,6 @@ import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ReviewedAnnotationListing;
@@ -262,14 +262,14 @@ public class AnnotationListingServiceTests {
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setImages(Collections.singletonList(reviewedAnnotation.getImage().getId()));
-        reviewedAnnotationListing.setUser(reviewedAnnotation.getUser().getId());
+        reviewedAnnotationListing.setUser(reviewedAnnotation.getUserId());
         assertThat(annotationListingService.listGeneric(reviewedAnnotationListing)
             .stream().map(x -> ((AnnotationResult) x).get("id")))
             .contains(reviewedAnnotation.getId());
 
         reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setImages(Collections.singletonList(reviewedAnnotation.getImage().getId()));
-        reviewedAnnotationListing.setUser(builder.givenAUser().id());
+        reviewedAnnotationListing.setUser(builder.givenUserAclRead().id());
         assertThat(annotationListingService.listGeneric(reviewedAnnotationListing)
             .stream().map(x -> ((AnnotationResult) x).get("id")))
             .doesNotContain(reviewedAnnotation.getId());
@@ -279,8 +279,8 @@ public class AnnotationListingServiceTests {
     void searchReviewedAnnotationByTerms() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenDefaultUser();
-        User user2 = builder.givenDefaultAdmin();
+        UserResponse user1 = builder.givenAclUserNoAcl();
+        UserResponse user2 = builder.givenAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -324,8 +324,8 @@ public class AnnotationListingServiceTests {
     void searchReviewedAnnotationByBbox() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenDefaultUser();
-        User user2 = builder.givenDefaultAdmin();
+        UserResponse user1 = builder.givenAclUserNoAcl();
+        UserResponse user2 = builder.givenAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -355,8 +355,8 @@ public class AnnotationListingServiceTests {
     void searchReviewedAnnotationByImageAndReviewUser() throws ParseException {
 
         SliceInstance sliceInstance = builder.givenASliceInstance();
-        User user1 = builder.givenDefaultUser();
-        User user2 = builder.givenDefaultAdmin();
+        UserResponse user1 = builder.givenAclUserNoAcl();
+        UserResponse user2 = builder.givenAdmin();
 
         Term term1 = builder.givenATerm(sliceInstance.getProject().getOntology());
         Term term2 = builder.givenATerm(sliceInstance.getProject().getOntology());
@@ -366,14 +366,14 @@ public class AnnotationListingServiceTests {
         ReviewedAnnotation a3 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("c"), user2, term1);
         ReviewedAnnotation a4 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("d"), user2, term2);
 
-        a1.setReviewUser(user1);
-        a2.setReviewUser(user1);
-        a3.setReviewUser(user2);
-        a4.setReviewUser(user2);
+        a1.setReviewUser(builder.getUserEntity(user1));
+        a2.setReviewUser(builder.getUserEntity(user1));
+        a3.setReviewUser(builder.getUserEntity(user2));
+        a4.setReviewUser(builder.getUserEntity(user2));
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setSlice(sliceInstance.getId());
-        reviewedAnnotationListing.setReviewUsers(Collections.singletonList(user1.getId()));
+        reviewedAnnotationListing.setReviewUsers(Collections.singletonList(user1.id()));
         assertThat(annotationListingService.listGeneric(reviewedAnnotationListing)
             .stream().map(x -> ((AnnotationResult) x).get("id")))
             .contains(a1.getId())
@@ -383,7 +383,7 @@ public class AnnotationListingServiceTests {
 
         reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setSlice(sliceInstance.getId());
-        reviewedAnnotationListing.setReviewUsers(Collections.singletonList(user2.getId()));
+        reviewedAnnotationListing.setReviewUsers(Collections.singletonList(user2.id()));
         assertThat(annotationListingService.listGeneric(reviewedAnnotationListing)
             .stream().map(x -> ((AnnotationResult) x).get("id")))
             .doesNotContain(a1.getId())

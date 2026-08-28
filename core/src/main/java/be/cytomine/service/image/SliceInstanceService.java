@@ -134,7 +134,7 @@ public class SliceInstanceService extends ModelService {
         securityACLService.checkUser(currentUser);
         securityACLService.checkFullOrRestrictedForOwner(
             domain.container(),
-            ((SliceInstance) domain).getImage().getUser()
+            ((SliceInstance) domain).getImage().getUser().getId()
         );
         Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);

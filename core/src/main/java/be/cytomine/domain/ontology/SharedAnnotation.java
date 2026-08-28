@@ -97,8 +97,8 @@ public class SharedAnnotation extends CytomineDomain implements Serializable {
         return sharedAnnotation;
     }
 
-    public User userDomainCreator() {
-        return sender;
+    public Long userDomainCreator() {
+        return sender.getId();
     }
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {

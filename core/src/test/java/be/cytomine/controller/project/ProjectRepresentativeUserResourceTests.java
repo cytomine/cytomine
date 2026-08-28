@@ -144,7 +144,7 @@ public class ProjectRepresentativeUserResourceTests {
     @Transactional
     public void deleteProjectRepresentativeUser() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser.getProject(), user.username(), user.id()
         );
@@ -166,7 +166,7 @@ public class ProjectRepresentativeUserResourceTests {
     @Transactional
     public void deleteProjectRepresentativeUserWithUserParameter() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser.getProject(), user.username(), user.id()
         );
@@ -202,7 +202,7 @@ public class ProjectRepresentativeUserResourceTests {
     @Transactional
     public void failWhenDeleteProjectRepresentativeUserProjectNotExists() throws Exception {
         restProjectRepresentativeUserControllerMockMvc.perform(delete("/api/project/{project}/representative.json", 0)
-                .param("user", builder.givenSuperAdmin().getId().toString())
+                .param("user", String.valueOf(builder.givenSuperAdmin().id()))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors").exists());

@@ -45,9 +45,9 @@ public class ParamServiceTests {
     @Test
     public void paramsUser() {
         Project project = builder.givenAProject();
-        UserResponse userInProject = builder.givenAUser();
+        UserResponse userInProject = builder.givenUserAclRead();
         builder.addUserToProject(project, userInProject.username());
-        UserResponse userNotInProject = builder.givenAUser();
+        UserResponse userNotInProject = builder.givenUserAclWrite();
 
         assertThat(paramsService.getParamsUserList(null, project))
             .contains(userInProject.id()).doesNotContain(userNotInProject.id());

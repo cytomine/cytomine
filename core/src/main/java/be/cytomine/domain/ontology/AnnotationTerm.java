@@ -62,8 +62,8 @@ public class AnnotationTerm extends CytomineDomain implements Serializable {
         return relationTerm;
     }
 
-    public User userDomainCreator() {
-        return user;
+    public Long userDomainCreator() {
+        return user.getId();
     }
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {

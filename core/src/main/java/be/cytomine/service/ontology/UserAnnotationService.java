@@ -448,7 +448,7 @@ public class UserAnnotationService extends ModelService {
         //Check if user has at least READ permission for the project
         securityACLService.check(domain.container(), READ, currentUser);
         //Check if user is admin, the project mode and if is the owner of the annotation
-        securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation) domain).getUser());
+        securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation) domain).getUserId());
 
         // TODO: what about image/project ??
 
@@ -542,7 +542,7 @@ public class UserAnnotationService extends ModelService {
         //Check if user has at least READ permission for the project
         securityACLService.check(domain.container(), READ, currentUser);
         //Check if user is admin, the project mode and if is the owner of the annotation
-        securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation) domain).getUser());
+        securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation) domain).getUserId());
 
         try {
             retrievalService.deleteIndex((AnnotationDomain) domain);
@@ -588,7 +588,7 @@ public class UserAnnotationService extends ModelService {
         return List.of(
             currentUserService.getCurrentUser().id(),
             annotation.getImage().getBlindInstanceFilename(),
-            ((UserAnnotation) domain).getUser().toString()
+            ((UserAnnotation) domain).getUserId()
         );
     }
 

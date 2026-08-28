@@ -181,7 +181,7 @@ public class CompanionFileResourceTests {
 
         restCompanionFileControllerMockMvc.perform(get("/api/companionfile/{id}/user.json", companionFile.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().getId()));
+            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().id()));
     }
 
     @Test

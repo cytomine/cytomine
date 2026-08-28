@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -38,6 +39,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -55,6 +57,7 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
@@ -73,6 +76,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -110,6 +115,9 @@ public class ImageInstanceResourceTests {
 
     @Autowired
     private UrlApi urlApi;
+
+    @MockitoBean
+    private MeiliSearchService meiliSearchService;
 
     @BeforeAll
     public static void beforeAll() throws JOSEException {
@@ -336,6 +344,38 @@ public class ImageInstanceResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id==" + imageInProject1.getId() + ")]").exists())
             .andExpect(jsonPath("$.collection[?(@.id==" + imageInAnotherProject.getId() + ")]").doesNotExist());
 
+    }
+
+    @Test
+    @Transactional
+    public void listImageInstanceByProjectFilteredByMetadata() throws Exception {
+        Project project = builder.givenAProject();
+
+        AbstractImage matchingImage = builder.givenAnAbstractImage();
+        ImageInstance imageWithCriteria = builder.givenAnImageInstance(matchingImage, project);
+        ImageInstance imageWithoutCriteria = builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
+
+        when(meiliSearchService.searchImageIds(any(), any())).thenReturn(Set.of(matchingImage.getId()));
+
+        restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project.getId())
+                .param("metadataFilter", "specimens.biological_being.sex:Male"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection[?(@.id==" + imageWithCriteria.getId() + ")]").exists())
+            .andExpect(jsonPath("$.collection[?(@.id==" + imageWithoutCriteria.getId() + ")]").doesNotExist());
+    }
+
+    @Test
+    @Transactional
+    public void listImageInstanceByProjectReturnsEmptyWhenMetadataMatchesNoImage() throws Exception {
+        Project project = builder.givenAProject();
+        builder.givenAnImageInstance(builder.givenAnAbstractImage(), project);
+
+        when(meiliSearchService.searchImageIds(any(), any())).thenReturn(Set.of(-999L));
+
+        restImageInstanceControllerMockMvc.perform(get("/api/project/{id}/imageinstance.json", project.getId())
+                .param("metadataFilter", "specimens.biological_being.sex:Male"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(0)));
     }
 
     @Test

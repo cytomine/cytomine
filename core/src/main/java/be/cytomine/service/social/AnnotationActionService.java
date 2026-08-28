@@ -50,7 +50,7 @@ public class AnnotationActionService {
         annotationAction.setAction(action);
         annotationAction.setAnnotationIdent(annotation.getId());
         annotationAction.setAnnotationClassName(annotation.getClass().getName());
-        annotationAction.setAnnotationCreator(annotation.user().getId());
+        annotationAction.setAnnotationCreator(annotation.getUserId());
 
         return annotationActionRepository.insert(annotationAction);
     }

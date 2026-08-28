@@ -256,8 +256,8 @@ public class ReportFormatServiceTests {
     }
 
     private List<Map<String, Object>> buildUsers(boolean isComplete) {
-        UserResponse user1 = builder.givenAUser();
-        UserResponse user2 = builder.givenAUser();
+        UserResponse user1 = builder.givenUserAclRead();
+        UserResponse user2 = builder.givenUserAclWrite();
         String name1 = user1.name().orElseThrow();
         String name2 = user2.name().orElseThrow();
         expectedDataObject = new Object[][] {

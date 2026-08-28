@@ -42,6 +42,7 @@ import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_READ;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
@@ -164,9 +165,9 @@ public class AbstractImageServiceTests {
     }
 
     @Test
-    @WithMockUser(username = "list_all_image_by_user_storage")
+    @WithMockUser(username = USER_ACL_READ)
     void listAllImageByUserStorage() {
-        UserResponse user = builder.givenAUser("list_all_image_by_user_storage");
+        UserResponse user = builder.givenUserAclRead();
         Storage storage = builder.givenAStorage(builder.getUser(user.username()));
         UploadedFile uploadedFile = builder.givenAUploadedFile();
         uploadedFile.setStorage(storage);

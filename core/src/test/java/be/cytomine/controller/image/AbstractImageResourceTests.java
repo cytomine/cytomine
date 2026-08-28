@@ -528,7 +528,7 @@ public class AbstractImageResourceTests {
 
         restAbstractImageControllerMockMvc.perform(get("/api/abstractimage/{id}/user.json", image.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().getId()));
+            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().id()));
     }
 
     @Test

@@ -25,7 +25,6 @@ import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
@@ -83,7 +82,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void addConnection() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         Project project = builder.givenAProject();
 
         // {"project":"7577928","os":"Linux","browser":"chrome","browserVersion":"97.0.4692"}
@@ -98,7 +97,7 @@ public class ProjectConnectionResourceTests {
                 .content(jsonObject.toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.social.PersistentProjectConnection"))
-            .andExpect(jsonPath("$.user").value(user.getId()))
+            .andExpect(jsonPath("$.user").value(user.id()))
             .andExpect(jsonPath("$.project").value(project.getId()))
             .andExpect(jsonPath("$.browser").exists())
             .andExpect(jsonPath("$.browserVersion").exists());
@@ -108,7 +107,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getConnectionByUserAndProject() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -126,8 +125,8 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getConnectionByProject() throws Exception {
-        UserResponse user = builder.givenAUser();
-        UserResponse anotherUser = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
+        UserResponse anotherUser = builder.givenUserAclWrite();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -145,7 +144,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getLastConnectionByProject() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -163,7 +162,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getLastConnectionByProjectByUser() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -182,7 +181,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionByProject() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -199,7 +198,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionByProjectHeatmap() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -215,7 +214,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionByProjectWithPeriod() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -231,7 +230,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionFrequencyByUser() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -248,7 +247,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionFrequencyByUserWithHeatmap() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -265,7 +264,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getNumberConnectionFrequencyByUserWithPeriod() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -282,7 +281,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void getConnectionFrequency() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -296,7 +295,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void averageEconnection() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -311,7 +310,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void userConnectionCount() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -327,7 +326,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void connectionHistory() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         givenAPersistentConnectionInProject(user.id(), project1, DateUtils.addSeconds(new Date(), -3));
@@ -344,7 +343,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void connectionHistoryWithExportCsv() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         Date firstDate = DateUtils.addSeconds(new Date(), -3);
@@ -389,7 +388,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void activityDetail() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         PersistentProjectConnection connection = givenAPersistentConnectionInProject(
@@ -407,7 +406,7 @@ public class ProjectConnectionResourceTests {
     @Test
     @Transactional
     public void activityDetailWithExportCsv() throws Exception {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         Project project1 = builder.givenAProject();
 
         PersistentProjectConnection connection = givenAPersistentConnectionInProject(

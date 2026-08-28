@@ -17,7 +17,6 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.ProjectDefaultLayer;
-import be.cytomine.domain.security.User;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectDefaultLayerService;
 
@@ -68,7 +67,7 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
 
     @Override
     protected void whenIAddDomain() {
-        UserResponse user = builder.givenAUser();
+        UserResponse user = builder.givenCreator();
         builder.addUserToProject(projectDefaultLayer.getProject(), user.username());
         projectDefaultLayerService.add(
             builder.givenANotPersistedProjectRepresentativeUser(projectDefaultLayer.getProject(), user.username(),
@@ -79,8 +78,8 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
 
     @Override
     protected void whenIDeleteDomain() {
-        User user = projectDefaultLayer.getUser();
-        builder.addUserToProject(projectDefaultLayer.getProject(), user.getUsername());
+        UserResponse user = builder.getUser(projectDefaultLayer.getUser().getUsername());
+        builder.addUserToProject(projectDefaultLayer.getProject(), user.username());
         ProjectDefaultLayer projectDefaultLayerToDelete = builder.givenANotPersistedProjectDefaultLayer(
             projectDefaultLayer.getProject(),
             user

@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="box error" v-if="!configUI['project-images-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -145,6 +131,8 @@
 
             <div class="column filter"></div>
           </div>
+
+          <MetadataFilter @filter-change="onMetadataFilterChange" />
         </div>
       </b-collapse>
 
@@ -161,7 +149,7 @@
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100" :visible="isPropDisplayed('overview')">
             <router-link :to="`/project/${image.project}/image/${image.id}`">
-              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken}"/>
+              <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken}"/>
             </router-link>
           </b-table-column>
 
@@ -224,21 +212,22 @@
 </template>
 
 <script>
-import {ImageInstanceCollection, TagCollection} from '@/api';
+import { ImageInstanceCollection, TagCollection } from '@/api';
 
-import {get, sync, syncMultiselectFilter, syncBoundsFilter} from '@/utils/store-helpers';
+import { get, sync, syncMultiselectFilter, syncBoundsFilter } from '@/utils/store-helpers';
 import vendorFromFormat from '@/utils/vendor';
 
-import AddImageModal from '@/components/image/AddImageModal';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineSlider from '@/components/form/CytomineSlider';
-import CytomineTable from '@/components/utils/CytomineTable';
-import ImageDetails from '@/components/image/ImageDetails';
-import ImageName from '@/components/image/ImageName';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
+import AddImageModal from '@/components/image/AddImageModal.vue';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
+import CytomineSlider from '@/components/form/CytomineSlider.vue';
+import CytomineTable from '@/components/utils/CytomineTable.vue';
+import ImageDetails from '@/components/image/ImageDetails.vue';
+import ImageName from '@/components/image/ImageName.vue';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
+import MetadataFilter from '@/components/search/MetadataFilter.vue';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
-const storeOptions = {rootModuleProp: 'storeModule'};
+const storeOptions = { rootModuleProp: 'storeModule' };
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
 const localSyncBoundsFilter = (filterName, maxProp) => syncBoundsFilter(null, filterName, maxProp, storeOptions);
@@ -252,7 +241,8 @@ export default {
     CytomineTable,
     ImageDetails,
     ImageName,
-    ImageThumbnail
+    ImageThumbnail,
+    MetadataFilter
   },
   data() {
     return {
@@ -260,6 +250,8 @@ export default {
       error: false,
       images: [],
       addImageModal: false,
+      metadataSearch: '',
+      metadataFilters: [],
       excludedProperties: [
         'overview',
         'instanceFilename',
@@ -292,14 +284,15 @@ export default {
       return this.$store.getters['currentProject/canManageProject'];
     },
     canAddImage() {
-      return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly);
+      let isLSAAIUser = this.currentUser.username.endsWith('@lifescience-ri.eu'); // temp flag
+      return !this.currentUser.guestByNow && (this.canManageProject || !this.project.isReadOnly) && !isLSAAIUser;
     },
 
     storeModule() { // path to the vuex module in which state of this component is stored (projects/currentProject/listImages)
       return this.$store.getters['currentProject/currentProjectModule'] + 'listImages';
     },
 
-    searchString: sync('searchString', {...storeOptions, debounce: 500}),
+    searchString: sync('searchString', { ...storeOptions, debounce: 500 }),
     filtersOpened: sync('filtersOpened', storeOptions),
 
     querySearchTags() {
@@ -317,11 +310,11 @@ export default {
 
     multiSelectFilters() {
       return [
-        {prop: 'contentType', selected: this.selectedContentTypes, total: this.availableFormats.length},
-        {prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length},
-        {prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length},
-        {prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length},
-        {prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length}
+        { prop: 'contentType', selected: this.selectedContentTypes, total: this.availableFormats.length },
+        { prop: 'vendor', selected: this.selectedVendors.map(option => option.value), total: this.availableVendors.length },
+        { prop: 'magnification', selected: this.selectedMagnifications.map(option => option.value), total: this.availableMagnifications.length },
+        { prop: 'physicalSizeX', selected: this.selectedResolutions.map(option => option.value), total: this.availableResolutions.length },
+        { prop: 'tag', selected: this.selectedTags.map(option => option.id), total: this.availableTags.length }
       ];
     },
 
@@ -334,10 +327,10 @@ export default {
 
     boundsFilters() {
       return [
-        {prop: 'width', bounds: this.boundsWidth, max: this.maxWidth},
-        {prop: 'height', bounds: this.boundsHeight, max: this.maxHeight},
-        {prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations},
-        {prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations},
+        { prop: 'width', bounds: this.boundsWidth, max: this.maxWidth },
+        { prop: 'height', bounds: this.boundsHeight, max: this.maxHeight },
+        { prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations },
+        { prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations },
       ];
     },
 
@@ -345,13 +338,15 @@ export default {
       let collection = new ImageInstanceCollection({
         filterKey: 'project',
         filterValue: this.project.id,
+        metadataSearch: this.metadataSearch || null,
+        metadataFilter: this.metadataFilters.length ? this.metadataFilters.join(' AND ') : null,
       });
       if (this.searchString) {
         collection['name'] = {
           ilike: encodeURIComponent(this.searchString)
         };
       }
-      for (let {prop, bounds, max} of this.boundsFilters) {
+      for (let { prop, bounds, max } of this.boundsFilters) {
         collection[prop] = {};
         if (bounds[1] !== max) {
           // if max bounds is the max possible value, do not set the filter in the request
@@ -365,7 +360,7 @@ export default {
           collection[prop]['gte'] = bounds[0];
         }
       }
-      for (let {prop, selected, total} of this.multiSelectFilters) {
+      for (let { prop, selected, total } of this.multiSelectFilters) {
         if (selected.length > 0 && selected.length < total) {
           collection[prop] = {
             in: selected.join()
@@ -392,7 +387,7 @@ export default {
   },
   methods: {
     async fetchFilters() {
-      let stats = await ImageInstanceCollection.fetchBounds({project: this.project.id});
+      let stats = await ImageInstanceCollection.fetchBounds({ project: this.project.id });
       this.maxWidth = Math.max(100, stats.width.max);
       this.maxHeight = Math.max(100, stats.height.max);
       this.maxNbUserAnnotations = Math.max(100, stats.countImageAnnotations.max);
@@ -427,7 +422,7 @@ export default {
       // });
     },
     async fetchTags() {
-      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+      this.availableTags = [{ id: 'null', name: this.$t('no-tag') }, ...(await TagCollection.fetchAll()).array];
     },
 
     async refreshData() {
@@ -444,6 +439,10 @@ export default {
 
     toggleFilterDisplay() {
       this.filtersOpened = !this.filtersOpened;
+    },
+    onMetadataFilterChange({ query, filters }) {
+      this.metadataSearch = query;
+      this.metadataFilters = filters;
     },
     isPropDisplayed(prop) {
       return this.excludedProperties.includes(prop) && (this.configUI[`project-explore-image-${prop}`] === null || this.configUI[`project-explore-image-${prop}`]);
@@ -500,7 +499,7 @@ export default {
   align-items: center;
 }
 
-::v-deep .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }
@@ -509,12 +508,12 @@ export default {
   display: flex;
 }
 
-::v-deep .search-images {
+:deep(.search-images) {
   max-width: 30rem;
   margin-right: 1rem;
 }
 
-::v-deep td, ::v-deep th {
+:deep(td), :deep(th) {
   vertical-align: middle !important;
 }
 </style>

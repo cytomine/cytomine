@@ -1,20 +1,7 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -30,13 +17,19 @@ class AbstractReader(ABC):
     """
     Base reader. All format readers must extend this class.
     """
+
     def __init__(self, format: AbstractFormat):
         self.format = format
 
     @abstractmethod
     def read_thumb(
-        self, out_width: int, out_height: int, precomputed: bool = None,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+        self,
+        out_width: int,
+        out_height: int,
+        precomputed: bool = False,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
     ) -> RawImagePixels:
         """
         Get an image thumbnail whose dimensions are the nearest possible to
@@ -87,8 +80,13 @@ class AbstractReader(ABC):
 
     @abstractmethod
     def read_window(
-        self, region: Region, out_width: int, out_height: int,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+        self,
+        region: Region,
+        out_width: int,
+        out_height: int,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
     ) -> RawImagePixels:
         """
         Get an image window whose output dimensions are the nearest possible to
@@ -140,8 +138,11 @@ class AbstractReader(ABC):
 
     @abstractmethod
     def read_tile(
-        self, tile: Tile,
-        c: Optional[Union[int, List[int]]] = None, z: Optional[int] = None, t: Optional[int] = None
+        self,
+        tile: Tile,
+        c: int | list[int] | None = None,
+        z: int | None = None,
+        t: int | None = None,
     ) -> RawImagePixels:
         """
         Get an image tile. It is a particular case of `read_window` where the
@@ -180,7 +181,7 @@ class AbstractReader(ABC):
         """
         raise NotImplementedError()
 
-    def read_label(self, out_width: int, out_height: int) -> Optional[RawImagePixels]:
+    def read_label(self, out_width: int, out_height: int) -> RawImagePixels | None:
         """
         Get a precomputed image label whose output dimensions are the nearest
         possible to asked output dimensions.
@@ -209,7 +210,7 @@ class AbstractReader(ABC):
         """
         return None
 
-    def read_macro(self, out_width: int, out_height: int) -> Optional[RawImagePixels]:
+    def read_macro(self, out_width: int, out_height: int) -> RawImagePixels | None:
         """
         Get a precomputed image macro whose output dimensions are the nearest
         possible to asked output dimensions.
@@ -239,15 +240,15 @@ class AbstractReader(ABC):
         return None
 
     def _concrete_channel_indexes(
-        self, channels: Optional[Union[int, List[int]]]
-    ) -> Tuple[list, list]:
+        self, channels: int | list[int] | None
+    ) -> tuple[list, list]:
         if channels is None:
-            channels = np.arange(self.format.main_imd.n_channels)
+            ch = np.arange(self.format.main_imd.n_channels)
         else:
-            channels = np.asarray(ensure_list(channels))
+            ch = np.asarray(ensure_list(channels))
 
         spp = self.format.main_imd.n_samples
 
-        cc_idxs = channels // spp
-        s_idxs = channels % spp
+        cc_idxs = ch // spp
+        s_idxs = ch % spp
         return cc_idxs.tolist(), s_idxs.tolist()

@@ -27,12 +27,13 @@
 </template>
 
 <script>
-import UploadedFileStatus from '@/components/storage/UploadedFileStatus';
-import {UploadedFileStatus as UFStatus, CompanionFileCollection, CompanionFile} from '@/api';
+import UploadedFileStatus from '@/components/storage/UploadedFileStatus.vue';
+import { UploadedFileStatus as UFStatus } from '@/constants/UploadedFileStatus';
+import { CompanionFileCollection, CompanionFile } from '@/api';
 
 export default {
   name: 'profile-status',
-  components: {UploadedFileStatus},
+  components: { UploadedFileStatus },
   props: {
     image: Object
   },
@@ -76,13 +77,13 @@ export default {
     },
     async computeProfile() {
       try {
-        let cf = await new CompanionFile({image: this.image.id, type: 'HDF5'}).save();
+        let cf = await new CompanionFile({ image: this.image.id, type: 'HDF5' }).save();
         cf.status = UFStatus.UPLOADED; //TODO: Issue in core: no status returned
         this.companionFiles.push(cf);
         this.$emit('update');
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-profile-computation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-profile-computation') });
       }
     },
 
@@ -102,13 +103,13 @@ export default {
         this.$emit('update');
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-profile-deletion')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-profile-deletion') });
       }
     },
 
     async fetchCompanionFiles() {
       try {
-        this.companionFiles = (await CompanionFileCollection.fetchAll({filterKey: 'abstractimage', filterValue: this.image.id})).array;
+        this.companionFiles = (await CompanionFileCollection.fetchAll({ filterKey: 'abstractimage', filterValue: this.image.id })).array;
       } catch (error) {
         console.log(error);
         this.error = true;

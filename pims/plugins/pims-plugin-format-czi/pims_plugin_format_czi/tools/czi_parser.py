@@ -8,7 +8,7 @@ from PIL import Image as PILImage
 from pylibCZIrw import czi
 from pyvips import Image as VIPSImage
 from pyvips import BandFormat
-from typing import Any, Optional
+from typing import Any
 
 
 pixel_types_to_vips_band_type = {
@@ -43,7 +43,7 @@ numpy_to_vips_band_type = {
     }
 
 
-def pretty_print(title: Optional[str], data: Any, indent: int = 0) -> None:
+def pretty_print(title: str | None, data: Any, indent: int = 0) -> None:
     if data is None:
         return
     if isinstance(data, dict):

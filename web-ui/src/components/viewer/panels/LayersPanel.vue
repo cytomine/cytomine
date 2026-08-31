@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="layers">
   <h1>{{ $t('annotation-layers') }}</h1>
@@ -69,10 +55,11 @@
 </template>
 
 <script>
-import _ from 'lodash';
-import {get} from '@/utils/store-helpers';
+import eventBus from '@/utils/event-bus';
 
-import {Cytomine, ProjectDefaultLayerCollection} from '@/api';
+import _ from 'lodash';
+import { get } from '@/utils/store-helpers';
+import { Cytomine, ProjectDefaultLayerCollection } from '@/api';
 
 export default {
   name: 'layers-panel',
@@ -138,7 +125,7 @@ export default {
       return this.image.inReview || this.image.reviewed;
     },
     reviewLayer() {
-      return {id: -1, isReview: true};
+      return { id: -1, isReview: true };
     },
     reviewMode() {
       return this.imageWrapper.review.reviewMode;
@@ -208,7 +195,7 @@ export default {
         this.fetchIndexLayers();
       }
     },
-    reloadAnnotationsHandler({idImage} = {}) {
+    reloadAnnotationsHandler({ idImage } = {}) {
       if (!idImage || idImage === this.image.id) {
         this.fetchIndexLayers();
       }
@@ -226,7 +213,7 @@ export default {
       let id = (this.currentAccount.isDeveloper) ? ` (${this.$t('id')}: ${layer.id})` : '';
 
       let indexLayer = this.indexLayers.find(index => index.user === layer.id) || {};
-      return `${layer.fullName}${id} (${indexLayer.countAnnotation || 0})`;
+      return `${layer.name}${id} (${indexLayer.countAnnotation || 0})`;
     },
 
     canDraw(layer) {
@@ -292,7 +279,7 @@ export default {
           countAnnotation: a.countAnnotation + b.countAnnotation,
           countReviewedAnnotation: a.countReviewedAnnotation + b.countReviewedAnnotation
         };
-      }, {user: userIndexLayers[0].user, countAnnotation: 0, countReviewedAnnotation: 0}));
+      }, { user: userIndexLayers[0].user, countAnnotation: 0, countReviewedAnnotation: 0 }));
       // ----
     },
 
@@ -326,15 +313,15 @@ export default {
     } catch (error) {
       console.log(error);
       this.error = true;
-      this.$notify({type: 'error', text: this.$t('notif-error-loading-annotation-layers')});
+      this.$notify({ type: 'error', text: this.$t('notif-error-loading-annotation-layers') });
       return;
     }
 
-    let layersToAdd = this.layersToPreload.map(id => ({id, visible: true}));
+    let layersToAdd = this.layersToPreload.map(id => ({ id, visible: true }));
 
     if (!this.imageWrapper.layers.selectedLayers) { // we do not use computed property selectedLayers because we don't want the replacement by [] if the store array is null
       if (!this.layersToPreload.includes(this.currentUser.id)) {
-        layersToAdd.push({id: this.currentUser.id, visible: true});
+        layersToAdd.push({ id: this.currentUser.id, visible: true });
       }
 
       try {
@@ -345,9 +332,9 @@ export default {
 
         let addedIds = layersToAdd.map(layer => layer.id);
 
-        defaultLayers.array.forEach(({user, hideByDefault}) => {
+        defaultLayers.array.forEach(({ user, hideByDefault }) => {
           if (!addedIds.includes(user)) {
-            layersToAdd.push({id: user, visible: !hideByDefault});
+            layersToAdd.push({ id: user, visible: !hideByDefault });
           }
         });
       } catch (error) {
@@ -357,24 +344,24 @@ export default {
     layersToAdd.map(layer => this.addLayerById(layer.id, layer.visible));
   },
   mounted() {
-    this.$eventBus.$on('addAnnotation', this.addAnnotationEventHandler);
-    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationEventHandler);
-    this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
-    this.$eventBus.$on('annotation-layers:refresh', this.fetchLayers);
+    eventBus.on('addAnnotation', this.addAnnotationEventHandler);
+    eventBus.on('deleteAnnotation', this.deleteAnnotationEventHandler);
+    eventBus.on('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('annotation-layers:refresh', this.fetchLayers);
   },
   beforeDestroy() {
-    this.$eventBus.$off('addAnnotation', this.addAnnotationEventHandler);
-    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationEventHandler);
-    this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
-    this.$eventBus.$off('annotation-layers:refresh', this.fetchLayers);
+    eventBus.off('addAnnotation', this.addAnnotationEventHandler);
+    eventBus.off('deleteAnnotation', this.deleteAnnotationEventHandler);
+    eventBus.off('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('annotation-layers:refresh', this.fetchLayers);
   }
 };
 </script>
 
 <style scoped>
->>> select {
+:deep(select) {
   width: 21em;
 }
 
@@ -414,11 +401,11 @@ td .button {
   width: 100%;
 }
 
->>> .checkbox .control-label {
+:deep(.checkbox .control-label) {
   padding: 0 !important;
 }
 
->>> input[type="range"].slider {
+:deep(input[type="range"].slider) {
   margin: 0;
   padding: 0;
 }

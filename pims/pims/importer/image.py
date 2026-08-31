@@ -1,7 +1,6 @@
 import logging
 from lxml import etree
 from pathlib import Path
-from typing import List
 
 from cytomine.models import UploadedFile
 
@@ -24,7 +23,7 @@ class ImageImporter:
         self.user = user
         self.storage_id = storage_id
 
-    def get_images(self) -> None:
+    def get_images(self) -> list[str]:
         dataset_xml_path = self.base_path / "METADATA" / "dataset.xml"
         tree = etree.parse(dataset_xml_path)
         root = tree.getroot()
@@ -32,7 +31,7 @@ class ImageImporter:
         images = root.findall(".//IMAGE_REF")
         return [image.get("alias") for image in images]
 
-    def import_image(self, alias: str, projects: List[str]) -> ImportResult:
+    def import_image(self, alias: str, projects: list[str]) -> ImportResult:
         image_path = self.base_path / "IMAGES" / alias
         if not image_path.exists():
             logger.warning(f"'{image_path}' does not exist!")
@@ -56,7 +55,7 @@ class ImageImporter:
         uploadedFile = UploadedFile(
             original_filename=image_path.name,
             filename=str(tmp_path),
-            size=image_path.size,
+            size=image_path.stat().st_size,
             ext="",
             content_type="",
             id_projects=[],

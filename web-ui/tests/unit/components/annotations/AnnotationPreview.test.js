@@ -1,13 +1,13 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(() => Promise.resolve({
-          data: new Blob(['test image data'], {type: 'image/jpeg'})
+        get: vi.fn(() => Promise.resolve({
+          data: new Blob(['test image data'], { type: 'image/jpeg' })
         })),
       },
     },
@@ -18,30 +18,19 @@ const mockBlobUrl = 'blob:mock-url-12345';
 
 describe('AnnotationPreview.vue', () => {
   const createWrapper = (options) => shallowMount(AnnotationPreview, {
-    mocks: {
-      $eventBus: mockEventBus,
-    },
     stubs: {
       'v-popover': true,
     },
     ...options,
   });
 
-  let mockEventBus;
-
   beforeEach(() => {
-    global.URL.createObjectURL = jest.fn(() => mockBlobUrl);
-    global.URL.revokeObjectURL = jest.fn();
-
-    mockEventBus = {
-      $on: jest.fn(),
-      $off: jest.fn(),
-      $emit: jest.fn()
-    };
+    global.URL.createObjectURL = vi.fn(() => mockBlobUrl);
+    global.URL.revokeObjectURL = vi.fn();
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('annotation thumbnail', () => {
@@ -49,7 +38,7 @@ describe('AnnotationPreview.vue', () => {
       const wrapper = createWrapper({
         propsData: {
           annot: {
-            annotationCropURL: jest.fn(() => 'http://cytomine.org/crop.jpg'),
+            annotationCropURL: vi.fn(() => 'http://cytomine.org/crop.jpg'),
           },
         }
       });
@@ -64,7 +53,7 @@ describe('AnnotationPreview.vue', () => {
       const wrapper = createWrapper({
         propsData: {
           annot: {
-            annotationCropURL: jest.fn(() => 'http://cytomine.org/crop.jpg'),
+            annotationCropURL: vi.fn(() => 'http://cytomine.org/crop.jpg'),
           },
         }
       });
@@ -80,7 +69,7 @@ describe('AnnotationPreview.vue', () => {
     it('should display preview button is showDetails is true', () => {
       const wrapper = createWrapper();
 
-      const buttonWrapper = wrapper.findComponent({ref: 'previewButton'});
+      const buttonWrapper = wrapper.findComponent({ ref: 'previewButton' });
       expect(buttonWrapper.exists()).toBe(true);
     });
 
@@ -91,7 +80,7 @@ describe('AnnotationPreview.vue', () => {
         }
       });
 
-      const buttonWrapper = wrapper.findComponent({ref: 'previewButton'});
+      const buttonWrapper = wrapper.findComponent({ ref: 'previewButton' });
       expect(buttonWrapper.exists()).toBe(false);
     });
   });

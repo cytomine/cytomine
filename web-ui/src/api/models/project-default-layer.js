@@ -25,7 +25,7 @@ export default class ProjectDefaultLayer extends Model {
    * @returns {this} The fetched object
    */
   static async fetch(id, project) {
-    return new this({id, project}).fetch();
+    return new this({ id, project }).fetch();
   }
 
   /**
@@ -36,7 +36,7 @@ export default class ProjectDefaultLayer extends Model {
    * @param {number} project  The identifier of the project
    */
   static async delete(id, project) {
-    return new this({id, project}).delete();
+    return new this({ id, project }).delete();
   }
 
   // HACK: remove (temporary hack due to lack of consistency in API endpoint)

@@ -1,14 +1,140 @@
-# apiVersion: v1
-# kind: Pod
-# metadata:
-#   name: "core-test-connection"
-#   labels:
-#   annotations:
-#    "helm.sh/hook": test
-# spec:
-#   containers:
-#     - name: curl
-#       image: curlimages/curl
-#       command: ['curl']
-#       args: ['-f', '{{ include "core.url" . }}/server/ping']
-#   restartPolicy: Never
+{{- $gatewayIP := .Values.test.ingressIP | default "" }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "e2e-tests"
+  labels:
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "1"
+spec:
+  securityContext:
+  {{- include "cytomine.podSecurityContext" . | nindent 4 }}
+  {{- if $gatewayIP }}
+  hostAliases:
+    - ip: "{{ $gatewayIP }}"
+      hostnames:
+        - "{{ .Values.global.domainName }}"
+  {{- end }}
+  volumes:
+    - name: tmp
+      emptyDir: {}
+    - name: workspace
+      persistentVolumeClaim:
+        claimName: "e2e-test-reports"
+  initContainers:
+    - name: wait-for-services
+      image: "{{ .Values.images.curl }}"
+      securityContext:
+      {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Waiting for core to be ready..."
+          until curl -sf http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }}/server/ping; do
+            echo "core not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "core is ready!"
+          echo "Waiting for pims to be ready..."
+          until curl -sf http://pims.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.pims.port }}/ims/disk-usage; do
+            echo "pims not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "pims is ready!"
+          echo "Waiting for app-engine to be ready..."
+          until curl -sf http://app-engine.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.app_engine.port }}/ping; do
+            echo "app-engine not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "app-engine is ready!"
+          echo "Waiting for sam to be ready..."
+          until curl -sf http://sam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.sam.port }}/; do
+            echo "sam not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "sam is ready!"
+          echo "Waiting for cbir to be ready..."
+          until curl -sf http://cbir.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.cbir.port }}/health; do
+            echo "cbir not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "cbir is ready!"
+  containers:
+    - name: selenium
+      image: "{{ .Values.images.selenium }}"
+      imagePullPolicy: {{ .Values.images.pullPolicy }}
+      securityContext:
+        allowPrivilegeEscalation: false
+        privileged: false
+        readOnlyRootFilesystem: false
+        runAsNonRoot: true
+        runAsUser: 1200
+        runAsGroup: 1200
+        capabilities:
+          drop: [ "ALL" ]
+      resources:
+        requests:
+          memory: "4Gi"
+          cpu: "2"
+        limits:
+          memory: "64Gi"
+          cpu: "16"
+      volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      env:
+        - name: SE_NODE_MAX_SESSIONS
+          value: "8"
+        - name: SE_SESSION_REQUEST_TIMEOUT
+          value: "300"
+        - name: SE_SESSION_RETRY_INTERVAL
+          value: "5"
+        - name: SE_DRAIN_AFTER_SESSION_COUNT
+          value: {{ .Values.test.e2eTestCount | quote }}
+      ports:
+        - name: http
+          containerPort: 4444
+      readinessProbe:
+        httpGet:
+          path: /wd/hub/status
+          port: 4444
+        periodSeconds: 5
+        failureThreshold: 20
+        timeoutSeconds: 5
+      startupProbe:
+        httpGet:
+          path: /wd/hub/status
+          port: 4444
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        failureThreshold: 30
+        timeoutSeconds: 5
+    - name: e2e-tests
+      image: "{{ .Values.images.e2e_tests }}"
+      imagePullPolicy: {{ .Values.images.pullPolicy }}
+      securityContext:
+      {{- include "cytomine.containerSecurityContext" . | nindent 8 }}
+      volumeMounts:
+      - name: tmp
+        mountPath: /tmp
+      - name: workspace
+        mountPath: /workspace
+      env:
+        - name: CYTOMINE_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cytomine-admin-iam-secret
+              key: password
+        - name: CYTOMINE_ADMIN_USERNAME
+          value: admin
+        - name: CYTOMINE_URL
+          value: https://{{ .Values.global.domainName }}
+        - name: SELENIUM_URL
+          value: http://localhost:4444
+        - name: E2E_PARALLEL
+          value: "false"
+        - name: IAM_URL
+          value: {{ include "cytomine.iamInternalUrl" . }}
+  restartPolicy: Never

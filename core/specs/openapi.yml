@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Cytomine Core API
-  version: 0.1.0
+  version: 0.4.0
   description: core API provides requests for core features of Cytomine.
 
 servers:
@@ -40,8 +40,6 @@ tags:
     description: Manage images in a project
   - name: Image | Slice instance
     description: Manage slices of an image in a project
-  - name: Image | Image server
-    description: Manage image servers (IMS)
   - name: Legacy user keys
     description: Legacy user keys management
   - name: Metadata | Property
@@ -74,8 +72,6 @@ tags:
     description: Manage project representative users
   - name: Storage
     description: Manage storages (virtual disk space)
-  - name: Storage | Member
-    description: Manage storage members
   - name: Storage | Uploaded file
     description: Manage uploaded files in a storage
   - name: Track
@@ -1336,32 +1332,6 @@ paths:
               schema:
                 "$ref": "#/components/schemas/AnnotationTerm"
           description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/annotation/method/download:
-    get:
-      tags:
-        - Annotation
-      description: Download an annotation search report
-      parameters:
-        - name: format
-          in: query
-          description: "(Optional) Output file format (pdf, xls,...)"
-          required: true
-          schema:
-            type: string
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          description: file
         "400":
           $ref: "#/components/responses/bad-request"
         "401":
@@ -3031,59 +3001,6 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/imageinstance/{idImage}/annotation/included/download:
-    get:
-      tags:
-        - Annotation
-      description: Download an annotation search report for included annotations
-      parameters:
-        - name: idImage
-          in: path
-          description: The image id
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: geometry
-          in: query
-          description: "(Optional) WKT form of the geometry (if not set, set annotation param)"
-          required: true
-          schema:
-            type: string
-        - name: annotation
-          in: query
-          description: "(Optional) The annotation id for the geometry (if not set, set geometry param)"
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: user
-          in: query
-          description: "The annotation user id"
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: terms
-          in: query
-          description: The annotation terms id
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        "200":
-          description: file
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
   /api/imageinstance/{id}/associated.json:
     get:
       tags:
@@ -3688,128 +3605,6 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/imageserver.json:
-    get:
-      tags:
-        - Image | Image server
-      description: List image servers
-      parameters:
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ImageServerCollection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/imageserver/{id}.json:
-    get:
-      tags:
-        - Image | Image server
-      description: Get an image server
-      parameters:
-        - name: id
-          in: path
-          description: The image server id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ImageServer"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/ldap/user.json:
-    post:
-      tags:
-        - user
-      description: Add an user from the LDAP
-      parameters:
-        - name: username
-          in: query
-          description: The username in LDAP
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserCollection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/user"
-
-  /api/ldap/{username}/user.json:
-    get:
-      tags:
-        - user
-      description: Check if an user is in the LDAP
-      parameters:
-        - name: username
-          in: path
-          description: The username in LDAP
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserCollection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
   /api/ontology.json:
     post:
       tags:
@@ -3995,6 +3790,51 @@ paths:
           $ref: "#/components/responses/forbidden"
         "404":
           $ref: "#/components/responses/not-found"
+
+  /api/ontology/{id}/export:
+    get:
+      tags:
+        - Ontology
+      summary: Export an ontology as JSON
+      description: Export an ontology and its terms as a JSON file
+      parameters:
+        - $ref: "#/components/parameters/path-ontology-id"
+      responses:
+        "200":
+          headers:
+            Content-Disposition:
+              description: attachment; filename={ontologyName}.json
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OntologyExport"
+              example:
+                name: "my-ontology"
+                terms:
+                  - name: "term-name"
+                    color: "#2C3A59"
+        "404":
+          description: Ontology not found
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+              example:
+                title: "Not Found"
+                status: 404
+                detail: "Ontology not found with id: 123"
+                instance: "/api/ontology/123/export"
 
   /api/ontology/{id}/user.json:
     get:
@@ -4714,42 +4554,6 @@ paths:
           $ref: "#/components/responses/forbidden"
         "404":
           $ref: "#/components/responses/not-found"
-
-  /api/project/{id}/invitation.json:
-    post:
-      tags:
-        - Project | Member
-      description: Invite a not yer existing user to the project
-      parameters:
-        - $ref: "#/components/parameters/path-project-id"
-        - name: json
-          in: query
-          description: The user name and email of the invited user
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/Project"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/Project"
 
   /api/project/{id}/last/{max}.json:
     get:
@@ -5760,59 +5564,6 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/relation.json:
-    get:
-      tags:
-        - Ontology | Relation
-      description: List all relations
-      parameters:
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RelationCollection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/relation/{id}.json:
-    get:
-      tags:
-        - Ontology | Relation
-      description: Get a relation
-      parameters:
-        - name: id
-          in: path
-          description: The relation id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/Relation"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
   /api/relation/parent/term.json:
     post:
       tags:
@@ -5918,38 +5669,6 @@ paths:
       tags:
         - Ontology | Relation term
       description: List relations for a term
-      parameters:
-        - $ref: "#/components/parameters/path-term-id"
-        - name: i
-          in: path
-          description: The position index (1 or 2) in the relation
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RelationTermCollection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/relation/term/{i}/{id}.json:
-    get:
-      tags:
-        - Ontology | Relation term
-      description: List relations for a term at position
       parameters:
         - $ref: "#/components/parameters/path-term-id"
         - name: i
@@ -6786,83 +6505,6 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/storage/{id}/user.json:
-    get:
-      tags:
-        - Storage | Member
-      description: List storage members
-      parameters:
-        - $ref: "#/components/schemas/path-storage-id"
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserCollection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
-  /api/storage/{id}/user/{iduser}.json:
-    post:
-      tags:
-        - Storage | Member
-      description: Add user in a storage
-      parameters:
-        - $ref: "#/components/schemas/path-storage-id"
-        - name: iduser
-          in: path
-          description: The user id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: empty
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-    delete:
-      tags:
-        - Storage | Member
-      description: Remove user from a storage
-      parameters:
-        - $ref: "#/components/schemas/path-storage-id"
-        - name: iduser
-          in: path
-          description: The user id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: empty
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
   /api/tag.json:
     post:
       tags:
@@ -7318,7 +6960,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UploadedFile"
+                "$ref": "#/components/schemas/HttpCommandResponse"
           description: ""
         "400":
           $ref: "#/components/responses/bad-request"
@@ -7331,59 +6973,24 @@ paths:
         "409":
           $ref: "#/components/responses/conflict"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/UploadedFile"
+              "$ref": "#/components/schemas/CreateUploadedFile"
     get:
       tags:
         - Storage | Uploaded file
       description: Get all uploaded files made by the current user
       parameters:
-        - name: onlyRootsWithDetails
-          in: query
-          description:
-            If set, only return uploaded files which are roots (no parent)
-            with supplementary details such global size.
-          required: true
-          schema:
-            type: boolean
-        - name: onlyRoots
-          in: query
-          description: If set, only return uploaded files which are roots (no parent).
-          required: true
-          schema:
-            type: boolean
-        - name: parent
-          in: query
-          description: If set, only return uploaded files having the given parent.
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: root
-          in: query
-          description:
-            If set, only return uploaded files which are children of the
-            given root. Returned attributes are a subset of uploaded files attributes.
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: all
-          in: query
-          description:
-            True to list uploaded files for all users the current user has
-            access to
-          required: true
-          schema:
-            type: boolean
+        - $ref: "#/components/parameters/pagination-max"
+        - $ref: "#/components/parameters/pagination-offset"
       responses:
         "200":
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UploadedFile"
+                "$ref": "#/components/schemas/UploadedFileCollection"
           description: ""
         "400":
           $ref: "#/components/responses/bad-request"
@@ -7439,7 +7046,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UploadedFile"
+                "$ref": "#/components/schemas/HttpCommandResponse"
           description: ""
         "400":
           $ref: "#/components/responses/bad-request"
@@ -7452,10 +7059,11 @@ paths:
         "409":
           $ref: "#/components/responses/conflict"
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/UploadedFile"
+              "$ref": "#/components/schemas/UpdateUploadedFile"
     delete:
       tags:
         - Storage | Uploaded file
@@ -7475,7 +7083,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/UploadedFile"
+                "$ref": "#/components/schemas/HttpCommandResponse"
           description: ""
         "400":
           $ref: "#/components/responses/bad-request"
@@ -7590,13 +7198,20 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: authorization
+          in: query
+          description: Bearer token used to authenticate the download request
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           content:
-            application/json:
+            application/octet-stream:
               schema:
-                "$ref": "#/components/schemas/UploadedFile"
-          description: ""
+                type: string
+                format: binary
+          description: The file content
         "400":
           $ref: "#/components/responses/bad-request"
         "401":
@@ -7684,41 +7299,6 @@ paths:
           $ref: "#/components/responses/forbidden"
         "404":
           $ref: "#/components/responses/not-found"
-
-  /api/user/security_check.json:
-    post:
-      tags:
-        - user
-      description: Check a user password for the current user
-      parameters:
-        - name: password
-          in: query
-          description: The password
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/user"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/user"
 
   /api/user/{id}.json:
     get:
@@ -7929,48 +7509,6 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/user/{id}/password.json:
-    put:
-      tags:
-        - user
-      description: Change a user password for a user
-      parameters:
-        - name: id
-          in: path
-          description: The user id
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: password
-          in: query
-          description: The new password
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/user"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/user"
-
   /api/user/{user}/project.json:
     get:
       tags:
@@ -8055,45 +7593,6 @@ paths:
           $ref: "#/components/responses/forbidden"
         "404":
           $ref: "#/components/responses/not-found"
-
-  /api/user/{iduser}/reviewedannotation.json:
-    post:
-      tags:
-        - Annotation | Reviewed annotation
-      summary: Add a reviewed annotation
-      description:
-        Add a reviewed annotation. Only use to create a reviewed annotation
-        with all json data. Use /annotation/x/review
-      parameters:
-        - name: iduser
-          in: path
-          description: The user id
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/ReviewedAnnotation"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-        "409":
-          $ref: "#/components/responses/conflict"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/ReviewedAnnotation"
 
   /api/user/{id}/reviewedannotation/count.json:
     get:
@@ -8867,44 +8366,6 @@ paths:
         "404":
           $ref: "#/components/responses/not-found"
 
-  /api/userannotation/{idannotation}/user/{iduser}/term.json:
-    get:
-      tags:
-        - Annotation | Associated term
-      description: List associated terms to a user annotation done by a user
-      parameters:
-        - name: idannotation
-          in: path
-          description: The annotation id
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: iduser
-          in: path
-          description: "(Optional) Only get term from this user id (may be a job)"
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - $ref: "#/components/parameters/pagination-max"
-        - $ref: "#/components/parameters/pagination-offset"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AnnotationTermCollection"
-          description: ""
-        "400":
-          $ref: "#/components/responses/bad-request"
-        "401":
-          $ref: "#/components/responses/unauthorized"
-        "403":
-          $ref: "#/components/responses/forbidden"
-        "404":
-          $ref: "#/components/responses/not-found"
-
   /api/userkey/{publicKey}/keys.json:
     get:
       tags:
@@ -8959,31 +8420,6 @@ paths:
                   serverID:
                     type: string
                     example: "default"
-                  serverURL:
-                    type: string
-                    example: "http://127.0.0.1"
-                  version:
-                    type: string
-                    example: "5.2.0"
-
-  /status.json:
-    get:
-      summary: Check server health status
-      description: Returns basic server health information.
-      tags:
-        - Health Check
-      operationId: status
-      responses:
-        "200":
-          description: Server is healthy
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  alive:
-                    type: boolean
-                    example: true
                   serverURL:
                     type: string
                     example: "http://127.0.0.1"
@@ -9692,10 +9128,6 @@ components:
           type: integer
           description: The underlying file for the slice
           format: int64
-        imageServerUrl:
-          type: string
-          description: URL of the server with tiles
-          readOnly: true
         path:
           type: string
           description: The internal path of the file
@@ -9703,10 +9135,6 @@ components:
         image:
           type: integer
           description: The abstract image encapsulating this slice
-          format: int64
-        mime:
-          type: integer
-          description: The Cytomine internal slice mime type.
           format: int64
         channel:
           type: integer
@@ -9739,7 +9167,6 @@ components:
       required:
         - uploadedFile
         - image
-        - mime
         - channel
         - zStack
         - time
@@ -9951,10 +9378,6 @@ components:
           type: integer
           description: File status
           format: int32
-          readOnly: true
-        statusText:
-          type: string
-          description: Textual file status
           readOnly: true
       required:
         - uploadedFile
@@ -10318,36 +9741,6 @@ components:
       required:
         - image
         - imageGroup
-    ImageServer:
-      description: An image server (IMS) instance
-      type: object
-      properties:
-        class:
-          $ref: "#/components/schemas/attribute-class"
-        id:
-          $ref: "#/components/schemas/attribute-id"
-        created:
-          $ref: "#/components/schemas/attribute-created"
-        updated:
-          $ref: "#/components/schemas/attribute-updated"
-        deleted:
-          $ref: "#/components/schemas/attribute-deleted"
-        name:
-          type: string
-          description: A user friendly name for the image server
-        url:
-          type: string
-          description: The URL of the image server instance
-        basePath:
-          type: string
-          description: The base path used by the image server
-        available:
-          type: boolean
-          description: Whether the server is available or not
-      required:
-        - url
-        - basePath
-        - available
     LastConnection:
       description: A Connection is recorded all long the user is connected.
       type: object
@@ -11359,18 +10752,9 @@ components:
           description: The underlying file for the slice
           format: int64
           readOnly: true
-        imageServerUrl:
-          type: string
-          description: URL of the server with tiles
-          readOnly: true
         path:
           type: string
           description: The internal path of the file
-          readOnly: true
-        mime:
-          type: integer
-          description: The Cytomine internal slice mime type.
-          format: int64
           readOnly: true
         channel:
           type: integer
@@ -11567,8 +10951,6 @@ components:
       description: A file uploaded on the server
       type: object
       properties:
-        class:
-          $ref: "#/components/schemas/attribute-class"
         id:
           $ref: "#/components/schemas/attribute-id"
         created:
@@ -11581,18 +10963,17 @@ components:
           type: integer
           description: The uploader
           format: int64
+          nullable: true
         parent:
           type: integer
           description: The parent uploaded file in the hierarchy
           format: int64
-        imageServer:
-          type: integer
-          description: The image server managing the file
-          format: int64
+          nullable: true
         storage:
           type: integer
           description: The virtual storage where the file is uploaded
           format: int64
+          nullable: true
         originalFilename:
           type: string
           description: The original filename, including extension
@@ -11617,30 +10998,133 @@ components:
           type: integer
           description: File status
           format: int32
-        statusText:
-          type: string
-          description: Textual file status
-          readOnly: true
         projects:
-          type: integer
-          description:
-            List of projects (id) that will have the image, if it can be
-            deployed
-          format: int64
-        lTree:
+          type: array
+          description: List of project ids the image will be linked to once deployed
+          items:
+            type: integer
+            format: int64
+        thumbnailUrl:
           type: string
-          description: Hierarchical tree of uploaded files
-          writeOnly: true
+          description: The URL of the thumbnail, absent if the file has not yet been deployed.
+          nullable: true
+          readOnly: true
+      required:
+        - contentType
+        - ext
+        - filename
+        - originalFilename
+        - projects
+        - status
+    UploadedFileCollection:
+      description: A paginated list of uploaded files
+      type: object
+      properties:
+        collection:
+          type: array
+          items:
+            $ref: "#/components/schemas/UploadedFile"
+        size:
+          type: integer
+          description: Total number of uploaded files
+        offset:
+          type: integer
+          description: Pagination offset
+    CreateUploadedFile:
+      description: Payload to create an uploaded file record
+      type: object
+      properties:
+        user:
+          type: integer
+          format: int64
+          description: The uploader
+        storage:
+          type: integer
+          format: int64
+          description: The virtual storage where the file is uploaded
+        parent:
+          type: integer
+          format: int64
+          description: The parent uploaded file in the hierarchy
+          nullable: true
+        filename:
+          type: string
+          description: The internal filename path
+        originalFilename:
+          type: string
+          description: The original filename, including extension
+        ext:
+          type: string
+          description: Extension name
+        contentType:
+          type: string
+          description: File content type
+        size:
+          type: integer
+          format: int64
+          description: File size
+        status:
+          type: integer
+          format: int32
+          description: File status
+        projects:
+          type: array
+          description: List of project ids to link the image to once deployed
+          items:
+            type: integer
+            format: int64
       required:
         - user
-        - parent
-        - imageServer
         - storage
-        - originalFilename
         - filename
-        - ext
-        - contentType
-        - projects
+        - originalFilename
+        - status
+    UpdateUploadedFile:
+      description: Payload to update an uploaded file record (all fields optional)
+      type: object
+      properties:
+        filename:
+          type: string
+          description: The internal filename path
+        originalFilename:
+          type: string
+          description: The original filename, including extension
+        ext:
+          type: string
+          description: Extension name
+        contentType:
+          type: string
+          description: File content type
+        size:
+          type: integer
+          format: int64
+          description: File size
+        status:
+          type: integer
+          format: int32
+          description: File status
+        projects:
+          type: array
+          description: List of project ids to link the image to once deployed
+          items:
+            type: integer
+            format: int64
+    HttpCommandResponse:
+      description: Response wrapper returned by write operations on uploaded files
+      type: object
+      properties:
+        printMessage:
+          type: boolean
+          description: Whether the client should display a confirmation message
+        data:
+          $ref: "#/components/schemas/UploadedFile"
+        commandId:
+          type: string
+          format: uuid
+          description: The id of the command that was executed
+        command:
+          type: string
+          description: The fully qualified name of the command class
     user:
       description: A cytomine human user
       type: object
@@ -12076,15 +11560,6 @@ components:
               items:
                 $ref: "#/components/schemas/ImageInstance"
         - $ref: "#/components/schemas/collection"
-    ImageServerCollection:
-      allOf:
-        - type: object
-          properties:
-            collection:
-              type: array
-              items:
-                $ref: "#/components/schemas/ImageServer"
-        - $ref: "#/components/schemas/collection"
     OntologyCollection:
       allOf:
         - type: object
@@ -12094,6 +11569,16 @@ components:
               items:
                 $ref: "#/components/schemas/Ontology"
         - $ref: "#/components/schemas/collection"
+    OntologyExport:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the ontology
+        terms:
+          type: array
+          items:
+            $ref: "#/components/schemas/TermSummary"
     ProjectCollection:
       allOf:
         - type: object
@@ -12211,6 +11696,16 @@ components:
               items:
                 $ref: "#/components/schemas/Term"
         - $ref: "#/components/schemas/collection"
+    TermSummary:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the term
+        color:
+          type: string
+          description: Color of the term in hex format
+          example: "#2C3A59"
     TrackCollection:
       allOf:
         - type: object

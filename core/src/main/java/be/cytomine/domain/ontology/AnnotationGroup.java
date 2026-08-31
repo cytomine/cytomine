@@ -10,6 +10,7 @@ import lombok.Setter;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -33,7 +34,12 @@ public class AnnotationGroup extends CytomineDomain {
         annotationGroup.updated = json.getJSONAttrDate("updated");
 
         annotationGroup.project = (Project) json.getJSONAttrDomain(entityManager, "project", new Project(), true);
-        annotationGroup.imageGroup = (ImageGroup) json.getJSONAttrDomain(entityManager, "imageGroup", new ImageGroup(), true);
+        annotationGroup.imageGroup = (ImageGroup) json.getJSONAttrDomain(
+            entityManager,
+            "imageGroup",
+            new ImageGroup(),
+            true
+        );
         annotationGroup.type = json.getJSONAttrStr("type", "SAME_OBJECT");
 
         return annotationGroup;
@@ -51,7 +57,7 @@ public class AnnotationGroup extends CytomineDomain {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

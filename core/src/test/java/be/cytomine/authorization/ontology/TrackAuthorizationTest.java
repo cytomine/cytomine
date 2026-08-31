@@ -1,28 +1,7 @@
 package be.cytomine.authorization.ontology;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+import java.util.Optional;
 
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.authorization.CRUDAuthorizationTest;
-import be.cytomine.domain.ontology.Track;
-import be.cytomine.service.PermissionService;
-import be.cytomine.service.ontology.TrackService;
-import be.cytomine.service.security.SecurityACLService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,72 +12,67 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.domain.ontology.Track;
+import be.cytomine.service.UrlApi;
+import be.cytomine.service.ontology.TrackService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional
 public class TrackAuthorizationTest extends CRUDAuthorizationTest {
 
-
-    private Track track = null;
-
     @Autowired
     TrackService trackService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
-    SecurityACLService securityACLService;
-
-    @Autowired
-    PermissionService permissionService;
+    private UrlApi urlApi;
+    private Track track = null;
 
     @BeforeEach
     public void before() throws Exception {
         if (track == null) {
-            track = builder.given_a_track();
-            ;
+            track = builder.givenATrack();
             initACL(track.container());
         }
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_tracks() {
-        expectOK (() -> { trackService.list(track.getProject()); });
+    public void adminCanListTracks() {
+        expectOK(() -> trackService.list(track.getProject()));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_cannot_list_tracks(){
-        expectOK(() -> {
-            trackService.list(track.getProject());
-        });
+    public void userCannotListTracks() {
+        expectOK(() -> trackService.list(track.getProject()));
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         trackService.get(track.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
-        Track track = builder.given_a_not_persisted_track();
+    protected void whenIAddDomain() {
+        Track track = builder.givenANotPersistedTrack();
         track.setProject(this.track.getProject());
         track.setImage(this.track.getImage());
-        trackService.add(track.toJsonObject());
+        trackService.add(track.toJsonObject(urlApi));
     }
 
     @Override
-    public void when_i_edit_domain() {
-        trackService.update(track, track.toJsonObject());
+    public void whenIEditDomain() {
+        trackService.update(track, track.toJsonObject(urlApi));
     }
 
     @Override
-    protected void when_i_delete_domain() {
-        Track trackToDelete = builder.given_a_track();
+    protected void whenIDeleteDomain() {
+        Track trackToDelete = builder.givenATrack();
         trackToDelete.setImage(this.track.getImage());
         trackToDelete.setProject(this.track.getProject());
         builder.persistAndReturn(trackToDelete);
@@ -119,7 +93,6 @@ public class TrackAuthorizationTest extends CRUDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(BasePermission.READ);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

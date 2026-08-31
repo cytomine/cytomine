@@ -33,9 +33,11 @@
 </template>
 
 <script>
-import {Cytomine} from '@/api';
+import eventBus from '@/utils/event-bus';
 
-import {getWildcardRegexp} from '@/utils/string-utils';
+import { Cytomine } from '@/api';
+
+import { getWildcardRegexp } from '@/utils/string-utils';
 
 export default {
   name: 'MetadataPanel',
@@ -67,11 +69,11 @@ export default {
     async fetchMetadata() {
       this.metadata = (await Cytomine.instance.api.get(
         `imageinstance/${this.image.id}/metadata.json`
-      )).data.collection.map(md => ({fullKey: `${md.namespace}.${md.key}`, ...md}));
+      )).data.collection.map(md => ({ fullKey: `${md.namespace}.${md.key}`, ...md }));
       this.metadata.sort((a, b) => a.fullKey.localeCompare(b.fullKey));
     },
     closeMetadata() {
-      this.$eventBus.$emit('close-metadata');
+      eventBus.emit('close-metadata');
     }
   },
   async created() {

@@ -7,10 +7,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.DeleteCommand;
@@ -18,7 +19,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.group.ImageGroupImageInstanceRepository;
 import be.cytomine.service.CurrentUserService;
@@ -34,27 +34,24 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class ImageGroupImageInstanceService extends ModelService {
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private ImageGroupService imageGroupService;
+    private final ImageGroupService imageGroupService;
 
-    @Autowired
-    private ImageInstanceService imageInstanceService;
+    private final ImageInstanceService imageInstanceService;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
 
-    @Autowired
-    private ImageGroupImageInstanceRepository imageGroupImageInstanceRepository;
+    private final ImageGroupImageInstanceRepository imageGroupImageInstanceRepository;
+
+    private final UrlApi urlApi;
 
     @Override
     public Class currentDomain() {
@@ -69,9 +66,9 @@ public class ImageGroupImageInstanceService extends ModelService {
     @Override
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
         return List.of(
-                domain.getId(),
-                ((ImageGroupImageInstance) domain).getGroup().getName(),
-                ((ImageGroupImageInstance) domain).getImage().getBlindInstanceFilename()
+            domain.getId(),
+            ((ImageGroupImageInstance) domain).getGroup().getName(),
+            ((ImageGroupImageInstance) domain).getImage().getBlindInstanceFilename()
         );
     }
 
@@ -115,20 +112,20 @@ public class ImageGroupImageInstanceService extends ModelService {
         }
 
         transactionService.start();
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.checkIsNotReadOnly(group.getProject());
 
-        return executeCommand(new AddCommand(currentUser), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new DeleteCommand(currentUser, transaction), domain, null);
+        return executeCommand(new DeleteCommand(currentUser.id(), transaction), domain, null);
     }
 
     public List<ImageInstance> getImages(Long groupId, Long imageId) {
@@ -140,21 +137,21 @@ public class ImageGroupImageInstanceService extends ModelService {
         }
 
         return imageGroupImageInstanceRepository.findAllByGroup(group)
-                .stream()
-                .map((ImageGroupImageInstance::getImage))
-                .sorted(Comparator.comparing(ImageInstance::getBlindInstanceFilename))
-                .toList();
+            .stream()
+            .map((ImageGroupImageInstance::getImage))
+            .sorted(Comparator.comparing(ImageInstance::getBlindInstanceFilename))
+            .toList();
     }
 
     public List<Object> buildImageInstances(ImageGroup group) {
         List<Object> images = new ArrayList<>();
         for (ImageGroupImageInstance igii : list(group)) {
             images.add(Map.of(
-                    "id", igii.getImage().getId(),
-                    "instanceFilename", igii.getImage().getBlindInstanceFilename(),
-                    "thumb", UrlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
-                    "width", igii.getImage().getBaseImage().getWidth(),
-                    "height", igii.getImage().getBaseImage().getHeight()
+                "id", igii.getImage().getId(),
+                "instanceFilename", igii.getImage().getBlindInstanceFilename(),
+                "thumb", urlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
+                "width", igii.getImage().getBaseImage().getWidth(),
+                "height", igii.getImage().getBaseImage().getHeight()
             ));
         }
 

@@ -16,6 +16,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.AnnotationGroupService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -27,17 +28,17 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Autowired
+    private UrlApi urlApi;
+    @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private AnnotationGroupService annotationGroupService;
-
     private AnnotationGroup annotationGroup = null;
 
     @BeforeEach
     public void before() throws Exception {
         if (annotationGroup == null) {
-            annotationGroup = builder.given_an_annotation_group();
+            annotationGroup = builder.givenAnAnnotationGroup();
             initACL(annotationGroup.container());
         }
         annotationGroup.getProject().setMode(EditingMode.CLASSIC);
@@ -45,24 +46,24 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_get_domain() {
+    protected void whenIGetDomain() {
         annotationGroupService.get(annotationGroup.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
-        annotationGroupService.add(builder.given_a_not_persisted_annotation_group(
-                annotationGroup.getProject(), annotationGroup.getImageGroup()).toJsonObject()
+    protected void whenIAddDomain() {
+        annotationGroupService.add(builder.givenANotPersistedAnnotationGroup(
+            annotationGroup.getProject(), annotationGroup.getImageGroup()).toJsonObject(urlApi)
         );
     }
 
     @Override
-    protected void when_i_edit_domain() {
-        annotationGroupService.update(annotationGroup, annotationGroup.toJsonObject());
+    protected void whenIEditDomain() {
+        annotationGroupService.update(annotationGroup, annotationGroup.toJsonObject(urlApi));
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         annotationGroupService.delete(annotationGroup, null, null, true);
     }
 
@@ -98,59 +99,59 @@ public class AnnotationGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_annotation_group_by_project() {
+    public void adminCanListAnnotationGroupByProject() {
         assertThat(annotationGroupService.list(annotationGroup.getProject())).contains(annotationGroup);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_annotation_group_by_project() {
+    public void userCanListAnnotationGroupByProject() {
         assertThat(annotationGroupService.list(annotationGroup.getProject())).contains(annotationGroup);
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_annotation_group_by_image_group() {
+    public void adminCanListAnnotationGroupByImageGroup() {
         assertThat(annotationGroupService.list(annotationGroup.getImageGroup())).contains(annotationGroup);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_annotation_group_by_image_group() {
+    public void userCanListAnnotationGroupByImageGroup() {
         assertThat(annotationGroupService.list(annotationGroup.getImageGroup())).contains(annotationGroup);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode(){
+    public void userAdminCanAddInReadonlyMode() {
         annotationGroup.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_add_domain());
+        expectOK(this::whenIAddDomain);
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_update_annotation_group_in_restricted_project() {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+    public void adminCanUpdateAnnotationGroupInRestrictedProject() {
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         annotationGroup.getProject().setMode(EditingMode.RESTRICTED);
-        expectOK (() -> { when_i_get_domain(); });
-        expectOK (() -> { when_i_add_domain(); });
-        expectOK (() -> { when_i_delete_domain(); });
+        expectOK(this::whenIGetDomain);
+        expectOK(this::whenIAddDomain);
+        expectOK(this::whenIDeleteDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_update_annotation_group_in_classic_project() {
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group();
+    public void userCanUpdateAnnotationGroupInClassicProject() {
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
         annotationGroup.getProject().setMode(EditingMode.CLASSIC);
-        expectOK (() -> { when_i_get_domain(); });
-        expectOK (() -> { when_i_add_domain(); });
-        expectOK (() -> { when_i_delete_domain(); });
+        expectOK(this::whenIGetDomain);
+        expectOK(this::whenIAddDomain);
+        expectOK(this::whenIDeleteDomain);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_delete_in_readonly_mode(){
+    public void userAdminCanDeleteInReadonlyMode() {
         annotationGroup.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_delete_domain());
+        expectOK(this::whenIDeleteDomain);
     }
 }

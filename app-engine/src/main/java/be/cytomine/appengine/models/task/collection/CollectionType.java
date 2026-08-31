@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import be.cytomine.appengine.exceptions.TypeValidationException;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageDataEntry;
 import be.cytomine.appengine.handlers.StorageDataType;
+import be.cytomine.appengine.handlers.StorageHandler;
 import be.cytomine.appengine.models.task.Parameter;
 import be.cytomine.appengine.models.task.ParameterType;
 import be.cytomine.appengine.models.task.Run;
@@ -50,11 +52,8 @@ import be.cytomine.appengine.models.task.Type;
 import be.cytomine.appengine.models.task.TypePersistence;
 import be.cytomine.appengine.models.task.ValueType;
 import be.cytomine.appengine.models.task.bool.BooleanPersistence;
-import be.cytomine.appengine.models.task.bool.BooleanType;
 import be.cytomine.appengine.models.task.datetime.DateTimePersistence;
-import be.cytomine.appengine.models.task.datetime.DateTimeType;
 import be.cytomine.appengine.models.task.enumeration.EnumerationPersistence;
-import be.cytomine.appengine.models.task.enumeration.EnumerationType;
 import be.cytomine.appengine.models.task.file.FilePersistence;
 import be.cytomine.appengine.models.task.file.FileType;
 import be.cytomine.appengine.models.task.geometry.GeometryPersistence;
@@ -62,11 +61,8 @@ import be.cytomine.appengine.models.task.geometry.GeometryType;
 import be.cytomine.appengine.models.task.image.ImagePersistence;
 import be.cytomine.appengine.models.task.image.ImageType;
 import be.cytomine.appengine.models.task.integer.IntegerPersistence;
-import be.cytomine.appengine.models.task.integer.IntegerType;
 import be.cytomine.appengine.models.task.number.NumberPersistence;
-import be.cytomine.appengine.models.task.number.NumberType;
 import be.cytomine.appengine.models.task.string.StringPersistence;
-import be.cytomine.appengine.models.task.string.StringType;
 import be.cytomine.appengine.repositories.bool.BooleanPersistenceRepository;
 import be.cytomine.appengine.repositories.collection.CollectionPersistenceRepository;
 import be.cytomine.appengine.repositories.collection.ReferencePersistenceRepository;
@@ -87,10 +83,10 @@ import be.cytomine.appengine.utils.FileHelper;
 @NoArgsConstructor
 public class CollectionType extends Type {
 
-    @Column(nullable = true)
+    @Column
     private Integer minSize;
 
-    @Column(nullable = true)
+    @Column
     private Integer maxSize;
 
     @OneToOne(cascade = CascadeType.ALL, optional = false)
@@ -117,30 +113,30 @@ public class CollectionType extends Type {
     public void validateFeatureCollection(String json, GeometryType geometryType)
         throws TypeValidationException {
         ObjectMapper objectMapper = new ObjectMapper();
-    
+
         JsonNode rootNode = null;
         try {
             rootNode = objectMapper.readTree(json);
         } catch (JsonProcessingException e) {
             throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_FEATURE_COLLECTION);
         }
-    
+
         // Validate "type"
         if (!rootNode.has("type") || !rootNode.get("type").asText().equals("FeatureCollection")) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_GEOJSON);
         }
-    
+
         // Validate "features" array
         if (!rootNode.has("features") || !rootNode.get("features").isArray()) {
             throw new TypeValidationException(ErrorCode.INTERNAL_PARAMETER_INVALID_GEOJSON);
         }
-    
+
         // validate against constraints
         int size = rootNode.get("features").size();
         if (size < minSize || size > maxSize) {
             throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
         }
-    
+
         // Validate each feature
         for (JsonNode feature : rootNode.get("features")) {
             if (!feature.has("type") || !feature.get("type").asText().equals("Feature")) {
@@ -210,11 +206,7 @@ public class CollectionType extends Type {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void validateFiles(
-        Run run,
-        Parameter currentOutput,
-        StorageData currentOutputStorageData)
+    public void validateFiles(Run run, Parameter currentOutput, StorageData currentOutputStorageData)
         throws TypeValidationException {
         // make sure we have the right file structure
         Type currentType = new CollectionType(this);
@@ -232,63 +224,47 @@ public class CollectionType extends Type {
         Map<String, Object> lists = new LinkedHashMap<>();
         for (StorageDataEntry entry : currentOutputStorageData.getEntryList()) {
             String entryName = entry.getName();
-            if (entryName.endsWith("/")) { // when it is a directory
-                boolean relatedToOutputParameter = entryName.startsWith(currentOutput.getName() + "/");
-                boolean isOutputParameterMainDirectory = entryName.equals(currentOutput.getName() + "/");
-                if (relatedToOutputParameter && isOutputParameterMainDirectory) {
-                    List<Object> nestedItems = new ArrayList<>();
-                    lists.put(entryName, nestedItems);
-                }
+            if (entry.getStorageDataType() == StorageDataType.DIRECTORY) {
+                List<Object> nestedItems = new ArrayList<>();
+                lists.put(entryName, nestedItems);
             } else { // when it is a file
+                String parentListName = entryName.substring(0, entryName.lastIndexOf('/'));
+
                 if (entryName.endsWith("array.yml")) {
-                    String parentListName = entryName.substring(0, entryName.lastIndexOf('/') + 1);
                     Map<String, Object> item = new LinkedHashMap<>();
                     String arrayDotYmlContent = FileHelper.read(entry.getData(), getStorageCharset());
                     item.put("array.yml", arrayDotYmlContent);
                     ((List<Object>) lists.get(parentListName)).add(item);
                     continue;
                 }
-                String parentListName = entryName.substring(0, entryName.lastIndexOf('/') + 1);
+
                 Map<String, Object> item = new LinkedHashMap<>(); // anyway we need to add it to this item
                 String indexString = entryName.substring(entryName.lastIndexOf('/') + 1); // just the name of one dicom file
-                int index;
+
                 try {
-                    index = Integer.parseInt(indexString);
+                    item.put("index", Integer.parseInt(indexString));
                 } catch (NumberFormatException e) {
                     item.put(indexString, entry.getData());
                     continue;
                 }
-                item.put("index", index);
-                String value = null;
-                switch (leafType) {
-                    case "IntegerType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Integer.parseInt(value));
-                        break;
-                    case "StringType",
-                         "GeometryType",
-                         "EnumerationType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", value);
-                        break;
-                    case "NumberType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Double.parseDouble(value));
-                        break;
-                    case "BooleanType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Boolean.parseBoolean(value));
-                        break;
-                    case "DateTimeType":
-                        value = FileHelper.read(entry.getData(), getStorageCharset());
-                        item.put("value", Instant.parse(value));
-                        break;
-                    case "FileType", "ImageType":
-                        item.put("value", entry.getData()); // this is how I should read it assuming it is a directory-based image wsidicom
-                        break;
-                    default:
-                        throw new TypeValidationException("unknown leaf type: " + leafType);
+
+                Set<String> rawTypes = Set.of(FileType.class.getSimpleName(), ImageType.class.getSimpleName());
+                Object value;
+                if (rawTypes.contains(leafType)) {
+                    value = entry.getData();
+                } else {
+                    String raw = FileHelper.read(entry.getData(), getStorageCharset());
+                    value = switch (leafType) {
+                        case "IntegerType"  -> Integer.parseInt(raw);
+                        case "StringType", "GeometryType", "EnumerationType" -> raw;
+                        case "NumberType"   -> Double.parseDouble(raw);
+                        case "BooleanType"  -> Boolean.parseBoolean(raw);
+                        case "DateTimeType" -> Instant.parse(raw);
+                        default -> throw new TypeValidationException("unknown leaf type: " + leafType);
+                    };
                 }
+                item.put("value", value);
+
                 ((List<Object>) lists.get(parentListName)).add(item);
             }
         }
@@ -305,15 +281,15 @@ public class CollectionType extends Type {
             if (arrayYmlFound == 0) {
                 throw new TypeValidationException(ErrorCode.INTERNAL_MISSING_METADATA);
             }
+            collection.removeIf(item -> ((Map<?, ?>) item).containsKey("array.yml"));
         }
 
-        validate(lists.get(currentOutput.getName() + "/"));
-
+        validate(lists.get(currentOutput.getName()));
     }
 
     @Override
     public void validate(Object valueObject) throws TypeValidationException {
-        if (Objects.isNull(valueObject)) {
+        if (valueObject == null) {
             return;
         }
 
@@ -343,14 +319,18 @@ public class CollectionType extends Type {
             File.class
         );
         if (validTypes.contains(valueObject.getClass())) {
-
             ObjectMapper objectMapper = new ObjectMapper();
             // validate a GeoJSON collection like FeatureCollection or GeometryCollection
             if (valueObject instanceof String stringValueObject) {
                 try {
                     JsonNode rootNode = objectMapper.readTree(stringValueObject);
                     if (rootNode.has("type")) {
-                        validateGeoJsonCollection(stringValueObject);
+                        String geoType = rootNode.get("type").asText();
+                        if (geoType.equals("FeatureCollection") || geoType.equals("GeometryCollection")) {
+                            validateGeoJsonCollection(stringValueObject);
+                        } else {
+                            validatePrimitiveCollectionItem(stringValueObject);
+                        }
                     } else {
                         validatePrimitiveCollectionItem(stringValueObject);
                     }
@@ -362,11 +342,9 @@ public class CollectionType extends Type {
                 validatePrimitiveCollectionItem(valueObject);
             }
         }
-
     }
 
-    private void validatePrimitiveCollectionItem(Object valueObject)
-        throws TypeValidationException {
+    private void validatePrimitiveCollectionItem(Object valueObject) throws TypeValidationException {
         Type currentType = new CollectionType(this);
         while (currentType instanceof CollectionType collectionType) {
             currentType = collectionType.getSubType();
@@ -376,8 +354,7 @@ public class CollectionType extends Type {
         }
     }
 
-    private void validateGeoJsonCollection(String valueObject)
-        throws TypeValidationException {
+    private void validateGeoJsonCollection(String valueObject) throws TypeValidationException {
         GeometryType geometryType = new GeometryType();
         try {
             validateFeatureCollection(valueObject, geometryType);
@@ -390,67 +367,51 @@ public class CollectionType extends Type {
         validateNode(value);
     }
 
-    @SuppressWarnings("unchecked")
-    public void validateNode(Object obj)
-        throws TypeValidationException {
-        if (Objects.isNull(trackingType)) {
+    public void validateNode(Object obj) throws TypeValidationException {
+        if (trackingType == null) {
             trackingType = new CollectionType(this);
             parentType = trackingType;
-        } else {
-            if (trackingType instanceof CollectionType) {
-                parentType = trackingType;
-                trackingType = ((CollectionType) trackingType).getSubType();
-            }
+        } else if (trackingType instanceof CollectionType) {
+            parentType = trackingType;
+            trackingType = ((CollectionType) trackingType).getSubType();
         }
-        if (trackingType instanceof CollectionType && !(obj instanceof List<?>)) {
-            throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
-        }
-        if (obj instanceof List<?>) {
-            List<?> list = (List<?>) obj;
-            assert trackingType instanceof CollectionType;
-            CollectionType currentType = (CollectionType) trackingType;
-            if (Objects.nonNull(currentType.getMinSize()) && Objects.nonNull(currentType.getMaxSize())) {
-                if (list.size() < currentType.getMinSize() || list.size() > currentType.getMaxSize()) {
-                    throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
-                }
+
+        if (obj instanceof List<?> elements && trackingType instanceof CollectionType currentType) {
+            Integer minSize = currentType.getMinSize();
+            Integer maxSize = currentType.getMaxSize();
+
+            if (minSize != null && maxSize != null && (elements.size() < minSize || elements.size() > maxSize)) {
+                throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
             }
-            for (Object o : list) {
+
+            for (Object o : elements) {
                 validateNode(o);
             }
-        } else {
-            Map<String, Object> map = null;
-            if (obj instanceof LinkedHashMap) {
-                map = (LinkedHashMap<String, Object>) obj;
-            }
-            assert map != null;
-            if (!(trackingType instanceof CollectionType) && map.get("value") instanceof List<?>) {
+        } else if (obj instanceof Map<?, ?> map) {
+            Object value = map.get("value");
+
+            if (!(trackingType instanceof CollectionType) && value instanceof List<?>) {
                 throw new TypeValidationException(ErrorCode.INTERNAL_WRONG_PROVISION_STRUCTURE);
             }
-            if (map.get("value") instanceof List<?>) {
-                if (trackingType instanceof CollectionType) {
-                    parentType = trackingType;
-                    trackingType = ((CollectionType) trackingType).getSubType();
-                }
-                List<?> list = (List<?>) map.get("value");
+
+            if (value instanceof List<?> elements) {
                 CollectionType currentType = (CollectionType) trackingType;
-                if (list.size() < currentType.getMinSize() || list.size() > currentType.getMaxSize()) {
+                if (elements.size() < currentType.getMinSize() || elements.size() > currentType.getMaxSize()) {
                     throw new TypeValidationException(ErrorCode.INTERNAL_INVALID_COLLECTION_DIMENSIONS);
                 }
-                for (Object o : list) {
+                for (Object o : elements) {
                     validateNode(o);
                 }
                 trackingType = parentType;
             }
 
-            // validate subtype
-            if (map.get("value") != null) {
-                trackingType.validate(map.get("value"));
-                referenced = map.get("value") instanceof String
+            if (value != null) {
+                trackingType.validate(value);
+                referenced = value instanceof String
                         && (trackingType instanceof FileType
                         || trackingType instanceof ImageType);
                 trackingType = parentType;
             }
-
         }
     }
 
@@ -476,9 +437,13 @@ public class CollectionType extends Type {
         for (int i = 0; i < indexes.length; i++) {
             if (currentType instanceof CollectionType) {
                 if (i == 0) { // first item which is the parameter
-                    persistedProvision =
-                        collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                            indexes[i], runId, ParameterType.INPUT);
+                    persistedProvision = collectionRepo
+                        .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                            indexes[i],
+                            runId,
+                            ParameterType.INPUT
+                        )
+                        .orElse(null);
                     if (Objects.isNull(persistedProvision)) {
                         persistedProvision = new CollectionPersistence();
                         persistedProvision.setRunId(runId);
@@ -486,12 +451,10 @@ public class CollectionType extends Type {
                         persistedProvision.setParameterName(indexes[i]);
                         persistedProvision.setValueType(ValueType.ARRAY);
                         persistedProvision.setProvisioned(true);
-                        persistedProvision.setItems(new ArrayList<>());
                         persistedProvision = collectionRepo.save(persistedProvision);
                     }
                     parentType = (CollectionType) currentType;
                     currentType = ((CollectionType) currentType).getSubType();
-                    continue;
                 } else {
                     if (i == indexes.length - 1) { // this is the last item, yet it is still a collection (nested)
                         while (currentType instanceof CollectionType) {
@@ -752,7 +715,7 @@ public class CollectionType extends Type {
 
         CollectionPersistenceRepository collectionRepo =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
 
         CollectionPersistence collectionPersistence = (CollectionPersistence) persistNode(provision,
             runId, parameterName, leafType);
@@ -764,9 +727,13 @@ public class CollectionType extends Type {
         CollectionPersistenceRepository collectionRepo =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
         if (node.isArray()) {
-            CollectionPersistence persistedProvision =
-                collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                parameterName, runId, ParameterType.INPUT);
+            CollectionPersistence persistedProvision = collectionRepo
+                .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                    parameterName,
+                    runId,
+                    ParameterType.INPUT
+                )
+                .orElse(null);
             if (persistedProvision == null) {
                 persistedProvision = new CollectionPersistence();
                 persistedProvision.setValueType(ValueType.ARRAY);
@@ -809,8 +776,8 @@ public class CollectionType extends Type {
 
         if (node.isObject()) {
             String paramName = "";
-            if (Objects.nonNull(node.get("param_name"))) {
-                paramName = node.get("param_name").asText();
+            if (Objects.nonNull(node.get("parameterName"))) {
+                paramName = node.get("parameterName").asText();
             } else {
                 String transformedIndex = transform(node.get("index").asText());
                 if (parameterName.equalsIgnoreCase(transformedIndex)) {
@@ -823,9 +790,12 @@ public class CollectionType extends Type {
             if (node.has("type")
                 && (node.get("type").asText().equals("GeometryCollection")
                 || node.get("type").asText().equals("FeatureCollection"))) {
-                CollectionPersistence persistedProvision =
-                    collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                    parameterName, runId, ParameterType.INPUT);
+                CollectionPersistence persistedProvision = collectionRepo
+                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                        parameterName,
+                        runId,
+                        ParameterType.INPUT
+                    ).orElse(null);
                 if (persistedProvision == null) {
                     persistedProvision = new CollectionPersistence();
                     persistedProvision.setValueType(ValueType.ARRAY);
@@ -1044,77 +1014,133 @@ public class CollectionType extends Type {
         return datetimePersistence;
     }
 
+    private TypePersistence createPersistence(String leafType, String value) throws ProvisioningException {
+        return switch (leafType) {
+            case "IntegerType" -> {
+                IntegerPersistence p = new IntegerPersistence();
+                p.setValue(Integer.parseInt(value));
+                p.setValueType(ValueType.INTEGER);
+                yield p;
+            }
+
+            case "StringType" -> {
+                StringPersistence p = new StringPersistence();
+                p.setValue(value);
+                p.setValueType(ValueType.STRING);
+                yield p;
+            }
+
+            case "EnumerationType" -> {
+                EnumerationPersistence p = new EnumerationPersistence();
+                p.setValue(value);
+                p.setValueType(ValueType.ENUMERATION);
+                yield p;
+            }
+
+            case "GeometryType" -> {
+                GeometryPersistence p = new GeometryPersistence();
+                p.setValue(value);
+                p.setValueType(ValueType.GEOMETRY);
+                yield p;
+            }
+
+            case "NumberType" -> {
+                NumberPersistence p = new NumberPersistence();
+                p.setValue(Double.parseDouble(value));
+                p.setValueType(ValueType.NUMBER);
+                yield p;
+            }
+
+            case "BooleanType" -> {
+                BooleanPersistence p = new BooleanPersistence();
+                p.setValue(Boolean.parseBoolean(value));
+                p.setValueType(ValueType.BOOLEAN);
+                yield p;
+            }
+
+            case "FileType" -> {
+                FilePersistence p = new FilePersistence();
+                p.setValue(null);
+                p.setValueType(ValueType.FILE);
+                yield p;
+            }
+
+            case "ImageType" -> {
+                ImagePersistence p = new ImagePersistence();
+                p.setValue(null);
+                p.setValueType(ValueType.IMAGE);
+                yield p;
+            }
+
+            case "DateTimeType" -> {
+                DateTimePersistence p = new DateTimePersistence();
+                p.setValue(Instant.parse(value));
+                p.setValueType(ValueType.DATETIME);
+                yield p;
+            }
+
+            default ->  throw new ProvisioningException("unknown leaf type: " + leafType);
+        };
+    }
+
     @Transactional
     @Override
-    public void persistResult(Run run, Parameter currentOutput, StorageData outputValue)
-        throws ProvisioningException {
+    public void persistResult(Run run, Parameter currentOutput, StorageData outputValue) throws ProvisioningException {
         CollectionPersistenceRepository collectionPersistenceRepository =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
-        CollectionPersistence result = null;
 
-        Type currentType = new CollectionType(this);
-        while (currentType instanceof CollectionType) {
-            currentType = ((CollectionType) currentType).getSubType();
+        Type currentType = getSubType();
+        while (currentType instanceof CollectionType ct) {
+            currentType = ct.getSubType();
         }
 
         String leafType = currentType.getClass().getSimpleName();
         Map<String, TypePersistence> parameterNameToTypePersistence = new LinkedHashMap<>();
         outputValue.sortShallowToDeep();
-        for (StorageDataEntry entry : outputValue.getEntryList()) {
-            if (entry.getStorageDataType().equals(StorageDataType.DIRECTORY)) { // our code contains some directory logic
-                if (entry.getName().equals(currentOutput.getName() + "/")) { // the main collection directory
-                    result = new CollectionPersistence();
-                    result.setValueType(ValueType.ARRAY);
-                    result.setParameterType(ParameterType.OUTPUT);
-                    result.setParameterName(currentOutput.getName());
-                    result.setRunId(run.getId());
-                    List<TypePersistence> items = new ArrayList<>();
-                    result.setItems(items);
-                    parameterNameToTypePersistence.put(entry.getName(), result);
-                } else { // any directory below main is a subCollection
 
-                    String[] nameParts = entry.getName().trim().split("/");
-                    for (int i = 0; i < nameParts.length; i++) {
-                        if (i != 0) {
-                            nameParts[i] = "[" + nameParts[i] + "]";
-                        }
+        CollectionPersistence root = new CollectionPersistence();
+        root.setValueType(ValueType.ARRAY);
+        root.setParameterType(ParameterType.OUTPUT);
+        root.setParameterName(currentOutput.getName());
+        root.setRunId(run.getId());
+        parameterNameToTypePersistence.put(currentOutput.getName(), root);
+
+        List<StorageDataEntry> entries = outputValue.getEntryList();
+        for (StorageDataEntry entry : entries.subList(1, entries.size())) {
+            String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
+
+            if (entry.getStorageDataType() == StorageDataType.DIRECTORY) {
+                String[] nameParts = entry.getName().trim().split("/");
+                for (int i = 0; i < nameParts.length; i++) {
+                    if (i != 0) {
+                        nameParts[i] = "[" + nameParts[i] + "]";
                     }
-                    // it is a subCollection if contains array.yml
-                    boolean containsArrayYml = outputValue.getEntryList().stream().anyMatch(
-                        storage -> storage.getName()
-                            .equalsIgnoreCase(entry.getName() + "array.yml"));
+                }
+                // it is a subCollection if contains array.yml
+                boolean containsArrayYml = outputValue.getEntryList().stream().anyMatch(
+                    storage -> storage.getName()
+                        .equalsIgnoreCase(entry.getName() + "/array.yml"));
 
-                    if (containsArrayYml) {
-                        CollectionPersistence subCollection = new CollectionPersistence();
-                        subCollection.setParameterName(String.join("", nameParts));
-                        subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
-                        // prepare list for sub items
-                        List<TypePersistence> items = new ArrayList<>();
-                        subCollection.setItems(items);
-                        parameterNameToTypePersistence.put(entry.getName(), subCollection);
-                        // add this collection to parent collection
-                        CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
-                        parentPersistence.getItems().add(subCollection);
-                    } else {
+                CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
+                if (containsArrayYml) {
+                    CollectionPersistence subCollection = new CollectionPersistence();
+                    subCollection.setValueType(ValueType.ARRAY);
+                    subCollection.setParameterName(entry.getName());
+                    subCollection.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
+                        Collectors.joining()));
 
-                        String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
-                        DirectoryPersistence directory = new DirectoryPersistence();
-                        directory.setParameterName(String.join("", nameParts));
-                        List<TypePersistence> items = new ArrayList<>();
-                        directory.setItems(items);
-                        parameterNameToTypePersistence.put(entry.getName(), directory);
-                        // add this directory to the parent collection
-                        CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
-                        parentPersistence.getItems().add(directory);
+                    parameterNameToTypePersistence.put(entry.getName(), subCollection);
+                    parentPersistence.getItems().add(subCollection);
+                } else {
+                    DirectoryPersistence directory = new DirectoryPersistence();
+                    directory.setParameterName(entry.getName());
+                    parameterNameToTypePersistence.put(entry.getName(), directory);
 
-                    }
-
+                    parentPersistence.getItems().add(directory);
                 }
             }
+
             if (entry.getStorageDataType().equals(StorageDataType.FILE)) {
-                String parentName = entry.getName().substring(0, entry.getName().lastIndexOf("/") + 1);
                 if (entry.getName().endsWith("array.yml")) {
                     CollectionPersistence parentPersistence = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
                     parentPersistence.setSize(getCollectionSize(entry));
@@ -1127,12 +1153,10 @@ public class CollectionType extends Type {
                         nameParts[i] = "[" + nameParts[i] + "]";
                     }
                 }
-                CollectionPersistence parentCollection = (CollectionPersistence) parameterNameToTypePersistence.get(parentName); // can't get the parent collection because the parent is not a collection
+                CollectionPersistence parentCollection = (CollectionPersistence) parameterNameToTypePersistence.get(parentName);
 
                 String entryValue = null;
-                if (!(leafType.equals("FileType")
-                    || leafType.equals("ImageType"))) {
-
+                if (!(leafType.equals("FileType") || leafType.equals("ImageType"))) {
                     entryValue = FileHelper.read(entry.getData(), getStorageCharset());
                 }
 
@@ -1165,176 +1189,65 @@ public class CollectionType extends Type {
                     continue;
                 }
 
-                switch (leafType) {
-                    case "IntegerType":
-                        IntegerPersistence integerPersistence = new IntegerPersistence();
-                        integerPersistence.setParameterType(ParameterType.OUTPUT);
-                        integerPersistence.setRunId(run.getId());
-                        integerPersistence.setParameterName(String.join("", nameParts));
-                        integerPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        integerPersistence.setValue(Integer.parseInt(entryValue));
-                        integerPersistence.setValueType(ValueType.INTEGER);
+                TypePersistence persistence = createPersistence(leafType, entryValue);
+                persistence.setParameterType(ParameterType.OUTPUT);
+                persistence.setRunId(run.getId());
+                persistence.setParameterName(String.join("", nameParts));
+                persistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(Collectors.joining()));
 
-                        parentCollection.getItems().add(integerPersistence);
-                        break;
-                    case "StringType":
-                        StringPersistence stringPersistence = new StringPersistence();
-                        stringPersistence.setParameterType(ParameterType.OUTPUT);
-                        stringPersistence.setRunId(run.getId());
-                        stringPersistence.setParameterName(String.join("", nameParts));
-                        stringPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        stringPersistence.setValue(entryValue);
-                        stringPersistence.setValueType(ValueType.STRING);
-
-                        parentCollection.getItems().add(stringPersistence);
-                        break;
-                    case "EnumerationType":
-                        EnumerationPersistence enumerationPersistence = new EnumerationPersistence();
-                        enumerationPersistence.setParameterType(ParameterType.OUTPUT);
-                        enumerationPersistence.setRunId(run.getId());
-                        enumerationPersistence.setParameterName(String.join("", nameParts));
-                        enumerationPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        enumerationPersistence.setValue(entryValue);
-                        enumerationPersistence.setValueType(ValueType.ENUMERATION);
-
-                        parentCollection.getItems().add(enumerationPersistence);
-                        break;
-                    case "GeometryType":
-                        GeometryPersistence geoPersistence = new GeometryPersistence();
-                        geoPersistence.setParameterType(ParameterType.OUTPUT);
-                        geoPersistence.setRunId(run.getId());
-                        geoPersistence.setParameterName(String.join("", nameParts));
-                        geoPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        geoPersistence.setValue(entryValue);
-                        geoPersistence.setValueType(ValueType.GEOMETRY);
-
-                        parentCollection.getItems().add(geoPersistence);
-                        break;
-                    case "NumberType":
-                        NumberPersistence numberPersistence = new NumberPersistence();
-                        numberPersistence.setParameterType(ParameterType.OUTPUT);
-                        numberPersistence.setRunId(run.getId());
-                        numberPersistence.setParameterName(String.join("", nameParts));
-                        numberPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        numberPersistence.setValue(Double.parseDouble(entryValue));
-                        numberPersistence.setValueType(ValueType.NUMBER);
-
-                        parentCollection.getItems().add(numberPersistence);
-                        break;
-                    case "BooleanType":
-                        BooleanPersistence booleanPersistence = new BooleanPersistence();
-                        booleanPersistence.setParameterType(ParameterType.OUTPUT);
-                        booleanPersistence.setRunId(run.getId());
-                        booleanPersistence.setParameterName(String.join("", nameParts));
-                        booleanPersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        booleanPersistence.setValue(Boolean.parseBoolean(entryValue));
-                        booleanPersistence.setValueType(ValueType.BOOLEAN);
-
-                        parentCollection.getItems().add(booleanPersistence);
-                        break;
-                    case "FileType":
-                        FilePersistence filePersistence = new FilePersistence();
-                        filePersistence.setParameterType(ParameterType.OUTPUT);
-                        filePersistence.setRunId(run.getId());
-                        filePersistence.setParameterName(String.join("", nameParts));
-                        filePersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        filePersistence.setValue(null);
-                        filePersistence.setValueType(ValueType.FILE);
-
-                        parentCollection.getItems().add(filePersistence);
-                        break;
-                    case "ImageType":
-                        ImagePersistence imagePersistence = new ImagePersistence();
-                        imagePersistence.setParameterType(ParameterType.OUTPUT);
-                        imagePersistence.setRunId(run.getId());
-                        imagePersistence.setParameterName(String.join("", nameParts));
-                        imagePersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(
-                            Collectors.joining()));
-                        imagePersistence.setValue(null); // basically we don't store data in the database
-                        imagePersistence.setValueType(ValueType.IMAGE);
-
-                        if (Objects.nonNull(parentCollection)) { // a collection item file
-                            parentCollection.getItems().add(imagePersistence);
-                        } else {
-                            String parentDirectoryName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
-                            DirectoryPersistence parentDirectory = (DirectoryPersistence) parameterNameToTypePersistence.get(parentDirectoryName);
-                            parentDirectory.getItems().add(imagePersistence);
-                        }
-                        break;
-                    case "DateTimeType":
-                        DateTimePersistence datetimePersistence = new DateTimePersistence();
-                        datetimePersistence.setParameterType(ParameterType.OUTPUT);
-                        datetimePersistence.setRunId(run.getId());
-                        datetimePersistence.setParameterName(String.join("", nameParts));
-                        datetimePersistence.setCollectionIndex(Arrays.stream(nameParts, 1, nameParts.length).collect(Collectors.joining()));
-                        datetimePersistence.setValue(Instant.parse(entryValue));
-                        datetimePersistence.setValueType(ValueType.DATETIME);
-
-                        parentCollection.getItems().add(datetimePersistence);
-                        break;
-                    default:
-                        throw new ProvisioningException("unknown leaf type: " + leafType);
+                if (leafType.equals("ImageType") && parentCollection == null) {
+                    String parentDirectoryName = entry.getName().substring(0, entry.getName().lastIndexOf("/"));
+                    DirectoryPersistence parentDirectory = (DirectoryPersistence) parameterNameToTypePersistence.get(parentDirectoryName);
+                    parentDirectory.getItems().add(persistence);
+                } else {
+                    parentCollection.getItems().add(persistence);
                 }
-
             }
         }
 
-        assert result != null;
-        collectionPersistenceRepository.save(result);
+        if (root.getSize() == null || root.getSize() == 0) {
+            root.setSize(root.getItems().size());
+        }
+        collectionPersistenceRepository.save(root);
     }
 
     @Override
     public StorageData mapToStorageFileData(JsonNode provision, Run run) throws FileStorageException {
-        String name = null;
-        // if provision is an item
-        if (provision.has("index")) {
-            name = provision.get("index").asText();
-        } else {
-            name = provision.get("param_name").asText();
-        }
-
         if (referenced) {
             return new StorageData(true);
         }
 
-        // if provision is full collection
-        return mapNode("/" + name, provision.get("value"),
-            new StorageData(), run);
+        String name;
+        if (provision.has("index")) {
+            name = provision.get("index").asText();
+        } else {
+            name = provision.get("parameterName").asText();
+        }
+
+        return mapNode("/" + name, provision.get("value"), new StorageData(), run);
     }
 
     private StorageData mapNode(
         String path,
         JsonNode value,
         StorageData container,
-        Run run)
-        throws FileStorageException {
-
-        Type currentType = new CollectionType(this);
-        while (currentType instanceof CollectionType) {
-            currentType = ((CollectionType) currentType).getSubType();
-        }
-        String leafType = currentType.getClass().getSimpleName();
+        Run run
+    ) throws FileStorageException {
         if (value.isNull()) {
             throw new FileStorageException(ErrorCode.INTERNAL_NULL_PROVISION);
         }
+
         if (value.isArray()) {
             container.add(new StorageDataEntry(path, StorageDataType.DIRECTORY));
-            int size = value.size();
-            String arrayDotYmpData = "size: " + size;
+            String arrayDotYmpData = "size: " + value.size();
             container.add(new StorageDataEntry(FileHelper.write("array.yml", arrayDotYmpData.getBytes(StandardCharsets.UTF_8)),
-                path + "/" + "array.yml",
+                path.substring(1) + "/array.yml",
                 StorageDataType.FILE));
             for (JsonNode item : value) {
                 container = mapNode(path + "/" + item.get("index").asText(), item.get("value"), container, run);
             }
         }
+
         if (value.isObject() || value.isValueNode()) {
             if (value.has("type")
                 && (value.get("type").asText().equals("GeometryCollection")
@@ -1342,10 +1255,14 @@ public class CollectionType extends Type {
                 path += ".geojson";
             }
 
-            StorageDataEntry itemFileEntry = null;
-            if (leafType.equalsIgnoreCase("FileType")
-                || leafType.equalsIgnoreCase("ImageType")) {
+            Type currentType = new CollectionType(this);
+            while (currentType instanceof CollectionType collectionType) {
+                currentType = collectionType.getSubType();
+            }
+            String leafType = currentType.getClass().getSimpleName();
 
+            StorageDataEntry itemFileEntry;
+            if (leafType.equalsIgnoreCase("FileType") || leafType.equalsIgnoreCase("ImageType")) {
                 itemFileEntry = new StorageDataEntry(new File(value.asText()), path, StorageDataType.FILE);
             } else {
                 itemFileEntry = new StorageDataEntry(
@@ -1355,23 +1272,49 @@ public class CollectionType extends Type {
                 );
             }
 
-            // add the yml file to the storage data object
             String ymlPath = "";
             if (path.contains("/")) {
                 ymlPath = path.substring(1, path.lastIndexOf("/"));
             }
+            String arrayYmlName = ymlPath + "/array.yml";
 
-            container.getEntryList().removeIf(tempYml -> tempYml.getName().endsWith("array.yml"));
-            int minusParameterDirectory = container.getEntryList().size() - 1;
+            container.getEntryList().removeIf(entry -> entry.getName().equals(arrayYmlName));
+            String dirPrefix = "/" + ymlPath + "/";
+            long filesAlreadyInContainer = container.getEntryList().stream()
+                .filter(e -> e.getStorageDataType() == StorageDataType.FILE)
+                .filter(e -> e.getName().startsWith(dirPrefix)
+                    && !e.getName().substring(dirPrefix.length()).contains("/"))
+                .count();
             container.add(itemFileEntry);
-            String arrayDotYmpData = "size: " + (minusParameterDirectory + 1);
+
+            int persistedSize = readPersistedArraySize(run, arrayYmlName);
+            String arraySize = "size: " + (persistedSize + filesAlreadyInContainer + 1);
             container.add(new StorageDataEntry(
-                FileHelper.write("array.yml", arrayDotYmpData.getBytes(StandardCharsets.UTF_8)),
-                ymlPath + "/array.yml",
+                FileHelper.write("array.yml", arraySize.getBytes(StandardCharsets.UTF_8)),
+                arrayYmlName,
                 StorageDataType.FILE
             ));
         }
         return container;
+    }
+
+    private int readPersistedArraySize(Run run, String arrayYmlName) {
+        if (run == null || run.getId() == null) {
+            return 0;
+        }
+
+        StorageDataEntry query = new StorageDataEntry(arrayYmlName, StorageDataType.FILE);
+        query.setStorageId("task-run-inputs-" + run.getId());
+
+        try {
+            StorageDataEntry arrayYml = AppEngineApplicationContext.getBean(StorageHandler.class)
+                .readStorageData(new StorageData(query))
+                .peek();
+            String content = FileHelper.read(arrayYml.getData(), StandardCharsets.UTF_8);
+            return Integer.parseInt(content.replace("size:", "").trim());
+        } catch (FileStorageException e) {
+            return 0;
+        }
     }
 
     @Override
@@ -1385,8 +1328,8 @@ public class CollectionType extends Type {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode provisionedParameter = mapper.createObjectNode();
         // if json has param_name then it's a collection
-        if (provision.has("param_name")) {
-            provisionedParameter.put("param_name", provision.get("param_name").asText());
+        if (provision.has("parameterName")) {
+            provisionedParameter.put("parameterName", provision.get("parameterName").asText());
         } else {
             provisionedParameter.put("index", provision.get("index").asText());
         }
@@ -1401,7 +1344,7 @@ public class CollectionType extends Type {
             provisionedParameter.set("value", provision.get("value"));
         }
 
-        provisionedParameter.put("task_run_id", String.valueOf(run.getId()));
+        provisionedParameter.put("taskRunId", String.valueOf(run.getId()));
         return provisionedParameter;
     }
 
@@ -1551,73 +1494,49 @@ public class CollectionType extends Type {
     }
 
     private TaskRunParameterValue buildNode(TypePersistence typePersistence) throws ProvisioningException {
-        Type currentType = new CollectionType(this);
-        while (currentType instanceof CollectionType) {
-            currentType = ((CollectionType) currentType).getSubType();
+        if (!(typePersistence instanceof CollectionPersistence collectionPersistence)) {
+            return getCollectionItemValue(typePersistence);
         }
-        String leafType = currentType.getClass().getSimpleName();
 
-        if (typePersistence instanceof CollectionPersistence collectionPersistence) {
-            // either items or compact value but not both
-            if (Objects.nonNull(collectionPersistence.getItems())
-                && !collectionPersistence.getItems().isEmpty()
-                && Objects.isNull(collectionPersistence.getCompactValue())) {
+        // either items or compact value but not both
+        boolean hasItems = !collectionPersistence.getItems().isEmpty();
+        boolean isCompactValueMissing = collectionPersistence.getCompactValue() == null;
+        if (hasItems && isCompactValueMissing) {
+            CollectionValue collectionValue = new CollectionValue();
+            collectionValue.setType(ValueType.ARRAY);
+            collectionValue.setParameterName(collectionPersistence.getParameterName());
+            collectionValue.setTaskRunId(collectionPersistence.getRunId());
 
-                CollectionValue collectionValue = new CollectionValue();
-                collectionValue.setType(ValueType.ARRAY);
-                collectionValue.setParameterName(collectionPersistence.getParameterName());
-                collectionValue.setTaskRunId(collectionPersistence.getRunId());
-                collectionValue.setSubType(getCollectionSubType());
+            List<TaskRunParameterValue> items = new ArrayList<>();
+            collectionValue.setValue(items);
+            collectionPersistence.getItems().stream()
+                    .sorted(Comparator.comparingInt(p -> {
+                        String index = p.getCollectionIndex();
+                        int last = index.lastIndexOf('[');
+                        return Integer.parseInt(index.substring(last + 1, index.length() - 1));
+                    }))
+                    .forEach(persistence -> {
+                        try {
+                            items.add(buildNode(persistence));
+                        } catch (ProvisioningException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+            collectionValue.setSubType(items.getFirst().getType());
 
-                List<TaskRunParameterValue> items = new ArrayList<>();
-                collectionValue.setValue(items);
-                for (TypePersistence persistence : collectionPersistence.getItems()) {
-                    items.add(buildNode(persistence));
-                }
-                return collectionValue;
-            } else {
-                GeoCollectionValue geoCollectionValue = new GeoCollectionValue();
-                geoCollectionValue.setType(ValueType.ARRAY);
-                geoCollectionValue.setParameterName(collectionPersistence.getParameterName());
-                geoCollectionValue.setTaskRunId(collectionPersistence.getRunId());
-                geoCollectionValue.setValue(collectionPersistence.getCompactValue());
-
-                return geoCollectionValue;
-            }
-        } else {
-            return getCollectionItemValue(typePersistence, leafType);
+            return collectionValue;
         }
+
+        GeoCollectionValue geoCollectionValue = new GeoCollectionValue();
+        geoCollectionValue.setType(ValueType.ARRAY);
+        geoCollectionValue.setParameterName(collectionPersistence.getParameterName());
+        geoCollectionValue.setTaskRunId(collectionPersistence.getRunId());
+        geoCollectionValue.setValue(collectionPersistence.getCompactValue());
+
+        return geoCollectionValue;
     }
 
-    private ValueType getCollectionSubType() throws ProvisioningException {
-        if (subType instanceof CollectionType) {
-            return ValueType.ARRAY;
-        } else if (subType instanceof ImageType) {
-            return ValueType.IMAGE;
-        } else if (subType instanceof FileType) {
-            return ValueType.FILE;
-        } else if (subType instanceof GeometryType) {
-            return ValueType.GEOMETRY;
-        } else if (subType instanceof NumberType) {
-            return ValueType.NUMBER;
-        } else if (subType instanceof StringType) {
-            return ValueType.STRING;
-        } else if (subType instanceof BooleanType) {
-            return ValueType.BOOLEAN;
-        } else if (subType instanceof IntegerType) {
-            return ValueType.INTEGER;
-        } else if (subType instanceof EnumerationType) {
-            return ValueType.ENUMERATION;
-        } else if (subType instanceof DateTimeType) {
-            return ValueType.DATETIME;
-        } else {
-            throw new ProvisioningException(ErrorCode.INTERNAL_UNKNOWN_SUBTYPE);
-        }
-    }
-
-    private static CollectionItemValue getCollectionItemValue(
-        TypePersistence typePersistence,
-        String leafType)
+    private CollectionItemValue getCollectionItemValue(TypePersistence typePersistence)
         throws ProvisioningException {
 
         CollectionItemValue collectionItemValue = new CollectionItemValue();
@@ -1625,26 +1544,26 @@ public class CollectionType extends Type {
             typePersistence.getParameterName().lastIndexOf("[") + 1).replace("]", "");
         collectionItemValue.setIndex(Integer.parseInt(fileName));
 
-        if (typePersistence instanceof IntegerPersistence) {
-            collectionItemValue.setValue(((IntegerPersistence) typePersistence).getValue());
+        if (typePersistence instanceof IntegerPersistence ip) {
+            collectionItemValue.setValue(ip.getValue());
             collectionItemValue.setType(ValueType.INTEGER);
-        } else if (typePersistence instanceof StringPersistence) {
-            collectionItemValue.setValue(((StringPersistence) typePersistence).getValue());
+        } else if (typePersistence instanceof StringPersistence sp) {
+            collectionItemValue.setValue(sp.getValue());
             collectionItemValue.setType(ValueType.STRING);
-        } else if (typePersistence instanceof GeometryPersistence) {
-            collectionItemValue.setValue(((GeometryPersistence) typePersistence).getValue());
+        } else if (typePersistence instanceof GeometryPersistence gp) {
+            collectionItemValue.setValue(gp.getValue());
             collectionItemValue.setType(ValueType.GEOMETRY);
-        } else if (typePersistence instanceof NumberPersistence) {
-            collectionItemValue.setValue(((NumberPersistence) typePersistence).getValue());
+        } else if (typePersistence instanceof NumberPersistence np) {
+            collectionItemValue.setValue(np.getValue());
             collectionItemValue.setType(ValueType.NUMBER);
-        } else if (typePersistence instanceof BooleanPersistence) {
-            collectionItemValue.setValue(((BooleanPersistence) typePersistence).isValue());
+        } else if (typePersistence instanceof BooleanPersistence bp) {
+            collectionItemValue.setValue(bp.isValue());
             collectionItemValue.setType(ValueType.BOOLEAN);
-        } else if (typePersistence instanceof EnumerationPersistence) {
-            collectionItemValue.setValue(((EnumerationPersistence) typePersistence).getValue());
+        } else if (typePersistence instanceof EnumerationPersistence ep) {
+            collectionItemValue.setValue(ep.getValue());
             collectionItemValue.setType(ValueType.ENUMERATION);
-        } else if (typePersistence instanceof DateTimePersistence) {
-            collectionItemValue.setValue(((DateTimePersistence) typePersistence).getValue());
+        } else if (typePersistence instanceof DateTimePersistence dp) {
+            collectionItemValue.setValue(dp.getValue());
             collectionItemValue.setType(ValueType.DATETIME);
         } else if (typePersistence instanceof ImagePersistence) {
             collectionItemValue.setType(ValueType.IMAGE);

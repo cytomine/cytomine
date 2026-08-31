@@ -1,13 +1,13 @@
-import {createLocalVue, mount} from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import GeometryField from '@/components/appengine/forms/fields/GeometryField';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        get: jest.fn(),
+        get: vi.fn(),
       },
     },
   },
@@ -47,7 +47,7 @@ describe('GeometryField.vue', () => {
     expect(wrapper.find('button').text()).toBe('select');
     expect(wrapper.find('.annotation-container').exists()).toBe(false);
 
-    const tooltips = wrapper.findAllComponents({name: 'BTooltip'});
+    const tooltips = wrapper.findAllComponents({ name: 'BTooltip' });
     expect(tooltips.length).toBe(1);
     expect(tooltips.at(0).exists()).toBe(true);
     expect(tooltips.at(0).props('label')).toBe(mockParameter.description);
@@ -58,7 +58,7 @@ describe('GeometryField.vue', () => {
   });
 
   it('The id should be rendered when selected', async  () => {
-    await wrapper.setProps({value: 42});
+    await wrapper.setProps({ value: 42 });
 
     expect(wrapper.vm.value).toBe(42);
     expect(wrapper.find('.annotation-container').exists()).toBe(true);
@@ -66,7 +66,7 @@ describe('GeometryField.vue', () => {
   });
 
   it('should emit an event when the value is changed', async () => {
-    await wrapper.setData({input: 42});
+    await wrapper.setData({ input: 42 });
 
     expect(wrapper.emitted().input).toBeTruthy();
     expect(wrapper.emitted().input.at(0)).toEqual([42]);

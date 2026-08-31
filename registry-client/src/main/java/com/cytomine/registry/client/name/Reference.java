@@ -1,6 +1,5 @@
 package com.cytomine.registry.client.name;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,8 +54,7 @@ public class Reference {
         return t;
     }
 
-    public static Reference prepareReference(String image) // only image without endpoint part
-    {
+    public static Reference prepareReference(String image) {
         Reference t = new Reference();
         t.endpoint = Configurer.url();
         if (image.contains(Constants.AT)) {

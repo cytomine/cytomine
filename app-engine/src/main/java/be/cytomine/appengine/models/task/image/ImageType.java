@@ -21,7 +21,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.beans.factory.annotation.Value;
 
 import be.cytomine.appengine.dto.inputs.task.types.image.ImageTypeConstraint;
 import be.cytomine.appengine.dto.inputs.task.types.image.ImageValue;
@@ -64,9 +63,10 @@ public class ImageType extends Type {
     @Transient
     private FileFormat format;
 
-    @Transient
-    @Value("${storage.base-path}")
-    private static String storageBasePath;
+    private String getStorageBasePath() {
+        return AppEngineApplicationContext.getBean(org.springframework.core.env.Environment.class)
+            .getProperty("storage.base-path");
+    }
 
     public void setConstraint(ImageTypeConstraint constraint, JsonNode value) {
         switch (constraint) {
@@ -262,7 +262,7 @@ public class ImageType extends Type {
         File outputFile = currentOutputStorageData.peek().getData();
         // if this is a directory-based image like wsi dicom
         if (currentOutputStorageData.peek().getStorageDataType().equals(StorageDataType.DIRECTORY)) {
-            outputFile = new File(storageBasePath
+            outputFile = new File(getStorageBasePath()
                 + "/"
                 + currentOutputStorageData.peek().getStorageId()
                 + "/"
@@ -310,7 +310,7 @@ public class ImageType extends Type {
 
     @Override
     public void persistProvision(JsonNode provision, UUID runId) {
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
         ImagePersistenceRepository imagePersistenceRepository = AppEngineApplicationContext.getBean(ImagePersistenceRepository.class);
         ImagePersistence persistedProvision = imagePersistenceRepository.findImagePersistenceByParameterNameAndRunIdAndParameterType(parameterName, runId, ParameterType.INPUT);
         if (persistedProvision != null) {
@@ -344,7 +344,7 @@ public class ImageType extends Type {
 
     @Override
     public StorageData mapToStorageFileData(JsonNode provision, Run run) {
-        String parameterName = provision.get("param_name").asText();
+        String parameterName = provision.get("parameterName").asText();
         File data = new File(provision.get("value").asText());
         StorageDataEntry entry = new StorageDataEntry(data, parameterName, StorageDataType.FILE);
         return new StorageData(entry);
@@ -354,8 +354,8 @@ public class ImageType extends Type {
     public JsonNode createInputProvisioningEndpointResponse(JsonNode provision, Run run) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode provisionedParameter = mapper.createObjectNode();
-        provisionedParameter.put("param_name", provision.get("param_name").asText());
-        provisionedParameter.put("task_run_id", String.valueOf(run.getId()));
+        provisionedParameter.put("parameterName", provision.get("parameterName").asText());
+        provisionedParameter.put("taskRunId", String.valueOf(run.getId()));
         return provisionedParameter;
     }
 

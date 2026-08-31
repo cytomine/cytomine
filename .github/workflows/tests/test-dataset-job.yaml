@@ -1,0 +1,87 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: test-dataset-loader
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 20000
+        runAsGroup: 20000
+        fsGroup: 20000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: wait-for-image
+          image: registry.cytomine.org/docker/library/alpine:3.18
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for wsi..."
+              until [ -f /tmp/images/wsi/1.2.826.0.1.3680043.8.498.68297860750526126870974958290035028993.dcm ]; do sleep 2; done
+              echo "wsi found!"
+          volumeMounts:
+            - mountPath: /tmp/images
+              name: image-staging
+      containers:
+        - name: loader
+          image: registry.cytomine.org/docker/library/alpine:3.18
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /data/dataset/aa-test-project/test-project/IMAGES
+              mkdir -p /data/dataset/aa-test-project/test-project/METADATA
+              cp /tmp/metadata/dataset.xml /data/dataset/aa-test-project/test-project/METADATA/dataset.xml
+              cp /tmp/metadata/image.xml /data/dataset/aa-test-project/test-project/METADATA/image.xml
+              cp /tmp/metadata/observation.xml /data/dataset/aa-test-project/test-project/METADATA/observation.xml
+              cp /tmp/metadata/observer.xml /data/dataset/aa-test-project/test-project/METADATA/observer.xml
+              cp /tmp/metadata/sample.xml /data/dataset/aa-test-project/test-project/METADATA/sample.xml
+              cp /tmp/metadata/staining.xml /data/dataset/aa-test-project/test-project/METADATA/staining.xml
+              cp /tmp/metadata/policy.xml /data/dataset/aa-test-project/test-project/METADATA/policy.xml
+              cp -r /tmp/images/wsi /data/dataset/aa-test-project/test-project/IMAGES/wsi
+          volumeMounts:
+            - mountPath: /data/dataset
+              name: dataset-pvc
+            - mountPath: /tmp/metadata
+              name: dataset-metadata
+            - mountPath: /tmp/images
+              name: image-staging
+      volumes:
+        - name: dataset-pvc
+          persistentVolumeClaim:
+            claimName: test-dataset-pvc
+        - name: dataset-metadata
+          projected:
+            sources:
+              - configMap:
+                  name: test-dataset-metadata
+              - configMap:
+                  name: test-dataset-metadata-image
+              - configMap:
+                  name: test-dataset-metadata-observation
+              - configMap:
+                  name: test-dataset-metadata-observer
+              - configMap:
+                  name: test-dataset-metadata-policy
+              - configMap:
+                  name: test-dataset-metadata-sample
+              - configMap:
+                  name: test-dataset-metadata-staining
+        - name: image-staging
+          emptyDir: {}

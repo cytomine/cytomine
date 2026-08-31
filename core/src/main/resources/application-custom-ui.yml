@@ -14,6 +14,9 @@ application:
       explore: ["ROLE_USER","ROLE_ADMIN"]
 
     project:
+      project-apps-tab:
+        ADMIN_PROJECT: true
+        CONTRIBUTOR_PROJECT: true
       project-images-tab:
         ADMIN_PROJECT: true
         CONTRIBUTOR_PROJECT: true

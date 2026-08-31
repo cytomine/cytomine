@@ -1,19 +1,3 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-
-from typing import Tuple
-
 import numpy as np
 from rasterio.features import rasterize
 from shapely.affinity import affine_transform
@@ -75,7 +59,7 @@ def rasterize_mask(
     """
     def _to_shape(
         annot: ParsedAnnotation, is_grayscale: bool = True
-    ) -> Tuple[BaseGeometry, int]:
+    ) -> tuple[BaseGeometry, int]:
         geometry = affine_transform(annot.geometry, affine)
         if is_grayscale:
             value = annot.fill_color.as_rgb_tuple()[0]
@@ -101,7 +85,7 @@ def rasterize_mask(
 def rasterize_draw(
     annots: ParsedAnnotations, affine: np.ndarray, out_width: int, out_height: int,
     point_style: PointCross
-) -> Tuple[np.ndarray, int]:
+) -> tuple[np.ndarray, int]:
     """
     Rasterize annotations contours.
     """
@@ -112,7 +96,7 @@ def rasterize_draw(
 
     def _to_shape(
         annot: ParsedAnnotation, is_grayscale: bool = True
-    ) -> Tuple[BaseGeometry, int]:
+    ) -> tuple[BaseGeometry, int]:
         width = _contour_width(annot.stroke_width)
         geometry = stretch_contour(
             affine_transform(

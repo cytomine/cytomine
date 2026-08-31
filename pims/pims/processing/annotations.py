@@ -1,19 +1,5 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 from collections.abc import MutableSequence
 from math import floor
-from typing import Optional, Tuple
 
 import numpy as np
 from shapely.geometry import GeometryCollection, LineString, Point
@@ -31,8 +17,8 @@ class ParsedAnnotation:
     """
 
     def __init__(
-        self, geometry: BaseGeometry, fill_color: Optional[Color] = None,
-        stroke_color: Optional[Color] = None, stroke_width: int = None,
+        self, geometry: BaseGeometry, fill_color: Color | None = None,
+        stroke_color: Color | None = None, stroke_width: int | None = None,
         point_envelope_length: float = 1
     ):
         self.geometry = geometry
@@ -62,7 +48,7 @@ class ParsedAnnotation:
         return self.is_fill_grayscale and self.is_stroke_grayscale
 
     @property
-    def bounds(self) -> Tuple[float, float, float, float]:
+    def bounds(self) -> tuple[float, float, float, float]:
         """
         Returns a (minx, miny, maxx, maxy) tuple (float values)
         that bounds the object.
@@ -132,7 +118,7 @@ class ParsedAnnotations(MutableSequence):
         return all(annot.is_grayscale for annot in self._data)
 
     @property
-    def bounds(self) -> Tuple[float, float, float, float]:
+    def bounds(self) -> tuple[float, float, float, float]:
         """
         Returns a (minx, miny, maxx, maxy) tuple (float values)
         that bounds the whole collection.

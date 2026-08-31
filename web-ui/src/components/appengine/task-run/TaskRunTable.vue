@@ -15,7 +15,7 @@
       </b-table-column>
 
       <b-table-column :label="$t('app-engine.task.name')">
-        {{ formatTaskName(props.row) }}
+        {{ taskRunName(props.row) }}
       </b-table-column>
     </template>
 
@@ -42,8 +42,9 @@
 </template>
 
 <script>
-import TaskRunStateIcon from '@/components/appengine/task-run/TaskRunStateIcon';
-import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable';
+import TaskRunStateIcon from '@/components/appengine/task-run/TaskRunStateIcon.vue';
+import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable.vue';
+import { formatTaskName } from '@/utils/app';
 
 export default {
   name: 'TaskRunTable',
@@ -52,7 +53,7 @@ export default {
     TaskRunParametersTable
   },
   props: {
-    taskRuns: {type: Array, required: true},
+    taskRuns: { type: Array, required: true },
   },
   data() {
     return {
@@ -60,12 +61,6 @@ export default {
     };
   },
   methods: {
-    formattedTime(timestamp) {
-      return (new Date(timestamp)).toLocaleString();
-    },
-    formatTaskName(row) {
-      return `${row.task.name} (${row.task.version}) - ${this.formattedTime(row.created_at)}`;
-    },
     async onDetailsOpen(taskRun) {
       if (!taskRun.inputs) {
         await taskRun.fetchInputs();
@@ -75,6 +70,9 @@ export default {
         await taskRun.fetchOutputs();
       }
     },
+    taskRunName(taskRun) {
+      return formatTaskName(taskRun);
+    }
   },
 };
 </script>

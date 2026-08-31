@@ -1,7 +1,7 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import FileUploadItem from '@/components/appengine/FileUploadItem.vue';
-import {UploadStatus} from '@/utils/app';
+import { UploadStatus } from '@/utils/app';
 
 describe('FileUploadItem.vue', () => {
   const mockFile = new File(['PK\x03\x04'], 'test.zip', {

@@ -1,39 +1,22 @@
 import axios from 'axios';
 
-function prepareBasePath(basePath) {
-  if (!basePath.startsWith('/')) {
-    basePath = '/' + basePath;
-  }
-
-  if (!basePath.endsWith('/')) {
-    basePath = basePath + '/';
-  }
-
-  return basePath;
+function ensureTrailingSlash(url) {
+  return url.endsWith('/') ? url : url + '/';
 }
 
 export default class Cytomine {
 
   /**
-   * @param {string}   host             The Cytomine host
-   * @param {string} [basePath=/api/]   The base path to perform API requests
-   * @param {string} iamPath            The base path to perform IAM requests
-   * @param {function} authorizationHeaderInterceptor   The Axios request interceptor for authorization header
+   * @param {string} coreUrl Full URL for core API (e.g., http://core:8080/api/)
+   * @param {string} iamUrl Full URL for IAM (e.g., http://iam:8080/iam/realms/cytomine/)
+   * @param {function} [authorizationHeaderInterceptor] The Axios request interceptor for authorization header
    *
    * @returns {this} The singleton instance
    */
-  constructor(host, basePath = '/api/', iamPath = '/iam/realms/cytomine/', authorizationHeaderInterceptor = null) {
+  constructor(coreUrl, iamUrl, authorizationHeaderInterceptor = null) {
     if (!Cytomine._instance) {
-      if (!host.startsWith('http://') && !host.startsWith('https://')) {
-        host = 'http://' + host;
-      }
-      if (host.endsWith('/')) {
-        host = host.slice(0, -1);
-      }
-
-      this._host = host;
-      this._basePath = prepareBasePath(basePath);
-      this._iamPath = prepareBasePath(iamPath);
+      this._coreUrl = ensureTrailingSlash(coreUrl);
+      this._iamUrl = ensureTrailingSlash(iamUrl);
 
       const onRejectedResponseInterceptor = error => {
         error.message += ' - Response data: ' + JSON.stringify(error.response.data);
@@ -41,7 +24,7 @@ export default class Cytomine {
       };
 
       this.iam = axios.create({
-        baseURL: this._host + this._iamPath,
+        baseURL: this._iamUrl,
         withCredentials: true
       });
       if (authorizationHeaderInterceptor !== null) {
@@ -50,7 +33,7 @@ export default class Cytomine {
       this.iam.interceptors.response.use(response => response, onRejectedResponseInterceptor);
 
       this.api = axios.create({
-        baseURL: this._host + this._basePath,
+        baseURL: this._coreUrl,
         withCredentials: true
       });
       if (authorizationHeaderInterceptor !== null) {
@@ -76,17 +59,33 @@ export default class Cytomine {
   }
 
   /**
-   * @returns {string} The host
+   * @returns {string} The core URL
+   */
+  get coreUrl() {
+    return this._coreUrl;
+  }
+
+  /**
+   * @returns {string} The IAM URL
+   */
+  get iamUrl() {
+    return this._iamUrl;
+  }
+
+  /**
+   * @returns {string} The host (protocol + hostname + port)
    */
   get host() {
-    return this._host;
+    const url = new URL(this._coreUrl);
+    return url.origin;
   }
 
   /**
    * @returns {string} The base path
    */
   get basePath() {
-    return this._basePath;
+    const url = new URL(this._coreUrl);
+    return url.pathname;
   }
 
   /**
@@ -96,7 +95,7 @@ export default class Cytomine {
    * @returns {{alive, authenticated, version, serverURL, serverID, user}} The data returned by the server
    */
   async ping(project) {
-    let {data} = await this.api.post(`${this._host}/server/ping.json`, {project});
+    let { data } = await this.api.post('server/ping.json', { project });
 
     return data;
   }
@@ -106,7 +105,7 @@ export default class Cytomine {
    * @returns {boolean} True if the current user is now connected as admin
    */
   async openAdminSession() {
-    let {data} = await axios.get(`${this._host}/session/admin/open.json`, {withCredentials: true});
+    let { data } = await this.api.get('session/admin/open.json');
     return data.adminByNow;
   }
 
@@ -115,7 +114,7 @@ export default class Cytomine {
    * @returns {boolean} True if the current user is no longer connected as admin
    */
   async closeAdminSession() {
-    let {data} = await axios.get(`${this._host}/session/admin/close.json`, {withCredentials: true});
+    let { data } = await this.api.get('session/admin/close.json');
     return !data.adminByNow;
   }
 
@@ -131,7 +130,7 @@ export default class Cytomine {
       params.project = project;
     }
 
-    let {data} = await this.api.get('custom-ui/config.json', {params});
+    let { data } = await this.api.get('custom-ui/config.json', { params });
     return data;
   }
 
@@ -145,10 +144,10 @@ export default class Cytomine {
    * @param {string} [contentType] The request content type
    * @returns {string} The generated signature
    */
-  async fetchSignature({method, uri, queryString, date, contentMD5, contentType} = {}) {
-    let params = {method, forwardURI: uri, queryString, date, 'content-MD5': contentMD5, 'content-type': contentType};
+  async fetchSignature({ method, uri, queryString, date, contentMD5, contentType } = {}) {
+    let params = { method, forwardURI: uri, queryString, date, 'content-MD5': contentMD5, 'content-type': contentType };
 
-    let {data} = await this.api.get('signature.json', {params});
+    let { data } = await this.api.get('signature.json', { params });
     return data.signature;
   }
 
@@ -159,7 +158,7 @@ export default class Cytomine {
    *          The total count for each model
    */
   async fetchTotalCounts() {
-    let {data} = await this.api.get('stats/all.json');
+    let { data } = await this.api.get('stats/all.json');
     return data;
   }
 
@@ -169,7 +168,7 @@ export default class Cytomine {
    * @returns {{users, projects, mostActiveProject}} Stats related to current activity
    */
   async fetchCurrentStats() {
-    let {data} = await this.api.get('stats/currentStats.json');
+    let { data } = await this.api.get('stats/currentStats.json');
     return data;
   }
 
@@ -179,7 +178,7 @@ export default class Cytomine {
    * @returns {{total, available, used, usedP}} Stats related to the storage
    */
   async fetchStorageStats() {
-    let {data} = await this.api.get('stats/imageserver/total.json');
+    let { data } = await this.api.get('stats/imageserver/total.json');
     return data;
   }
 
@@ -191,7 +190,7 @@ export default class Cytomine {
    * @returns {Array<Object>} The collection of affected models
    */
   async undo(command = null) {
-    let {data} = await this.api.get(`command/${command ? command + '/' : ''}undo.json`);
+    let { data } = await this.api.get(`command/${command ? command + '/' : ''}undo.json`);
     return data.collection;
   }
 
@@ -203,7 +202,7 @@ export default class Cytomine {
    * @returns {Array<Object>} The collection of affected models
    */
   async redo(command = null) {
-    let {data} = await this.api.get(`command/${command ? command + '/' : ''}redo.json`);
+    let { data } = await this.api.get(`command/${command ? command + '/' : ''}redo.json`);
     return data.collection;
   }
 }

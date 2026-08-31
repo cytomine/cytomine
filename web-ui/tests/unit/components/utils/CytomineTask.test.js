@@ -1,12 +1,12 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 
 import CytomineTask from '@/components/utils/CytomineTask';
-import {Task} from '@/api';
+import { Task } from '@/api';
 
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Task: {
-    fetch: jest.fn()
+    fetch: vi.fn()
   }
 }));
 
@@ -16,7 +16,7 @@ describe('CytomineTask.vue', () => {
   let wrapper;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     Task.fetch.mockResolvedValue({
       id: 1,
@@ -38,7 +38,7 @@ describe('CytomineTask.vue', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should display the correct progress value', async () => {

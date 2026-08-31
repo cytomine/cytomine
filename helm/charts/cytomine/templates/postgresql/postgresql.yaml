@@ -74,12 +74,40 @@ spec:
             - name: postgres
               containerPort: {{ .Values.postgresql.port }}
               protocol: TCP
+          startupProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - {{ .Values.postgresql.user }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - {{ .Values.postgresql.user }}
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - {{ .Values.postgresql.user }}
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.postgresql.resources | nindent 12 }}
       initContainers:
         {{ if .Values.fixVolumesPermissions -}}
         - name: fix-previous-permissions
-          image: alpine:3.18
+          image: {{ .Values.images.alpine }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
             runAsUser: 0
@@ -98,7 +126,7 @@ spec:
             {{- toYaml .Values.postgresql.resources | nindent 12 }}
         {{ end }}
         - name: postgis-init
-          image: alpine:3.18
+          image: {{ .Values.images.alpine }}
           imagePullPolicy: {{ .Values.images.pullPolicy }}
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}

@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="box error" v-if="!configUI['project-annotations-tab']">
   <h2> {{ $t('access-denied') }} </h2>
@@ -302,9 +288,10 @@
     <div class="box">
       <h2 class="has-text-centered"> {{ $t('download-results') }} </h2>
       <div class="buttons is-centered">
-        <a class="button is-link" :href="downloadURL('pdf')">{{$t('download-PDF')}}</a>
-        <a class="button is-link" :href="downloadURL('csv')">{{$t('download-CSV')}}</a>
-        <a class="button is-link" :href="downloadURL('xls')">{{$t('download-excel')}}</a>
+        <button class="button is-link" type="button" @click="download('pdf')">{{$t('download-PDF')}}</button>
+        <button class="button is-link" type="button" @click="download('csv')">{{$t('download-CSV')}}</button>
+        <button class="button is-link" type="button" @click="download('xls')">{{$t('download-excel')}}</button>
+        <button class="button is-link" type="button" @click="exportAnnotations()">{{$t('export-annotations')}}</button>
       </div>
     </div>
   </div>
@@ -312,27 +299,28 @@
 </template>
 
 <script>
-import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
+import { get, sync, syncMultiselectFilter } from '@/utils/store-helpers';
 import constants from '@/utils/constants.js';
 
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import CytomineDatepicker from '@/components/form/CytomineDatepicker';
-import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
+import CytomineDatepicker from '@/components/form/CytomineDatepicker.vue';
+import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultiselect.vue';
 
-import ListAnnotationsBy from './ListAnnotationsBy';
+import ListAnnotationsBy from './ListAnnotationsBy.vue';
 
-import {ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection} from '@/api';
+import { Cytomine, ImageInstanceCollection, UserCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance, ImageGroupCollection } from '@/api';
 
-import {defaultColors} from '@/utils/style-utils.js';
-import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect';
+import { defaultColors } from '@/utils/style-utils.js';
+import TrackTreeMultiselect from '@/components/track/TrackTreeMultiselect.vue';
+import { getFilename, triggerBlobDownload } from '@/utils/download';
 
 import _ from 'lodash';
 
 // store options to use with store helpers to target projects/currentProject/listImages module
-const storeOptions = {rootModuleProp: 'storeModule'};
+const storeOptions = { rootModuleProp: 'storeModule' };
 // redefine helpers to use storeOptions and correct module path
 const localSyncMultiselectFilter = (filterName, options) => syncMultiselectFilter(null, filterName, options, storeOptions);
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import { appendShortTermToken } from '@/utils/token-utils.js';
 const categoryBatch = constants.CATEGORY_ITEMS_PER_BATCH;
 
 export default {
@@ -355,16 +343,16 @@ export default {
       tracks: [],
 
       allowedSizes: [
-        {label: this.$t('small'), size: 85},
-        {label: this.$t('medium'), size: 125},
-        {label: this.$t('large'), size: 200},
-        {label: this.$t('huge'), size: 400},
+        { label: this.$t('small'), size: 85 },
+        { label: this.$t('medium'), size: 125 },
+        { label: this.$t('large'), size: 200 },
+        { label: this.$t('huge'), size: 400 },
       ],
 
       groupBundling: [
-        {label: this.$t('yes-one-group-per-line'), bundling: 'ONE_PER_LINE'},
-        {label: this.$t('yes'), bundling: 'YES'},
-        {label: this.$t('no'), bundling: 'NO'}
+        { label: this.$t('yes-one-group-per-line'), bundling: 'ONE_PER_LINE' },
+        { label: this.$t('yes'), bundling: 'YES' },
+        { label: this.$t('no'), bundling: 'NO' }
       ],
 
       userAnnotationOption: this.$t('user-annotations'),
@@ -375,15 +363,15 @@ export default {
       imageGroups: [],
       tags:[],
 
-      noTermOption: {id: 0, name: this.$t('no-term')},
-      multipleTermsOption: {id: -1, name: this.$t('multiple-terms')},
+      noTermOption: { id: 0, name: this.$t('no-term') },
+      multipleTermsOption: { id: -1, name: this.$t('multiple-terms') },
 
-      noTrackOption: {id: 0, name: this.$t('no-track')},
-      multipleTracksOption: {id: -1, name: this.$t('multiple-tracks')},
+      noTrackOption: { id: 0, name: this.$t('no-track') },
+      multipleTracksOption: { id: -1, name: this.$t('multiple-tracks') },
 
-      noTagOption: {id: 0, name: this.$t('no-tag')},
+      noTagOption: { id: 0, name: this.$t('no-tag') },
 
-      uncategorizedOption: {id: 0, name: this.$t('uncategorized')},
+      uncategorizedOption: { id: 0, name: this.$t('uncategorized') },
 
       nLoadedOptionsPerCategory: {
         'TERM': constants.ANNOTATIONS_MAX_ITEMS_PER_CATEGORY,
@@ -397,18 +385,18 @@ export default {
   computed: {
     allowedCategorizations() {
       let categorizations = [
-        {label: this.$t('per-term'), categorization: 'TERM'},
-        {label: this.$t('per-track'), categorization: 'TRACK'},
-        {label: this.$t('per-user'), categorization: 'USER'},
-        {label: this.$t('per-image-group'), categorization: 'IMAGEGROUP'},
+        { label: this.$t('per-term'), categorization: 'TERM' },
+        { label: this.$t('per-track'), categorization: 'TRACK' },
+        { label: this.$t('per-user'), categorization: 'USER' },
+        { label: this.$t('per-image-group'), categorization: 'IMAGEGROUP' },
       ];
 
       if (!this.tooManyImages) {
-        categorizations.push({label: this.$t('per-image'), categorization: 'IMAGE'});
+        categorizations.push({ label: this.$t('per-image'), categorization: 'IMAGE' });
       }
 
       // Adding an uncategorized option at the end of the array
-      categorizations.push({label: this.$t('uncategorized'), categorization: 'UNCATEGORIZED'});
+      categorizations.push({ label: this.$t('uncategorized'), categorization: 'UNCATEGORIZED' });
 
       return categorizations;
     },
@@ -429,8 +417,8 @@ export default {
     },
 
     colors() {
-      let colors = defaultColors.map(color => ({label: this.$t(color.name), ...color}));
-      colors.push({label: this.$t('no-outline'), hexaCode: ''});
+      let colors = defaultColors.map(color => ({ label: this.$t(color.name), ...color }));
+      colors.push({ label: this.$t('no-outline'), hexaCode: '' });
       return colors;
     },
 
@@ -555,7 +543,6 @@ export default {
       return this.selectedImageGroups.map(group => group.id);
     },
 
-    // eslint-disable-next-line vue/return-in-computed-property
     /**
      * This computed property returns an array.
      * The array will be either empty or will be multiple objects of the same type.
@@ -696,13 +683,27 @@ export default {
       this.projectUsers = (await collection.fetchAll()).array;
     },
     async fetchTracks() {
-      this.tracks = (await TrackCollection.fetchAll({filterKey: 'project', filterValue: this.project.id})).array;
+      this.tracks = (await TrackCollection.fetchAll({ filterKey: 'project', filterValue: this.project.id })).array;
     },
     async fetchTags() {
       this.tags = (await TagCollection.fetchAll()).array;
     },
-    downloadURL(format) {
-      return appendShortTermToken(this.collection.getDownloadURL(format), this.shortTermToken);
+    download(format) {
+      this.collection.download(format);
+    },
+    async exportAnnotations() {
+      try {
+        const response = await Cytomine.instance.api.get(
+          `/project/${this.project.id}/annotations/export`,
+          { responseType: 'blob' },
+        );
+
+        const defaultFilename = `project-${this.project.id}-annotations.geojson`;
+        const filename = getFilename(response.headers?.['content-disposition']) || defaultFilename;
+        triggerBlobDownload(response.data, filename);
+      } catch (error) {
+        console.error(error);
+      }
     },
     addTerm(term) {
       this.terms.push(term);
@@ -781,7 +782,6 @@ export default {
     if (!this.regroup) {
       this.regroup = this.groupBundling[this.groupBundling.length - 1];
     }
-    // ---
 
     try {
       await Promise.all([

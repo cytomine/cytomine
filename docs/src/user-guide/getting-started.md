@@ -9,8 +9,8 @@ title: Getting started
 There are three main ways to get a personal account:
 
 - If you have Cytomine installed at your institution, ask an account from your local administrator.
-- Ask for an account on our demo instance via email at <a :href="'mailto:'+$cytomine.email">{{$cytomine.email}}</a>.
-- [Install Cytomine on your laptop or your server](/admin-guide/ce/installation.md) (for Linux users only).
+- Ask for an account on our demo instance via email at <a :href="'mailto:'+$cytomine.infoemail">{{$cytomine.infoemail}}</a>.
+- [Install Cytomine on your laptop or your server](/admin-guide/docker/installation.md) (for Linux users only).
 
 When you have a username and a password, go to the login page and ... Welcome to Cytomine!
 
@@ -123,25 +123,6 @@ Use the **+/-** buttons or your mouse wheel to zoom in your image and the left c
 On the right panel, you will find a menu related to your exploration: you can see the layer of other users and properties associated to annotations, change the color balance of the image, etc.
 But currently, there is no annotation on this image.
 We will add them in the next point.
-
-## Upload a task
-
-navigate to applications tab and upload the task zip archive from your machine.
-
-![upload_task](/images/user-guide/getting-started/upload_task.png)
-
-## Run a task
-
-Running a task involves 2 steps as follows:
- #### 1. select the task from the dropdown list.
- #### 2. provision the inputs of the task, the inputs will be listed by name, depending on the type the user sees :
- - Field for numeric or textual values
- - Toggle for boolean values
- - Selector for images and annotations
-
- after provisioning all inputs click on **Run Task** button to execute
-
-![upload_task](/images/user-guide/getting-started/run_task.png)
 
 ## Add annotations
 

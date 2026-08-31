@@ -1,0 +1,34 @@
+package org.cytomine.repository.persistence.entity;
+
+import java.sql.Timestamp;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.Data;
+
+import be.cytomine.common.repository.model.HasTimestampCUD;
+
+@Entity(name = "relation_term")
+@Data
+public class TermRelationEntity implements HasTimestampCUD {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column
+    private long version;
+    @Column
+    private Timestamp created;
+    @Column
+    private Timestamp deleted;
+    @Column
+    private Timestamp updated;
+    @Column
+    private long relationId;
+    @Column(name = "term1_id")
+    private long term1Id;
+    @Column(name = "term2_id")
+    private long term2Id;
+}

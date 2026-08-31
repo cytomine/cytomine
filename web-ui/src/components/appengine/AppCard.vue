@@ -34,13 +34,13 @@
 </template>
 
 <script>
-import {installApp} from '@/utils/app';
+import { installApp } from '@/utils/app';
 
 export default {
   name: 'AppCard',
   props: {
-    app: {type: Object, required: true},
-    installable: {type: Boolean, default: false},
+    app: { type: Object, required: true },
+    installable: { type: Boolean, default: false },
   },
   methods: {
     async handleInstall() {

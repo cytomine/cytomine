@@ -1,15 +1,15 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import attachedFiles from '@/components/attached-file/AttachedFiles';
-import {AttachedFileCollection} from '@/api';
+import { AttachedFileCollection } from '@/api';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
-    instance: {host: 'https://test.cytomine.com'}
+    instance: { host: 'https://test.cytomine.com' }
   },
   AttachedFileCollection: {
-    fetchAll: jest.fn().mockResolvedValue({array: []})
+    fetchAll: vi.fn().mockResolvedValue({ array: [] })
   }
 }));
 
@@ -29,13 +29,13 @@ describe('attached-files.vue', () => {
       },
       mocks: {
         $t: (message) => message,
-        $notify: jest.fn(),
+        $notify: vi.fn(),
         $buefy: {
           modal: {
-            open: jest.fn()
+            open: vi.fn()
           },
           dialog: {
-            confirm: jest.fn((options) => options.onConfirm())
+            confirm: vi.fn((options) => options.onConfirm())
           }
         }
       }
@@ -45,7 +45,7 @@ describe('attached-files.vue', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render the component correctly', () => {
@@ -74,7 +74,7 @@ describe('attached-files.vue', () => {
   it('should add attached file to the list', async () => {
     expect(wrapper.vm.attachedFiles.length).toBe(0);
 
-    wrapper.vm.addAttachedFile({id: 2, filename: 'newfile.pdf'});
+    wrapper.vm.addAttachedFile({ id: 2, filename: 'newfile.pdf' });
 
     expect(wrapper.vm.attachedFiles.length).toBe(1);
     expect(wrapper.vm.attachedFiles[0].filename).toBe('newfile.pdf');

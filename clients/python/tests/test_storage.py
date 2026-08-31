@@ -1,22 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# * Copyright (c) 2009-2024. Authors: see NOTICE file.
-# *
-# * Licensed under the Apache License, Version 2.0 (the "License");
-# * you may not use this file except in compliance with the License.
-# * You may obtain a copy of the License at
-# *
-# *      http://www.apache.org/licenses/LICENSE-2.0
-# *
-# * Unless required by applicable law or agreed to in writing, software
-# * distributed under the License is distributed on an "AS IS" BASIS,
-# * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# * See the License for the specific language governing permissions and
-# * limitations under the License.
-
-# pylint: disable=unused-argument
-
-from typing import Any, Dict
+from typing import Any
 
 from cytomine.cytomine import Cytomine
 from cytomine.models import (
@@ -27,12 +11,11 @@ from cytomine.models import (
 )
 from tests.conftest import random_string
 
-
 class TestStorage:
     def test_storage(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         name = random_string()
         storage = Storage(name, dataset["user"].id).save()
@@ -53,16 +36,15 @@ class TestStorage:
         # storage.delete()
         # assert(not Storage().fetch(storage.id))
 
-    def test_storages(self, connect: Cytomine, dataset: Dict[str, Any]) -> None:
+    def test_storages(self, connect: Cytomine, dataset: dict[str, Any]) -> None:
         storages = StorageCollection().fetch()
         assert isinstance(storages, StorageCollection)
-
 
 class TestUploadedFile:
     def test_uploaded_file(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         storages = StorageCollection().fetch()
         filename = "filename"
@@ -74,7 +56,6 @@ class TestUploadedFile:
             ext="ext",
             contentType="contentType",
             id_storage=storages[0].id,  # type: ignore
-            id_image_server=dataset["image_servers"][0].id,
         ).save()
         assert isinstance(uf, UploadedFile)
         assert uf.filename == filename
@@ -91,7 +72,7 @@ class TestUploadedFile:
     def test_uploaded_files(
         self,
         connect: Cytomine,
-        dataset: Dict[str, Any],
+        dataset: dict[str, Any],
     ) -> None:
         uploaded_files = UploadedFileCollection().fetch()
         assert isinstance(uploaded_files, UploadedFileCollection)

@@ -17,7 +17,7 @@ If you are not familiar with *forks*, take a moment to read GitHub's [Fork a rep
 
 We label issues that are suitable for first-time contributors as [`good first issue`](https://github.com/cytomine/cytomine/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22). These typically do not require extensive experience with Cytomine or familiarity with the codebase.
 
-You do not need our permission to start working on an issue labeled as suitable for community contribution. However, it's a good idea to indicate in the **issue** itself that you are working on it to avoid duplicate efforts.
+You do not need our permission to start working on an issue labelled as suitable for community contribution. However, it's a good idea to indicate in the **issue** itself that you are working on it to avoid duplicate efforts.
 
 :warning: Please do not open pull requests for new features without prior discussion.
 
@@ -38,7 +38,7 @@ You do not need our permission to start working on an issue labeled as suitable 
 
 3. Under "**Owner**", select the dropdown menu and click an owner for the forked repository.
 
-    > :bulb: By default, it is your personal account that is set as owner. 
+    > :bulb: By default, it is your personal account that is set as owner.
 
 4. Click on **Create fork**.
 
@@ -140,8 +140,21 @@ We follow the [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.
 
     Our team will review your PR and approve it once it passes all CI pipelines. Feedback may be provided if changes are needed.
 
-    > :warning: It is the responsability of the contributor to ensure that all the CI checks pass!
+    > :warning: It is the responsibility of the contributor to ensure that all the CI checks pass!
 
     After the approval and passing CI, your contribution will be merged.
+
+6. CheckStyle Intellij Note
+
+    When using idea with the checkstyle plugin, the imports are not always the right order. The
+   order is:
+    - import java.*
+    - import javax.*
+    - <blank line>
+    - import all other imports
+    - <blank line>
+    - import be.cytomine.*
+    - <blank line>
+    - import static all other imports
 
 Thank you for helping make Cytomine even better!

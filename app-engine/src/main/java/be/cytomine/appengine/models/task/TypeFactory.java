@@ -67,12 +67,10 @@ public class TypeFactory {
         Arrays.stream(CollectionGenericTypeConstraint.values())
             .map(CollectionGenericTypeConstraint::getStringKey)
             .filter(typeNode::has)
-            .forEach(key -> {
-                type.setConstraint(
-                    CollectionGenericTypeConstraint.getConstraint(key),
-                    typeNode.get(key).asText()
-                );
-            });
+            .forEach(key -> type.setConstraint(
+                CollectionGenericTypeConstraint.getConstraint(key),
+                typeNode.get(key).asText()
+            ));
 
         // handle nested type
         JsonNode subtype = typeNode.get("subtype");
@@ -98,12 +96,10 @@ public class TypeFactory {
         Arrays.stream(IntegerTypeConstraint.values())
             .map(IntegerTypeConstraint::getStringKey)
             .filter(typeNode::has)
-            .forEach(key -> {
-                type.setConstraint(
-                    IntegerTypeConstraint.getConstraint(key),
-                    typeNode.get(key).asInt()
-                );
-            });
+            .forEach(key -> type.setConstraint(
+                IntegerTypeConstraint.getConstraint(key),
+                typeNode.get(key).asInt()
+            ));
 
         return type;
     }
@@ -117,12 +113,10 @@ public class TypeFactory {
         Arrays.stream(NumberTypeConstraint.values())
             .map(NumberTypeConstraint::getStringKey)
             .filter(typeNode::has)
-            .forEach(key -> {
-                type.setConstraint(
-                    NumberTypeConstraint.getConstraint(key),
-                    typeNode.get(key).asText()
-                );
-            });
+            .forEach(key -> type.setConstraint(
+                NumberTypeConstraint.getConstraint(key),
+                typeNode.get(key).asText()
+            ));
 
         return type;
     }
@@ -136,12 +130,10 @@ public class TypeFactory {
         Arrays.stream(StringTypeConstraint.values())
             .map(StringTypeConstraint::getStringKey)
             .filter(typeNode::has)
-            .forEach(key -> {
-                type.setConstraint(
-                    StringTypeConstraint.getConstraint(key),
-                    typeNode.get(key).asInt()
-                );
-            });
+            .forEach(key -> type.setConstraint(
+                StringTypeConstraint.getConstraint(key),
+                typeNode.get(key).asInt()
+            ));
 
         return type;
     }
@@ -159,12 +151,10 @@ public class TypeFactory {
         Arrays.stream(EnumerationTypeConstraint.values())
             .map(EnumerationTypeConstraint::getStringKey)
             .filter(typeNode::has)
-            .forEach(key -> {
-                type.setConstraint(
-                    EnumerationTypeConstraint.getConstraint(key),
-                    typeNode.get(key).toString()
-                );
-            });
+            .forEach(key -> type.setConstraint(
+                EnumerationTypeConstraint.getConstraint(key),
+                typeNode.get(key).toString()
+            ));
 
         return type;
     }
@@ -178,12 +168,10 @@ public class TypeFactory {
         Arrays.stream(DateTimeTypeConstraint.values())
             .map(DateTimeTypeConstraint::getStringKey)
             .filter(node::has)
-            .forEach(key -> {
-                type.setConstraint(
-                    DateTimeTypeConstraint.getConstraint(key),
-                    node.get(key).toString()
-                );
-            });
+            .forEach(key -> type.setConstraint(
+                DateTimeTypeConstraint.getConstraint(key),
+                node.get(key).toString()
+            ));
 
         return type;
     }
@@ -205,9 +193,7 @@ public class TypeFactory {
         Arrays.stream(ImageTypeConstraint.values())
             .map(ImageTypeConstraint::getStringKey)
             .filter(typeNode::has)
-            .forEach(key -> {
-                type.setConstraint(ImageTypeConstraint.getConstraint(key), typeNode.get(key));
-            });
+            .forEach(key -> type.setConstraint(ImageTypeConstraint.getConstraint(key), typeNode.get(key)));
 
         return type;
     }
@@ -221,9 +207,7 @@ public class TypeFactory {
         Arrays.stream(FileTypeConstraint.values())
             .map(FileTypeConstraint::getStringKey)
             .filter(typeNode::has)
-            .forEach(key -> {
-                type.setConstraint(FileTypeConstraint.getConstraint(key), typeNode.get(key));
-            });
+            .forEach(key -> type.setConstraint(FileTypeConstraint.getConstraint(key), typeNode.get(key)));
 
         return type;
     }

@@ -1,22 +1,24 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import VueRouter from 'vue-router';
 
 import AppInfoPage from '@/components/appengine/AppInfoPage.vue';
 import Task from '@/utils/appengine/task';
-import {flushPromises} from '../../../utils';
+import { flushPromises } from '../../../utils';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        post: jest.fn(),
+        post: vi.fn(),
       },
     },
   },
 }));
 
-jest.mock('@/utils/appengine/task', () => ({
-  fetchNamespaceVersion: jest.fn(),
+vi.mock('@/utils/appengine/task', () => ({
+  default: {
+    fetchNamespaceVersion: vi.fn(),
+  }
 }));
 
 const localVue = createLocalVue();
@@ -26,7 +28,7 @@ const router = new VueRouter();
 describe('AppInfoPage.vue', () => {
   const mockTask = {
     name: 'Test App',
-    authors: [{first_name: 'John', last_name: 'Doe'}],  // eslint-disable-line
+    authors: [{ firstName: 'John', lastName: 'Doe' }],
     date: '2025-10-23',
     version: '1.0.0',
     imageUrl: 'https://example.com/image.png',
@@ -42,7 +44,7 @@ describe('AppInfoPage.vue', () => {
       localVue,
       router,
       mocks: {
-        $notify: jest.fn(),
+        $notify: vi.fn(),
         $t: (key) => key,
       },
       stubs: {
@@ -75,7 +77,7 @@ describe('AppInfoPage.vue', () => {
     expect(wrapper.vm.task).toBe(mockTask);
 
     const expectedAuthors = mockTask.authors
-      .map(author => `- ${author.first_name} ${author.last_name}`)
+      .map(author => `- ${author.firstName} ${author.lastName}`)
       .join('');
     expect(wrapper.text()).toContain(expectedAuthors);
     expect(wrapper.text()).toContain(mockTask.name);
@@ -96,7 +98,7 @@ describe('AppInfoPage.vue', () => {
   it('should render no description when description is missing', async () => {
     Task.fetchNamespaceVersion.mockResolvedValue({
       name: 'Test App',
-      authors: [{first_name: 'John', last_name: 'Doe'}],  // eslint-disable-line
+      authors: [{ firstName: 'John', lastName: 'Doe' }],
       date: '2025-10-23',
       version: '1.0.0',
       imageUrl: 'https://example.com/image.png',
@@ -111,7 +113,7 @@ describe('AppInfoPage.vue', () => {
   it('should render unknown when date is missing', async () => {
     Task.fetchNamespaceVersion.mockResolvedValue({
       name: 'Test App',
-      authors: [{first_name: 'John', last_name: 'Doe'}],  // eslint-disable-line
+      authors: [{ firstName: 'John', lastName: 'Doe' }],
       version: '1.0.0',
       imageUrl: 'https://example.com/image.png',
       description: 'App description here',

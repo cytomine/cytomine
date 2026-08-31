@@ -25,7 +25,7 @@ export default class AnnotationCommentCollection extends DomainCollection {
 
   /** @override */
   set object(obj) {
-    new AnnotationComment({object: obj}); // same validity checks as for model
+    new AnnotationComment({ object: obj }); // same validity checks as for model
     this._object = obj;
   }
 

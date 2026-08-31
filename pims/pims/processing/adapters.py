@@ -1,19 +1,6 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 from __future__ import annotations
 
-from typing import Callable, Dict, Tuple, Type, Union
+from collections.abc import Callable
 
 import numpy as np
 from PIL import Image as PILImage
@@ -21,9 +8,7 @@ from pyvips import Image as VIPSImage
 from pyvips.vimage import FORMAT_TO_TYPESTR
 
 
-def numpy_to_vips(
-    np_array: np.ndarray,
-) -> VIPSImage:
+def numpy_to_vips(np_array: np.ndarray) -> VIPSImage:
     """
     Convert a Numpy array to a VIPS image.
 
@@ -142,10 +127,10 @@ def identity(v):
     return v
 
 
-RawImagePixels = Union[np.ndarray, VIPSImage, PILImage.Image]
-RawImagePixelsType = Union[Type[np.ndarray], Type[VIPSImage], Type[PILImage.Image]]
+RawImagePixels = np.ndarray | VIPSImage | PILImage.Image
+RawImagePixelsType = type[np.ndarray] | type[VIPSImage] | type[PILImage.Image]
 
-imglib_adapters: Dict[Tuple[RawImagePixelsType, RawImagePixelsType], Callable] = {
+imglib_adapters: dict[tuple[RawImagePixelsType, RawImagePixelsType], Callable] = {
     (np.ndarray, VIPSImage): numpy_to_vips,
     (np.ndarray, PILImage.Image): numpy_to_pil,
     (np.ndarray, np.ndarray): identity,
@@ -176,4 +161,4 @@ def convert_to(
     converted
         The image (pixels) in the new type
     """
-    return imglib_adapters.get((type(image), new_image_type))(image)
+    return imglib_adapters.get((type(image), new_image_type), identity)(image)

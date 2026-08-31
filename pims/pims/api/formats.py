@@ -1,18 +1,3 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-from typing import List, Optional
-
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
@@ -31,7 +16,7 @@ class Format(BaseModel):
     name: str = Field(
         ..., description='Readable format name', examples=['Hamamatsu VMS']
     )
-    remarks: Optional[str] = Field(
+    remarks: str | None = Field(
         None, description='Readable end-user remarks about the format',
     )
     convertible: bool = Field(
@@ -50,7 +35,7 @@ class Format(BaseModel):
         description='Whether the format is importable by an upload in PIMS or not. '
                     'Non importable formats should be created by other means.'
     )
-    plugin: Optional[str] = Field(
+    plugin: str | None = Field(
         None,
         description='PIMS plugin providing this format, returned as a Python module.',
         examples=['pims.formats.common'],
@@ -58,7 +43,7 @@ class Format(BaseModel):
 
 
 class FormatsList(CollectionSize):
-    items: List[Format] = Field(None, description='Array of formats', title='Format')
+    items: list[Format] = Field(None, description='Array of formats', title='Format')
 
 
 def _serialize_format(format):

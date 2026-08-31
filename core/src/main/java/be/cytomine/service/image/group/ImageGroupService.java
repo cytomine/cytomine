@@ -1,25 +1,32 @@
 package be.cytomine.service.image.group;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.command.*;
+import be.cytomine.domain.command.AddCommand;
+import be.cytomine.domain.command.DeleteCommand;
+import be.cytomine.domain.command.EditCommand;
+import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.group.ImageGroup;
+import be.cytomine.domain.image.group.ImageGroupImageInstance;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.repository.image.group.ImageGroupImageInstanceRepository;
 import be.cytomine.repository.image.group.ImageGroupRepository;
 import be.cytomine.repository.ontology.AnnotationGroupRepository;
 import be.cytomine.repository.ontology.AnnotationLinkRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.utils.CommandResponse;
@@ -29,33 +36,26 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class ImageGroupService extends ModelService {
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final AnnotationGroupRepository annotationGroupRepository;
 
-    @Autowired
-    private ImageGroupImageInstanceService imageGroupImageInstanceService;
+    private final AnnotationLinkRepository annotationLinkRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private TransactionService transactionService;
+    private final ImageGroupRepository imageGroupRepository;
 
-    @Autowired
-    private AnnotationGroupRepository annotationGroupRepository;
+    private final ImageGroupImageInstanceRepository imageGroupImageInstanceRepository;
 
-    @Autowired
-    private AnnotationLinkRepository annotationLinkRepository;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private ImageGroupRepository imageGroupRepository;
+    private final TransactionService transactionService;
 
-    @Autowired
-    private ImageGroupImageInstanceRepository imageGroupImageInstanceRepository;
+    private final UrlApi urlApi;
 
     @Override
     public Class currentDomain() {
@@ -87,7 +87,17 @@ public class ImageGroupService extends ModelService {
 
         List<ImageGroup> groups = imageGroupRepository.findAllByProject(project);
         for (ImageGroup group : groups) {
-            group.setImages(imageGroupImageInstanceService.buildImageInstances(group));
+            List<Object> images = new ArrayList<>();
+            for (ImageGroupImageInstance igii : imageGroupImageInstanceRepository.findAllByGroup(group)) {
+                images.add(Map.of(
+                    "id", igii.getImage().getId(),
+                    "instanceFilename", igii.getImage().getBlindInstanceFilename(),
+                    "thumb", urlApi.getImageInstanceThumbUrlWithMaxSize(igii.getImage().getId()),
+                    "width", igii.getImage().getBaseImage().getWidth(),
+                    "height", igii.getImage().getBaseImage().getHeight()
+                ));
+            }
+            group.setImages(images);
         }
 
         return groups;
@@ -95,29 +105,29 @@ public class ImageGroupService extends ModelService {
 
     public CommandResponse add(JsonObject json) {
         transactionService.start();
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(json.getJSONAttrLong("project"), Project.class, READ);
 
-        return executeCommand(new AddCommand(currentUser), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
     }
 
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
+        return executeCommand(new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new DeleteCommand(currentUser, transaction), domain, null);
+        return executeCommand(new DeleteCommand(currentUser.id(), transaction), domain, null);
     }
 
     protected void beforeDelete(CytomineDomain domain) {

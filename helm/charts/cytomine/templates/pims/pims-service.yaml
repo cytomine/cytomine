@@ -4,7 +4,6 @@ kind: Service
 metadata:
   name: pims
 spec:
-  clusterIP: None
   selector:
     app: pims
   ports:

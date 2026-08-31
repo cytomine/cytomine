@@ -1,22 +1,8 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
   <div>
     <b-loading :is-full-page="false" :active="loading" />
     <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
-      {{$t('unexpected-error-info-message')}}
+      {{ $t('unexpected-error-info-message') }}
     </b-message>
     <div v-else-if="!loading" class="ontology-details-wrapper">
       <table class="table is-fullwidth">
@@ -65,6 +51,7 @@
           <td><strong>{{$t('actions')}}</strong></td>
           <td>
             <div class="buttons">
+              <button class="button" @click="exportOntology">{{$t('export-ontology')}}</button>
               <button class="button" @click="isRenameModalActive = true">
                 {{$t('button-rename')}}
               </button>
@@ -94,10 +81,11 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {Ontology, User, ProjectCollection} from '@/api';
-import OntologyTree from './OntologyTree';
-import RenameModal from '@/components/utils/RenameModal';
+import { get } from '@/utils/store-helpers';
+import { Cytomine, Ontology, User, ProjectCollection } from '@/api';
+import OntologyTree from './OntologyTree.vue';
+import RenameModal from '@/components/utils/RenameModal.vue';
+import { getFilename, triggerBlobDownload } from '@/utils/download';
 
 export default {
   name: 'ontology-details',
@@ -155,7 +143,7 @@ export default {
         this.fullOntology = await Ontology.fetch(this.ontology.id);
 
         // projects prop of ontology contains all projects, including those that the current user cannot see => need to refetch the collection
-        this.projects = (await ProjectCollection.fetchAll({filterKey: 'ontology', filterValue: this.ontology.id})).array;
+        this.projects = (await ProjectCollection.fetchAll({ filterKey: 'ontology', filterValue: this.ontology.id })).array;
         // ---
       } catch (error) {
         console.log(error);
@@ -188,14 +176,14 @@ export default {
         await this.fullOntology.save();
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-ontology-rename', {name: this.fullOntology.name})
+          text: this.$t('notif-success-ontology-rename', { name: this.fullOntology.name })
         });
         this.$emit('rename', newName);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-ontology-rename', {name: oldName})
+          text: this.$t('notif-error-ontology-rename', { name: oldName })
         });
       }
       this.isRenameModalActive = false;
@@ -204,13 +192,27 @@ export default {
     confirmDeletion() {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
-        message: this.$t('confirm-deletion-ontology', {name: this.ontology.name}),
+        message: this.$t('confirm-deletion-ontology', { name: this.ontology.name }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
         onConfirm: () => this.$emit('delete')
       });
-    }
+    },
+    async exportOntology() {
+      try {
+        const response = await Cytomine.instance.api.get(
+          `/ontology/${this.fullOntology.id}/export`,
+          { responseType: 'blob' },
+        );
+
+        const defaultFilename = `${this.fullOntology.name}.json`;
+        const filename = getFilename(response.headers?.['content-disposition']) || defaultFilename;
+        triggerBlobDownload(response.data, filename);
+      } catch (error) {
+        console.error(error);
+      }
+    },
   },
   created() {
     this.fetchOntology();

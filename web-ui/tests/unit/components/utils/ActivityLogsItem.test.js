@@ -1,22 +1,26 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import moment from 'moment';
 
 import ActivityLogsItem from '@/components/utils/ActivityLogsItem';
 import VueRouter from 'vue-router';
 
-jest.mock('@/utils/token-utils', () => ({
-  appendShortTermToken: jest.fn((url, token) => `${url}?token=${token}`)
+vi.mock('@/utils/token-utils', () => ({
+  appendShortTermToken: vi.fn((url, token) => `${url}?token=${token}`)
 }));
 
-jest.mock('@/utils/store-helpers', () => ({
-  get: jest.fn(() => 'mock-token')
+vi.mock('@/utils/store-helpers', () => ({
+  get: vi.fn(() => 'mock-token')
+}));
+
+vi.mock('@/utils/date', () => ({
+  formatMomentDate: vi.fn((value, format) => moment.utc(Number(value)).format(format))
 }));
 
 describe('ActivityLogsItem.vue', () => {
   let wrapper;
   const action = {
     id: 1,
-    created: '1626874800000', // Timestamp for 07/21/2021
+    created: '1626874800000',
     serviceName: 'userAnnotationService',
     className: 'be.cytomine.command.AddCommand',
     data: JSON.stringify({
@@ -30,12 +34,8 @@ describe('ActivityLogsItem.vue', () => {
 
   const localVue = createLocalVue();
   localVue.use(VueRouter);
-  localVue.component('router-link', {template: '<a><slot></slot></a>'});
-  localVue.component('router-view', {template: '<div><slot></slot></div>'});
-
-  beforeAll(() => {
-    localVue.filter('moment', jest.fn((value, format) => moment.utc(Number(value)).format(format)));
-  });
+  localVue.component('router-link', { template: '<a><slot></slot></a>' });
+  localVue.component('router-view', { template: '<div><slot></slot></div>' });
 
   beforeEach(() => {
     wrapper = shallowMount(ActivityLogsItem, {
@@ -50,7 +50,7 @@ describe('ActivityLogsItem.vue', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render the correct timestamp and message', () => {
@@ -72,12 +72,10 @@ describe('ActivityLogsItem.vue', () => {
   it('should toggle preview when hovering over', async () => {
     expect(wrapper.vm.showPreview).toBe(false);
 
-    // Simulate mouse enter (hover)
     wrapper.vm.enter();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.showPreview).toBe(true);
 
-    // Simulate mouse leave
     wrapper.vm.leave();
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.showPreview).toBe(false);

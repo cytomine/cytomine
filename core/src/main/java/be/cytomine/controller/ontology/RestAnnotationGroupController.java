@@ -1,17 +1,26 @@
 package be.cytomine.controller.ontology;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.group.ImageGroupService;
 import be.cytomine.service.ontology.AnnotationGroupService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -25,6 +34,8 @@ public class RestAnnotationGroupController extends RestCytomineController {
 
     private final ProjectService projectService;
 
+    private final CurrentUserService currentUserService;
+
     @PostMapping("/annotationgroup.json")
     public ResponseEntity<String> add(@RequestBody String json) {
         log.debug("REST request to save annotationgroup: " + json);
@@ -35,8 +46,8 @@ public class RestAnnotationGroupController extends RestCytomineController {
     public ResponseEntity<String> show(@PathVariable Long id) {
         log.debug("REST request to show annotationgroup: " + id);
         return annotationGroupService.find(id)
-                .map(this::responseSuccess)
-                .orElseThrow(() -> new ObjectNotFoundException("AnnotationGroup", id));
+            .map(this::responseSuccess)
+            .orElseThrow(() -> new ObjectNotFoundException("AnnotationGroup", id));
     }
 
     @PutMapping("/annotationgroup/{id}.json")
@@ -68,6 +79,6 @@ public class RestAnnotationGroupController extends RestCytomineController {
     @PostMapping("/annotationgroup/{id}/annotationgroup/{mergedId}/merge.json")
     public ResponseEntity<String> merge(@PathVariable Long id, @PathVariable Long mergedId) {
         log.debug("REST request to merge annotationgroup {} with annotationgroup {}", id, mergedId);
-        return responseSuccess(annotationGroupService.merge(id, mergedId));
+        return responseSuccess(annotationGroupService.merge(id, mergedId, currentUserService.getCurrentUser().id()));
     }
 }

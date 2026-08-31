@@ -10,12 +10,13 @@
       :showDetails="false"
       :size="85"
       :users="users"
+      color="000000"
     />
   </div>
 </template>
 
 <script>
-import AnnotationPreview from '@/components/annotations/AnnotationPreview';
+import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
 
 export default {
   name: 'SelectableAnnotation',
@@ -23,10 +24,10 @@ export default {
     AnnotationPreview,
   },
   props: {
-    annotation: {type: Object, default: null},
-    images: {type: Array, default: () => []},
-    isSelected: {type: Boolean, default: false},
-    users: {type: Array, default: () => []},
+    annotation: { type: Object, default: null },
+    images: { type: Array, default: () => [] },
+    isSelected: { type: Boolean, default: false },
+    users: { type: Array, default: () => [] },
   }
 };
 </script>

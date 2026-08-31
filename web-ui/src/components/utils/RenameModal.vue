@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <form @submit.prevent="rename()">
   <cytomine-modal :title="title" :active="active" @close="close()">
@@ -31,7 +17,7 @@
 </template>
 
 <script>
-import CytomineModal from './CytomineModal';
+import CytomineModal from './CytomineModal.vue';
 
 export default {
   name: 'rename-modal',
@@ -40,8 +26,8 @@ export default {
     currentName: String,
     title: String
   },
-  components: {CytomineModal},
-  $_veeValidate: {validator: 'new'},
+  components: { CytomineModal },
+  $_veeValidate: { validator: 'new' },
   data() {
     return {
       newName: ''
@@ -71,7 +57,7 @@ export default {
 </script>
 
 <style scoped>
->>> input[type=text] {
+:deep(input[type=text]) {
   width: 26em;
 }
 </style>

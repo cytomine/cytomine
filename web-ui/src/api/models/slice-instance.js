@@ -14,7 +14,6 @@ export default class SliceInstance extends Model {
     this.uploadedFile = null;
     this.path = null;
     this.image = null;
-    this.mime = null;
 
     this.channel = null;
     this.zStack = null;
@@ -36,16 +35,16 @@ export default class SliceInstance extends Model {
       throw new Error('Cannot fetch annotations index of slice with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/annotationindex.json`);
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/annotationindex.json`);
     return data.collection;
   }
 
-  async fetchHistogram({nBins} = {}) {
+  async fetchHistogram({ nBins } = {}) {
     if (this.isNew()) {
       throw new Error('Cannot get histogram for a slice with no ID.');
     }
-    let params = {nBins};
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/histogram.json`, {params});
+    let params = { nBins };
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/histogram.json`, { params });
     return data.collection;
   }
 
@@ -54,16 +53,16 @@ export default class SliceInstance extends Model {
       throw new Error('Cannot get histogram bounds for a slice with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/histogram/bounds.json`);
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/histogram/bounds.json`);
     return data.collection;
   }
 
-  async fetchChannelHistograms({nBins} = {}) {
+  async fetchChannelHistograms({ nBins } = {}) {
     if (this.isNew()) {
       throw new Error('Cannot get channel histograms for a slice with no ID.');
     }
-    let params = {nBins};
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/channelhistogram.json`, {params});
+    let params = { nBins };
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/channelhistogram.json`, { params });
     return data.collection;
   }
 
@@ -72,7 +71,7 @@ export default class SliceInstance extends Model {
       throw new Error('Cannot get channel histogram bounds for a slice with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/channelhistogram/bounds.json`);
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/channelhistogram/bounds.json`);
     return data.collection;
   }
 }

@@ -37,16 +37,18 @@
 
 
 <script>
-import {get} from '@/utils/store-helpers';
-import ImageName from '@/components/image/ImageName';
-import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
+import eventBus from '@/utils/event-bus';
 
-import {AnnotationGroup, AnnotationLink} from '@/api';
-import {listAnnotationsInGroup} from '@/utils/annotation-utils';
+import { get } from '@/utils/store-helpers';
+import ImageName from '@/components/image/ImageName.vue';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
+
+import { AnnotationGroup, AnnotationLink } from '@/api';
+import { listAnnotationsInGroup } from '@/utils/annotation-utils';
 
 export default {
   name: 'annotation-link-selector',
-  components: {ImageName, AnnotationLinksPreview},
+  components: { ImageName, AnnotationLinksPreview },
   props: {
     index: String
   },
@@ -195,21 +197,21 @@ export default {
           group = annotGroup.id;
           await Promise.all([
             new AnnotationLink(
-              {annotationIdent: this.annotation.id, image: this.annotation.image, group}
+              { annotationIdent: this.annotation.id, image: this.annotation.image, group }
             ).save(),
             new AnnotationLink(
-              {annotationIdent: view.annot.id, image: view.annot.image, group}
+              { annotationIdent: view.annot.id, image: view.annot.image, group }
             ).save()
           ]);
         } else if (!this.annotationGroupId && view.annotationGroupId) {
           let group = view.annotationGroupId;
           await new AnnotationLink(
-            {annotationIdent: this.annotation.id, image: this.annotation.image, group}
+            { annotationIdent: this.annotation.id, image: this.annotation.image, group }
           ).save();
         } else if (this.annotationGroupId && !view.annotationGroupId) {
           let group = this.annotationGroupId;
           await new AnnotationLink(
-            {annotationIdent: view.annot.id, image: view.annot.image, group}
+            { annotationIdent: view.annot.id, image: view.annot.image, group }
           ).save();
         } else {
           let annotGroup = await AnnotationGroup.fetch(this.annotationGroupId);
@@ -218,7 +220,7 @@ export default {
         }
 
         (await listAnnotationsInGroup(this.image.project, group)).forEach(annot => {
-          this.$eventBus.$emit('editAnnotation', annot);
+          eventBus.emit('editAnnotation', annot);
           if (this.copiedAnnot && annot.id === this.copiedAnnot.id) {
             let copiedAnnot = this.copiedAnnot.clone();
             copiedAnnot.annotationLink = annot.annotationLink;
@@ -226,10 +228,10 @@ export default {
             this.copiedAnnot = copiedAnnot;
           }
         });
-        this.$notify({type: 'success', text: successMessage});
+        this.$notify({ type: 'success', text: successMessage });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: errorMessage});
+        this.$notify({ type: 'error', text: errorMessage });
       }
     },
   },

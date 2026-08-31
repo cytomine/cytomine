@@ -1,0 +1,38 @@
+[project]
+name = "cytomine"
+version = "2026.1.0"
+description = "A web platform for collaborative analysis of very large bio-medical images"
+maintainers = [
+  { name = "Cytomine ULiège", email = "uliege@cytomine.org" },
+]
+readme = "README.md"
+requires-python = ">=3.10,<3.11"
+license = "Apache-2.0"
+
+[dependency-groups]
+dev = [
+  "pyrefly==1.1.1",
+  "ruff==0.16.1",
+]
+
+[tool.ruff]
+extend-exclude = [
+  "pims/resources"
+]
+
+[tool.ruff.lint]
+select = ["F401", "FAST001", "FAST003"]
+ignore = ["E402"]
+
+[tool.pyrefly]
+preset = "legacy"
+ignore-missing-imports = ["*"]
+project-includes = [
+  "cbir/**/*.py",
+  "clients/python/**/*.py",
+  "pims/**/*.py",
+  "sam/**/*.py",
+]
+project-excludes = [
+  "pims/plugins/**/*.py",
+]

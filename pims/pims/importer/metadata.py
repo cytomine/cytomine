@@ -44,7 +44,7 @@ class XMLValidator:
 class MetadataValidator:
     @property
     def schema_root(self) -> Path:
-        return resources.files("resources") / "bigpicture_metaflex" / "src"
+        return Path(str(resources.files("resources") / "bigpicture_metaflex" / "src"))
 
     def validate(self, file_path: Path) -> bool:
         for structure in MetadataStructure:

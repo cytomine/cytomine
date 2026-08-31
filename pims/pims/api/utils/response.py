@@ -1,18 +1,6 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 import logging
-from typing import Any, Optional
+from collections.abc import Mapping
+from typing import Any
 
 import orjson
 from cytomine.models import Model as CytomineModel
@@ -34,7 +22,7 @@ def response_list(list_):
     }
 
 
-def convert_quantity(quantity: Optional[Quantity], unit: str, ndigits: int = 6) -> Optional[float]:
+def convert_quantity(quantity: Quantity | None, unit: str, ndigits: int = 6) -> float | None:
     """
     Convert a quantity to the unit required by API specification.
 
@@ -87,11 +75,11 @@ class FastJsonResponse(ORJSONResponse):
         self,
         content: Any = None,
         status_code: int = 200,
-        headers: dict = None,
-        media_type: str = None,
-        background: BackgroundTask = None,
-        include: Optional[IncEx]  = None,
-        exclude: Optional[IncEx] = None,
+        headers: Mapping[str, str] | None = None,
+        media_type: str | None = None,
+        background: BackgroundTask | None = None,
+        include: IncEx | None  = None,
+        exclude: IncEx | None = None,
         by_alias: bool = True,
         exclude_unset: bool = False,
         exclude_defaults: bool = False,

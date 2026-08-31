@@ -3,6 +3,7 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
+import torch
 from fastapi import FastAPI
 
 from cbir import __version__
@@ -15,8 +16,13 @@ from cbir.models.utils import load_model
 async def lifespan(local_app: FastAPI) -> AsyncGenerator[None, None]:
     """Lifespan of the app."""
 
+    settings = get_settings()
+
+    if settings.device.type == "cpu":
+        torch.set_num_threads(settings.num_threads)
+
     # Initialisation
-    local_app.state.model = load_model(get_settings())
+    local_app.state.model = load_model(settings)
 
     yield
 
@@ -34,6 +40,14 @@ app = FastAPI(
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
     },
 )
+
+
+@app.get("/health")
+async def health() -> dict[str, str]:
+    """Health check endpoint."""
+    return {"status": "ok"}
+
+
 app.include_router(router=images.router, prefix=PREFIX)
 app.include_router(router=searches.router, prefix=PREFIX)
 app.include_router(router=storages.router, prefix=PREFIX)

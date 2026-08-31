@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -45,8 +46,18 @@ public class AnnotationLink extends CytomineDomain {
 
         annotationLink.annotationClassName = json.getJSONAttrStr("annotationClassName", true);
         annotationLink.annotationIdent = json.getJSONAttrLong("annotationIdent", null);
-        annotationLink.group = (AnnotationGroup) json.getJSONAttrDomain(entityManager, "group", new AnnotationGroup(), true);
-        annotationLink.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
+        annotationLink.group = (AnnotationGroup) json.getJSONAttrDomain(
+            entityManager,
+            "group",
+            new AnnotationGroup(),
+            true
+        );
+        annotationLink.image = (ImageInstance) json.getJSONAttrDomain(
+            entityManager,
+            "image",
+            new ImageInstance(),
+            true
+        );
 
         return annotationLink;
     }
@@ -64,7 +75,7 @@ public class AnnotationLink extends CytomineDomain {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

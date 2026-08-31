@@ -2,6 +2,7 @@ package be.cytomine.repository.appengine;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,10 @@ public interface TaskRunLayerRepository extends JpaRepository<TaskRunLayer, Long
     Optional<TaskRunLayer> findByAnnotationLayerId(Long id);
 
     Optional<TaskRunLayer> findByTaskRunAndImage(TaskRun taskRun, ImageInstance image);
+
+    Optional<TaskRunLayer> findByTaskRun(TaskRun taskRun);
+
+    Optional<TaskRunLayer> findByTaskRunAndDerivedFrom(TaskRun taskRun, String parameterName);
+
+    Set<TaskRunLayer> findAllByTaskRunAndImage(TaskRun taskRun, ImageInstance image);
 }

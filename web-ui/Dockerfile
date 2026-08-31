@@ -1,7 +1,7 @@
 ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG WEB_UI_VERSION
 ARG WEB_UI_REVISION
-ARG NODE_VERSION=20.19.4
+ARG NODE_VERSION=22.22.3
 ARG NGINX_VERSION=1.22.1
 
 #######################################################################################
@@ -16,8 +16,8 @@ COPY ./package-lock.json /app/package-lock.json
 COPY ./src /app/src
 COPY ./public /app/public
 COPY ./scripts /app/scripts
-COPY ./babel.config.js /app/babel.config.js
-COPY ./.eslintrc.js /app/.eslintrc.js
+COPY ./index.html /app/index.html
+COPY ./vite.config.js /app/vite.config.js
 
 RUN npm install && npm run build
 
@@ -27,8 +27,13 @@ FROM ${PROXY_CACHE}/node:${NODE_VERSION}-bookworm-slim AS dev-server
 
 WORKDIR /app
 
-COPY ./scripts/configuration.json ./public/configuration.json
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext \
+    && rm -rf /var/lib/apt/lists/*
 
+COPY --chmod=755 ./docker-entrypoint.sh /docker-entrypoint.sh
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["npm", "run", "serve"]
 
 #######################################################################################
@@ -52,9 +57,13 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
 
 WORKDIR /app
 
+RUN apk add --no-cache gettext
+
 COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY ./scripts/configuration.json ./configuration.json
+COPY ./scripts/configuration.json ./configuration.json.template
+COPY --chmod=755 ./docker-entrypoint.sh /docker-entrypoint.sh
 
 COPY --from=frontend-builder /app/dist /app
 
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]

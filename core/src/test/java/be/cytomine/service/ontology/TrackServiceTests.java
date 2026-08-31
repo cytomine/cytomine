@@ -1,47 +1,39 @@
 package be.cytomine.service.ontology;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
-import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.CytomineCoreApplication;
-import be.cytomine.domain.ontology.AnnotationTrack;
-import be.cytomine.domain.ontology.Track;
-import be.cytomine.exceptions.AlreadyExistException;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.ontology.TrackRepository;
-import be.cytomine.service.CommandService;
-import be.cytomine.service.command.TransactionService;
-import be.cytomine.utils.CommandResponse;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import jakarta.transaction.Transactional;
+import be.cytomine.BasicInstanceBuilder;
+import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
+import be.cytomine.domain.ontology.AnnotationTrack;
+import be.cytomine.domain.ontology.Track;
+import be.cytomine.exceptions.AlreadyExistException;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.repository.ontology.TrackRepository;
+import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
+import be.cytomine.service.command.TransactionService;
+import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class TrackServiceTests {
 
     @Autowired
@@ -58,82 +50,85 @@ public class TrackServiceTests {
 
     @Autowired
     TransactionService transactionService;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
-    void get_track_with_success() {
-        Track track = builder.given_a_track();
+    void getTrackWithSuccess() {
+        Track track = builder.givenATrack();
         assertThat(track).isEqualTo(trackService.get(track.getId()));
     }
 
     @Test
-    void get_unexisting_track_return_null() {
+    void getUnexistingTrackReturnNull() {
         assertThat(trackService.get(0L)).isNull();
     }
 
     @Test
-    void find_track_with_success() {
-        Track track = builder.given_a_track();
+    void findTrackWithSuccess() {
+        Track track = builder.givenATrack();
         assertThat(trackService.find(track.getId()).isPresent());
         assertThat(track).isEqualTo(trackService.find(track.getId()).get());
     }
 
     @Test
-    void find_unexisting_track_return_empty() {
+    void findUnexistingTrackReturnEmpty() {
         assertThat(trackService.find(0L)).isEmpty();
     }
 
     @Test
-    void list_all_track_by_image() {
-        Track track = builder.given_a_track();
+    void listAllTrackByImage() {
+        Track track = builder.givenATrack();
         assertThat(track).isIn(trackService.list(track.getImage()));
-        assertThat(trackService.list(builder.given_an_image_instance()).size()).isEqualTo(0);
+        assertThat(trackService.list(builder.givenAnImageInstance()).size()).isEqualTo(0);
     }
 
     @Test
-    void list_all_track_by_project() {
-        Track track = builder.given_a_track();
+    void listAllTrackByProject() {
+        Track track = builder.givenATrack();
         assertThat(track).isIn(trackService.list(track.getProject()));
-        assertThat(trackService.list(builder.given_a_project()).size()).isEqualTo(0);
+        assertThat(trackService.list(builder.givenAProject()).size()).isEqualTo(0);
     }
 
-
     @Test
-    void count_by_project() {
-        Track track = builder.given_a_track();
+    void countByProject() {
+        Track track = builder.givenATrack();
         assertThat(trackService.countByProject(track.getProject(), null, null))
-                .isEqualTo(1);
-        assertThat(trackService.countByProject(builder.given_a_project(), null, null))
-                .isEqualTo(0);
+            .isEqualTo(1);
+        assertThat(trackService.countByProject(builder.givenAProject(), null, null))
+            .isEqualTo(0);
     }
 
     @Test
-    void count_by_project_with_date() {
-        Track track = builder.given_a_track();
+    void countByProjectWithDate() {
+        Track track = builder.givenATrack();
 
         assertThat(trackService.countByProject(
-                track.getProject(),
-                        DateUtils.addDays(track.getCreated(),-30),
-                        DateUtils.addDays(track.getCreated(),30)))
-                .isEqualTo(1);
+            track.getProject(),
+            DateUtils.addDays(track.getCreated(), -30),
+            DateUtils.addDays(track.getCreated(), 30)
+        ))
+            .isEqualTo(1);
 
         assertThat(trackService.countByProject(
-                track.getProject(),
-                        DateUtils.addDays(track.getCreated(),-30),
-                        DateUtils.addDays(track.getCreated(),-15)))
-                .isEqualTo(0);
+            track.getProject(),
+            DateUtils.addDays(track.getCreated(), -30),
+            DateUtils.addDays(track.getCreated(), -15)
+        ))
+            .isEqualTo(0);
 
         assertThat(trackService.countByProject(
-                track.getProject(),
-                        DateUtils.addDays(track.getCreated(),15),
-                        DateUtils.addDays(track.getCreated(),30)))
-                .isEqualTo(0);
+            track.getProject(),
+            DateUtils.addDays(track.getCreated(), 15),
+            DateUtils.addDays(track.getCreated(), 30)
+        ))
+            .isEqualTo(0);
     }
 
-
     @Test
-    void add_valid_track_with_success() {
-        Track track = builder.given_a_not_persisted_track();
-        CommandResponse commandResponse = trackService.add(track.toJsonObject());
+    void addValidTrackWithSuccess() {
+        Track track = builder.givenANotPersistedTrack();
+        CommandResponse commandResponse = trackService.add(track.toJsonObject(urlApi));
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(trackService.find(commandResponse.getObject().getId())).isPresent();
@@ -142,26 +137,33 @@ public class TrackServiceTests {
     }
 
     @Test
-    void add_track_with_null_image_fails() {
-        Track track = builder.given_a_not_persisted_track();
-        Assertions.assertThrows(ObjectNotFoundException.class, () -> {
-            trackService.add(track.toJsonObject().withChange("image", null));
-        });
+    void addTrackWithNullImageFails() {
+        Track track = builder.givenANotPersistedTrack();
+        Assertions.assertThrows(
+            ObjectNotFoundException.class, () -> {
+                trackService.add(track.toJsonObject(urlApi).withChange("image", null));
+            }
+        );
     }
 
     @Test
-    void add_track_already_exists() {
-        Track track = builder.given_a_track();
-        Assertions.assertThrows(AlreadyExistException.class, () -> {
-            trackService.add(track.toJsonObject().withChange("id", null));
-        });
+    void addTrackAlreadyExists() {
+        Track track = builder.givenATrack();
+        Assertions.assertThrows(
+            AlreadyExistException.class, () -> {
+                trackService.add(track.toJsonObject(urlApi).withChange("id", null));
+            }
+        );
     }
 
     @Test
-    void edit_valid_track_with_success() {
-        Track track = builder.given_a_track();
+    void editValidTrackWithSuccess() {
+        Track track = builder.givenATrack();
 
-        CommandResponse commandResponse = trackService.update(track, track.toJsonObject().withChange("name", "NEW NAME").withChange("color", "NEW COLOR"));
+        CommandResponse commandResponse = trackService.update(
+            track,
+            track.toJsonObject(urlApi).withChange("name", "NEW NAME").withChange("color", "NEW COLOR")
+        );
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -172,12 +174,12 @@ public class TrackServiceTests {
     }
 
     @Test
-    void undo_redo_track_edition_with_success() {
-        Track track = builder.given_a_track();
+    void undoRedoTrackEditionWithSuccess() {
+        Track track = builder.givenATrack();
         track.setName("OLD NAME");
         track = builder.persistAndReturn(track);
 
-        trackService.update(track, track.toJsonObject().withChange("name", "NEW NAME"));
+        trackService.update(track, track.toJsonObject(urlApi).withChange("name", "NEW NAME"));
 
         assertThat(trackRepository.getById(track.getId()).getName()).isEqualTo("NEW NAME");
 
@@ -192,8 +194,8 @@ public class TrackServiceTests {
     }
 
     @Test
-    void delete_track_with_success() {
-        Track track = builder.given_a_track();
+    void deleteTrackWithSuccess() {
+        Track track = builder.givenATrack();
 
         CommandResponse commandResponse = trackService.delete(track, null, null, true);
 
@@ -203,8 +205,8 @@ public class TrackServiceTests {
     }
 
     @Test
-    void delete_track_with_dependencies_with_success() {
-        AnnotationTrack annotationTrack = builder.given_a_annotation_track();
+    void deleteTrackWithDependenciesWithSuccess() {
+        AnnotationTrack annotationTrack = builder.givenAnAnnotationTrack();
         CommandResponse commandResponse = trackService.delete(annotationTrack.getTrack(), null, null, true);
 
         assertThat(commandResponse).isNotNull();
@@ -212,10 +214,9 @@ public class TrackServiceTests {
         assertThat(trackService.find(annotationTrack.getId()).isEmpty());
     }
 
-
     @Test
-    void undo_redo_track_deletion_with_success() {
-        Track track = builder.given_a_track();
+    void undoRedoTrackDeletionWithSuccess() {
+        Track track = builder.givenATrack();
 
         trackService.delete(track, null, null, true);
 

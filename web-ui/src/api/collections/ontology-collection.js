@@ -17,4 +17,9 @@ export default class OntologyCollection extends Collection {
   static get allowedFilters() {
     return [null];
   }
+
+  /** @inheritdoc */
+  get uriWithoutFilter() {
+    return this.light ? 'ontology_light.json' : 'ontology.json';
+  }
 }

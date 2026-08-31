@@ -17,6 +17,7 @@ import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
 import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.group.ImageGroupImageInstanceService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -27,18 +28,18 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTest {
 
-    private ImageGroupImageInstance igii = null;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     ImageGroupImageInstanceService imageGroupImageInstanceService;
+    @Autowired
+    private UrlApi urlApi;
+    private ImageGroupImageInstance igii = null;
 
     @BeforeEach
     public void before() throws Exception {
         if (igii == null) {
-            igii = builder.given_an_imagegroup_imageinstance();
+            igii = builder.givenAnImageGroupImageInstance();
             initACL(igii.container());
         }
         ImageGroup imageGroup = igii.getGroup();
@@ -46,17 +47,20 @@ public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTe
     }
 
     @Override
-    protected void when_i_get_domain() {
+    protected void whenIGetDomain() {
         imageGroupImageInstanceService.get(igii.getGroup(), igii.getImage());
     }
 
     @Override
-    protected void when_i_add_domain() {
-        imageGroupImageInstanceService.add(builder.given_a_not_persisted_imagegroup_imageinstance(igii.getGroup(), igii.getImage()).toJsonObject());
+    protected void whenIAddDomain() {
+        imageGroupImageInstanceService.add(builder.givenANotPersistedImageGroupImageInstance(
+            igii.getGroup(),
+            igii.getImage()
+        ).toJsonObject(urlApi));
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         imageGroupImageInstanceService.delete(igii, null, null, true);
     }
 
@@ -92,25 +96,25 @@ public class ImageGroupImageInstanceAuthorizationTest extends CRDAuthorizationTe
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_imagegroup_imageinstance_by_imagegroup() {
+    public void adminCanListImagegroupImageinstanceByImagegroup() {
         assertThat(imageGroupImageInstanceService.list(igii.getGroup())).contains(igii);
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_imagegroup_imageinstance_by_imageinstance() {
+    public void adminCanListImagegroupImageinstanceByImageinstance() {
         assertThat(imageGroupImageInstanceService.list(igii.getImage())).contains(igii);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_imagegroup_imageinstance_by_imagegroup() {
+    public void userCanListImagegroupImageinstanceByImagegroup() {
         assertThat(imageGroupImageInstanceService.list(igii.getGroup())).contains(igii);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_imagegroup_imageinstance_by_imageinstance() {
+    public void userCanListImagegroupImageinstanceByImageinstance() {
         assertThat(imageGroupImageInstanceService.list(igii.getImage())).contains(igii);
     }
 }

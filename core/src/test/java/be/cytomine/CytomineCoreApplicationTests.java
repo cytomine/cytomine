@@ -1,11 +1,17 @@
 package be.cytomine;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.context.annotation.Import;
 
-@SpringBootTest
-@ActiveProfiles("test")
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
+
+@SpringBootTest(classes = CytomineCoreApplication.class)
+@AutoConfigureMockMvc
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 class CytomineCoreApplicationTests {
 
     @Test

@@ -9,7 +9,8 @@ from pylibCZIrw import czi
 from pyvips import Image as VIPSImage
 from pyvips import BandFormat
 
-from typing import Any, Iterable, Optional
+from collections.abc import Iterable
+from typing import Any
 
 
 logger = logging.getLogger("pims.format.czi")
@@ -409,7 +410,7 @@ class CZIFile():
 
         return self._height
 
-    def channel_name(self, index: int) -> Optional[str]:
+    def channel_name(self, index: int) -> str | None:
         """
         Return the name of the channel, if known
         """
@@ -419,7 +420,7 @@ class CZIFile():
         else:
             return None
 
-    def channel_excitation_wavelength(self, index: int) -> Optional[float]:
+    def channel_excitation_wavelength(self, index: int) -> float | None:
         """
         Return the excitation wavelength of the channel, if known
         """
@@ -429,7 +430,7 @@ class CZIFile():
         else:
             return None
 
-    def channel_emission_wavelength(self, index: int) -> Optional[float]:
+    def channel_emission_wavelength(self, index: int) -> float | None:
         """
         Return the emission wavelength of the channel, if known
         """
@@ -456,7 +457,7 @@ class CZIFile():
         return self._depth
 
     @property
-    def depth_scale(self) -> Optional[float]:
+    def depth_scale(self) -> float | None:
         """
         Return the physical scale of the depth (z) dimension
         """
@@ -475,7 +476,7 @@ class CZIFile():
         return self._duration
 
     @property
-    def duration_scale(self) -> Optional[float]:
+    def duration_scale(self) -> float | None:
         """
         Return the physical scale of the time dimension
         """
@@ -486,7 +487,7 @@ class CZIFile():
         return scale
 
     @property
-    def frame_rate(self) -> Optional[float]:
+    def frame_rate(self) -> float | None:
         """
         Return the frame rate of the time dimension
         """

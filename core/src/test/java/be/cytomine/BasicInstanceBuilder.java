@@ -1,7 +1,6 @@
 package be.cytomine;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -11,10 +10,8 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
@@ -24,7 +21,6 @@ import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.CompanionFile;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.image.Mime;
 import be.cytomine.domain.image.NestedImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.image.UploadedFile;
@@ -61,9 +57,10 @@ import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.image.MimeRepository;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -80,194 +77,96 @@ public class BasicInstanceBuilder {
 
     public static final String ROLE_GUEST = "ROLE_GUEST";
 
+    public static final String ADMIN = "admin";
+
+    public static final String ANOTHER_USER = "anotheruser";
+
+    public static final String SUPER_ADMIN = "superadmin";
+
+    public static final String SUPER_ADMIN_ACL = "SUPER_ADMIN_ACL";
+
+    public static final String ADMIN_ACL = "ADMIN_ACL";
+
+    public static final String ACL_USER_NO_ACL = "ACL_USER_NO_ACL";
+
+    public static final String USER_ACL_READ = "USER_ACL_READ";
+
+    public static final String USER_ACL_WRITE = "USER_ACL_WRITE";
+
+    public static final String USER_ACL_CREATE = "USER_ACL_CREATE";
+
+    public static final String USER_ACL_DELETE = "USER_ACL_DELETE";
+
+    public static final String USER_ACL_ADMIN = "USER_ACL_ADMIN";
+
+    public static final String CREATOR = "CREATOR";
+
+    public static final String GUEST_ACL = "GUEST_ACL";
+
     EntityManager em;
-
-    TransactionTemplate transactionTemplate;
-
     PermissionService permissionService;
-
     SecRoleRepository secRoleRepository;
-
-    MimeRepository mimeRepository;
-
     UserRepository userRepository;
+    UserMapper userMapper;
 
-    ApplicationBootstrap applicationBootstrap;
-
-    private static User aUser;
-    private static User anAdmin;
-    private static User aGuest;
-
-    public BasicInstanceBuilder(
-            EntityManager em,
-            TransactionTemplate transactionTemplate,
-            UserRepository userRepository,
-            PermissionService permissionService,
-            SecRoleRepository secRoleRepository,
-            MimeRepository mimeRepository,
-            ApplicationBootstrap applicationBootstrap) {
-        if (secRoleRepository.count()==0) {
-            applicationBootstrap.init();
-        }
+    public BasicInstanceBuilder(EntityManager em, UserRepository userRepository, PermissionService permissionService,
+        SecRoleRepository secRoleRepository, UserMapper userMapper) {
         this.em = em;
         this.userRepository = userRepository;
         this.permissionService = permissionService;
         this.secRoleRepository = secRoleRepository;
-        this.mimeRepository = mimeRepository;
-        this.transactionTemplate = transactionTemplate;
-
-        this.transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                aUser = (User) userRepository.findByUsernameLikeIgnoreCase("user")
-                        .orElseGet(() -> given_default_user());
-                anAdmin = (User) userRepository.findByUsernameLikeIgnoreCase("admin")
-                        .orElseGet(() -> given_default_admin());
-            }
-        });
+        this.userMapper = userMapper;
     }
 
-    public User given_default_user() {
-        if (aUser == null) {
-            aUser = given_a_user("user");
-        }
-        return aUser;
+    public UserResponse givenAdmin() {
+        return getUser(ADMIN);
     }
 
-    public User given_default_admin() {
-        if (anAdmin == null) {
-            anAdmin = given_a_admin("admin");
-        }
-        return anAdmin;
+    public UserResponse givenAnotherUser() {
+        return getUser(ANOTHER_USER);
     }
 
-
-    public User given_default_guest() {
-        if (aGuest == null) {
-            aGuest = given_a_guest("guest");
-        }
-        return aGuest;
+    public UserResponse givenSuperAdminAcl() {
+        return getUser(SUPER_ADMIN_ACL);
     }
 
-    public User given_a_user() {
-        return given_a_user(randomString());
+    public UserResponse givenAdminAcl() {
+        return getUser(ADMIN_ACL);
     }
 
-    public User given_a_guest() {
-        return given_a_guest(randomString());
+    public UserResponse givenAclUserNoAcl() {
+        return getUser(ACL_USER_NO_ACL);
     }
 
-    public User given_a_admin() {
-        return given_a_admin(randomString());
+    public UserResponse givenUserAclRead() {
+        return getUser(USER_ACL_READ);
     }
 
-    public User given_a_user(String username) {
-        User user = persistAndReturn(given_a_not_persisted_user());
-        user.setUsername(username);
-        user = persistAndReturn(user);
-        addRole(user, ROLE_USER);
-        return user;
+    public UserResponse givenUserAclWrite() {
+        return getUser(USER_ACL_WRITE);
     }
 
-    public User given_a_guest(String username) {
-        User user = persistAndReturn(given_a_not_persisted_user());
-        user.setUsername(username);
-        user = persistAndReturn(user);
-        addRole(user, ROLE_GUEST);
-        return user;
+    public UserResponse givenUserAclCreate() {
+        return getUser(USER_ACL_CREATE);
     }
 
-    public User given_a_admin(String username) {
-        User user = persistAndReturn(given_a_not_persisted_user());
-        user.setUsername(username);
-        user = persistAndReturn(user);
-        addRole(user, ROLE_ADMIN);
-        return user;
+    public UserResponse givenUserAclDelete() {
+        return getUser(USER_ACL_DELETE);
     }
 
-    public void addRole(User user, String authority) {
-        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
-        secSecUserSecRole.setSecUser(user);
-        secSecUserSecRole.setSecRole(secRoleRepository.findByAuthority(authority).orElseThrow(() -> new ObjectNotFoundException("authority " + authority + " does not exists")));
-        em.persist(secSecUserSecRole);
-        em.flush();
-        em.refresh(user);
+    public UserResponse givenUserAclAdmin() {
+        return getUser(USER_ACL_ADMIN);
     }
 
-    public User given_superadmin() {
-        return userRepository.findByUsernameLikeIgnoreCase("superadmin")
-                   .orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
+    public UserResponse givenCreator() {
+        return getUser(CREATOR);
     }
 
-    public static User given_a_not_persisted_user() {
-        //User user2 = new User();
-        User user = new User();
-        user.setName("firstname lastname");
-        user.setReference(UUID.randomUUID().toString());
-        user.setUsername(randomString());
-        user.generateKeys();
-        return user;
+    public UserResponse givenGuestAcl() {
+        return getUser(GUEST_ACL);
     }
 
-    public ImageFilterProject given_a_not_persisted_image_filter_project(ImageFilter imageFilter, Project project) {
-        ImageFilterProject imageFilterProject = new ImageFilterProject();
-        imageFilterProject.setImageFilter(imageFilter);
-        imageFilterProject.setProject(project);
-        return imageFilterProject;
-    }
-
-    public ImageFilterProject given_a_image_filter_project() {
-        return persistAndReturn(given_a_not_persisted_image_filter_project(given_a_image_filter(), given_a_project()));
-    }
-
-    public ImageFilterProject given_a_image_filter_project(ImageFilter imageFilter, Project project) {
-        return persistAndReturn(given_a_not_persisted_image_filter_project(imageFilter, project));
-    }
-
-    public ImageFilter given_a_not_persisted_image_filter() {
-        ImageFilter imageFilter = new ImageFilter();
-        imageFilter.setName(randomString());
-        imageFilter.setMethod(randomString());
-        return imageFilter;
-    }
-    public ImageFilter given_a_image_filter() {
-        return persistAndReturn(given_a_not_persisted_image_filter());
-    }
-
-    public Term given_a_term() {
-        return persistAndReturn(given_a_not_persisted_term(given_an_ontology()));
-    }
-
-    public Term given_a_term(Ontology ontology) {
-        return persistAndReturn(given_a_not_persisted_term(ontology));
-    }
-
-    public static Term given_a_not_persisted_term(Ontology ontology) {
-        Term term = new Term();
-        term.setName(randomString());
-        term.setOntology(ontology);
-        term.setColor("blue");
-        return term;
-    }
-
-    public Relation given_a_relation() {
-        return (Relation)em.createQuery("SELECT relation FROM Relation relation WHERE relation.name LIKE 'parent'").getResultList().get(0);
-    }
-
-    public RelationTerm given_a_relation_term() {
-        Ontology ontology = given_an_ontology();
-        return given_a_relation_term(given_a_term(ontology), given_a_term(ontology));
-    }
-
-    public RelationTerm given_a_relation_term(Term term1, Term term2) {
-        return given_a_relation_term(given_a_relation(), term1, term2);
-    }
-
-    public RelationTerm given_a_relation_term(Relation relation, Term term1, Term term2) {
-        return persistAndReturn(given_a_not_persisted_relation_term(relation, term1, term2));
-    }
-
-    public static RelationTerm given_a_not_persisted_relation_term(Relation relation, Term term1, Term term2) {
+    public RelationTerm givenANotPersistedRelationTerm(Relation relation, Term term1, Term term2) {
         RelationTerm relationTerm = new RelationTerm();
         relationTerm.setRelation(relation);
         relationTerm.setTerm1(term1);
@@ -276,34 +175,126 @@ public class BasicInstanceBuilder {
         return relationTerm;
     }
 
-    public Ontology given_an_ontology() {
-        return persistAndReturn(given_a_not_persisted_ontology());
+    public UserResponse givenSuperAdmin() {
+        return getUser(SUPER_ADMIN);
     }
 
-    public static Ontology given_a_not_persisted_ontology() {
+    public UserResponse getUser(String username) {
+        return userMapper.map(getUserEntity(username));
+    }
+
+    public User getUserEntity(String username) {
+        return userRepository.findByUsernameLikeIgnoreCase(username)
+            .orElseThrow(() -> new ObjectNotFoundException(username + " not in db"));
+    }
+
+    public User getUserEntity(UserResponse user) {
+        return getUserEntity(user.username());
+    }
+
+    public UserResponse givenCurrentUser() {
+        return CurrentUserService.getSecurityCurrentUser().map(currentUser -> currentUser.getUser().username())
+            .flatMap(userRepository::findByUsernameLikeIgnoreCase).map(user -> userMapper.map(user))
+            .orElseGet(this::givenSuperAdmin);
+    }
+
+    public User givenANotPersistedUser() {
+        User user = new User();
+        user.setName("firstname lastname");
+        user.setReference(UUID.randomUUID().toString());
+        user.setUsername(randomString());
+        user.generateKeys();
+        return user;
+    }
+
+    public ImageFilterProject givenANotPersistedImageFilterProject(ImageFilter imageFilter, Project project) {
+        ImageFilterProject imageFilterProject = new ImageFilterProject();
+        imageFilterProject.setImageFilter(imageFilter);
+        imageFilterProject.setProject(project);
+        return imageFilterProject;
+    }
+
+    public ImageFilterProject givenAnImageFilterProject() {
+        return persistAndReturn(givenANotPersistedImageFilterProject(givenAnImageFilter(), givenAProject()));
+    }
+
+    public ImageFilterProject givenAnImageFilterProject(ImageFilter imageFilter, Project project) {
+        return persistAndReturn(givenANotPersistedImageFilterProject(imageFilter, project));
+    }
+
+    public ImageFilter givenANotPersistedImageFilter() {
+        ImageFilter imageFilter = new ImageFilter();
+        imageFilter.setName(randomString());
+        imageFilter.setMethod(randomString());
+        return imageFilter;
+    }
+
+    public ImageFilter givenAnImageFilter() {
+        return persistAndReturn(givenANotPersistedImageFilter());
+    }
+
+    public Term givenATerm() {
+        return persistAndReturn(givenANotPersistedTerm(givenAnOntology()));
+    }
+
+    public Term givenATerm(Ontology ontology) {
+        return persistAndReturn(givenANotPersistedTerm(ontology));
+    }
+
+    public Term givenANotPersistedTerm(Ontology ontology) {
+        Term term = new Term();
+        term.setName(randomString());
+        term.setOntology(ontology);
+        term.setColor(String.format("#%06X", new Random().nextInt(0x1000000)));
+        return term;
+    }
+
+    public RelationTerm givenARelationTerm() {
+        Ontology ontology = givenAnOntology();
+        return givenARelationTerm(givenATerm(ontology), givenATerm(ontology));
+    }
+
+    public RelationTerm givenARelationTerm(Term term1, Term term2) {
+        return givenARelationTerm(givenARelation(), term1, term2);
+    }
+
+    public RelationTerm givenARelationTerm(Relation relation, Term term1, Term term2) {
+        return persistAndReturn(givenANotPersistedRelationTerm(relation, term1, term2));
+    }
+
+    public Relation givenARelation() {
+        return (Relation) em.createQuery("SELECT relation FROM Relation relation WHERE relation.name LIKE 'parent'")
+            .getResultList().get(0);
+    }
+
+    public Ontology givenAnOntology() {
+        return persistAndReturn(givenANotPersistedOntology());
+    }
+
+    public Ontology givenANotPersistedOntology() {
         Ontology ontology = new Ontology();
         ontology.setName(randomString());
-        ontology.setUser(aUser);
+        ontology.setUserId(givenAclUserNoAcl().id());
         return ontology;
     }
 
-    public Project given_a_project_with_user(User user) {
-        Project project = given_a_project();
-        addUserToProject(project, user.getUsername(), ADMINISTRATION);
+    public Project givenAProjectWithUser(String username) {
+        Project project = givenAProject();
+        addUserToProject(project, username, ADMINISTRATION);
         return project;
     }
 
-    public Project given_a_project() {
-        return persistAndReturn(given_a_project_with_ontology(given_an_ontology()));
+    public Project givenAProject() {
+        return persistAndReturn(givenAProjectWithOntology(givenAnOntology()));
     }
 
-    public Project given_a_project_with_ontology(Ontology ontology) {
-        Project project =  given_a_not_persisted_project();
+    public Project givenAProjectWithOntology(Ontology ontology) {
+        Project project = givenANotPersistedProject();
         project.setOntology(ontology);
         return persistAndReturn(project);
     }
 
-    public static Project given_a_not_persisted_project() {
+    public Project givenANotPersistedProject() {
         Project project = new Project();
         project.setName(randomString());
         project.setOntology(null);
@@ -312,27 +303,11 @@ public class BasicInstanceBuilder {
     }
 
     public void addUserToProject(Project project, String username, Permission permission) {
-        permissionService.addPermission(project, username, permission, this.given_superadmin());
+        permissionService.addPermission(project, username, permission, this.givenSuperAdmin().username());
     }
 
     public void addUserToProject(Project project, String username) {
-        permissionService.addPermission(project, username, ADMINISTRATION, this.given_superadmin());
-    }
-
-    public void addUserToOntology(Ontology ontology, String username, Permission permission) {
-        permissionService.addPermission(ontology, username, permission);
-    }
-
-    public void addUserToOntology(Ontology ontology, String username) {
-        permissionService.addPermission(ontology, username, ADMINISTRATION, this.given_superadmin());
-    }
-
-    public void addUserToStorage(Storage storage, String username, Permission permission) {
-        permissionService.addPermission(storage, username, permission);
-    }
-
-    public void addUserToStorage(Storage storage, String username) {
-        permissionService.addPermission(storage, username, ADMINISTRATION, this.given_superadmin());
+        permissionService.addPermission(project, username, ADMINISTRATION, this.givenSuperAdmin().username());
     }
 
     public <T> T persistAndReturn(T instance) {
@@ -341,15 +316,15 @@ public class BasicInstanceBuilder {
         return instance;
     }
 
-    public UploadedFile given_a_uploaded_file() {
-        UploadedFile uploadedFile = given_a_not_persisted_uploaded_file();
+    public UploadedFile givenAUploadedFile() {
+        UploadedFile uploadedFile = givenANotPersistedUploadedFile();
         return persistAndReturn(uploadedFile);
     }
 
-    public UploadedFile given_a_not_persisted_uploaded_file(String contentType) {
+    public UploadedFile givenANotPersistedUploadedFile(String contentType) {
         UploadedFile uploadedFile = new UploadedFile();
-        uploadedFile.setStorage(given_a_storage());
-        uploadedFile.setUser(given_superadmin());
+        uploadedFile.setStorage(givenAStorage());
+        uploadedFile.setUser(getUserEntity(SUPER_ADMIN));
         uploadedFile.setFilename(randomString());
         uploadedFile.setOriginalFilename(randomString());
         uploadedFile.setExt("tif");
@@ -359,144 +334,136 @@ public class BasicInstanceBuilder {
         return uploadedFile;
     }
 
-    public UploadedFile given_a_not_persisted_uploaded_file() {
-        return given_a_not_persisted_uploaded_file("PYRTIFF");
+    public UploadedFile givenANotPersistedUploadedFile() {
+        return givenANotPersistedUploadedFile("PYRTIFF");
     }
 
-    public Storage given_a_storage() {
-        return given_a_storage(given_superadmin());
+    public Storage givenAStorage() {
+        return givenAStorage(givenSuperAdmin());
     }
 
-    public Storage given_a_storage(User user) {
-        Storage storage = given_a_not_persisted_storage();
-        storage.setUser(user);
+    public Storage givenAStorage(UserResponse user) {
+        Storage storage = givenANotPersistedStorage(user);
         storage = persistAndReturn(storage);
-        permissionService.addPermission(storage, storage.getUser().getUsername(), ADMINISTRATION, storage.getUser());
+        permissionService.addPermission(storage, storage.getUser().getUsername(), ADMINISTRATION,
+            storage.getUser().getUsername());
         return storage;
     }
 
-    public static Storage given_a_not_persisted_storage(User user) {
+    public Storage givenANotPersistedStorage(UserResponse user) {
         Storage storage = new Storage();
         storage.setName(randomString());
-        storage.setUser(user);
+        storage.setUser(getUserEntity(user));
         return storage;
     }
 
-    public Storage given_a_not_persisted_storage() {
-        return given_a_not_persisted_storage(given_superadmin());
+    public Storage givenANotPersistedStorage() {
+        return givenANotPersistedStorage(givenSuperAdmin());
     }
 
-    private static String randomString() {
+    private String randomString() {
         return UUID.randomUUID().toString();
     }
 
-
-    public AbstractImage given_an_abstract_image() {
-        AbstractImage imageServer = given_a_not_persisted_abstract_image();
-        return persistAndReturn(imageServer);
+    public AbstractImage givenAnAbstractImage() {
+        return persistAndReturn(givenANotPersistedAbstractImage());
     }
 
-    public AbstractImage given_a_not_persisted_abstract_image() {
+    public AbstractImage givenANotPersistedAbstractImage() {
         AbstractImage image = new AbstractImage();
-        image.setUploadedFile(given_a_uploaded_file());
+        image.setUploadedFile(givenAUploadedFile());
         image.setOriginalFilename(randomString());
         image.setWidth(16000);
         image.setHeight(16000);
         return image;
     }
 
-
-    public ImageInstance given_an_image_instance(AbstractImage abstractImage, Project project) {
-        ImageInstance imageInstance = given_a_not_persisted_image_instance(abstractImage, project);
-        return persistAndReturn(imageInstance);
+    public ImageInstance givenANotPersistedImageInstance(Project project) {
+        return givenANotPersistedImageInstance(givenAnAbstractImage(), project);
     }
 
-    public ImageInstance given_a_not_persisted_image_instance(Project project) {
-        return given_a_not_persisted_image_instance(given_an_abstract_image(), project);
+    public ImageInstance givenANotPersistedImageInstance() {
+        return givenANotPersistedImageInstance(givenAnAbstractImage(), givenAProject());
     }
 
-    public ImageInstance given_a_not_persisted_image_instance() {
-        return given_a_not_persisted_image_instance(given_an_abstract_image(), given_a_project());
-    }
-
-    public ImageInstance given_a_not_persisted_image_instance(AbstractImage abstractImage, Project project) {
+    public ImageInstance givenANotPersistedImageInstance(AbstractImage abstractImage, Project project) {
         ImageInstance image = new ImageInstance();
         image.setBaseImage(abstractImage);
         image.setProject(project);
-        image.setUser(given_superadmin());
+        image.setUser(getUserEntity(SUPER_ADMIN));
         return image;
     }
 
-    public ImageInstance given_an_image_instance(Project project) {
-        ImageInstance imageInstance = given_an_image_instance(given_an_abstract_image(), project);
+    public ImageInstance givenAnImageInstance(AbstractImage abstractImage, Project project) {
+        ImageInstance imageInstance = givenANotPersistedImageInstance(abstractImage, project);
         return persistAndReturn(imageInstance);
     }
 
-    public ImageInstance given_an_image_instance() {
-        ImageInstance imageInstance = given_an_image_instance(given_an_abstract_image(), given_a_project());
+    public ImageInstance givenAnImageInstance(Project project) {
+        ImageInstance imageInstance = givenAnImageInstance(givenAnAbstractImage(), project);
         return persistAndReturn(imageInstance);
     }
 
-    public AbstractSlice given_an_abstract_slice() {
-        AbstractImage abstractImage = given_an_abstract_image();
-        UploadedFile uploadedFile = given_a_uploaded_file();
+    public ImageInstance givenAnImageInstance() {
+        ImageInstance imageInstance = givenAnImageInstance(givenAnAbstractImage(), givenAProject());
+        return persistAndReturn(imageInstance);
+    }
+
+    public AbstractSlice givenAnAbstractSlice() {
+        AbstractImage abstractImage = givenAnAbstractImage();
+        UploadedFile uploadedFile = givenAUploadedFile();
         uploadedFile.setStorage(abstractImage.getUploadedFile().getStorage());
         persistAndReturn(uploadedFile);
-        return given_an_abstract_slice(abstractImage, uploadedFile);
+        return givenAnAbstractSlice(abstractImage, uploadedFile);
     }
 
-    public AbstractSlice given_an_abstract_slice(AbstractImage abstractImage, int c, int z, int t) {
-        AbstractSlice slice = given_a_not_persisted_abstract_slice(abstractImage, abstractImage.getUploadedFile());
-        slice.setMime(given_a_mime("openslide/mrxs"));
+    public AbstractSlice givenAnAbstractSlice(AbstractImage abstractImage, int c, int z, int t) {
+        AbstractSlice slice = givenANotPersistedAbstractSlice(abstractImage, abstractImage.getUploadedFile());
         slice.setChannel(c);
         slice.setZStack(z);
         slice.setTime(t);
         return persistAndReturn(slice);
     }
 
-    public AbstractSlice given_an_abstract_slice(AbstractImage abstractImage, UploadedFile uploadedFile) {
-        return persistAndReturn(given_a_not_persisted_abstract_slice(abstractImage, uploadedFile));
+    public AbstractSlice givenAnAbstractSlice(AbstractImage abstractImage, UploadedFile uploadedFile) {
+        return persistAndReturn(givenANotPersistedAbstractSlice(abstractImage, uploadedFile));
     }
 
-    public AbstractSlice given_a_not_persisted_abstract_slice() {
-        return given_a_not_persisted_abstract_slice(given_an_abstract_image(), given_a_uploaded_file());
+    public AbstractSlice givenANotPersistedAbstractSlice() {
+        return givenANotPersistedAbstractSlice(givenAnAbstractImage(), givenAUploadedFile());
     }
 
-    public AbstractSlice given_a_not_persisted_abstract_slice(AbstractImage abstractImage, UploadedFile uploadedFile) {
+    public AbstractSlice givenANotPersistedAbstractSlice(AbstractImage abstractImage, UploadedFile uploadedFile) {
         AbstractSlice slice = new AbstractSlice();
         slice.setImage(abstractImage);
         slice.setUploadedFile(uploadedFile);
-        slice.setMime(given_a_mime());
         slice.setChannel(0);
         slice.setZStack(0);
         slice.setTime(0);
         return slice;
     }
 
-    public SliceInstance given_a_slice_instance() {
-        return given_a_slice_instance(given_an_image_instance(), 0, 0, 0);
+    public SliceInstance givenASliceInstance() {
+        return givenASliceInstance(givenAnImageInstance(), 0, 0, 0);
     }
 
-    public SliceInstance given_a_slice_instance(ImageInstance imageInstance, int c, int z, int t) {
-        AbstractSlice abstractSlice = given_an_abstract_slice(imageInstance.getBaseImage(), c, z, t);
-        return persistAndReturn(given_a_not_persisted_slice_instance(imageInstance, abstractSlice));
+    public SliceInstance givenASliceInstance(ImageInstance imageInstance, int c, int z, int t) {
+        AbstractSlice abstractSlice = givenAnAbstractSlice(imageInstance.getBaseImage(), c, z, t);
+        return persistAndReturn(givenANotPersistedSliceInstance(imageInstance, abstractSlice));
     }
 
-    public SliceInstance given_a_slice_instance(ImageInstance imageInstance, AbstractSlice abstractSlice) {
-        return persistAndReturn(given_a_not_persisted_slice_instance(imageInstance, abstractSlice));
+    public SliceInstance givenASliceInstance(ImageInstance imageInstance, AbstractSlice abstractSlice) {
+        return persistAndReturn(givenANotPersistedSliceInstance(imageInstance, abstractSlice));
     }
 
-    public SliceInstance given_a_not_persisted_slice_instance() {
-        return given_a_not_persisted_slice_instance(given_an_image_instance(), given_an_abstract_slice());
-    }
-
-    public SliceInstance given_a_slice_instance(Project project) {
-        AbstractImage image = given_an_abstract_image();
-        SliceInstance sliceInstance = given_a_slice_instance(given_an_image_instance(image, project), given_an_abstract_slice(image, 0,0,0));
+    public SliceInstance givenASliceInstance(Project project) {
+        AbstractImage image = givenAnAbstractImage();
+        SliceInstance sliceInstance =
+            givenASliceInstance(givenAnImageInstance(image, project), givenAnAbstractSlice(image, 0, 0, 0));
         return persistAndReturn(sliceInstance);
     }
 
-    public SliceInstance given_a_not_persisted_slice_instance(ImageInstance imageInstance, AbstractSlice abstractSlice) {
+    public SliceInstance givenANotPersistedSliceInstance(ImageInstance imageInstance, AbstractSlice abstractSlice) {
         SliceInstance slice = new SliceInstance();
         slice.setImage(imageInstance);
         slice.setProject(imageInstance.getProject());
@@ -504,48 +471,35 @@ public class BasicInstanceBuilder {
         return slice;
     }
 
-
-    public Mime given_a_mime() {
-        Optional<Mime> optionalMime = mimeRepository.findByMimeType("image/pyrtiff");
-        if (optionalMime.isPresent()) {
-            return optionalMime.get();
-        } else {
-            Mime mime = new Mime();
-            mime.setExtension("tif");
-            mime.setMimeType("image/pyrtiff");
-            return persistAndReturn(mime);
-        }
+    public SliceInstance givenANotPersistedSliceInstance() {
+        return givenANotPersistedSliceInstance(givenAnImageInstance(), givenAnAbstractSlice());
     }
 
-    public Mime given_a_mime(String mimeType) {
-        return mimeRepository.findByMimeType(mimeType).orElseThrow(() -> new ObjectNotFoundException("MimeType", mimeType));
+    public NestedImageInstance givenANestedImageInstance() {
+        return persistAndReturn(givenANotPersistedNestedImageInstance());
     }
 
-    public NestedImageInstance given_a_nested_image_instance() {
-        return persistAndReturn(given_a_not_persisted_nested_image_instance());
-    }
-
-    public NestedImageInstance given_a_not_persisted_nested_image_instance() {
-        ImageInstance parent = given_an_image_instance();
+    public NestedImageInstance givenANotPersistedNestedImageInstance() {
+        ImageInstance parent = givenAnImageInstance();
         NestedImageInstance nestedImageInstance = new NestedImageInstance();
-        nestedImageInstance.setBaseImage(given_an_abstract_image());
+        nestedImageInstance.setBaseImage(givenAnAbstractImage());
         nestedImageInstance.setProject(parent.getProject());
-        nestedImageInstance.setUser(given_superadmin());
+        nestedImageInstance.setUser(getUserEntity(SUPER_ADMIN));
         nestedImageInstance.setParent(parent);
         nestedImageInstance.setX(1);
         nestedImageInstance.setY(2);
         return nestedImageInstance;
     }
 
-    public Property given_a_property(CytomineDomain cytomineDomain) {
-        return persistAndReturn(given_a_not_persisted_property(cytomineDomain, "key", "value"));
+    public Property givenAProperty(CytomineDomain cytomineDomain) {
+        return persistAndReturn(givenANotPersistedProperty(cytomineDomain, "key", "value"));
     }
 
-    public Property given_a_property(CytomineDomain cytomineDomain, String key, String value) {
-        return persistAndReturn(given_a_not_persisted_property(cytomineDomain, key, value));
+    public Property givenAProperty(CytomineDomain cytomineDomain, String key, String value) {
+        return persistAndReturn(givenANotPersistedProperty(cytomineDomain, key, value));
     }
 
-    public Property given_a_not_persisted_property(CytomineDomain cytomineDomain, String key, String value) {
+    public Property givenANotPersistedProperty(CytomineDomain cytomineDomain, String key, String value) {
         Property property = new Property();
         property.setDomain(cytomineDomain);
         property.setKey(key);
@@ -553,11 +507,11 @@ public class BasicInstanceBuilder {
         return property;
     }
 
-    public CompanionFile given_a_companion_file(AbstractImage abstractImage) {
-        return persistAndReturn(given_a_not_persisted_companion_file(abstractImage));
+    public CompanionFile givenACompanionFile(AbstractImage abstractImage) {
+        return persistAndReturn(givenANotPersistedCompanionFile(abstractImage));
     }
 
-    public CompanionFile given_a_not_persisted_companion_file(AbstractImage abstractImage) {
+    public CompanionFile givenANotPersistedCompanionFile(AbstractImage abstractImage) {
         CompanionFile companionFile = new CompanionFile();
         companionFile.setImage(abstractImage);
         companionFile.setUploadedFile(abstractImage.getUploadedFile());
@@ -568,58 +522,49 @@ public class BasicInstanceBuilder {
         return companionFile;
     }
 
-    public UserAnnotation given_a_not_persisted_user_annotation() {
+    public UserAnnotation givenANotPersistedGuestAnnotation() {
         UserAnnotation annotation = new UserAnnotation();
-        annotation.setUser(given_superadmin());
+        annotation.setUserId(givenGuestAcl().id());
         try {
             annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
         } catch (ParseException ignored) {
-
+            // TODO
         }
-        annotation.setSlice(given_a_slice_instance());
+        annotation.setSlice(givenASliceInstance());
         annotation.setImage(annotation.getSlice().getImage());
         annotation.setProject(annotation.getImage().getProject());
         return annotation;
     }
 
-        public UserAnnotation given_a_not_persisted_guest_annotation() {
+    public UserAnnotation givenANotPersistedUserAnnotation() {
         UserAnnotation annotation = new UserAnnotation();
-        annotation.setUser(given_a_guest());
+        annotation.setUserId(givenSuperAdmin().id());
         try {
             annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
         } catch (ParseException ignored) {
-
+            // TODO
         }
-        annotation.setSlice(given_a_slice_instance());
+        annotation.setSlice(givenASliceInstance());
         annotation.setImage(annotation.getSlice().getImage());
         annotation.setProject(annotation.getImage().getProject());
         return annotation;
     }
 
-    public UserAnnotation given_a_user_annotation(Project project) {
-        UserAnnotation annotation = given_a_not_persisted_user_annotation();
-        annotation.getSlice().setProject(project);
-        annotation.getImage().setProject(project);
-        annotation.setProject(project);
-        return persistAndReturn(annotation);
-    }
-
-    public UserAnnotation given_a_not_persisted_user_annotation(Project project) {
-        UserAnnotation annotation = given_a_not_persisted_user_annotation();
+    public UserAnnotation givenANotPersistedUserAnnotation(Project project) {
+        UserAnnotation annotation = givenANotPersistedUserAnnotation();
         annotation.getSlice().setProject(project);
         annotation.getImage().setProject(project);
         annotation.setProject(project);
         return annotation;
     }
 
-
-    public UserAnnotation given_a_not_persisted_user_annotation(SliceInstance sliceInstance) {
+    public UserAnnotation givenANotPersistedUserAnnotation(SliceInstance sliceInstance) {
         UserAnnotation annotation = new UserAnnotation();
-        annotation.setUser(given_superadmin());
+        annotation.setUserId(givenSuperAdmin().id());
         try {
             annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
         } catch (ParseException ignored) {
-
+            // Ignored
         }
         annotation.setSlice(sliceInstance);
         annotation.setImage(annotation.getSlice().getImage());
@@ -627,33 +572,42 @@ public class BasicInstanceBuilder {
         return annotation;
     }
 
-    public UserAnnotation given_a_user_annotation(SliceInstance sliceInstance) {
-        return persistAndReturn(given_a_user_annotation(sliceInstance, given_superadmin()));
+    public UserAnnotation givenAUserAnnotation(Project project) {
+        UserAnnotation annotation = givenANotPersistedUserAnnotation();
+        annotation.getSlice().setProject(project);
+        annotation.getImage().setProject(project);
+        annotation.setProject(project);
+        return persistAndReturn(annotation);
     }
 
-    public UserAnnotation given_a_user_annotation(SliceInstance sliceInstance, User user) {
-        UserAnnotation annotation = given_a_not_persisted_user_annotation();
+    public UserAnnotation givenAUserAnnotation(SliceInstance sliceInstance) {
+        return persistAndReturn(givenAUserAnnotation(sliceInstance, givenSuperAdmin()));
+    }
+
+    public UserAnnotation givenAUserAnnotation(SliceInstance sliceInstance, UserResponse user) {
+        UserAnnotation annotation = givenANotPersistedUserAnnotation();
         annotation.setSlice(sliceInstance);
         annotation.setImage(sliceInstance.getImage());
         annotation.setProject(sliceInstance.getProject());
-        annotation.setUser(user);
+        annotation.setUserId(user.id());
         return persistAndReturn(annotation);
     }
 
-    public UserAnnotation given_a_user_annotation() {
-        return persistAndReturn(given_a_not_persisted_user_annotation());
+    public UserAnnotation givenAUserAnnotation() {
+        return persistAndReturn(givenANotPersistedUserAnnotation());
     }
 
-    public UserAnnotation given_a_user_annotation(SliceInstance sliceInstance, String location, User user, Term term) throws ParseException {
-        UserAnnotation annotation = given_a_not_persisted_user_annotation(sliceInstance);
+    public UserAnnotation givenAUserAnnotation(SliceInstance sliceInstance, String location, UserResponse user,
+        Term term) throws ParseException {
+        UserAnnotation annotation = givenANotPersistedUserAnnotation(sliceInstance);
         annotation.setLocation(new WKTReader().read(location));
-        annotation.setUser(user);
+        annotation.setUserId(user.id());
         persistAndReturn(annotation);
 
-        if (term!=null) {
+        if (term != null) {
             AnnotationTerm annotationTerm = new AnnotationTerm();
             annotationTerm.setUserAnnotation(annotation);
-            annotationTerm.setUser(user);
+            annotationTerm.setUser(getUserEntity(user));
             annotationTerm.setTerm(term);
             persistAndReturn(annotationTerm);
             em.refresh(annotation);
@@ -661,95 +615,93 @@ public class BasicInstanceBuilder {
         return annotation;
     }
 
-    public AnnotationTerm given_a_not_persisted_annotation_term(UserAnnotation annotation) {
-        return given_a_not_persisted_annotation_term(annotation, this.given_a_term(annotation.getProject().getOntology()));
+    public AnnotationTerm givenANotPersistedAnnotationTerm(UserAnnotation annotation) {
+        return givenANotPersistedAnnotationTerm(annotation, this.givenATerm(annotation.getProject().getOntology()));
     }
 
-    public AnnotationTerm given_a_not_persisted_annotation_term(UserAnnotation annotation, Term term) {
+    public AnnotationTerm givenANotPersistedAnnotationTerm(UserAnnotation annotation, Term term) {
         AnnotationTerm annotationTerm = new AnnotationTerm();
         annotationTerm.setTerm(term);
-        annotationTerm.setUser(this.given_superadmin());
+        annotationTerm.setUser(getUserEntity(this.givenCurrentUser()));
         annotationTerm.setUserAnnotation(annotation);
         return annotationTerm;
     }
 
-    public AnnotationTerm given_an_annotation_term(UserAnnotation annotation, Term term) {
-        return persistAndReturn(given_a_not_persisted_annotation_term(annotation, term));
+    public AnnotationTerm givenAnAnnotationTerm(UserAnnotation annotation, Term term) {
+        return persistAndReturn(givenANotPersistedAnnotationTerm(annotation, term));
     }
 
-    public AnnotationTerm given_an_annotation_term(UserAnnotation annotation) {
-        return persistAndReturn(given_a_not_persisted_annotation_term(annotation, this.given_a_term(annotation.getProject().getOntology())));
+    public AnnotationTerm givenAnAnnotationTerm(UserAnnotation annotation) {
+        return persistAndReturn(
+            givenANotPersistedAnnotationTerm(annotation, this.givenATerm(annotation.getProject().getOntology())));
     }
 
-    public AnnotationTerm given_an_annotation_term() {
-        UserAnnotation annotation = given_a_user_annotation();
-        return persistAndReturn(given_a_not_persisted_annotation_term(annotation, this.given_a_term(annotation.getProject().getOntology())));
+    public AnnotationTerm givenAnAnnotationTerm() {
+        UserAnnotation annotation = givenAUserAnnotation();
+        return persistAndReturn(
+            givenANotPersistedAnnotationTerm(annotation, this.givenATerm(annotation.getProject().getOntology())));
     }
 
-    public ReviewedAnnotation given_a_not_persisted_reviewed_annotation() {
+    public ReviewedAnnotation givenANotPersistedReviewedAnnotation() {
         ReviewedAnnotation annotation = new ReviewedAnnotation();
-        annotation.setUser(given_superadmin());
+        annotation.setUserId(givenSuperAdmin().id());
         try {
             annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
         } catch (ParseException ignored) {
-
+            // Ignored
         }
-        UserAnnotation userAnnotation = given_a_user_annotation();
+        UserAnnotation userAnnotation = givenAUserAnnotation();
         annotation.setSlice(userAnnotation.getSlice());
         annotation.setImage(userAnnotation.getImage());
         annotation.setProject(userAnnotation.getImage().getProject());
         annotation.putParentAnnotation(userAnnotation);
-        annotation.setReviewUser(given_superadmin());
+        annotation.setReviewUser(getUserEntity(SUPER_ADMIN));
         annotation.setStatus(0);
         return annotation;
     }
 
-    public ReviewedAnnotation given_a_not_persisted_reviewed_annotation(Project project) {
-        ReviewedAnnotation annotation = given_a_not_persisted_reviewed_annotation();
-        UserAnnotation userAnnotation = given_a_not_persisted_user_annotation(project);
+    public ReviewedAnnotation givenANotPersistedReviewedAnnotation(Project project) {
+        ReviewedAnnotation annotation = givenANotPersistedReviewedAnnotation();
+        UserAnnotation userAnnotation = givenANotPersistedUserAnnotation(project);
         userAnnotation = persistAndReturn(userAnnotation);
         annotation.putParentAnnotation(userAnnotation);
         annotation.getSlice().setProject(project);
         annotation.getImage().setProject(project);
         annotation.setProject(project);
-        annotation.setReviewUser(given_superadmin());
+        annotation.setReviewUser(getUserEntity(SUPER_ADMIN));
         annotation.setStatus(0);
         return annotation;
     }
 
-
-    public ReviewedAnnotation given_a_reviewed_annotation() {
-        return persistAndReturn(given_a_not_persisted_reviewed_annotation());
+    public ReviewedAnnotation givenAReviewedAnnotation() {
+        return persistAndReturn(givenANotPersistedReviewedAnnotation());
     }
 
-    public ReviewedAnnotation given_a_reviewed_annotation(Project project) throws ParseException {
-        SliceInstance sliceInstance = given_a_slice_instance(given_an_image_instance(project), given_an_abstract_slice());
-        return given_a_reviewed_annotation(
-                sliceInstance,
-                "POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))",
-                given_superadmin(),
-                given_a_term(project.getOntology()));
+    public ReviewedAnnotation givenAReviewedAnnotation(Project project) throws ParseException {
+        SliceInstance sliceInstance = givenASliceInstance(givenAnImageInstance(project), givenAnAbstractSlice());
+        return givenAReviewedAnnotation(sliceInstance, "POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))",
+            givenSuperAdmin(), givenATerm(project.getOntology()));
     }
 
-    public ReviewedAnnotation given_a_reviewed_annotation(SliceInstance sliceInstance, String location, User user, Term term) throws ParseException {
-        UserAnnotation userAnnotation =
-                given_a_user_annotation(sliceInstance, location, user, term);
+    public ReviewedAnnotation givenAReviewedAnnotation(SliceInstance sliceInstance, String location, UserResponse user,
+        Term term) throws ParseException {
+        UserAnnotation userAnnotation = givenAUserAnnotation(sliceInstance, location, user, term);
 
         ReviewedAnnotation annotation = new ReviewedAnnotation();
         annotation.setImage(sliceInstance.getImage());
         annotation.setSlice(sliceInstance);
         annotation.setLocation(new WKTReader().read(location));
-        annotation.setUser(user);
+        annotation.setUserId(user.id());
         annotation.setProject(sliceInstance.getProject());
         annotation.putParentAnnotation(userAnnotation);
-        annotation.setReviewUser(given_superadmin());
+        annotation.setReviewUser(getUserEntity(SUPER_ADMIN));
         annotation.setStatus(0);
         persistAndReturn(annotation);
 
-        if (term!=null) {
+        if (term != null) {
             AnnotationTerm annotationTerm = new AnnotationTerm();
             annotationTerm.setUserAnnotation(userAnnotation);
-            annotationTerm.setUser(user);
+            annotationTerm.setUser(getUserEntity(user));
             annotationTerm.setTerm(term);
             persistAndReturn(annotationTerm);
             annotation.getTerms().add(term);
@@ -761,55 +713,56 @@ public class BasicInstanceBuilder {
         return annotation;
     }
 
-    public SharedAnnotation given_a_not_persisted_shared_annotation() {
+    public SharedAnnotation givenANotPersistedSharedAnnotation() {
         SharedAnnotation sharedAnnotation = new SharedAnnotation();
-        sharedAnnotation.setAnnotation(given_a_user_annotation());
+        sharedAnnotation.setAnnotation(givenAUserAnnotation());
         sharedAnnotation.setComment("Rech. proj. pr proj. priv. Self Dem. Brt. Poss. S'adr. à l'hô. Mart");
-        sharedAnnotation.setSender(given_superadmin());
-        sharedAnnotation.setReceivers(List.of(given_superadmin()));
+        sharedAnnotation.setSender(getUserEntity(SUPER_ADMIN));
+        sharedAnnotation.setReceivers(List.of(getUserEntity(SUPER_ADMIN)));
         return sharedAnnotation;
     }
 
-    public SharedAnnotation given_a_shared_annotation() {
-        return persistAndReturn(given_a_not_persisted_shared_annotation());
+    public SharedAnnotation givenASharedAnnotation() {
+        return persistAndReturn(givenANotPersistedSharedAnnotation());
     }
-    public SharedAnnotation given_a_shared_annotation(AnnotationDomain annotationDomain) {
-        SharedAnnotation sharedAnnotation = given_a_not_persisted_shared_annotation();
+
+    public SharedAnnotation givenASharedAnnotation(AnnotationDomain annotationDomain) {
+        SharedAnnotation sharedAnnotation = givenANotPersistedSharedAnnotation();
         sharedAnnotation.setAnnotation(annotationDomain);
         return persistAndReturn(sharedAnnotation);
     }
 
-    public Track given_a_track() {
-        return persistAndReturn(given_a_not_persisted_track());
+    public Track givenATrack() {
+        return persistAndReturn(givenANotPersistedTrack());
     }
 
-    public Track given_a_not_persisted_track() {
+    public Track givenANotPersistedTrack() {
         Track track = new Track();
         track.setName(randomString());
         track.setColor(randomString());
-        track.setImage(given_an_image_instance());
+        track.setImage(givenAnImageInstance());
         track.setProject(track.getImage().getProject());
         return track;
     }
 
-    public AnnotationTrack given_a_annotation_track() {
-        return persistAndReturn(given_a_not_persisted_annotation_track());
+    public AnnotationTrack givenAnAnnotationTrack() {
+        return persistAndReturn(givenANotPersistedAnnotationTrack());
     }
 
-    public AnnotationTrack given_a_not_persisted_annotation_track() {
+    public AnnotationTrack givenANotPersistedAnnotationTrack() {
         AnnotationTrack annotationTrack = new AnnotationTrack();
-        UserAnnotation annotation = given_a_user_annotation();
+        UserAnnotation annotation = givenAUserAnnotation();
         annotationTrack.setAnnotation(annotation);
         annotationTrack.setSlice(annotation.getSlice());
-        annotationTrack.setTrack(given_a_track());
+        annotationTrack.setTrack(givenATrack());
         return annotationTrack;
     }
 
-    public AttachedFile given_a_attached_file(CytomineDomain domain) {
-        return persistAndReturn(given_a_not_persisted_attached_file(domain));
+    public AttachedFile givenAnAttachedFile(CytomineDomain domain) {
+        return persistAndReturn(givenANotPersistedAttachedFile(domain));
     }
 
-    public AttachedFile given_a_not_persisted_attached_file(CytomineDomain domain) {
+    public AttachedFile givenANotPersistedAttachedFile(CytomineDomain domain) {
         AttachedFile attachedFile = new AttachedFile();
         attachedFile.setData(UUID.randomUUID().toString().getBytes());
         attachedFile.setFilename("test.txt");
@@ -817,24 +770,24 @@ public class BasicInstanceBuilder {
         return attachedFile;
     }
 
-    public AnnotationIndex given_a_not_persisted_annotation_index() {
+    public AnnotationIndex givenANotPersistedAnnotationIndex() {
         AnnotationIndex annotationIndex = new AnnotationIndex();
-        annotationIndex.setSlice(given_a_slice_instance());
+        annotationIndex.setSlice(givenASliceInstance());
         annotationIndex.setCountAnnotation(1L);
         annotationIndex.setCountReviewedAnnotation(1L);
-        annotationIndex.setUser(given_superadmin());
+        annotationIndex.setUser(getUserEntity(SUPER_ADMIN));
         return annotationIndex;
     }
 
-    public AnnotationIndex given_a_annotation_index() {
-        return persistAndReturn(given_a_not_persisted_annotation_index());
+    public AnnotationIndex givenAnAnnotationIndex() {
+        return persistAndReturn(givenANotPersistedAnnotationIndex());
     }
 
-    public Configuration given_a_configuration(String key) {
-        return persistAndReturn(given_a_not_persisted_configuration(key));
+    public Configuration givenAConfiguration(String key) {
+        return persistAndReturn(givenANotPersistedConfiguration(key));
     }
 
-    public Configuration given_a_not_persisted_configuration(String key) {
+    public Configuration givenANotPersistedConfiguration(String key) {
         Configuration configuration = new Configuration();
         configuration.setKey(key);
         configuration.setValue("value");
@@ -842,159 +795,162 @@ public class BasicInstanceBuilder {
         return configuration;
     }
 
-    public Description given_a_description(CytomineDomain domain) {
-        return persistAndReturn(given_a_not_persisted_description(domain));
+    public Description givenADescription(CytomineDomain domain) {
+        return persistAndReturn(givenANotPersistedDescription(domain));
     }
 
-    public Description given_a_not_persisted_description(CytomineDomain domain) {
+    public Description givenANotPersistedDescription(CytomineDomain domain) {
         Description description = new Description();
         description.setDomain(domain);
         description.setData("hello!");
         return description;
     }
 
-    public Tag given_a_tag(String name) {
-        return persistAndReturn(given_a_not_persisted_tag(name));
+    public Tag givenATag(String name) {
+        return persistAndReturn(givenANotPersistedTag(name));
     }
 
-
-    public Tag given_a_tag() {
-        return persistAndReturn(given_a_not_persisted_tag(randomString()));
+    public Tag givenATag() {
+        return persistAndReturn(givenANotPersistedTag(randomString()));
     }
 
-    public Tag given_a_not_persisted_tag(String name) {
+    public Tag givenANotPersistedTag(String name) {
         Tag tag = new Tag();
         tag.setName(name);
-        tag.setUser(given_superadmin());
+        tag.setUser(getUserEntity(SUPER_ADMIN));
         return tag;
     }
 
-    public TagDomainAssociation given_a_tag_association(Tag tag, CytomineDomain domain) {
-        return persistAndReturn(given_a_not_persisted_tag_association(tag, domain));
+    public TagDomainAssociation givenATagAssociation(Tag tag, CytomineDomain domain) {
+        return persistAndReturn(givenANotPersistedTagAssociation(tag, domain));
     }
 
-    public TagDomainAssociation given_a_not_persisted_tag_association(Tag tag, CytomineDomain domain) {
+    public TagDomainAssociation givenANotPersistedTagAssociation(Tag tag, CytomineDomain domain) {
         TagDomainAssociation tagDomainAssociation = new TagDomainAssociation();
         tagDomainAssociation.setTag(tag);
         tagDomainAssociation.setDomain(domain);
         return tagDomainAssociation;
     }
 
-    public ProjectRepresentativeUser given_a_project_representative_user() {
-        return persistAndReturn(given_a_not_persisted_project_representative_user(given_a_project(), given_superadmin()));
+    public ProjectRepresentativeUser givenAProjectRepresentativeUser() {
+        return persistAndReturn(
+            givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin().username(),
+                givenSuperAdmin().id()));
     }
 
-    public ProjectRepresentativeUser given_a_project_representative_user(Project project, User user) {
-        return persistAndReturn(given_a_not_persisted_project_representative_user(project, user));
+    public ProjectRepresentativeUser givenAProjectRepresentativeUser(Project project, String username, long userId) {
+        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(project, username, userId));
     }
 
-    public ProjectRepresentativeUser given_a_not_persisted_project_representative_user() {
-        return given_a_not_persisted_project_representative_user(given_a_project(), given_superadmin());
+    public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser() {
+        return givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin().username(),
+            givenSuperAdmin().id());
     }
 
-    public ProjectRepresentativeUser given_a_not_persisted_project_representative_user(Project project, User user) {
-        addUserToProject(project, user.getUsername());
+    public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser(Project project, String username,
+        long userId) {
+        addUserToProject(project, username);
         ProjectRepresentativeUser projectRepresentativeUser = new ProjectRepresentativeUser();
-        projectRepresentativeUser.setUser(user);
+        projectRepresentativeUser.setUserId(userId);
         projectRepresentativeUser.setProject(project);
         return projectRepresentativeUser;
     }
 
-
-    public ProjectDefaultLayer given_a_project_default_layer() {
-        return persistAndReturn(given_a_not_persisted_project_default_layer(given_a_project(), given_superadmin()));
+    public ProjectDefaultLayer givenAProjectDefaultLayer() {
+        return persistAndReturn(givenANotPersistedProjectDefaultLayer(givenAProject(), givenSuperAdmin()));
     }
 
-    public ProjectDefaultLayer given_a_project_default_layer(Project project, User user) {
-        return persistAndReturn(given_a_not_persisted_project_default_layer(project, user));
+    public ProjectDefaultLayer givenAProjectDefaultLayer(Project project, UserResponse user) {
+        return persistAndReturn(givenANotPersistedProjectDefaultLayer(project, user));
     }
 
-    public ProjectDefaultLayer given_a_not_persisted_project_default_layer() {
-        return given_a_not_persisted_project_default_layer(given_a_project(), given_superadmin());
+    public ProjectDefaultLayer givenANotPersistedProjectDefaultLayer() {
+        return givenANotPersistedProjectDefaultLayer(givenAProject(), givenSuperAdmin());
     }
 
-    public ProjectDefaultLayer given_a_not_persisted_project_default_layer(Project project, User user) {
-        addUserToProject(project, user.getUsername());
+    public ProjectDefaultLayer givenANotPersistedProjectDefaultLayer(Project project, UserResponse user) {
+        addUserToProject(project, user.username());
         ProjectDefaultLayer projectDefaultLayer = new ProjectDefaultLayer();
-        projectDefaultLayer.setUser(user);
+        projectDefaultLayer.setUser(getUserEntity(user));
         projectDefaultLayer.setProject(project);
         projectDefaultLayer.setHideByDefault(false);
         return projectDefaultLayer;
     }
 
-    public SecUserSecRole given_a_user_role() {
-        return persistAndReturn(given_a_not_persisted_user_role( given_a_guest(), secRoleRepository.findByAuthority(ROLE_USER).get()));
+    public SecUserSecRole givenAUserRole() {
+        return persistAndReturn(givenANotPersistedUserRole(getUserEntity(GUEST_ACL),
+            secRoleRepository.findByAuthority(ROLE_USER).get()));
     }
 
-    public SecUserSecRole given_a_user_role(User user) {
-        return persistAndReturn(given_a_not_persisted_user_role(user, secRoleRepository.findByAuthority(ROLE_USER).get()));
+    public SecUserSecRole givenAUserRole(User user) {
+        return persistAndReturn(givenANotPersistedUserRole(user, secRoleRepository.findByAuthority(ROLE_USER).get()));
     }
 
-    public SecUserSecRole given_a_user_role(User user, SecRole secRole) {
-        return persistAndReturn(given_a_not_persisted_user_role(user, secRole));
+    public SecUserSecRole givenAUserRole(User user, SecRole secRole) {
+        return persistAndReturn(givenANotPersistedUserRole(user, secRole));
     }
 
-    public SecUserSecRole given_a_not_persisted_user_role(User user, String authority) {
-        return given_a_not_persisted_user_role(user, secRoleRepository.findByAuthority(authority).get());
+    public SecUserSecRole givenANotPersistedUserRole(User user, String authority) {
+        return givenANotPersistedUserRole(user, secRoleRepository.findByAuthority(authority).get());
     }
 
-    public SecUserSecRole given_a_not_persisted_user_role(User secUser, SecRole secRole) {
+    public SecUserSecRole givenANotPersistedUserRole(User secUser, SecRole secRole) {
         SecUserSecRole secSecUserSecRole = new SecUserSecRole();
         secSecUserSecRole.setSecRole(secRole);
         secSecUserSecRole.setSecUser(secUser);
         return secSecUserSecRole;
     }
 
-    public ImageGroup given_a_not_persisted_imagegroup() {
-        return given_a_not_persisted_imagegroup(given_a_project());
+    public ImageGroup givenANotPersistedImagegroup() {
+        return givenANotPersistedImagegroup(givenAProject());
     }
 
-    public ImageGroup given_a_not_persisted_imagegroup(Project project) {
+    public ImageGroup givenANotPersistedImagegroup(Project project) {
         ImageGroup imageGroup = new ImageGroup();
         imageGroup.setName(randomString());
         imageGroup.setProject(project);
         return imageGroup;
     }
 
-    public ImageGroup given_an_imagegroup() {
-        return persistAndReturn(given_a_not_persisted_imagegroup(given_a_project()));
+    public ImageGroup givenAnImageGroup() {
+        return persistAndReturn(givenANotPersistedImagegroup(givenAProject()));
     }
 
-    public ImageGroup given_an_imagegroup(Project project) {
-        return persistAndReturn(given_a_not_persisted_imagegroup(project));
+    public ImageGroup givenAnImageGroup(Project project) {
+        return persistAndReturn(givenANotPersistedImagegroup(project));
     }
 
-    public ImageGroupImageInstance given_a_not_persisted_imagegroup_imageinstance() {
-        Project project = given_a_project();
-        ImageGroup group = given_an_imagegroup(project);
-        ImageInstance image = given_an_image_instance(project);
+    public ImageGroupImageInstance givenANotPersistedImageGroupImageInstance() {
+        Project project = givenAProject();
+        ImageGroup group = givenAnImageGroup(project);
+        ImageInstance image = givenAnImageInstance(project);
 
-        return given_a_not_persisted_imagegroup_imageinstance(group, image);
+        return givenANotPersistedImageGroupImageInstance(group, image);
     }
 
-    public ImageGroupImageInstance given_a_not_persisted_imagegroup_imageinstance(ImageGroup group, ImageInstance image) {
+    public ImageGroupImageInstance givenANotPersistedImageGroupImageInstance(ImageGroup group, ImageInstance image) {
         ImageGroupImageInstance igii = new ImageGroupImageInstance();
         igii.setGroup(group);
         igii.setImage(image);
         return igii;
     }
 
-    public ImageGroupImageInstance given_an_imagegroup_imageinstance() {
-        ImageGroupImageInstance igii = given_a_not_persisted_imagegroup_imageinstance();
-        Project project = given_a_project();
-        igii.setGroup(given_an_imagegroup(project));
-        igii.setImage(given_an_image_instance(project));
+    public ImageGroupImageInstance givenAnImageGroupImageInstance() {
+        ImageGroupImageInstance igii = givenANotPersistedImageGroupImageInstance();
+        Project project = givenAProject();
+        igii.setGroup(givenAnImageGroup(project));
+        igii.setImage(givenAnImageInstance(project));
         return persistAndReturn(igii);
     }
 
-    public ImageGroupImageInstance given_an_imagegroup_imageinstance(ImageGroup group, ImageInstance image) {
-        ImageGroupImageInstance igii = given_a_not_persisted_imagegroup_imageinstance();
+    public ImageGroupImageInstance givenAnImageGroupImageInstance(ImageGroup group, ImageInstance image) {
+        ImageGroupImageInstance igii = givenANotPersistedImageGroupImageInstance();
         igii.setGroup(group);
         igii.setImage(image);
         return persistAndReturn(igii);
     }
 
-    public AnnotationGroup given_a_not_persisted_annotation_group(Project project, ImageGroup imageGroup) {
+    public AnnotationGroup givenANotPersistedAnnotationGroup(Project project, ImageGroup imageGroup) {
         AnnotationGroup annotationGroup = new AnnotationGroup();
         annotationGroup.setProject(project);
         annotationGroup.setImageGroup(imageGroup);
@@ -1002,22 +958,21 @@ public class BasicInstanceBuilder {
         return annotationGroup;
     }
 
-    public AnnotationGroup given_a_not_persisted_annotation_group() {
-        Project project = given_a_project();
-        return given_a_not_persisted_annotation_group(project, given_an_imagegroup(project));
+    public AnnotationGroup givenANotPersistedAnnotationGroup() {
+        Project project = givenAProject();
+        return givenANotPersistedAnnotationGroup(project, givenAnImageGroup(project));
     }
 
-    public AnnotationGroup given_an_annotation_group(Project project, ImageGroup imageGroup) {
-        return persistAndReturn(given_a_not_persisted_annotation_group(project, imageGroup));
+    public AnnotationGroup givenAnAnnotationGroup(Project project, ImageGroup imageGroup) {
+        return persistAndReturn(givenANotPersistedAnnotationGroup(project, imageGroup));
     }
 
-    public AnnotationGroup given_an_annotation_group() {
-        return persistAndReturn(given_a_not_persisted_annotation_group());
+    public AnnotationGroup givenAnAnnotationGroup() {
+        return persistAndReturn(givenANotPersistedAnnotationGroup());
     }
 
-    public AnnotationLink given_a_not_persisted_annotation_link(
-            UserAnnotation annotation, AnnotationGroup annotationGroup, ImageInstance image
-    ) {
+    public AnnotationLink givenANotPersistedAnnotationLink(UserAnnotation annotation, AnnotationGroup annotationGroup,
+        ImageInstance image) {
         AnnotationLink annotationLink = new AnnotationLink();
         annotationLink.setAnnotationClassName(annotation.getClass().getName());
         annotationLink.setAnnotationIdent(annotation.getId());
@@ -1027,85 +982,79 @@ public class BasicInstanceBuilder {
         return annotationLink;
     }
 
-    public AnnotationLink given_a_not_persisted_annotation_link() {
-        Project project = given_a_project();
+    public AnnotationLink givenANotPersistedAnnotationLink() {
+        Project project = givenAProject();
 
-        return given_a_not_persisted_annotation_link(
-                given_a_user_annotation(project),
-                given_an_annotation_group(project, given_an_imagegroup(project)),
-                given_an_image_instance(project)
-        );
+        return givenANotPersistedAnnotationLink(givenAUserAnnotation(project),
+            givenAnAnnotationGroup(project, givenAnImageGroup(project)), givenAnImageInstance(project));
     }
 
-    public AnnotationLink given_an_annotation_link(
-            UserAnnotation annotation, AnnotationGroup annotationGroup, ImageInstance image
-    ) {
-        return persistAndReturn(given_a_not_persisted_annotation_link(
-                annotation, annotationGroup, image
-        ));
+    public AnnotationLink givenAnAnnotationLink(UserAnnotation annotation, AnnotationGroup annotationGroup,
+        ImageInstance image) {
+        return persistAndReturn(givenANotPersistedAnnotationLink(annotation, annotationGroup, image));
     }
 
-    public AnnotationLink given_an_annotation_link() {
-        return persistAndReturn(given_a_not_persisted_annotation_link());
+    public AnnotationLink givenAnAnnotationLink() {
+        return persistAndReturn(givenANotPersistedAnnotationLink());
     }
 
-    public TaskRun given_a_not_persisted_task_run() {
-        return given_a_not_persisted_task_run(given_a_project(), UUID.randomUUID(), given_an_image_instance());
+    public TaskRun givenANotPersistedTaskRun() {
+        return givenANotPersistedTaskRun(givenAProject(), UUID.randomUUID(), givenAnImageInstance());
     }
 
-    public TaskRun given_a_not_persisted_task_run(Project project, UUID taskRunId, ImageInstance image) {
+    public TaskRun givenANotPersistedTaskRun(Project project, UUID taskRunId, ImageInstance image) {
         TaskRun taskRun = new TaskRun();
         taskRun.setProject(project);
-        taskRun.setUser(given_superadmin());
+        taskRun.setUser(getUserEntity(SUPER_ADMIN));
         taskRun.setTaskRunId(taskRunId);
         taskRun.setImage(image);
         return taskRun;
     }
 
-    public TaskRun given_a_task_run() {
-        return persistAndReturn(given_a_not_persisted_task_run(given_a_project(), UUID.randomUUID(), given_an_image_instance()));
+    public TaskRun givenATaskRun() {
+        return persistAndReturn(givenANotPersistedTaskRun(givenAProject(), UUID.randomUUID(), givenAnImageInstance()));
     }
 
-    public AnnotationLayer given_a_not_persisted_annotation_layer() {
+    public AnnotationLayer givenANotPersistedAnnotationLayer() {
         AnnotationLayer annotationLayer = new AnnotationLayer();
         annotationLayer.setName(randomString());
         return annotationLayer;
     }
 
-    public AnnotationLayer given_a_persisted_annotation_layer() {
-        return persistAndReturn(given_a_not_persisted_annotation_layer());
+    public AnnotationLayer givenAPersistedAnnotationLayer() {
+        return persistAndReturn(givenANotPersistedAnnotationLayer());
     }
 
-    public Annotation given_a_not_persisted_annotation(AnnotationLayer annotationLayer) {
+    public Annotation givenANotPersistedAnnotation(AnnotationLayer annotationLayer) {
         Annotation annotation = new Annotation();
         annotation.setAnnotationLayer(annotationLayer);
         annotation.setLocation("{\"type\": \"Point\",\"coordinates\": [0, 0]}".getBytes());
         return annotation;
     }
 
-    public Annotation given_a_not_persisted_annotation() {
-        return given_a_not_persisted_annotation(given_a_persisted_annotation_layer());
+    public Annotation givenANotPersistedAnnotation() {
+        return givenANotPersistedAnnotation(givenAPersistedAnnotationLayer());
     }
 
-    public Annotation given_a_persisted_annotation() {
-        return persistAndReturn(given_a_not_persisted_annotation());
+    public Annotation givenAPersistedAnnotation() {
+        return persistAndReturn(givenANotPersistedAnnotation());
     }
 
-    public TaskRunLayer given_a_not_persisted_task_run_layer(AnnotationLayer annotationLayer, TaskRun taskRun, ImageInstance image) {
+    public TaskRunLayer givenANotPersistedTaskRunLayer(AnnotationLayer annotationLayer, TaskRun taskRun,
+        ImageInstance image) {
         TaskRunLayer taskRunLayer = new TaskRunLayer();
         taskRunLayer.setAnnotationLayer(annotationLayer);
         taskRunLayer.setTaskRun(taskRun);
         taskRunLayer.setImage(image);
-        taskRunLayer.setXOffset(new Random().nextInt(100));
-        taskRunLayer.setYOffset(new Random().nextInt(100));
         return taskRunLayer;
     }
 
-    public TaskRunLayer given_a_not_persisted_task_run_layer() {
-        return given_a_not_persisted_task_run_layer(given_a_persisted_annotation_layer(), given_a_task_run(), given_an_image_instance());
+    public TaskRunLayer givenANotPersistedTaskRunLayer() {
+        return givenANotPersistedTaskRunLayer(givenAPersistedAnnotationLayer(), givenATaskRun(),
+            givenAnImageInstance());
     }
 
-    public TaskRunLayer given_a_persisted_task_run_layer() {
-        return persistAndReturn(given_a_not_persisted_task_run_layer());
+    public TaskRunLayer givenAPersistedTaskRunLayer() {
+        return persistAndReturn(givenANotPersistedTaskRunLayer());
     }
 }

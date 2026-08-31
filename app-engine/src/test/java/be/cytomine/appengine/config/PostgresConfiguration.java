@@ -5,5 +5,5 @@ import org.testcontainers.junit.jupiter.Container;
 
 public class PostgresConfiguration {
     @Container
-    PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:14");
+    PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:15");
 }

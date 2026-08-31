@@ -1,5 +1,5 @@
 import DomainModel from './domain-model.js';
-import Annotation, {AnnotationType} from './annotation.js';
+import Annotation, { AnnotationType } from './annotation.js';
 
 export default class AnnotationComment extends DomainModel {
   /** @inheritdoc */

@@ -1,18 +1,3 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-from typing import List, Union
-
 from fastapi import APIRouter, Depends
 from starlette.requests import Request
 from starlette.responses import Response
@@ -89,12 +74,12 @@ async def show_window_with_body(
 async def _show_window(
     request: Request, response: Response,  # required for @cache  # noqa
     path: Path,
-    region: Union[Region, dict],
+    region: Region | dict,
     height, width, length, zoom, level,
     channels, z_slices, timepoints,
     min_intensities, max_intensities, filters, gammas, threshold,
     bits, colorspace,
-    annotations: Union[ParsedAnnotations, dict, List[dict]],
+    annotations: ParsedAnnotations | dict | list[dict],
     annotation_style: dict,
     extension,
     headers,
@@ -206,7 +191,7 @@ async def _show_window(
         )
 
     affine = None
-    if annotations:
+    if annotations and isinstance(annotations, ParsedAnnotations):
         affine = annotation_crop_affine_matrix(annotations.region, region, *out_size)
 
     if annotations and annotation_style and \

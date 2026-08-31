@@ -1,20 +1,24 @@
 package be.cytomine.domain.ontology;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import lombok.Getter;
+import lombok.Setter;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
@@ -23,17 +27,6 @@ import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
-import lombok.Getter;
-import lombok.Setter;
-
-import jakarta.persistence.*;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -48,8 +41,7 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
     String parentClassName;
 
     /**
-     * Status for the reviewed (not yet use)
-     * May be: 'validate','conflict',...
+     * Status for the reviewed (not yet use) May be: 'validate','conflict',...
      */
     Integer status;
 
@@ -57,9 +49,8 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
     /**
      * User that create the annotation that has been reviewed
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "user_id")
+    private Long userId;
 
     /**
      * User that review annotation
@@ -70,12 +61,11 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "reviewed_annotation_term",
-            joinColumns = { @JoinColumn(name = "reviewed_annotation_terms_id") },
-            inverseJoinColumns = { @JoinColumn(name = "term_id") }
+        name = "reviewed_annotation_term",
+        joinColumns = {@JoinColumn(name = "reviewed_annotation_terms_id")},
+        inverseJoinColumns = {@JoinColumn(name = "term_id")}
     )
     private List<Term> terms = new ArrayList<>();
-
 
 
     @PrePersist
@@ -91,13 +81,13 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
 
     /**
      * Set link to the annotation that has been reviewed
+     *
      * @param annotation Annotation that is reviewed
      */
     public void putParentAnnotation(AnnotationDomain annotation) {
         parentClassName = annotation.getClass().getName();
         parentIdent = annotation.getId();
     }
-
 
 
     @Override
@@ -108,6 +98,7 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
 
     /**
      * Get all annotation terms id
+     *
      * @return Terms id list
      */
     public List<Long> termsId() {
@@ -118,11 +109,6 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
     @Override
     public boolean isUserAnnotation() {
         return false;
-    }
-
-    @Override
-    Long getUserId() {
-        return user.getId();
     }
 
     /**
@@ -139,16 +125,16 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         ReviewedAnnotation annotation = this;
-        annotation.id = json.getJSONAttrLong("id",null);
+        annotation.id = json.getJSONAttrLong("id", null);
 
-        annotation.slice = (SliceInstance)json.getJSONAttrDomain(entityManager, "slice", new SliceInstance(), true);
-        annotation.image = (ImageInstance)json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
+        annotation.slice = (SliceInstance) json.getJSONAttrDomain(entityManager, "slice", new SliceInstance(), true);
+        annotation.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
         annotation.project = annotation.getImage().getProject();
-        annotation.user = (User)json.getJSONAttrDomain(entityManager, "user", new User(), true);
-        annotation.reviewUser = (User)json.getJSONAttrDomain(entityManager, "reviewUser", new User(), true);
+        annotation.userId = ((User) json.getJSONAttrDomain(entityManager, "user", new User(), true)).getId();
+        annotation.reviewUser = (User) json.getJSONAttrDomain(entityManager, "reviewUser", new User(), true);
 
-        annotation.status = json.getJSONAttrInteger("status",0);
-        annotation.geometryCompression = json.getJSONAttrDouble("geometryCompression",0D);
+        annotation.status = json.getJSONAttrInteger("status", 0);
+        annotation.geometryCompression = json.getJSONAttrDouble("geometryCompression", 0D);
 
         annotation.created = json.getJSONAttrDate("created");
         annotation.updated = json.getJSONAttrDate("updated");
@@ -159,13 +145,12 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         } else {
             try {
                 annotation.location = new WKTReader().read(json.getJSONAttrStr("location"));
-            }
-            catch (ParseException ex) {
+            } catch (ParseException ex) {
                 throw new WrongArgumentException(ex.toString());
             }
         }
 
-        if (annotation.location==null) {
+        if (annotation.location == null) {
             throw new WrongArgumentException("Geometry is null: 0 points");
         }
 
@@ -197,8 +182,10 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
 
         for (Long id : json.getJSONAttrListLong("terms")) {
             Term term = entityManager.find(Term.class, id);
-            if (term==null || !term.getOntology().equals(annotation.getProject().getOntology())) {
-                throw new WrongArgumentException("Term "+term+" is null or is not in ontology from the annotation project");
+            if (term == null || !term.getOntology().equals(annotation.getProject().getOntology())) {
+                throw new WrongArgumentException("Term "
+                    + term
+                    + " is null or is not in ontology from the annotation project");
             }
             annotation.getTerms().add(term);
         }
@@ -206,13 +193,13 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
     }
 
     @Override
-    public JsonObject toJsonObject() {
-        return getDataFromDomain(this);
+    public JsonObject toJsonObject(UrlApi urlApi) {
+        return getDataFromDomain(this, urlApi);
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
         JsonObject returnArray = AnnotationDomain.getDataFromDomain(domain);
-        ReviewedAnnotation annotation = (ReviewedAnnotation)domain;
+        ReviewedAnnotation annotation = (ReviewedAnnotation) domain;
 
         returnArray.put("parentIdent", annotation.parentIdent);
         returnArray.put("parentClassName", annotation.getParentClassName());
@@ -221,28 +208,35 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         returnArray.put("terms", annotation.termsId());
         returnArray.put("term", annotation.termsId());
 
-        returnArray.put("cropURL", UrlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
-        returnArray.put("smallCropURL", UrlApi.getReviewedAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png"));
-        returnArray.put("url", UrlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
-        returnArray.put("imageURL", UrlApi.getAnnotationURL(annotation.getImage().getProject().getId(), annotation.getImage().getId(), annotation.getId()));
+        returnArray.put("cropURL", urlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put(
+            "smallCropURL",
+            urlApi.getReviewedAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
+        );
+        returnArray.put("url", urlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put(
+            "imageURL",
+            urlApi.getAnnotationURL(
+                annotation.getImage().getProject().getId(),
+                annotation.getImage().getId(),
+                annotation.getId()
+            )
+        );
         returnArray.put("reviewed", true);
 
         return returnArray;
     }
 
-    @Override
-    public User user() {
-        return user;
-    }
+
 
     /**
-     * Return domain user (annotation user, image user...)
-     * By default, a domain has no user.
-     * You need to override userDomainCreator() in domain class
+     * Return domain user (annotation user, image user...) By default, a domain has no user. You need to override
+     * userDomainCreator() in domain class
+     *
      * @return Domain user
      */
     @Override
-    public User userDomainCreator() {
-        return reviewUser;
+    public Long userDomainCreator() {
+        return reviewUser.getId();
     }
 }

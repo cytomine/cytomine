@@ -2,15 +2,21 @@ import os
 from datetime import datetime
 from functools import cached_property
 from pathlib import Path
-from typing import List, Optional
 
 import shapely
 from pydicom.multival import MultiValue
+from pydicom.valuerep import DSfloat
 from wsidicom.graphical_annotations import Point as WsiPoint
 from wsidicom.graphical_annotations import Polygon as WsiPolygon
 from wsidicom.wsidicom import WsiDicom
 
-from pims.formats.utils.abstract import AbstractChecker, AbstractParser, AbstractReader, AbstractFormat, CachedDataPath
+from pims.formats.utils.abstract import (
+    AbstractChecker,
+    AbstractParser,
+    AbstractReader,
+    AbstractFormat,
+    CachedDataPath,
+)
 from pims.formats.utils.histogram import DefaultHistogramReader
 from pims.formats.utils.structures.annotations import ParsedMetadataAnnotation
 from pims.formats.utils.structures.metadata import ImageMetadata, ImageChannel
@@ -18,6 +24,19 @@ from pims.formats.utils.structures.pyramid import Pyramid
 from pims.utils import UNIT_REGISTRY
 from pims.utils.dtypes import np_dtype
 from pims.utils.types import parse_float
+
+
+EXCLUDED_TAGS = [
+    "ICCProfile",
+]
+
+
+def sanitize(value):
+    if isinstance(value, DSfloat):
+        return float(value)
+    if isinstance(value, MultiValue):
+        return [sanitize(v) for v in value]
+    return value
 
 
 def dictify(ds):
@@ -48,7 +67,7 @@ def cached_wsi_dicom_file(format: AbstractFormat) -> WsiDicom:
     return format.get_cached('_wsi_dicom', WsiDicom.open, str(format.path))
 
 
-def get_root_file(path: Path) -> Optional[Path]:
+def get_root_file(path: Path) -> Path | None:
     """Try to get WSI DICOM directory (as it is a multi-file format)."""
     if path.is_dir():
         if sum(1 for _ in Path(path).glob('*')):
@@ -164,9 +183,10 @@ class WSIDicomParser(AbstractParser):
                 name = f"{tag.group:04x}_{tag.element:04x}"  # noqa
             name = name.replace(' ', '')
 
-            value = data_element.value
-            if type(value) is MultiValue:
-                value = list(value)
+            if name in EXCLUDED_TAGS:
+                continue
+
+            value = sanitize(data_element.value)
             store.set(name, value, namespace="DICOM")
 
         return store
@@ -185,7 +205,7 @@ class WSIDicomParser(AbstractParser):
 
         return pyramid
 
-    def parse_annotations(self) -> List[ParsedMetadataAnnotation]:
+    def parse_annotations(self) -> list[ParsedMetadataAnnotation]:
         wsidicom_object = cached_wsi_dicom_file(self.format)
         channels = list(range(self.format.main_imd.n_channels))
         parsed_annots = []

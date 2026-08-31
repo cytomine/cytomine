@@ -5,10 +5,11 @@ import java.util.Optional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.DeleteCommand;
@@ -16,7 +17,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.ontology.AnnotationLink;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.AnnotationLinkRepository;
 import be.cytomine.service.CurrentUserService;
@@ -30,27 +30,22 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class AnnotationLinkService extends ModelService {
 
-    @Autowired
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
-    @Autowired
-    private AnnotationGroupService annotationGroupService;
+    private final AnnotationGroupService annotationGroupService;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final AnnotationLinkRepository annotationLinkRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private TransactionService transactionService;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    private AnnotationLinkRepository annotationLinkRepository;
+    private final TransactionService transactionService;
 
     @Override
     public Class currentDomain() {
@@ -74,7 +69,9 @@ public class AnnotationLinkService extends ModelService {
     }
 
     public Optional<AnnotationLink> find(AnnotationGroup group, AnnotationDomain annotation) {
-        Optional<AnnotationLink> annotationLink = annotationLinkRepository.findByAnnotationIdentAndGroup(annotation.getId(), group);
+        Optional<AnnotationLink>
+            annotationLink
+            = annotationLinkRepository.findByAnnotationIdentAndGroup(annotation.getId(), group);
         annotationLink.ifPresent(link -> securityACLService.check(link.container(), READ));
         return annotationLink;
     }
@@ -94,10 +91,13 @@ public class AnnotationLinkService extends ModelService {
 
     public CommandResponse add(JsonObject json) {
         transactionService.start();
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
-        AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(entityManager, json.getJSONAttrLong("annotationIdent"));
+        AnnotationDomain annotation = AnnotationDomain.getAnnotationDomain(
+            entityManager,
+            json.getJSONAttrLong("annotationIdent")
+        );
         securityACLService.check(annotation.getProject(), READ);
         securityACLService.checkIsNotReadOnly(annotation.getProject());
 
@@ -109,26 +109,32 @@ public class AnnotationLinkService extends ModelService {
         json.put("annotationIdent", annotation.getId());
         json.put("annotationClassName", annotation.getClass().getName());
 
-        return executeCommand(new AddCommand(currentUser), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new DeleteCommand(currentUser, transaction), domain, null);
+        return executeCommand(new DeleteCommand(currentUser.id(), transaction), domain, null);
     }
 
-    public CommandResponse addAnnotationLink(String annotationClassName, Long annotationIdent, Long groupId, Long imageId, Transaction transaction) {
+    public CommandResponse addAnnotationLink(
+        String annotationClassName,
+        Long annotationIdent,
+        Long groupId,
+        Long imageId,
+        Transaction transaction
+    ) {
         JsonObject jsonObject = JsonObject.of(
-                "annotationClassName", annotationClassName,
-                "annotationIdent", annotationIdent,
-                "group", groupId,
-                "image", imageId
+            "annotationClassName", annotationClassName,
+            "annotationIdent", annotationIdent,
+            "group", groupId,
+            "image", imageId
         );
 
-        return executeCommand(new AddCommand(currentUserService.getCurrentUser(), transaction), null, jsonObject);
+        return executeCommand(new AddCommand(currentUserService.getCurrentUser().id(), transaction), null, jsonObject);
     }
 }

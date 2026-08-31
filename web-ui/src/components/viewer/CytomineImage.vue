@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="map-container" @click="isActiveImage = true" ref="container">
   <template v-if="!loading && zoom !== null">
@@ -51,15 +37,6 @@
           :tile-size="[tileSize, tileSize]"
         />
       </vl-layer-tile>
-
-<!--      <vl-layer-image>-->
-<!--        <vl-source-raster-->
-<!--          v-if="baseSource && colorManipulationOn"-->
-<!--          :sources="[baseSource]"-->
-<!--          :operation="operation"-->
-<!--          :lib="lib"-->
-<!--        />-->
-<!--      </vl-layer-image>-->
 
       <annotation-layer
         v-for="layer in selectedLayers"
@@ -189,42 +166,45 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import eventBus from '@/utils/event-bus';
+
+import { get } from '@/utils/store-helpers';
 import _ from 'lodash';
+import domToImage from 'dom-to-image-more';
 
-import ImageName from '@/components/image/ImageName';
-import AnnotationLayer from './AnnotationLayer';
-import RotationSelector from './RotationSelector';
-import ScaleLine from './ScaleLine';
-import DrawTools from './DrawTools';
-import ImageControls from './ImageControls';
-import AnnotationsContainer from './AnnotationsContainer';
+import ImageName from '@/components/image/ImageName.vue';
+import AnnotationLayer from './AnnotationLayer.vue';
+import RotationSelector from './RotationSelector.vue';
+import ScaleLine from './ScaleLine.vue';
+import DrawTools from './DrawTools.vue';
+import ImageControls from './ImageControls.vue';
+import AnnotationsContainer from './AnnotationsContainer.vue';
 
-import InformationPanel from './panels/InformationPanel';
+import InformationPanel from './panels/InformationPanel.vue';
 import MetadataPanel from './panels/MetadataPanel.vue';
-import DigitalZoom from './panels/DigitalZoom';
-import ColorManipulation from './panels/ColorManipulation';
-import LinkPanel from './panels/LinkPanel';
-import LayersPanel from './panels/LayersPanel';
-import OntologyPanel from './panels/OntologyPanel';
-import PropertiesPanel from './panels/PropertiesPanel';
-import FollowPanel from './panels/FollowPanel';
-import ReviewPanel from './panels/ReviewPanel';
+import DigitalZoom from './panels/DigitalZoom.vue';
+import ColorManipulation from './panels/ColorManipulation.vue';
+import LinkPanel from './panels/LinkPanel.vue';
+import LayersPanel from './panels/LayersPanel.vue';
+import OntologyPanel from './panels/OntologyPanel.vue';
+import PropertiesPanel from './panels/PropertiesPanel.vue';
+import FollowPanel from './panels/FollowPanel.vue';
+import ReviewPanel from './panels/ReviewPanel.vue';
 
-import SelectInteraction from './interactions/SelectInteraction';
-import DrawInteraction from './interactions/DrawInteraction';
-import ModifyInteraction from './interactions/ModifyInteraction';
-import ToggleScaleLine from './interactions/ToggleScaleLine';
+import SelectInteraction from './interactions/SelectInteraction.vue';
+import DrawInteraction from './interactions/DrawInteraction.vue';
+import ModifyInteraction from './interactions/ModifyInteraction.vue';
+import ToggleScaleLine from './interactions/ToggleScaleLine.vue';
 
-import {addProj, createProj, getProj} from 'vuelayers/lib/ol-ext';
+import { addProj, createProj, getProj } from 'vuelayers/lib/ol-ext';
 
 import View from 'ol/View';
 import OverviewMap from 'ol/control/OverviewMap';
-import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
-import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
+import { KeyboardPan, KeyboardZoom } from 'ol/interaction';
+import { noModifierKeys, targetNotEditable } from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {Cytomine, ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from '@/api';
+import { Cytomine, ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance } from '@/api';
 
 // import {constLib, operation} from '@/utils/color-manipulation.js';
 
@@ -353,13 +333,12 @@ export default {
     maxZoom() {
       return this.$store.getters[this.imageModule + 'maxZoom'];
     },
-
     center: {
       get() {
         return this.imageWrapper.view.center;
       },
       set(value) {
-        this.$store.dispatch(this.viewerModule + 'setCenter', {index: this.index, center: value});
+        this.$store.dispatch(this.viewerModule + 'setCenter', { index: this.index, center: value });
       }
     },
     zoom: {
@@ -367,7 +346,7 @@ export default {
         return this.imageWrapper.view.zoom;
       },
       set(value) {
-        this.$store.dispatch(this.viewerModule + 'setZoom', {index: this.index, zoom: Number(value)});
+        this.$store.dispatch(this.viewerModule + 'setZoom', { index: this.index, zoom: Number(value) });
       }
     },
     rotation: {
@@ -375,12 +354,12 @@ export default {
         return this.imageWrapper.view.rotation;
       },
       set(value) {
-        this.$store.dispatch(this.viewerModule + 'setRotation', {index: this.index, rotation: Number(value)});
+        this.$store.dispatch(this.viewerModule + 'setRotation', { index: this.index, rotation: Number(value) });
       }
     },
 
     viewState() {
-      return {center: this.center, zoom: this.zoom, rotation: this.rotation};
+      return { center: this.center, zoom: this.zoom, rotation: this.rotation };
     },
 
     extent() {
@@ -402,7 +381,7 @@ export default {
       };
     },
     baseLayerURLQuery() {
-      let query = new URLSearchParams({...this.baseLayerSliceParams, ...this.baseLayerProcessingParams}).toString();
+      let query = new URLSearchParams({ ...this.baseLayerSliceParams, ...this.baseLayerProcessingParams }).toString();
       if (query.length > 0) {
         return `?${query}`;
       }
@@ -535,7 +514,7 @@ export default {
       let map = this.$refs.map.$map;
 
       this.overview = new OverviewMap({
-        view: new View({projection: this.projectionName}),
+        view: new View({ projection: this.projectionName }),
         layers: [this.$refs.baseLayer.$layer],
         tipLabel: this.$t('overview'),
         target: this.$refs.overview,
@@ -559,6 +538,10 @@ export default {
       this.$store.commit(this.imageModule + 'togglePanel', panel);
     },
 
+    closeMetadataHandler() {
+      this.togglePanel('info');
+    },
+
     savePosition: _.debounce(async function () {
       if (this.$refs.view) {
         let extent = this.$refs.view.$view.calculateExtent(); // [minX, minY, maxX, maxY]
@@ -580,7 +563,7 @@ export default {
           });
         } catch (error) {
           console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-save-user-position')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-save-user-position') });
         }
 
         clearTimeout(this.timeoutSavePosition);
@@ -610,7 +593,7 @@ export default {
         }
 
         let geometry = this.format.readGeometry(annot.location);
-        await this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
+        await this.$refs.view.fit(geometry, { duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom });
 
         if (!Object.prototype.hasOwnProperty.call(annot, 'centroid')) {
           return;
@@ -623,7 +606,7 @@ export default {
       }
     },
 
-    async selectAnnotationHandler({index, annot, center = false, showComments = false}) {
+    async selectAnnotationHandler({ index, annot, center = false, showComments = false }) {
       if (this.index === index && annot.image === this.image.id) {
         try {
           let sliceChange = false;
@@ -635,7 +618,7 @@ export default {
           if (!this.sliceIds.includes(annot.slice)) {
             let slice = await SliceInstance.fetch(annot.slice);
             await this.$store.dispatch(this.imageModule + 'setActiveSlice', slice);
-            this.$eventBus.$emit('reloadAnnotations', {idImage: this.image.id, hard: true});
+            eventBus.emit('reloadAnnotations', { idImage: this.image.id, hard: true });
             sliceChange = true;
           }
 
@@ -645,7 +628,7 @@ export default {
 
           this.selectedAnnotation = annot; // used to pre-load annot layer
           this.$store.commit(this.imageModule + 'setAnnotToSelect', annot);
-          this.$eventBus.$emit('selectAnnotationInLayer', {index, annot});
+          eventBus.emit('selectAnnotationInLayer', { index, annot });
 
           if (center) {
             await this.viewMounted();
@@ -654,7 +637,7 @@ export default {
           }
         } catch (error) {
           console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-target-annotation') });
         }
       }
     },
@@ -722,24 +705,30 @@ export default {
       }
     },
     async takeScreenshot() {
-      // Use of css percent values and html2canvas results in strange behavior
+      // Use of css percent values and DOM rasterization results in strange behavior
       // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
-      let containerHeight = document.querySelector('.map-container').clientHeight;
-      document.querySelector('.map-container').style.height = containerHeight + 'px';
+      let container = document.querySelector('.map-container');
+      let containerHeight = container.clientHeight;
+      container.style.height = containerHeight + 'px';
 
-      let a = document.createElement('a');
-      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
-      let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
-      a.download = imageName;
-      a.click();
-
-      // Reset container css values as previous
-      document.querySelector('.map-container').style.height = '';
+      try {
+        let a = document.createElement('a');
+        a.href = await domToImage.toPng(document.querySelector('.ol-unselectable'));
+        let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
+        a.download = imageName;
+        a.click();
+      } catch (error) {
+        console.log(error);
+        this.$notify({ type: 'error', text: this.$t('notify-error-screenshot') });
+      } finally {
+        // Reset container css values as previous
+        container.style.height = '';
+      }
     },
   },
   async created() {
     if (!getProj(this.projectionName)) { // if image opened for the first time
-      let projection = createProj({code: this.projectionName, units: 'pixels', extent: this.extent});
+      let projection = createProj({ code: this.projectionName, units: 'pixels', extent: this.extent });
       addProj(projection);
     }
 
@@ -751,7 +740,7 @@ export default {
           this.$store.commit(this.imageModule + 'setImageInstance', clone);
         } catch (error) {
           console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-start-review')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-start-review') });
         }
       }
       this.$store.commit(this.imageModule + 'setReviewMode', true);
@@ -760,7 +749,7 @@ export default {
     // remove all selected features in order to reselect them when they will be added to the map (otherwise,
     // issue with the select interaction)
     this.selectedLayers.forEach(layer => {
-      this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer, cache: true});
+      this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', { layer, cache: true });
     });
 
     let annot = this.imageWrapper.routedAnnotation;
@@ -774,7 +763,7 @@ export default {
           }
         } catch (error) {
           console.log(error);
-          this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-target-annotation') });
         }
       }
     }
@@ -802,38 +791,38 @@ export default {
         this.$store.commit(this.imageModule + 'clearRoutedAnnotation');
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-target-annotation') });
       }
     }
 
     try {
-      await new ImageConsultation({image: this.image.id}).save();
+      await new ImageConsultation({ image: this.image.id }).save();
     } catch (error) {
       console.log(error);
-      this.$notify({type: 'error', text: this.$t('notif-error-save-image-consultation')});
+      this.$notify({ type: 'error', text: this.$t('notif-error-save-image-consultation') });
     }
 
     this.loading = false;
   },
   mounted() {
-    this.$eventBus.$on('updateMapSize', this.updateMapSize);
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
-    this.$eventBus.$on('selectAnnotation', this.selectAnnotationHandler);
-    this.$eventBus.$on('close-metadata', () => this.$store.commit(this.imageModule + 'togglePanel', 'info'));
+    eventBus.on('updateMapSize', this.updateMapSize);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('selectAnnotation', this.selectAnnotationHandler);
+    eventBus.on('close-metadata', this.closeMetadataHandler);
     this.setInitialZoom();
   },
   beforeDestroy() {
-    this.$eventBus.$off('updateMapSize', this.updateMapSize);
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
-    this.$eventBus.$off('selectAnnotation', this.selectAnnotationHandler);
-    this.$eventBus.$off('close-metadata');
+    eventBus.off('updateMapSize', this.updateMapSize);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('selectAnnotation', this.selectAnnotationHandler);
+    eventBus.off('close-metadata', this.closeMetadataHandler);
     clearTimeout(this.timeoutSavePosition);
   }
 };
 </script>
 
 <style lang="scss">
-@import '~vuelayers/lib/style.css';
+@import 'vuelayers/lib/style.css';
 
 $backgroundPanelBar: #555;
 $widthPanelBar: 2.8rem;

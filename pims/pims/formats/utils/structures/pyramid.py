@@ -1,20 +1,6 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 from __future__ import annotations
 
 from math import ceil
-from typing import List, Tuple, Union
 
 from pims.api.utils.models import TierIndexType
 from pims.processing.region import Region, Tile
@@ -27,23 +13,23 @@ class PyramidTier:
     """
 
     def __init__(
-        self, width: int, height: int, tile_size: Union[Tuple[int, int], int],
+        self, width: int, height: int, tile_size: tuple[int, int] | int,
         pyramid: Pyramid,
-        data: dict = None
+        data: dict | None = None
     ):
         self.width = width
         self.height = height
         self.tile_width = split_tuple(tile_size, 0)
         self.tile_height = split_tuple(tile_size, 1)
         self.pyramid = pyramid
-        self.data = data if type(data) is dict else dict()
+        self.data = data if isinstance(data, dict) else {}
 
     @property
     def n_pixels(self) -> int:
         return self.width * self.height
 
     @property
-    def factor(self) -> Tuple[float, float]:
+    def factor(self) -> tuple[float, float]:
         if self.pyramid.base is None:
             return 1.0, 1.0
         else:
@@ -97,7 +83,7 @@ class PyramidTier:
         """
         return self.max_tx * self.max_ty
 
-    def ti2txty(self, ti: int) -> Tuple[int, int]:
+    def ti2txty(self, ti: int) -> tuple[int, int]:
         """
         Convert a tile index to a couple (tx, ty)
         """
@@ -150,11 +136,11 @@ class Pyramid:
         return self.n_zooms - 1
 
     @property
-    def tiers(self) -> List[PyramidTier]:
+    def tiers(self) -> list[PyramidTier]:
         return self._tiers
 
     @property
-    def base(self) -> PyramidTier:
+    def base(self) -> PyramidTier | None:
         """
         Get base tier (always the image at full resolution).
         """
@@ -167,7 +153,7 @@ class Pyramid:
         return self.max_level - level if self.max_level > 0 else 0
 
     def insert_tier(
-        self, width: int, height: int, tile_size: Union[Tuple[int, int], int],
+        self, width: int, height: int, tile_size: tuple[int, int] | int,
         **tier_data
     ):
         """
@@ -202,10 +188,8 @@ class Pyramid:
     def __iter__(self):
         return iter(self._tiers)
 
-    def most_appropriate_tier_for_downsample_factor(
-        self, factor: float
-    ) -> PyramidTier:
-        if factor < self.base.average_factor:
+    def most_appropriate_tier_for_downsample_factor(self, factor: float) -> PyramidTier:
+        if self.base is not None and factor < self.base.average_factor:
             return self.base
 
         for i in range(1, self.n_levels):
@@ -220,7 +204,7 @@ class Pyramid:
         return self.tiers[self.n_levels - 1]
 
     def most_appropriate_tier(
-        self, region: Region, out_size: Tuple[int, int]
+        self, region: Region, out_size: tuple[int, int]
     ) -> PyramidTier:
         """
         Get the best pyramid tier to get `region` at `out_size`.

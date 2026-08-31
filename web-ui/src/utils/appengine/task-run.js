@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Model from './model';
 import Task from './task';
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 
 export default class TaskRun extends Model {
   static get STATES() {
@@ -45,17 +45,15 @@ export default class TaskRun extends Model {
   _initProperties() {
     super._initProperties();
     this.project = null;
+    this.user = null;
     this.task = new Task();
     this.state = null;
-    /* eslint-disable */
-    this.created_at = null;
-    this.updated_at = null;
-    this.last_state_transition_at = null;
-    /* eslint-enable */
+    this.createdAt = null;
+    this.updatedAt = null;
   }
 
   static async fetchByProject(projectId) {
-    let {data} = await Cytomine.instance.api.get(`project/${projectId}/task-runs`);
+    let { data } = await Cytomine.instance.api.get(`project/${projectId}/task-runs`);
     return data;
   }
 
@@ -67,20 +65,24 @@ export default class TaskRun extends Model {
     return TaskRun.TERMINAL_STATES.has(this.state);
   }
 
+  async delete() {
+    await Cytomine.instance.api.delete(this.uri);
+  }
+
   // Step-2: Provision task / user inputs
   async batchProvisionTask(params) {
-    let {data} = await Cytomine.instance.api.put(`${this.uri}/input-provisions`, params);
+    let { data } = await Cytomine.instance.api.put(`${this.uri}/input-provisions`, params);
     return data;
   }
 
   async singleProvisionTask(paramName, param) {
-    let {data} = Cytomine.instance.api.put(`${this.uri}/input-provisions/${paramName}`, param);
+    let { data } = Cytomine.instance.api.put(`${this.uri}/input-provisions/${paramName}`, param);
     return data;
   }
 
   // Step-3 Run/Execute the Provisioned Task
   async start() {
-    let {data} = await Cytomine.instance.api.post(`${this.uri}/state-actions`, {'desired': 'RUNNING'});
+    let { data } = await Cytomine.instance.api.post(`${this.uri}/state-actions`, { 'desired': 'RUNNING' });
     return data;
   }
 
@@ -107,7 +109,18 @@ export default class TaskRun extends Model {
   }
 
   async fetchSingleIO(parameterName, type) {
-    let {data} = await Cytomine.instance.api.get(`${this.uri}/${type}/${parameterName}`, {responseType: 'arraybuffer'});
+    let { data } = await Cytomine.instance.api.get(`${this.uri}/${type}/${parameterName}`, { responseType: 'arraybuffer' });
     return data;
+  }
+
+  async fetchLogs() {
+    if (this.state !== TaskRun.STATES.FINISHED) {
+      return null;
+    }
+
+    const logs = (await Cytomine.instance.api.get(`${this.uri}/logs`)).data;
+    Vue.set(this, 'logs', logs);
+
+    return logs;
   }
 }

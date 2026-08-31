@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="annotation-details">
   <table class="table">
@@ -71,7 +57,7 @@
         <td colspan="2">
           <h5>{{$t('terms')}}</h5>
           <b-tag v-for="{term, user} in associatedTerms" :key="term.id"
-          :title="$t('associated-by', {username: user.fullName})">
+          :title="$t('associated-by', {username: user.name})">
             <cytomine-term :term="term" />
             <button v-if="canEditTerms" class="delete is-small" :title="$t('button-delete')"
               @click="removeTerm(term.id, user.id)">
@@ -199,13 +185,13 @@
         <tr>
           <td><strong>{{$t('created-by')}}</strong></td>
           <td>
-            {{ creator.fullName }}
+            {{ creator.name }}
           </td>
         </tr>
         <template v-if="!isReviewedAnnotation">
           <tr>
             <td><strong>{{ $t('created-on') }}</strong></td>
-              <td> {{ Number(annotation.created) | moment('ll') }} </td>
+              <td> {{ formatMomentDate(Number(annotation.created), 'll') }} </td>
           </tr>
           <tr v-if="isImageInReviewMode">
             <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
@@ -220,12 +206,12 @@
           <tr>
             <td><strong>{{$t('reviewed-by')}}</strong></td>
             <td>
-              {{ reviewer.fullName }}
+              {{ reviewer.name }}
             </td>
           </tr>
           <tr>
             <td><strong>{{$t('reviewed-on')}}</strong></td>
-            <td> {{ Number(annotation.created) | moment('ll') }} </td>
+            <td> {{ formatMomentDate(Number(annotation.created), 'll') }} </td>
           </tr>
           <tr v-if="isImageInReviewMode">
             <td><strong>{{ $t('reviewed-annotation-status') }}</strong></td>
@@ -284,25 +270,27 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import eventBus from '@/utils/event-bus';
+import { get } from '@/utils/store-helpers';
 
-import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack, PropertyCollection} from '@/api';
-import copyToClipboard from 'copy-to-clipboard';
-import ImageName from '@/components/image/ImageName';
-import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
-import CytomineTags from '@/components/tag/CytomineTags';
-import CytomineTerm from '@/components/ontology/CytomineTerm';
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
-import OntologyTree from '@/components/ontology/OntologyTree';
-import TrackTree from '@/components/track/TrackTree';
-import CytomineTrack from '@/components/track/CytomineTrack';
-import AnnotationCommentsModal from './AnnotationCommentsModal';
-import ProfileModal from '@/components/viewer/ProfileModal';
-import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview';
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import ChannelName from '@/components/viewer/ChannelName';
+import { AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack, PropertyCollection } from '@/api';
+import { useClipboard } from '@vueuse/core';
+import ImageName from '@/components/image/ImageName.vue';
+import CytomineDescription from '@/components/description/CytomineDescription.vue';
+import CytomineProperties from '@/components/property/CytomineProperties.vue';
+import CytomineTags from '@/components/tag/CytomineTags.vue';
+import CytomineTerm from '@/components/ontology/CytomineTerm.vue';
+import AttachedFiles from '@/components/attached-file/AttachedFiles.vue';
+import OntologyTree from '@/components/ontology/OntologyTree.vue';
+import TrackTree from '@/components/track/TrackTree.vue';
+import CytomineTrack from '@/components/track/CytomineTrack.vue';
+import AnnotationCommentsModal from './AnnotationCommentsModal.vue';
+import ProfileModal from '@/components/viewer/ProfileModal.vue';
+import AnnotationLinksPreview from '@/components/annotations/AnnotationLinksPreview.vue';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import ChannelName from '@/components/viewer/ChannelName.vue';
 import constants from '@/utils/constants.js';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'annotations-details',
@@ -320,16 +308,20 @@ export default {
     AnnotationLinksPreview,
   },
   props: {
-    annotation: {type: Object},
-    terms: {type: Array},
-    tracks: {type: Array},
-    users: {type: Array},
-    images: {type: Array},
-    slices: {type: Array, default: () => []},
-    profiles: {type: Array, default: () => []},
-    showImageInfo: {type: Boolean, default: true},
-    showChannelInfo: {type: Boolean, default: false},
-    showComments: {type: Boolean, default: false}
+    annotation: { type: Object },
+    terms: { type: Array },
+    tracks: { type: Array },
+    users: { type: Array },
+    images: { type: Array },
+    slices: { type: Array, default: () => [] },
+    profiles: { type: Array, default: () => [] },
+    showImageInfo: { type: Boolean, default: true },
+    showChannelInfo: { type: Boolean, default: false },
+    showComments: { type: Boolean, default: false }
+  },
+  setup() {
+    const { copy } = useClipboard({ legacy: true });
+    return { copy };
   },
   data() {
     return {
@@ -373,7 +365,7 @@ export default {
     },
     image() {
       return this.images.find(image => image.id === this.annotation.image) ||
-        {'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename};
+        { 'id': this.annotation.image, 'instanceFilename': this.annotation.instanceFilename };
     },
     isImageInReviewMode() {
       return this.image.inReview;
@@ -395,7 +387,7 @@ export default {
         return this.annotation.userByTerm.map(ubt => {
           let term = this.terms.find(term => ubt.term === term.id);
           let user = this.users.find(user => user.id === ubt.user[0]) || {}; // QUESTION: can we have several users?
-          return {term, user};
+          return { term, user };
         });
       } else {
         return [];
@@ -403,13 +395,13 @@ export default {
     },
     associatedTermsIds() {
       this.revTerms;
-      return this.associatedTerms.map(({term}) => term.id);
+      return this.associatedTerms.map(({ term }) => term.id);
     },
     associatedTracks() {
       if (this.annotation.annotationTrack) {
         return this.annotation.annotationTrack.map(at => {
           let track = this.tracks.find(track => at.track === track.id);
-          return {track};
+          return { track };
         });
       } else {
         return [];
@@ -417,7 +409,7 @@ export default {
     },
     associatedTracksIds() {
       this.revTracks;
-      return this.associatedTracks.map(({track}) => track.id);
+      return this.associatedTracks.map(({ track }) => track.id);
     },
     availableTracks() {
       return this.tracks.filter(track => track.image === this.annotation.image);
@@ -441,6 +433,7 @@ export default {
   },
   methods: {
     appendShortTermToken,
+    formatMomentDate,
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];
     },
@@ -448,8 +441,8 @@ export default {
       window.location.assign(appendShortTermToken(annotation.url + '?draw=true&complete=true&increaseArea=1.25', this.shortTermToken), '_blank');
     },
     copyURL() {
-      copyToClipboard(window.location.origin + '/#' + this.annotationURL);
-      this.$notify({type: 'success', text: this.$t('notif-success-annot-URL-copied')});
+      this.copy(window.location.origin + this.annotationURL);
+      this.$notify({ type: 'success', text: this.$t('notif-success-annot-URL-copied') });
     },
 
     async newTerm(term) { // a new term was added to the ontology
@@ -461,11 +454,11 @@ export default {
     async addTerm(idTerm) {
       if (idTerm) {
         try {
-          await new AnnotationTerm({annotation: this.annotation.id, term: idTerm}).save();
+          await new AnnotationTerm({ annotation: this.annotation.id, term: idTerm }).save();
           this.$emit('updateTerms');
           this.showTermSelector = false;
         } catch (error) {
-          this.$notify({type: 'error', text: this.$t('notif-error-add-term')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-add-term') });
           this.revTerms++;
         } finally {
           this.addTermString = '';
@@ -483,7 +476,7 @@ export default {
         this.$emit('updateTerms');
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-remove-term')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-remove-term') });
         this.revTerms++;
       }
     },
@@ -503,11 +496,11 @@ export default {
     async addTrack(idTrack) {
       if (idTrack) {
         try {
-          await new AnnotationTrack({annotation: this.annotation.id, track: idTrack}).save();
+          await new AnnotationTrack({ annotation: this.annotation.id, track: idTrack }).save();
           this.$emit('updateTracks');
           this.showTrackSelector = false;
         } catch (error) {
-          this.$notify({type: 'error', text: this.$t('notif-error-add-track')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-add-track') });
           this.revTracks++;
         } finally {
           this.addTrackString = '';
@@ -520,7 +513,7 @@ export default {
           await AnnotationTrack.delete(this.annotation.id, idTrack);
           this.$emit('updateTracks');
         } catch (error) {
-          this.$notify({type: 'error', text: this.$t('notif-error-remove-track')});
+          this.$notify({ type: 'error', text: this.$t('notif-error-remove-track') });
           this.revTracks++;
         } finally {
           this.addTrackString = '';
@@ -532,9 +525,9 @@ export default {
       this.$buefy.modal.open({
         parent: this,
         component: AnnotationCommentsModal,
-        props: {annotation: this.annotation, comments: this.comments},
+        props: { annotation: this.annotation, comments: this.comments },
         hasModalCard: true,
-        events: {'addComment': this.addComment}
+        events: { 'addComment': this.addComment }
       });
     },
 
@@ -554,7 +547,7 @@ export default {
       this.$buefy.modal.open({
         parent: this,
         component: ProfileModal,
-        props: {annotation: this.annotation, image: this.image, spatialAxis},
+        props: { annotation: this.annotation, image: this.image, spatialAxis },
         hasModalCard: true
       });
     },
@@ -575,34 +568,34 @@ export default {
         await this.annotation.delete();
         this.$emit('deletion');
       } catch (err) {
-        this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-annotation-deletion') });
       }
     }
   },
   async created() {
     if (this.isPropDisplayed('comments') && this.annotation.type === AnnotationType.USER) {
       try {
-        this.comments = (await AnnotationCommentCollection.fetchAll({annotation: this.annotation})).array;
+        this.comments = (await AnnotationCommentCollection.fetchAll({ annotation: this.annotation })).array;
         if (this.showComments) {
           this.openCommentsModal();
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-annotation-comments')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-annotation-comments') });
       }
     }
 
     try {
-      this.properties = (await PropertyCollection.fetchAll({object: this.annotation})).array;
+      this.properties = (await PropertyCollection.fetchAll({ object: this.annotation })).array;
     } catch (error) {
       this.loadPropertiesError = true;
       console.log(error);
     }
 
-    this.$eventBus.$emit('hide-similar-annotations');
+    eventBus.emit('hide-similar-annotations');
   },
   destroyed() {
-    this.$eventBus.$emit('hide-similar-annotations');
+    eventBus.emit('hide-similar-annotations');
   },
 };
 </script>
@@ -660,17 +653,11 @@ a.is-fullwidth {
   margin-top: 4px;
 }
 
-/**
-* https://stackoverflow.com/a/55368933
-* Since the project is using Sass and Vue 2.6.10, use `::v-deep` instead of `>>>` so it doesn't break validation.
-* Note that it's deprecated but will in Vue 3.
-* TODO: update >>> and ::v-deep using the unified :deep() selector when using the latest Vue.
-*/
-::v-deep .sl-vue-tree-node-item {
+:deep(.sl-vue-tree-node-item) {
   font-size: 0.9em;
 }
 
-::v-deep .tag {
+:deep(.tag) {
     margin-right: 5px;
     margin-bottom: 5px !important;
     background-color: rgba(0, 0, 0, 0.04);

@@ -1,0 +1,26 @@
+package be.cytomine.domain.appengine;
+
+import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import be.cytomine.domain.CytomineDomain;
+import be.cytomine.service.UrlApi;
+import be.cytomine.utils.JsonObject;
+
+@ToString
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+public class CropOffset extends CytomineDomain {
+    private int x;
+    private int y;
+
+    @Override
+    public JsonObject toJsonObject(UrlApi urlApi) {
+        return null;
+    }
+}

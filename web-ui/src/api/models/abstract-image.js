@@ -57,7 +57,7 @@ export default class AbstractImage extends Model {
       return null;
     }
     let url = this.preview.split('?')[0].split('.').slice(0, -1).join('.');
-    let parameters = {maxSize, ...otherParameters};
+    let parameters = { maxSize, ...otherParameters };
     let query = new URLSearchParams(parameters).toString();
     return `${url}.${format}?${query}`;
   }
@@ -75,7 +75,7 @@ export default class AbstractImage extends Model {
       return null;
     }
     let url = this.thumb.split('?')[0].split('.').slice(0, -1).join('.');
-    let parameters = {maxSize, ...otherParameters};
+    let parameters = { maxSize, ...otherParameters };
     let query = new URLSearchParams(parameters).toString();
     return `${url}.${format}?${query}`;
   }
@@ -95,7 +95,7 @@ export default class AbstractImage extends Model {
     }
     let url = this.macroURL.split('?')[0].split('.').slice(0, -1).join('.');
     url = url.substring(0, url.lastIndexOf('/'));
-    let parameters = {maxSize, ...otherParameters};
+    let parameters = { maxSize, ...otherParameters };
     let query = new URLSearchParams(parameters).toString();
     return `${url}/${kind}.${format}?${query}`;
   }
@@ -111,29 +111,11 @@ export default class AbstractImage extends Model {
     }
 
     if (!this._uploader) {
-      let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/user.json`);
+      let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/user.json`);
       this._uploader = new User(data);
     }
 
     return this._uploader;
-  }
-
-  /**
-   * Get the list of image servers (as URLs) associated with the abstract image
-   *
-   * @returns {Array<String>}
-   */
-  async fetchImageServers() {
-    if (this.isNew()) {
-      throw new Error('Cannot get image servers for an abstract image with no ID.');
-    }
-
-    if (!this._imageServers) {
-      let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/imageservers.json`);
-      this._imageServers = data.imageServersURLs;
-    }
-
-    return this._imageServers;
   }
 
   /**
@@ -147,7 +129,7 @@ export default class AbstractImage extends Model {
     }
 
     if (!this._histogramStats) {
-      let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/histogram/stats.json`);
+      let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/histogram/stats.json`);
       this._histogramStats = data.collection;
     }
 

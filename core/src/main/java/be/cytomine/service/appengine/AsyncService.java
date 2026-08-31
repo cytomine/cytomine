@@ -1,0 +1,125 @@
+package be.cytomine.service.appengine;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
+import be.cytomine.common.repository.http.StorageHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import be.cytomine.config.security.ApiKeyFilter;
+import be.cytomine.domain.security.User;
+import be.cytomine.dto.appengine.task.TaskRunValue;
+import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.service.image.AbstractImageService;
+import be.cytomine.service.middleware.ImageServerService;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class AsyncService {
+
+    private final AbstractImageService abstractImageService;
+
+    private final AppEngineService appEngineService;
+
+    private final RestTemplate restTemplate;
+
+    private final StorageHttpContract storageHttpContract;
+
+    private final ImageServerService imageServerService;
+
+    @Async
+    public void launchImageAdditionJob(List<TaskRunValue> taskRunId, Long projectId, User currentUser) {
+        // get all images and arrays of images
+        List<TaskRunValue> outputs = taskRunId.stream().filter(
+            value -> value.type().equalsIgnoreCase("IMAGE") || (value.type().equalsIgnoreCase("ARRAY")
+                && value.subType().equalsIgnoreCase("IMAGE"))).toList();
+
+        for (TaskRunValue output : outputs) {
+            if (output.type().equalsIgnoreCase("IMAGE")) {
+                try {
+                    handleImage(output, projectId, currentUser);
+                } catch (IOException | NoSuchAlgorithmException | InvalidKeyException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                handleImageArray(output);
+            }
+        }
+    }
+
+    private void handleImageArray(TaskRunValue output) {
+        // TODO: implement storing image array
+    }
+
+    private void handleImage(TaskRunValue output, Long projectId, User currentUser)
+        throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+        String originalFileName = output.taskRunId().toString() + "_" + output.parameterName();
+        if (abstractImageService.find(originalFileName).isPresent()) {
+            return;
+        }
+        // download the image from app-engine
+        File tempFile = Files.createTempFile("image_", ".tmp").toFile();
+        try (FileOutputStream tempFileOutputStream = new FileOutputStream(tempFile)) {
+            getTaskRunIOParameter(output.taskRunId(), output.parameterName(), "output", tempFileOutputStream);
+        }
+        // signature
+        String signatureDate = Instant.now().toString();
+        String signature = ApiKeyFilter.generateKeys("POST", "", "", signatureDate, currentUser.getPrivateKey());
+        String authorizationHeader = "CYTOMINE " + currentUser.getPublicKey() + ":" + signature;
+        String contentTypeFull = null;
+
+        // Prepare headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.set("authorization", authorizationHeader);
+        headers.set("dateFull", signatureDate);
+        headers.set("content-type-full", contentTypeFull);
+
+        // Prepare a multipart body
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("files[]", new FileSystemResource(tempFile) {
+            @Override
+            public String getFilename() {
+                return originalFileName; // Use the desired name here
+            }
+        });
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        StorageResponse userStorage = storageHttpContract.getAll(currentUser.getId(), Pageable.unpaged()).stream()
+            .filter(storageResponse -> storageResponse.name().contains(currentUser.getUsername())).findFirst()
+            .orElseThrow(() -> new ObjectNotFoundException("User with storage", currentUser.getId()));
+        String queryString = "?idStorage=" + userStorage.id() + "&idProject=" + projectId;
+        // Send the request
+        String uploadUrl = imageServerService.internalImageServerURL() + "/upload";
+        restTemplate.postForEntity(uploadUrl + queryString, requestEntity, String.class);
+
+        // Clean up temp file
+        tempFile.delete();
+    }
+
+    public void getTaskRunIOParameter(UUID taskRunId, String parameterName, String type, OutputStream outputStream) {
+        appEngineService.getStreamedFile("task-runs/" + taskRunId + "/" + type + "/" + parameterName, outputStream);
+    }
+}

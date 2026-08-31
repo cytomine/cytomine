@@ -1,18 +1,4 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 import logging
-from typing import Optional
 
 import numpy as np
 from PIL import Image as PILImage
@@ -31,14 +17,14 @@ log = logging.getLogger("pims.formats")
 
 
 def cached_pillow_file(
-    format: AbstractFormat, pil_format_slug: Optional[str]
+    format: AbstractFormat, pil_format_slug: str | None
 ) -> PILImage:
     slugs = [pil_format_slug] if pil_format_slug else None
     return format.get_cached('_pil', PILImage.open, format.path, formats=slugs)
 
 
 def cached_palette_converted_pillow_file(
-    format: AbstractFormat, pil_format_slug: Optional[str]
+    format: AbstractFormat, pil_format_slug: str | None
 ) -> PILImage:
     """Palette converted pillow image"""
     def _open_palette_converted(_format, _pil_format_slug):

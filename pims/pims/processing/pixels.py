@@ -1,20 +1,7 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import List, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from PIL.Image import Image as PILImage
@@ -60,7 +47,7 @@ class ImagePixelsImpl(ABC):
         pass
 
     @abstractmethod
-    def prepare_channels(self, required_indexes: List[int]) -> ImagePixelsImpl:
+    def prepare_channels(self, required_indexes: list[int]) -> ImagePixelsImpl:
         pass
 
     @abstractmethod
@@ -122,7 +109,7 @@ class NumpyImagePixels(ImagePixelsImpl):
         self.pixels = np.dstack((self.pixels, pixels))
         return self
 
-    def prepare_channels(self, required_indexes: List[int]) -> ImagePixelsImpl:
+    def prepare_channels(self, required_indexes: list[int]) -> ImagePixelsImpl:
         self.pixels = self.pixels[:, :, required_indexes]
         return self
 
@@ -198,7 +185,7 @@ class VipsImagePixels(ImagePixelsImpl):
         self.pixels = self.pixels.bandjoin(pixels)
         return self
 
-    def prepare_channels(self, required_indexes: List[int]) -> ImagePixelsImpl:
+    def prepare_channels(self, required_indexes: list[int]) -> ImagePixelsImpl:
         self.pixels = bandjoin([self.pixels[i] for i in required_indexes])
         return self
 
@@ -345,8 +332,8 @@ class VipsImagePixels(ImagePixelsImpl):
 class ImagePixels:
     _impl: ImagePixelsImpl
 
-    def __init__(self, pixels: Union[RawImagePixels, ImagePixelsImpl]):
-        self._impl = None  # noqa
+    def __init__(self, pixels: RawImagePixels | ImagePixelsImpl):
+        self._impl = None  # noqa # pyrefly: ignore
 
         if not isinstance(pixels, ImagePixelsImpl):
             if type(pixels) is VIPSImage:
@@ -382,7 +369,7 @@ class ImagePixels:
         self._impl.append_channel(pixels)
         return self
 
-    def prepare_channels(self, required_indexes: List[int]) -> ImagePixels:
+    def prepare_channels(self, required_indexes: list[int]) -> ImagePixels:
         self._impl.prepare_channels(required_indexes)
         return self
     

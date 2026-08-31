@@ -42,7 +42,7 @@ public class Run extends BaseEntity {
 
     private String secret;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Task task;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

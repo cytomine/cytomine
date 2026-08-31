@@ -1,41 +1,21 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
-<vl-layer-vector
-  :visible="layer.visible"
-  :extent="imageExtent"
-  :update-while-interacting="false"
->
+  <vl-layer-vector :visible="layer.visible" :extent="imageExtent" :update-while-interacting="false">
 
-  <vl-source-vector
-    ref="olSource"
-    :loader-factory="loaderFactory"
-    :strategy-factory="strategyFactory"
-    url="-"
-  > <!-- HACK because loader factory not used if URL not specified -->
-    <vl-style-func :factory="styleFunctionFactory" />
-  </vl-source-vector>
+    <vl-source-vector ref="olSource" :loader-factory="loaderFactory" :strategy-factory="strategyFactory" url="-">
+      <!-- HACK because loader factory not used if URL not specified -->
+      <vl-style-func :factory="styleFunctionFactory" />
+    </vl-source-vector>
 
-</vl-layer-vector>
+  </vl-layer-vector>
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus';
+
 import WKT from 'ol/format/WKT';
-import {AnnotationCollection, Cytomine} from '@/api';
-import {annotBelongsToLayer} from '@/utils/annotation-utils';
-import {get} from '@/utils/store-helpers';
+import { AnnotationCollection, Cytomine } from '@/api';
+import { annotBelongsToLayer } from '@/utils/annotation-utils';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'annotation-layer',
@@ -120,7 +100,7 @@ export default {
   methods: {
     clearFeatures(cache = true) {
       if (this.$refs.olSource) {
-        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', {layer: this.layer, cache});
+        this.$store.commit(this.imageModule + 'removeLayerFromSelectedFeatures', { layer: this.layer, cache });
         this.$refs.olSource.clearFeatures();
       }
     },
@@ -134,7 +114,7 @@ export default {
         this.$refs.olSource.addFeature(this.createFeature(annot));
       }
     },
-    selectAnnotationHandler({annot, index}) {
+    selectAnnotationHandler({ annot, index }) {
       if (index === this.index && this.annotBelongsToLayer(annot) && this.$refs.olSource) {
         let olFeature = this.$refs.olSource.getFeatureById(annot.id);
         if (!olFeature) {
@@ -144,7 +124,7 @@ export default {
         }
       }
     },
-    reloadAnnotationsHandler({idImage, clear = false, hard = false} = {}) {
+    reloadAnnotationsHandler({ idImage, clear = false, hard = false } = {}) {
       if (!idImage || idImage === this.image.id) {
         if (clear) {
           this.clearFeatures();
@@ -199,7 +179,7 @@ export default {
 
         if (this.$refs.olSource && this.resolution && this.clustered !== null && ( // some features have already been loaded
           !this.clustered && resolution > this.maxResolutionNoClusters // recluster
-                    || resolution !== this.resolution && this.clustered)) { // change of resolution while clustering
+          || resolution !== this.resolution && this.clustered)) { // change of resolution while clustering
 
           // clear loaded extents to force reloading features
           this.$refs.olSource.$source.loadedExtentsRtree_.clear();
@@ -256,7 +236,6 @@ export default {
       let isFeatureSelected = indexSelectedFeature !== -1;
 
       if (!annot) {
-        console.log(`Removing annot ${feature.getId()} in layer ${this.layer.id} (external action)`);
         this.$refs.olSource.removeFeature(feature);
         if (isFeatureSelected) {
           this.$store.commit(this.imageModule + 'clearSelectedFeatures');
@@ -273,17 +252,14 @@ export default {
       if (isFeatureSelected) {
         if (this.ongoingEdit) {
           // if feature is selected and under modification, updating it may lead to conflict
-          console.log(`Skipping update of selected annot ${annot.id} in layer ${this.layer.id} (ongoing edit)`);
           return;
         }
-        console.log(`Updating selected annot ${annot.id} in layer ${this.layer.id} (external action)`);
         this.$store.commit(this.imageModule + 'changeAnnotSelectedFeature', {
           indexFeature: indexSelectedFeature,
           annot
         });
       }
 
-      console.log(`Updating annot ${annot.id} in layer ${this.layer.id} (external action)`);
       feature.set('annot', annot);
       feature.setGeometry(this.format.readGeometry(annot.location));
     },
@@ -297,7 +273,9 @@ export default {
 
       let arrayAnnots;
       try {
-        if (Object.prototype.hasOwnProperty.call(this.layer, 'username')) {
+        const isUserAnnotation = Object.prototype.hasOwnProperty.call(this.layer, 'username');
+        const isReviewedAnnotation = Object.prototype.hasOwnProperty.call(this.layer, 'isReview');
+        if (isUserAnnotation || isReviewedAnnotation) {
           arrayAnnots = await this.fetchAnnots(extent);
           // Order by size, so bigger ones are always sent to back
           arrayAnnots.sort(
@@ -314,7 +292,7 @@ export default {
         }
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-fetch-annotations-viewer')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-fetch-annotations-viewer') });
         return;
       }
 
@@ -379,21 +357,21 @@ export default {
     }
   },
   mounted() {
-    this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$on('selectAnnotationInLayer', this.selectAnnotationHandler);
-    this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$on('reviewAnnotation', this.reviewAnnotationHandler);
-    this.$eventBus.$on('editAnnotation', this.editAnnotationHandler);
-    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationHandler);
+    eventBus.on('addAnnotation', this.addAnnotationHandler);
+    eventBus.on('selectAnnotationInLayer', this.selectAnnotationHandler);
+    eventBus.on('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.on('reviewAnnotation', this.reviewAnnotationHandler);
+    eventBus.on('editAnnotation', this.editAnnotationHandler);
+    eventBus.on('deleteAnnotation', this.deleteAnnotationHandler);
   },
   beforeDestroy() {
     // unsubscribe from all events
-    this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$off('selectAnnotationInLayer', this.selectAnnotationHandler);
-    this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$off('reviewAnnotation', this.reviewAnnotationHandler);
-    this.$eventBus.$off('editAnnotation', this.editAnnotationHandler);
-    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationHandler);
+    eventBus.off('addAnnotation', this.addAnnotationHandler);
+    eventBus.off('selectAnnotationInLayer', this.selectAnnotationHandler);
+    eventBus.off('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.off('reviewAnnotation', this.reviewAnnotationHandler);
+    eventBus.off('editAnnotation', this.editAnnotationHandler);
+    eventBus.off('deleteAnnotation', this.deleteAnnotationHandler);
   }
 };
 </script>

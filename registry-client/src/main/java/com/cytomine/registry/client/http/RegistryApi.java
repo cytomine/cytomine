@@ -1,6 +1,5 @@
 package com.cytomine.registry.client.http;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -36,8 +35,7 @@ public class RegistryApi {
     private static final String MANIFEST = "%s/v2/%s/manifests/%s";
     private static final String BLOB = "%s/v2/%s/blobs/%s";
     private static final String BLOB_UPLOAD = "%s/v2/%s/blobs/uploads/";
-    private static final Pattern AUTH_URL_PATTERN = Pattern.compile("Bearer realm=\"(.*?)\"," +
-        "service=\"(.*?)\"");
+    private static final Pattern AUTH_URL_PATTERN = Pattern.compile("Bearer realm=\"(.*?)\",service=\"(.*?)\"");
 
     public int base(String endpoint) throws IOException {
         try (Response response = HttpClient.execute(HttpClient.METHOD_HEAD, String.format(BASE,
@@ -47,11 +45,14 @@ public class RegistryApi {
                 return code;
             }
             String auth = response.header("Www-Authenticate");
-            if (auth == null) return code;
+            if (auth == null) {
+                return code;
+            }
             Matcher matcher = AUTH_URL_PATTERN.matcher(auth);
-            if (!matcher.find()) return code;
-            Authenticator.instance().setAuthUrl(new Authenticator.AuthUrl(matcher.group(1),
-                matcher.group(2)));
+            if (!matcher.find()) {
+                return code;
+            }
+            Authenticator.instance().setAuthUrl(new Authenticator.AuthUrl(matcher.group(1), matcher.group(2)));
             return code;
         }
     }
@@ -59,12 +60,12 @@ public class RegistryApi {
     public Optional<String> digest(Reference reference, String token) throws IOException {
         Map<String, String> headers = new HashMap<>();
         Optional.ofNullable(token).ifPresent(t -> headers.put(HttpHeaders.AUTHORIZATION, t));
-        headers.put(HttpHeaders.ACCEPT, "application/vnd.docker.distribution.manifest.v1+json," +
-            "application/vnd.docker.distribution.manifest.v1+prettyjws," +
-            "application/vnd.docker.distribution.manifest.v2+json," +
-            "application/vnd.docker.distribution.manifest.list.v2+json," +
-            "application/vnd.oci.image.manifest.v1+json," +
-            "application/vnd.oci.image.index.v1+json");
+        headers.put(HttpHeaders.ACCEPT, "application/vnd.docker.distribution.manifest.v1+json,"
+            + "application/vnd.docker.distribution.manifest.v1+prettyjws,"
+            + "application/vnd.docker.distribution.manifest.v2+json,"
+            + "application/vnd.docker.distribution.manifest.list.v2+json,"
+            + "application/vnd.oci.image.manifest.v1+json,"
+            + "application/vnd.oci.image.index.v1+json");
         String url = String.format(MANIFEST, reference.getEndpoint(), reference.getName(),
             reference.getTag());
         try (Response response = HttpClient.execute(HttpClient.METHOD_GET, url,

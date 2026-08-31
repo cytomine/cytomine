@@ -1,0 +1,6 @@
+ARG PROXY_CACHE=registry.cytomine.org/docker
+
+FROM ${PROXY_CACHE}/alpine
+RUN mkdir -p /app/weights && \
+    wget -q -O /app/weights/weights.pt \
+    "https://huggingface.co/TVM13/Cytomine-sam/resolve/main/weights.pt"

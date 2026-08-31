@@ -1,24 +1,10 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-
 import logging
 import re
 from abc import ABC, abstractmethod
 from importlib import import_module
 from inspect import isabstract, isclass
 from pkgutil import iter_modules
-from typing import Callable, Dict, List, Tuple, Type, Union
+from collections.abc import Callable
 
 from pims.processing.adapters import RawImagePixels, RawImagePixelsType, imglib_adapters
 
@@ -35,7 +21,7 @@ class AbstractFilter(ABC):
     Base class for a filter.
     Filters are expected to be called like functions.
     """
-    _impl: Dict[RawImagePixelsType, Callable]
+    _impl: dict[RawImagePixelsType, Callable]
 
     def __init__(self, histogram=None):
         self._impl = {}
@@ -45,18 +31,18 @@ class AbstractFilter(ABC):
         self.histogram = histogram
 
     @property
-    def implementations(self) -> List[RawImagePixelsType]:
+    def implementations(self) -> list[RawImagePixelsType]:
         return list(self._impl.keys())
 
     @property
     def implementation_adapters(
         self
-    ) -> Dict[Tuple[RawImagePixelsType, RawImagePixelsType], Callable]:
+    ) -> dict[tuple[RawImagePixelsType, RawImagePixelsType], Callable]:
         return imglib_adapters
 
     def __call__(
         self, obj: RawImagePixels, *args, **kwargs
-    ) -> Union[RawImagePixels, bytes]:
+    ) -> RawImagePixels | bytes:
         """
         Apply image operation on given obj. Return type is a convertible
         image type (but not necessarily the type of `obj`).
@@ -64,7 +50,7 @@ class AbstractFilter(ABC):
 
         if type(obj) not in self.implementations:
             obj = self.implementation_adapters.get(
-                (type(obj), self.implementations[0])
+                (type(obj), self.implementations[0]), lambda x: x
             )(obj)
 
         processed = self._impl[type(obj)](obj, *args, **kwargs)
@@ -207,7 +193,7 @@ def _get_all_filters():
     return filters
 
 
-FiltersById = Dict[str, Type[AbstractFilter]]
+FiltersById = dict[str, type[AbstractFilter]]
 
 
 FILTER_PLUGINS = _discover_filter_plugins()

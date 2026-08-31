@@ -1,19 +1,5 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 import logging
 import shutil
-from typing import List, Optional
 
 from celery import group, signature
 from celery.result import allow_join_result
@@ -72,35 +58,35 @@ class FileImporter:
     identify the file format, converts it if needed and checks its integrity.
     """
 
-    listeners: List[ImportListener]
+    listeners: list[ImportListener]
 
     # Pending file (not yet in `FILE_ROOT_PATH`)
     pending_file: Path
-    pending_name: Optional[str]
+    pending_name: str | None
 
     # Paths to directories for the current import (in `FILE_ROOT_PATH`)
-    upload_dir: Optional[Path]
-    processed_dir: Optional[Path]
-    extracted_dir: Optional[Path]
+    upload_dir: Path | None
+    processed_dir: Path | None
+    extracted_dir: Path | None
 
     # Path to upload file (in `upload_dir`)
-    upload_path: Optional[Path]
+    upload_path: Path | None
 
     # Original representation path (& image) (in `processed_dir`)
-    original_path: Optional[Path]
-    original: Optional[Image]
+    original_path: Path | None
+    original: Image | None
 
     # Spatial representation path (& image) (in `processed_dir`)
-    spatial_path: Optional[Path]
-    spatial: Optional[Image]
+    spatial_path: Path | None
+    spatial: Image | None
 
     # Histogram representation path (& histogram) (in `processed_dir`)
-    histogram_path: Optional[Path]
-    histogram: Optional[Histogram]
+    histogram_path: Path | None
+    histogram: Histogram | None
 
     def __init__(
-        self, pending_file: Path, pending_name: Optional[str] = None,
-        listeners: Optional[List[ImportListener]] = None
+        self, pending_file: Path, pending_name: str | None = None,
+        listeners: list[ImportListener] | None = None
     ):
         """
         Parameters
@@ -317,7 +303,7 @@ class FileImporter:
                 ImportEventType.FILE_ERROR,
                 self.upload_path, exeception=e
             )
-            if AUTO_DELETE_FAILED_UPLOAD and self.upload_path.exists():
+            if AUTO_DELETE_FAILED_UPLOAD and self.upload_path is not None and self.upload_path.exists():
                 self.upload_path.delete_upload_root()
             raise e
 
@@ -344,7 +330,7 @@ class FileImporter:
                         ImportEventType.ERROR_CONVERSION,
                         self.spatial_path
                     )
-                    if AUTO_DELETE_FAILED_UPLOAD and self.upload_path.exists():
+                    if AUTO_DELETE_FAILED_UPLOAD and self.upload_path is not None and self.upload_path.exists():
                         self.upload_path.delete_upload_root()
                     raise FormatConversionProblem()
             except Exception as e:
@@ -352,7 +338,7 @@ class FileImporter:
                     ImportEventType.ERROR_CONVERSION,
                     self.spatial_path, exception=e
                 )
-                if AUTO_DELETE_FAILED_UPLOAD and self.upload_path.exists():
+                if AUTO_DELETE_FAILED_UPLOAD and self.upload_path is not None and self.upload_path.exists():
                     self.upload_path.delete_upload_root()
                 raise FormatConversionProblem()
 
@@ -363,7 +349,7 @@ class FileImporter:
             spatial_format = SpatialReadableFormatFactory().match(self.spatial_path)
             if not spatial_format:
                 self.notify(ImportEventType.ERROR_NO_FORMAT, self.spatial_path)
-                if AUTO_DELETE_FAILED_UPLOAD and self.upload_path.exists():
+                if AUTO_DELETE_FAILED_UPLOAD and self.upload_path is not None and self.upload_path.exists():
                     self.upload_path.delete_upload_root()
                 raise NoMatchingFormatProblem(self.spatial_path)
             self.notify(
@@ -381,7 +367,7 @@ class FileImporter:
                     ImportEventType.ERROR_INTEGRITY_CHECK, self.spatial_path,
                     integrity_errors=errors
                 )
-                if AUTO_DELETE_FAILED_UPLOAD and self.upload_path.exists():
+                if AUTO_DELETE_FAILED_UPLOAD and self.upload_path is not None and self.upload_path.exists():
                     self.upload_path.delete_upload_root()
                 raise ImageParsingProblem(self.spatial)
             self.notify(ImportEventType.END_INTEGRITY_CHECK, self.spatial)
@@ -416,7 +402,7 @@ class FileImporter:
                 ImportEventType.ERROR_HISTOGRAM, self.histogram_path, image,
                 exception=e
             )
-            if AUTO_DELETE_FAILED_UPLOAD and self.upload_path.exists():
+            if AUTO_DELETE_FAILED_UPLOAD and self.upload_path is not None and self.upload_path.exists():
                 self.upload_path.delete_upload_root()
             raise FileErrorProblem(self.histogram_path)
 
@@ -432,7 +418,7 @@ class FileImporter:
             directory.mkdir()  # TODO: mode
         except (FileNotFoundError, FileExistsError, OSError) as e:
             self.notify(ImportEventType.FILE_ERROR, directory, exception=e)
-            if AUTO_DELETE_FAILED_UPLOAD and self.upload_path.exists():
+            if AUTO_DELETE_FAILED_UPLOAD and self.upload_path is not None and self.upload_path.exists():
                 self.upload_path.delete_upload_root()
             raise FileErrorProblem(directory)
 
@@ -445,7 +431,7 @@ class FileImporter:
                 shutil.move(origin, dest)
         except (FileNotFoundError, FileExistsError, OSError) as e:
             self.notify(ImportEventType.FILE_NOT_MOVED, origin, exception=e)
-            if AUTO_DELETE_FAILED_UPLOAD and self.upload_path.exists():
+            if AUTO_DELETE_FAILED_UPLOAD and self.upload_path is not None and self.upload_path.exists():
                 self.upload_path.delete_upload_root()
             raise FileErrorProblem(origin)
 
@@ -458,7 +444,7 @@ class FileImporter:
             )
         except (FileNotFoundError, FileExistsError, OSError) as e:
             self.notify(ImportEventType.FILE_ERROR, path, exception=e)
-            if AUTO_DELETE_FAILED_UPLOAD and self.upload_path.exists():
+            if AUTO_DELETE_FAILED_UPLOAD and self.upload_path is not None and self.upload_path.exists():
                 self.upload_path.delete_upload_root()
             raise FileErrorProblem(path)
 
@@ -537,7 +523,7 @@ class FileImporter:
 
 
 def run_import(
-    filepath: str, name: str, extra_listeners: Optional[List[ImportListener]] = None,
+    filepath: str, name: str, extra_listeners: list[ImportListener] | None = None,
     prefer_copy: bool = False
 ):
     pending_file = Path(filepath)

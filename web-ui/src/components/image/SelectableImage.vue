@@ -8,15 +8,15 @@
       :key="`${image.id}-thumb-128`"
       :image="image"
       :size="128"
-      :extra-parameters="{Authorization: 'Bearer ' + shortTermToken}"
+      :extra-parameters="{authorization: 'Bearer ' + shortTermToken}"
     />
     <span>{{ image.instanceFilename }}</span>
   </div>
 </template>
 
 <script>
-import ImageThumbnail from '@/components/image/ImageThumbnail';
-import {get} from '@/utils/store-helpers';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'SelectableImage',
@@ -24,8 +24,8 @@ export default {
     ImageThumbnail,
   },
   props: {
-    image: {type: Object, required: true},
-    isSelected: {type: Boolean, required: true},
+    image: { type: Object, required: true },
+    isSelected: { type: Boolean, required: true },
   },
   computed: {
     shortTermToken: get('currentUser/shortTermToken'),

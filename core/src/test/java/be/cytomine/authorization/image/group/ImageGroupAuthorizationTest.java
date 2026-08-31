@@ -16,6 +16,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.group.ImageGroupService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -33,11 +34,13 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
     private ImageGroupService imageGroupService;
 
     private ImageGroup imageGroup = null;
+    @Autowired
+    private UrlApi urlApi;
 
     @BeforeEach
     public void before() throws Exception {
         if (imageGroup == null) {
-            imageGroup = builder.given_an_imagegroup();
+            imageGroup = builder.givenAnImageGroup();
             initACL(imageGroup.container());
         }
         imageGroup.getProject().setMode(EditingMode.CLASSIC);
@@ -45,22 +48,22 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
     }
 
     @Override
-    protected void when_i_get_domain() {
+    protected void whenIGetDomain() {
         imageGroupService.get(imageGroup.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
-        imageGroupService.add(builder.given_a_not_persisted_imagegroup(imageGroup.getProject()).toJsonObject());
+    protected void whenIAddDomain() {
+        imageGroupService.add(builder.givenANotPersistedImagegroup(imageGroup.getProject()).toJsonObject(urlApi));
     }
 
     @Override
-    protected void when_i_edit_domain() {
-        imageGroupService.update(imageGroup, imageGroup.toJsonObject());
+    protected void whenIEditDomain() {
+        imageGroupService.update(imageGroup, imageGroup.toJsonObject(urlApi));
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         ImageGroup imageGroupToDelete = imageGroup;
         imageGroupService.delete(imageGroupToDelete, null, null, true);
     }
@@ -97,20 +100,20 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_imagegroup() {
+    public void adminCanListImagegroup() {
         assertThat(imageGroupService.list(imageGroup.getProject())).contains(imageGroup);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_can_list_imagegroup() {
+    public void userCanListImagegroup() {
         assertThat(imageGroupService.list(imageGroup.getProject())).contains(imageGroup);
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_admin_can_add_in_readonly_mode(){
+    public void userAdminCanAddInReadonlyMode() {
         imageGroup.getProject().setMode(EditingMode.READ_ONLY);
-        expectOK(() -> when_i_add_domain());
+        expectOK(() -> whenIAddDomain());
     }
 }

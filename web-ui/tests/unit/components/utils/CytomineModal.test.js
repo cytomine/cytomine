@@ -1,4 +1,4 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineModal from '@/components/utils/CytomineModal';

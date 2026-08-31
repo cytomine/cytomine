@@ -83,7 +83,7 @@ export default class Annotation extends Model {
       return null;
     }
     let url = this.cropURL.split('?')[0].split('.').slice(0, -1).join('.');
-    let parameters = {maxSize, ...otherParameters};
+    let parameters = { maxSize, ...otherParameters };
     let query = new URLSearchParams(parameters).toString();
     return `${url}.${format}?${query}`;
   }
@@ -98,7 +98,7 @@ export default class Annotation extends Model {
    * @returns {Annotation} The fetched annotation
    */
   static async fetch(id, annotationType = null) {
-    let annotation = new this({id});
+    let annotation = new this({ id });
     if (annotationType) {
       annotation.type = annotationType;
     }
@@ -121,8 +121,8 @@ export default class Annotation extends Model {
     if (this._profileProjections && cache) {
       return this._profileProjections;
     } else {
-      let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/profile/projections.json`,
-        {params: {axis}});
+      let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/profile/projections.json`,
+        { params: { axis } });
       if (cache) {
         this._profileProjections = data;
       }
@@ -142,7 +142,7 @@ export default class Annotation extends Model {
       throw new Error('Cannot record an action on an annotation with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.post('annotation_action.json', {
+    let { data } = await Cytomine.instance.api.post('annotation_action.json', {
       annotationIdent: this.id,
       action
     });
@@ -161,7 +161,7 @@ export default class Annotation extends Model {
       throw new Error('Cannot review an annotation with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.put(`${this.callbackIdentifier}/${this.id}/review.json`, {terms});
+    let { data } = await Cytomine.instance.api.put(`${this.callbackIdentifier}/${this.id}/review.json`, { terms });
     let reviewedAnnotation = new this.constructor(data['reviewedannotation']);
     Cytomine.instance.lastCommand = data.command;
     return reviewedAnnotation;
@@ -172,7 +172,7 @@ export default class Annotation extends Model {
       throw new Error('Cannot repeat an annotation with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.post(`userannotation/${this.id}/repeat.json`, {
+    let { data } = await Cytomine.instance.api.post(`userannotation/${this.id}/repeat.json`, {
       slice,
       repeat: number
     });
@@ -204,7 +204,7 @@ export default class Annotation extends Model {
       throw new Error('Cannot simplify an annotation with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.put(`${this.callbackIdentifier}/${this.id}/simplify.json?
+    let { data } = await Cytomine.instance.api.put(`${this.callbackIdentifier}/${this.id}/simplify.json?
             minPoint=${minNbPoints}&maxPoint=${maxNbPoints}`);
 
     this.populate(data);
@@ -221,7 +221,7 @@ export default class Annotation extends Model {
       throw new Error('Cannot fill an annotation with no ID.');
     }
 
-    let {data} = await Cytomine.instance.api.post(`${this.callbackIdentifier}/${this.id}/fill.json`);
+    let { data } = await Cytomine.instance.api.post(`${this.callbackIdentifier}/${this.id}/fill.json`);
     this.populate(data.annotation || data.reviewedannotation);
     Cytomine.instance.lastCommand = data.command;
     return this;
@@ -241,9 +241,9 @@ export default class Annotation extends Model {
    *
    * @returns {Annotation} One of the corrected annotations
    */
-  static async correctAnnotations({image, location, review, remove, layers, annotation}) {
-    let params = {image, location, review, remove, layers, annotation};
-    let {data} = await Cytomine.instance.api.post('annotationcorrection.json', params);
+  static async correctAnnotations({ image, location, review, remove, layers, annotation }) {
+    let params = { image, location, review, remove, layers, annotation };
+    let { data } = await Cytomine.instance.api.post('annotationcorrection.json', params);
     Cytomine.instance.lastCommand = data.command;
     return new this(data.annotation || data.reviewedannotation);
   }

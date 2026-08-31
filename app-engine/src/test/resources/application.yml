@@ -51,6 +51,7 @@ scheduler:
   advertised-url: http://0.0.0.0:8080
   use-host-network: true
   tasks-namespace: tasks
+  tasks-runner-image: registry.cytomine.org/docker/cytomine/app-engine-tasks-runner:latest
   task-resources:
     cpus: 1
     ram: 4Gi

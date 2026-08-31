@@ -1,30 +1,14 @@
 package be.cytomine.utils;
 
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
-import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.ServerException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.socket.WebSocketSession;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import lombok.extern.slf4j.Slf4j;
+
+import be.cytomine.domain.project.Project;
+import be.cytomine.exceptions.ServerException;
 
 @Slf4j
 public class Lock {
@@ -35,11 +19,12 @@ public class Lock {
     private Map<Long, ReentrantLock> customUILocks = new ConcurrentHashMap<>();
     private static Lock lock = null;
 
-    private Lock() {}
+    private Lock() {
+    }
 
     public static Lock getInstance() {
         synchronized (Lock.class) {
-            if (lock==null) {
+            if (lock == null) {
                 lock = new Lock();
             }
             return lock;
@@ -68,7 +53,11 @@ public class Lock {
         try {
             log.debug("Try to lock custom UI for project " + project.getId());
             customUILocks.putIfAbsent(project.getId(), new ReentrantLock());
-            log.debug("Custom UI Project {} current lock {}", project.getId(), customUILocks.get(project.getId()).isLocked());
+            log.debug(
+                "Custom UI Project {} current lock {}",
+                project.getId(),
+                customUILocks.get(project.getId()).isLocked()
+            );
             boolean result = customUILocks.get(project.getId()).tryLock(60, TimeUnit.SECONDS);
             log.debug("Custom UI Project {} lock result {}", project.getId(), result);
             return result;

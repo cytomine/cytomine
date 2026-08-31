@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import Optional
 from lxml import etree
 from pathlib import Path
 
@@ -13,7 +12,7 @@ class OntologyImporter:
     def __init__(self, base_path: Path) -> None:
         self.base_path = base_path
 
-    def get_ontology(self, name: str) -> Optional[Ontology]:
+    def get_ontology(self, name: str) -> Ontology | None:
         return next((o for o in OntologyCollection().fetch() if o.name == name), None)
 
     def run(self) -> Ontology:

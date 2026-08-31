@@ -235,8 +235,7 @@ Examples:
 
 ## `image`
 
-Image files are provided in the input folder with their parameter name (the original filename is replaced and the extension is
-removed).
+Image files are provided in the input folder with their parameter name (the original filename is replaced and the extension is removed).
 
 For directory-based image formats like **WSI DICOM**:
 
@@ -245,6 +244,18 @@ For directory-based image formats like **WSI DICOM**:
 
 In storage, directory-based images can be represented as a directory containing multiple files (for referenced datasets)
 
+::: tip
+When a geometry is selected for as input for the image type, Cytomine generates:
+- A **cropped image** corresponding to the selected geometry.
+- A **GeoJSON file** containing the geometry coordinates.
+
+The GeoJSON file is named according to the parameter name associated with the geometry, using the `.geojson` extension.
+
+Example:
+| Parameter Name  | GeoJSON Filename        | Description                                             |
+| --------------- | ----------------------- | ------------------------------------------------------- |
+| `tumour_region` | `tumour_region.geojson` | Contains the coordinates of the selected tumour region. |
+:::
 
 ## `array`
 

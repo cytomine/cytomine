@@ -1,18 +1,3 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-from typing import List, Optional
-
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
@@ -32,20 +17,20 @@ class Filter(BaseModel):
     source image.
     """
     id: FilterId
-    aliases: List[FilterId] = Field(
+    aliases: list[FilterId] = Field(
         [], description='List of filter id aliases'
     )
     name: str = Field(
         ..., description='A human readable name for the image filter.'
     )
     type: FilterType = Field(...)
-    description: Optional[str] = Field(
+    description: str | None = Field(
         None, description='Filter description, explaining how it works, in Markdown.'
     )
 
 
 class FiltersList(CollectionSize):
-    items: List[Filter] = Field(None, description='Array of filters', title='Filter')
+    items: list[Filter] = Field(None, description='Array of filters', title='Filter')
 
 
 def _serialize_filter(imgfilter):

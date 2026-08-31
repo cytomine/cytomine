@@ -15,12 +15,16 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v7.0.1
+
+      - name: Load versions
+        id: versions
+        uses: ./.github/actions/load-versions
 
       - name: Set up NodeJS
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: ${{ vars.NODE_VERSION }}
+          node-version: ${{ steps.versions.outputs.node-version }}
 
       - name: Install Dependencies
         run: npm ci
@@ -32,31 +36,27 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v7.0.1
+
+      - name: Load versions
+        id: versions
+        uses: ./.github/actions/load-versions
 
       - name: Set up NodeJS
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: ${{ vars.NODE_VERSION }}
+          node-version: ${{ steps.versions.outputs.node-version }}
 
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Unit Tests
-        run: npm run test:unit
+      - name: Run tests
+        run: npm run test
 
       - name: Upload test coverage
         if: ${{ always() }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: coverage
           path: ./web-ui/coverage
-          retention-days: 7
-
-      - name: Upload test report
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v6
-        with:
-          name: test-report.html
-          path: ./web-ui/reports/test-report.html
           retention-days: 7

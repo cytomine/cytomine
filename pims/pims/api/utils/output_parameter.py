@@ -1,19 +1,3 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-
-from typing import Optional, Tuple, Union
-
 from pims.api.exceptions import BadRequestException, TooLargeOutputProblem
 from pims.api.utils.header import SafeMode
 from pims.api.utils.models import TierIndexType
@@ -22,14 +6,14 @@ from pims.formats.utils.structures.pyramid import Pyramid
 from pims.processing.region import Region
 from pims.utils.math import get_rationed_resizing
 
-Size = Union[int, float]
+Size = int | float
 
 
 def get_thumb_output_dimensions(
-    in_image: Image, height: Optional[Size] = None, width: Optional[Size] = None,
-    length: Optional[Size] = None, zoom: Optional[int] = None, level: Optional[int] = None,
+    in_image: Image, height: Size | None = None, width: Size | None = None,
+    length: Size | None = None, zoom: int | None = None, level: int | None = None,
     allow_upscaling: bool = True
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     """
     Get output dimensions according, by order of precedence, either height, either width,
     either the largest image length, either zoom or level and such that ratio is preserved.
@@ -98,9 +82,9 @@ def get_thumb_output_dimensions(
 
 
 def get_window_output_dimensions(
-    in_image: Image, region: Region, height: Optional[Size] = None, width: Optional[Size] = None,
-    length: Optional[Size] = None, zoom: Optional[int] = None, level: Optional[int] = None
-) -> Tuple[int, int]:
+    in_image: Image, region: Region, height: Size | None = None, width: Size | None = None,
+    length: Size | None = None, zoom: int | None = None, level: int | None = None
+) -> tuple[int, int]:
     """
     Get output dimensions according, by order of precedence, either height, either width,
     either the largest image length, either zoom or level and such that region ratio is preserved.
@@ -178,7 +162,7 @@ def get_window_output_dimensions(
 
 def safeguard_output_dimensions(
     safe_mode: SafeMode, max_size: int, width: int, height: int
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     """
     Safeguard image output dimensions according to safe mode and maximum
     admissible size.
@@ -220,7 +204,7 @@ def safeguard_output_dimensions(
         return width, height
 
 
-def check_level_validity(pyramid: Pyramid, level: Optional[int]):
+def check_level_validity(pyramid: Pyramid, level: int | None) -> None:
     """ Check the level tier exists in the image pyramid.
 
     Parameters
@@ -240,7 +224,7 @@ def check_level_validity(pyramid: Pyramid, level: Optional[int]):
         raise BadRequestException(detail=f"Level tier {level} does not exist.")
 
 
-def check_zoom_validity(pyramid: Pyramid, zoom: Optional[int]):
+def check_zoom_validity(pyramid: Pyramid, zoom: int | None) -> None:
     """Check the zoom tier exists in the image pyramid.
 
     Parameters

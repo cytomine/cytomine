@@ -7,7 +7,7 @@
 
 The Cytomine Web UI is the official front-end for Cytomine, developed in [Vue.js](https://vuejs.org/).
 You will find more information about the Cytomine project on the [website][website-url].
-You can also find, on our official documentation [how to install it](https://doc.uliege.cytomine.org/admin-guide/ce/installation) and a [user guide](https://doc.uliege.cytomine.org/user-guide/).
+You can also find, on our official documentation [how to install it](https://doc.uliege.cytomine.org/admin-guide/docker/installation) and a [user guide](https://doc.uliege.cytomine.org/user-guide/).
 
 The main features of this front-end are:
 

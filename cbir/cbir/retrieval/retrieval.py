@@ -1,7 +1,6 @@
 """Image retrieval methods."""
 
 from io import BytesIO
-from typing import List, Optional, Tuple
 
 import torch
 from PIL import Image
@@ -27,7 +26,7 @@ class ImageRetrieval:
         self.store = store
         self.indexer = indexer
 
-    def index_image(self, model: Model, image: bytes, filename: str) -> List[int]:
+    def index_image(self, model: Model, image: bytes, filename: str) -> list[int]:
         """
         Index an image.
 
@@ -68,7 +67,7 @@ class ImageRetrieval:
 
         return ids
 
-    def remove_image(self, name: str) -> Optional[int]:
+    def remove_image(self, name: str) -> int | None:
         """
         Remove an image.
 
@@ -91,7 +90,7 @@ class ImageRetrieval:
         model: Model,
         image: bytes,
         nrt_neigh: int,
-    ) -> List[Tuple[str, float]]:
+    ) -> list[tuple[str, float]]:
         """
         Search for similar images.
 

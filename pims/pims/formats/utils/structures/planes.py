@@ -1,17 +1,4 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-from typing import Any, List, Optional
+from typing import Any
 
 import numpy as np
 
@@ -23,8 +10,8 @@ class PlanesInfo:
 
     def __init__(
         self, n_channels: int, depth: int, duration: int,
-        keys: Optional[List[str]] = None,
-        value_datatypes: Optional[List] = None
+        keys: list[str] | None = None,
+        value_datatypes: list | None = None
     ):
         """
         Initializer.
@@ -53,7 +40,7 @@ class PlanesInfo:
         self._keys = keys
         self._data = self._init_data(keys, value_datatypes)
 
-    def _init_data(self, keys: List[str], formats: List[np.dtype]):
+    def _init_data(self, keys: list[str], formats: list[np.dtype]):
         return np.zeros(
             (self.n_channels, self.depth, self.duration),
             dtype={'names': keys, 'formats': formats}

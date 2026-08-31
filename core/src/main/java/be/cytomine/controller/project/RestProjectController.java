@@ -3,20 +3,28 @@ package be.cytomine.controller.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.command.CommandHistory;
-import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.ontology.OntologyRepository;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
@@ -29,9 +37,6 @@ import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api")
 @Slf4j
@@ -39,6 +44,7 @@ import java.util.List;
 public class RestProjectController extends RestCytomineController {
 
     private final ProjectService projectService;
+
     private final ProjectRepository projectRepository;
 
     private final TaskService taskService;
@@ -47,32 +53,32 @@ public class RestProjectController extends RestCytomineController {
 
     private final CurrentRoleService currentRoleService;
 
-    private final OntologyRepository ontologyRepository;
+    private final OntologyHttpContract ontologyHttpContract;
+
     private final UserService userService;
 
     private final TaskRunService taskRunService;
 
+    private final UserHttpContract userHttpContract;
 
     /**
-     * List all ontology visible for the current user
-     * For each ontology, print the terms tree
+     * List all ontology visible for the current user For each ontology, print the terms tree
      */
     @GetMapping("/project.json")
     public ResponseEntity<String> list(
-            @RequestParam(value = "withMembersCount", defaultValue = "false", required = false) Boolean withMembersCount,
-            @RequestParam(value = "withLastActivity", defaultValue = "false", required = false) Boolean withLastActivity,
-            @RequestParam(value = "withDescription", defaultValue = "false", required = false) Boolean withDescription,
-            @RequestParam(value = "withCurrentUserRoles", defaultValue = "false", required = false) Boolean withCurrentUserRoles,
-            @RequestParam(value = "sort", defaultValue = "created", required = false) String sort,
-            @RequestParam(value = "order", defaultValue = "desc", required = false) String order,
-            @RequestParam(value = "offset", defaultValue = "0", required = false) Long offset,
-            @RequestParam(value = "max", defaultValue = "0", required = false) Long max
-
+        @RequestParam(defaultValue = "false", required = false) Boolean withMembersCount,
+        @RequestParam(defaultValue = "false", required = false) Boolean withLastActivity,
+        @RequestParam(defaultValue = "false", required = false) Boolean withDescription,
+        @RequestParam(defaultValue = "false", required = false) Boolean withCurrentUserRoles,
+        @RequestParam(defaultValue = "created", required = false) String sort,
+        @RequestParam(defaultValue = "desc", required = false) String order,
+        @RequestParam(defaultValue = "0", required = false) Long offset,
+        @RequestParam(defaultValue = "0", required = false) Long max
     ) {
         log.debug("REST request to list projects");
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
 
-        if (user.getUsername().equals("admin") && currentRoleService.isAdminByNow(user)) {
+        if (user.username().equals("admin") && currentRoleService.isAdminByNow(user)) {
             user = null;
         }
 
@@ -82,17 +88,17 @@ public class RestProjectController extends RestCytomineController {
         projectSearchExtension.setWithDescription(withDescription);
         projectSearchExtension.setWithCurrentUserRoles(withCurrentUserRoles);
         List<SearchParameterEntry> searchParameterEntryList = super.retrieveSearchParameters();
-        return responseSuccess(projectService.list(user, projectSearchExtension, searchParameterEntryList, sort, order, max, offset));
+        return responseSuccess(
+            projectService.list(user, projectSearchExtension, searchParameterEntryList, sort, order, max, offset)
+        );
     }
 
     @GetMapping("/project/{id}.json")
-    public ResponseEntity<String> show(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<String> show(@PathVariable Long id) {
         log.debug("REST request to get project : {}", id);
         return projectService.find(id)
-                .map(this::responseSuccess)
-                .orElseGet(() -> responseNotFound("Project", id));
+            .map(this::responseSuccess)
+            .orElseGet(() -> responseNotFound("Project", id));
     }
 
     @PostMapping("/project.json")
@@ -104,7 +110,11 @@ public class RestProjectController extends RestCytomineController {
     }
 
     @PutMapping("/project/{id}.json")
-    public ResponseEntity<String> edit(@PathVariable String id, @RequestBody JsonObject json, @RequestParam(required = false) Long task) {
+    public ResponseEntity<String> edit(
+        @PathVariable String id,
+        @RequestBody JsonObject json,
+        @RequestParam(required = false) Long task
+    ) {
         log.debug("REST request to edit Project : " + id);
         Task existingTask = taskService.get(task);
         return update(projectService, json, existingTask);
@@ -118,41 +128,37 @@ public class RestProjectController extends RestCytomineController {
     }
 
     /**
-     * Get last action done on a specific project
-     * ex: "user x add a new annotation on image y",...
+     * Get last action done on a specific project ex: "user x add a new annotation on image y",...
      */
     @GetMapping("/project/{id}/last/{max}.json")
     public ResponseEntity<String> lastAction(
-            @PathVariable Long id,
-            @PathVariable Long max
+        @PathVariable Long id,
+        @PathVariable Long max
     ) {
         log.debug("REST request to list last project actions");
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Project", id));
+            .orElseThrow(() -> new ObjectNotFoundException("Project", id));
         List<CommandHistory> commandHistories = projectService.lastAction(project, max.intValue());
         return responseSuccess(commandHistories);
     }
 
     @GetMapping("/project/method/lastopened.json")
-    public ResponseEntity<String> listLastOpened(
-            @RequestParam(required = false, defaultValue = "0") Long max
-    ) {
+    public ResponseEntity<String> listLastOpened(@RequestParam(required = false, defaultValue = "0") Long max) {
         log.debug("REST request to list last opened");
 
-        return responseSuccess(projectService.listLastOpened((User) currentUserService.getCurrentUser(), max));
+        return responseSuccess(projectService.listLastOpened(currentUserService.getCurrentUserOld(), max));
     }
 
     /**
      * List all project available for this user, that use a ontology
      */
     @GetMapping("/ontology/{id}/project.json")
-    public ResponseEntity<String> listByOntology(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<String> listByOntology(@PathVariable Long id) {
         log.debug("REST request to list project with ontology {}", id);
-        Ontology ontology = ontologyRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
-        return responseSuccess(projectService.listByOntology(ontology));
+        long ontologyId = ontologyHttpContract.getLight(id, currentUserService.getCurrentUser().id())
+            .map(OntologyLight::id)
+            .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
+        return responseSuccess(projectService.listByOntology(ontologyId));
     }
 
     /**
@@ -160,15 +166,17 @@ public class RestProjectController extends RestCytomineController {
      */
     @GetMapping("/user/{id}/project.json")
     public ResponseEntity<String> listByUser(
-            @PathVariable Long id,
-            @RequestParam(required = false, defaultValue = "0") Long max,
-            @RequestParam(required = false, defaultValue = "0") Long offset
-
+        @PathVariable Long id,
+        @RequestParam(required = false, defaultValue = "0") Long max,
+        @RequestParam(required = false, defaultValue = "0") Long offset
     ) {
         log.debug("REST request to list project with user {}", id);
-        User user = userService.findUser(id)
-                .orElseThrow(() -> new ObjectNotFoundException("User", id));
-        Page<JsonObject> result = projectService.list(user, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", max, offset);
+        UserResponse currentUser = currentUserService.getCurrentUser();
+        UserResponse user = userHttpContract.get(id, currentUser.id())
+            .orElseThrow(() -> new ObjectNotFoundException("User", id));
+        Page<JsonObject> result = projectService.list(
+            user, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", max, offset
+        );
         return responseSuccess(result);
     }
 
@@ -177,28 +185,28 @@ public class RestProjectController extends RestCytomineController {
      */
     @GetMapping("/user/{id}/project/light.json")
     public ResponseEntity<String> listLightByUser(
-            @PathVariable Long id,
-            @RequestParam(required = false, defaultValue = "false") Boolean creator,
-            @RequestParam(required = false, defaultValue = "false") Boolean admin,
-            @RequestParam(required = false, defaultValue = "false") Boolean user
-
+        @PathVariable Long id,
+        @RequestParam(required = false, defaultValue = "false") Boolean creator,
+        @RequestParam(required = false, defaultValue = "false") Boolean admin,
+        @RequestParam(required = false, defaultValue = "false") Boolean user
     ) {
         log.debug("REST request to list project with user {}", id);
-        User requestedUser = userService.findUser(id)
-                .orElseThrow(() -> new ObjectNotFoundException("User", id));
+        long currentUserId = currentUserService.getCurrentUser().id();
+        long requestedUserId = userHttpContract.get(id, currentUserId)
+            .orElseThrow(() -> new ObjectNotFoundException("User", id)).id();
 
-        if(creator) {
-            return responseSuccess(projectService.listByCreator(requestedUser));
-        } else if(admin) {
-            return responseSuccess(projectService.listByAdmin(requestedUser));
+        if (creator) {
+            return responseSuccess(projectService.listByCreatorId(requestedUserId));
+        } else if (admin) {
+            return responseSuccess(projectService.listByAdminId(requestedUserId));
         } else {
-            return responseSuccess(projectService.listByUser(requestedUser));
+            return responseSuccess(projectService.listByUserId(requestedUserId));
         }
     }
 
     @GetMapping("/bounds/project.json")
     public ResponseEntity<String> bounds(
-            @RequestParam(required = false, defaultValue = "false") Boolean withMembersCount
+        @RequestParam(required = false, defaultValue = "false") Boolean withMembersCount
     ) {
         log.debug("REST request get bounds for projects");
 
@@ -207,25 +215,27 @@ public class RestProjectController extends RestCytomineController {
 
     @GetMapping({"/commandhistory.json", "/project/{id}/commandhistory.json"})
     public ResponseEntity<String> listCommandHistory(
-            @PathVariable(required = false) Long id,
-            @RequestParam(required = false) Long user,
-            @RequestParam(required = false) Long startDate,
-            @RequestParam(required = false) Long endDate,
-            @RequestParam(required = false, defaultValue = "false") Boolean fullData,
-            @RequestParam(required = false, defaultValue = "0") Long max,
-            @RequestParam(required = false, defaultValue = "0") Long offset
+        @PathVariable(required = false) Long id,
+        @RequestParam(required = false) Long user,
+        @RequestParam(required = false) Long startDate,
+        @RequestParam(required = false) Long endDate,
+        @RequestParam(required = false, defaultValue = "false") Boolean fullData,
+        @RequestParam(required = false, defaultValue = "0") Long max,
+        @RequestParam(required = false, defaultValue = "0") Long offset
     ) {
         log.debug("REST request to list history with project {}", id);
         List<Project> projects = new ArrayList<>();
 
-        if(id!=null) {
+        if (id != null) {
             projects.add(projectRepository.findById(id)
-                    .orElseThrow(() -> new ObjectNotFoundException("Project", id)));
+                .orElseThrow(() -> new ObjectNotFoundException("Project", id)));
         } else {
             projects.addAll(projectService.listForCurrentUser());
         }
 
-        return responseSuccess(JsonObject.toJsonString(projectService.findCommandHistory(projects, user, max, offset, fullData, startDate, endDate)));
+        return responseSuccess(JsonObject.toJsonString(
+            projectService.findCommandHistory(projects, user, max, offset, fullData, startDate, endDate))
+        );
     }
 
     @GetMapping("/project/{id}/task-runs")

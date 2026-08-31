@@ -1,4 +1,4 @@
-import {Cytomine} from '@/api';
+import { Cytomine } from '@/api';
 
 export const UploadStatus = {
   CANCELLED: 'cancelled',
@@ -15,10 +15,15 @@ export async function deleteApp(app, notify, t) {
     const uri = `${app.namespace}/${app.version}`;
     await Cytomine.instance.api.delete(`/app-engine/tasks/${uri}`);
 
-    notify({type: 'success', text: t('notify-success-app-deletion')});
+    notify({ type: 'success', text: t('notify-success-app-deletion') });
   } catch (error) {
     console.error('Failed to delete app:', error);
-    notify({type: 'error', text: t('notify-error-app-deletion')});
+
+    if (error.response?.status === 403) {
+      notify({ type: 'error', text: t('notify-error-app-deletion-forbidden') });
+    } else {
+      notify({ type: 'error', text: t('notify-error-app-deletion') });
+    }
   }
 }
 
@@ -27,16 +32,32 @@ export async function installApp(app, notify, t) {
     const uri = `${app.namespace}/${app.version}`;
     await Cytomine.instance.api.post(`/app-engine/tasks/${uri}/install`);
 
-    notify({type: 'success', text: t('notify-success-app-installation')});
+    notify({ type: 'success', text: t('notify-success-app-installation') });
     return true;
   } catch (error) {
     console.error('Failed to install app:', error);
-    notify({type: 'error', text: t('notify-error-app-installation')});
+    notify({ type: 'error', text: t('notify-error-app-installation') });
     return false;
   }
 }
 
-export async function hasBinaryType(input) {
+export function hasBinaryType(input) {
   const typeId = input.type.id === 'array' ? input.type.subType.id : input.type.id;
   return BINARY_TYPES.includes(typeId);
+}
+
+export function isGeometry(parameter) {
+  if (parameter.type.id === 'geometry') {
+    return true;
+  }
+
+  if (parameter.type.id === 'array' && parameter.type.subType.id === 'geometry') {
+    return true;
+  }
+
+  return false;
+}
+
+export function formatTaskName(taskRun) {
+  return `${taskRun.task.name} (${taskRun.task.version}) - ${(new Date(taskRun.createdAt)).toLocaleString()}`;
 }

@@ -1345,10 +1345,6 @@ components:
           description: Last update datetime for the task run
           type: string
           format: date-time
-        last_state_transition_at:
-          description: Last task run state transaction datetime
-          type: string
-          format: date-time
 
     param_name_type:
       type: string
@@ -1469,13 +1465,13 @@ components:
     generic_error:
       type: object
       properties:
-        error_code:
+        errorCode:
           type: string
           pattern: ^APPE-[a-zA-Z0-9_-]+$
           description: an error code structured as `{component}-{reason}`
         message:
           type: string
-          description: the human-readable error message associated with the error_code (non-localized, in english)
+          description: the human-readable error message associated with the errorCode (non-localized, in english)
         details:
           type: object
           description: provide a more detailed description of the error, structure and content depends on the error code

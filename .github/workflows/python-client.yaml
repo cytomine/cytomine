@@ -1,52 +1,23 @@
 name: Python Client
 
 on:
-  workflow_call:
+  push:
+    branches:
+      - main
 
 defaults:
   run:
     working-directory: ./clients/python
 
 jobs:
-  lint:
-    runs-on: self-hosted
-
-    steps:
-      - name: Set up the repository
-        uses: actions/checkout@v6.0.1
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          version: ${{ vars.UV_VERSION }}
-
-      - name: Lint
-        run: uv run ruff check
-
-  type-check:
-    runs-on: self-hosted
-
-    steps:
-      - name: Set up the repository
-        uses: actions/checkout@v6.0.1
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          version: ${{ vars.UV_VERSION }}
-
-      - name: Check type
-        run: uv run mypy cytomine tests
-
   check-version:
-    if: github.ref_name == 'main' && github.event_name == 'push'
     runs-on: self-hosted
     outputs:
       changed: ${{ steps.check.outputs.changed }}
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 2
 
@@ -68,15 +39,24 @@ jobs:
     if: needs.check-version.outputs.changed == 'true'
     needs: check-version
     runs-on: self-hosted
+    environment:
+      name: pypi
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Set up the repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v7.0.1
+
+      - name: Load versions
+        id: versions
+        uses: ./.github/actions/load-versions
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          version: ${{ vars.UV_VERSION }}
+          version: ${{ steps.versions.outputs.uv-version }}
 
       - name: Build package
         run: uv build

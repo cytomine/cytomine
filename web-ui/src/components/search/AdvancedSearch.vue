@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="box error" v-if="error">
   <h2> {{ $t('error') }} </h2>
@@ -126,7 +112,7 @@
             </b-table-column>
 
             <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-              {{ Number(project.lastActivity) | moment('ll') }}
+              {{ formatMomentDate(Number(project.lastActivity), 'll') }}
             </b-table-column>
 
             <b-table-column label=" " centered width="150">
@@ -183,7 +169,7 @@
 
             <b-table-column :label="$t('overview')" width="100">
               <router-link :to="`/project/${image.project}/image/${image.id}`">
-                <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{Authorization: 'Bearer ' + shortTermToken }"/>
+                <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
               </router-link>
             </b-table-column>
 
@@ -256,16 +242,17 @@
 
 <script>
 import _ from 'lodash';
-import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
-import ImageName from '@/components/image/ImageName';
-import CytomineTable from '@/components/utils/CytomineTable';
-import ProjectDetails from '@/components/project/ProjectDetails';
-import ImageDetails from '@/components/image/ImageDetails';
-import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import {ImageInstanceCollection, ProjectCollection, TagCollection} from '@/api';
-import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
-import {appendShortTermToken} from '@/utils/token-utils.js';
+import { get, sync, syncMultiselectFilter } from '@/utils/store-helpers';
+import ImageName from '@/components/image/ImageName.vue';
+import CytomineTable from '@/components/utils/CytomineTable.vue';
+import ProjectDetails from '@/components/project/ProjectDetails.vue';
+import ImageDetails from '@/components/image/ImageDetails.vue';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
+import { ImageInstanceCollection, ProjectCollection, TagCollection } from '@/api';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'advanced-search',
@@ -298,6 +285,7 @@ export default {
   },
   methods: {
     appendShortTermToken,
+    formatMomentDate,
     debounceSearchString: _.debounce(async function (value) {
       this.searchString = value;
     }, 500),
@@ -318,7 +306,7 @@ export default {
     openedDetails: sync('advancedSearch/openedDetails'),
 
     filtersOpened: sync('advancedSearch/filtersOpened'),
-    searchString: sync('advancedSearch/searchString', {debounce: 500}),
+    searchString: sync('advancedSearch/searchString', { debounce: 500 }),
     selectedTags: syncMultiselectFilter('advancedSearch', 'selectedTags', 'availableTags'),
 
     nbActiveFilters() {
@@ -399,7 +387,7 @@ export default {
   async created() {
     this.searchString = this.pathSearchString || this.querySearchString || this.searchString || '';
     try {
-      this.availableTags = [{id: 'null', name: this.$t('no-tag')}, ...(await TagCollection.fetchAll()).array];
+      this.availableTags = [{ id: 'null', name: this.$t('no-tag') }, ...(await TagCollection.fetchAll()).array];
     } catch (error) {
       console.log(error);
       this.error = true;
@@ -435,7 +423,7 @@ export default {
   margin-bottom: 0.4em;
 }
 
->>> .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 4rem;
   max-width: 10rem;
 }

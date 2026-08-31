@@ -1,19 +1,5 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 import itertools
 import operator
-from typing import List, Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Response
 from pydantic import BaseModel, Field
@@ -47,14 +33,14 @@ class Histogram(HistogramInfo):
     first_bin: int = Field(..., description="Index of first bin returned in histogram")
     last_bin: int = Field(..., description="Index of last bin returned in histogram")
     n_bins: int = Field(..., description="The number of bins in the full range histogram")
-    histogram: List[int] = Field(..., description="Histogram")
+    histogram: list[int] = Field(..., description="Histogram")
 
 
 class ChannelHistogramInfo(HistogramInfo):
     channel: int = Field(..., description="Image channel index")
     concrete_channel: int = Field(..., description="Image concrete channel index")
     sample: int = Field(..., description="Image channel sample index")
-    color: Optional[str] = Field(None, description="Channel color")
+    color: str | None = Field(None, description="Channel color")
 
 
 class ChannelHistogram(ChannelHistogramInfo, Histogram):
@@ -62,13 +48,13 @@ class ChannelHistogram(ChannelHistogramInfo, Histogram):
 
 
 class ChannelsHistogramCollection(CollectionSize):
-    items: List[ChannelHistogram] = Field(
+    items: list[ChannelHistogram] = Field(
         None, description='Array of channel histograms', title='Channel histogram'
     )
 
 
 class ChannelsHistogramInfoCollection(CollectionSize):
-    items: List[ChannelHistogramInfo] = Field(
+    items: list[ChannelHistogramInfo] = Field(
         None, description='Array of channel histograms', title='Channel histogram'
     )
 
@@ -83,13 +69,13 @@ class PlaneHistogram(PlaneHistogramInfo, Histogram):
 
 
 class PlaneHistogramCollection(CollectionSize):
-    items: List[PlaneHistogram] = Field(
+    items: list[PlaneHistogram] = Field(
         None, description='Array of plane histograms', title='Plane histogram'
     )
 
 
 class PlaneHistogramInfoCollection(CollectionSize):
-    items: List[PlaneHistogramInfo] = Field(
+    items: list[PlaneHistogramInfo] = Field(
         None, description='Array of plane histograms', title='Plane histogram'
     )
 
@@ -211,7 +197,7 @@ async def show_image_histogram_bounds(
 async def show_channels_histogram(
     path: Path = Depends(imagepath_parameter),
     hist_config: HistogramConfig = Depends(),
-    channels: Optional[List[Annotated[int, Field(ge=0)]]] = Query(
+    channels: list[Annotated[int, Field(ge=0)]] | None = Query(
         None, description="Only return histograms for these channels"
     ),
 ):
@@ -257,7 +243,7 @@ async def show_channels_histogram(
 )
 async def show_channels_histogram_bounds(
     path: Path = Depends(imagepath_parameter),
-    channels: Optional[List[Annotated[int, Field(ge=0)]]] = Query(
+    channels: list[Annotated[int, Field(ge=0)]] | None = Query(
         None, description="Only return histograms for these channels"
     ),
 ):
@@ -303,7 +289,7 @@ async def show_plane_histogram(
     timepoints: Annotated[int, Field(ge=0)],
     path: Path = Depends(imagepath_parameter),
     hist_config: HistogramConfig = Depends(),
-    channels: Optional[List[Annotated[int, Field(ge=0)]]] = Query(
+    channels: list[Annotated[int, Field(ge=0)]] | None = Query(
         None, description="Only return histograms for these channels"
     ),
 ):
@@ -352,7 +338,7 @@ async def show_plane_histogram_bounds(
     z_slices: Annotated[int, Field(ge=0)],
     timepoints: Annotated[int, Field(ge=0)],
     path: Path = Depends(imagepath_parameter),
-    channels: Optional[List[Annotated[int, Field(ge=0)]]] = Query(
+    channels: list[Annotated[int, Field(ge=0)]] | None = Query(
         None, description="Only return histograms for these channels"
     ),
 ):
@@ -393,7 +379,6 @@ async def compute_histogram(
     response: Response,
     background: BackgroundTasks,
     path: Path = Depends(imagepath_parameter),
-    # companion_file_id: Optional[int] = Body(None, description="Cytomine ID for the histogram")
     sync: bool = True,
     overwrite: bool = True
 ):

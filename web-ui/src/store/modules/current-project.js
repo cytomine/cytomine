@@ -1,19 +1,3 @@
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
 import {
   AnnotationType,
   Cytomine,
@@ -24,7 +8,7 @@ import {
   UserCollection
 } from '@/api';
 
-import {getAllTerms} from '@/utils/ontology-utils';
+import { getAllTerms } from '@/utils/ontology-utils';
 
 function getDefaultState() {
   return {
@@ -73,11 +57,11 @@ export default {
   },
 
   actions: {
-    async loadProject({state, dispatch, commit}, idProject) {
+    async loadProject({ state, dispatch, commit }, idProject) {
       let projectChange = !state.project || state.project.id !== idProject;
       let project = await Project.fetch(idProject);
       commit('setProject', project);
-      commit(`projects/${project.id}/setProject`, project, {root: true});
+      commit(`projects/${project.id}/setProject`, project, { root: true });
 
       let promises = [
         dispatch('fetchUIConfig'),
@@ -86,30 +70,30 @@ export default {
       ];
 
       if (projectChange) {
-        promises.push(new ProjectConnection({project: idProject}).save());
+        promises.push(new ProjectConnection({ project: idProject }).save());
       }
       await Promise.all(promises);
     },
-    async reloadProject({state, commit}) {
+    async reloadProject({ state, commit }) {
       let project = await Project.fetch(state.project.id);
       commit('setProject', project);
     },
 
-    async updateProject({state, dispatch, commit}, updatedProject) {
+    async updateProject({ state, dispatch, commit }, updatedProject) {
       let reloadOntology = state.project.ontology !== updatedProject.ontology;
       commit('setProject', updatedProject);
-      commit(`projects/${updatedProject.id}/setProject`, updatedProject, {root: true});
+      commit(`projects/${updatedProject.id}/setProject`, updatedProject, { root: true });
       if (reloadOntology) {
         await dispatch('fetchOntology');
       }
     },
 
-    async fetchUIConfig({state, commit}) {
+    async fetchUIConfig({ state, commit }) {
       let config = await Cytomine.instance.fetchUIConfigCurrentUser(state.project.id);
       commit('setConfigUI', config);
     },
 
-    async fetchProjectMembers({state, commit}) {
+    async fetchProjectMembers({ state, commit }) {
       let collection = new UserCollection({
         filterKey: 'project',
         filterValue: state.project.id,
@@ -122,11 +106,11 @@ export default {
       commit('setMembers', members);
     },
 
-    async fetchFollowers(_, {userId, imageId}) {
+    async fetchFollowers(_, { userId, imageId }) {
       return await UserCollection.fetchFollowers(userId, imageId);
     },
 
-    async fetchOntology({state, commit}) {
+    async fetchOntology({ state, commit }) {
       let ontology = state.project.ontology ? await Ontology.fetch(state.project.ontology) : null;
       commit('setOntology', ontology);
     }

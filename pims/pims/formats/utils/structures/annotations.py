@@ -1,23 +1,10 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from shapely.geometry.base import BaseGeometry
 
 from pims.utils.iterables import ensure_list
 
-PlaneIndex = Union[int, List[int]]
+PlaneIndex = int | list[int]
 
 
 class ParsedMetadataAnnotation:
@@ -27,8 +14,8 @@ class ParsedMetadataAnnotation:
     """
     def __init__(
         self, geometry: BaseGeometry, c: PlaneIndex, z: PlaneIndex, t: PlaneIndex,
-        terms: Optional[List[str]] = None,
-        properties: Optional[Dict[str, Any]] = None
+        terms: list[str] | None = None,
+        properties: dict[str, Any] | None = None
     ):
         """
         Initialize an annotation from image metadata.

@@ -1,7 +1,6 @@
 """Indexer class for indexing images and their features."""
 
 import os
-from typing import List, Tuple
 
 import faiss
 import numpy as np
@@ -50,7 +49,7 @@ class Indexer:
         index = faiss.index_gpu_to_cpu(self.index) if self.gpu else self.index
         faiss.write_index(index, self.index_path)
 
-    def add(self, last_id: int, images: np.ndarray) -> List[int]:
+    def add(self, last_id: int, images: np.ndarray) -> list[int]:
         """
         Index the given images in the index.
 
@@ -87,7 +86,7 @@ class Indexer:
         self,
         image: np.ndarray,
         nrt_neigh: int,
-    ) -> Tuple[List[str], List[float]]:
+    ) -> tuple[list[str], list[float]]:
         """
         Search similar images given a query image.
 

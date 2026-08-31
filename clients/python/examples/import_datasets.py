@@ -36,7 +36,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--import-uri",
-        default="import",
+        default="ims/import",
         help="The Cytomine private key",
     )
     params, _ = parser.parse_known_args(sys.argv[1:])
@@ -49,11 +49,11 @@ if __name__ == "__main__":
         # To import the datasets, we need to know the ID of your Cytomine storage.
         storages = StorageCollection().fetch()
         storage = next(
-            filter(lambda storage: storage.user == cytomine.current_user.id, storages)
+            filter(lambda storage: storage.userId == cytomine.current_user.id, storages)
         )
         if not storage:
             raise ValueError("Storage not found")
 
-        response = cytomine.import_datasets(storage.id, pims_url= urljoin(params.cytomine_pims_host, params.import_uri))
+        response = cytomine.import_datasets(storage.id, pims_url=urljoin(params.cytomine_pims_host, params.import_uri))
 
         print(response)

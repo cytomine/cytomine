@@ -31,11 +31,11 @@ module.exports = (content) => [
       {
         text: "Cytomine",
         items: [
-          {text: "Installation", link: "/admin-guide/ce/installation"},
-          {text: "Configuration", link: "/admin-guide/ce/configuration"},
-          {text: "Backup", link: "/admin-guide/ce/backup"},
-          {text: "Troubleshooting", link: "/admin-guide/ce/troubleshooting"},
-          {text: "Uninstallation", link: "/admin-guide/ce/uninstallation"},
+          {text: "Installation", link: "/admin-guide/docker/installation"},
+          {text: "Configuration", link: "/admin-guide/docker/configuration"},
+          {text: "Backup", link: "/admin-guide/docker/backup"},
+          {text: "Troubleshooting", link: "/admin-guide/docker/troubleshooting"},
+          {text: "Uninstallation", link: "/admin-guide/docker/uninstallation"},
         ],
       },
       {

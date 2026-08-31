@@ -1,6 +1,11 @@
 package be.cytomine.domain.image.server;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -8,6 +13,7 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -21,14 +27,14 @@ public class Storage extends CytomineDomain {
     protected String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "user_id")
     protected User user;
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        Storage storage = (Storage)this;
-        storage.id = json.getJSONAttrLong("id",null);
+        Storage storage = (Storage) this;
+        storage.id = json.getJSONAttrLong("id", null);
         storage.name = json.getJSONAttrStr("name", true);
-        storage.user = (User)json.getJSONAttrDomain(entityManager, "user", new User(), true);
+        storage.user = (User) json.getJSONAttrDomain(entityManager, "user", new User(), true);
         storage.created = json.getJSONAttrDate("created");
         storage.updated = json.getJSONAttrDate("updated");
         return storage;
@@ -36,19 +42,19 @@ public class Storage extends CytomineDomain {
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        Storage storage = (Storage)domain;
+        Storage storage = (Storage) domain;
         returnArray.put("name", storage.getName());
-        returnArray.put("user", (storage.getUser()!=null ? storage.getUser().getId() : null));
+        returnArray.put("user", (storage.getUser() != null ? storage.getUser().getId() : null));
         return returnArray;
     }
 
     @Override
-    public String toJSON() {
+    public String toJSON(UrlApi urlApi) {
         return getDataFromDomain(this).toJsonString();
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

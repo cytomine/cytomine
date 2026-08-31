@@ -1,21 +1,7 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-
 import logging
 from copy import copy
 from enum import Enum
-from typing import Dict, Iterator, Optional, Tuple, Union
+from collections.abc import Iterator
 
 from cytomine.models import (
     AbstractImage, AbstractSlice, AbstractSliceCollection, Annotation, AnnotationCollection,
@@ -169,11 +155,11 @@ class ImportListener:
 
 class CytomineListener(ImportListener):
     def __init__(
-        self, auth: Tuple[str, str, str], uf: UploadedFile,
-        root: Optional[UploadedFile] = None,
-        existing_mapping: Optional[Dict[str, UploadedFile]] = None,
-        projects: Optional[ProjectCollection] = None,
-        user_properties: Optional[Iterator[Tuple[str, str]]] = None
+        self, auth: tuple[str, str, str], uf: UploadedFile,
+        root: UploadedFile | None = None,
+        existing_mapping: dict[str, UploadedFile] | None = None,
+        projects: ProjectCollection | None = None,
+        user_properties: Iterator[tuple[str, str]] | None = None
     ):
         """
         Parameters
@@ -210,8 +196,8 @@ class CytomineListener(ImportListener):
                     root = UploadedFile().fetch(root.parent)
 
         self.abstract_images = []
-        self.projects = projects
-        self.user_properties = user_properties
+        self.projects = projects or ProjectCollection()
+        self.user_properties = user_properties or iter([])
         self.images = []
 
     def new_listener_from_registered_child(self, child: Path):
@@ -227,9 +213,9 @@ class CytomineListener(ImportListener):
             UploadedFile().fetch(id)
         )
 
-    def get_uf(self, path: Union[str, Path]) -> UploadedFile:
+    def get_uf(self, path: str | Path) -> UploadedFile:
         uf = self.path_uf_mapping.get(str(path))
-        if not uf:
+        if not uf and isinstance(path, Path):
             path = path.readlink()
             uf = self.path_uf_mapping.get(str(path))
             if not uf:
@@ -309,7 +295,6 @@ class CytomineListener(ImportListener):
             uf.storage = parent.storage
             uf.user = parent.user
             uf.parent = None if delete_zip else parent.id
-            uf.imageServer = parent.imageServer
             uf.save()
             self.path_uf_mapping[str(unpacked_path)] = uf
             if delete_zip:
@@ -328,7 +313,6 @@ class CytomineListener(ImportListener):
         uf.storage = parent.storage
         uf.user = parent.user
         uf.parent = None if delete_zip else parent.id
-        uf.imageServer = parent.imageServer
         uf.save()
         self.path_uf_mapping[str(path)] = uf
 
@@ -365,7 +349,6 @@ class CytomineListener(ImportListener):
         uf.storage = parent.storage
         uf.user = parent.user
         uf.parent = parent.id
-        uf.imageServer = parent.imageServer
         uf.save()
         self.path_uf_mapping[str(path)] = uf
 
@@ -459,13 +442,15 @@ class CytomineListener(ImportListener):
 
             for z in range(image.depth):
                 for t in range(image.duration):
-                    mime = "image/pyrtiff"  # TODO: remove
-                    asc.append(
-                        AbstractSlice(
-                            ai.id, uf.id, mime, cc, z, t,
-                            channelName=name, channelColor=color
-                        )
-                    )
+                    asc.append(AbstractSlice(
+                        id_image=ai.id,
+                        id_uploaded_file=uf.id,
+                        channel=cc,
+                        z_stack=z,
+                        time=t,
+                        channelName=name,
+                        channelColor=color,
+                    ))
         asc.save()
 
         uf.status = UploadedFile.DEPLOYED

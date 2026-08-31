@@ -7,21 +7,28 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
+import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.ontology.AnnotationLink;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class AnnotationLinkServiceTests {
 
@@ -30,44 +37,63 @@ public class AnnotationLinkServiceTests {
 
     @Autowired
     AnnotationLinkService annotationLinkService;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
-    void find_annotation_link_with_success() {
-        AnnotationLink annotationLink = builder.given_an_annotation_link();
+    void findAnnotationLinkWithSuccess() {
+        AnnotationLink annotationLink = builder.givenAnAnnotationLink();
         AssertionsForClassTypes.assertThat(annotationLinkService.find(annotationLink.getId()).isPresent());
         assertThat(annotationLink).isEqualTo(annotationLinkService.find(annotationLink.getId()).get());
     }
 
     @Test
-    void find_non_existing_annotation_link_return_empty() {
+    void findNonExistingAnnotationLinkReturnEmpty() {
         AssertionsForClassTypes.assertThat(annotationLinkService.find(0L)).isEmpty();
     }
 
     @Test
-    void get_non_existing_annotation_link_return_null() {
+    void getNonExistingAnnotationLinkReturnNull() {
         AssertionsForClassTypes.assertThat(annotationLinkService.get(0L)).isNull();
     }
 
     @Test
-    void list_annotation_link_by_annotation_group() {
-        Project project = builder.given_a_project();
-        AnnotationGroup annotationGroup = builder.given_an_annotation_group(project, builder.given_an_imagegroup(project));
-        ImageInstance image = builder.given_an_image_instance(project);
+    void listAnnotationLinkByAnnotationGroup() {
+        Project project = builder.givenAProject();
+        AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup(
+            project,
+            builder.givenAnImageGroup(project)
+        );
+        ImageInstance image = builder.givenAnImageInstance(project);
 
-        AnnotationLink annotationLink1 = builder.given_an_annotation_link(builder.given_a_user_annotation(project), annotationGroup, image);
-        AnnotationLink annotationLink2 = builder.given_an_annotation_link(builder.given_a_user_annotation(project), annotationGroup, image);
-        AnnotationLink annotationLink3 = builder.given_an_annotation_link(builder.given_a_user_annotation(project), annotationGroup, image);
-        AnnotationLink annotationLink4 = builder.given_an_annotation_link();
+        AnnotationLink annotationLink1 = builder.givenAnAnnotationLink(
+            builder.givenAUserAnnotation(project),
+            annotationGroup,
+            image
+        );
+        AnnotationLink annotationLink2 = builder.givenAnAnnotationLink(
+            builder.givenAUserAnnotation(project),
+            annotationGroup,
+            image
+        );
+        AnnotationLink annotationLink3 = builder.givenAnAnnotationLink(
+            builder.givenAUserAnnotation(project),
+            annotationGroup,
+            image
+        );
+        AnnotationLink annotationLink4 = builder.givenAnAnnotationLink();
 
-        AssertionsForInterfaceTypes.assertThat(annotationLinkService.list(annotationGroup)).containsExactly(annotationLink1, annotationLink2, annotationLink3);
-        AssertionsForInterfaceTypes.assertThat(annotationLinkService.list(annotationGroup)).doesNotContain(annotationLink4);
+        AssertionsForInterfaceTypes.assertThat(annotationLinkService.list(annotationGroup))
+            .containsExactly(annotationLink1, annotationLink2, annotationLink3);
+        AssertionsForInterfaceTypes.assertThat(annotationLinkService.list(annotationGroup))
+            .doesNotContain(annotationLink4);
     }
 
     @Test
-    void add_valid_annotation_link_with_success() {
-        AnnotationLink annotationLink = builder.given_a_not_persisted_annotation_link();
+    void addValidAnnotationLinkWithSuccess() {
+        AnnotationLink annotationLink = builder.givenANotPersistedAnnotationLink();
 
-        CommandResponse commandResponse = annotationLinkService.add(annotationLink.toJsonObject());
+        CommandResponse commandResponse = annotationLinkService.add(annotationLink.toJsonObject(urlApi));
 
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -75,8 +101,8 @@ public class AnnotationLinkServiceTests {
     }
 
     @Test
-    void delete_annotation_link_with_success() {
-        AnnotationLink annotationLink = builder.given_an_annotation_link();
+    void deleteAnnotationLinkWithSuccess() {
+        AnnotationLink annotationLink = builder.givenAnAnnotationLink();
 
         CommandResponse commandResponse = annotationLinkService.delete(annotationLink, null, null, true);
 

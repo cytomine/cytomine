@@ -13,6 +13,7 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import be.cytomine.domain.CytomineDomain;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Setter
@@ -41,7 +42,9 @@ public class Annotation extends CytomineDomain {
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         Annotation annotation = this;
         annotation.id = json.getJSONAttrLong("id", null);
-        annotation.annotationLayer = (AnnotationLayer) json.getJSONAttrDomain(entityManager, "annotationLayer", new AnnotationLayer(), true);
+        annotation.annotationLayer = (AnnotationLayer) json.getJSONAttrDomain(
+            entityManager, "annotationLayer", new AnnotationLayer(), true
+        );
         annotation.created = json.getJSONAttrDate("created");
         annotation.updated = json.getJSONAttrDate("updated");
 
@@ -54,7 +57,7 @@ public class Annotation extends CytomineDomain {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 }

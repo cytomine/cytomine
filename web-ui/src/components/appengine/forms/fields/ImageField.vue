@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import AnnotationSelection from '@/components/annotations/AnnotationSelection';
-import ImageSelection from '@/components/image/ImageSelection';
+import AnnotationSelection from '@/components/annotations/AnnotationSelection.vue';
+import ImageSelection from '@/components/image/ImageSelection.vue';
 
 export default {
   name: 'ImageField',
@@ -44,7 +44,7 @@ export default {
     ImageSelection,
   },
   props: {
-    parameter: {type: Object, required: true},
+    parameter: { type: Object, required: true },
     value: {},
   },
   data() {
@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     selectInput(input, type) {
-      this.input = {type, id: input};
+      this.input = { type, id: input };
       this.type = type;
     },
   },

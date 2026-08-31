@@ -1,0 +1,29 @@
+package be.cytomine.common.repository.http;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.annotation.HttpExchange;
+import org.springframework.web.service.annotation.PostExchange;
+
+import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+
+@HttpExchange(CommandHttpContract.ROOT_PATH)
+public interface CommandHttpContract {
+    String ROOT_PATH = "/commands";
+
+    @PostExchange("/undo/{commandId}")
+    Optional<HttpCommandResponse> undo(@PathVariable UUID commandId, @RequestParam long userId);
+
+    @GetExchange("/{commandId}")
+    Optional<CommandV2Response<?>> get(@PathVariable UUID commandId, @RequestParam long userId);
+
+    @GetExchange("/all")
+    Page<CommandV2Response<?>> getAllForUser(@RequestParam long userId, Pageable pageable);
+}

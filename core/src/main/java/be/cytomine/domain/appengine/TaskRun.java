@@ -1,9 +1,17 @@
 package be.cytomine.domain.appengine;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +21,7 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -34,6 +43,9 @@ public class TaskRun extends CytomineDomain {
     @Convert(converter = UUIDConverter.class)
     private UUID taskRunId;
 
+    @OneToMany(mappedBy = "taskRun", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TaskRunLayer> taskRunLayers = new ArrayList<>();
+
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         TaskRun taskRun = (TaskRun) domain;
@@ -52,7 +64,7 @@ public class TaskRun extends CytomineDomain {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

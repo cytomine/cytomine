@@ -11,7 +11,7 @@
         </tr>
         <tr>
           <td><strong>{{ $t('created-on') }}</strong></td>
-          <td> {{ Number(annotation.created) | moment('ll') }}</td>
+          <td> {{ formatMomentDate(Number(annotation.created), 'll') }}</td>
         </tr>
       </template>
 
@@ -37,13 +37,18 @@
 </template>
 
 <script>
-import copyToClipboard from 'copy-to-clipboard';
-import {get} from '@/utils/store-helpers';
+import { useClipboard } from '@vueuse/core';
+import { get } from '@/utils/store-helpers';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'AnnotationSimpleDetails',
   props: {
-    annotation: {type: Object, required: true},
+    annotation: { type: Object, required: true },
+  },
+  setup() {
+    const { copy } = useClipboard({ legacy: true });
+    return { copy };
   },
   computed: {
     configUI: get('currentProject/configUI'),
@@ -59,9 +64,10 @@ export default {
     },
   },
   methods: {
+    formatMomentDate,
     copyURL() {
-      copyToClipboard(window.location.origin + '/#' + this.annotationURL);
-      this.$notify({type: 'success', text: this.$t('notif-success-annot-URL-copied')});
+      this.copy(window.location.origin + this.annotationURL);
+      this.$notify({ type: 'success', text: this.$t('notif-success-annot-URL-copied') });
     },
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];

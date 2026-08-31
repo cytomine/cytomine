@@ -1,0 +1,5 @@
+---
+services:
+  k3s:
+    volumes:
+      - ../.kube/secrets/lsaai-secrets.yaml:/var/lib/rancher/k3s/server/manifests/lsaai-secrets.yaml:ro

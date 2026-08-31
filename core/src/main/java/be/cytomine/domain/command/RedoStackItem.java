@@ -1,11 +1,16 @@
 package be.cytomine.domain.command;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -17,20 +22,19 @@ public class RedoStackItem extends CytomineDomain {
     @JoinColumn(name = "command_id", nullable = false)
     protected Command command;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    protected User user;
+    @Column(name = "user_id")
+    protected Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transaction_id", nullable = true)
     protected Transaction transaction;
 
-    public RedoStackItem() { }
+    public RedoStackItem() {
+    }
 
     public RedoStackItem(UndoStackItem firstUndoStack) {
         this.command = firstUndoStack.getCommand();
-        this.user = firstUndoStack.getUser();
+        this.userId = firstUndoStack.getUserId();
         this.transaction = firstUndoStack.getTransaction();
     }
 
@@ -43,12 +47,12 @@ public class RedoStackItem extends CytomineDomain {
     }
 
     @Override
-    public String toJSON() {
+    public String toJSON(UrlApi urlApi) {
         return getDataFromDomain(this).toJsonString();
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 }

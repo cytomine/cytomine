@@ -1,10 +1,13 @@
 package be.cytomine.authorization.project;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,76 +22,78 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.meta.Description;
 import be.cytomine.domain.meta.Property;
-import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.meta.AttachedFileService;
 import be.cytomine.service.meta.DescriptionService;
 import be.cytomine.service.meta.PropertyService;
-import be.cytomine.service.meta.TagDomainAssociationService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ProjectSearchExtension;
 
-import static be.cytomine.domain.project.EditingMode.*;
+import static be.cytomine.domain.project.EditingMode.CLASSIC;
+import static be.cytomine.domain.project.EditingMode.READ_ONLY;
+import static be.cytomine.domain.project.EditingMode.RESTRICTED;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 
+@SuppressWarnings("checkstyle:VariableDeclarationUsageDistance")
 @AutoConfigureMockMvc
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @Transactional
 public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
+    @Autowired
+    private BasicInstanceBuilder basicInstanceBuilder;
     @Autowired
     private ProjectMemberService projectMemberService;
-
     @Autowired
     private ProjectService projectService;
-
     @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private ProjectRepresentativeUserService projectRepresentativeUserService;
-
     @Autowired
     private ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
-
     @Autowired
     private DescriptionService descriptionService;
-
     @Autowired
     private AttachedFileService attachedFileService;
-
     @Autowired
     private PropertyService propertyService;
-
     @Autowired
     private ImageInstanceService imageInstanceService;
-
-    @Autowired
-    private TagDomainAssociationService tagDomainAssociationService;
-
     @Autowired
     private UserAnnotationService userAnnotationService;
 
-    private Project project = null;
+    @Autowired
+    private UserMapper userMapper;
 
-    private static WireMockServer wireMockServer;
+    @Autowired
+    private UrlApi urlApi;
+    private Project project = null;
 
     private static void setupStub() {
         /* Simulate call to PIMS */
@@ -122,21 +127,13 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
-
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach
     public void before() throws Exception {
         if (project == null) {
-            project = builder.given_a_project();
+            project = builder.givenAProject();
 
             initACL(project);
         }
@@ -146,258 +143,152 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_list_projects() {
+    public void adminCanListProjects() {
         assertThat(projectService.list(null, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", 0L, 0L)
-                .stream().map(x -> x.get("id")))
-                .contains(project.getId());
+            .stream().map(x -> x.get("id")))
+            .contains(project.getId());
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_at_least_read_permission_can_list_projects(){
-        assertThat(projectService.list((User) userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get(), new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", 0L, 0L)
-                .stream().map(x -> x.get("id")))
-                .contains(project.getId());
+    public void userWithAtLeastReadPermissionCanListProjects() {
+        assertThat(projectService.list(
+                userMapper.map(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get()),
+                new ProjectSearchExtension(),
+                new ArrayList<>(),
+                "created",
+                "desc",
+                0L,
+                0L
+            )
+            .stream().map(x -> x.get("id")))
+            .contains(project.getId());
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_no_acl_cannot_list_projects(){
+    public void userNoAclCannotListProjects() {
         expectForbidden(() -> {
-            projectService.list(null, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", 0L, 0L).stream().map(x -> x.get("id"));
+            projectService.list(null, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", 0L, 0L)
+                .stream()
+                .map(x -> x.get("id"));
         });
     }
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void admin_can_add_user_to_project() {
-        expectOK(() -> {projectMemberService.addUserToProject(builder.given_a_user(), project, true); });
-        expectOK(() -> {projectMemberService.addUserToProject(builder.given_a_user(), project, false); });
+    public void adminCanAddUserToProject() {
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenCreator().username(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenAclUserNoAcl().username(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void user_with_admin_rigth_can_manage_user_in_project(){
-        expectOK(() -> {projectMemberService.addUserToProject(builder.given_a_user(), project, true); });
-        expectOK(() -> {projectMemberService.addUserToProject(builder.given_a_user(), project, false); });
+    public void userWithAdminRigthCanManageUserInProject() {
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenCreator().username(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(builder.givenAclUserNoAcl().username(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_acl_cannot_manage_user_in_project(){
-        expectForbidden(() -> {projectMemberService.addUserToProject(builder.given_a_user(), project, true); });
-        expectForbidden(() -> {projectMemberService.addUserToProject(builder.given_a_user(), project, false); });
+    public void userWithReadAclCannotManageUserInProject() {
+        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenCreator().username(), project, true));
+        expectForbidden(() -> projectMemberService.addUserToProject(builder.givenAclUserNoAcl().username(), project,
+            false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void classic_project_scenario_for_admin(){
+    public void classicProjectScenarioForAdmin() {
 
-        expectOK(() -> {when_i_edit_domain();});
+        expectOK(this::whenIEditDomain);
 
-        User user = builder.given_a_user();
-        expectOK(() -> {projectMemberService.addUserToProject(user, project, false); });
-        expectOK(() -> {projectMemberService.deleteUserFromProject(user, project, false); });
-        expectOK(() -> {projectMemberService.addUserToProject(user, project, true); });
-        expectOK(() -> {projectMemberService.deleteUserFromProject(user, project, true); });
+        UserResponse user = builder.givenCreator();
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
-        expectOK(() -> {projectMemberService.addUserToProject(user, project, true); });
-
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_not_persisted_project_representative_user(
-                project, user
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
+            project,
+            user.username(), user.id()
         );
 
         // add another representative so that we can delete the first one
-        expectOK(() -> {projectMemberService.addUserToProject(builder.given_superadmin(), project, false); });
-        expectOK(() -> {projectRepresentativeUserService.add(builder.given_a_not_persisted_project_representative_user(
-                project, builder.given_superadmin()
-        ).toJsonObject());});
+        UserResponse superAdmin = builder.givenSuperAdmin();
+        expectOK(() -> projectMemberService.addUserToProject(superAdmin.username(),
+            project, false));
+        expectOK(() -> projectRepresentativeUserService.add(builder.givenANotPersistedProjectRepresentativeUser(
+            project, superAdmin.username(), superAdmin.id()
+        ).toJsonObject(urlApi)));
 
-        expectOK(() -> {projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject());});
-        expectOK(() -> {projectRepresentativeUserService.delete(
-                projectRepresentativeUserService.find(project, user).get(), null, null, false
-        );});
+        expectOK(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
+        expectOK(() -> projectRepresentativeUserService.delete(
+            projectRepresentativeUserService.find(project, user.id()).get(), null, null, false
+        ));
 
-        expectOK(() -> {descriptionService.add(builder.given_a_not_persisted_description(project).toJsonObject());});
-        expectOK(() -> {attachedFileService.create("test.txt", new String("hello").getBytes(), "test", project.getId(), project.getClass().getName());});
-        expectOK(() -> {propertyService.add(builder.given_a_not_persisted_property(project, "xxxx", "xxxxxx").toJsonObject());});
-        expectOK(() -> {tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), project).toJsonObject());});
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(project).toJsonObject(urlApi)));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            project.getId(),
+            project.getClass().getName()
+        ));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(project, "xxxx", "xxxxxx")
+            .toJsonObject(urlApi)));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void classic_project_scenario_for_user(){
+    public void classicProjectScenarioForUser() {
+        expectForbidden(this::whenIEditDomain);
 
-        expectForbidden(() -> {when_i_edit_domain();});
+        UserResponse user = builder.givenCreator();
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
 
-        User user = builder.given_a_user();
-        expectForbidden(() -> {projectMemberService.addUserToProject(user, project, false); });
-        expectForbidden(() -> {projectMemberService.deleteUserFromProject(user, project, false); });
-        expectForbidden(() -> {projectMemberService.addUserToProject(user, project, true); });
-        expectForbidden(() -> {projectMemberService.deleteUserFromProject(user, project, true); });
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
-        expectForbidden(() -> {projectMemberService.addUserToProject(user, project, true); });
-
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_not_persisted_project_representative_user(
-                project, user
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
+            project, user.username(), user.id()
         );
 
         // add another representative so that we can try to delete the first one
-        projectRepresentativeUserRepository.save(builder.given_a_not_persisted_project_representative_user(
-                project, builder.given_superadmin()
+        UserResponse superAdmin = builder.givenSuperAdmin();
+        projectRepresentativeUserRepository.save(builder.givenANotPersistedProjectRepresentativeUser(
+            project, superAdmin.username(), superAdmin.id()
         ));
 
-        expectForbidden(() -> {projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject());});
+        expectForbidden(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
         builder.persistAndReturn(projectRepresentativeUser);
-        expectForbidden(() -> {projectRepresentativeUserService.delete(
-                projectRepresentativeUserService.find(project, user).get(), null, null, false
-        );});
+        expectForbidden(() -> projectRepresentativeUserService.delete(
+            projectRepresentativeUserService.find(project, user.id()).get(), null, null, false
+        ));
 
-        expectForbidden(() -> {descriptionService.add(builder.given_a_not_persisted_description(project).toJsonObject());});
-        expectForbidden(() -> {attachedFileService.create("test.txt", new String("hello").getBytes(), "test", project.getId(), project.getClass().getName());});
-        expectForbidden(() -> {propertyService.add(builder.given_a_not_persisted_property(project, UUID.randomUUID().toString(), "value").toJsonObject());});
-        expectForbidden(() -> {tagDomainAssociationService.add(builder.given_a_tag_association(builder.given_a_tag(), project).toJsonObject());});
+        expectForbidden(
+            () -> descriptionService.add(builder.givenANotPersistedDescription(project).toJsonObject(urlApi)));
+        expectForbidden(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            project.getId(),
+            project.getClass().getName()
+        ));
+        expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(
+                project,
+                UUID.randomUUID().toString(),
+                "value"
+            )
+            .toJsonObject(urlApi)));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void classic_project_with_image_as_contributor(){
-       //Force project to Read and write
-        project.setMode(CLASSIC);
-        builder.persistAndReturn(project);
-
-        Map<String, Object> data = initProjectDataSet(project);
-
-        //super admin data
-        ImageInstance image = (ImageInstance) data.get("image");
-        SliceInstance slice = (SliceInstance) data.get("slice");
-        UserAnnotation annotation = (UserAnnotation) data.get("annotation");
-        Description description = (Description) data.get("description");
-        Property property = (Property) data.get("property");
-        AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
-
-        //admin data
-        ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
-        SliceInstance sliceAdmin = (SliceInstance) data.get("sliceAdmin");
-        UserAnnotation annotationAdmin = (UserAnnotation) data.get("annotationAdmin");
-        Description descriptionAdmin = (Description) data.get("descriptionAdmin");
-        Property propertyAdmin = (Property) data.get("propertyAdmin");
-        AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
-
-        //simple user data
-        ImageInstance imageUser = (ImageInstance) data.get("imageUser");
-        SliceInstance sliceUser = (SliceInstance) data.get("sliceUser");
-        UserAnnotation annotationUser = (UserAnnotation) data.get("annotationUser");
-        Description descriptionUser = (Description) data.get("descriptionUser");
-        Property propertyUser = (Property) data.get("propertyUser");
-        AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
-
-        //add,update, delete property (simple user data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotationUser, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(propertyUser, propertyUser.toJsonObject()));
-        expectOK(() -> propertyService.delete(propertyUser, null, null, false));
-
-        //add,update, delete property (admin data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotationAdmin, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject()));
-        expectOK(() -> propertyService.delete(propertyAdmin, null, null, false));
-
-        //add,update, delete property (superadmin data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotation, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(property, property.toJsonObject()));
-        expectOK(() -> propertyService.delete(property, null, null, false));
-
-        //add,update, delete description (simple user data)
-        expectOK(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject()));
-        expectOK(() -> descriptionService.delete(descriptionUser, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotationUser).toJsonObject()));
-
-        //add,update, delete description (admin data)
-        expectOK(() -> descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject()));
-        expectOK(() -> descriptionService.delete(descriptionAdmin, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotationAdmin).toJsonObject()));
-
-        //add,update, delete description (superadmin data)
-        expectOK(() -> descriptionService.update(description, description.toJsonObject()));
-        expectOK(() -> descriptionService.delete(description, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotation).toJsonObject()));
-
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotationUser).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotationAdmin).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotation).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tda, null, null, false));
-
-        //add,update, delete attachedFile (simple user data)
-        expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationUser.getId(), annotationUser.getClass().getName()));
-
-        //add,update, delete attachedFile (admin data)
-        expectOK(() -> attachedFileService.delete(attachedFileAdmin, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationAdmin.getId(), annotationAdmin.getClass().getName()));
-
-        //add,update, delete attachedFile (superadmin data)
-        expectOK(() -> attachedFileService.delete(attachedFile, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotation.getId(), annotation.getClass().getName()));
-
-        //start reviewing image (simple user data)
-        expectOK(() -> imageInstanceService.startReview(imageUser));
-        expectOK(() -> imageInstanceService.stopReview(imageUser, false));
-
-        //start reviewing image (admin data)
-        expectOK(() -> imageInstanceService.startReview(imageAdmin));
-        expectOK(() -> imageInstanceService.stopReview(imageAdmin, false));
-
-        //start reviewing image (superadmin data)
-        expectOK(() -> imageInstanceService.startReview(image));
-        expectOK(() -> imageInstanceService.stopReview(image, false));
-
-        //add annotation on my layer
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(slice).toJsonObject()));
-        //add annotation on other layers
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(sliceUser).toJsonObject()));
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(sliceAdmin).toJsonObject()));
-
-        //update, delete annotation (simple user data)
-        expectOK(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject()));
-        expectOK(() -> userAnnotationService.delete(annotationUser, null, null, false));
-
-        //update, delete annotation (admin data)
-        expectOK(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject()));
-        expectOK(() -> userAnnotationService.delete(annotationAdmin, null, null, false));
-
-        //update, delete annotation (super admin data)
-        expectOK(() -> userAnnotationService.update(annotation, annotation.toJsonObject()));
-        expectOK(() -> userAnnotationService.delete(annotation, null, null, false));
-
-        //add image instance
-        expectOK(() -> imageInstanceService.add(builder.given_a_not_persisted_image_instance(project).toJsonObject()));
-
-        //update, delete image instance (simple user data)
-        expectOK(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject()));
-        expectOK(() -> imageInstanceService.delete(imageUser, null, null, false));
-
-        //update, delete image instance (admin data)
-        expectOK(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject()));
-        expectOK(() -> imageInstanceService.delete(imageAdmin, null, null, false));
-
-        //update, delete image instance (superadmin data)
-        expectOK(() -> imageInstanceService.update(image, image.toJsonObject()));
-        expectOK(() -> imageInstanceService.delete(image, null, null, false));
-    }
-
-    @Test
-    @WithMockUser(username = USER_ACL_ADMIN)
-    public void classic_project_with_image_as_project_manager(){
+    public void classicProjectWithImageAsContributor() {
         //Force project to Read and write
         project.setMode(CLASSIC);
         builder.persistAndReturn(project);
@@ -411,7 +302,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -420,7 +310,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -429,61 +318,71 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotationUser, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(propertyUser, propertyUser.toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(propertyUser, propertyUser.toJsonObject(urlApi)));
         expectOK(() -> propertyService.delete(propertyUser, null, null, false));
 
         //add,update, delete property (admin data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotationAdmin, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationAdmin, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject(urlApi)));
         expectOK(() -> propertyService.delete(propertyAdmin, null, null, false));
 
         //add,update, delete property (superadmin data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotation, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(property, property.toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotation, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(property, property.toJsonObject(urlApi)));
         expectOK(() -> propertyService.delete(property, null, null, false));
 
         //add,update, delete description (simple user data)
-        expectOK(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject()));
+        expectOK(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject(urlApi)));
         expectOK(() -> descriptionService.delete(descriptionUser, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotationUser).toJsonObject()));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationUser)
+            .toJsonObject(urlApi)));
 
         //add,update, delete description (admin data)
-        expectOK(() -> descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject()));
+        expectOK(() -> descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject(urlApi)));
         expectOK(() -> descriptionService.delete(descriptionAdmin, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotationAdmin).toJsonObject()));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationAdmin)
+            .toJsonObject(urlApi)));
 
         //add,update, delete description (superadmin data)
-        expectOK(() -> descriptionService.update(description, description.toJsonObject()));
+        expectOK(() -> descriptionService.update(description, description.toJsonObject(urlApi)));
         expectOK(() -> descriptionService.delete(description, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotation).toJsonObject()));
-
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotationUser).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotationAdmin).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotation).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tda, null, null, false));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotation).toJsonObject(urlApi)));
 
         //add,update, delete attachedFile (simple user data)
         expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationUser.getId(), annotationUser.getClass().getName()));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationUser.getId(),
+            annotationUser.getClass().getName()
+        ));
 
         //add,update, delete attachedFile (admin data)
         expectOK(() -> attachedFileService.delete(attachedFileAdmin, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationAdmin.getId(), annotationAdmin.getClass().getName()));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationAdmin.getId(),
+            annotationAdmin.getClass().getName()
+        ));
 
         //add,update, delete attachedFile (superadmin data)
         expectOK(() -> attachedFileService.delete(attachedFile, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotation.getId(), annotation.getClass().getName()));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotation.getId(),
+            annotation.getClass().getName()
+        ));
 
         //start reviewing image (simple user data)
         expectOK(() -> imageInstanceService.startReview(imageUser));
@@ -498,118 +397,274 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(() -> imageInstanceService.stopReview(image, false));
 
         //add annotation on my layer
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(slice).toJsonObject()));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(slice).toJsonObject(urlApi)));
         //add annotation on other layers
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(sliceUser).toJsonObject()));
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(sliceAdmin).toJsonObject()));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceUser).toJsonObject(urlApi)));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceAdmin).toJsonObject(urlApi)));
 
         //update, delete annotation (simple user data)
-        expectOK(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject()));
+        expectOK(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject(urlApi)));
         expectOK(() -> userAnnotationService.delete(annotationUser, null, null, false));
 
         //update, delete annotation (admin data)
-        expectOK(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject()));
+        expectOK(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject(urlApi)));
         expectOK(() -> userAnnotationService.delete(annotationAdmin, null, null, false));
 
         //update, delete annotation (super admin data)
-        expectOK(() -> userAnnotationService.update(annotation, annotation.toJsonObject()));
+        expectOK(() -> userAnnotationService.update(annotation, annotation.toJsonObject(urlApi)));
         expectOK(() -> userAnnotationService.delete(annotation, null, null, false));
 
         //add image instance
-        expectOK(() -> imageInstanceService.add(builder.given_a_not_persisted_image_instance(project).toJsonObject()));
+        expectOK(() -> imageInstanceService.add(builder.givenANotPersistedImageInstance(project).toJsonObject(urlApi)));
 
         //update, delete image instance (simple user data)
-        expectOK(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject()));
+        expectOK(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject(urlApi)));
         expectOK(() -> imageInstanceService.delete(imageUser, null, null, false));
 
         //update, delete image instance (admin data)
-        expectOK(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject()));
+        expectOK(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject(urlApi)));
         expectOK(() -> imageInstanceService.delete(imageAdmin, null, null, false));
 
         //update, delete image instance (superadmin data)
-        expectOK(() -> imageInstanceService.update(image, image.toJsonObject()));
+        expectOK(() -> imageInstanceService.update(image, image.toJsonObject(urlApi)));
         expectOK(() -> imageInstanceService.delete(image, null, null, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void restricted_project_scenario_for_admin(){
+    public void classicProjectWithImageAsProjectManager() {
+        //Force project to Read and write
+        project.setMode(CLASSIC);
+        builder.persistAndReturn(project);
+
+        Map<String, Object> data = initProjectDataSet(project);
+
+        //super admin data
+        ImageInstance image = (ImageInstance) data.get("image");
+        SliceInstance slice = (SliceInstance) data.get("slice");
+        UserAnnotation annotation = (UserAnnotation) data.get("annotation");
+        Description description = (Description) data.get("description");
+        Property property = (Property) data.get("property");
+        AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
+
+        //admin data
+        ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
+        SliceInstance sliceAdmin = (SliceInstance) data.get("sliceAdmin");
+        UserAnnotation annotationAdmin = (UserAnnotation) data.get("annotationAdmin");
+        Description descriptionAdmin = (Description) data.get("descriptionAdmin");
+        Property propertyAdmin = (Property) data.get("propertyAdmin");
+        AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
+
+        //simple user data
+        ImageInstance imageUser = (ImageInstance) data.get("imageUser");
+        SliceInstance sliceUser = (SliceInstance) data.get("sliceUser");
+        UserAnnotation annotationUser = (UserAnnotation) data.get("annotationUser");
+        Description descriptionUser = (Description) data.get("descriptionUser");
+        Property propertyUser = (Property) data.get("propertyUser");
+        AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
+
+        //add,update, delete property (simple user data)
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(propertyUser, propertyUser.toJsonObject(urlApi)));
+        expectOK(() -> propertyService.delete(propertyUser, null, null, false));
+
+        //add,update, delete property (admin data)
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationAdmin, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject(urlApi)));
+        expectOK(() -> propertyService.delete(propertyAdmin, null, null, false));
+
+        //add,update, delete property (superadmin data)
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotation, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(property, property.toJsonObject(urlApi)));
+        expectOK(() -> propertyService.delete(property, null, null, false));
+
+        //add,update, delete description (simple user data)
+        expectOK(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject(urlApi)));
+        expectOK(() -> descriptionService.delete(descriptionUser, null, null, false));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationUser)
+            .toJsonObject(urlApi)));
+
+        //add,update, delete description (admin data)
+        expectOK(() -> descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject(urlApi)));
+        expectOK(() -> descriptionService.delete(descriptionAdmin, null, null, false));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationAdmin)
+            .toJsonObject(urlApi)));
+
+        //add,update, delete description (superadmin data)
+        expectOK(() -> descriptionService.update(description, description.toJsonObject(urlApi)));
+        expectOK(() -> descriptionService.delete(description, null, null, false));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotation).toJsonObject(urlApi)));
+
+        //add,update, delete attachedFile (simple user data)
+        expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationUser.getId(),
+            annotationUser.getClass().getName()
+        ));
+
+        //add,update, delete attachedFile (admin data)
+        expectOK(() -> attachedFileService.delete(attachedFileAdmin, null, null, false));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationAdmin.getId(),
+            annotationAdmin.getClass().getName()
+        ));
+
+        //add,update, delete attachedFile (superadmin data)
+        expectOK(() -> attachedFileService.delete(attachedFile, null, null, false));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotation.getId(),
+            annotation.getClass().getName()
+        ));
+
+        //start reviewing image (simple user data)
+        expectOK(() -> imageInstanceService.startReview(imageUser));
+        expectOK(() -> imageInstanceService.stopReview(imageUser, false));
+
+        //start reviewing image (admin data)
+        expectOK(() -> imageInstanceService.startReview(imageAdmin));
+        expectOK(() -> imageInstanceService.stopReview(imageAdmin, false));
+
+        //start reviewing image (superadmin data)
+        expectOK(() -> imageInstanceService.startReview(image));
+        expectOK(() -> imageInstanceService.stopReview(image, false));
+
+        //add annotation on my layer
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(slice).toJsonObject(urlApi)));
+        //add annotation on other layers
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceUser).toJsonObject(urlApi)));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceAdmin).toJsonObject(urlApi)));
+
+        //update, delete annotation (simple user data)
+        expectOK(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject(urlApi)));
+        expectOK(() -> userAnnotationService.delete(annotationUser, null, null, false));
+
+        //update, delete annotation (admin data)
+        expectOK(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject(urlApi)));
+        expectOK(() -> userAnnotationService.delete(annotationAdmin, null, null, false));
+
+        //update, delete annotation (super admin data)
+        expectOK(() -> userAnnotationService.update(annotation, annotation.toJsonObject(urlApi)));
+        expectOK(() -> userAnnotationService.delete(annotation, null, null, false));
+
+        //add image instance
+        expectOK(() -> imageInstanceService.add(builder.givenANotPersistedImageInstance(project).toJsonObject(urlApi)));
+
+        //update, delete image instance (simple user data)
+        expectOK(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject(urlApi)));
+        expectOK(() -> imageInstanceService.delete(imageUser, null, null, false));
+
+        //update, delete image instance (admin data)
+        expectOK(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject(urlApi)));
+        expectOK(() -> imageInstanceService.delete(imageAdmin, null, null, false));
+
+        //update, delete image instance (superadmin data)
+        expectOK(() -> imageInstanceService.update(image, image.toJsonObject(urlApi)));
+        expectOK(() -> imageInstanceService.delete(image, null, null, false));
+    }
+
+    @Test
+    @WithMockUser(username = USER_ACL_ADMIN)
+    public void restrictedProjectScenarioForAdmin() {
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
-        expectOK(() -> {when_i_edit_domain();});
+        expectOK(this::whenIEditDomain);
 
-        User user = builder.given_a_user();
-        expectOK(() -> {projectMemberService.addUserToProject(user, project, false); });
-        expectOK(() -> {projectMemberService.deleteUserFromProject(user, project, false); });
-        expectOK(() -> {projectMemberService.addUserToProject(user, project, true); });
-        expectOK(() -> {projectMemberService.deleteUserFromProject(user, project, true); });
+        UserResponse user = builder.givenCreator();
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
-        expectOK(() -> {projectMemberService.addUserToProject(user, project, true); });
-
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_not_persisted_project_representative_user(
-                project, user
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
+            project,
+            user.username(), user.id()
         );
 
-
-
         // add another representative so that we can delete the first one
-        expectOK(() -> {projectMemberService.addUserToProject(builder.given_superadmin(), project, false); });
-        expectOK(() -> {projectRepresentativeUserService.add(builder.given_a_not_persisted_project_representative_user(
-                project, builder.given_superadmin()
-        ).toJsonObject());});
+        UserResponse superAdmin = builder.givenSuperAdmin();
+        expectOK(() -> projectMemberService.addUserToProject(superAdmin.username(), project, false));
+        expectOK(() -> projectRepresentativeUserService.add(builder.givenANotPersistedProjectRepresentativeUser(
+            project, superAdmin.username(), superAdmin.id()
+        ).toJsonObject(urlApi)));
 
-        expectOK(() -> {projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject());});
-        expectOK(() -> {projectRepresentativeUserService.delete(
-                projectRepresentativeUserService.find(project, user).get(), null, null, false
-        );});
+        expectOK(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
+        expectOK(() -> projectRepresentativeUserService.delete(
+            projectRepresentativeUserService.find(project, user.id()).get(), null, null, false
+        ));
 
-        expectOK(() -> {descriptionService.add(builder.given_a_not_persisted_description(project).toJsonObject());});
-        expectOK(() -> {attachedFileService.create("test.txt", new String("hello").getBytes(), "test", project.getId(), project.getClass().getName());});
-        expectOK(() -> {propertyService.add(builder.given_a_not_persisted_property(project,"xxxxxx","yyy").toJsonObject());});
-        expectOK(() -> {tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), project).toJsonObject());});
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(project).toJsonObject(urlApi)));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            project.getId(),
+            project.getClass().getName()
+        ));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(project, "xxxxxx", "yyy")
+            .toJsonObject(urlApi)));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void restricted_project_scenario_for_user(){
+    public void restrictedProjectScenarioForUser() {
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
 
-        expectForbidden(() -> {when_i_edit_domain();});
+        expectForbidden(this::whenIEditDomain);
 
-        User user = builder.given_a_user();
-        expectForbidden(() -> {projectMemberService.addUserToProject(user, project, false); });
-        expectForbidden(() -> {projectMemberService.deleteUserFromProject(user, project, false); });
-        expectForbidden(() -> {projectMemberService.addUserToProject(user, project, true); });
-        expectForbidden(() -> {projectMemberService.deleteUserFromProject(user, project, true); });
+        UserResponse user = builder.givenCreator();
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
-        expectForbidden(() -> {projectMemberService.addUserToProject(user, project, true); });
-
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_not_persisted_project_representative_user(
-                project, user
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
+            project,
+            user.username(), user.id()
         );
 
         // add another representative so that we can try to delete the first one
-        projectRepresentativeUserRepository.save(builder.given_a_not_persisted_project_representative_user(
-                project, builder.given_superadmin()
+        UserResponse superAdmin = builder.givenSuperAdmin();
+        projectRepresentativeUserRepository.save(builder.givenANotPersistedProjectRepresentativeUser(
+            project, superAdmin.username(), superAdmin.id()
         ));
 
-        expectForbidden(() -> {projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject());});
+        expectForbidden(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
         builder.persistAndReturn(projectRepresentativeUser);
-        expectForbidden(() -> {projectRepresentativeUserService.delete(
-                projectRepresentativeUser, null, null, false
-        );});
+        expectForbidden(() -> projectRepresentativeUserService.delete(
+            projectRepresentativeUser, null, null, false
+        ));
 
         //Description check if not readonly mode, other metadata stick to Write permission. To fix
-        expectForbidden(() -> {descriptionService.add(builder.given_a_not_persisted_description(project).toJsonObject());});
-        expectForbidden(() -> {attachedFileService.create("test.txt", new String("hello").getBytes(), "test", project.getId(), project.getClass().getName());});
-        expectForbidden(() -> {propertyService.add(builder.given_a_property(project).toJsonObject());});
-        expectForbidden(() -> {tagDomainAssociationService.add(builder.given_a_tag_association(builder.given_a_tag(), project).toJsonObject());});
+        expectForbidden(
+            () -> descriptionService.add(builder.givenANotPersistedDescription(project).toJsonObject(urlApi)));
+        expectForbidden(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            project.getId(),
+            project.getClass().getName()
+        ));
+        expectForbidden(() -> propertyService.add(builder.givenAProperty(project).toJsonObject(urlApi)));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void restricted_project_with_image_as_contributor(){
+    public void restrictedProjectWithImageAsContributor() {
         //Force project to Read and write
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
@@ -623,7 +678,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -632,7 +686,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -641,61 +694,64 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotationUser, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(propertyUser, propertyUser.toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(propertyUser, propertyUser.toJsonObject(urlApi)));
         expectOK(() -> propertyService.delete(propertyUser, null, null, false));
 
         //add,update, delete property (admin data)
-        expectForbidden(() -> propertyService.add(builder.given_a_not_persisted_property(annotationAdmin, "xxx", "value").toJsonObject()));
-        expectForbidden(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject()));
+        expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(
+            annotationAdmin,
+            "xxx",
+            "value"
+        ).toJsonObject(urlApi)));
+        expectForbidden(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject(urlApi)));
         expectForbidden(() -> propertyService.delete(propertyAdmin, null, null, false));
 
         //add,update, delete property (superadmin data)
-        expectForbidden(() -> propertyService.add(builder.given_a_not_persisted_property(annotation, "xxx", "value").toJsonObject()));
-        expectForbidden(() -> propertyService.update(property, property.toJsonObject()));
+        expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(annotation, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectForbidden(() -> propertyService.update(property, property.toJsonObject(urlApi)));
         expectForbidden(() -> propertyService.delete(property, null, null, false));
 
         //add,update, delete description (simple user data)
-        expectOK(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject()));
+        expectOK(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject(urlApi)));
         expectOK(() -> descriptionService.delete(descriptionUser, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotationUser).toJsonObject()));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationUser)
+            .toJsonObject(urlApi)));
         //TODO description doesn't have a user or creator field. Doesn't check neither if admin or not so all is 200
-//        //add,update, delete description (admin data)
-//        expectOK(() -> { descriptionService.add(builder.given_a_not_persisted_description(annotationAdmin).toJsonObject()); });
-//        expectOK(() -> { descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject()); });
-//        expectOK(() -> { descriptionService.delete(descriptionAdmin, null, null, false); });
-//
-//        //add,update, delete description (superadmin data)
-//        expectOK(() -> { descriptionService.add(builder.given_a_not_persisted_description(annotation).toJsonObject()); });
-//        expectOK(() -> { descriptionService.update(description, description.toJsonObject()); });
-//        expectOK(() -> { descriptionService.delete(description, null, null, false); });
-
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotationUser).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectForbidden(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotationAdmin).toJsonObject()));
-        expectForbidden(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectForbidden(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotation).toJsonObject()));
-        expectForbidden(() -> tagDomainAssociationService.delete(tda, null, null, false));
 
         //add,update, delete attachedFile (simple user data)
         expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationUser.getId(), annotationUser.getClass().getName()));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationUser.getId(),
+            annotationUser.getClass().getName()
+        ));
 
         //add,update, delete attachedFile (admin data)
         expectForbidden(() -> attachedFileService.delete(attachedFileAdmin, null, null, false));
-        expectForbidden(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationAdmin.getId(), annotationAdmin.getClass().getName()));
+        expectForbidden(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationAdmin.getId(),
+            annotationAdmin.getClass().getName()
+        ));
 
         //add,update, delete attachedFile (superadmin data)
         expectForbidden(() -> attachedFileService.delete(attachedFile, null, null, false));
-        expectForbidden(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotation.getId(), annotation.getClass().getName()));
+        expectForbidden(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotation.getId(),
+            annotation.getClass().getName()
+        ));
 
         //start reviewing image (simple user data)
         expectOK(() -> imageInstanceService.startReview(imageUser));
@@ -707,44 +763,47 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(() -> imageInstanceService.startReview(image));
 
         //add annotation on my layer
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(sliceUser, userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get()).toJsonObject()));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(
+            sliceUser,
+            builder.givenUserAclRead()
+        ).toJsonObject(urlApi)));
 
         //add annotation on other layers
-        expectForbidden(() -> userAnnotationService.add(builder.given_a_user_annotation(slice).toJsonObject()));
-        expectForbidden(() -> userAnnotationService.add(builder.given_a_user_annotation(sliceAdmin).toJsonObject()));
+        expectForbidden(() -> userAnnotationService.add(builder.givenAUserAnnotation(slice).toJsonObject(urlApi)));
+        expectForbidden(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceAdmin).toJsonObject(urlApi)));
 
         //update, delete annotation (simple user data)
-        expectOK(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject()));
+        expectOK(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject(urlApi)));
         expectOK(() -> userAnnotationService.delete(annotationUser, null, null, false));
 
         //update, delete annotation (admin data)
-        expectForbidden(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject()));
+        expectForbidden(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject(urlApi)));
         expectForbidden(() -> userAnnotationService.delete(annotationAdmin, null, null, false));
 
         //update, delete annotation (super admin data)
-        expectForbidden(() -> userAnnotationService.update(annotation, annotation.toJsonObject()));
+        expectForbidden(() -> userAnnotationService.update(annotation, annotation.toJsonObject(urlApi)));
         expectForbidden(() -> userAnnotationService.delete(annotation, null, null, false));
 
         //add image instance
-        expectOK(() -> imageInstanceService.add(builder.given_a_not_persisted_image_instance(project).toJsonObject()));
+        expectOK(() -> imageInstanceService.add(builder.givenANotPersistedImageInstance(project).toJsonObject(urlApi)));
 
         //update, delete image instance (simple user data)
-        expectOK(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject()));
+        expectOK(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject(urlApi)));
 
         expectOK(() -> imageInstanceService.delete(imageUser, null, null, false));
 
         //update, delete image instance (admin data)
-        expectForbidden(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject()));
+        expectForbidden(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject(urlApi)));
         expectForbidden(() -> imageInstanceService.delete(imageAdmin, null, null, false));
 
         //update, delete image instance (superadmin data)
-        expectForbidden(() -> imageInstanceService.update(image, image.toJsonObject()));
+        expectForbidden(() -> imageInstanceService.update(image, image.toJsonObject(urlApi)));
         expectForbidden(() -> imageInstanceService.delete(image, null, null, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void restricted_project_with_image_as_project_manager(){
+    public void restrictedProjectWithImageAsProjectManager() {
         //Force project to Read and write
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
@@ -758,7 +817,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -767,7 +825,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -776,61 +833,71 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotationUser, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(propertyUser, propertyUser.toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(propertyUser, propertyUser.toJsonObject(urlApi)));
         expectOK(() -> propertyService.delete(propertyUser, null, null, false));
 
         //add,update, delete property (admin data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotationAdmin, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationAdmin, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject(urlApi)));
         expectOK(() -> propertyService.delete(propertyAdmin, null, null, false));
 
         //add,update, delete property (superadmin data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotation, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(property, property.toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotation, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(property, property.toJsonObject(urlApi)));
         expectOK(() -> propertyService.delete(property, null, null, false));
 
         //add,update, delete description (simple user data)
-        expectOK(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject()));
+        expectOK(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject(urlApi)));
         expectOK(() -> descriptionService.delete(descriptionUser, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotationUser).toJsonObject()));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationUser)
+            .toJsonObject(urlApi)));
 
         //add,update, delete description (admin data)
-        expectOK(() -> descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject()));
+        expectOK(() -> descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject(urlApi)));
         expectOK(() -> descriptionService.delete(descriptionAdmin, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotationAdmin).toJsonObject()));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationAdmin)
+            .toJsonObject(urlApi)));
 
         //add,update, delete description (superadmin data)
-        expectOK(() -> descriptionService.update(description, description.toJsonObject()));
+        expectOK(() -> descriptionService.update(description, description.toJsonObject(urlApi)));
         expectOK(() -> descriptionService.delete(description, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotation).toJsonObject()));
-
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotationUser).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotationAdmin).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotation).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tda, null, null, false));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotation).toJsonObject(urlApi)));
 
         //add,update, delete attachedFile (simple user data)
         expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationUser.getId(), annotationUser.getClass().getName()));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationUser.getId(),
+            annotationUser.getClass().getName()
+        ));
 
         //add,update, delete attachedFile (admin data)
         expectOK(() -> attachedFileService.delete(attachedFileAdmin, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationAdmin.getId(), annotationAdmin.getClass().getName()));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationAdmin.getId(),
+            annotationAdmin.getClass().getName()
+        ));
 
         //add,update, delete attachedFile (superadmin data)
         expectOK(() -> attachedFileService.delete(attachedFile, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotation.getId(), annotation.getClass().getName()));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotation.getId(),
+            annotation.getClass().getName()
+        ));
 
         //start reviewing image (simple user data)
         expectOK(() -> imageInstanceService.startReview(imageUser));
@@ -845,115 +912,129 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(() -> imageInstanceService.stopReview(image, false));
 
         //add annotation on my layer
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(slice).toJsonObject()));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(slice).toJsonObject(urlApi)));
         //add annotation on other layers
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(sliceUser).toJsonObject()));
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(sliceAdmin).toJsonObject()));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceUser).toJsonObject(urlApi)));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceAdmin).toJsonObject(urlApi)));
 
         //update, delete annotation (simple user data)
-        expectOK(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject()));
+        expectOK(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject(urlApi)));
         expectOK(() -> userAnnotationService.delete(annotationUser, null, null, false));
 
         //update, delete annotation (admin data)
-        expectOK(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject()));
+        expectOK(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject(urlApi)));
         expectOK(() -> userAnnotationService.delete(annotationAdmin, null, null, false));
 
         //update, delete annotation (super admin data)
-        expectOK(() -> userAnnotationService.update(annotation, annotation.toJsonObject()));
+        expectOK(() -> userAnnotationService.update(annotation, annotation.toJsonObject(urlApi)));
         expectOK(() -> userAnnotationService.delete(annotation, null, null, false));
 
         //add image instance
-        expectOK(() -> imageInstanceService.add(builder.given_a_not_persisted_image_instance(project).toJsonObject()));
+        expectOK(() -> imageInstanceService.add(builder.givenANotPersistedImageInstance(project).toJsonObject(urlApi)));
 
         //update, delete image instance (simple user data)
-        expectOK(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject()));
+        expectOK(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject(urlApi)));
         expectOK(() -> imageInstanceService.delete(imageUser, null, null, false));
 
         //update, delete image instance (admin data)
-        expectOK(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject()));
+        expectOK(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject(urlApi)));
         expectOK(() -> imageInstanceService.delete(imageAdmin, null, null, false));
 
         //update, delete image instance (superadmin data)
-        expectOK(() -> imageInstanceService.update(image, image.toJsonObject()));
+        expectOK(() -> imageInstanceService.update(image, image.toJsonObject(urlApi)));
         expectOK(() -> imageInstanceService.delete(image, null, null, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void readonly_project_scenario_for_admin(){
+    public void readonlyProjectScenarioForAdmin() {
         project.setMode(READ_ONLY);
         builder.persistAndReturn(project);
-        expectOK(() -> {when_i_edit_domain();});
+        expectOK(this::whenIEditDomain);
 
-        User user = builder.given_a_user();
-        expectOK(() -> {projectMemberService.addUserToProject(user, project, false); });
-        expectOK(() -> {projectMemberService.deleteUserFromProject(user, project, false); });
-        expectOK(() -> {projectMemberService.addUserToProject(user, project, true); });
-        expectOK(() -> {projectMemberService.deleteUserFromProject(user, project, true); });
+        UserResponse user = builder.givenCreator();
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
-        expectOK(() -> {projectMemberService.addUserToProject(user, project, true); });
-
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_not_persisted_project_representative_user(
-                project, user
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
+            project,
+            user.username(), user.id()
         );
 
         // add another representative so that we can delete the first one
-        expectOK(() -> {projectMemberService.addUserToProject(builder.given_superadmin(), project, false); });
-        expectOK(() -> {projectRepresentativeUserService.add(builder.given_a_not_persisted_project_representative_user(
-                project, builder.given_superadmin()
-        ).toJsonObject());});
+        UserResponse superAdmin = builder.givenSuperAdmin();
+        expectOK(() -> projectMemberService.addUserToProject(superAdmin.username(), project, false));
+        expectOK(() -> projectRepresentativeUserService.add(builder.givenANotPersistedProjectRepresentativeUser(
+            project, superAdmin.username(), superAdmin.id()
+        ).toJsonObject(urlApi)));
 
-        expectOK(() -> {projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject());});
-        expectOK(() -> {projectRepresentativeUserService.delete(
-                projectRepresentativeUserService.find(project, user).get(), null, null, false
-        );});
+        expectOK(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
+        expectOK(() -> projectRepresentativeUserService.delete(
+            projectRepresentativeUserService.find(project, user.id()).get(), null, null, false
+        ));
 
-        expectOK(() -> {descriptionService.add(builder.given_a_not_persisted_description(project).toJsonObject());});
-        expectOK(() -> {attachedFileService.create("test.txt", new String("hello").getBytes(), "test", project.getId(), project.getClass().getName());});
-        expectOK(() -> {propertyService.add(builder.given_a_property(project).toJsonObject());});
-        expectOK(() -> {tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), project).toJsonObject());});
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(project).toJsonObject(urlApi)));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            project.getId(),
+            project.getClass().getName()
+        ));
+        expectOK(() -> propertyService.add(builder.givenAProperty(project).toJsonObject(urlApi)));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void readonly_project_scenario_for_user(){
+    public void readonlyProjectScenarioForUser() {
         project.setMode(READ_ONLY);
         builder.persistAndReturn(project);
 
-        expectForbidden(() -> {when_i_edit_domain();});
+        expectForbidden(this::whenIEditDomain);
 
-        User user = builder.given_a_user();
-        expectForbidden(() -> {projectMemberService.addUserToProject(user, project, false); });
-        expectForbidden(() -> {projectMemberService.deleteUserFromProject(user, project, false); });
-        expectForbidden(() -> {projectMemberService.addUserToProject(user, project, true); });
-        expectForbidden(() -> {projectMemberService.deleteUserFromProject(user, project, true); });
+        UserResponse user = builder.givenCreator();
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, true));
 
-        expectForbidden(() -> {projectMemberService.addUserToProject(user, project, true); });
-
-        ProjectRepresentativeUser projectRepresentativeUser = builder.given_a_not_persisted_project_representative_user(
-                project, user
+        ProjectRepresentativeUser projectRepresentativeUser = builder.givenANotPersistedProjectRepresentativeUser(
+            project,
+            user.username(), user.id()
         );
 
         // add another representative so that we can try to delete the first one
-        projectRepresentativeUserRepository.save(builder.given_a_not_persisted_project_representative_user(
-                project, builder.given_superadmin()
+        UserResponse superAdmin = builder.givenSuperAdmin();
+        projectRepresentativeUserRepository.save(builder.givenANotPersistedProjectRepresentativeUser(
+            project,
+            superAdmin.username(), superAdmin.id()
         ));
 
-        expectForbidden(() -> {projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject());});
+        expectForbidden(() -> projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)));
         builder.persistAndReturn(projectRepresentativeUser);
-        expectForbidden(() -> {projectRepresentativeUserService.delete(
-                projectRepresentativeUser, null, null, false
-        );});
+        expectForbidden(() -> projectRepresentativeUserService.delete(
+            projectRepresentativeUser, null, null, false
+        ));
 
-        expectForbidden(() -> {descriptionService.add(builder.given_a_not_persisted_description(project).toJsonObject());});
-        expectForbidden(() -> {attachedFileService.create("test.txt", new String("hello").getBytes(), "test", project.getId(), project.getClass().getName());});
-        expectForbidden(() -> {propertyService.add(builder.given_a_property(project).toJsonObject());});
-        expectForbidden(() -> {tagDomainAssociationService.add(builder.given_a_tag_association(builder.given_a_tag(), project).toJsonObject());});
+        expectForbidden(
+            () -> descriptionService.add(builder.givenANotPersistedDescription(project).toJsonObject(urlApi)));
+        expectForbidden(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            project.getId(),
+            project.getClass().getName()
+        ));
+        expectForbidden(() -> propertyService.add(builder.givenAProperty(project).toJsonObject(urlApi)));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void read_only_project_with_image_as_contributor(){
+    public void readOnlyProjectWithImageAsContributor() {
         //Force project to Read and write
         project.setMode(READ_ONLY);
         builder.persistAndReturn(project);
@@ -967,7 +1048,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -976,7 +1056,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -985,108 +1064,120 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
-        expectForbidden(() -> { propertyService.add(builder.given_a_not_persisted_property(annotationUser, "xxx", "value").toJsonObject()); });
-        expectForbidden(() -> { propertyService.update(propertyUser, propertyUser.toJsonObject()); });
-        expectForbidden(() -> { propertyService.delete(propertyUser, null, null, false); });
+        expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectForbidden(() -> propertyService.update(propertyUser, propertyUser.toJsonObject(urlApi)));
+        expectForbidden(() -> propertyService.delete(propertyUser, null, null, false));
 
         //add,update, delete property (admin data)
-        expectForbidden(() -> { propertyService.add(builder.given_a_not_persisted_property(annotationAdmin, "xxx", "value").toJsonObject()); });
-        expectForbidden(() -> { propertyService.update(propertyAdmin, propertyAdmin.toJsonObject()); });
-        expectForbidden(() -> { propertyService.delete(propertyAdmin, null, null, false); });
+        expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(annotationAdmin, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectForbidden(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject(urlApi)));
+        expectForbidden(() -> propertyService.delete(propertyAdmin, null, null, false));
 
         //add,update, delete property (superadmin data)
-        expectForbidden(() -> { propertyService.add(builder.given_a_not_persisted_property(annotation, "xxx", "value").toJsonObject()); });
-        expectForbidden(() -> { propertyService.update(property, property.toJsonObject()); });
-        expectForbidden(() -> { propertyService.delete(property, null, null, false); });
+        expectForbidden(() -> propertyService.add(builder.givenANotPersistedProperty(annotation, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectForbidden(() -> propertyService.update(property, property.toJsonObject(urlApi)));
+        expectForbidden(() -> propertyService.delete(property, null, null, false));
 
         //add,update, delete description (simple user data)
-        expectForbidden(() -> { descriptionService.add(builder.given_a_not_persisted_description(annotationUser).toJsonObject()); });
-        expectForbidden(() -> { descriptionService.update(descriptionUser, descriptionUser.toJsonObject()); });
-        expectForbidden(() -> { descriptionService.delete(descriptionUser, null, null, false); });
+        expectForbidden(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationUser)
+            .toJsonObject(urlApi)));
+        expectForbidden(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject(urlApi)));
+        expectForbidden(() -> descriptionService.delete(descriptionUser, null, null, false));
 
         //add,update, delete description (admin data)
-        expectForbidden(() -> { descriptionService.add(builder.given_a_not_persisted_description(annotationAdmin).toJsonObject()); });
-        expectForbidden(() -> { descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject()); });
-        expectForbidden(() -> { descriptionService.delete(descriptionAdmin, null, null, false); });
+        expectForbidden(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationAdmin)
+            .toJsonObject(urlApi)));
+        expectForbidden(() -> descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject(urlApi)));
+        expectForbidden(() -> descriptionService.delete(descriptionAdmin, null, null, false));
 
         //add,update, delete description (superadmin data)
-        expectForbidden(() -> { descriptionService.add(builder.given_a_not_persisted_description(annotation).toJsonObject()); });
-        expectForbidden(() -> { descriptionService.update(description, description.toJsonObject()); });
-        expectForbidden(() -> { descriptionService.delete(description, null, null, false); });
-
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectForbidden(() -> { tagDomainAssociationService.add(builder.given_a_tag_association(builder.given_a_tag(), annotationUser).toJsonObject()); });
-        expectForbidden(() -> { tagDomainAssociationService.delete(tdaUser, null, null, false); });
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectForbidden(() -> { tagDomainAssociationService.add(builder.given_a_tag_association(builder.given_a_tag(), annotationAdmin).toJsonObject()); });
-        expectForbidden(() -> { tagDomainAssociationService.delete(tdaAdmin, null, null, false); });
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectForbidden(() -> { tagDomainAssociationService.add(builder.given_a_tag_association(builder.given_a_tag(), annotation).toJsonObject()); });
-        expectForbidden(() -> { tagDomainAssociationService.delete(tda, null, null, false); });
+        expectForbidden(
+            () -> descriptionService.add(builder.givenANotPersistedDescription(annotation).toJsonObject(urlApi)));
+        expectForbidden(() -> descriptionService.update(description, description.toJsonObject(urlApi)));
+        expectForbidden(() -> descriptionService.delete(description, null, null, false));
 
         //add,update, delete attachedFile (simple user data)
-        expectForbidden(() -> { attachedFileService.delete(attachedFileUser, null, null, false); });
-        expectForbidden(() -> { attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationUser.getId(), annotationUser.getClass().getName()); });
+        expectForbidden(() -> attachedFileService.delete(attachedFileUser, null, null, false));
+        expectForbidden(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationUser.getId(),
+            annotationUser.getClass().getName()
+        ));
 
         //add,update, delete attachedFile (admin data)
-        expectForbidden(() -> { attachedFileService.delete(attachedFileAdmin, null, null, false); });
-        expectForbidden(() -> { attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationAdmin.getId(), annotationAdmin.getClass().getName()); });
+        expectForbidden(() -> attachedFileService.delete(attachedFileAdmin, null, null, false));
+        expectForbidden(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationAdmin.getId(),
+            annotationAdmin.getClass().getName()
+        ));
 
         //add,update, delete attachedFile (superadmin data)
-        expectForbidden(() -> { attachedFileService.delete(attachedFile, null, null, false); });
-        expectForbidden(() -> { attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotation.getId(), annotation.getClass().getName()); });
+        expectForbidden(() -> attachedFileService.delete(attachedFile, null, null, false));
+        expectForbidden(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotation.getId(),
+            annotation.getClass().getName()
+        ));
 
         //start reviewing image (simple user data)
-        expectForbidden(() -> { imageInstanceService.startReview(imageUser); });
+        expectForbidden(() -> imageInstanceService.startReview(imageUser));
 
         //start reviewing image (admin data)
-        expectForbidden(() -> { imageInstanceService.startReview(imageAdmin); });
+        expectForbidden(() -> imageInstanceService.startReview(imageAdmin));
 
         //start reviewing image (superadmin data)
-        expectForbidden(() -> { imageInstanceService.startReview(image); });
+        expectForbidden(() -> imageInstanceService.startReview(image));
 
         //add annotation on my layer
-        expectForbidden(() -> { userAnnotationService.add(builder.given_a_user_annotation(slice).toJsonObject()); });
+        expectForbidden(() -> userAnnotationService.add(builder.givenAUserAnnotation(slice).toJsonObject(urlApi)));
         //add annotation on other layers
-        expectForbidden(() -> { userAnnotationService.add(builder.given_a_user_annotation(sliceUser).toJsonObject()); });
-        expectForbidden(() -> { userAnnotationService.add(builder.given_a_user_annotation(sliceAdmin).toJsonObject()); });
+        expectForbidden(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceUser).toJsonObject(urlApi)));
+        expectForbidden(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceAdmin).toJsonObject(urlApi)));
 
         //update, delete annotation (simple user data)
-        expectForbidden(() -> { userAnnotationService.update(annotationUser, annotationUser.toJsonObject()); });
-        expectForbidden(() -> { userAnnotationService.delete(annotationUser, null, null, false); });
+        expectForbidden(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject(urlApi)));
+        expectForbidden(() -> userAnnotationService.delete(annotationUser, null, null, false));
 
         //update, delete annotation (admin data)
-        expectForbidden(() -> { userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject()); });
-        expectForbidden(() -> { userAnnotationService.delete(annotationAdmin, null, null, false); });
+        expectForbidden(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject(urlApi)));
+        expectForbidden(() -> userAnnotationService.delete(annotationAdmin, null, null, false));
 
         //update, delete annotation (super admin data)
-        expectForbidden(() -> { userAnnotationService.update(annotation, annotation.toJsonObject()); });
-        expectForbidden(() -> { userAnnotationService.delete(annotation, null, null, false); });
+        expectForbidden(() -> userAnnotationService.update(annotation, annotation.toJsonObject(urlApi)));
+        expectForbidden(() -> userAnnotationService.delete(annotation, null, null, false));
 
         //add image instance
-        expectForbidden(() -> { imageInstanceService.add(builder.given_a_not_persisted_image_instance(project).toJsonObject()); });
+        expectForbidden(() -> imageInstanceService.add(builder.givenANotPersistedImageInstance(project)
+            .toJsonObject(urlApi)));
 
         //update, delete image instance (simple user data)
-        expectForbidden(() -> { imageInstanceService.update(imageUser, imageUser.toJsonObject()); });
-        expectForbidden(() -> { imageInstanceService.delete(imageUser, null, null, false); });
+        expectForbidden(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject(urlApi)));
+        expectForbidden(() -> imageInstanceService.delete(imageUser, null, null, false));
 
         //update, delete image instance (admin data)
-        expectForbidden(() -> { imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject()); });
-        expectForbidden(() -> { imageInstanceService.delete(imageAdmin, null, null, false); });
+        expectForbidden(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject(urlApi)));
+        expectForbidden(() -> imageInstanceService.delete(imageAdmin, null, null, false));
 
         //update, delete image instance (superadmin data)
-        expectForbidden(() -> { imageInstanceService.update(image, image.toJsonObject()); });
-        expectForbidden(() -> { imageInstanceService.delete(image, null, null, false); });
+        expectForbidden(() -> imageInstanceService.update(image, image.toJsonObject(urlApi)));
+        expectForbidden(() -> imageInstanceService.delete(image, null, null, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
-    public void read_only_project_with_image_as_project_manager(){
+    public void readOnlyProjectWithImageAsProjectManager() {
         //Force project to Read and write
         project.setMode(RESTRICTED);
         builder.persistAndReturn(project);
@@ -1100,7 +1191,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description description = (Description) data.get("description");
         Property property = (Property) data.get("property");
         AttachedFile attachedFile = (AttachedFile) data.get("attachedFile");
-        TagDomainAssociation tda = (TagDomainAssociation) data.get("tagDomainAssociation");
 
         //admin data
         ImageInstance imageAdmin = (ImageInstance) data.get("imageAdmin");
@@ -1109,7 +1199,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionAdmin = (Description) data.get("descriptionAdmin");
         Property propertyAdmin = (Property) data.get("propertyAdmin");
         AttachedFile attachedFileAdmin = (AttachedFile) data.get("attachedFileAdmin");
-        TagDomainAssociation tdaAdmin = (TagDomainAssociation) data.get("tagDomainAssociationAdmin");
 
         //simple user data
         ImageInstance imageUser = (ImageInstance) data.get("imageUser");
@@ -1118,61 +1207,71 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         Description descriptionUser = (Description) data.get("descriptionUser");
         Property propertyUser = (Property) data.get("propertyUser");
         AttachedFile attachedFileUser = (AttachedFile) data.get("attachedFileUser");
-        TagDomainAssociation tdaUser = (TagDomainAssociation) data.get("tagDomainAssociationUser");
 
         //add,update, delete property (simple user data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotationUser, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(propertyUser, propertyUser.toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationUser, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(propertyUser, propertyUser.toJsonObject(urlApi)));
         expectOK(() -> propertyService.delete(propertyUser, null, null, false));
 
         //add,update, delete property (admin data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotationAdmin, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotationAdmin, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(propertyAdmin, propertyAdmin.toJsonObject(urlApi)));
         expectOK(() -> propertyService.delete(propertyAdmin, null, null, false));
 
         //add,update, delete property (superadmin data)
-        expectOK(() -> propertyService.add(builder.given_a_not_persisted_property(annotation, "xxx", "value").toJsonObject()));
-        expectOK(() -> propertyService.update(property, property.toJsonObject()));
+        expectOK(() -> propertyService.add(builder.givenANotPersistedProperty(annotation, "xxx", "value")
+            .toJsonObject(urlApi)));
+        expectOK(() -> propertyService.update(property, property.toJsonObject(urlApi)));
         expectOK(() -> propertyService.delete(property, null, null, false));
 
         //add,update, delete description (simple user data)
-        expectOK(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject()));
+        expectOK(() -> descriptionService.update(descriptionUser, descriptionUser.toJsonObject(urlApi)));
         expectOK(() -> descriptionService.delete(descriptionUser, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotationUser).toJsonObject()));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationUser)
+            .toJsonObject(urlApi)));
 
         //add,update, delete description (admin data)
-        expectOK(() -> descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject()));
+        expectOK(() -> descriptionService.update(descriptionAdmin, descriptionAdmin.toJsonObject(urlApi)));
         expectOK(() -> descriptionService.delete(descriptionAdmin, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotationAdmin).toJsonObject()));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotationAdmin)
+            .toJsonObject(urlApi)));
 
         //add,update, delete description (superadmin data)
-        expectOK(() -> descriptionService.update(description, description.toJsonObject()));
+        expectOK(() -> descriptionService.update(description, description.toJsonObject(urlApi)));
         expectOK(() -> descriptionService.delete(description, null, null, false));
-        expectOK(() -> descriptionService.add(builder.given_a_not_persisted_description(annotation).toJsonObject()));
-
-        //add,update, delete tagDomainAssociation (simple user data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotationUser).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaUser, null, null, false));
-
-        //add,update, delete tagDomainAssociation (admin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotationAdmin).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tdaAdmin, null, null, false));
-
-        //add,update, delete tagDomainAssociation (superadmin data)
-        expectOK(() -> tagDomainAssociationService.add(builder.given_a_not_persisted_tag_association(builder.given_a_tag(), annotation).toJsonObject()));
-        expectOK(() -> tagDomainAssociationService.delete(tda, null, null, false));
+        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(annotation).toJsonObject(urlApi)));
 
         //add,update, delete attachedFile (simple user data)
         expectOK(() -> attachedFileService.delete(attachedFileUser, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationUser.getId(), annotationUser.getClass().getName()));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationUser.getId(),
+            annotationUser.getClass().getName()
+        ));
 
         //add,update, delete attachedFile (admin data)
         expectOK(() -> attachedFileService.delete(attachedFileAdmin, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotationAdmin.getId(), annotationAdmin.getClass().getName()));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotationAdmin.getId(),
+            annotationAdmin.getClass().getName()
+        ));
 
         //add,update, delete attachedFile (superadmin data)
         expectOK(() -> attachedFileService.delete(attachedFile, null, null, false));
-        expectOK(() -> attachedFileService.create("test.txt", new String("hello").getBytes(), "test", annotation.getId(), annotation.getClass().getName()));
+        expectOK(() -> attachedFileService.create(
+            "test.txt",
+            "hello".getBytes(),
+            "test",
+            annotation.getId(),
+            annotation.getClass().getName()
+        ));
 
         //start reviewing image (simple user data)
         expectOK(() -> imageInstanceService.startReview(imageUser));
@@ -1187,65 +1286,62 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         expectOK(() -> imageInstanceService.stopReview(image, false));
 
         //add annotation on my layer
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(slice).toJsonObject()));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(slice).toJsonObject(urlApi)));
         //add annotation on other layers
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(sliceUser).toJsonObject()));
-        expectOK(() -> userAnnotationService.add(builder.given_a_user_annotation(sliceAdmin).toJsonObject()));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceUser).toJsonObject(urlApi)));
+        expectOK(() -> userAnnotationService.add(builder.givenAUserAnnotation(sliceAdmin).toJsonObject(urlApi)));
 
         //update, delete annotation (simple user data)
-        expectOK(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject()));
+        expectOK(() -> userAnnotationService.update(annotationUser, annotationUser.toJsonObject(urlApi)));
         expectOK(() -> userAnnotationService.delete(annotationUser, null, null, false));
 
         //update, delete annotation (admin data)
-        expectOK(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject()));
+        expectOK(() -> userAnnotationService.update(annotationAdmin, annotationAdmin.toJsonObject(urlApi)));
         expectOK(() -> userAnnotationService.delete(annotationAdmin, null, null, false));
 
         //update, delete annotation (super admin data)
-        expectOK(() -> userAnnotationService.update(annotation, annotation.toJsonObject()));
+        expectOK(() -> userAnnotationService.update(annotation, annotation.toJsonObject(urlApi)));
         expectOK(() -> userAnnotationService.delete(annotation, null, null, false));
 
         //add image instance
-        expectOK(() -> imageInstanceService.add(builder.given_a_not_persisted_image_instance(project).toJsonObject()));
+        expectOK(() -> imageInstanceService.add(builder.givenANotPersistedImageInstance(project).toJsonObject(urlApi)));
 
         //update, delete image instance (simple user data)
-        expectOK(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject()));
+        expectOK(() -> imageInstanceService.update(imageUser, imageUser.toJsonObject(urlApi)));
         expectOK(() -> imageInstanceService.delete(imageUser, null, null, false));
 
         //update, delete image instance (admin data)
-        expectOK(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject()));
+        expectOK(() -> imageInstanceService.update(imageAdmin, imageAdmin.toJsonObject(urlApi)));
         expectOK(() -> imageInstanceService.delete(imageAdmin, null, null, false));
 
         //update, delete image instance (superadmin data)
-        expectOK(() -> imageInstanceService.update(image, image.toJsonObject()));
+        expectOK(() -> imageInstanceService.update(image, image.toJsonObject(urlApi)));
         expectOK(() -> imageInstanceService.delete(image, null, null, false));
     }
 
-    private Map<String, Object> initProjectDataSet(Project project){
+    private Map<String, Object> initProjectDataSet(Project project) {
 
         Map<String, Object> result = new HashMap<>();
 
         //Add a simple project user
-        User simpleUser = (User) userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get();
-//                builder.given_a_user();
-//        builder.addUserToProject(project, simpleUser.getUsername(), READ);
+        User simpleUser = userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get();
 
         //Add a project admin
-        User admin = builder.given_a_user();
-        builder.addUserToProject(project, admin.getUsername(), ADMINISTRATION);
+        UserResponse adminResponse = builder.givenCreator();
+        UserResponse admin = builder.getUser(adminResponse.username());
+        builder.addUserToProject(project, adminResponse.username(), ADMINISTRATION);
 
         /*super admin data*/
         //Create an annotation (by superadmin)
-        ImageInstance image = builder.given_an_image_instance(project);
-        SliceInstance slice = builder.given_a_slice_instance(image, builder.given_an_abstract_slice());
-        UserAnnotation annotation = builder.given_a_user_annotation(slice);
+        ImageInstance image = builder.givenAnImageInstance(project);
+        SliceInstance slice = builder.givenASliceInstance(image, builder.givenAnAbstractSlice());
+        UserAnnotation annotation = builder.givenAUserAnnotation(slice);
         //Create a description
-        Description description = builder.given_a_description(annotation);
+        Description description = builder.givenADescription(annotation);
         //Create a property
-        Property property = builder.given_a_property(annotation);
+        Property property = builder.givenAProperty(annotation);
         //Create an attached file
-        AttachedFile attachedFile = builder.given_a_attached_file(annotation);
-        //Create a tag
-        TagDomainAssociation tda = builder.given_a_tag_association(builder.given_a_tag(), annotation);
+        AttachedFile attachedFile = builder.givenAnAttachedFile(annotation);
 
         result.put("image", image);
         result.put("slice", slice);
@@ -1253,26 +1349,23 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         result.put("description", description);
         result.put("property", property);
         result.put("attachedFile", attachedFile);
-        result.put("tagDomainAssociation", tda);
 
         /*admin data*/
         //Create an annotation (by admin)
-        ImageInstance imageAdmin =builder.given_an_image_instance(project);
-        imageAdmin.setUser(admin);
+        ImageInstance imageAdmin = builder.givenAnImageInstance(project);
+        imageAdmin.setUser(builder.getUserEntity(admin));
         builder.persistAndReturn(imageAdmin);
 
-        SliceInstance sliceAdmin = builder.given_a_slice_instance(imageAdmin, builder.given_an_abstract_slice());
-        UserAnnotation annotationAdmin = builder.given_a_user_annotation(slice);
-        annotationAdmin.setUser(admin);
+        SliceInstance sliceAdmin = builder.givenASliceInstance(imageAdmin, builder.givenAnAbstractSlice());
+        UserAnnotation annotationAdmin = builder.givenAUserAnnotation(slice);
+        annotationAdmin.setUserId(admin.id());
         builder.persistAndReturn(annotationAdmin);
         //Create a description
-        Description descriptionAdmin = builder.given_a_description(annotationAdmin);
+        Description descriptionAdmin = builder.givenADescription(annotationAdmin);
         //Create a property
-        Property propertyAdmin = builder.given_a_property(annotationAdmin);
+        Property propertyAdmin = builder.givenAProperty(annotationAdmin);
         //Create an attached file
-        AttachedFile attachedFileAdmin = builder.given_a_attached_file(annotationAdmin);
-        //Create a tag
-        TagDomainAssociation tdaAdmin = builder.given_a_tag_association(builder.given_a_tag(), annotationAdmin);
+        AttachedFile attachedFileAdmin = builder.givenAnAttachedFile(annotationAdmin);
 
         result.put("imageAdmin", imageAdmin);
         result.put("sliceAdmin", sliceAdmin);
@@ -1280,26 +1373,23 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         result.put("descriptionAdmin", descriptionAdmin);
         result.put("propertyAdmin", propertyAdmin);
         result.put("attachedFileAdmin", attachedFileAdmin);
-        result.put("tagDomainAssociationAdmin", tdaAdmin);
 
         /*simple user data*/
         //Create an annotation (by user)
-        ImageInstance imageUser =builder.given_an_image_instance(project);
+        ImageInstance imageUser = builder.givenAnImageInstance(project);
         imageUser.setUser(simpleUser);
         builder.persistAndReturn(imageUser);
 
-        SliceInstance sliceUser = builder.given_a_slice_instance(imageUser, builder.given_an_abstract_slice());
-        UserAnnotation annotationUser = builder.given_a_user_annotation(slice);
-        annotationUser.setUser(simpleUser);
+        SliceInstance sliceUser = builder.givenASliceInstance(imageUser, builder.givenAnAbstractSlice());
+        UserAnnotation annotationUser = builder.givenAUserAnnotation(slice);
+        annotationUser.setUserId(simpleUser.getId());
         builder.persistAndReturn(annotationUser);
         //Create a description
-        Description descriptionUser = builder.given_a_description(annotationUser);
+        Description descriptionUser = builder.givenADescription(annotationUser);
         //Create a property
-        Property propertyUser = builder.given_a_property(annotationUser);
+        Property propertyUser = builder.givenAProperty(annotationUser);
         //Create an attached file
-        AttachedFile attachedFileUser = builder.given_a_attached_file(annotationUser);
-        //Create a tag
-        TagDomainAssociation tdaUser = builder.given_a_tag_association(builder.given_a_tag(), annotationUser);
+        AttachedFile attachedFileUser = builder.givenAnAttachedFile(annotationUser);
 
         result.put("imageUser", imageUser);
         result.put("sliceUser", sliceUser);
@@ -1307,7 +1397,6 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         result.put("descriptionUser", descriptionUser);
         result.put("propertyUser", propertyUser);
         result.put("attachedFileUser", attachedFileUser);
-        result.put("tagDomainAssociationUser", tdaUser);
 
         return result;
     }
@@ -1319,36 +1408,36 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
     @Override
     @Test
     @WithMockUser(username = USER_NO_ACL)
-    public void user_without_permission_add_domain() {
-        expectOK (() -> when_i_add_domain());
+    public void userWithoutPermissionAddDomain() {
+        expectOK(this::whenIAddDomain);
         // User with no ACL can create an project
     }
 
     @Override
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    public void user_with_read_permission_add_domain() {
-        expectOK (() -> when_i_add_domain());
+    public void userWithReadPermissionAddDomain() {
+        expectOK(this::whenIAddDomain);
         // User with READ permission can create another project
     }
 
     @Override
-    public void when_i_get_domain() {
+    public void whenIGetDomain() {
         projectService.get(project.getId());
     }
 
     @Override
-    protected void when_i_add_domain() {
-        projectService.add(BasicInstanceBuilder.given_a_not_persisted_project().toJsonObject());
+    protected void whenIAddDomain() {
+        projectService.add(basicInstanceBuilder.givenANotPersistedProject().toJsonObject(urlApi));
     }
 
     @Override
-    public void when_i_edit_domain() {
-        projectService.update(project, project.toJsonObject());
+    public void whenIEditDomain() {
+        projectService.update(project, project.toJsonObject(urlApi));
     }
 
     @Override
-    protected void when_i_delete_domain() {
+    protected void whenIDeleteDomain() {
         Project projectToDelete = project;
         projectService.delete(projectToDelete, null, null, true);
     }

@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.DeleteCommand;
@@ -16,7 +17,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.InvalidRequestException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationGroupRepository;
@@ -32,24 +32,20 @@ import be.cytomine.utils.Task;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class AnnotationGroupService extends ModelService {
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final AnnotationGroupRepository annotationGroupRepository;
 
-    @Autowired
-    private SecurityACLService securityACLService;
+    private final AnnotationLinkRepository annotationLinkRepository;
 
-    @Autowired
-    private TransactionService transactionService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private AnnotationGroupRepository annotationGroupRepository;
+    private final SecurityACLService securityACLService;
 
-    @Autowired
-    AnnotationLinkRepository annotationLinkRepository;
+    private final TransactionService transactionService;
 
     @Override
     public Class currentDomain() {
@@ -88,45 +84,56 @@ public class AnnotationGroupService extends ModelService {
 
     public CommandResponse add(JsonObject json) {
         transactionService.start();
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(json.getJSONAttrLong("project"), Project.class, READ);
 
-        return executeCommand(new AddCommand(currentUser), null, json);
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
     }
 
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new EditCommand(currentUser, transaction), domain, jsonNewData);
+        return executeCommand(
+            new EditCommand(currentUser.id(), transaction), domain, jsonNewData);
     }
 
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
 
-        return executeCommand(new DeleteCommand(currentUser, transaction), domain, null);
+        return executeCommand(new DeleteCommand(currentUser.id(), transaction), domain, null);
     }
 
-    public CommandResponse merge(Long id, Long mergedId) {
+    public CommandResponse merge(Long id, Long mergedId, long currentUserId) {
         AnnotationGroup ag = get(id);
         AnnotationGroup agToMerge = get(mergedId);
 
         if (ag == null || agToMerge == null) {
             throw new ObjectNotFoundException("AnnotationGroup {} not found.", ag == null ? id : mergedId);
         }
-        if (ag.getProject() != agToMerge.getProject() || ag.getImageGroup() != agToMerge.getImageGroup() || !ag.getType().equals(agToMerge.getType())) {
-            throw new InvalidRequestException("Annotation groups " + id + " and " + mergedId + " are incompatible to be merged.");
+        if (ag.getProject() != agToMerge.getProject()
+            || ag.getImageGroup() != agToMerge.getImageGroup()
+            || !ag.getType().equals(agToMerge.getType())) {
+            throw new InvalidRequestException("Annotation groups "
+                + id
+                + " and "
+                + mergedId
+                + " are incompatible to be merged.");
         }
 
         annotationLinkRepository.setMergedAnnotationGroup(ag, agToMerge);
         annotationGroupRepository.delete(agToMerge);
 
-        return executeCommand(new EditCommand(currentUserService.getCurrentUser(), null), ag, AnnotationGroup.getDataFromDomain(ag));
+        return executeCommand(
+            new EditCommand(currentUserId, null),
+            ag,
+            AnnotationGroup.getDataFromDomain(ag)
+        );
     }
 }

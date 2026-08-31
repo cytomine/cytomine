@@ -1,20 +1,5 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
-
 import logging
 from datetime import datetime
-from typing import List, Optional
 
 import numpy as np
 import pyvips
@@ -126,8 +111,8 @@ class DicomParser(AbstractParser):
 
     @staticmethod
     def parse_acquisition_date(
-        date: str, time: Optional[str] = None
-    ) -> Optional[datetime]:
+        date: str, time: str | None = None
+    ) -> datetime | None:
         """
         Date examples: 20211105
         Time examples: 151034, 151034.123
@@ -145,7 +130,7 @@ class DicomParser(AbstractParser):
             return None
 
     @staticmethod
-    def parse_physical_size(physical_size: Optional[str]) -> Optional[Quantity]:
+    def parse_physical_size(physical_size: str | None) -> Quantity | None:
         if physical_size is not None:
             physical_size = parse_float(physical_size)
             if physical_size is not None and physical_size > 0:
@@ -174,7 +159,7 @@ class DicomParser(AbstractParser):
             store.set(name, value, namespace="DICOM")
         return store
 
-    def parse_annotations(self) -> List[ParsedMetadataAnnotation]:
+    def parse_annotations(self) -> list[ParsedMetadataAnnotation]:
         """
         DICOM/DICONDE extension for Annotations
         * 0x0077-0x1900 (US) - Annotation.Number

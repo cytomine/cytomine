@@ -10,6 +10,10 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,7 +58,6 @@ public class TaskRunAuthorizationTest extends CRDAuthorizationTest {
         taskRun.getProject().setMode(EditingMode.CLASSIC);
     }
 
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     @WithMockUser(username = USER_ACL_ADMIN)
     public void shouldAllowAdminToAddDomainInReadOnlyMode() {
         taskRun.getProject().setMode(EditingMode.READ_ONLY);

@@ -1,7 +1,0 @@
-cytomine:
-  url: http://cytomine.local
-  admin:
-    username: admin
-    password:
-keycloak-client:
-  url: http://cytomine.local/iam

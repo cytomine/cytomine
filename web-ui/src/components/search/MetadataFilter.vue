@@ -18,6 +18,8 @@
             v-model="selectedFacets[item.key]"
             :options="item.values"
             :multiple="true"
+            label="label"
+            track-by="value"
             :allPlaceholder="$t('all')"
           />
         </b-field>
@@ -70,7 +72,7 @@ export default {
         .map(([key, values]) => {
           // Keep filters that are composed of several words with commas
           let clause = values
-            .map(value => `${key} = "${value.replace(/"/g, '\\"')}"`)
+            .map(({ value }) => `${key} = "${value.replace(/"/g, '\\"')}"`)
             .join(' OR ');
           return values.length === 1 ? clause : `(${clause})`;
         });
@@ -97,7 +99,11 @@ export default {
 
       this.facets = Object.entries(facets).map(([key, inner]) => ({
         key,
-        values: Object.keys(inner)
+        values: Object.entries(inner).map(([value, count]) => ({
+          value,
+          count,
+          label: `${value} (${Math.round(count)})`
+        }))
       }));
       this.selectedFacets = Object.fromEntries(this.facets.map(({ key }) => [key, []]));
     },

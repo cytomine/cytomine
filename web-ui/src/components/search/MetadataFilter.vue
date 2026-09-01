@@ -50,6 +50,12 @@ export default {
   components: {
     CytomineMultiselect,
   },
+  props: {
+    project: {
+      type: String,
+      default: null,
+    },
+  },
   data() {
     return {
       facets: [],
@@ -87,7 +93,7 @@ export default {
       return segment.replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
     },
     async fetchFacets() {
-      let facets = await fetchFacets();
+      let facets = await fetchFacets(this.project);
 
       this.facets = Object.entries(facets).map(([key, inner]) => ({
         key,

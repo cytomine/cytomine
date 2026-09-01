@@ -448,7 +448,7 @@ def _configure_index(client, index) -> None:
         "specimens.specimen_type.meaning",
         "dataset.alias",
     ]
-    index.update_settings({
+    task = index.update_settings({
         "searchableAttributes": searchable_attributes,
         "filterableAttributes": filterable_attributes,
     })

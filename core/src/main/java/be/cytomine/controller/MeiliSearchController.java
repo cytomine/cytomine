@@ -56,9 +56,11 @@ public class MeiliSearchController {
     }
 
     @GetMapping("/facets")
-    public ResponseEntity<MeiliSearchFacetsResponse> getFacets() {
+    public ResponseEntity<MeiliSearchFacetsResponse> getFacets(
+        @RequestParam(required = false) String project
+    ) {
 
-        MeiliSearchFacetsResponse facets = meiliSearchService.getFacetDistribution();
+        MeiliSearchFacetsResponse facets = meiliSearchService.getFacetDistribution(project);
         return ResponseEntity.ok(facets);
 
     }

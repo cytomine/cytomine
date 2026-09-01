@@ -132,12 +132,16 @@ public class MeiliSearchService {
         }
     }
 
-    public MeiliSearchFacetsResponse getFacetDistribution() {
+    public MeiliSearchFacetsResponse getFacetDistribution(String projectDatasetAlias) {
 
         Index index = getIndexOrThrow(indexId);
         try {
             String[] attributes = index.getFilterableAttributesSettings();
-            SearchRequest searchRequest = new SearchRequest("")
+            List<String> filters = (projectDatasetAlias != null && !projectDatasetAlias.isBlank())
+                ? List.of("dataset.alias:" + projectDatasetAlias)
+                : List.of();
+
+            SearchRequest searchRequest = buildSearchRequest(null, filters)
                 .setFacets(attributes)
                 .setLimit(0);
 

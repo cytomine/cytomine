@@ -18,15 +18,15 @@ platform is either registered as `lti-1p1` or `lti-1p3`, never both.
 
 ### LTI 1.3 (OIDC-based)
 
-| File | Role |
-|---|---|
-| `LTIIdentityProviderFactory` | Registers "LTI 1.3" in the admin console's Add-IdP dropdown + config form |
-| `LTIIdentityProviderConfig` | Typed config: platform issuer, tool client_id, JWKS URL, etc. |
-| `LTIIdentityProvider` | Builds the redirect to the LMS; validates the returned launch JWT; builds a `BrokeredIdentityContext` |
-| `LTIJwtValidator` | Fetches/caches the platform's JWKS, verifies the launch JWT's signature |
-| `LTILaunchHint` | Packs login_hint/message_hint/target_link_uri through the standard OIDC `login_hint` param |
-| `LTILoginInitiationResourceProvider(Factory)` | The `/realms/{realm}/lti/login-init` endpoint the LMS calls first |
-| `LTIInstructorRoleMapper` | Example: grants a realm role when the LTI roles claim includes Instructor |
+| File                                          | Role                                                                                                  |
+|-----------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| `LTIIdentityProviderFactory`                  | Registers "LTI 1.3" in the admin console's Add-IdP dropdown + config form                             |
+| `LTIIdentityProviderConfig`                   | Typed config: platform issuer, tool client_id, JWKS URL, etc.                                         |
+| `LTIIdentityProvider`                         | Builds the redirect to the LMS; validates the returned launch JWT; builds a `BrokeredIdentityContext` |
+| `LTIJwtValidator`                             | Fetches/caches the platform's JWKS, verifies the launch JWT's signature                               |
+| `LTILaunchHint`                               | Packs login_hint/message_hint/target_link_uri through the standard OIDC `login_hint` param            |
+| `LTILoginInitiationResourceProvider(Factory)` | The `/realms/{realm}/lti/login-init` endpoint the LMS calls first                                     |
+| `LTIUserRoleMapper`                           | Example: grants a client role when for all LTI standard roles                                         |
 
 ### LTI 1.1 (OAuth 1.0a-based)
 

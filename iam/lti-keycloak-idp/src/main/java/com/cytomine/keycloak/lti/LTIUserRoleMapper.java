@@ -34,9 +34,9 @@ import java.util.List;
  * any other core-client role previously granted by this mapper, so a user
  * whose LTI role changes between logins doesn't accumulate stale grants.
  */
-public class LTIInstructorRoleMapper extends AbstractIdentityProviderMapper {
+public class LTIUserRoleMapper extends AbstractIdentityProviderMapper {
 
-    private static final Logger log = Logger.getLogger(LTIInstructorRoleMapper.class);
+    private static final Logger log = Logger.getLogger(LTIUserRoleMapper.class);
 
     public static final String PROVIDER_ID = "lti-core-role-mapper";
 

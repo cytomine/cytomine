@@ -11,8 +11,6 @@ FROM ${PROXY_CACHE}/library/maven:${MAVEN_IMAGE_TAG} AS lti-builder
 
 WORKDIR /build
 
-# Copy just the pom first so dependency resolution is cached in its own layer,
-# and only re-runs when pom.xml actually changes -- not on every source edit.
 COPY lti-keycloak-idp/pom.xml .
 RUN mvn -B dependency:go-offline
 

@@ -120,7 +120,7 @@ def run_import_datasets(
 ) -> ImportResponse:
     client = get_settings().meilisearch_client
     index = client.index("imageMetadataIndex")
-    _configure_index(index)
+    _configure_index(client, index)
 
 
     buckets = (Path(entry.path) for entry in os.scandir(DATASET_ROOT) if entry.is_dir())
@@ -392,7 +392,7 @@ def _extract_staining_info(staining):
     else:
         return {"raw": dataclass_to_dict(staining)}
 
-def _configure_index(index) -> None:
+def _configure_index(client, index) -> None:
     """Configure searchable and filterable attributes on the MeiliSearch index."""
     searchable_attributes = [
         "image.identifier",
@@ -446,8 +446,10 @@ def _configure_index(index) -> None:
         "specimens.fixation_type.meaning",
         "block.block_preparation.meaning",
         "specimens.specimen_type.meaning",
+        "dataset.alias",
     ]
     index.update_settings({
         "searchableAttributes": searchable_attributes,
         "filterableAttributes": filterable_attributes,
     })
+    client.wait_for_task(task.task_uid)

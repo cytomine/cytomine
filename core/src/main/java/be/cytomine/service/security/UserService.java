@@ -618,9 +618,9 @@ public class UserService extends ModelService {
         return userRepository.findAllUsersByProjectId(project.getId()).stream().map(userMapper::map).toList();
     }
 
-    public List<User> listUsers(long ontologyId) {
+    public List<UserResponse> listUsers(long ontologyId) {
         //TODO:: Not optim code a single SQL request will be very faster
-        List<User> users = new ArrayList<>();
+        List<UserResponse> users = new ArrayList<>();
         List<Project> projects = projectRepository.findAllByOntologyId(ontologyId);
         for (Project project : projects) {
             users.addAll(listUsers(project));
@@ -633,7 +633,7 @@ public class UserService extends ModelService {
         return userRepository.findAllUsersByStorageId(storage.getId());
     }
 
-    public List<User> listAll(Project project) {
+    public List<UserResponse> listAll(Project project) {
         return new ArrayList<>(listUsers(project));
     }
 
@@ -646,7 +646,7 @@ public class UserService extends ModelService {
         securityACLService.check(project, READ, currentUser);
 
         List<UserResponse> humanAdmins = listAdmins(project);
-        List<UserReponse> humanUsers = listUsers(project);
+        List<UserResponse> humanUsers = listUsers(project);
 
         List<JsonObject> humanUsersFormatted = humanUsers.stream().map(u -> u.toJsonObject(urlApi)).toList();
 
@@ -656,14 +656,14 @@ public class UserService extends ModelService {
             || (!project.isHideAdminsLayers() && !project.isHideUsersLayers())) {
             layersFormatted.addAll(humanUsersFormatted);
         } else if (project.isHideAdminsLayers() && !project.isHideUsersLayers()) {
-            Set<Long> humanAdminsIds = humanAdmins.stream().map(CytomineDomain::getId).collect(Collectors.toSet());
+            Set<Long> humanAdminsIds = humanAdmins.stream().map(UserResponse::id).collect(Collectors.toSet());
             layersFormatted.addAll(
                 humanUsersFormatted.stream().filter(x -> !humanAdminsIds.contains(x.getJSONAttrLong("id"))).toList());
         } else if (!project.isHideAdminsLayers()) {
             layersFormatted.addAll(humanAdmins.stream().map(u -> u.toJsonObject(urlApi)).toList());
         }
 
-        boolean isProjectMember = humanUsers.stream().anyMatch(u -> u.getId().equals(currentUser.id()));
+        boolean isProjectMember = humanUsers.stream().anyMatch(u -> u.id() == currentUser.id());
         boolean hasOwnLayer = layersFormatted.stream()
             .anyMatch(x -> x.getJSONAttrLong("id").equals(currentUser.id()));
         if (isProjectMember && !hasOwnLayer) {

@@ -17,6 +17,7 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.util.JsonSerialization;
 import org.keycloak.models.FederatedIdentityModel;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -40,6 +41,13 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     static final String NOTE_TARGET_LINK_URI = "LTI_TARGET_LINK_URI";
     static final String NOTE_NONCE = "LTI_NONCE";
 
+    // Clock-skew tolerance applied to both directions of the exp/iat window.
+    private static final long CLOCK_SKEW_LEEWAY_SECONDS = 60;
+    // Reject launches whose id_token was issued (iat) further in the past than this,
+    // independent of exp - keeps the acceptance window tight even if a platform
+    // sets an unusually long exp. 5 minutes matches common LTI/OIDC guidance.
+    private static final long MAX_IAT_AGE_SECONDS = 300;
+
     private final LTIJwtValidator jwtValidator = new LTIJwtValidator();
 
     public LTIIdentityProvider(KeycloakSession session, LTIIdentityProviderConfig config) {
@@ -61,7 +69,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             String packed = authSession.getClientNote(org.keycloak.protocol.oidc.OIDCLoginProtocol.LOGIN_HINT_PARAM);
             if (packed == null) {
                 throw new IdentityBrokerException(
-                        "Missing LTI launch hint - this IdP must be entered via the /lti/login-init endpoint, not directly.");
+                    "Missing LTI launch hint - this IdP must be entered via the /lti/login-init endpoint, not directly.");
             }
             Map<String, String> hint = LTILaunchHint.decode(packed);
             String loginHint = hint.get("login_hint");
@@ -77,15 +85,15 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             String redirectUri = request.getRedirectUri();
 
             UriBuilder uriBuilder = UriBuilder.fromUri(getConfig().getPlatformAuthorizationEndpoint())
-                    .queryParam("scope", "openid")
-                    .queryParam("response_type", "id_token")
-                    .queryParam("response_mode", "form_post")
-                    .queryParam("prompt", "none")
-                    .queryParam("client_id", getConfig().getToolClientId())
-                    .queryParam("redirect_uri", redirectUri)
-                    .queryParam("login_hint", loginHint)
-                    .queryParam("state", authSession.getParentSession().getId())
-                    .queryParam("nonce", nonce);
+                .queryParam("scope", "openid")
+                .queryParam("response_type", "id_token")
+                .queryParam("response_mode", "form_post")
+                .queryParam("prompt", "none")
+                .queryParam("client_id", getConfig().getToolClientId())
+                .queryParam("redirect_uri", redirectUri)
+                .queryParam("login_hint", loginHint)
+                .queryParam("state", authSession.getParentSession().getId())
+                .queryParam("nonce", nonce);
 
             if (messageHint != null) {
                 uriBuilder.queryParam("lti_message_hint", messageHint);
@@ -119,8 +127,8 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         @POST
         @jakarta.ws.rs.Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public Response handleLaunchResponse(@FormParam("id_token") String idToken,
-                                              @FormParam("state") String state,
-                                              @FormParam("error") String error) {
+                                             @FormParam("state") String state,
+                                             @FormParam("error") String error) {
             if (error != null) {
                 log.warnf("LTI platform returned error on launch: %s", error);
                 return callback.error("lti_platform_error");
@@ -129,8 +137,18 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                 return callback.error("missing_id_token");
             }
 
+            // Same access pattern as LTI11IdentityProvider.Endpoint (provider.session ...):
+            // the browser's cookie/redirect already ties this callback back to the exact
+            // authentication session that performLogin() started, which is what lets us
+            // compare the nonce/state we generated then against what came back now.
+            AuthenticationSessionModel authSession = provider.session.getContext().getAuthenticationSession();
+            if (authSession == null) {
+                log.warn("LTI launch callback received with no active authentication session");
+                return callback.error("missing_authentication_session");
+            }
+
             try {
-                BrokeredIdentityContext identity = provider.validateAndExtract(idToken);
+                BrokeredIdentityContext identity = provider.validateAndExtract(idToken, state, authSession);
                 identity.setIdpConfig(provider.getConfig());
                 identity.setIdp(provider);
                 return callback.authenticated(identity);
@@ -143,7 +161,8 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
 
     // Validation and claim extraction
     @SuppressWarnings("unchecked")
-    BrokeredIdentityContext validateAndExtract(String rawIdToken) throws Exception {
+    BrokeredIdentityContext validateAndExtract(String rawIdToken, String returnedState,
+                                               AuthenticationSessionModel authSession) throws Exception {
         JWSInput jws = jwtValidator.verify(rawIdToken, getConfig().getPlatformJwksUrl());
         Map<String, Object> claims = JsonSerialization.readValue(jws.readContentAsString(), Map.class);
 
@@ -155,7 +174,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
 
         Object aud = claims.get("aud");
         boolean audOk = (aud instanceof String s && s.equals(getConfig().getToolClientId()))
-                || (aud instanceof List<?> l && l.contains(getConfig().getToolClientId()));
+            || (aud instanceof List<?> l && l.contains(getConfig().getToolClientId()));
         if (!audOk) {
             throw new IllegalArgumentException("aud does not include tool client_id");
         }
@@ -175,7 +194,49 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             throw new IllegalArgumentException("deployment_id not allowed: " + deploymentId);
         }
 
-        // TODO: Validate nonce and exp/iat/state against session
+        // --- state: binds this response back to the browser session that started the
+        // launch (CSRF / session-fixation protection). We set this to the parent
+        // session's id in performLogin() and expect the platform to echo it back verbatim.
+        String expectedState = authSession.getParentSession().getId();
+        if (expectedState == null || !expectedState.equals(returnedState)) {
+            throw new IllegalArgumentException("state mismatch - possible CSRF or a stale/replayed launch response");
+        }
+
+        // --- nonce: must match the single-use value we generated and sent in
+        // performLogin(). Consuming it immediately (removeClientNote) means even a
+        // resubmission of the exact same id_token against this same session is rejected.
+        String expectedNonce = authSession.getClientNote(NOTE_NONCE);
+        Object nonceClaim = claims.get("nonce");
+        if (expectedNonce == null) {
+            throw new IllegalArgumentException("No nonce recorded for this authentication session - was performLogin() skipped?");
+        }
+        if (!(nonceClaim instanceof String) || !expectedNonce.equals(nonceClaim)) {
+            throw new IllegalArgumentException("nonce mismatch - possible replay of a previous launch");
+        }
+        authSession.removeClientNote(NOTE_NONCE);
+
+        // --- exp / iat: reject expired tokens and tokens issued implausibly far in
+        // the past or future, independent of whatever exp the platform set.
+        long now = Instant.now().getEpochSecond();
+
+        Number expClaim = (Number) claims.get("exp");
+        if (expClaim == null) {
+            throw new IllegalArgumentException("Missing exp claim");
+        }
+        if (now > expClaim.longValue() + CLOCK_SKEW_LEEWAY_SECONDS) {
+            throw new IllegalArgumentException("Launch id_token has expired");
+        }
+
+        Number iatClaim = (Number) claims.get("iat");
+        if (iatClaim == null) {
+            throw new IllegalArgumentException("Missing iat claim");
+        }
+        if (iatClaim.longValue() > now + CLOCK_SKEW_LEEWAY_SECONDS) {
+            throw new IllegalArgumentException("Launch id_token iat is in the future");
+        }
+        if (now - iatClaim.longValue() > MAX_IAT_AGE_SECONDS) {
+            throw new IllegalArgumentException("Launch id_token is too old (iat too far in the past)");
+        }
 
         String subject = (String) claims.get(getConfig().getSubjectClaim());
         if (subject == null || subject.isBlank()) {

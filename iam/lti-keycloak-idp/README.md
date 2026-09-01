@@ -104,7 +104,7 @@ Launch URL.
 2. Admin Console -> Identity Providers -> Add provider -> **LTI 1.3** or
    **LTI 1.1**, depending on the platform, alias e.g. `lti-acme-lms`, and
    fill in the fields from the registration step above.
-3. Optionally add a role/context mapper (see `LTIInstructorRoleMapper` for
+3. Optionally add a role/context mapper (see `LTIUserRoleMapper` for
    the 1.3 pattern; a 1.1 equivalent would read `LTI11_ROLES`, which is
    already a split `String[]`, instead of a JSON claim).
 

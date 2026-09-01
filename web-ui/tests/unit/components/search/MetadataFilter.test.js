@@ -31,6 +31,8 @@ const facets = {
   },
 };
 
+const opt = (value, count) => ({ value, count, label: `${value} (${count})` });
+
 const SITE = 'specimens.anatomical_site.meaning';
 const SEX = 'specimens.biological_being.sex';
 const TYPE = 'specimens.specimen_type.meaning';
@@ -71,14 +73,15 @@ describe('MetadataFilter.vue', () => {
 
     expect(fetchFacets).toHaveBeenCalledOnce();
     expect(wrapper.vm.facets).toEqual([
-      { key: 'block.block_preparation.meaning', values: ['Paraffin wax (substance)'] },
+      { key: 'block.block_preparation.meaning', values: [opt('Paraffin wax (substance)', 47)] },
       {
         key: 'slide.staining.stains.compound.meaning',
-        values: ['hematoxylin stain', 'water soluble eosin stain'],
+        values: [opt('hematoxylin stain', 47), opt('water soluble eosin stain', 32)],
       },
-      { key: SITE, values: ['BONE, STERNUM', 'KIDNEY', 'LARGE INTESTINE, CECUM', 'LIVER'] },
-      { key: SEX, values: ['Male'] },
-      { key: TYPE, values: ['Tissue specimen (specimen)'] },
+      { key: SITE, values: [opt('BONE, STERNUM', 6), opt('KIDNEY', 14),
+          opt('LARGE INTESTINE, CECUM', 9), opt('LIVER', 18),] },
+      { key: SEX, values: [opt('Male', 47)] },
+      { key: TYPE, values: [opt('Tissue specimen (specimen)', 47)] },
     ]);
     expect(wrapper.vm.selectedFacets).toEqual(emptySelection);
   });
@@ -104,10 +107,11 @@ describe('MetadataFilter.vue', () => {
 
     const selects = wrapper.findAllComponents(CytomineMultiselect);
     expect(selects.length).toBe(5);
-    expect(selects.at(0).props('options')).toEqual(['Paraffin wax (substance)']);
+    expect(selects.at(0).props('options')).toEqual([opt('Paraffin wax (substance)', 47)]);
     expect(selects.at(0).props('multiple')).toBe(true);
     expect(selects.at(2).props('options')).toEqual([
-      'BONE, STERNUM', 'KIDNEY', 'LARGE INTESTINE, CECUM', 'LIVER',
+      opt('BONE, STERNUM', 6), opt('KIDNEY', 14),
+      opt('LARGE INTESTINE, CECUM', 9), opt('LIVER', 18),
     ]);
   });
 
@@ -127,7 +131,7 @@ describe('MetadataFilter.vue', () => {
   it('should build an equality filter when a single value is selected', async () => {
     const wrapper = await createWrapper();
 
-    await wrapper.setData({ selectedFacets: { [SEX]: ['Male'] } });
+    await wrapper.setData({ selectedFacets: { [SEX]: [opt('Male', 47)] } });
 
     expect(wrapper.vm.filters).toEqual([`${SEX} = "Male"`]);
   });
@@ -135,7 +139,7 @@ describe('MetadataFilter.vue', () => {
   it('should quote a single value containing separators', async () => {
     const wrapper = await createWrapper();
 
-    await wrapper.setData({ selectedFacets: { [SITE]: ['LARGE INTESTINE, CECUM'] } });
+    await wrapper.setData({ selectedFacets: { [SITE]: [opt('LARGE INTESTINE, CECUM', 9)] } });
 
     expect(wrapper.vm.filters).toEqual([`${SITE} = "LARGE INTESTINE, CECUM"`]);
   });
@@ -143,7 +147,7 @@ describe('MetadataFilter.vue', () => {
   it('should build a disjunction when several values are selected', async () => {
     const wrapper = await createWrapper();
 
-    await wrapper.setData({ selectedFacets: { [SITE]: ['LIVER', 'KIDNEY', 'BONE, STERNUM'] } });
+    await wrapper.setData({ selectedFacets: { [SITE]: [opt('LIVER', 18), opt('KIDNEY', 14), opt('BONE, STERNUM', 6)] } });
 
     expect(wrapper.vm.filters).toEqual([
       `(${SITE} = "LIVER" OR ${SITE} = "KIDNEY" OR ${SITE} = "BONE, STERNUM")`,
@@ -155,9 +159,9 @@ describe('MetadataFilter.vue', () => {
 
     await wrapper.setData({
       selectedFacets: {
-        [SITE]: ['LIVER', 'KIDNEY'],
-        [SEX]: ['Male'],
-        [TYPE]: ['Tissue specimen (specimen)'],
+        [SITE]: [opt('LIVER', 18), opt('KIDNEY', 14)],
+        [SEX]: [opt('Male', 47)],
+        [TYPE]: [opt('Tissue specimen (specimen)', 47)],
       },
     });
 
@@ -171,7 +175,7 @@ describe('MetadataFilter.vue', () => {
   it('should emit the query and filters when the selected facets change', async () => {
     const wrapper = await createWrapper();
 
-    await wrapper.setData({ selectedFacets: { [SITE]: ['LIVER', 'KIDNEY'], [SEX]: ['Male'] } });
+    await wrapper.setData({ selectedFacets: { [SITE]: [opt('LIVER', 18), opt('KIDNEY', 14)], [SEX]: [opt('Male', 47)] } });
     await advance(300);
 
     expect(wrapper.emitted('filter-change').at(-1)).toEqual([{
@@ -183,9 +187,9 @@ describe('MetadataFilter.vue', () => {
   it('should emit only once when the selected facets change repeatedly', async () => {
     const wrapper = await createWrapper();
 
-    await wrapper.setData({ selectedFacets: { [SITE]: ['LIVER'] } });
+    await wrapper.setData({ selectedFacets: { [SITE]: [opt('LIVER', 18)] } });
     await advance(100);
-    await wrapper.setData({ selectedFacets: { [SITE]: ['LIVER', 'KIDNEY'] } });
+    await wrapper.setData({ selectedFacets: { [SITE]: [opt('LIVER', 18), opt('KIDNEY', 14)] } });
     await advance(300);
 
     expect(wrapper.emitted('filter-change')).toEqual([[{

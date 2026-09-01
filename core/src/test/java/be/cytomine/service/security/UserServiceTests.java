@@ -222,7 +222,7 @@ public class UserServiceTests {
     @Test
     void findUserByPublicKey() {
         UserResponse user = builder.givenUserAclRead();
-        User expected = builder.getUserEntity(user.username());
+        UserResponse expected = builder.getUser(user.username());
         assertThat(userService.findByPublicKey(user.publicKey().orElseThrow())).isPresent().contains(expected);
     }
 

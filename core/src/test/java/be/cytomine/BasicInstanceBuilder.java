@@ -188,7 +188,7 @@ public class BasicInstanceBuilder {
             .orElseThrow(() -> new ObjectNotFoundException(username + " not in db"));
     }
 
-    public User getUserEntity(UserResponse user) {
+    private User getUserEntity(UserResponse user) {
         return getUserEntity(user.username());
     }
 

@@ -247,9 +247,9 @@ public class UserService extends ModelService {
         return userRepository.findByUsernameLikeIgnoreCase(username);
     }
 
-    public Optional<User> findByPublicKey(String publicKey) {
+    public Optional<UserResponse> findByPublicKey(String publicKey) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userRepository.findByPublicKey(publicKey);
+        return userRepository.findByPublicKey(publicKey).map(userMapper::map);
     }
 
     public AuthInformation getAuthenticationRoles(UserResponse user) {
@@ -597,15 +597,15 @@ public class UserService extends ModelService {
 
     }
 
-    public List<User> listAdmins(Project project) {
+    public List<UserResponse> listAdmins(Project project) {
         return listAdmins(project, true);
     }
 
-    public List<User> listAdmins(Project project, boolean checkPermission) {
+    public List<UserResponse> listAdmins(Project project, boolean checkPermission) {
         if (checkPermission) {
             securityACLService.check(project, READ);
         }
-        return userRepository.findAllAdminsByProjectId(project.getId());
+        return userRepository.findAllAdminsByProjectId(project.getId()).stream().map(userMapper::map).toList();
     }
 
     public Optional<User> findCreator(Project project) {
@@ -613,9 +613,9 @@ public class UserService extends ModelService {
         return aclRepository.listCreators(project.getId()).stream().findFirst();
     }
 
-    public List<User> listUsers(Project project) {
+    public List<UserResponse> listUsers(Project project) {
         securityACLService.check(project, READ);
-        return userRepository.findAllUsersByProjectId(project.getId());
+        return userRepository.findAllUsersByProjectId(project.getId()).stream().map(userMapper::map).toList();
     }
 
     public List<User> listUsers(long ontologyId) {
@@ -645,8 +645,8 @@ public class UserService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(project, READ, currentUser);
 
-        List<User> humanAdmins = listAdmins(project);
-        List<User> humanUsers = listUsers(project);
+        List<UserResponse> humanAdmins = listAdmins(project);
+        List<UserReponse> humanUsers = listUsers(project);
 
         List<JsonObject> humanUsersFormatted = humanUsers.stream().map(u -> u.toJsonObject(urlApi)).toList();
 

@@ -78,8 +78,7 @@ describe('MetadataFilter.vue', () => {
         key: 'slide.staining.stains.compound.meaning',
         values: [opt('hematoxylin stain', 47), opt('water soluble eosin stain', 32)],
       },
-      { key: SITE, values: [opt('BONE, STERNUM', 6), opt('KIDNEY', 14),
-          opt('LARGE INTESTINE, CECUM', 9), opt('LIVER', 18),] },
+      { key: SITE, values: [opt('BONE, STERNUM', 6), opt('KIDNEY', 14), opt('LARGE INTESTINE, CECUM', 9), opt('LIVER', 18),] },
       { key: SEX, values: [opt('Male', 47)] },
       { key: TYPE, values: [opt('Tissue specimen (specimen)', 47)] },
     ]);

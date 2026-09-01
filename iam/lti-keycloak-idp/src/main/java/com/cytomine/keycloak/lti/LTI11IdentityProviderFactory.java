@@ -8,10 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Registers "LTI 1.1" as a second, separate provider type in Admin Console
- * -> Identity Providers -> Add provider (alongside "LTI 1.3"). A tool can
- * have both configured at once - e.g. one legacy LMS still on 1.1, another
- * on 1.3 - each LMS gets its own IdP instance of whichever type matches it.
+ * Identity provider factory for LTI 1.1 legacy LMS launches.
  */
 public class LTI11IdentityProviderFactory
         extends AbstractIdentityProviderFactory<LTI11IdentityProvider> {

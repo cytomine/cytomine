@@ -11,26 +11,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * Verifies the OAuth 1.0a HMAC-SHA1 signature LTI 1.1 launches are signed
- * with (RFC 5849 section 3.4.2 / OAuth Core 1.0a). LTI 1.1 never uses a
- * token secret, so the signing key is always "consumerSecret&amp;".
- *
- * This is deliberately dependency-free (no external OAuth library) so the
- * scaffold has no extra runtime deps beyond what Keycloak already ships.
+ * Validates OAuth 1.0a HMAC-SHA1 signatures for LTI 1.1 launches (RFC 5849).
  */
 public final class OAuth1LaunchValidator {
 
     private OAuth1LaunchValidator() {}
 
     /**
-     * @param httpMethod   e.g. "POST"
-     * @param requestUrl   the exact URL the LMS launched to, no query string
-     *                     (scheme+host+port+path must match exactly what was
-     *                     signed - reverse proxies/hostname mismatches are
-     *                     the most common cause of false verification failures)
-     * @param params       all launch parameters (form-encoded body params),
-     *                     including oauth_signature - it is excluded automatically
-     * @param consumerSecret the shared secret for the oauth_consumer_key in params
+     * Verifies the OAuth 1.0a signature of an incoming launch request.
      */
     public static boolean verify(String httpMethod, String requestUrl,
                                   Map<String, List<String>> params, String consumerSecret) {
@@ -40,7 +28,7 @@ public final class OAuth1LaunchValidator {
         }
 
         String baseString = buildSignatureBaseString(httpMethod, requestUrl, params);
-        String signingKey = percentEncode(consumerSecret) + "&"; // no token secret in LTI
+        String signingKey = percentEncode(consumerSecret) + "&";
 
         String computed = hmacSha1Base64(baseString, signingKey);
         return constantTimeEquals(computed, providedSignature);
@@ -81,7 +69,7 @@ public final class OAuth1LaunchValidator {
         }
     }
 
-    /** RFC 3986 unreserved-char percent-encoding, as OAuth 1.0a requires (stricter than URLEncoder). */
+    /** RFC 3986 percent-encoding required by OAuth 1.0a. */
     private static String percentEncode(String value) {
         if (value == null) return "";
         try {

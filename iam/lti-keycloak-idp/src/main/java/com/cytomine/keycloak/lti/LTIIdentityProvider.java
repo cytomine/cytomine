@@ -22,24 +22,13 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Speaks the LTI 1.3 "platform-initiated" launch dialect and presents it to
- * the rest of Keycloak as a normal broker.
- *
- * Two moments matter:
- *  - performLogin(): called once Keycloak has decided "the user should log
- *    in via this IdP" (i.e. kc_idp_hint routed here from the login-init
- *    endpoint). Redirects the browser to the platform's authorization
- *    endpoint per the OIDC third-party-initiated-login flow LTI 1.3 uses.
- *  - the callback endpoint below: receives the platform's POSTed id_token,
- *    verifies it, and turns it into a BrokeredIdentityContext, which is what
- *    Keycloak's normal first-broker-login flow (create/link user, issue
- *    tokens) then takes over from.
+ * Identity provider implementation for LTI 1.3 platform-initiated launches.
  */
 public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityProviderConfig> {
 
     private static final Logger log = Logger.getLogger(LTIIdentityProvider.class);
 
-    // LTI claim URIs (IMS Global / 1EdTech LTI 1.3 Core spec)
+    // LTI 1.3 claim URIs
     private static final String CLAIM_MESSAGE_TYPE = "https://purl.imsglobal.org/spec/lti/claim/message_type";
     private static final String CLAIM_VERSION = "https://purl.imsglobal.org/spec/lti/claim/version";
     private static final String CLAIM_DEPLOYMENT_ID = "https://purl.imsglobal.org/spec/lti/claim/deployment_id";
@@ -47,7 +36,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     private static final String CLAIM_ROLES = "https://purl.imsglobal.org/spec/lti/claim/roles";
     private static final String CLAIM_CONTEXT = "https://purl.imsglobal.org/spec/lti/claim/context";
 
-    // Client notes used to shuttle data from login-init through to callback
+    // Authentication session notes
     static final String NOTE_TARGET_LINK_URI = "LTI_TARGET_LINK_URI";
     static final String NOTE_NONCE = "LTI_NONCE";
 
@@ -62,19 +51,13 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         return Response.ok(identity.getToken()).build();
     }
 
-    // ---------------------------------------------------------------
-    // Step A: redirect the browser to the LMS's authorization endpoint
-    // ---------------------------------------------------------------
-
+    // Step A: redirect browser to LMS authorization endpoint
     @Override
     public Response performLogin(AuthenticationRequest request) {
         try {
             AuthenticationSessionModel authSession = request.getAuthenticationSession();
 
-            // The login-init resource packed {login_hint, lti_message_hint,
-            // target_link_uri, deployment_id} into the standard "login_hint"
-            // query param it sent to /protocol/openid-connect/auth - Keycloak
-            // stores that verbatim under this client note. See LTILaunchHint.
+            // Retrieve encoded launch hints passed via login_hint param
             String packed = authSession.getClientNote(org.keycloak.protocol.oidc.OIDCLoginProtocol.LOGIN_HINT_PARAM);
             if (packed == null) {
                 throw new IdentityBrokerException(
@@ -91,7 +74,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             String nonce = UUID.randomUUID().toString();
             authSession.setClientNote(NOTE_NONCE, nonce);
 
-            String redirectUri = request.getRedirectUri(); // Keycloak's broker callback URL for this IdP
+            String redirectUri = request.getRedirectUri();
 
             UriBuilder uriBuilder = UriBuilder.fromUri(getConfig().getPlatformAuthorizationEndpoint())
                     .queryParam("scope", "openid")
@@ -114,10 +97,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         }
     }
 
-    // ---------------------------------------------------------------
-    // Step B: receive + validate the id_token the LMS posts back
-    // ---------------------------------------------------------------
-
+    // Step B: receive and validate launch id_token
     @Override
     public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
         return new Endpoint(this, realm, callback, event);
@@ -161,16 +141,13 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         }
     }
 
-    // ---------------------------------------------------------------
-    // Validation + claim extraction
-    // ---------------------------------------------------------------
-
+    // Validation and claim extraction
     @SuppressWarnings("unchecked")
     BrokeredIdentityContext validateAndExtract(String rawIdToken) throws Exception {
         JWSInput jws = jwtValidator.verify(rawIdToken, getConfig().getPlatformJwksUrl());
         Map<String, Object> claims = JsonSerialization.readValue(jws.readContentAsString(), Map.class);
 
-        // --- Required LTI / OIDC claim checks -----------------------------------
+        // Required LTI / OIDC claim checks
         String iss = (String) claims.get("iss");
         if (!getConfig().getPlatformIssuer().equals(iss)) {
             throw new IllegalArgumentException("iss mismatch: expected " + getConfig().getPlatformIssuer() + " got " + iss);
@@ -185,8 +162,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
 
         String messageType = (String) claims.get(CLAIM_MESSAGE_TYPE);
         if (!"LtiResourceLinkRequest".equals(messageType)) {
-            // Deep linking / other LTI message types would need their own handling;
-            // this scaffold only implements the plain resource-link launch.
             throw new IllegalArgumentException("Unsupported LTI message_type: " + messageType);
         }
 
@@ -200,9 +175,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             throw new IllegalArgumentException("deployment_id not allowed: " + deploymentId);
         }
 
-        // NOTE: nonce and exp/iat/state cross-checks against the values stashed in
-        // NOTE_NONCE / the auth session are omitted from this scaffold for brevity -
-        // add them here (reject on mismatch or expiry) before using this in production.
+        // TODO: Validate nonce and exp/iat/state against session
 
         String subject = (String) claims.get(getConfig().getSubjectClaim());
         if (subject == null || subject.isBlank()) {
@@ -223,8 +196,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             identity.setLastName((String) claims.get("family_name"));
         }
 
-        // Stash the raw claims so IdentityProviderMappers can pull LTI roles,
-        // course/context info, etc. into Keycloak roles or user attributes.
+        // Attach claims for identity provider mappers
         identity.getContextData().put("LTI_CLAIMS", claims);
         identity.getContextData().put("LTI_ROLES", claims.get(CLAIM_ROLES));
         identity.getContextData().put("LTI_CONTEXT", claims.get(CLAIM_CONTEXT));

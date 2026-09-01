@@ -21,22 +21,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Exposed at: /realms/{realm}/lti11/launch
- *
- * This IS the "Launch URL" you register with the LMS for a basic LTI 1.1
- * launch - unlike 1.3, there's no separate login-init step: the LMS POSTs
- * the signed launch directly here. We verify the OAuth 1.0a signature,
- * stash the validated claims server-side under a one-time ticket, then hand
- * off into Keycloak's normal broker login via kc_idp_hint so the rest
- * (user create/link, session, tokens) is standard Keycloak behavior.
+ * Resource provider handling LTI 1.1 launches at /realms/{realm}/lti11/launch.
  */
 public class LTI11LaunchResourceProvider implements RealmResourceProvider {
 
     private static final Logger log = Logger.getLogger(LTI11LaunchResourceProvider.class);
 
-    // TTL for the one-time ticket between "launch verified here" and
-    // "consumed by LTI11IdentityProvider.callback()". Keep this short -
-    // it only needs to survive one browser redirect.
+    // TTL for the one-time launch ticket
     static final int TICKET_TTL_SECONDS = 120;
 
     private final KeycloakSession session;
@@ -95,10 +86,9 @@ public class LTI11LaunchResourceProvider implements RealmResourceProvider {
                     .build();
         }
 
-        // Exact URL the LMS signed against - must match what's registered as
-        // the Launch URL with the LMS byte-for-byte (scheme/host/port/path).
+        // Exact URL the LMS signed against
         String requestUrl = uriInfo.getRequestUri().toString();
-        // Strip any query string defensively - the launch URL should not have one.
+        // Strip any query string
         int q = requestUrl.indexOf('?');
         if (q >= 0) requestUrl = requestUrl.substring(0, q);
 
@@ -128,8 +118,7 @@ public class LTI11LaunchResourceProvider implements RealmResourceProvider {
                     .build();
         }
 
-        // Namespace the subject with the consumer key: LTI 1.1 user_id is
-        // only guaranteed stable/unique *within* one consumer.
+        // Namespace subject with consumer key for per-consumer uniqueness
         String namespacedSubject = consumerKey + ":" + userId;
 
         String ticket = UUID.randomUUID().toString();

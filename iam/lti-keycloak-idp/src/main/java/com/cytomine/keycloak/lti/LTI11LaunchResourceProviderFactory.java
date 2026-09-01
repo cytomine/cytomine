@@ -6,8 +6,7 @@ import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resource.RealmResourceProviderFactory;
 
 /**
- * Registers everything under /realms/{realm}/lti11/... (currently just
- * POST /lti11/launch).
+ * Factory for LTI 1.1 realm resource endpoints under /realms/{realm}/lti11.
  */
 public class LTI11LaunchResourceProviderFactory implements RealmResourceProviderFactory {
 

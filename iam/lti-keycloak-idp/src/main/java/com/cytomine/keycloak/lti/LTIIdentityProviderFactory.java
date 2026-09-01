@@ -8,15 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Registers "LTI 1.3" as a selectable Identity Provider type in
- * Admin Console -> Identity Providers -> Add provider.
- *
- * Discovered via META-INF/services/org.keycloak.broker.provider.IdentityProviderFactory
+ * Factory for LTI 1.3 Identity Provider.
  */
 public class LTIIdentityProviderFactory
         extends AbstractIdentityProviderFactory<LTIIdentityProvider> {
 
-    // Shown in the admin console dropdown, and used as the provider "type".
     public static final String PROVIDER_ID = "lti-1p3";
 
     @Override
@@ -39,10 +35,6 @@ public class LTIIdentityProviderFactory
         return new LTIIdentityProviderConfig();
     }
 
-    /**
-     * These become the input fields on the "Add LTI 1.3 provider" form.
-     * Values entered here are what LTIIdentityProviderConfig reads back.
-     */
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
         List<ProviderConfigProperty> props = new ArrayList<>();

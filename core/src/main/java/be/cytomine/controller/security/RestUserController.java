@@ -154,10 +154,10 @@ public class RestUserController extends RestCytomineController {
     @Deprecated
     @GetMapping("/userkey/{publicKey}/keys.json")
     public ResponseEntity<String> keys(@PathVariable String publicKey) {
-        User user = userService.findByPublicKey(publicKey)
+        UserResponse user = userService.findByPublicKey(publicKey)
             .orElseThrow(() -> new ObjectNotFoundException("User", Map.of("publicKey", publicKey).toString()));
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return responseSuccess(JsonObject.of("privateKey", user.getPrivateKey(), "publicKey", user.getPublicKey()));
+        securityACLService.checkIsSameUser(user.id(), currentUserService.getCurrentUser());
+        return responseSuccess(JsonObject.of("privateKey", user.privateKey(), "publicKey", user.publicKey()));
     }
 
     @Deprecated
@@ -425,7 +425,7 @@ public class RestUserController extends RestCytomineController {
         User user = userService.findUser(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
 
-        List<User> friends = new ArrayList<>();
+        List<UserResponse> friends = new ArrayList<>();
 
         if (offlineToo) {
             if (projectId != null) {

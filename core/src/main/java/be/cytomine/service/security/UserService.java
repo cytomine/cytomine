@@ -750,14 +750,14 @@ public class UserService extends ModelService {
     /**
      * Get all online user
      */
-    public List<User> getAllOnlineUsers() {
+    public List<UserResponse> getAllOnlineUsers() {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         //get date with -X secondes
         Date xSecondAgo = DateUtils.addSeconds(new Date(), -300);
         // TODO: could be improve regarding performance...
         List<LastConnection> connections = lastConnectionRepository.findAllByCreatedAfter(xSecondAgo);
         List<Long> userIds = connections.stream().map(LastConnection::getUser).distinct().collect(Collectors.toList());
-        return userRepository.findAllByIdIn(userIds);
+        return userRepository.findAllByIdIn(userIds).stream().map(userMapper::map).toList();
     }
 
     /**
@@ -785,20 +785,20 @@ public class UserService extends ModelService {
     /**
      * Get all user that share at least a same project as user from argument
      */
-    public List<User> getAllFriendsUsers(User user) {
+    public List<UserResponse> getAllFriendsUsers(User user) {
         securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return userRepository.findAllUsersSharingAccessToSameProject(user.getUsername());
+        return userRepository.findAllUsersSharingAccessToSameProject(user.getUsername()).stream().map(userMapper::map)
+            .toList();
     }
 
     /**
      * Get all online user that share at least a same project as user from argument
      */
-    public List<User> getAllFriendsUsersOnline(User user) {
+    public List<UserResponse> getAllFriendsUsersOnline(User user) {
         securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        List<User> friends = getAllFriendsUsers(user);
-        List<User> friendsOnline =
-            getAllOnlineUsers().stream().distinct().filter(friends::contains).collect(Collectors.toList());
-        return friendsOnline;
+        List<UserResponse> friends = getAllFriendsUsers(user);
+        return getAllOnlineUsers().stream().distinct().filter(friends::contains).map(userMapper::map)
+            .collect(Collectors.toList());
     }
 
     /**

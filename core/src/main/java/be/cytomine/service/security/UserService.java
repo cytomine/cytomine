@@ -523,8 +523,7 @@ public class UserService extends ModelService {
         String select = "select distinct user ";
         String from =
             "from ProjectRepresentativeUser r right outer join User user ON (r.userId = user.id and r.project.id = "
-                + project.getId() + "), "
-                + "AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid ";
+                + project.getId() + "), " + "AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid ";
         String where =
             "where aclObjectId.objectId = " + project.getId() + " " + "and aclEntry.aclObjectIdentity = aclObjectId "
                 + "and aclEntry.sid = aclSid " + "and aclSid.sid = user.username ";
@@ -546,8 +545,9 @@ public class UserService extends ModelService {
         }
 
         if (projectRoleSearch.isPresent()) {
-            List<String> roles = (projectRoleSearch.get().getValue() instanceof String) ? List.of(
-                (String) projectRoleSearch.get().getValue()) : (List<String>) projectRoleSearch.get().getValue();
+            List<String> roles = (projectRoleSearch.get().getValue() instanceof String) ?
+                List.of((String) projectRoleSearch.get().getValue()) :
+                (List<String>) projectRoleSearch.get().getValue();
             having += " HAVING MAX(CASE WHEN r.id IS NOT NULL THEN 'representative' "
                 + "WHEN aclEntry.mask = 16 THEN 'manager' " + "ELSE 'contributor' END) IN (" + roles.stream()
                 .map(x -> "'" + x + "'").collect(Collectors.joining(",")) + ")";
@@ -664,8 +664,7 @@ public class UserService extends ModelService {
         }
 
         boolean isProjectMember = humanUsers.stream().anyMatch(u -> u.id() == currentUser.id());
-        boolean hasOwnLayer = layersFormatted.stream()
-            .anyMatch(x -> x.getJSONAttrLong("id").equals(currentUser.id()));
+        boolean hasOwnLayer = layersFormatted.stream().anyMatch(x -> x.getJSONAttrLong("id").equals(currentUser.id()));
         if (isProjectMember && !hasOwnLayer) {
             layersFormatted.add(userMapper.map(currentUser).toJsonObject(urlApi));
         }
@@ -676,7 +675,7 @@ public class UserService extends ModelService {
     public List<JsonObject> getAllOnlineUserWithTheirPositions(Project project) {
         //Get all project user online
         List<Long> usersId = this.getAllFriendsUsersOnline(currentUserService.getCurrentUserOld(), project).stream()
-            .map(CytomineDomain::getId).collect(Collectors.toList());
+            .map(UserResponse::id).collect(Collectors.toList());
         List<JsonObject> usersWithPosition = userPositionService.findUsersPositions(project);
         usersId.removeAll(usersWithPosition.stream().map(JsonObject::getId).toList());
 
@@ -713,7 +712,7 @@ public class UserService extends ModelService {
 
     public List<JsonObject> getUsersWithLastActivities(Project project) {
         List<JsonObject> results = new ArrayList<>();
-        List<User> users = listUsers(project).stream().sorted(Comparator.comparing(CytomineDomain::getId)).toList();
+        List<UserResponse> users = listUsers(project).stream().sorted(Comparator.comparing(UserResponse::id)).toList();
 
         Map<Long, JsonObject> connections =
             projectConnectionService.lastConnectionInProject(project, null, "user", "asc", 0L, 0L).stream()
@@ -725,17 +724,16 @@ public class UserService extends ModelService {
             imageConsultationService.lastImageOfUsersByProject(project, null, "user", "asc", 0L, 0L).stream()
                 .collect(Collectors.toMap(x -> x.getJSONAttrLong("user"), Function.identity()));
 
-        for (User user : users) {
+        for (UserResponse user : users) {
             if (user != null) {
-                JsonObject image = images.get(user.getId());
-                JsonObject connection = connections.get(user.getId());
-                JsonObject frequency = frequencies.get(user.getId());
+                JsonObject image = images.get(user.id());
+                JsonObject connection = connections.get(user.id());
+                JsonObject frequency = frequencies.get(user.id());
 
                 JsonObject jsonObject = new JsonObject();
-                jsonObject.put("id", user.getId());
-                jsonObject.put("username", user.getUsername());
-                jsonObject.put("name", user.getName());
-                jsonObject.put("fullName", user.getFullName());
+                jsonObject.put("id", user.id());
+                jsonObject.put("username", user.username());
+                jsonObject.put("name", user.name());
                 jsonObject.put("lastImageId", (image != null ? image.get("image") : null));
                 jsonObject.put("lastImageName", (image != null ? image.get("imageName") : null));
                 jsonObject.put("lastConnection", (connection != null ? connection.get("created") : null));
@@ -797,17 +795,16 @@ public class UserService extends ModelService {
     public List<UserResponse> getAllFriendsUsersOnline(User user) {
         securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
         List<UserResponse> friends = getAllFriendsUsers(user);
-        return getAllOnlineUsers().stream().distinct().filter(friends::contains).map(userMapper::map)
-            .collect(Collectors.toList());
+        return getAllOnlineUsers().stream().distinct().filter(friends::contains).toList();
     }
 
     /**
      * Get all user that share at least a same project as user from argument and
      */
-    public List<User> getAllFriendsUsersOnline(User user, Project project) {
+    public List<UserResponse> getAllFriendsUsersOnline(User user, Project project) {
         securityACLService.check(project, READ);
         //no need to make insterect because getAllOnlineUsers(project) contains only friends users
-        return getAllOnlineUsers(project);
+        return getAllOnlineUsers(project).stream().map(userMapper::map).toList();
     }
 
     public User regenerateKeys(User user) {
@@ -835,8 +832,7 @@ public class UserService extends ModelService {
                 List.of(json.getJSONAttrStr("role").substring(5)));
 
             accountService.createAccount(account);
-            CommandResponse response = executeCommand(new AddCommand(currentUser.id()), null,
-                json);
+            CommandResponse response = executeCommand(new AddCommand(currentUser.id()), null, json);
 
             return response;
         }
@@ -1044,7 +1040,8 @@ public class UserService extends ModelService {
     public void deleteDependentProjectRepresentativeUser(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
             for (ProjectRepresentativeUser projectRepresentativeUser :
-                projectRepresentativeUserRepository.findAllByUserId(user.getId())) {
+                projectRepresentativeUserRepository.findAllByUserId(
+                    user.getId())) {
                 projectRepresentativeUserService.delete(projectRepresentativeUser, transaction, null, false);
             }
         }

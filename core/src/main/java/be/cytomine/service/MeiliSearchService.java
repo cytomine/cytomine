@@ -140,7 +140,8 @@ public class MeiliSearchService {
             List<String> filters = (projectDatasetAlias != null && !projectDatasetAlias.isBlank())
                 ? List.of("dataset.alias:" + projectDatasetAlias)
                 : List.of();
-
+            List<String> filters = 
+                projectDatasetAlias.filter(p -> !p.isBlank()).map(p -> "dataset.alias:" + p).stream().toList();
             SearchRequest searchRequest = buildSearchRequest(null, filters)
                 .setFacets(attributes)
                 .setLimit(0);

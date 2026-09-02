@@ -3,6 +3,7 @@ package be.cytomine.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -137,9 +138,7 @@ public class MeiliSearchService {
         Index index = getIndexOrThrow(indexId);
         try {
             String[] attributes = index.getFilterableAttributesSettings();
-            List<String> filters = (projectDatasetAlias != null && !projectDatasetAlias.isBlank())
-                ? List.of("dataset.alias:" + projectDatasetAlias)
-                : List.of();
+
             List<String> filters = 
                 projectDatasetAlias.filter(p -> !p.isBlank()).map(p -> "dataset.alias:" + p).stream().toList();
             SearchRequest searchRequest = buildSearchRequest(null, filters)

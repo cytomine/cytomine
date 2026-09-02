@@ -1,6 +1,7 @@
 package be.cytomine.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
@@ -60,8 +61,7 @@ public class MeiliSearchController {
         @RequestParam Optional<String> project
     ) {
 
-        MeiliSearchFacetsResponse facets = meiliSearchService.getFacetDistribution(project);
-        return ResponseEntity.ok(facets);
+        return meiliSearchService.getFacetDistribution(project);
 
     }
 }

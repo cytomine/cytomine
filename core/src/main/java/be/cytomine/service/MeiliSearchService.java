@@ -132,7 +132,7 @@ public class MeiliSearchService {
         }
     }
 
-    public MeiliSearchFacetsResponse getFacetDistribution(String projectDatasetAlias) {
+    public MeiliSearchFacetsResponse getFacetDistribution(Optional<String> projectDatasetAlias) {
 
         Index index = getIndexOrThrow(indexId);
         try {

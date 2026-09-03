@@ -641,16 +641,16 @@ public class UserService extends ModelService {
      * List all layers from a project Each user has its own layer If project has private layer, just get current user
      * layer
      */
-    public List<JsonObject> listLayers(Project project) {
+    public List<UserResponse> listLayers(Project project) {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(project, READ, currentUser);
 
         List<UserResponse> humanAdmins = listAdmins(project);
         List<UserResponse> humanUsers = listUsers(project);
 
-        List<JsonObject> humanUsersFormatted = humanUsers.stream().map(u -> u.toJsonObject(urlApi)).toList();
+        List<UserResponse> humanUsersFormatted = humanUsers.stream().toList();
 
-        List<JsonObject> layersFormatted = new ArrayList<>();
+        List<UserResponse> layersFormatted = new ArrayList<>();
 
         if (permissionService.hasACLPermission(project, ADMINISTRATION, currentRoleService.isAdminByNow(currentUser))
             || (!project.isHideAdminsLayers() && !project.isHideUsersLayers())) {
@@ -658,15 +658,15 @@ public class UserService extends ModelService {
         } else if (project.isHideAdminsLayers() && !project.isHideUsersLayers()) {
             Set<Long> humanAdminsIds = humanAdmins.stream().map(UserResponse::id).collect(Collectors.toSet());
             layersFormatted.addAll(
-                humanUsersFormatted.stream().filter(x -> !humanAdminsIds.contains(x.getJSONAttrLong("id"))).toList());
+                humanUsersFormatted.stream().filter(x -> !humanAdminsIds.contains(x.id())).toList());
         } else if (!project.isHideAdminsLayers()) {
-            layersFormatted.addAll(humanAdmins.stream().map(u -> u.toJsonObject(urlApi)).toList());
+            layersFormatted.addAll(humanAdmins.stream().toList());
         }
 
         boolean isProjectMember = humanUsers.stream().anyMatch(u -> u.id() == currentUser.id());
-        boolean hasOwnLayer = layersFormatted.stream().anyMatch(x -> x.getJSONAttrLong("id").equals(currentUser.id()));
+        boolean hasOwnLayer = layersFormatted.stream().anyMatch(x -> x.id()==currentUser.id());
         if (isProjectMember && !hasOwnLayer) {
-            layersFormatted.add(userMapper.map(currentUser).toJsonObject(urlApi));
+            layersFormatted.add(currentUser);
         }
 
         return layersFormatted;

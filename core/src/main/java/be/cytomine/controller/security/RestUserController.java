@@ -483,14 +483,14 @@ public class RestUserController extends RestCytomineController {
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        List<User> projectUsers = userService.listUsers(project);
+        List<UserResponse> projectUsers = userService.listUsers(project);
         List<Map<String, Object>> users = new ArrayList<>();
 
-        for (User user : projectUsers) {
+        for (UserResponse user : projectUsers) {
             if (user != null) {
                 users.add(Map.of(
-                        "username", user.getUsername(),
-                        "name", user.getName()
+                        "username", user.username(),
+                        "name", user.name()
                     )
                 );
             }

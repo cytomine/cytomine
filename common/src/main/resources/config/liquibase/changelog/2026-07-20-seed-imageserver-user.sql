@@ -32,19 +32,25 @@ AND sid.sid = 'ImageServer1'
 AND NOT EXISTS (SELECT 1 FROM acl_object_identity aoi WHERE aoi.object_id_class = c.id AND aoi.object_id_identity = s.id);
 
 INSERT INTO acl_entry (id, ace_order, acl_object_identity, audit_failure, audit_success, granting, mask, sid)
-SELECT nextval('hibernate_sequence'), 0, aoi.id, false, false, true, 1, sid.id
+SELECT nextval('hibernate_sequence'),
+       COALESCE((SELECT MAX(ae2.ace_order) + 1 FROM acl_entry ae2 WHERE ae2.acl_object_identity = aoi.id), 0),
+       aoi.id, false, false, true, 1, sid.id
 FROM acl_object_identity aoi, storage s, acl_sid sid
 WHERE aoi.object_id_identity = s.id AND s.name = 'ImageServer1 storage' AND sid.sid = 'ImageServer1'
 AND NOT EXISTS (SELECT 1 FROM acl_entry ae WHERE ae.acl_object_identity = aoi.id AND ae.sid = sid.id AND ae.mask = 1);
 
 INSERT INTO acl_entry (id, ace_order, acl_object_identity, audit_failure, audit_success, granting, mask, sid)
-SELECT nextval('hibernate_sequence'), 1, aoi.id, false, false, true, 2, sid.id
+SELECT nextval('hibernate_sequence'),
+       COALESCE((SELECT MAX(ae2.ace_order) + 1 FROM acl_entry ae2 WHERE ae2.acl_object_identity = aoi.id), 0),
+       aoi.id, false, false, true, 2, sid.id
 FROM acl_object_identity aoi, storage s, acl_sid sid
 WHERE aoi.object_id_identity = s.id AND s.name = 'ImageServer1 storage' AND sid.sid = 'ImageServer1'
 AND NOT EXISTS (SELECT 1 FROM acl_entry ae WHERE ae.acl_object_identity = aoi.id AND ae.sid = sid.id AND ae.mask = 2);
 
 INSERT INTO acl_entry (id, ace_order, acl_object_identity, audit_failure, audit_success, granting, mask, sid)
-SELECT nextval('hibernate_sequence'), 2, aoi.id, false, false, true, 16, sid.id
+SELECT nextval('hibernate_sequence'),
+       COALESCE((SELECT MAX(ae2.ace_order) + 1 FROM acl_entry ae2 WHERE ae2.acl_object_identity = aoi.id), 0),
+       aoi.id, false, false, true, 16, sid.id
 FROM acl_object_identity aoi, storage s, acl_sid sid
 WHERE aoi.object_id_identity = s.id AND s.name = 'ImageServer1 storage' AND sid.sid = 'ImageServer1'
 AND NOT EXISTS (SELECT 1 FROM acl_entry ae WHERE ae.acl_object_identity = aoi.id AND ae.sid = sid.id AND ae.mask = 16);

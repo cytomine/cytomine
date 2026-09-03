@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.KeysResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.security.ApiKeyFilter;
@@ -153,11 +154,11 @@ public class RestUserController extends RestCytomineController {
      **/
     @Deprecated
     @GetMapping("/userkey/{publicKey}/keys.json")
-    public ResponseEntity<String> keys(@PathVariable String publicKey) {
+    public KeysResponse keys(@PathVariable String publicKey) {
         UserResponse user = userService.findByPublicKey(publicKey)
             .orElseThrow(() -> new ObjectNotFoundException("User", Map.of("publicKey", publicKey).toString()));
         securityACLService.checkIsSameUser(user.id(), currentUserService.getCurrentUser());
-        return responseSuccess(JsonObject.of("privateKey", user.privateKey(), "publicKey", user.publicKey()));
+        return new KeysResponse(user.privateKey().orElse(null), user.publicKey().orElse(null));
     }
 
     @Deprecated
@@ -490,14 +491,14 @@ public class RestUserController extends RestCytomineController {
             if (user != null) {
                 users.add(Map.of(
                         "username", user.username(),
-                        "name", user.name()
+                        "name", user.name().orElse("")
                     )
                 );
             }
-
-            byte[] report = reportService.generateUsersReport(project.getName(), users, format);
-            responseReportFile(reportService.getUsersReportFileName(format, projectId), report, format);
         }
+
+        byte[] report = reportService.generateUsersReport(project.getName(), users, format);
+        responseReportFile(reportService.getUsersReportFileName(format, projectId), report, format);
     }
 
     @GetMapping("/project/{project}/resumeActivity/{user}.json")

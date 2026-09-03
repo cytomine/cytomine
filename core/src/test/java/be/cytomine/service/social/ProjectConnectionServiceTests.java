@@ -280,12 +280,14 @@ public class ProjectConnectionServiceTests {
         givenALastConnection(user, projet);
 
         Page<PersistentProjectConnection> results =
-            projectConnectionService.getConnectionByUserAndProject(builder.getUserEntity(user.username()), projet, 50, 0);
+            projectConnectionService.getConnectionByUserAndProject(builder.getUserEntity(user.username()), projet, 50,
+                0);
         assertThat(results).isNotEmpty();
         assertThat(results.getContent().get(0).getUser()).isEqualTo(user.id());
         assertThat(results.getContent().get(0).getExtraProperties()).containsEntry("online", true);
 
-        results = projectConnectionService.getConnectionByUserAndProject(builder.getUserEntity(anotherUser.username()), projet,
+        results = projectConnectionService.getConnectionByUserAndProject(builder.getUserEntity(anotherUser.username()),
+            projet,
             50, 0);
         assertThat(results).isNotEmpty();
         assertThat(results.getContent().get(0).getUser()).isEqualTo(anotherUser.id());

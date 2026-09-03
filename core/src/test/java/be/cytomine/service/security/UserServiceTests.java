@@ -807,7 +807,8 @@ public class UserServiceTests {
     void listStorageUsers() {
         Storage storage = builder.givenAStorage(builder.givenSuperAdmin());
 
-        assertThat(userService.listUsers(storage)).contains(builder.getUserEntity(builder.givenSuperAdmin().username()));
+        assertThat(userService.listUsers(storage)).contains(
+            builder.getUserEntity(builder.givenSuperAdmin().username()));
     }
 
     @Test
@@ -920,7 +921,8 @@ public class UserServiceTests {
         Project anotherProject = builder.givenAProject();
 
         givenALastConnection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
-        givenALastConnection(builder.getUserEntity(userOnline.username()), project.getId(), DateUtils.addSeconds(new Date(), -15));
+        givenALastConnection(builder.getUserEntity(userOnline.username()), project.getId(),
+            DateUtils.addSeconds(new Date(), -15));
         givenALastConnection(
             userOnlineButOnDifferentProject,
             anotherProject.getId(),
@@ -1031,7 +1033,8 @@ public class UserServiceTests {
         Project anotherProject = builder.givenAProject();
 
         givenALastConnection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
-        givenALastConnection(builder.getUserEntity(userOnline.username()), project.getId(), DateUtils.addSeconds(new Date(), -15));
+        givenALastConnection(builder.getUserEntity(userOnline.username()), project.getId(),
+            DateUtils.addSeconds(new Date(), -15));
         givenALastConnection(
             userOnlineButOnDifferentProject,
             anotherProject.getId(),
@@ -1098,7 +1101,8 @@ public class UserServiceTests {
             DateUtils.addSeconds(new Date(), -15)
         );
 
-        givenAPersistentImageConsultation(builder.getUserEntity(userOnline.username()), builder.givenAnImageInstance(project),
+        givenAPersistentImageConsultation(builder.getUserEntity(userOnline.username()),
+            builder.givenAnImageInstance(project),
             new Date());
 
         JsonObject data = userService.getResumeActivities(project, userOnline);

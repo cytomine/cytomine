@@ -545,9 +545,9 @@ public class UserService extends ModelService {
         }
 
         if (projectRoleSearch.isPresent()) {
-            List<String> roles = (projectRoleSearch.get().getValue() instanceof String) ?
-                List.of((String) projectRoleSearch.get().getValue()) :
-                (List<String>) projectRoleSearch.get().getValue();
+            List<String> roles = (projectRoleSearch.get().getValue() instanceof String)
+                ? List.of((String) projectRoleSearch.get().getValue())
+                : (List<String>) projectRoleSearch.get().getValue();
             having += " HAVING MAX(CASE WHEN r.id IS NOT NULL THEN 'representative' "
                 + "WHEN aclEntry.mask = 16 THEN 'manager' " + "ELSE 'contributor' END) IN (" + roles.stream()
                 .map(x -> "'" + x + "'").collect(Collectors.joining(",")) + ")";
@@ -664,7 +664,7 @@ public class UserService extends ModelService {
         }
 
         boolean isProjectMember = humanUsers.stream().anyMatch(u -> u.id() == currentUser.id());
-        boolean hasOwnLayer = layersFormatted.stream().anyMatch(x -> x.id()==currentUser.id());
+        boolean hasOwnLayer = layersFormatted.stream().anyMatch(x -> x.id() == currentUser.id());
         if (isProjectMember && !hasOwnLayer) {
             layersFormatted.add(currentUser);
         }

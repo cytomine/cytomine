@@ -73,7 +73,8 @@ public class ReviewedAnnotationAuthorizationTest extends CRUDAuthorizationTest {
         annotation.setImage(this.reviewedAnnotation.getImage());
         annotation.setProject(this.reviewedAnnotation.getProject());
         annotation.getImage().setReviewStart(new Date());
-        annotation.getImage().setReviewUser(builder.getUserEntity(builder.givenSuperAdmin().username())); // someone else
+        annotation.getImage()
+            .setReviewUser(builder.getUserEntity(builder.givenSuperAdmin().username())); // someone else
         Assertions.assertThrows(
             WrongArgumentException.class,
             () -> reviewedAnnotationService.reviewAnnotation(annotation.getId(), null)

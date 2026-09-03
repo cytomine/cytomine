@@ -190,7 +190,7 @@ public class PropertyServiceTests {
         ));
 
         List<Map<String, Object>> results = propertyService.listAnnotationCenterPosition(
-            builder.getUserEntity(user),
+            builder.getUserEntity(user.username()),
             imageInstance,
             GeometryUtils.createBoundingBox("0,0,1000,1000"),
             "TestCytomine"

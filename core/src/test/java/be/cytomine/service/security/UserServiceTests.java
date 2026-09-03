@@ -760,13 +760,13 @@ public class UserServiceTests {
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.getUserEntity(USER_ACL_READ);
-        builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
-        builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
+        UserResponse anotherUser = builder.givenUserAclRead();
+        builder.addUserToProject(projectWhereUserIsMissing, anotherUser.username(), WRITE);
+        builder.addUserToProject(projectWithTwoUsers, anotherUser.username(), WRITE);
 
-        assertThat(userService.listAdmins(projectWhereUserIsManager)).contains(builder.getUserEntity(user))
+        assertThat(userService.listAdmins(projectWhereUserIsManager)).contains(user)
             .doesNotContain(anotherUser);
-        assertThat(userService.listAdmins(projectWhereUserIsContributor)).doesNotContain(builder.getUserEntity(user));
+        assertThat(userService.listAdmins(projectWhereUserIsContributor)).doesNotContain(user);
     }
 
     @Test
@@ -782,15 +782,15 @@ public class UserServiceTests {
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.getUserEntity(USER_ACL_READ);
-        builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
-        builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
+        UserResponse anotherUser = builder.givenUserAclRead();
+        builder.addUserToProject(projectWhereUserIsMissing, anotherUser.username(), WRITE);
+        builder.addUserToProject(projectWithTwoUsers, anotherUser.username(), WRITE);
 
-        assertThat(userService.listUsers(projectWhereUserIsManager)).contains(builder.getUserEntity(user))
+        assertThat(userService.listUsers(projectWhereUserIsManager)).contains(user)
             .doesNotContain(anotherUser);
-        assertThat(userService.listUsers(projectWhereUserIsContributor)).contains(builder.getUserEntity(user))
+        assertThat(userService.listUsers(projectWhereUserIsContributor)).contains(user)
             .doesNotContain(anotherUser);
-        assertThat(userService.listUsers(projectWithTwoUsers)).contains(builder.getUserEntity(user), anotherUser);
+        assertThat(userService.listUsers(projectWithTwoUsers)).contains(user, anotherUser);
     }
 
     @Test
@@ -800,14 +800,14 @@ public class UserServiceTests {
         Project projectWhereUserIsManager = builder.givenAProject();
         builder.addUserToProject(projectWhereUserIsManager, "superadmin", ADMINISTRATION);
 
-        assertThat(userService.findCreator(projectWhereUserIsManager)).contains(builder.getUserEntity(user));
+        assertThat(userService.findCreator(projectWhereUserIsManager)).contains(builder.getUserEntity(user.username()));
     }
 
     @Test
     void listStorageUsers() {
         Storage storage = builder.givenAStorage(builder.givenSuperAdmin());
 
-        assertThat(userService.listUsers(storage)).contains(builder.getUserEntity(builder.givenSuperAdmin()));
+        assertThat(userService.listUsers(storage)).contains(builder.getUserEntity(builder.givenSuperAdmin().username()));
     }
 
     @Test
@@ -818,7 +818,7 @@ public class UserServiceTests {
 
         builder.addUserToProject(project, "superadmin", WRITE);
 
-        assertThat(userService.listAll(project)).contains(builder.getUserEntity(user));
+        assertThat(userService.listAll(project)).contains(user);
     }
 
     @Test
@@ -834,7 +834,7 @@ public class UserServiceTests {
 
         assertThat(userService.listLayers(project)
             .stream()
-            .map(x -> x.getJSONAttrLong("id")))
+            .map(UserResponse::id))
             .contains(user.id(), anotherUserInProject.getId())
             .doesNotContain(anotherUserNotInProject.getId());
     }
@@ -853,7 +853,7 @@ public class UserServiceTests {
 
         assertThat(userService.listLayers(project)
             .stream()
-            .map(x -> x.getJSONAttrLong("id")))
+            .map(UserResponse::id))
             .hasSize(1)
             .contains(user.id())
             .doesNotContain(adminInProject.getId());
@@ -873,7 +873,7 @@ public class UserServiceTests {
 
         assertThat(userService.listLayers(project)
             .stream()
-            .map(x -> x.getJSONAttrLong("id")))
+            .map(UserResponse::id))
             .hasSize(1)
             .contains(user.id())
             .doesNotContain(userInProject.getId());
@@ -893,7 +893,7 @@ public class UserServiceTests {
 
         assertThat(userService.listLayers(project)
             .stream()
-            .map(x -> x.getJSONAttrLong("id")))
+            .map(UserResponse::id))
             .hasSize(2)
             .contains(user.id(), userInProject.getId());
     }
@@ -901,12 +901,12 @@ public class UserServiceTests {
     @Test
     void listOnlineUser() {
         UserResponse userOnline = builder.givenAclUserNoAcl();
-        User userOffline = builder.getUserEntity(USER_ACL_READ);
+        UserResponse userOffline = builder.givenUserAclRead();
 
         assertThat(userService.getAllOnlineUsers()).isEmpty();
-        givenALastConnection(builder.getUserEntity(userOnline), null, new Date());
+        givenALastConnection(builder.getUserEntity(userOnline.username()), null, new Date());
 
-        assertThat(userService.getAllOnlineUsers()).contains(builder.getUserEntity(userOnline))
+        assertThat(userService.getAllOnlineUsers()).contains(userOnline)
             .doesNotContain(userOffline);
     }
 
@@ -920,7 +920,7 @@ public class UserServiceTests {
         Project anotherProject = builder.givenAProject();
 
         givenALastConnection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
-        givenALastConnection(builder.getUserEntity(userOnline), project.getId(), DateUtils.addSeconds(new Date(), -15));
+        givenALastConnection(builder.getUserEntity(userOnline.username()), project.getId(), DateUtils.addSeconds(new Date(), -15));
         givenALastConnection(
             userOnlineButOnDifferentProject,
             anotherProject.getId(),
@@ -929,22 +929,22 @@ public class UserServiceTests {
 
         assertThat(userService.getAllOnlineUserIds(project)).contains(userOnline.id())
             .doesNotContain(userOnlineButOnDifferentProject.getId(), userOffline.getId());
-        assertThat(userService.getAllOnlineUsers(project)).contains(builder.getUserEntity(userOnline))
+        assertThat(userService.getAllOnlineUsers(project)).contains(builder.getUserEntity(userOnline.username()))
             .doesNotContain(userOnlineButOnDifferentProject, userOffline);
     }
 
     @Test
     void listFriendUsers() {
         UserResponse user = builder.givenAclUserNoAcl();
-        User userFriend = builder.getUserEntity(USER_ACL_READ);
-        User userNotFriend = builder.getUserEntity(USER_ACL_WRITE);
+        UserResponse userFriend = builder.givenUserAclRead();
+        UserResponse userNotFriend = builder.givenUserAclWrite();
 
         Project project = builder.givenAProject();
 
         builder.addUserToProject(project, user.username(), READ);
-        builder.addUserToProject(project, userFriend.getUsername(), READ);
+        builder.addUserToProject(project, userFriend.username(), READ);
 
-        assertThat(userService.getAllFriendsUsers(builder.getUserEntity(user))).contains(userFriend)
+        assertThat(userService.getAllFriendsUsers(builder.getUserEntity(user.username()))).contains(userFriend)
             .doesNotContain(userNotFriend);
     }
 
@@ -963,8 +963,9 @@ public class UserServiceTests {
         givenALastConnection(userFriendOffline, project.getId(), DateUtils.addDays(new Date(), -15));
         givenALastConnection(userFriendOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
 
-        assertThat(userService.getAllFriendsUsersOnline(builder.getUserEntity(user))).contains(userFriendOnline)
-            .doesNotContain(userFriendOffline);
+        assertThat(userService.getAllFriendsUsersOnline(builder.getUserEntity(user.username())))
+            .contains(builder.givenUserAclRead())
+            .doesNotContain(builder.givenUserAclWrite());
     }
 
     @Test
@@ -986,9 +987,9 @@ public class UserServiceTests {
         );
         givenALastConnection(userFriendOnline, project.getId(), DateUtils.addSeconds(new Date(), -15));
 
-        assertThat(userService.getAllFriendsUsersOnline(builder.getUserEntity(user),
-            project)).contains(userFriendOnline)
-            .doesNotContain(userFriendOnlineButOnAnotherProject);
+        assertThat(userService.getAllFriendsUsersOnline(builder.getUserEntity(user.username()), project))
+            .contains(builder.givenUserAclRead())
+            .doesNotContain(builder.givenUserAclWrite());
     }
 
     @Test
@@ -1000,13 +1001,13 @@ public class UserServiceTests {
         builder.addUserToProject(project, userOnline.username());
 
         PersistentProjectConnection lastConnection = givenAPersistentConnectionInProject(
-            builder.getUserEntity(userOnline),
+            builder.getUserEntity(userOnline.username()),
             project,
             DateUtils.addSeconds(new Date(), -15)
         );
 
         PersistentImageConsultation consultation = givenAPersistentImageConsultation(
-            builder.getUserEntity(userOnline),
+            builder.getUserEntity(userOnline.username()),
             builder.givenAnImageInstance(project),
             new Date()
         );
@@ -1030,7 +1031,7 @@ public class UserServiceTests {
         Project anotherProject = builder.givenAProject();
 
         givenALastConnection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
-        givenALastConnection(builder.getUserEntity(userOnline), project.getId(), DateUtils.addSeconds(new Date(), -15));
+        givenALastConnection(builder.getUserEntity(userOnline.username()), project.getId(), DateUtils.addSeconds(new Date(), -15));
         givenALastConnection(
             userOnlineButOnDifferentProject,
             anotherProject.getId(),
@@ -1038,7 +1039,7 @@ public class UserServiceTests {
         );
 
         givenAPersistentUserPosition(
-            DateUtils.addSeconds(new Date(), -15), builder.getUserEntity(userOnline),
+            DateUtils.addSeconds(new Date(), -15), builder.getUserEntity(userOnline.username()),
             builder.givenANotPersistedSliceInstance(
                 builder.givenAnImageInstance(project),
                 builder.givenAnAbstractSlice()
@@ -1087,17 +1088,17 @@ public class UserServiceTests {
         builder.addUserToProject(project, userOnline.username());
 
         PersistentProjectConnection firstConnection = givenAPersistentConnectionInProject(
-            builder.getUserEntity(userOnline),
+            builder.getUserEntity(userOnline.username()),
             project,
             DateUtils.addDays(new Date(), -15)
         );
         PersistentProjectConnection lastConnection = givenAPersistentConnectionInProject(
-            builder.getUserEntity(userOnline),
+            builder.getUserEntity(userOnline.username()),
             project,
             DateUtils.addSeconds(new Date(), -15)
         );
 
-        givenAPersistentImageConsultation(builder.getUserEntity(userOnline), builder.givenAnImageInstance(project),
+        givenAPersistentImageConsultation(builder.getUserEntity(userOnline.username()), builder.givenAnImageInstance(project),
             new Date());
 
         JsonObject data = userService.getResumeActivities(project, userOnline);

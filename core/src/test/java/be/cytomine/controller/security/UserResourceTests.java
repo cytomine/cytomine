@@ -882,7 +882,7 @@ public class UserResourceTests {
             .andExpect(jsonPath("$.collection[0].id").value(userOnline.id()))
             .andExpect(jsonPath("$.collection[0].username").value(userOnline.username()))
             .andExpect(jsonPath("$.collection[0].name").value(userOnline.name().orElse(null)))
-            .andExpect(jsonPath("$.collection[0].fullName").value(builder.getUserEntity(userOnline).getFullName()))
+            .andExpect(jsonPath("$.collection[0].fullName").value(builder.getUserEntity(userOnline.username()).getFullName()))
             .andExpect(jsonPath("$.collection[0].lastImageId").value(consultation.getImage()))
             .andExpect(jsonPath("$.collection[0].lastImageName").hasJsonPath())
             .andExpect(jsonPath("$.collection[0].lastConnection").value(lastConnection.getCreated().getTime()))

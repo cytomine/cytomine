@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.KeysResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.security.ApiKeyFilter;
@@ -153,11 +154,11 @@ public class RestUserController extends RestCytomineController {
      **/
     @Deprecated
     @GetMapping("/userkey/{publicKey}/keys.json")
-    public ResponseEntity<String> keys(@PathVariable String publicKey) {
-        User user = userService.findByPublicKey(publicKey)
+    public KeysResponse keys(@PathVariable String publicKey) {
+        UserResponse user = userService.findByPublicKey(publicKey)
             .orElseThrow(() -> new ObjectNotFoundException("User", Map.of("publicKey", publicKey).toString()));
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return responseSuccess(JsonObject.of("privateKey", user.getPrivateKey(), "publicKey", user.getPublicKey()));
+        securityACLService.checkIsSameUser(user.id(), currentUserService.getCurrentUser());
+        return new KeysResponse(user.privateKey().orElse(null), user.publicKey().orElse(null));
     }
 
     @Deprecated
@@ -425,7 +426,7 @@ public class RestUserController extends RestCytomineController {
         User user = userService.findUser(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
 
-        List<User> friends = new ArrayList<>();
+        List<UserResponse> friends;
 
         if (offlineToo) {
             if (projectId != null) {
@@ -483,21 +484,21 @@ public class RestUserController extends RestCytomineController {
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        List<User> projectUsers = userService.listUsers(project);
+        List<UserResponse> projectUsers = userService.listUsers(project);
         List<Map<String, Object>> users = new ArrayList<>();
 
-        for (User user : projectUsers) {
+        for (UserResponse user : projectUsers) {
             if (user != null) {
                 users.add(Map.of(
-                        "username", user.getUsername(),
-                        "name", user.getName()
+                        "username", user.username(),
+                        "name", user.name().orElse("")
                     )
                 );
             }
-
-            byte[] report = reportService.generateUsersReport(project.getName(), users, format);
-            responseReportFile(reportService.getUsersReportFileName(format, projectId), report, format);
         }
+
+        byte[] report = reportService.generateUsersReport(project.getName(), users, format);
+        responseReportFile(reportService.getUsersReportFileName(format, projectId), report, format);
     }
 
     @GetMapping("/project/{project}/resumeActivity/{user}.json")

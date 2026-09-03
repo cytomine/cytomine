@@ -734,6 +734,7 @@ public class UserService extends ModelService {
                 jsonObject.put("id", user.id());
                 jsonObject.put("username", user.username());
                 jsonObject.put("name", user.name());
+                jsonObject.put("fullName", user.fullName());
                 jsonObject.put("lastImageId", (image != null ? image.get("image") : null));
                 jsonObject.put("lastImageName", (image != null ? image.get("imageName") : null));
                 jsonObject.put("lastConnection", (connection != null ? connection.get("created") : null));

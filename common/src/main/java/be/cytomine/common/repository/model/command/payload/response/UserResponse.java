@@ -28,7 +28,7 @@ public record UserResponse(long id, String username, String email, Optional<Stri
     }
 
     public Optional<String> fullName() {
-        return Optional.of(firstname.map(f -> f + " ").orElse("") + lastname.orElse("")).filter(p -> !p.isBlank());
+        return name.map(n -> n.equals(username) ? username : n + " (" + username + ")");
     }
 
     @Override

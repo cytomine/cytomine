@@ -426,7 +426,7 @@ public class RestUserController extends RestCytomineController {
         User user = userService.findUser(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
 
-        List<UserResponse> friends = new ArrayList<>();
+        List<UserResponse> friends;
 
         if (offlineToo) {
             if (projectId != null) {

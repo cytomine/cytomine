@@ -1,21 +1,6 @@
 package be.cytomine.domain.meta;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
@@ -28,6 +13,7 @@ import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.GenericCytomineDomainContainer;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -44,7 +30,18 @@ public class TagDomainAssociation extends CytomineDomain {
     private String domainClassName;
 
     @NotNull
+    @Column(name = "domain_id")
     private Long domainIdent;
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        TagDomainAssociation tagDomainAssocitation = (TagDomainAssociation) domain;
+        returnArray.put("domainIdent", tagDomainAssocitation.getDomainIdent());
+        returnArray.put("domainClassName", tagDomainAssocitation.getDomainClassName());
+        returnArray.put("tag", tagDomainAssocitation.getTag().getId());
+        returnArray.put("tagName", tagDomainAssocitation.getTag().getName());
+        return returnArray;
+    }
 
     public void setDomain(CytomineDomain domain) {
         domainClassName = domain.getClass().getName();
@@ -60,23 +57,8 @@ public class TagDomainAssociation extends CytomineDomain {
         return tagDomainAssocitation;
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        TagDomainAssociation tagDomainAssocitation = (TagDomainAssociation) domain;
-        returnArray.put("domainIdent", tagDomainAssocitation.getDomainIdent());
-        returnArray.put("domainClassName", tagDomainAssocitation.getDomainClassName());
-        returnArray.put("tag", tagDomainAssocitation.getTag().getId());
-        returnArray.put("tagName", tagDomainAssocitation.getTag().getName());
-        return returnArray;
-    }
-
     @Override
-    public String toJSON() {
-        return toJsonObject().toJsonString();
-    }
-
-    @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

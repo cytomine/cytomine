@@ -1,5 +1,4 @@
 from math import floor
-from typing import Tuple, Union
 
 import geojson
 import numpy as np
@@ -19,7 +18,7 @@ def get_roi_around_annotation(
     image_width: int,
     box: np.ndarray,
     crop_size: int,
-) -> Tuple[int, int]:
+) -> tuple[int, int]:
     """
     Function to get the position of the annotation to extract with the top left corner,
     width and height.
@@ -59,7 +58,7 @@ def run_segmentation_pipeline(
     image_height: int,
     image_width: int,
     box: Polygon,
-) -> Union[geojson.Feature, None]:
+) -> geojson.Feature | None:
     """
     Function to run the segmentation model for the incoming request and its prompts.
 

@@ -1,21 +1,5 @@
 package be.cytomine;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,11 +15,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.test.web.servlet.MvcResult;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.utils.StringUtils;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -46,7 +30,7 @@ public class TestUtils {
         InputStream is = getResourceFileAsInputStream(fileName);
         if (is != null) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            return (String) reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            return reader.lines().collect(Collectors.joining(System.lineSeparator()));
         } else {
             throw new RuntimeException("resource not found");
         }
@@ -63,7 +47,7 @@ public class TestUtils {
         AnnotationDomain annotationDomain,
         Project project,
         ImageInstance imageInstance,
-        User user,
+        UserResponse user,
         Term term,
         String cropPath,
         String serverUrl
@@ -80,7 +64,7 @@ public class TestUtils {
             .getY()));
         assertThat(userAnnotationResult[5]).isEqualTo(imageInstance.getId().toString());
         assertThat(userAnnotationResult[6]).isEqualTo(imageInstance.getBlindInstanceFilename());
-        assertThat(userAnnotationResult[7]).isEqualTo(user.getUsername());
+        assertThat(userAnnotationResult[7]).isEqualTo(user.username());
         assertThat(userAnnotationResult[8]).isEqualTo(term.getName());
         assertThat(userAnnotationResult[9]).isEqualTo(serverUrl
             + "/api/"
@@ -102,7 +86,7 @@ public class TestUtils {
         AnnotationDomain annotationDomain,
         Project project,
         ImageInstance imageInstance,
-        User user,
+        UserResponse user,
         Term term,
         String cropPath,
         String serverUrl
@@ -131,7 +115,7 @@ public class TestUtils {
             .getY()));
         assertThat((long) cells[5].getNumericCellValue()).isEqualTo(imageInstance.getId());
         assertThat(cells[6].getStringCellValue()).isEqualTo(imageInstance.getBlindInstanceFilename());
-        assertThat(cells[7].getStringCellValue()).isEqualTo(user.getUsername());
+        assertThat(cells[7].getStringCellValue()).isEqualTo(user.username());
         assertThat(cells[8].getStringCellValue()).isEqualTo(term.getName());
         assertThat(cells[9].getStringCellValue()).isEqualTo(serverUrl
             + "/api/"

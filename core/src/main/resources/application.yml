@@ -57,13 +57,13 @@ spring:
           batch_size: 50
 
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
-  #liquibase:
-  #  contexts: prod
   liquibase:
     change-log: classpath:config/liquibase/master.xml
+    contexts: prod
 
   data:
     mongodb:
+      auto-index-creation: false
       authentication-database: admin
       username: ${MONGO_USER:admin}
       password: ${MONGO_PASS:password}
@@ -154,3 +154,8 @@ keycloak-client:
     client-id: core
   client-id: admin-cli
   url: ${IAM_URL:http://0.0.0.0:8100}/iam
+
+meilisearch:
+  host: ${MEILISEARCH_URL:http://localhost:7700}
+  api-key: ${MEILISEARCH_KEY:masterKey}
+  index_id: imageMetadataIndex

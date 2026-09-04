@@ -26,8 +26,6 @@ class HealthControllerTest {
     @Test
     @SneakyThrows
     void pingReturnsPong() {
-        mockMvc.perform(get("/ping"))
-            .andExpect(status().isOk())
-            .andExpect(content().string("pong"));
+        mockMvc.perform(get("/ping")).andExpect(status().isOk()).andExpect(content().string("pong"));
     }
 }

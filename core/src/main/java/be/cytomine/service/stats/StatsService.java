@@ -108,7 +108,7 @@ public class StatsService {
             counts.put(project.getName(), 0);
             percentage.put(project.getName(), 0);
 
-            List<Long> layers = userService.listLayers(project, null).stream().map(x -> x.getJSONAttrLong("id"))
+            List<Long> layers = userService.listLayers(project).stream().map(x -> x.getJSONAttrLong("id"))
                 .collect(Collectors.toList());
 
             if (!layers.isEmpty()) {
@@ -189,17 +189,17 @@ public class StatsService {
             Predicate endDatePredicate = cb.lessThan(userAnnotationRoot.get("created"), endDate);
             predicatesList.add(endDatePredicate);
         }
-        cq.multiselect(userAnnotationRoot.get("user").get("id"),
+        cq.multiselect(userAnnotationRoot.get("userId"),
                 cb.countDistinct(userAnnotationRoot.get("image").get("id")))
             .where(predicatesList.toArray(Predicate[]::new))
-            .groupBy(userAnnotationRoot.get("user").get("id"));
+            .groupBy(userAnnotationRoot.get("userId"));
 
         TypedQuery<Tuple> q = entityManager.createQuery(cq);
 
         List<Tuple> numberOfAnnotatedImagesByUser = q.getResultList();
         // Build empty result table
         Map<Long, JsonObject> result = new HashMap<>();
-        for (JsonObject user : userService.listLayers(project, null)) {
+        for (JsonObject user : userService.listLayers(project)) {
             JsonObject item = new JsonObject();
             item.put("id", user.get("id"));
             item.put("username", user.get("username"));
@@ -222,9 +222,9 @@ public class StatsService {
         Optional<LocalDateTime> endDate
     ) {
         securityACLService.check(project, READ);
-        Long userId = currentUserService.getCurrentUser().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         return statsHttpContract.findTermsByProject(
-            project.getOntology().getId(),
+            project.getId(),
             userId,
             startDate,
             endDate,
@@ -246,7 +246,7 @@ public class StatsService {
 
     public List<JsonObject> statTerm(Project project, Date startDate, Date endDate, boolean leafsOnly) {
         securityACLService.check(project, READ);
-        Long userId = currentUserService.getCurrentUser().getId();
+        Long userId = currentUserService.getCurrentUser().id();
         Optional<LocalDateTime> start = Optional.ofNullable(startDate)
             .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         Optional<LocalDateTime> end = Optional.ofNullable(endDate)
@@ -267,7 +267,7 @@ public class StatsService {
 
     public List<StatUserTerm> statUserAnnotations(Project project) {
         securityACLService.check(project, READ);
-        Long userId = currentUserService.getCurrentUser().getId();
+        Long userId = currentUserService.getCurrentUser().id();
 
         return statsMapper.mapToUserTerms(
             statsHttpContract.findUserTermsByProject(project.getId(), userId, Pageable.unpaged()).toSet()
@@ -297,9 +297,8 @@ public class StatsService {
             Predicate endDatePredicate = cb.lessThan(userAnnotationRoot.get("created"), endDate);
             predicatesList.add(endDatePredicate);
         }
-        userAnnotationRoot.join("user");
-        cq.multiselect(userAnnotationRoot.get("user").get("id"), cb.countDistinct(userAnnotationRoot.get("id")))
-            .where(predicatesList.toArray(Predicate[]::new)).groupBy(userAnnotationRoot.get("user").get("id"));
+        cq.multiselect(userAnnotationRoot.get("userId"), cb.countDistinct(userAnnotationRoot.get("id")))
+            .where(predicatesList.toArray(Predicate[]::new)).groupBy(userAnnotationRoot.get("userId"));
 
 
         TypedQuery<Tuple> q = entityManager.createQuery(cq);
@@ -307,7 +306,7 @@ public class StatsService {
         // user Jakarta JPA Criteria API
 
         //build empty result table
-        for (JsonObject user : userService.listLayers(project, null)) {
+        for (JsonObject user : userService.listLayers(project)) {
             JsonObject item = new JsonObject();
             item.put("id", user.get("id"));
             item.put("key", user.get("username"));

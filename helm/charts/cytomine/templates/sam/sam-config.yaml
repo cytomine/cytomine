@@ -4,4 +4,5 @@ metadata:
   name: sam
 data:
   API_BASE_PATH: /sam
+  TORCHINDUCTOR_CACHE_DIR: "/.cache/torchinductor"
   WEIGHTS_PATH: /app/weights

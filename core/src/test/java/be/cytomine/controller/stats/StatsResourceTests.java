@@ -23,9 +23,11 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
 import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
@@ -64,6 +66,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class StatsResourceTests {
 
     @Autowired
@@ -127,7 +130,7 @@ public class StatsResourceTests {
 
     PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
         PersistentProjectConnection connection = projectConnectionService.add(
-            user,
+            user.getId(),
             project,
             "xxx",
             "linux",
@@ -143,7 +146,7 @@ public class StatsResourceTests {
         ImageInstance imageInstance,
         Date created
     ) {
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
     AnnotationAction givenAPersistentAnnotationAction(
@@ -154,7 +157,7 @@ public class StatsResourceTests {
     ) {
         return annotationActionService.add(
             annotationDomain,
-            user,
+            user.getId(),
             action,
             creation
         );
@@ -163,7 +166,7 @@ public class StatsResourceTests {
     @Test
     void statsTerm() throws Exception {
         Project project = builder.givenAProject();
-        long userId = builder.givenSuperAdmin().getId();
+        long userId = builder.givenSuperAdmin().id();
         long ontologyId = project.getOntology().getId();
         long projectId = project.getId();
 
@@ -214,7 +217,7 @@ public class StatsResourceTests {
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/user.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId().intValue()))
+            .andExpect(jsonPath("$.collection[0].id").value((int) builder.givenSuperAdmin().id()))
             .andExpect(jsonPath("$.collection[0].value").value(2));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/user.json", project.getId())
@@ -226,10 +229,9 @@ public class StatsResourceTests {
     @Test
     void statsTermSlide() throws Exception {
         Project project = builder.givenAProject();
-        long userId = builder.givenSuperAdmin().getId();
-        long ontologyId = project.getOntology().getId();
+        long userId = builder.givenSuperAdmin().id();
 
-        when(statsHttpContract.findTermsByProject(eq(ontologyId), eq(userId), any(), any(), any(Pageable.class)))
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(new StatTerm(0L, "No term", "#fff", 0))));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termslide.json", project.getId()))
@@ -238,7 +240,7 @@ public class StatsResourceTests {
 
         Term term = builder.givenATerm(project.getOntology());
 
-        when(statsHttpContract.findTermsByProject(eq(ontologyId), eq(userId), any(), any(), any(Pageable.class)))
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(
                 new StatTerm(0L, "No term", "#fff", 0),
                 new StatTerm(term.getId(), term.getName(), term.getColor(), 0)
@@ -293,9 +295,8 @@ public class StatsResourceTests {
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/userslide.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId()))
+            .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().id()))
             .andExpect(jsonPath("$.collection[0].value").value(0));
-        ;
 
         UserAnnotation annotation1 = builder.givenAUserAnnotation(project);
         annotation1.setCreated(DateUtils.addDays(new Date(), -1));
@@ -307,9 +308,8 @@ public class StatsResourceTests {
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/userslide.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().getId()))
+            .andExpect(jsonPath("$.collection[0].id").value(builder.givenSuperAdmin().id()))
             .andExpect(jsonPath("$.collection[0].value").value(2));
-        ;
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/userslide.json", project.getId())
                 .param("startDate", String.valueOf(DateUtils.addDays(new Date(), -20).getTime()))
@@ -333,21 +333,20 @@ public class StatsResourceTests {
         builder.persistAndReturn(annotation2);
         entityManager.refresh(annotation2);
 
-        User superAdmin = builder.givenSuperAdmin();
-        when(statsHttpContract.findUserTermsByProject(eq(project.getId()), eq(superAdmin.getId()), any(Pageable.class)))
+        UserResponse superAdmin = builder.givenSuperAdmin();
+        when(statsHttpContract.findUserTermsByProject(eq(project.getId()), eq(superAdmin.id()), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(
-                new FlatStatUserTerm(superAdmin.getId(), superAdmin.getUsername(),
+                new FlatStatUserTerm(superAdmin.id(), superAdmin.username(),
                     new StatTerm(sharedTerm.getId(), sharedTerm.getName(), sharedTerm.getColor(), 2))
             )));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/userannotations.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
-            .andExpect(jsonPath("$.collection[0].userId").value(superAdmin.getId().intValue()))
+            .andExpect(jsonPath("$.collection[0].userId").value((int) superAdmin.id()))
             .andExpect(jsonPath("$.collection[0].terms[0].count").value(2));
 
     }
-
 
     @Test
     void statsUserAnnotationEvolution() throws Exception {
@@ -441,17 +440,17 @@ public class StatsResourceTests {
     void statsConnectionEvolution() throws Exception {
         Project project = builder.givenAProject();
         givenAPersistentConnectionInProject(
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             project,
             DateUtils.addDays(new Date(), -15)
         );
         givenAPersistentConnectionInProject(
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             project,
             DateUtils.addDays(new Date(), -15)
         );
         givenAPersistentConnectionInProject(
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             project,
             DateUtils.addDays(new Date(), -5)
         );
@@ -471,17 +470,17 @@ public class StatsResourceTests {
         Project project = builder.givenAProject();
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         givenAPersistentImageConsultation(
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             imageInstance,
             DateUtils.addDays(new Date(), -15)
         );
         givenAPersistentImageConsultation(
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             imageInstance,
             DateUtils.addDays(new Date(), -15)
         );
         givenAPersistentImageConsultation(
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             imageInstance,
             DateUtils.addDays(new Date(), -5)
         );
@@ -503,25 +502,25 @@ public class StatsResourceTests {
         givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             "select"
         );
         givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             "move"
         );
         givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             "select"
         );
         givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -5),
             annotation,
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             "select"
         );
 

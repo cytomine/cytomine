@@ -21,7 +21,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.UserAnnotation;
@@ -40,8 +43,9 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class ImageConsultationServiceTests {
 
     @Autowired
@@ -75,7 +79,7 @@ public class ImageConsultationServiceTests {
             sliceCoordinatesService.getReferenceSlice(imageInstance),
             USER_VIEW
         );
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(user.getId(), imageInstance.getId(), "xxx", "mode", created);
     }
 
     PersistentUserPosition givenAPersistentUserPosition(
@@ -86,7 +90,7 @@ public class ImageConsultationServiceTests {
     ) {
         return userPositionService.add(
             creation,
-            user,
+            user.getId(),
             sliceInstance,
             sliceInstance.getImage(),
             areaDTO,
@@ -98,10 +102,10 @@ public class ImageConsultationServiceTests {
 
     @Test
     void creationAndClose() {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance = builder.givenASliceInstance().getImage();
         PersistentImageConsultation consultation = givenAPersistentImageConsultation(
-            user,
+            builder.getUserEntity(user),
             imageInstance,
             new Date()
         );
@@ -109,13 +113,12 @@ public class ImageConsultationServiceTests {
         AssertionsForClassTypes.assertThat(consultation.getTime()).isNull();
         Date after = new Date();
 
-        consultation = givenAPersistentImageConsultation(user, imageInstance, new Date());
-
+        consultation = givenAPersistentImageConsultation(builder.getUserEntity(user), imageInstance, new Date());
 
         Optional<PersistentImageConsultation>
             connectionOptional
             = persistentImageConsultationRepository.findAllByUserAndImageAndCreatedLessThan(
-            builder.givenSuperAdmin().getId(), imageInstance.getId(), after,
+            builder.givenSuperAdmin().id(), imageInstance.getId(), after,
             PageRequest.of(0, 1, Sort.Direction.DESC, "created")
         ).stream().findFirst();
         assertThat(connectionOptional).isPresent();
@@ -123,15 +126,14 @@ public class ImageConsultationServiceTests {
         AssertionsForClassTypes.assertThat(connectionOptional.get().getTime()).isEqualTo(0);
     }
 
-
     @Test
     void fillProjectConnectionUpdateAnnotationsCounter() {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         Project projet = builder.givenAProject();
         ImageInstance imageInstance = builder.givenASliceInstance(projet).getImage();
 
         PersistentImageConsultation consultation = givenAPersistentImageConsultation(
-            user,
+            builder.getUserEntity(user),
             imageInstance,
             DateUtils.addSeconds(new Date(), -10)
         );
@@ -141,12 +143,14 @@ public class ImageConsultationServiceTests {
         annotation.setImage(imageInstance);
         builder.persistAndReturn(annotation);
 
-        consultation = givenAPersistentImageConsultation(user, imageInstance, DateUtils.addSeconds(new Date(), 1));
-        consultation = givenAPersistentImageConsultation(user, imageInstance, DateUtils.addSeconds(new Date(), 10));
+        consultation = givenAPersistentImageConsultation(builder.getUserEntity(user), imageInstance,
+            DateUtils.addSeconds(new Date(), 1));
+        consultation = givenAPersistentImageConsultation(builder.getUserEntity(user), imageInstance,
+            DateUtils.addSeconds(new Date(), 10));
         Page<PersistentImageConsultation> allByUserAndProject =
             persistentImageConsultationRepository.findAllByProjectAndUser(
                 projet.getId(),
-                user.getId(),
+                user.id(),
                 PageRequest.of(0, 50, Sort.Direction.DESC, "created")
             );
 
@@ -161,16 +165,16 @@ public class ImageConsultationServiceTests {
 
     @Test
     void listImageConsultationByProjectAndUserDoNotDistinctImage() {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance = builder.givenASliceInstance().getImage();
 
-        givenAPersistentImageConsultation(user, imageInstance, new Date());
+        givenAPersistentImageConsultation(builder.getUserEntity(user), imageInstance, new Date());
 
         Page<PersistentImageConsultation>
             results
             = imageConsultationService.listImageConsultationByProjectAndUserNoImageDistinct(
             imageInstance.getProject(),
-            user,
+            builder.getUserEntity(user),
             0,
             0
         );
@@ -179,57 +183,58 @@ public class ImageConsultationServiceTests {
 
     @Test
     void listImageConsultationByProjectAndUserWithDistinctImage() {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
 
-        givenAPersistentImageConsultation(user, imageInstance1, new Date());
-        givenAPersistentImageConsultation(user, imageInstance1, new Date());
-
+        givenAPersistentImageConsultation(builder.getUserEntity(user), imageInstance1, new Date());
+        givenAPersistentImageConsultation(builder.getUserEntity(user), imageInstance1, new Date());
 
         List<JsonObject> results = imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
-            imageInstance1.getProject(), user);
+            imageInstance1.getProject(), builder.getUserEntity(user));
         assertThat(results).hasSize(1);
         assertThat(results.get(0).get("imageName")).isEqualTo(imageInstance1.getBlindInstanceFilename());
 
-        givenAPersistentImageConsultation(user, imageInstance2, new Date());
+        givenAPersistentImageConsultation(builder.getUserEntity(user), imageInstance2, new Date());
 
         results = imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
-            imageInstance1.getProject(), user);
+            imageInstance1.getProject(), builder.getUserEntity(user));
         assertThat(results).hasSize(2);
 
     }
 
     @Test
     void listImageOfUsersByProject() {
-        User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
+        UserResponse user1 = builder.givenSuperAdmin();
+        UserResponse user2 = builder.givenAclUserNoAcl();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
 
-        givenAPersistentImageConsultation(user1, imageInstance1, DateUtils.addDays(new Date(), -3));
-        givenAPersistentImageConsultation(user1, imageInstance2, DateUtils.addDays(new Date(), -2));
-        givenAPersistentImageConsultation(user2, imageInstance1, DateUtils.addDays(new Date(), -1));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance1, DateUtils.addDays(new Date(),
+            -3));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance2, DateUtils.addDays(new Date(),
+            -2));
+        givenAPersistentImageConsultation(builder.getUserEntity(user2), imageInstance1, DateUtils.addDays(new Date(),
+            -1));
 
         List<JsonObject> results = imageConsultationService.lastImageOfUsersByProject(
             imageInstance1.getProject(),
-            List.of(user1.getId(), user2.getId()),
+            List.of(user1.id(), user2.id()),
             "created", "desc", 0L, 0L
         );
 
         System.out.println(results);
         assertThat(results).hasSize(2);
 
-        assertThat(results.get(0).get("user")).isEqualTo(user2.getId());
+        assertThat(results.get(0).get("user")).isEqualTo(user2.id());
         assertThat(results.get(0).get("image")).isEqualTo(imageInstance1.getId());
-        assertThat(results.get(1).get("user")).isEqualTo(user1.getId());
+        assertThat(results.get(1).get("user")).isEqualTo(user1.id());
         assertThat(results.get(1).get("image")).isEqualTo(imageInstance2.getId());
-
 
         results = imageConsultationService.lastImageOfUsersByProject(
             imageInstance1.getProject(),
-            List.of(user1.getId()),
+            List.of(user1.id()),
             "created", "desc", 0L, 0L
         );
         assertThat(results).hasSize(1);
@@ -250,19 +255,18 @@ public class ImageConsultationServiceTests {
 
     }
 
-
     @Test
     void shouldReturnLastConsultedImagePerUserForProject() {
-        User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
-        User userWithNoConsultation = builder.givenAUser();
+        UserResponse user1 = builder.givenSuperAdmin();
+        UserResponse user2 = builder.givenAclUserNoAcl();
+        UserResponse userWithNoConsultation = builder.givenAdmin();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
 
         List<JsonObject> results = imageConsultationService.lastImageOfGivenUsersByProject(
             imageInstance1.getProject(),
-            List.of(user1.getId(), user2.getId()),
+            List.of(user1.id(), user2.id()),
             "created",
             "desc",
             0L,
@@ -272,125 +276,135 @@ public class ImageConsultationServiceTests {
         assertThat(results.get(0).get("image")).isNull();
         assertThat(results.get(1).get("image")).isNull();
 
-        givenAPersistentImageConsultation(user1, imageInstance1, DateUtils.addDays(new Date(), -3));
-        givenAPersistentImageConsultation(user1, imageInstance2, DateUtils.addDays(new Date(), -2));
-        givenAPersistentImageConsultation(user2, imageInstance1, DateUtils.addDays(new Date(), -1));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance1, DateUtils.addDays(new Date(),
+            -3));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance2, DateUtils.addDays(new Date(),
+            -2));
+        givenAPersistentImageConsultation(builder.getUserEntity(user2), imageInstance1, DateUtils.addDays(new Date(),
+            -1));
 
         results = imageConsultationService.lastImageOfGivenUsersByProject(
             imageInstance1.getProject(),
-            List.of(user1.getId(), user2.getId(), userWithNoConsultation.getId()),
+            List.of(user1.id(), user2.id(), userWithNoConsultation.id()),
             "created",
             "desc",
             0L,
             0L
         );
         assertThat(results).hasSize(3);
-        assertThat(results.get(0).get("user")).isEqualTo(user2.getId());
+        assertThat(results.get(0).get("user")).isEqualTo(user2.id());
         assertThat(results.get(0).get("image")).isEqualTo(imageInstance1.getId());
-        assertThat(results.get(1).get("user")).isEqualTo(user1.getId());
+        assertThat(results.get(1).get("user")).isEqualTo(user1.id());
         assertThat(results.get(1).get("image")).isEqualTo(imageInstance2.getId());
-        assertThat(results.get(2).get("user")).isEqualTo(userWithNoConsultation.getId());
+        assertThat(results.get(2).get("user")).isEqualTo(userWithNoConsultation.id());
         assertThat(results.get(2).get("image")).isNull();
 
         results = imageConsultationService.lastImageOfGivenUsersByProject(
             imageInstance1.getProject(),
-            List.of(user1.getId(), user2.getId()),
+            List.of(user1.id(), user2.id()),
             "created",
             "desc",
             1L,
             0L
         );
         assertThat(results).hasSize(1);
-        assertThat(results.get(0).get("user")).isEqualTo(user2.getId());
+        assertThat(results.get(0).get("user")).isEqualTo(user2.id());
         assertThat(results.get(0).get("image")).isEqualTo(imageInstance1.getId());
     }
 
     @Test
     void shouldReturnUserImagesConsultedWithinDateRange() {
-        User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
+        UserResponse user1 = builder.givenSuperAdmin();
+        UserResponse user2 = builder.givenAclUserNoAcl();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
 
         List<JsonObject> results = imageConsultationService.getImagesOfUsersByProjectBetween(
-            user1.getId(),
+            user1.id(),
             imageInstance1.getProject().getId(),
             null,
             null
         );
         assertThat(results).hasSize(0);
 
-        givenAPersistentImageConsultation(user1, imageInstance1, DateUtils.addDays(new Date(), -10));
-        givenAPersistentImageConsultation(user1, imageInstance2, DateUtils.addDays(new Date(), -5));
-        givenAPersistentImageConsultation(user2, imageInstance1, DateUtils.addDays(new Date(), -1));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance1, DateUtils.addDays(new Date(),
+            -10));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance2, DateUtils.addDays(new Date(),
+            -5));
+        givenAPersistentImageConsultation(builder.getUserEntity(user2), imageInstance1, DateUtils.addDays(new Date(),
+            -1));
 
         results = imageConsultationService.getImagesOfUsersByProjectBetween(
-            user1.getId(),
+            user1.id(),
             imageInstance1.getProject().getId(),
             DateUtils.addDays(new Date(), -20),
             DateUtils.addDays(new Date(), 10)
         );
         assertThat(results).hasSize(2);
-        assertThat(results.get(0).get("user")).isEqualTo(user1.getId());
+        assertThat(results.get(0).get("user")).isEqualTo(user1.id());
         assertThat(results.get(0).get("image")).isEqualTo(imageInstance2.getId());
-        assertThat(results.get(1).get("user")).isEqualTo(user1.getId());
+        assertThat(results.get(1).get("user")).isEqualTo(user1.id());
         assertThat(results.get(1).get("image")).isEqualTo(imageInstance1.getId());
 
         results = imageConsultationService.getImagesOfUsersByProjectBetween(
-            user1.getId(),
+            user1.id(),
             imageInstance1.getProject().getId(),
             DateUtils.addDays(new Date(), -6),
             DateUtils.addDays(new Date(), 10)
         );
         assertThat(results).hasSize(1);
-        assertThat(results.get(0).get("user")).isEqualTo(user1.getId());
+        assertThat(results.get(0).get("user")).isEqualTo(user1.id());
         assertThat(results.get(0).get("image")).isEqualTo(imageInstance2.getId());
 
         results = imageConsultationService.getImagesOfUsersByProjectBetween(
-            user1.getId(),
+            user1.id(),
             imageInstance1.getProject().getId(),
             DateUtils.addDays(new Date(), -20),
             DateUtils.addDays(new Date(), -6)
         );
         assertThat(results).hasSize(1);
-        assertThat(results.get(0).get("user")).isEqualTo(user1.getId());
+        assertThat(results.get(0).get("user")).isEqualTo(user1.id());
         assertThat(results.get(0).get("image")).isEqualTo(imageInstance1.getId());
     }
 
     @Test
     void shouldReturnConsultationFrequencyPerImageForUserInProject() {
-        User user1 = builder.givenSuperAdmin();
-        User user2 = builder.givenAUser();
+        UserResponse user1 = builder.givenSuperAdmin();
+        UserResponse user2 = builder.givenAclUserNoAcl();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
 
         List<JsonObject> results = imageConsultationService.getImagesOfUsersByProjectBetween(
-            user1.getId(),
+            user1.id(),
             imageInstance1.getProject().getId(),
             null,
             null
         );
         assertThat(results).hasSize(0);
 
-        givenAPersistentImageConsultation(user1, imageInstance1, DateUtils.addDays(new Date(), -10));
-        givenAPersistentImageConsultation(user1, imageInstance1, DateUtils.addDays(new Date(), -7));
-        givenAPersistentImageConsultation(user1, imageInstance2, DateUtils.addDays(new Date(), -5));
-        givenAPersistentImageConsultation(user2, imageInstance1, DateUtils.addDays(new Date(), -1));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance1, DateUtils.addDays(new Date(),
+            -10));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance1, DateUtils.addDays(new Date(),
+            -7));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance2, DateUtils.addDays(new Date(),
+            -5));
+        givenAPersistentImageConsultation(builder.getUserEntity(user2), imageInstance1, DateUtils.addDays(new Date(),
+            -1));
 
-        results = imageConsultationService.resumeByUserAndProject(user1.getId(), imageInstance1.getProject().getId());
+        results = imageConsultationService.resumeByUserAndProject(user1.id(), imageInstance1.getProject().getId());
 
         assertThat(results).hasSize(2);
 
         Optional<JsonObject> user1image1 = results.stream()
-            .filter(x -> x.get("user").equals(user1.getId()) && x.get("image").equals(imageInstance1.getId()))
+            .filter(x -> x.get("user").equals(user1.id()) && x.get("image").equals(imageInstance1.getId()))
             .findFirst();
         assertThat(user1image1).isPresent();
         assertThat(user1image1.get().get("frequency")).isEqualTo(2);
 
         Optional<JsonObject> user1image2 = results.stream()
-            .filter(x -> x.get("user").equals(user1.getId()) && x.get("image").equals(imageInstance2.getId()))
+            .filter(x -> x.get("user").equals(user1.id()) && x.get("image").equals(imageInstance2.getId()))
             .findFirst();
         assertThat(user1image2).isPresent();
         assertThat(user1image2.get().get("frequency")).isEqualTo(1);
@@ -399,17 +413,20 @@ public class ImageConsultationServiceTests {
     @Test
     void totalNumberOfConsultationByProjectWithDates() {
         Project projet = builder.givenAProject();
-        User user1 = builder.givenSuperAdmin();
-        User anotherUser = builder.givenAUser();
+        UserResponse user1 = builder.givenSuperAdmin();
+        UserResponse anotherUser = builder.givenAclUserNoAcl();
 
         ImageInstance imageInstance1 = builder.givenASliceInstance(projet).getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(projet).getImage();
 
         Date noConnectionBefore = DateUtils.addDays(new Date(), -100);
-        givenAPersistentImageConsultation(user1, imageInstance1, DateUtils.addDays(new Date(), -10));
-        givenAPersistentImageConsultation(user1, imageInstance1, DateUtils.addDays(new Date(), -10));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance1, DateUtils.addDays(new Date(),
+            -10));
+        givenAPersistentImageConsultation(builder.getUserEntity(user1), imageInstance1, DateUtils.addDays(new Date(),
+            -10));
         Date twoConnectionBefore = DateUtils.addDays(new Date(), -5);
-        givenAPersistentImageConsultation(anotherUser, imageInstance1, DateUtils.addDays(new Date(), -1));
+        givenAPersistentImageConsultation(builder.getUserEntity(anotherUser), imageInstance1,
+            DateUtils.addDays(new Date(), -1));
         Date threeConnectionBefore = new Date();
 
         List<JsonObject> results;

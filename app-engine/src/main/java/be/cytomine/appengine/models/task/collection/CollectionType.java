@@ -44,6 +44,7 @@ import be.cytomine.appengine.exceptions.TypeValidationException;
 import be.cytomine.appengine.handlers.StorageData;
 import be.cytomine.appengine.handlers.StorageDataEntry;
 import be.cytomine.appengine.handlers.StorageDataType;
+import be.cytomine.appengine.handlers.StorageHandler;
 import be.cytomine.appengine.models.task.Parameter;
 import be.cytomine.appengine.models.task.ParameterType;
 import be.cytomine.appengine.models.task.Run;
@@ -205,10 +206,7 @@ public class CollectionType extends Type {
     }
 
     @Override
-    public void validateFiles(
-        Run run,
-        Parameter currentOutput,
-        StorageData currentOutputStorageData)
+    public void validateFiles(Run run, Parameter currentOutput, StorageData currentOutputStorageData)
         throws TypeValidationException {
         // make sure we have the right file structure
         Type currentType = new CollectionType(this);
@@ -283,6 +281,7 @@ public class CollectionType extends Type {
             if (arrayYmlFound == 0) {
                 throw new TypeValidationException(ErrorCode.INTERNAL_MISSING_METADATA);
             }
+            collection.removeIf(item -> ((Map<?, ?>) item).containsKey("array.yml"));
         }
 
         validate(lists.get(currentOutput.getName()));
@@ -320,14 +319,18 @@ public class CollectionType extends Type {
             File.class
         );
         if (validTypes.contains(valueObject.getClass())) {
-
             ObjectMapper objectMapper = new ObjectMapper();
             // validate a GeoJSON collection like FeatureCollection or GeometryCollection
             if (valueObject instanceof String stringValueObject) {
                 try {
                     JsonNode rootNode = objectMapper.readTree(stringValueObject);
                     if (rootNode.has("type")) {
-                        validateGeoJsonCollection(stringValueObject);
+                        String geoType = rootNode.get("type").asText();
+                        if (geoType.equals("FeatureCollection") || geoType.equals("GeometryCollection")) {
+                            validateGeoJsonCollection(stringValueObject);
+                        } else {
+                            validatePrimitiveCollectionItem(stringValueObject);
+                        }
                     } else {
                         validatePrimitiveCollectionItem(stringValueObject);
                     }
@@ -351,8 +354,7 @@ public class CollectionType extends Type {
         }
     }
 
-    private void validateGeoJsonCollection(String valueObject)
-        throws TypeValidationException {
+    private void validateGeoJsonCollection(String valueObject) throws TypeValidationException {
         GeometryType geometryType = new GeometryType();
         try {
             validateFeatureCollection(valueObject, geometryType);
@@ -435,9 +437,13 @@ public class CollectionType extends Type {
         for (int i = 0; i < indexes.length; i++) {
             if (currentType instanceof CollectionType) {
                 if (i == 0) { // first item which is the parameter
-                    persistedProvision =
-                        collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                            indexes[i], runId, ParameterType.INPUT);
+                    persistedProvision = collectionRepo
+                        .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                            indexes[i],
+                            runId,
+                            ParameterType.INPUT
+                        )
+                        .orElse(null);
                     if (Objects.isNull(persistedProvision)) {
                         persistedProvision = new CollectionPersistence();
                         persistedProvision.setRunId(runId);
@@ -449,7 +455,6 @@ public class CollectionType extends Type {
                     }
                     parentType = (CollectionType) currentType;
                     currentType = ((CollectionType) currentType).getSubType();
-                    continue;
                 } else {
                     if (i == indexes.length - 1) { // this is the last item, yet it is still a collection (nested)
                         while (currentType instanceof CollectionType) {
@@ -722,9 +727,13 @@ public class CollectionType extends Type {
         CollectionPersistenceRepository collectionRepo =
             AppEngineApplicationContext.getBean(CollectionPersistenceRepository.class);
         if (node.isArray()) {
-            CollectionPersistence persistedProvision =
-                collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                parameterName, runId, ParameterType.INPUT);
+            CollectionPersistence persistedProvision = collectionRepo
+                .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                    parameterName,
+                    runId,
+                    ParameterType.INPUT
+                )
+                .orElse(null);
             if (persistedProvision == null) {
                 persistedProvision = new CollectionPersistence();
                 persistedProvision.setValueType(ValueType.ARRAY);
@@ -781,9 +790,12 @@ public class CollectionType extends Type {
             if (node.has("type")
                 && (node.get("type").asText().equals("GeometryCollection")
                 || node.get("type").asText().equals("FeatureCollection"))) {
-                CollectionPersistence persistedProvision =
-                    collectionRepo.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
-                    parameterName, runId, ParameterType.INPUT);
+                CollectionPersistence persistedProvision = collectionRepo
+                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                        parameterName,
+                        runId,
+                        ParameterType.INPUT
+                    ).orElse(null);
                 if (persistedProvision == null) {
                     persistedProvision = new CollectionPersistence();
                     persistedProvision.setValueType(ValueType.ARRAY);
@@ -1193,6 +1205,9 @@ public class CollectionType extends Type {
             }
         }
 
+        if (root.getSize() == null || root.getSize() == 0) {
+            root.setSize(root.getItems().size());
+        }
         collectionPersistenceRepository.save(root);
     }
 
@@ -1209,30 +1224,30 @@ public class CollectionType extends Type {
             name = provision.get("parameterName").asText();
         }
 
-        return mapNode("/" + name, provision.get("value"), new StorageData());
+        return mapNode("/" + name, provision.get("value"), new StorageData(), run);
     }
 
-    private StorageData mapNode(String path, JsonNode value, StorageData container) throws FileStorageException {
-
-        Type currentType = new CollectionType(this);
-        while (currentType instanceof CollectionType) {
-            currentType = ((CollectionType) currentType).getSubType();
-        }
-        String leafType = currentType.getClass().getSimpleName();
+    private StorageData mapNode(
+        String path,
+        JsonNode value,
+        StorageData container,
+        Run run
+    ) throws FileStorageException {
         if (value.isNull()) {
             throw new FileStorageException(ErrorCode.INTERNAL_NULL_PROVISION);
         }
+
         if (value.isArray()) {
             container.add(new StorageDataEntry(path, StorageDataType.DIRECTORY));
-            int size = value.size();
-            String arrayDotYmpData = "size: " + size;
+            String arrayDotYmpData = "size: " + value.size();
             container.add(new StorageDataEntry(FileHelper.write("array.yml", arrayDotYmpData.getBytes(StandardCharsets.UTF_8)),
-                path + "/" + "array.yml",
+                path.substring(1) + "/array.yml",
                 StorageDataType.FILE));
             for (JsonNode item : value) {
-                container = mapNode(path + "/" + item.get("index").asText(), item.get("value"), container);
+                container = mapNode(path + "/" + item.get("index").asText(), item.get("value"), container, run);
             }
         }
+
         if (value.isObject() || value.isValueNode()) {
             if (value.has("type")
                 && (value.get("type").asText().equals("GeometryCollection")
@@ -1240,7 +1255,13 @@ public class CollectionType extends Type {
                 path += ".geojson";
             }
 
-            StorageDataEntry itemFileEntry = null;
+            Type currentType = new CollectionType(this);
+            while (currentType instanceof CollectionType collectionType) {
+                currentType = collectionType.getSubType();
+            }
+            String leafType = currentType.getClass().getSimpleName();
+
+            StorageDataEntry itemFileEntry;
             if (leafType.equalsIgnoreCase("FileType") || leafType.equalsIgnoreCase("ImageType")) {
                 itemFileEntry = new StorageDataEntry(new File(value.asText()), path, StorageDataType.FILE);
             } else {
@@ -1251,23 +1272,49 @@ public class CollectionType extends Type {
                 );
             }
 
-            // add the yml file to the storage data object
             String ymlPath = "";
             if (path.contains("/")) {
                 ymlPath = path.substring(1, path.lastIndexOf("/"));
             }
+            String arrayYmlName = ymlPath + "/array.yml";
 
-            container.getEntryList().removeIf(tempYml -> tempYml.getName().endsWith("array.yml"));
-            int minusParameterDirectory = container.getEntryList().size() - 1;
+            container.getEntryList().removeIf(entry -> entry.getName().equals(arrayYmlName));
+            String dirPrefix = "/" + ymlPath + "/";
+            long filesAlreadyInContainer = container.getEntryList().stream()
+                .filter(e -> e.getStorageDataType() == StorageDataType.FILE)
+                .filter(e -> e.getName().startsWith(dirPrefix)
+                    && !e.getName().substring(dirPrefix.length()).contains("/"))
+                .count();
             container.add(itemFileEntry);
-            String arrayDotYmpData = "size: " + (minusParameterDirectory + 1);
+
+            int persistedSize = readPersistedArraySize(run, arrayYmlName);
+            String arraySize = "size: " + (persistedSize + filesAlreadyInContainer + 1);
             container.add(new StorageDataEntry(
-                FileHelper.write("array.yml", arrayDotYmpData.getBytes(StandardCharsets.UTF_8)),
-                ymlPath + "/array.yml",
+                FileHelper.write("array.yml", arraySize.getBytes(StandardCharsets.UTF_8)),
+                arrayYmlName,
                 StorageDataType.FILE
             ));
         }
         return container;
+    }
+
+    private int readPersistedArraySize(Run run, String arrayYmlName) {
+        if (run == null || run.getId() == null) {
+            return 0;
+        }
+
+        StorageDataEntry query = new StorageDataEntry(arrayYmlName, StorageDataType.FILE);
+        query.setStorageId("task-run-inputs-" + run.getId());
+
+        try {
+            StorageDataEntry arrayYml = AppEngineApplicationContext.getBean(StorageHandler.class)
+                .readStorageData(new StorageData(query))
+                .peek();
+            String content = FileHelper.read(arrayYml.getData(), StandardCharsets.UTF_8);
+            return Integer.parseInt(content.replace("size:", "").trim());
+        } catch (FileStorageException e) {
+            return 0;
+        }
     }
 
     @Override
@@ -1475,7 +1522,7 @@ public class CollectionType extends Type {
                             throw new RuntimeException(e);
                         }
                     });
-            collectionValue.setSubType(items.get(0).getType());
+            collectionValue.setSubType(items.getFirst().getType());
 
             return collectionValue;
         }

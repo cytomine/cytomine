@@ -15,25 +15,29 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class ImageGroupImageInstanceServiceTests {
 
     @Autowired
+    private UrlApi urlApi;
+    @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private ImageGroupImageInstanceService imageGroupImageInstanceService;
 
@@ -89,7 +93,7 @@ public class ImageGroupImageInstanceServiceTests {
     void addValidImagegroupImageinstanceWithSuccess() {
         ImageGroupImageInstance igii = builder.givenANotPersistedImageGroupImageInstance();
 
-        CommandResponse commandResponse = imageGroupImageInstanceService.add(igii.toJsonObject());
+        CommandResponse commandResponse = imageGroupImageInstanceService.add(igii.toJsonObject(urlApi));
 
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -105,7 +109,7 @@ public class ImageGroupImageInstanceServiceTests {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> imageGroupImageInstanceService.add(igii.toJsonObject()
+            () -> imageGroupImageInstanceService.add(igii.toJsonObject(urlApi)
                 .withChange("group", builder.givenAnImageGroup().getId()))
         );
     }
@@ -115,7 +119,7 @@ public class ImageGroupImageInstanceServiceTests {
         ImageGroupImageInstance igii = builder.givenAnImageGroupImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> imageGroupImageInstanceService.add(igii.toJsonObject()
+            () -> imageGroupImageInstanceService.add(igii.toJsonObject(urlApi)
                 .withChange("image", builder.givenAnImageInstance().getId()))
         );
     }

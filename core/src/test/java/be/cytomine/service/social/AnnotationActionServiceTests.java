@@ -16,7 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.AnnotationAction;
@@ -24,12 +27,12 @@ import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class AnnotationActionServiceTests {
 
     @Autowired
@@ -54,7 +57,7 @@ public class AnnotationActionServiceTests {
     ) {
         AnnotationAction annotationAction = annotationActionService.add(
             annotationDomain,
-            user,
+            user.getId(),
             action,
             creation
         );
@@ -67,7 +70,7 @@ public class AnnotationActionServiceTests {
         givenAPersistentAnnotationAction(
             new Date(),
             builder.givenAUserAnnotation(),
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             "view"
         );
         assertThat(annotationActionRepository.count()).isEqualTo(1);
@@ -80,28 +83,32 @@ public class AnnotationActionServiceTests {
         assertThat(annotationActionService.list(annotationDomain.getSlice(), null, null, null))
             .hasSize(0);
 
-        givenAPersistentAnnotationAction(new Date(), annotationDomain, builder.givenSuperAdmin(), "view");
-        givenAPersistentAnnotationAction(new Date(), annotationDomain, builder.givenSuperAdmin(), "select");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain,
+            builder.getUserEntity(builder.givenSuperAdmin()), "view");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain,
+            builder.getUserEntity(builder.givenSuperAdmin()), "select");
 
         assertThat(annotationActionService.list(annotationDomain.getSlice(), null, null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.givenSuperAdmin(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getSlice(),
+            builder.getUserEntity(builder.givenSuperAdmin()), null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getSlice(), builder.givenAUser(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getSlice(),
+            builder.getUserEntity(builder.givenAclUserNoAcl()), null, null))
             .hasSize(0);
 
         assertThat(annotationActionService.list(
             annotationDomain.getSlice(),
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             null,
             new Date().getTime()
         )).hasSize(2);
 
         assertThat(annotationActionService.list(
             annotationDomain.getSlice(),
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             new Date().getTime(),
             null
         )).hasSize(0);
@@ -114,30 +121,34 @@ public class AnnotationActionServiceTests {
         assertThat(annotationActionService.list(annotationDomain.getImage(), null, null, null))
             .hasSize(0);
 
-        givenAPersistentAnnotationAction(new Date(), annotationDomain, builder.givenSuperAdmin(), "view");
-        givenAPersistentAnnotationAction(new Date(), annotationDomain, builder.givenSuperAdmin(), "select");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain,
+            builder.getUserEntity(builder.givenSuperAdmin()), "view");
+        givenAPersistentAnnotationAction(new Date(), annotationDomain,
+            builder.getUserEntity(builder.givenSuperAdmin()), "select");
 
         assertThat(annotationActionRepository.count()).isEqualTo(2);
         System.out.println(annotationActionRepository.findAll());
         assertThat(annotationActionService.list(annotationDomain.getImage(), null, null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getImage(), builder.givenSuperAdmin(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getImage(),
+            builder.getUserEntity(builder.givenSuperAdmin()), null, null))
             .hasSize(2);
 
-        assertThat(annotationActionService.list(annotationDomain.getImage(), builder.givenAUser(), null, null))
+        assertThat(annotationActionService.list(annotationDomain.getImage(),
+            builder.getUserEntity(builder.givenAclUserNoAcl()), null, null))
             .hasSize(0);
 
         assertThat(annotationActionService.list(
             annotationDomain.getImage(),
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             null,
             new Date().getTime()
         )).hasSize(2);
 
         assertThat(annotationActionService.list(
             annotationDomain.getImage(),
-            builder.givenSuperAdmin(),
+            builder.getUserEntity(builder.givenSuperAdmin()),
             new Date().getTime(),
             null
         )).hasSize(0);
@@ -145,14 +156,17 @@ public class AnnotationActionServiceTests {
 
     @Test
     void totalAnnotationActionByProjectCount() {
-        User user1 = builder.givenSuperAdmin();
+        UserResponse user1 = builder.givenSuperAdmin();
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
         Date noConnectionBefore = DateUtils.addDays(new Date(), -100);
-        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -10), annotationDomain, user1, "select");
-        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -10), annotationDomain, user1, "view");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -10), annotationDomain,
+            builder.getUserEntity(user1), "select");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -10), annotationDomain,
+            builder.getUserEntity(user1), "view");
         Date twoConnectionBefore = DateUtils.addDays(new Date(), -5);
-        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -3), annotationDomain, user1, "select");
+        givenAPersistentAnnotationAction(DateUtils.addDays(new Date(), -3), annotationDomain,
+            builder.getUserEntity(user1), "select");
         Date threeConnectionBefore = new Date();
 
         AssertionsForClassTypes.assertThat(annotationActionService.countByProject(

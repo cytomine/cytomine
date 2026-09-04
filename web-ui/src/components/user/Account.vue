@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="content-wrapper">
   <b-loading :is-full-page="false" :active="loading" />
@@ -101,7 +87,7 @@
             horizontal
           >
             <template v-if="currentPasswordInfo">
-              {{ $t('last-updated-on') }} {{Number(currentPasswordInfo.createdDate) | moment('ll LT')}}.
+              {{ $t('last-updated-on') }} {{formatMomentDate(Number(currentPasswordInfo.createdDate), 'll LT')}}.
             </template>
             <em v-else>{{ $t('no-password') }}</em>
           </b-field>
@@ -163,17 +149,24 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
-import {changeLanguageMixin} from '@/lang.js';
-import {MyAccount, User} from '@/api';
-import {rolesMapping} from '@/utils/role-utils';
-import copyToClipboard from 'copy-to-clipboard';
+import { get } from '@/utils/store-helpers';
+import { changeLanguageMixin } from '@/lang.js';
+import { MyAccount, User } from '@/api';
+import { rolesMapping } from '@/utils/role-utils';
+import { getKeycloak } from '@/keycloak.js';
+import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
+import { useClipboard } from '@vueuse/core';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   // eslint-disable-next-line
   name: 'Account',
-  $_veeValidate: {validator: 'new'},
+  $_veeValidate: { validator: 'new' },
   mixins: [changeLanguageMixin],
+  setup() {
+    const { copy } = useClipboard({ legacy: true });
+    return { copyToClipboard: copy };
+  },
   data() {
     return {
       updatedAccount: this.$store.state.currentUser.account.clone(),
@@ -183,10 +176,10 @@ export default {
       apiKeysError: null,
       loading: true,
       languages: [
-        {value: 'en', name:'English'},
-        {value: 'fr', name:'Français'},
-        {value: 'es', name:'Español'},
-        {value: 'nl', name:'Nederlands'},
+        { value: 'en', name:'English' },
+        { value: 'fr', name:'Français' },
+        { value: 'es', name:'Español' },
+        { value: 'nl', name:'Nederlands' },
       ],
     };
   },
@@ -195,7 +188,8 @@ export default {
     currentAccount: get('currentUser/account'),
     role() {
       // Guest > User > Admin
-      let key = this.$keycloak.hasResourceRole('ADMIN') ? 'ROLE_ADMIN' : this.$keycloak.hasResourceRole('USER') ? 'ROLE_USER' : 'ROLE_GUEST';
+      let key = getKeycloak().hasResourceRole(KeycloakRole.ADMIN) ? UserRole.ADMIN
+        : getKeycloak().hasResourceRole(KeycloakRole.USER) ? UserRole.USER : UserRole.GUEST;
       return rolesMapping[key];
     },
 
@@ -214,6 +208,7 @@ export default {
   watch: {
   },
   methods: {
+    formatMomentDate,
     async editDetails() {
       let result = await this.$validator.validateAll('profile');
       if (!result) {
@@ -223,29 +218,29 @@ export default {
       try {
         await this.$store.dispatch('currentUser/updateAccount', this.updatedAccount);
         this.changeLanguage(this.currentAccount.locale);
-        this.$notify({type: 'success', text: this.$t('notif-success-user-details-saved')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-user-details-saved') });
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('notif-error-user-details-not-saved')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-user-details-not-saved') });
       }
     },
 
     updatePassword() {
-      this.$keycloak.login({action: this.passwordCredentials.updateAction});
+      getKeycloak().login({ action: this.passwordCredentials.updateAction });
     },
 
 
     copy(value) {
-      copyToClipboard(value);
-      this.$notify({type: 'success', text: this.$t('notif-success-key-copied')});
+      this.copyToClipboard(value);
+      this.$notify({ type: 'success', text: this.$t('notif-success-key-copied') });
     },
 
     async regenerateKeys() {
       try {
         this.apiKeys = await User.regenerateKeys();
-        this.$notify({type: 'success', text: this.$t('notif-success-keys-regenerated')});
+        this.$notify({ type: 'success', text: this.$t('notif-success-keys-regenerated') });
       } catch (err) {
-        this.$notify({type: 'error', text: this.$t('notif-error-keys-not-regenerated')});
+        this.$notify({ type: 'error', text: this.$t('notif-error-keys-not-regenerated') });
       }
     }
   },

@@ -22,6 +22,7 @@ import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.meta.DescriptionService;
 
 @AutoConfigureMockMvc
@@ -29,25 +30,20 @@ import be.cytomine.service.meta.DescriptionService;
 @Transactional
 public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
 
-
+    @Autowired
+    DescriptionService descriptionService;
+    @Autowired
+    BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
     private Description descriptionForProject = null;
     private Description descriptionForAnnotation = null;
     private Description descriptionForAbstractImage = null;
-
     private Description descriptionForImageInstance = null;
-
     private Project project = null;
     private AnnotationDomain annotationDomain = null;
     private AbstractImage abstractImage = null;
-
     private ImageInstance imageInstance = null;
-
-
-    @Autowired
-    DescriptionService descriptionService;
-
-    @Autowired
-    BasicInstanceBuilder builder;
 
     @BeforeEach
     public void before() throws Exception {
@@ -82,7 +78,6 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         expectForbidden(() -> descriptionService.list());
     }
 
-
     // ANNOTATIONS
     @Test
     @WithMockUser(username = USER_ACL_READ)
@@ -109,7 +104,8 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void userCanaddInRestrictedModeForAnnotationIfOwner() {
         annotationDomain.getProject().setMode(EditingMode.RESTRICTED);
-        ((UserAnnotation) annotationDomain).setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
+        ((UserAnnotation) annotationDomain).setUserId(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get()
+            .getId());
         expectOK(this::whenIAddDomain);
     }
 
@@ -125,12 +121,12 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         AnnotationDomain annotationDomain = builder.persistAndReturn(
             builder.givenANotPersistedUserAnnotation(project)
         );
-        descriptionService.add(builder.givenANotPersistedDescription(annotationDomain).toJsonObject());
+        descriptionService.add(builder.givenANotPersistedDescription(annotationDomain).toJsonObject(urlApi));
     }
 
     @Override
     protected void whenIEditDomain() {
-        descriptionService.update(descriptionForAnnotation, descriptionForAnnotation.toJsonObject());
+        descriptionService.update(descriptionForAnnotation, descriptionForAnnotation.toJsonObject(urlApi));
     }
 
     @Override
@@ -143,7 +139,8 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = USER_ACL_READ)
     public void userCanAddForImage() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
-        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(imageInstance).toJsonObject()));
+        expectOK(
+            () -> descriptionService.add(builder.givenANotPersistedDescription(imageInstance).toJsonObject(urlApi)));
     }
 
     @Test
@@ -152,7 +149,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> descriptionService.add(builder.givenANotPersistedDescription(imageInstance)
-            .toJsonObject()));
+            .toJsonObject(urlApi)));
     }
 
     @Test
@@ -161,14 +158,15 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
-        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(imageInstance).toJsonObject()));
+        expectOK(
+            () -> descriptionService.add(builder.givenANotPersistedDescription(imageInstance).toJsonObject(urlApi)));
     }
 
     @Test
     @WithMockUser(username = GUEST)
     public void guestCannotAddImage() {
         expectForbidden(() -> descriptionService.add(
-            builder.givenANotPersistedDescription(builder.givenAnImageInstance()).toJsonObject())
+            builder.givenANotPersistedDescription(builder.givenAnImageInstance()).toJsonObject(urlApi))
         );
     }
 
@@ -177,7 +175,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     public void userCanEditForImage() {
         expectOK(() -> descriptionService.update(
             descriptionForImageInstance,
-            descriptionForImageInstance.toJsonObject(),
+            descriptionForImageInstance.toJsonObject(urlApi),
             null,
             null
         ));
@@ -190,7 +188,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         expectForbidden(() -> descriptionService.update(
             builder.givenADescription(imageInstance),
-            builder.givenADescription(imageInstance).toJsonObject(),
+            builder.givenADescription(imageInstance).toJsonObject(urlApi),
             null
         ));
 
@@ -203,14 +201,15 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
         imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
         Description descriptionForImage = builder.givenADescription(imageInstance);
-        expectOK(() -> descriptionService.update(descriptionForImage, descriptionForImage.toJsonObject(), null));
+        expectOK(() -> descriptionService.update(descriptionForImage, descriptionForImage.toJsonObject(urlApi), null));
     }
 
     @Test
     @WithMockUser(username = GUEST)
     public void guestCannotEditImage() {
         Description descriptionForImage = builder.givenADescription(imageInstance);
-        expectForbidden(() -> descriptionService.update(descriptionForImage, descriptionForImage.toJsonObject(), null));
+        expectForbidden(
+            () -> descriptionService.update(descriptionForImage, descriptionForImage.toJsonObject(urlApi), null));
     }
 
     @Test
@@ -246,14 +245,14 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     @WithMockUser(username = SUPERADMIN)
     public void adminCanAddForProject() {
         expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(builder.givenAProject())
-            .toJsonObject()));
+            .toJsonObject(urlApi)));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void userWithReadCannotAddForProject() {
         expectForbidden(() -> descriptionService.add(builder.givenANotPersistedDescription(builder.givenAProject())
-            .toJsonObject()));
+            .toJsonObject(urlApi)));
     }
 
     @Test
@@ -261,7 +260,8 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     public void userWithWriteCanAddForProject() {
         Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
-        expectOK(() -> descriptionService.add(builder.givenANotPersistedDescription(projectLocal).toJsonObject()));
+        expectOK(
+            () -> descriptionService.add(builder.givenANotPersistedDescription(projectLocal).toJsonObject(urlApi)));
     }
 
     @Test
@@ -269,7 +269,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     public void adminCanEditForProject() {
         expectOK(() -> descriptionService.update(
             descriptionForProject,
-            descriptionForProject.toJsonObject(),
+            descriptionForProject.toJsonObject(urlApi),
             null,
             null
         ));
@@ -280,7 +280,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     public void userWithReadCannotEditForProject() {
         expectForbidden(() -> descriptionService.update(
             descriptionForProject,
-            descriptionForProject.toJsonObject(),
+            descriptionForProject.toJsonObject(urlApi),
             null,
             null
         ));
@@ -292,7 +292,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
         Project projectLocal = builder.givenAProject();
         initACL(projectLocal);
         Description description = builder.givenADescription(projectLocal);
-        expectOK(() -> descriptionService.update(description, description.toJsonObject(), null));
+        expectOK(() -> descriptionService.update(description, description.toJsonObject(urlApi), null));
     }
 
     @Test

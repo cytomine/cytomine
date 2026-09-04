@@ -19,9 +19,7 @@ import be.cytomine.common.repository.model.command.payload.response.TermRelation
 import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
-import static be.cytomine.common.repository.http.TermRelationHttpContract.ROOT_PATH;
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(TermRelationHttpContract.ROOT_PATH)
 public interface TermRelationHttpContract {
     String ROOT_PATH = "/term_relations";
 
@@ -40,23 +38,21 @@ public interface TermRelationHttpContract {
 
     @PostExchange
     Optional<HttpCommandResponse> create(@RequestParam long userId,
-                                         @Valid @RequestBody CreateTermRelation createTermRelation);
+        @Valid @RequestBody CreateTermRelation createTermRelation);
 
     @PutExchange("/{id}")
     Optional<HttpCommandResponse> update(@PathVariable long id,
-                                         @RequestParam long userId,
-                                         @RequestBody UpdateTermRelation updateTermRelation);
+        @RequestParam long userId,
+        @RequestBody UpdateTermRelation updateTermRelation);
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse> delete(@PathVariable long id,
-                                         @RequestParam long userId);
+    Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
 
     @DeleteExchange("/all")
-    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids,
-        @RequestParam long userId);
+    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids, @RequestParam long userId);
 
     @DeleteExchange("/term1/{idTerm1}/term2/{idTerm2}")
     Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1,
-                                                @PathVariable long idTerm2,
-                                                @RequestParam long userId);
+        @PathVariable long idTerm2,
+        @RequestParam long userId);
 }

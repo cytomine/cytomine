@@ -1,7 +1,5 @@
 """Search API"""
 
-from typing import List
-
 from fastapi import (
     APIRouter,
     Depends,
@@ -23,9 +21,9 @@ async def retrieve_image(
     request: Request,
     image: UploadFile,
     nrt_neigh: int = Query(...),
-    storage_names: List[str] = Query(..., alias="storage"),
+    storage_names: list[str] = Query(..., alias="storage"),
     index_name: str = Query(default="index", alias="index"),
-    retrievals: List[ImageRetrieval] = Depends(get_retrievals),
+    retrievals: list[ImageRetrieval] = Depends(get_retrievals),
 ) -> JSONResponse:
     """
     Search for similar images from the index.
@@ -34,9 +32,9 @@ async def retrieve_image(
         request (Request): The incoming HTTP request.
         image (UploadFile): The query image.
         nrt_neigh (int): The number of nearest neighbors to retrieve.
-        storage_names (List[str]): The list of storage names.
+        storage_names (list[str]): The list of storage names.
         index_name (str): The name of the index where the image features will be added.
-        retrievals (List[ImageRetrieval]): The image retrieval object.
+        retrievals (list[ImageRetrieval]): The image retrieval object.
 
     Returns:
         JSONResponse: A JSON containing the list of similarities.

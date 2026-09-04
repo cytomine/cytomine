@@ -1,21 +1,5 @@
 package be.cytomine.controller.meta;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -32,12 +16,15 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -49,8 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class PropertyResourceTests {
 
     @Autowired
@@ -58,6 +45,8 @@ public class PropertyResourceTests {
 
     @Autowired
     private MockMvc restPropertyControllerMockMvc;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     @Transactional
@@ -180,9 +169,8 @@ public class PropertyResourceTests {
             .andExpect(jsonPath("$.collection[?(@.key=='" + property.getKey() + "')]").exists())
             .andExpect(jsonPath("$.collection[?(@.key=='"
                 + property.getKey()
-                + "')].user").value(builder.givenSuperAdmin().getId().intValue()));
+                + "')].user").value((int) builder.givenSuperAdmin().id()));
     }
-
 
     @Test
     @Transactional
@@ -196,7 +184,6 @@ public class PropertyResourceTests {
             .andExpect(jsonPath("$.collection[0]").value("key"));
     }
 
-
     @Test
     @Transactional
     public void listAnnotationPosition() throws Exception {
@@ -204,13 +191,12 @@ public class PropertyResourceTests {
         Property property = builder.givenAProperty(userAnnotation);
         restPropertyControllerMockMvc.perform(get(
                 "/api/user/{user}/imageinstance/{image}/annotationposition.json",
-                userAnnotation.getUser().getId(), userAnnotation.getImage().getId()
+                userAnnotation.getUserId(), userAnnotation.getImage().getId()
             )
                 .param("key", property.getKey()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))));
     }
-
 
     @Test
     @Transactional
@@ -233,7 +219,6 @@ public class PropertyResourceTests {
             .andExpect(status().isNotFound());
     }
 
-
     @Test
     @Transactional
     public void showPropertyForProjectKeyNotExists() throws Exception {
@@ -245,7 +230,6 @@ public class PropertyResourceTests {
             ))
             .andExpect(status().isNotFound());
     }
-
 
     @Test
     @Transactional
@@ -267,7 +251,6 @@ public class PropertyResourceTests {
         restPropertyControllerMockMvc.perform(get("/api/annotation/{annotation}/key/{key}/property.json", 0L, "xxx"))
             .andExpect(status().isNotFound());
     }
-
 
     @Test
     @Transactional
@@ -352,7 +335,6 @@ public class PropertyResourceTests {
             .andExpect(status().isNotFound());
     }
 
-
     @Test
     @Transactional
     public void addValidProperty() throws Exception {
@@ -363,7 +345,7 @@ public class PropertyResourceTests {
                 property.getDomainIdent()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(property.toJSON()))
+                .content(property.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -386,10 +368,10 @@ public class PropertyResourceTests {
                 property1.getDomainIdent()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonObject.toJsonString(List.of(property1.toJsonObject(), property2.toJsonObject()))))
+                .content(JsonObject.toJsonString(List.of(property1.toJsonObject(urlApi),
+                    property2.toJsonObject(urlApi)))))
             .andExpect(status().isOk());
     }
-
 
     @Test
     @Transactional
@@ -397,7 +379,7 @@ public class PropertyResourceTests {
         Property property = builder.givenANotPersistedProperty(builder.givenAProject(), "key", "value");
         restPropertyControllerMockMvc.perform(post("/api/property.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(property.toJSON()))
+                .content(property.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -407,7 +389,6 @@ public class PropertyResourceTests {
             .andExpect(jsonPath("$.command").exists())
             .andExpect(jsonPath("$.property.id").exists());
     }
-
 
     @Test
     @Transactional
@@ -421,7 +402,7 @@ public class PropertyResourceTests {
                 property.getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(property.toJsonObject().withChange("value", "v2").toJsonString()))
+                .content(property.toJsonObject(urlApi).withChange("value", "v2").toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())

@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import ImageThumbnail from '@/components/image/ImageThumbnail';
-import {get} from '@/utils/store-helpers';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
+import { get } from '@/utils/store-helpers';
 
 export default {
   name: 'SelectableImage',
@@ -24,8 +24,8 @@ export default {
     ImageThumbnail,
   },
   props: {
-    image: {type: Object, required: true},
-    isSelected: {type: Boolean, required: true},
+    image: { type: Object, required: true },
+    isSelected: { type: Boolean, required: true },
   },
   computed: {
     shortTermToken: get('currentUser/shortTermToken'),

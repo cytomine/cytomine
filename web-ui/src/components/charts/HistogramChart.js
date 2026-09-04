@@ -1,26 +1,11 @@
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
-import {Line} from 'vue-chartjs';
+import { Line } from 'vue-chartjs';
 import _ from 'lodash';
 
 export default {
   name: 'histogram-chart',
-  extends: Line,
+  components: { Line },
   props: {
+    cssClasses: { type: String, default: '' },
     logScale: Boolean,
     color: String,
 
@@ -34,11 +19,6 @@ export default {
     currentBounds: Object,
     gamma: Number,
     inverted: Boolean,
-  },
-  data() {
-    return {
-      chartData: null,
-    };
   },
   computed: {
     extendedHistogram() {
@@ -90,8 +70,8 @@ export default {
     systemResponse() {
       if (this.currentLabels.length === 1) {
         return [
-          {x: this.currentLabels[0], y: 0},
-          {x: this.currentLabels[0], y: 255}
+          { x: this.currentLabels[0], y: 0 },
+          { x: this.currentLabels[0], y: 255 }
         ];
       }
 
@@ -123,6 +103,7 @@ export default {
     datasets() {
       return [
         {
+          label: 'response',
           data: this.systemResponse,
           fill: false,
           pointRadius: 0,
@@ -130,33 +111,88 @@ export default {
           borderColor: '#333',
           borderWidth: 1,
           type: 'line',
-          order: 2,
+          order: 1,
           cubicInterpolationMode: 'monotone',
           yAxisID: 'yResponse'
         },
         {
+          label: 'histogram',
           data: this.scaledHistogram,
           backgroundColor: this.backgroundColor,
+          fill: true,
           pointRadius: 1,
-          order: 1,
+          order: 2,
           yAxisID: 'yHistogram'
         },
       ];
-    }
-  },
-  watch: {
-    currentBoundsLabel() {
-      this.doRenderChart();
     },
-    logScale() {
-      this.doRenderChart();
+    chartData() {
+      return {
+        labels: this.labels,
+        datasets: this.datasets,
+      };
     },
-    systemResponse() {
-      this.doRenderChart();
+    chartOptions() {
+      const logScale = this.logScale;
+      const binSize = this.integerBinSize;
+      const boundsLabel = this.boundsLabel;
+
+      return {
+        maintainAspectRatio: false,
+        responsive: true,
+        animation: {
+          duration: 0,
+        },
+        plugins: {
+          title: {
+            display: false
+          },
+          legend: {
+            display: false
+          },
+          tooltip: {
+            filter: (tooltipItem) => tooltipItem.datasetIndex !== 0,
+            callbacks: {
+              label: (tooltipItem) => {
+                if (logScale) {
+                  return Math.round(Math.exp(tooltipItem.parsed.y));
+                }
+                return tooltipItem.parsed.y;
+              },
+              title: (tooltipItems) => {
+                if (tooltipItems.length > 0) {
+                  let left = Number(tooltipItems[0].label);
+                  if (binSize === 1) {
+                    return left;
+                  }
+                  let right = left + binSize;
+                  return `[${left} - ${right}[`;
+                }
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            display: true,
+            min: boundsLabel.min,
+            max: boundsLabel.max,
+            title: {
+              display: false
+            },
+            ticks: {
+              font: { size: 10 },
+            }
+          },
+          yHistogram: {
+            display: false,
+          },
+          yResponse: {
+            display: false
+          },
+        },
+      };
     },
-    backgroundColor() {
-      this.doRenderChart();
-    }
   },
   methods: {
     findBin(value) {
@@ -165,78 +201,15 @@ export default {
     findLabel(value) {
       return Math.floor(this.findBin(value) * this.binSize);
     },
-    doRenderChart() {
-      try {
-        this.renderChart({
-          labels: this.labels,
-          datasets: this.datasets,
-
-          // Additional data for tooltips
-          logScale: this.logScale,
-          binSize: this.integerBinSize,
-        }, {
-          tooltips: {
-            filter: function (tooltipItem) {
-              return tooltipItem.datasetIndex !== 0;
-            },
-            callbacks: {
-              label: function (tooltipItem, data) {
-                if (data.logScale) {
-                  return Math.round(Math.exp(tooltipItem.value));
-                }
-                return tooltipItem.value;
-              },
-              title: function (tooltipItems, data) {
-                if (tooltipItems.length > 0) {
-                  let left = Number(tooltipItems[0].label);
-                  if (data.binSize === 1) {
-                    return left;
-                  }
-                  let right = left + data.binSize;
-                  return `[${left} - ${right}[`;
-                }
-              }
-            }
-          },
-          maintainAspectRatio: false,
-          responsive: true,
-          title: {
-            display: false
-          },
-          legend: {
-            display: false
-          },
-          animation: {
-            duration: 0,
-          },
-          scales: {
-            xAxes: [{
-              display: true,
-              scaleLabel: {
-                display: false
-              },
-              ticks: {
-                ...this.boundsLabel,
-                fontSize: 10,
-              }
-            }],
-            yAxes: [{
-              id: 'yHistogram',
-              display: false,
-            }, {
-              id: 'yResponse',
-              display: false
-            }
-            ]
-          },
-        });
-      } catch (error) {
-        console.log(error);
-        this.$emit('error', true);
-      }
-    }
   },
-  async mounted() {
-    this.doRenderChart();
-  }
+  render(h) {
+    return h('div', { class: this.cssClasses }, [
+      h(Line, {
+        props: {
+          data: this.chartData,
+          options: this.chartOptions,
+        },
+      }),
+    ]);
+  },
 };

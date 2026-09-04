@@ -3,7 +3,7 @@
 import os
 import shutil
 import tempfile
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 from fastapi import FastAPI
@@ -16,7 +16,7 @@ from cbir import config
 
 
 @pytest.fixture(scope="session")
-def redis_container():
+def redis_container() -> Generator[RedisContainer, None, None]:
     """Start a Redis container for the test session."""
 
     image_prefix = os.environ.get("PROXY_CACHE", "")

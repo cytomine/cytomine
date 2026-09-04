@@ -42,9 +42,9 @@
 </template>
 
 <script>
-import TaskRunStateIcon from '@/components/appengine/task-run/TaskRunStateIcon';
-import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable';
-import {formatTaskName} from '@/utils/app';
+import TaskRunStateIcon from '@/components/appengine/task-run/TaskRunStateIcon.vue';
+import TaskRunParametersTable from '@/components/appengine/task-run/TaskRunParametersTable.vue';
+import { formatTaskName } from '@/utils/app';
 
 export default {
   name: 'TaskRunTable',
@@ -53,7 +53,7 @@ export default {
     TaskRunParametersTable
   },
   props: {
-    taskRuns: {type: Array, required: true},
+    taskRuns: { type: Array, required: true },
   },
   data() {
     return {

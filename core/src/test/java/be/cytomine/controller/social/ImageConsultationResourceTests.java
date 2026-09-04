@@ -1,21 +1,5 @@
 package be.cytomine.controller.social;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Date;
 
 import org.apache.commons.lang3.time.DateUtils;
@@ -37,11 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.PersistentImageConsultation;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.service.social.ImageConsultationService;
@@ -59,8 +45,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class ImageConsultationResourceTests {
 
     @Autowired
@@ -84,17 +71,17 @@ public class ImageConsultationResourceTests {
     }
 
     PersistentImageConsultation givenAPersistentImageConsultation(
-        User user,
+        long userId,
         ImageInstance imageInstance,
         Date created
     ) {
-        return imageConsultationService.add(user, imageInstance.getId(), "xxx", "mode", created);
+        return imageConsultationService.add(userId, imageInstance.getId(), "xxx", "mode", created);
     }
 
     @Test
     @Transactional
     public void addConsultation() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
 
@@ -111,7 +98,7 @@ public class ImageConsultationResourceTests {
                 .content(jsonObject.toJsonString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.social.PersistentImageConsultation"))
-            .andExpect(jsonPath("$.user").value(user.getId()))
+            .andExpect(jsonPath("$.user").value(user.id()))
             .andExpect(jsonPath("$.image").value(imageInstance.getId()))
             .andExpect(jsonPath("$.imageName").exists())
             .andExpect(jsonPath("$.imageThumb").exists())
@@ -119,23 +106,22 @@ public class ImageConsultationResourceTests {
 
         Page<PersistentImageConsultation> persisted = persistentImageConsultationRepository.findAllByProjectAndUser(
             imageInstance.getProject().getId(),
-            user.getId(),
+            user.id(),
             PageRequest.of(0, 1)
         );
         assertThat(persisted).hasSize(1);
         assertThat(persisted.getContent().get(0).getMode()).isEqualTo("view");
     }
 
-
     @Test
     @Transactional
     public void shouldReturnLastConsultedImagePerUserForProject() throws Exception {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenUserAclRead();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentImageConsultation(user, imageInstance2, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentImageConsultation(user.id(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.id(), imageInstance2, DateUtils.addSeconds(new Date(), -2));
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{image}/lastImages.json",
@@ -149,13 +135,16 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void listLastUserConsultation() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        imageConsultationService.add(user, imageInstance1.getId(), "xxx", "mode", DateUtils.addSeconds(new Date(), -3));
-        imageConsultationService.add(user, imageInstance1.getId(), "xxx", "mode", DateUtils.addSeconds(new Date(), -2));
-        imageConsultationService.add(user, imageInstance2.getId(), "xxx", "mode", DateUtils.addSeconds(new Date(), -1));
+        imageConsultationService.add(user.id(), imageInstance1.getId(), "xxx", "mode",
+            DateUtils.addSeconds(new Date(), -3));
+        imageConsultationService.add(user.id(), imageInstance1.getId(), "xxx", "mode",
+            DateUtils.addSeconds(new Date(), -2));
+        imageConsultationService.add(user.id(), imageInstance2.getId(), "xxx", "mode",
+            DateUtils.addSeconds(new Date(), -1));
 
         restImageConsultationControllerMockMvc.perform(get("/api/imageinstance/method/lastopened.json")
                 .param("max", "10"))
@@ -174,7 +163,7 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void listLastUserConsultationNoData() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
@@ -186,17 +175,17 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void shouldReturnDistinctConsultedImagesForUserInProject() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentImageConsultation(user, imageInstance2, DateUtils.addSeconds(new Date(), -2));
+        givenAPersistentImageConsultation(user.id(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.id(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.id(), imageInstance2, DateUtils.addSeconds(new Date(), -2));
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{project}/user/{user}/imageconsultation.json",
-                imageInstance1.getProject().getId().toString(), user.getId().toString()
+                imageInstance1.getProject().getId().toString(), String.valueOf(user.id())
             ).param("distinctImages", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(2))))
@@ -205,7 +194,7 @@ public class ImageConsultationResourceTests {
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{project}/user/{user}/imageconsultation.json",
-                imageInstance1.getProject().getId().toString(), builder.givenAUser().getId().toString()
+                imageInstance1.getProject().getId().toString(), String.valueOf(builder.givenUserAclRead().id())
             ).param("distinctImages", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
@@ -214,13 +203,13 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void resumeByUserAndProjectEmpty() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
         restImageConsultationControllerMockMvc.perform(get("/api/imageconsultation/resume.json")
                 .param("project", imageInstance1.getProject().getId().toString())
-                .param("user", user.getId().toString()))
+                .param("user", String.valueOf(user.id())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(0))));
     }
@@ -228,16 +217,16 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void resumeByUserAndProject() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
-        givenAPersistentImageConsultation(user, imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.id(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
+        givenAPersistentImageConsultation(user.id(), imageInstance1, DateUtils.addSeconds(new Date(), -3));
 
         restImageConsultationControllerMockMvc.perform(get("/api/imageconsultation/resume.json")
                 .param("project", imageInstance1.getProject().getId().toString())
-                .param("user", user.getId().toString()))
+                .param("user", String.valueOf(user.id())))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(equalTo(1))))
             .andExpect(jsonPath("$.collection[0].frequency").value(2));
@@ -246,18 +235,18 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void resumeByUserAndProjectExportAsCsv() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         SliceInstance slice = builder.givenASliceInstance(imageInstance1, 1, 0, 1);
         builder.givenAUserAnnotation(slice);
 
         Date currentDate = DateUtils.addSeconds(new Date(), -3);
-        givenAPersistentImageConsultation(user, imageInstance1, currentDate);
-        givenAPersistentImageConsultation(user, imageInstance1, currentDate);
+        givenAPersistentImageConsultation(user.id(), imageInstance1, currentDate);
+        givenAPersistentImageConsultation(user.id(), imageInstance1, currentDate);
 
         MvcResult mvcResult = restImageConsultationControllerMockMvc.perform(get("/api/imageconsultation/resume.json")
                 .param("project", imageInstance1.getProject().getId().toString())
-                .param("user", user.getId().toString())
+                .param("user", String.valueOf(user.id()))
                 .param("export", "csv"))
             .andExpect(header().string("Content-Type", "text/csv"))
             .andExpect(status().isOk()).andReturn();
@@ -280,11 +269,11 @@ public class ImageConsultationResourceTests {
     @Test
     @Transactional
     public void countAnnotationByProject() throws Exception {
-        User user = builder.givenSuperAdmin();
+        UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
 
-        givenAPersistentImageConsultation(user, imageInstance2, DateUtils.addDays(new Date(), -2));
+        givenAPersistentImageConsultation(user.id(), imageInstance2, DateUtils.addDays(new Date(), -2));
 
         restImageConsultationControllerMockMvc.perform(get(
                 "/api/project/{project}/imageconsultation/count.json",

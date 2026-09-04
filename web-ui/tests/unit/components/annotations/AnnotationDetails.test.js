@@ -1,27 +1,27 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 import VueRouter from 'vue-router';
 
-import {AnnotationType} from '@/api';
+import { AnnotationType } from '@/api';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   AnnotationType: {
     USER: 'USER',
     REVIEWED: 'REVIEWED',
   },
-  AnnotationTerm: jest.fn().mockImplementation(() => ({
-    save: jest.fn().mockResolvedValue({})
+  AnnotationTerm: vi.fn().mockImplementation(() => ({
+    save: vi.fn().mockResolvedValue({}),
   })),
-  AnnotationTrack: jest.fn().mockImplementation(() => ({
-    save: jest.fn().mockResolvedValue({})
+  AnnotationTrack: vi.fn().mockImplementation(() => ({
+    save: vi.fn().mockResolvedValue({}),
   })),
   AnnotationCommentCollection: {
-    fetchAll: jest.fn().mockResolvedValue({array: []})
+    fetchAll: vi.fn().mockResolvedValue({ array: [] }),
   },
   PropertyCollection: {
-    fetchAll: jest.fn().mockResolvedValue({array: []})
-  }
+    fetchAll: vi.fn().mockResolvedValue({ array: [] }),
+  },
 }));
 
 const localVue = createLocalVue();
@@ -32,7 +32,6 @@ localVue.directive('click-outside', {
   bind() {},
   unbind() {},
 });
-localVue.filter('moment', (value) => value);
 
 const mockAdminUser = {
   id: 123,
@@ -53,11 +52,11 @@ const mockAnnotation = {
   created: 1234567890000,
   location: 'POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))',
   userByTerm: [
-    {term: 10, user: [1]},
-    {term: 11, user: [1]}
+    { term: 10, user: [1] },
+    { term: 11, user: [1] }
   ],
   annotationTrack: [
-    {track: 20}
+    { track: 20 }
   ],
   url: 'http://example.com/annotation/1'
 };
@@ -77,17 +76,17 @@ const mockStore = {
         'project-explore-annotation-creation-info': true,
         'project-explore-annotation-comments': true,
       },
-      ontology: {id: 1, name: 'Test Ontology'},
+      ontology: { id: 1, name: 'Test Ontology' },
     },
     currentUser: {
-      account: {isDeveloper: false},
+      account: { isDeveloper: false },
       shortTermToken: 'test-token',
     }
   },
   getters: {
     'currentProject/canEditAnnot': () => true,
   },
-  dispatch: jest.fn(),
+  dispatch: vi.fn(),
 };
 
 describe('AnnotationDetails.vue', () => {
@@ -98,15 +97,15 @@ describe('AnnotationDetails.vue', () => {
       propsData: {
         annotation: mockAnnotation,
         terms: [
-          {id: 10, name: 'Cell'},
-          {id: 11, name: 'Nucleus'},
+          { id: 10, name: 'Cell' },
+          { id: 11, name: 'Nucleus' },
         ],
         tracks: [
-          {id: 20, name: 'Track 1', image: 200},
+          { id: 20, name: 'Track 1', image: 200 },
         ],
         users: [
           mockAdminUser,
-          {id: 124, name: 'Test user'},
+          { id: 124, name: 'Test user' },
         ],
         images: [
           {
@@ -120,20 +119,17 @@ describe('AnnotationDetails.vue', () => {
           }
         ],
         slices: [
-          {id: 300, channel: 0},
+          { id: 300, channel: 0 },
         ],
         profiles: [
-          {image: 201},
+          { image: 201 },
         ],
         showImageInfo: false,
         showChannelInfo: false,
         showComments: false,
       },
       mocks: {
-        $eventBus: {
-          $emit: jest.fn(),
-        },
-        $notify: jest.fn(),
+        $notify: vi.fn(),
         $store: mockStore,
         $t: (key) => key,
       },

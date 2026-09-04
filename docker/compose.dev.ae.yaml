@@ -6,12 +6,16 @@ services:
       context: ./app-engine
       target: dev-server
     working_dir: "/app"
-    command: ["/bin/bash"]
+    command: ["/bin/sh"]
     stdin_open: true
     tty: true
     volumes:
       - ./app-engine:/app/app-engine
+      - ./common:/app/common
+      - ./core:/app/core
+      - ./e2e-tests:/app/e2e-tests
       - ./registry-client:/app/registry-client
+      - ./repository:/app/repository
       - ./settings.gradle:/app/settings.gradle
       # gradle cache for faster build
       - ./cache/app-engine:/.gradle

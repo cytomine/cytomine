@@ -11,9 +11,6 @@ public class HibernateConfig {
 
     @Bean
     HibernatePropertiesCustomizer jsonFormatMapperCustomizer(ObjectMapper objectMapper) {
-        return properties -> properties.put(
-            MappingSettings.JSON_FORMAT_MAPPER,
-            new Jackson3FormatMapper(objectMapper)
-        );
+        return properties -> properties.put(MappingSettings.JSON_FORMAT_MAPPER, new Jackson3FormatMapper(objectMapper));
     }
 }

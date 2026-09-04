@@ -1,21 +1,5 @@
 package be.cytomine.domain.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +24,6 @@ import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.Point;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -226,7 +209,7 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
         }
     }
 
-    abstract Long getUserId();
+    public abstract Long getUserId();
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
@@ -245,7 +228,7 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
         );
         returnArray.put("user", annotationDomain.getUserId());
 
-        returnArray.put("location", annotationDomain.location.toString()); //TODO: totext?
+        returnArray.put("location", annotationDomain.location.toString()); //TODO: to text?
         returnArray.put("geometryCompression", annotationDomain.geometryCompression);
         returnArray.put("centroid", annotationDomain.getCentroid());
 
@@ -259,7 +242,5 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
 
         return returnArray;
     }
-
-    public abstract User user();
 
 }

@@ -16,6 +16,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.group.ImageGroupService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -33,6 +34,8 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
     private ImageGroupService imageGroupService;
 
     private ImageGroup imageGroup = null;
+    @Autowired
+    private UrlApi urlApi;
 
     @BeforeEach
     public void before() throws Exception {
@@ -51,12 +54,12 @@ public class ImageGroupAuthorizationTest extends CRUDAuthorizationTest {
 
     @Override
     protected void whenIAddDomain() {
-        imageGroupService.add(builder.givenANotPersistedImagegroup(imageGroup.getProject()).toJsonObject());
+        imageGroupService.add(builder.givenANotPersistedImagegroup(imageGroup.getProject()).toJsonObject(urlApi));
     }
 
     @Override
     protected void whenIEditDomain() {
-        imageGroupService.update(imageGroup, imageGroup.toJsonObject());
+        imageGroupService.update(imageGroup, imageGroup.toJsonObject(urlApi));
     }
 
     @Override

@@ -27,7 +27,7 @@ export default class AbstractAnnotationTerm extends Model {
    * @returns {this} The fetched object
    */
   static async fetch(annotation, term) {
-    return new this({id: 0, annotation, term}).fetch(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0, annotation, term }).fetch(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @inheritdoc */
@@ -45,7 +45,7 @@ export default class AbstractAnnotationTerm extends Model {
    * @param {number} [user]       The identifier of the user
    */
   static async delete(annotation, term, user = null) {
-    return new this({id: 0, annotation, term, user}).delete(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0, annotation, term, user }).delete(); // ID set to 0 to bypass the isNew() verification
   }
 
   /**
@@ -57,8 +57,8 @@ export default class AbstractAnnotationTerm extends Model {
     if (!this.annotation || !this.term) {
       throw new Error('Cannot add annotation term with no annotation ID or term ID.');
     }
-    let {data} = await Cytomine.instance.api.post(`annotation/${this.annotation}/term/${this.term}/clearBefore.json`,
-      {clearForAll: clearForAllUsers});
+    let { data } = await Cytomine.instance.api.post(`annotation/${this.annotation}/term/${this.term}/clearBefore.json`,
+      { clearForAll: clearForAllUsers });
 
     this.populate(data[this.callbackIdentifier]);
     Cytomine.instance.lastCommand = data.command;

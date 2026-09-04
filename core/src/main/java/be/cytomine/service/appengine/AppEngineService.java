@@ -93,6 +93,28 @@ public class AppEngineService {
         return sendWithBody(HttpMethod.PUT, uri, body, contentType);
     }
 
+    public <B> String putWithParams(String uri, B body, MediaType contentType, Map<String, String> queryParams) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl + apiBasePath + uri);
+        if (queryParams != null) {
+            queryParams.forEach(builder::queryParam);
+        }
+        String finalUrl = builder.toUriString();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(contentType);
+
+        HttpEntity<B> requestEntity = new HttpEntity<>(body, headers);
+        try {
+            return restTemplate.exchange(finalUrl, HttpMethod.PUT, requestEntity, String.class)
+                .getBody();
+        } catch (HttpStatusCodeException e) {
+            throw new AppEngineException(
+                "error from appengine",
+                e.getStatusCode().value(),
+                e.getResponseBodyAsString()
+            );
+        }
+    }
+
     public <B> String postWithParams(String uri, B body, MediaType contentType, Map<String, String> queryParams) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl + apiBasePath + uri);
         if (queryParams != null) {

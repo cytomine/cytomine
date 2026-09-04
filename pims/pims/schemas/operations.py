@@ -21,3 +21,5 @@ class ImportResponse(BaseModel):
 
 class JobResponse(BaseModel):
     status: str
+    path: str
+    content: list[str] = Field(default_factory=list)

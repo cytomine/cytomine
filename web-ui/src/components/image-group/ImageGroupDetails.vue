@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.-->
-
 <template>
 <div class="image-details-wrapper">
   <table class="table">
@@ -34,7 +20,7 @@ limitations under the License.-->
     <tr v-if="isPropDisplayed('created')">
       <td class="prop-label">{{$t('created-on')}}</td>
       <td class="prop-content" colspan="3">
-        {{ Number(imageGroup.created) | moment('ll') }}
+        {{ formatMomentDate(Number(imageGroup.created), 'll') }}
       </td>
     </tr>
     <tr v-if="isPropDisplayed('description')">
@@ -125,19 +111,20 @@ limitations under the License.-->
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
-import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
-import CytomineTags from '@/components/tag/CytomineTags';
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
-import RenameModal from '@/components/utils/RenameModal';
-import ImagePreview from '../image/ImagePreview';
-import ImageGroupPreview from '@/components/image-group/ImageGroupPreview';
-import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal';
+import CytomineDescription from '@/components/description/CytomineDescription.vue';
+import CytomineProperties from '@/components/property/CytomineProperties.vue';
+import CytomineTags from '@/components/tag/CytomineTags.vue';
+import AttachedFiles from '@/components/attached-file/AttachedFiles.vue';
+import RenameModal from '@/components/utils/RenameModal.vue';
+import ImagePreview from '../image/ImagePreview.vue';
+import ImageGroupPreview from '@/components/image-group/ImageGroupPreview.vue';
+import AddToImageGroupModal from '@/components/image-group/AddToImageGroupModal.vue';
 import constants from '@/utils/constants';
+import { formatMomentDate } from '@/utils/date';
 
-import {ImageGroup, ImageGroupImageInstance, PropertyCollection} from '@/api';
+import { ImageGroup, ImageGroupImageInstance, PropertyCollection } from '@/api';
 
 export default {
   name: 'image-group-details',
@@ -152,9 +139,9 @@ export default {
     AddToImageGroupModal
   },
   props: {
-    imageGroup: {type: Object},
-    excludedProperties: {type: Array, default: () => []},
-    editable: {type: Boolean, default: false}
+    imageGroup: { type: Object },
+    excludedProperties: { type: Array, default: () => [] },
+    editable: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -181,6 +168,7 @@ export default {
     },
   },
   methods: {
+    formatMomentDate,
     removeProp(prop) {
       this.properties = this.properties.filter(p => p.id !== prop.id);
     },
@@ -205,13 +193,13 @@ export default {
         await this.imageGroup.save();
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-group-rename', {imageName: this.imageGroup.name})
+          text: this.$t('notif-success-image-group-rename', { imageName: this.imageGroup.name })
         });
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-group-rename', {imageName: oldName})
+          text: this.$t('notif-error-image-group-rename', { imageName: oldName })
         });
       }
       this.isRenameModalActive = false;
@@ -220,7 +208,7 @@ export default {
     confirmDeletion() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-image-group'),
-        message: this.$t('delete-image-group-confirmation-message', {groupName: this.imageGroup.name}),
+        message: this.$t('delete-image-group-confirmation-message', { groupName: this.imageGroup.name }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -232,7 +220,7 @@ export default {
         await ImageGroup.delete(this.imageGroup.id);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-group-deletion', {groupName: this.imageGroup.name})
+          text: this.$t('notif-success-image-group-deletion', { groupName: this.imageGroup.name })
         });
         this.$emit('delete');
 
@@ -240,7 +228,7 @@ export default {
         console.log(err);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-group-deletion', {groupName: this.imageGroup.name})
+          text: this.$t('notif-error-image-group-deletion', { groupName: this.imageGroup.name })
         });
       }
     },
@@ -251,7 +239,7 @@ export default {
     confirmImageGroupLinkDeletion(image) {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-image-group-link'),
-        message: this.$t('delete-image-group-link-confirmation-message', {imageName: this.imageNameNotif(image)}),
+        message: this.$t('delete-image-group-link-confirmation-message', { imageName: this.imageNameNotif(image) }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -264,21 +252,21 @@ export default {
         await ImageGroupImageInstance.delete(this.imageGroup.id, image.id);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-group-link-deletion', {imageName: this.imageNameNotif(image)})
+          text: this.$t('notif-success-image-group-link-deletion', { imageName: this.imageNameNotif(image) })
         });
         this.$emit('deleteImage', image);
       } catch (err) {
         console.log(err);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-group-link-deletion', {imageName: this.imageNameNotif(image)})
+          text: this.$t('notif-error-image-group-link-deletion', { imageName: this.imageNameNotif(image) })
         });
       }
     },
   },
   async created() {
     try {
-      this.properties = (await PropertyCollection.fetchAll({object: this.imageGroup})).array;
+      this.properties = (await PropertyCollection.fetchAll({ object: this.imageGroup })).array;
     } catch (error) {
       this.loadPropertiesError = true;
       console.log(error);

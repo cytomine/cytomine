@@ -1,21 +1,5 @@
 package be.cytomine.domain.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Optional;
 
 import jakarta.persistence.Entity;
@@ -26,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -38,9 +23,6 @@ public class AbstractSlice extends CytomineDomain {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private UploadedFile uploadedFile;
-
-    @ManyToOne(fetch = FetchType.EAGER, optional = true)
-    private Mime mime; // [PIMS] Deprecated.
 
     private Integer channel;
 
@@ -67,15 +49,6 @@ public class AbstractSlice extends CytomineDomain {
             false
         );
         abstractSlice.image = (AbstractImage) json.getJSONAttrDomain(entityManager, "image", new AbstractImage(), true);
-        abstractSlice.mime = (Mime) json.getJSONAttrDomain(
-            entityManager,
-            "mime",
-            new Mime(),
-            "mimeType",
-            "String",
-            false
-        );
-
         abstractSlice.channel = json.getJSONAttrInteger("channel", 0);
         abstractSlice.zStack = json.getJSONAttrInteger("zStack", 0);
         abstractSlice.time = json.getJSONAttrInteger("time", 0);
@@ -94,8 +67,6 @@ public class AbstractSlice extends CytomineDomain {
         returnArray.put("uploadedFile", abstractSlice.getUploadedFileId());
         returnArray.put("path", abstractSlice.getPath());
         returnArray.put("image", abstractSlice.getImageId());
-        returnArray.put("mime", abstractSlice.getMimeType());
-
         returnArray.put("channel", abstractSlice.getChannel());
         returnArray.put("zStack", abstractSlice.getZStack());
         returnArray.put("time", abstractSlice.getTime());
@@ -115,10 +86,6 @@ public class AbstractSlice extends CytomineDomain {
 
     public Long getImageId() {
         return this.getImage() != null ? this.getImage().getId() : null;
-    }
-
-    public String getMimeType() {
-        return this.getMime() != null ? this.getMime().getMimeType() : null;
     }
 
     public String getPath() {
@@ -145,7 +112,7 @@ public class AbstractSlice extends CytomineDomain {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 }

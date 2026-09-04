@@ -739,23 +739,26 @@ public class ProvisionTaskStepDefinitions {
         }
     }
 
-    @SuppressWarnings("checkstyle:LineLength")
     @Then("the value {string} is saved and associated collection {string} in the database")
     public void theValueIsSavedAndAssociatedCollectionInTheDatabase(String value, String parameterName) {
-        Parameter input = persistedTask
-            .getParameters()
+        Parameter input = persistedTask.getParameters()
             .stream()
             .filter(i -> i.getName().equals(parameterName) && i.getParameterType().equals(ParameterType.INPUT))
             .findFirst()
             .orElse(null);
         Assertions.assertNotNull(input);
 
-        CollectionPersistence provision = collectionPersistenceRepository.findCollectionPersistenceByParameterNameAndRunIdAndParameterType(parameterName, persistedRun.getId(), ParameterType.INPUT);
+        CollectionPersistence provision = collectionPersistenceRepository
+            .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                parameterName,
+                persistedRun.getId(),
+                ParameterType.INPUT
+            )
+            .orElse(null);
 
         Assertions.assertNotNull(provision);
         Assertions.assertEquals(1, provision.getItems().size());
         Assertions.assertTrue(provision.getParameterName().equalsIgnoreCase(parameterName));
-
     }
 
     @And("a input file named {string} is created in the task run storage {string}+UUID within {string}")

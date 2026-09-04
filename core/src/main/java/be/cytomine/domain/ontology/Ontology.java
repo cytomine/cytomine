@@ -1,21 +1,5 @@
 package be.cytomine.domain.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,8 +14,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -41,6 +23,7 @@ import lombok.Setter;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
 @Entity
@@ -50,12 +33,11 @@ public class Ontology extends CytomineDomain {
 
     @NotNull
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     protected String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
-    protected User user;
+    @Column(name = "user_id")
+    protected Long userId;
 
     @Column()
     protected LocalDateTime deleted;
@@ -88,7 +70,6 @@ public class Ontology extends CytomineDomain {
         } else {
             returnArray.put("children", new ArrayList<>());
         }
-        returnArray.put("user", (ontology.getUser() != null ? ontology.getUser().getId() : null));
         return returnArray;
     }
 
@@ -96,14 +77,10 @@ public class Ontology extends CytomineDomain {
         Ontology ontology = this;
         ontology.id = json.getJSONAttrLong("id", null);
         ontology.name = json.getJSONAttrStr("name", true);
-        ontology.user = (User) json.getJSONAttrDomain(entityManager, "user", new User(), true);
+        ontology.userId = (json.getJSONAttrDomain(entityManager, "user", new User(), true)).getId();
         ontology.created = json.getJSONAttrDate("created");
         ontology.updated = json.getJSONAttrDate("updated");
         return ontology;
-    }
-
-    private Long getUserId() {
-        return (user != null ? user.getId() : null);
     }
 
     /**
@@ -134,7 +111,6 @@ public class Ontology extends CytomineDomain {
      * Get the term branch
      *
      * @param term Root term
-     *
      * @return Branch with all term children as tree
      */
     Map<String, Object> branch(Term term) {
@@ -178,12 +154,12 @@ public class Ontology extends CytomineDomain {
     }
 
     @Override
-    public String toJSON() {
+    public String toJSON(UrlApi urlApi) {
         return getDataFromDomain(this).toJsonString();
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this);
     }
 

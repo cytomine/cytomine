@@ -1,21 +1,5 @@
 package be.cytomine.domain.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Date;
 import java.util.Optional;
 
@@ -83,57 +67,7 @@ public class ImageInstance extends CytomineDomain {
 
     private Double fps;
 
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        return buildDomainFromJson(this, json, entityManager);
-    }
-
-    public CytomineDomain buildDomainFromJson(
-        ImageInstance imageInstance,
-        JsonObject json,
-        EntityManager entityManager
-    ) {
-        imageInstance.id = json.getJSONAttrLong("id", null);
-        imageInstance.created = json.getJSONAttrDate("created");
-        imageInstance.updated = json.getJSONAttrDate("updated");
-
-        imageInstance.user = (User) json.getJSONAttrDomain(entityManager, "user", new User(), false);
-        imageInstance.baseImage = (AbstractImage) json.getJSONAttrDomain(
-            entityManager,
-            "baseImage",
-            new AbstractImage(),
-            false
-        );
-        imageInstance.project = (Project) json.getJSONAttrDomain(entityManager, "project", new Project(), false);
-
-        imageInstance.instanceFilename = json.getJSONAttrStr("instanceFilename", false);
-
-        imageInstance.reviewStart = json.getJSONAttrDate("reviewStart");
-        imageInstance.reviewStop = json.getJSONAttrDate("reviewStart");
-        imageInstance.reviewUser = (User) json.getJSONAttrDomain(entityManager, "reviewUser", new User(), false);
-
-        imageInstance.magnification = json.getJSONAttrInteger("magnification", null);
-        imageInstance.physicalSizeX = json.getJSONAttrDouble("physicalSizeX", null);
-        imageInstance.physicalSizeY = json.getJSONAttrDouble("physicalSizeY", null);
-        imageInstance.physicalSizeZ = json.getJSONAttrDouble("physicalSizeZ", null);
-        imageInstance.fps = json.getJSONAttrDouble("fps", null);
-
-        //Check review constraint
-        if ((imageInstance.reviewUser == null && imageInstance.reviewStart != null)
-            || (imageInstance.reviewUser != null && imageInstance.reviewStart == null)
-            || (imageInstance.reviewStart == null && imageInstance.reviewStop != null)) {
-            throw new WrongArgumentException("Review data are not valid: user= "
-                + this.reviewUser
-                + "start= "
-                + this.reviewStart
-                + " , stop= "
-                + this.reviewStop);
-        }
-
-        return imageInstance;
-    }
-
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         ImageInstance imageInstance = (ImageInstance) domain;
         returnArray.put("baseImage", imageInstance.getBaseImageId());
@@ -184,7 +118,6 @@ public class ImageInstance extends CytomineDomain {
             Optional.ofNullable(imageInstance.getBaseImage()).map(AbstractImage::getApparentChannels).orElse(null)
         );
 
-
         returnArray.put("physicalSizeX", imageInstance.getPhysicalSizeX());
         returnArray.put("physicalSizeY", imageInstance.getPhysicalSizeY());
         returnArray.put("physicalSizeZ", imageInstance.getPhysicalSizeZ());
@@ -219,7 +152,6 @@ public class ImageInstance extends CytomineDomain {
             Optional.ofNullable(imageInstance.getBaseImage()).map(AbstractImage::getColorspace).orElse(null)
         );
 
-
         returnArray.put(
             "reviewStart",
             Optional.ofNullable(imageInstance.getReviewStart()).map(x -> String.valueOf(x.getTime())).orElse(null)
@@ -228,8 +160,7 @@ public class ImageInstance extends CytomineDomain {
             "reviewStop",
             Optional.ofNullable(imageInstance.getReviewStop()).map(x -> String.valueOf(x.getTime())).orElse(null)
         );
-        returnArray.put("reviewUser", Optional.ofNullable(imageInstance.getReviewUser()).map(User::getId).orElse(null));
-
+        returnArray.put("reviewUser", imageInstance.getReviewUserId());
 
         returnArray.put("reviewed", imageInstance.isReviewed());
         returnArray.put("inReview", imageInstance.isInReviewMode());
@@ -238,11 +169,11 @@ public class ImageInstance extends CytomineDomain {
         returnArray.put("numberOfJobAnnotations", imageInstance.countImageJobAnnotations);
         returnArray.put("numberOfReviewedAnnotations", imageInstance.countImageReviewedAnnotations);
 
-        returnArray.put("thumb", UrlApi.getImageInstanceThumbUrlWithMaxSize(imageInstance.id, 512, "png"));
-        returnArray.put("preview", UrlApi.getImageInstanceThumbUrlWithMaxSize(imageInstance.id, 1024, "png"));
+        returnArray.put("thumb", urlApi.getImageInstanceThumbUrlWithMaxSize(imageInstance.id, 512, "png"));
+        returnArray.put("preview", urlApi.getImageInstanceThumbUrlWithMaxSize(imageInstance.id, 1024, "png"));
         returnArray.put(
             "macroURL",
-            UrlApi.getAssociatedImage(
+            urlApi.getAssociatedImage(
                 imageInstance,
                 "macro",
                 Optional.ofNullable(imageInstance.getBaseImage())
@@ -257,6 +188,53 @@ public class ImageInstance extends CytomineDomain {
         return returnArray;
     }
 
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        return buildDomainFromJson(this, json, entityManager);
+    }
+
+    public CytomineDomain buildDomainFromJson(
+        ImageInstance imageInstance,
+        JsonObject json,
+        EntityManager entityManager
+    ) {
+        imageInstance.id = json.getJSONAttrLong("id", null);
+        imageInstance.created = json.getJSONAttrDate("created");
+        imageInstance.updated = json.getJSONAttrDate("updated");
+
+        imageInstance.user = (User) json.getJSONAttrDomain(entityManager, "user", new User(), false);
+        imageInstance.baseImage = (AbstractImage) json.getJSONAttrDomain(
+            entityManager,
+            "baseImage",
+            new AbstractImage(),
+            false
+        );
+        imageInstance.project = (Project) json.getJSONAttrDomain(entityManager, "project", new Project(), false);
+
+        imageInstance.instanceFilename = json.getJSONAttrStr("instanceFilename", false);
+
+        imageInstance.reviewStart = json.getJSONAttrDate("reviewStart");
+        imageInstance.reviewStop = json.getJSONAttrDate("reviewStart");
+        imageInstance.reviewUser = (User) json.getJSONAttrDomain(entityManager, "reviewUser", new User(), false);
+        imageInstance.magnification = json.getJSONAttrInteger("magnification", null);
+        imageInstance.physicalSizeX = json.getJSONAttrDouble("physicalSizeX", null);
+        imageInstance.physicalSizeY = json.getJSONAttrDouble("physicalSizeY", null);
+        imageInstance.physicalSizeZ = json.getJSONAttrDouble("physicalSizeZ", null);
+        imageInstance.fps = json.getJSONAttrDouble("fps", null);
+
+        //Check review constraint
+        if ((imageInstance.reviewUser == null && imageInstance.reviewStart != null)
+            || (imageInstance.reviewUser != null && imageInstance.reviewStart == null)
+            || (imageInstance.reviewStart == null && imageInstance.reviewStop != null)) {
+            throw new WrongArgumentException("Review data are not valid: user= "
+                + this.reviewUser
+                + "start= "
+                + this.reviewStart
+                + " , stop= "
+                + this.reviewStop);
+        }
+
+        return imageInstance;
+    }
 
     private Long getBaseImageId() {
         return Optional.ofNullable(this.getBaseImage()).map(CytomineDomain::getId).orElse(null);
@@ -266,8 +244,12 @@ public class ImageInstance extends CytomineDomain {
         return Optional.ofNullable(this.getProject()).map(CytomineDomain::getId).orElse(null);
     }
 
-    private Long getUserId() {
+    public Long getUserId() {
         return Optional.ofNullable(this.getUser()).map(CytomineDomain::getId).orElse(null);
+    }
+
+    public Long getReviewUserId() {
+        return Optional.ofNullable(this.getReviewUser()).map(CytomineDomain::getId).orElse(null);
     }
 
     /**
@@ -304,13 +286,13 @@ public class ImageInstance extends CytomineDomain {
      * @return Domain user
      */
     @Override
-    public User userDomainCreator() {
-        return user;
+    public Long userDomainCreator() {
+        return getUserId();
     }
 
     @Override
-    public JsonObject toJsonObject() {
-        return getDataFromDomain(this);
+    public JsonObject toJsonObject(UrlApi urlApi) {
+        return getDataFromDomain(this, urlApi);
     }
 
     public String getBlindOriginalFilename() {

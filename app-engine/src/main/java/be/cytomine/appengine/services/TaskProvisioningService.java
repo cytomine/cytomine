@@ -1059,7 +1059,6 @@ public class TaskProvisioningService {
             case PROVISIONED -> updateToProvisioned(run);
             case RUNNING -> run(run);
             case FINISHED -> updateToFinished(run);
-            // to safeguard against unknown state transition requests
             default -> throw new ProvisioningException(ErrorBuilder.build(ErrorCode.UNKNOWN_STATE));
         };
     }
@@ -1094,7 +1093,6 @@ public class TaskProvisioningService {
         }
         log.info("Running Task: valid run");
 
-
         checkBeforeExecutionMatches(run);
 
         log.info("Running Task: contacting scheduler...");
@@ -1108,17 +1106,15 @@ public class TaskProvisioningService {
             .stream()
             .filter(parameter -> parameter.getParameterType().equals(ParameterType.INPUT))
             .collect(Collectors.toSet());
+
         // loop input parameters
         List<Symlink> links = new ArrayList<>();
         for (Parameter parameter : inputs) {
             if (parameter.getType() instanceof CollectionType) {
                 // if referenced, fetch the paths from the database
                 CollectionPersistence collectionPersistence = collectionPersistenceRepository
-                    .findCollectionPersistenceByParameterNameAndRunId(
-                    parameter.getName(),
-                    run.getId());
+                    .findCollectionPersistenceByParameterNameAndRunId(parameter.getName(), run.getId());
                 if (collectionPersistence.isReferenced()) {
-
                     CollectionSymlink collectionSymlink = new CollectionSymlink();
                     collectionSymlink.setParameterName(parameter.getName());
                     collectionSymlink.setSymlinks(new HashMap<>());
@@ -1144,13 +1140,11 @@ public class TaskProvisioningService {
             }
         }
 
-
         // populate schedule object
         schedule.setLinks(links);
         schedulerHandler.schedule(schedule);
         log.info("Running Task: scheduling done");
 
-        // update the final state
         run.setState(TaskRunState.QUEUING);
         runRepository.saveAndFlush(run);
         log.info("Running Task: updated Run state to QUEUING");
@@ -1163,19 +1157,28 @@ public class TaskProvisioningService {
 
     private void checkBeforeExecutionMatches(Run run) throws ProvisioningException {
         AppEngineError error;
-        List<Match> matches = run.getTask().getMatches().stream().filter(match ->
-            match.getCheckTime().equals(CheckTime.BEFORE_EXECUTION)).toList();
+        List<Match> matches = run.getTask()
+            .getMatches()
+            .stream()
+            .filter(match -> match.getCheckTime().equals(CheckTime.BEFORE_EXECUTION))
+            .toList();
 
         if (!matches.isEmpty()) {
             for (Match match : matches) {
                 CollectionPersistence matching = collectionPersistenceRepository
-                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(match
-                    .getMatching()
-                    .getName(), run.getId(), ParameterType.INPUT);
+                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                        match.getMatching().getName(),
+                        run.getId(),
+                        ParameterType.INPUT
+                    )
+                    .orElseThrow(() -> new RuntimeException("matching cannot be null"));
                 CollectionPersistence matched = collectionPersistenceRepository
-                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(match
-                    .getMatched()
-                    .getName(), run.getId(), ParameterType.INPUT);
+                    .findCollectionPersistenceByParameterNameAndRunIdAndParameterType(
+                        match.getMatched().getName(),
+                        run.getId(),
+                        ParameterType.INPUT
+                    )
+                    .orElseThrow(() -> new RuntimeException("matched cannot be null"));
                 // compare size
                 if (!Objects.equals(matching.getSize(), matched.getSize())) {
                     error = ErrorBuilder.build(ErrorCode.INTERNAL_NOT_MATCHING_DIFF_SIZE);
@@ -1205,22 +1208,17 @@ public class TaskProvisioningService {
     private List<AppEngineError> checkAfterExecutionMatches(Run run) {
         List<AppEngineError> multipleErrors = new ArrayList<>();
         List<Match> matches = run.getTask()
-                .getMatches()
-                .stream()
-                .filter(match -> match.getCheckTime().equals(CheckTime.AFTER_EXECUTION))
-                .toList();
+            .getMatches()
+            .stream()
+            .filter(match -> match.getCheckTime().equals(CheckTime.AFTER_EXECUTION))
+            .toList();
 
         for (Match match : matches) {
             CollectionPersistence matching = collectionPersistenceRepository
-                .findCollectionPersistenceByParameterNameAndRunId(match
-                .getMatching()
-                .getName(), run.getId());
+                .findCollectionPersistenceByParameterNameAndRunId(match.getMatching().getName(), run.getId());
             CollectionPersistence matched = collectionPersistenceRepository
-                .findCollectionPersistenceByParameterNameAndRunId(match
-                .getMatched()
-                .getName(), run.getId());
+                .findCollectionPersistenceByParameterNameAndRunId(match.getMatched().getName(), run.getId());
 
-            // compare size
             if (!Objects.equals(matching.getSize(), matched.getSize())) {
                 ParameterError parameterError = new ParameterError(matching.getParameterName());
                 AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_NOT_MATCHING_DIFF_SIZE, parameterError);
@@ -1228,20 +1226,18 @@ public class TaskProvisioningService {
             }
             // map indexes
             for (TypePersistence item : matching.getItems()) {
-                String matchingItemIndex = item
-                    .getCollectionIndex()
+                String matchingItemIndex = item.getCollectionIndex()
                     .substring(item.getCollectionIndex().lastIndexOf('['));
-                List<TypePersistence> matchedItemIndexes = matched
-                    .getItems()
+                List<TypePersistence> matchedItemIndexes = matched.getItems()
                     .stream()
-                    .filter(typePersistence -> typePersistence
-                    .getCollectionIndex()
-                    .endsWith(matchingItemIndex))
+                    .filter(typePersistence -> typePersistence.getCollectionIndex().endsWith(matchingItemIndex))
                     .toList();
                 if (matchedItemIndexes.size() != 1) {
                     ParameterError parameterError = new ParameterError(matching.getParameterName());
-                    AppEngineError error = ErrorBuilder
-                        .build(ErrorCode.INTERNAL_NOT_MATCHING_NOT_ALIGNED_INDEXES, parameterError);
+                    AppEngineError error = ErrorBuilder.build(
+                        ErrorCode.INTERNAL_NOT_MATCHING_NOT_ALIGNED_INDEXES,
+                        parameterError
+                    );
                     multipleErrors.add(error);
                 }
             }
@@ -1271,13 +1267,12 @@ public class TaskProvisioningService {
             throw new ProvisioningException(error);
         }
 
-        // list all outputs of the task
-        Set<Parameter> outputs = run
-            .getTask()
+        Set<Parameter> outputs = run.getTask()
             .getParameters()
             .stream()
             .filter(parameter -> parameter.getParameterType().equals(ParameterType.OUTPUT))
             .collect(Collectors.toSet());
+
         log.info("Provisioning: reading outputs...");
         List<AppEngineError> multipleErrors = new ArrayList<>();
         for (Parameter parameter : outputs) {
@@ -1445,18 +1440,10 @@ public class TaskProvisioningService {
         return filePath;
     }
 
-    public Path prepareStreaming(
-        String runId,
-        String parameterName,
-        String[] indexesArray
-    ) throws IOException {
+    public Path prepareStreaming(String runId, String parameterName, String[] indexesArray) throws IOException {
         log.info("provisioning collection item streaming: preparing...");
         Storage runStorage = new Storage("task-run-inputs-" + runId);
-        Path filePath = Paths.get(
-            basePath,
-            runStorage.id(),
-            parameterName + "/" + String.join("/",
-            indexesArray));
+        Path filePath = Paths.get(basePath, runStorage.id(), parameterName + "/" + String.join("/", indexesArray));
         Files.createDirectories(filePath.getParent());
         String[] arrayYmlPosition = Arrays.stream(indexesArray)
             .limit(indexesArray.length - 1)

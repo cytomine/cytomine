@@ -1,39 +1,35 @@
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
-import {Bar} from 'vue-chartjs';
-import {ProjectConnectionCollection} from '@/api';
+import { Bar } from 'vue-chartjs';
+import { ProjectConnectionCollection } from '@/api';
 import moment from 'moment';
 
 export default {
   name: 'last-connections-chart',
-  extends: Bar,
+  components: { Bar },
   props: {
+    cssClasses: { type: String, default: '' },
     startDate: Number,
     endDate: Number,
     period: String,
     project: Number,
     user: Number,
-    showDates: {type: Boolean, default: false},
+    showDates: { type: Boolean, default: false },
     revision: Number
   },
   data() {
     return {
-      chartData: null,
-      projectConnections: null
+      projectConnections: null,
+      chartData: {
+        labels: [],
+        datasets: [
+          {
+            label: this.$t('project-connections'),
+            data: [],
+            backgroundColor: '#4480c4',
+            borderWidth: 0,
+            categoryPercentage: 0.6,
+          }
+        ]
+      },
     };
   },
   computed: {
@@ -52,16 +48,32 @@ export default {
     },
     momentPeriod() {
       return this.period + 's';
-    }
+    },
+    chartOptions() {
+      return {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            min: 0,
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        }
+      };
+    },
   },
   watch: {
     async queryParams() {
       await this.fetchData();
-      this.updateChart();
     },
     locale() {
       this.updateLabels();
-      this.updateChart();
     }
   },
   methods: {
@@ -78,7 +90,7 @@ export default {
           allConnections.push(connections[indexConnection]);
           indexConnection++;
         } else {
-          allConnections.push({time: iterMoment.valueOf(), frequency: 0});
+          allConnections.push({ time: iterMoment.valueOf(), frequency: 0 });
         }
         iterMoment.add(1, this.momentPeriod);
       }
@@ -99,41 +111,18 @@ export default {
         }
       });
     },
-    async updateChart() {
-      this.$data._chart.update();
-    }
   },
   async mounted() {
-    this.chartData = {
-      labels: [],
-      datasets: [
-        {
-          label: this.$t('project-connections'),
-          data: [],
-          backgroundColor: '#4480c4',
-          borderWidth: 0
-        }
-      ]
-    };
-
     await this.fetchData();
-
-    this.renderChart(this.chartData, {
-      maintainAspectRatio: false,
-      legend: {display: false},
-      scales: {
-        yAxes: [{
-          ticks: {
-            min: 0,
-          }
-        }],
-        xAxes: [{
-          categoryPercentage: 0.6,
-          gridLines: {
-            display: false
-          }
-        }]
-      }
-    });
-  }
+  },
+  render(h) {
+    return h('div', { class: this.cssClasses }, [
+      h(Bar, {
+        props: {
+          data: this.chartData,
+          options: this.chartOptions,
+        },
+      }),
+    ]);
+  },
 };

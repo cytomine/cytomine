@@ -167,12 +167,6 @@ data:
           "displayName": "projects",
           "validations": {},
           "annotations": {},
-          "required": {
-            "roles": [
-              "admin",
-              "user"
-            ]
-          },
           "permissions": {
             "view": [],
             "edit": [

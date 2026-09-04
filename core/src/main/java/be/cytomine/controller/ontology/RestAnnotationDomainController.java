@@ -51,6 +51,8 @@ import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.AnnotationListingService;
+import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.annotation.AnnotationReportService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.middleware.ImageServerService;
@@ -84,6 +86,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     private final UserService userService;
 
+    private final CurrentUserService currentUserService;
+
     private final EntityManager entityManager;
 
     private final ParamsService paramsService;
@@ -109,7 +113,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final AnnotationDomainRepository annotationDomainRepository;
 
     private final RestTemplate restTemplate;
-
+    private final UrlApi urlApi;
     @Value("${application.samURL}")
     private String samUrl;
 
@@ -134,7 +138,10 @@ public class RestAnnotationDomainController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
         String filename = reportService.getAnnotationReportFileName(ReportType.GEOJSON.getLabel(), project.getName());
-        Map<String, Object> geoJson = annotationReportService.exportAnnotations(projectId);
+        Map<String, Object> geoJson = annotationReportService.exportAnnotations(
+            projectId,
+            currentUserService.getCurrentUser().id()
+        );
 
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
@@ -167,7 +174,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
         bodyMap.put("afterThan", afterThan);
 
         JsonObject parameters = new JsonObject(bodyMap);
-        byte[] report = annotationReportService.downloadDocumentByProject(parameters, project);
+        byte[] report = annotationReportService.downloadDocumentByProject(parameters, project,
+            currentUserService.getCurrentUser().id());
         String filename = reportService.getAnnotationReportFileName(reportType.getLabel(), project.getName());
 
         return buildReportResponse(filename, report, reportType);
@@ -273,7 +281,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
         }
 
         //get term
-        List<Long> terms = paramsService.getParamsTermList(params.getJSONAttrStr("terms"), image.getProject());
+        List<Long> terms = paramsService.getParamsTermList(params.getJSONAttrStr("terms"), image.getProject(),
+            currentUserService.getCurrentUser().id());
 
         List response;
         if (user == null) {
@@ -402,7 +411,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         //Is the first polygon always the big 'boundary' polygon?
         String newGeom = GeometryUtils.fillPolygon(annotation.getLocation().toText());
-        JsonObject jsonObject = annotation.toJsonObject()
+        JsonObject jsonObject = annotation.toJsonObject(urlApi)
             .withChange("location", newGeom);
 
         if (annotation.isUserAnnotation()) {
@@ -530,7 +539,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
             annotationDomainRepository.saveAndFlush(annotation);
 
-            return ResponseEntity.ok(annotation.toJSON());
+            return ResponseEntity.ok(annotation.toJSON(urlApi));
         } catch (HttpStatusCodeException e) {
             log.error("Failed to process annotation {} with SAM", id, e);
             throw new RuntimeException("Failed to refine annotation with SAM");

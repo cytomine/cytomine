@@ -1,21 +1,5 @@
 package be.cytomine.controller.project;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,9 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
+import be.cytomine.service.UrlApi;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -42,8 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class ProjectRepresentativeUserResourceTests {
 
     @Autowired
@@ -51,6 +39,8 @@ public class ProjectRepresentativeUserResourceTests {
 
     @Autowired
     private MockMvc restProjectRepresentativeUserControllerMockMvc;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     @Transactional
@@ -84,7 +74,7 @@ public class ProjectRepresentativeUserResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(projectRepresentativeUser.getId().intValue()))
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.project.ProjectRepresentativeUser"))
-            .andExpect(jsonPath("$.user").value(projectRepresentativeUser.getUser().getId()))
+            .andExpect(jsonPath("$.user").value(projectRepresentativeUser.getUserId()))
             .andExpect(jsonPath("$.project").value(projectRepresentativeUser.getProject().getId()));
     }
 
@@ -123,7 +113,7 @@ public class ProjectRepresentativeUserResourceTests {
                 projectRepresentativeUser.getProject().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectRepresentativeUser.toJSON()))
+                .content(projectRepresentativeUser.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -145,7 +135,7 @@ public class ProjectRepresentativeUserResourceTests {
                 projectRepresentativeUser.getProject().getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectRepresentativeUser.toJSON()))
+                .content(projectRepresentativeUser.toJSON(urlApi)))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.success").value(false));
     }
@@ -154,15 +144,16 @@ public class ProjectRepresentativeUserResourceTests {
     @Transactional
     public void deleteProjectRepresentativeUser() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
-        ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
-            projectRepresentativeUser.getProject(), projectRepresentativeUser.getUser()
+        UserResponse user = builder.givenUserAclRead();
+        builder.givenAProjectRepresentativeUser(
+            projectRepresentativeUser.getProject(), user.username(), user.id()
         );
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative/{id}.json",
                 projectRepresentativeUser.getProject().getId(), projectRepresentativeUser.getId()
             )
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectRepresentativeUser.toJSON()))
+                .content(projectRepresentativeUser.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -175,16 +166,17 @@ public class ProjectRepresentativeUserResourceTests {
     @Transactional
     public void deleteProjectRepresentativeUserWithUserParameter() throws Exception {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
+        UserResponse user = builder.givenUserAclRead();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
-            projectRepresentativeUser.getProject(), builder.givenAUser()
+            projectRepresentativeUser.getProject(), user.username(), user.id()
         );
         restProjectRepresentativeUserControllerMockMvc.perform(delete(
                 "/api/project/{project}/representative.json",
                 projectRepresentativeUser.getProject().getId()
             )
-                .param("user", projectRepresentativeUser.getUser().getId().toString())
+                .param("user", projectRepresentativeUser.getUserId().toString())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(projectRepresentativeUser.toJSON()))
+                .content(projectRepresentativeUser.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -210,7 +202,7 @@ public class ProjectRepresentativeUserResourceTests {
     @Transactional
     public void failWhenDeleteProjectRepresentativeUserProjectNotExists() throws Exception {
         restProjectRepresentativeUserControllerMockMvc.perform(delete("/api/project/{project}/representative.json", 0)
-                .param("user", builder.givenSuperAdmin().getId().toString())
+                .param("user", String.valueOf(builder.givenSuperAdmin().id()))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errors").exists());

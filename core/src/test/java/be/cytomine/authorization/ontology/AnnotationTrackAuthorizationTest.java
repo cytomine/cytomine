@@ -17,6 +17,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.ontology.AnnotationTrack;
 import be.cytomine.domain.ontology.UserAnnotation;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.AnnotationTrackService;
 
 @AutoConfigureMockMvc
@@ -24,13 +25,13 @@ import be.cytomine.service.ontology.AnnotationTrackService;
 @Transactional
 public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
 
-    private AnnotationTrack annotationTrack = null;
-
     @Autowired
     AnnotationTrackService annotationTrackService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
+    private AnnotationTrack annotationTrack = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -71,11 +72,10 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
 
         annotationTrackService.add(
             builder.givenANotPersistedAnnotationTrack()
-                .toJsonObject()
+                .toJsonObject(urlApi)
                 .withChange("annotationIdent", annotation.getId())
                 .withChange("track", this.annotationTrack.getTrack().getId()));
     }
-
 
     @Override
     protected void whenIDeleteDomain() {
@@ -103,7 +103,6 @@ public class AnnotationTrackAuthorizationTest extends CRDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(BasePermission.READ);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

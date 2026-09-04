@@ -10,12 +10,12 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.image.ImageInstanceService;
-import be.cytomine.service.ontology.TermService;
 import be.cytomine.utils.JsonObject;
 
 /**
@@ -27,12 +27,20 @@ import be.cytomine.utils.JsonObject;
 @AllArgsConstructor
 public class ParamsService {
 
+    private static Map<String, String> PARAMETER_ASSOCIATION = Map.of(
+        "showBasic", "basic",
+        "showMeta", "meta",
+        "showWKT", "wkt",
+        "showGIS", "gis",
+        "showTerm", "term",
+        "showImage", "image",
+        "showUser", "user",
+        "showSlice", "slice",
+        "showTrack", "track"
+    );
     private final UserRepository userRepository;
-
     private final ImageInstanceService imageInstanceService;
-
-    private final TermService termService;
-
+    private final TermHttpContract termHttpContract;
 
     /**
      * Retrieve all user id from paramsUsers request string (format users=x,y,z or x_y_z) Just get user from project
@@ -55,7 +63,6 @@ public class ParamsService {
             return userRepository.findAllAllowedUserIdList(project.getId());
         }
     }
-
 
     /**
      * Retrieve all images id from paramsImages request string (format images=x,y,z or x_y_z) Just get images from
@@ -84,13 +91,13 @@ public class ParamsService {
      * Retrieve all images id from paramsImages request string (format images=x,y,z or x_y_z) Just get images from
      * project
      */
-    public List<Long> getParamsTermList(String paramsTerms, Project project) {
+    public List<Long> getParamsTermList(String paramsTerms, Project project, long userId) {
         if (paramsTerms != null && !paramsTerms.equals("null")) {
-            if (!paramsTerms.equals("")) {
+            if (!paramsTerms.isEmpty()) {
                 List<Long> termsIdsFromParams = Arrays.stream(paramsTerms.split(paramsTerms.contains("_") ? "_" : ","))
                     .map(Long::parseLong)
-                    .collect(Collectors.toList());
-                return termService.getAllTermIds(project)
+                    .toList();
+                return termHttpContract.findAllTermIdsByProject(project.getId(), userId)
                     .stream()
                     .distinct()
                     .filter(termsIdsFromParams::contains)
@@ -99,22 +106,9 @@ public class ParamsService {
                 return new ArrayList<>();
             }
         } else {
-            return termService.getAllTermIds(project).stream().toList();
+            return termHttpContract.findAllTermIdsByProject(project.getId(), userId).stream().toList();
         }
     }
-
-    private static Map<String, String> PARAMETER_ASSOCIATION = Map.of(
-        "showBasic", "basic",
-        "showMeta", "meta",
-        "showWKT", "wkt",
-        "showGIS", "gis",
-        "showTerm", "term",
-        "showImage", "image",
-        "showUser", "user",
-        "showSlice", "slice",
-        "showTrack", "track"
-    );
-
 
     public List<String> getPropertyGroupToShow(JsonObject params) {
         List<String> propertiesToPrint = new ArrayList<>();
@@ -124,7 +118,6 @@ public class ParamsService {
                 propertiesToPrint.add(entry.getValue());
             }
         }
-
 
         //if no specific show asked show default prop
         if (params.getJSONAttrBoolean("showDefault", false) || propertiesToPrint.isEmpty()) {

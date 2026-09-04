@@ -1,22 +1,7 @@
-/*
-* Copyright (c) 2009-2022. Authors: see NOTICE file.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
 import Vue from 'vue';
 import axios from 'axios';
 import constants from '@/utils/constants.js';
+import { getKeycloak } from '@/keycloak.js';
 
 import VueRouter from 'vue-router';
 import router from './routes.js';
@@ -27,9 +12,9 @@ import i18n from './lang.js';
 import store from './store/store.js';
 
 import Buefy from 'buefy';
-Vue.use(Buefy, {defaultIconPack: 'fas'});
+Vue.use(Buefy, { defaultIconPack: 'fas' });
 
-import VeeValidate, {Validator} from 'vee-validate';
+import VeeValidate, { Validator } from 'vee-validate';
 Validator.extend('positive', value => Number(value) > 0);
 Vue.use(VeeValidate, {
   i18nRootKey: 'validations',
@@ -43,28 +28,8 @@ Vue.use(Notifications);
 import VTooltip from 'v-tooltip';
 Vue.use(VTooltip);
 
-import VueMoment from 'vue-moment';
-const moment = require('moment');
-Vue.use(VueMoment, {moment});
-
-import VueShortKey from 'vue-shortkey';
-Vue.use(VueShortKey, {
-  prevent: [
-    'input[type=text]',
-    'input[type=password]',
-    'input[type=search]',
-    'input[type=email]',
-    'textarea',
-    '.ql-editor'
-  ]
-});
-
-import VueHtml2Canvas from 'vue-html2canvas';
-
-Vue.use(VueHtml2Canvas);
-
-import * as vClickOutside from 'v-click-outside-x';
-Vue.use(vClickOutside);
+import { vOnClickOutside } from '@vueuse/components';
+Vue.directive('click-outside', vOnClickOutside);
 
 import VueLayers from 'vuelayers';
 import CytomineSource from './vuelayers-suppl/cytomine-source';
@@ -81,25 +46,14 @@ Vue.use(RotateInteraction);
 Vue.use(ModifyInteraction);
 Vue.use(RescaleInteraction);
 
-import Chart from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
-import ChartZoom from 'chartjs-plugin-zoom';
-Chart.plugins.unregister(ChartZoom);
-Chart.plugins.unregister(ChartDataLabels);
-Chart.helpers.merge(Chart.defaults.global.plugins.datalabels, {
-  anchor: 'end',
-  align: 'end',
-  offset: 5,
-  clamp: true
-});
+import 'chart.js/auto';
 
 import App from './App.vue';
 
 Vue.config.productionTip = false;
-Vue.prototype.$eventBus = new Vue();
 
 // Load configuration before initializing Keycloak
-axios.get('configuration.json').then(response => {
+axios.get('/configuration.json').then(response => {
   const settings = response.data;
   for (let i in settings) {
     if (Object.prototype.hasOwnProperty.call(constants, i)
@@ -108,22 +62,18 @@ axios.get('configuration.json').then(response => {
     }
   }
 
-  // Now import and initialize Keycloak with loaded config
-  import('./keycloak').then(module => {
-    const Keycloak = module.default;
-    Vue.use(Keycloak);
-
-    Vue.$keycloak
-      .init({
-        onLoad: 'login-required'
-      })
-      .then(() => {
-        new Vue({
-          render: h => h(App),
-          router,
-          store,
-          i18n
-        }).$mount('#app');
-      });
-  });
+  // Now initialize Keycloak with loaded config
+  const keycloak = getKeycloak();
+  keycloak
+    .init({
+      onLoad: 'login-required'
+    })
+    .then(() => {
+      new Vue({
+        render: h => h(App),
+        router,
+        store,
+        i18n
+      }).$mount('#app');
+    });
 });

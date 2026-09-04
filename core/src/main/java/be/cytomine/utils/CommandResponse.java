@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import be.cytomine.domain.CytomineDomain;
+import be.cytomine.service.UrlApi;
 
 @Getter
 @Setter
@@ -17,16 +18,16 @@ public class CommandResponse {
 
     Map<String, Object> data;
 
-    public JsonObject toJsonObject() {
-        return getDataFromDomain(this);
-    }
-
-    public static JsonObject getDataFromDomain(CommandResponse domain) {
+    public static JsonObject getDataFromDomain(CommandResponse domain, UrlApi urlApi) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("status", domain.getStatus());
-        jsonObject.put("object", domain.getObject().toJsonObject());
+        jsonObject.put("object", domain.getObject().toJsonObject(urlApi));
         jsonObject.put("data", domain.getData());
         return jsonObject;
+    }
+
+    public JsonObject toJsonObject(UrlApi urlApi) {
+        return getDataFromDomain(this, urlApi);
     }
 
 }

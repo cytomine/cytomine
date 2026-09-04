@@ -4,7 +4,7 @@ title: API Client for Python Examples
 
 # {{$frontmatter.title}}
 
-This section provides code snippets for common use cases with the Cytomine API Client for Python library. More examples are available on the [GitHub repository](https://github.com/cytomine/Cytomine-python-client/tree/main/examples).
+This section provides code snippets for common use cases with the Cytomine API Client for Python library. More examples are available on the [GitHub repository](https://github.com/cytomine/cytomine/tree/main/clients/python/examples).
 
 ## Get images
 
@@ -12,7 +12,7 @@ This script fetches all images in a project with ID `id_project`, prints some ba
 
 <<< @/code-snippets/python-client/get_images.py
 
-This script is also available on [Github](https://github.com/cytomine/Cytomine-python-client/tree/main/examples/get_images.py). To run it, the command should be like
+This script is also available on [Github](https://github.com/cytomine/cytomine/tree/main/clients/python/examples/get_images.py). To run it, the command should be like
 
 ```bash
 python get_images.py --host https://mycytomine.com --public_key AAA --private_key ZZZ --id_project 42 --download_path /tmp
@@ -24,7 +24,7 @@ This script fetches all terms in (the ontology of) a project with ID `id_project
 
 <<< @/code-snippets/python-client/get_terms.py
 
-This script is also available on [Github](https://github.com/cytomine/Cytomine-python-client/tree/main/examples/get_terms.py). To run it, the command should be like
+This script is also available on [Github](https://github.com/cytomine/cytomine/tree/main/clients/python/examples/get_terms.py). To run it, the command should be like
 
 ```bash
 python get_terms.py --host https://mycytomine.com --public_key AAA --private_key ZZZ --id_project 42
@@ -36,7 +36,7 @@ This script fetches all annotations in a project with ID `id_project`, prints so
 
 <<< @/code-snippets/python-client/get_annotations.py
 
-This script is also available on [Github](https://github.com/cytomine/Cytomine-python-client/tree/main/examples/get_annotations.py). To run it, the command should be like
+This script is also available on [Github](https://github.com/cytomine/cytomine/tree/main/clients/python/examples/get_annotations.py). To run it, the command should be like
 
 ```bash
 python get_annotations.py --host https://mycytomine.com --public_key AAA --private_key ZZZ --id_project 42 --download_path /tmp
@@ -48,7 +48,7 @@ This script adds 2 annotations in an image with ID `id_image_instance` associate
 
 <<< @/code-snippets/python-client/add_annotation.py
 
-This script is also available on [Github](https://github.com/cytomine/Cytomine-python-client/tree/main/examples/add_annotation.py). To run it, the command should be like
+This script is also available on [Github](https://github.com/cytomine/cytomine/tree/main/clients/python/examples/add_annotation.py). To run it, the command should be like
 
 ```bash
 python add_annotation.py --host https://mycytomine.com --public_key AAA --private_key ZZZ --id_project 42  --id_image 13209 --id_term 176
@@ -60,7 +60,7 @@ This script adds a property (key-value pair) to a Cytomine resource: a project, 
 
 <<< @/code-snippets/python-client/add_properties.py
 
-This script is also available on [Github](https://github.com/cytomine/Cytomine-python-client/tree/main/examples/add_properties.py). To run it, the command should be like
+This script is also available on [Github](https://github.com/cytomine/cytomine/tree/main/clients/python/examples/add_properties.py). To run it, the command should be like
 
 ```bash
 python add_property.py --host https://mycytomine.com --public_key AAA --private_key ZZZ --id_project 42  --key "PROJECT_STATUS" --value "PENDING"
@@ -73,7 +73,7 @@ All future instances of the image will thus be affected. Every instance of this 
 
 <<< @/code-snippets/python-client/calibrate_image.py
 
-This script is also available on [Github](https://github.com/cytomine/Cytomine-python-client/tree/main/examples/calibrate_image.py). To run it, the command should be like
+This script is also available on [Github](https://github.com/cytomine/cytomine/tree/main/clients/python/examples/calibrate_image.py). To run it, the command should be like
 
 ```bash
 python calibrate_image.py --host https://mycytomine.com --public_key AAA --private_key ZZZ --id_image 10372 --resolution 0.499 --magnification 20
@@ -83,11 +83,11 @@ to set a resolution of 0.499µm/px and 20x magnification to the abstract image r
 
 ## Upload image
 
-This script shows how to use the Python client library to upload an image to Cytomine. The image located at `filepath` on your computer is uploaded to your storage and optionally linked with the project having `id_project` ID. This example is detailled on a [dedicated page](/dev-guide/faq/upload-python).
+This script shows how to use the Python client library to upload an image to Cytomine. The image located at `filepath` on your computer is uploaded to your storage and optionally linked with the project having `id_project` ID. This example is detailed on a [dedicated page](/dev-guide/faq/upload-python).
 
 <<< @/code-snippets/python-client/upload_image.py
 
-This script is also available on [Github](https://github.com/cytomine/Cytomine-python-client/tree/main/examples/upload_image.py). To run it, the command should be like
+This script is also available on [Github](https://github.com/cytomine/cytomine/tree/main/clients/python/examples/upload_image.py). To run it, the command should be like
 
 ```bash
 python upload_image.py --host https://mycytomine.com --public_key AAA --private_key ZZZ --filepath /data/my-image.svs

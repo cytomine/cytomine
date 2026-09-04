@@ -49,7 +49,7 @@ export default class AnnotationTrack extends Model {
    * @returns {this} The fetched object
    */
   static async fetch(annotation, track) {
-    return new this({id: 0, annotation, track}).fetch(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0, annotation, track }).fetch(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @inheritdoc */
@@ -66,7 +66,7 @@ export default class AnnotationTrack extends Model {
    * @param {number} track       The identifier of the track
    */
   static async delete(annotation, track) {
-    return new this({id: 0, annotation, track}).delete(); // ID set to 0 to bypass the isNew() verification
+    return new this({ id: 0, annotation, track }).delete(); // ID set to 0 to bypass the isNew() verification
   }
 
   /** @inheritdoc */

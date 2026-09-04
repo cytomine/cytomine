@@ -1,4 +1,4 @@
-import {formatTaskName, hasBinaryType, isGeometry} from '@/utils/app';
+import { formatTaskName, hasBinaryType, isGeometry } from '@/utils/app';
 
 describe('app.js', () => {
   describe('hasBinaryType', () => {
@@ -7,7 +7,7 @@ describe('app.js', () => {
       ['file'],
     ])('should return true for binary type "%s"', (typeId) => {
       const input = {
-        type: {id: typeId},
+        type: { id: typeId },
       };
 
       expect(hasBinaryType(input)).toBe(true);
@@ -15,7 +15,7 @@ describe('app.js', () => {
 
     it('should return true when type is array of binary subtype', () => {
       const input = {
-        type: {id: 'array', subType: {id: 'image'}},
+        type: { id: 'array', subType: { id: 'image' } },
       };
 
       expect(hasBinaryType(input)).toBe(true);
@@ -28,7 +28,7 @@ describe('app.js', () => {
       ['boolean'],
     ])('should return false for non-binary type "%s"', (typeId) => {
       const input = {
-        type: {id: typeId},
+        type: { id: typeId },
       };
 
       expect(hasBinaryType(input)).toBe(false);
@@ -41,7 +41,7 @@ describe('app.js', () => {
       ['boolean'],
     ])('should return false for array with non-binary subtype "%s"', (typeId) => {
       const input = {
-        type: {id: 'array', subType: {id: typeId}},
+        type: { id: 'array', subType: { id: typeId } },
       };
 
       expect(hasBinaryType(input)).toBe(false);
@@ -51,7 +51,7 @@ describe('app.js', () => {
   describe('isGeometry', () => {
     it('should return true when type is "geometry"', () => {
       const parameter = {
-        type: {id: 'geometry'}
+        type: { id: 'geometry' }
       };
 
       expect(isGeometry(parameter)).toBe(true);
@@ -61,7 +61,7 @@ describe('app.js', () => {
       const parameter = {
         type: {
           id: 'array',
-          subType: {id: 'geometry'}
+          subType: { id: 'geometry' }
         }
       };
 
@@ -78,7 +78,7 @@ describe('app.js', () => {
       ['file'],
     ])('should return false when type is "%s"', (typeId) => {
       const parameter = {
-        type: {id: typeId}
+        type: { id: typeId }
       };
 
       expect(isGeometry(parameter)).toBe(false);
@@ -96,7 +96,7 @@ describe('app.js', () => {
       const parameter = {
         type: {
           id: 'array',
-          subType: {id: typeId}
+          subType: { id: typeId }
         }
       };
 
@@ -108,7 +108,7 @@ describe('app.js', () => {
     it('should format task name with version and date', () => {
       const taskRun = {
         createdAt: '2026-04-28T10:30:00Z',
-        task: {name: 'Nuclei Segmentation', version: '1.2.3'},
+        task: { name: 'Nuclei Segmentation', version: '1.2.3' },
       };
 
       const result = formatTaskName(taskRun);
@@ -120,7 +120,7 @@ describe('app.js', () => {
     it('should handle different dates correctly', () => {
       const taskRun = {
         createdAt: '2023-06-01T08:00:00Z',
-        task: {name: 'Object Detection', version: '0.9.0'},
+        task: { name: 'Object Detection', version: '0.9.0' },
       };
 
       const result = formatTaskName(taskRun);

@@ -1,4 +1,5 @@
-from typing import Any, Iterable, Sized, TypeVar
+from collections.abc import Iterable, Sized
+from typing import Any, TypeVar
 
 from pims.api.exceptions import BadRequestException
 

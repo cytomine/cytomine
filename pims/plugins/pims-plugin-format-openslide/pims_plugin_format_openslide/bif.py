@@ -1,18 +1,4 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 from datetime import datetime
-from typing import Optional
 
 from pims.cache import cached_property
 from pims.formats import AbstractFormat
@@ -53,7 +39,7 @@ class BifParser(OpenslideVipsParser):
         return imd
 
     @staticmethod
-    def parse_acquisition_date(date: str) -> Optional[datetime]:
+    def parse_acquisition_date(date: str) -> datetime | None:
         # Have seen: 8/18/2014 09:44:30 | 8/30/2017 12:04:52 PM
         return parse_datetime(
             date, ["%m/%d/%Y %H:%M:%S", "%m/%d/%Y %H:%M:%S %p"]

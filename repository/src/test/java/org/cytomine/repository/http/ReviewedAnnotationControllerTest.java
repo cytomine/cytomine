@@ -1,6 +1,7 @@
 package org.cytomine.repository.http;
 
 import java.util.Set;
+import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.cytomine.repository.RepositoryApp;
@@ -51,18 +52,18 @@ class ReviewedAnnotationControllerTest {
 
     @BeforeEach
     void setUp() {
-        userId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'admin')", userId);
-        Long adminRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_role (id, version, authority) VALUES (?, 0, 'ROLE_ADMIN')", adminRoleId);
-        Long userRoleId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
+        userId = jdbcTemplate.queryForObject("INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING id",
+            Long.class, UUID.randomUUID().toString());
         jdbcTemplate.update(
-            "INSERT INTO sec_user_sec_role (id, version, sec_user_id, sec_role_id) " + "VALUES (?, 0, ?, ?)",
-            userRoleId, userId, adminRoleId);
+            "INSERT INTO sec_role (version, authority) SELECT 0, 'ROLE_ADMIN' "
+                + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
+        jdbcTemplate.update(
+            "INSERT INTO sec_user_sec_role (version, sec_user_id, sec_role_id) SELECT 0, ?, (SELECT id FROM "
+                + "sec_role WHERE authority = 'ROLE_ADMIN')", userId);
 
-        Long ontologyId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO ontology (id, version, name, user_id) VALUES (?, 0, 'ontology', ?)",
-            ontologyId, userId);
+        Long ontologyId = jdbcTemplate.queryForObject(
+            "INSERT INTO ontology (version, name, user_id) VALUES (0, 'ontology', ?) RETURNING id", Long.class,
+            userId);
 
         Long abstractImageId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update("INSERT INTO abstract_image (id, version) VALUES (?, 0)", abstractImageId);
@@ -80,15 +81,13 @@ class ReviewedAnnotationControllerTest {
                 + "VALUES (?, 0, ?, 0, 0, ?, ?, 'be.cytomine.domain.image.ImageInstance')", imageInstanceId,
             abstractImageId, projectId, userId);
 
-        termId1 = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update(
-            "INSERT INTO term (id, version, name, color, ontology_id) VALUES (?, 0, 'term1', '#FF0000', ?)", termId1,
-            ontologyId);
+        termId1 = jdbcTemplate.queryForObject(
+            "INSERT INTO term (version, name, color, ontology_id) VALUES (0, 'term1', '#FF0000', ?) RETURNING id",
+            Long.class, ontologyId);
 
-        termId2 = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update(
-            "INSERT INTO term (id, version, name, color, ontology_id) VALUES (?, 0, 'term2', '#00FF00', ?)", termId2,
-            ontologyId);
+        termId2 = jdbcTemplate.queryForObject(
+            "INSERT INTO term (version, name, color, ontology_id) VALUES (0, 'term2', '#00FF00', ?) RETURNING id",
+            Long.class, ontologyId);
 
         reviewedAnnotationTermsId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
         jdbcTemplate.update(
@@ -107,8 +106,7 @@ class ReviewedAnnotationControllerTest {
                     .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId1))))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertEquals(Set.of(termId1), result);
         assertEquals(Set.of(termId1), termIdsForAnnotation(reviewedAnnotationTermsId));
     }
@@ -124,8 +122,7 @@ class ReviewedAnnotationControllerTest {
                     .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId2))))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertEquals(Set.of(termId2), result);
         assertEquals(Set.of(termId2), termIdsForAnnotation(reviewedAnnotationTermsId));
     }
@@ -141,8 +138,7 @@ class ReviewedAnnotationControllerTest {
                     .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId1))))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertEquals(Set.of(termId1), result);
         assertEquals(Set.of(termId1), termIdsForAnnotation(reviewedAnnotationTermsId));
     }
@@ -158,8 +154,7 @@ class ReviewedAnnotationControllerTest {
                     .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of())))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertTrue(result.isEmpty());
         assertTrue(
             reviewedAnnotationLinkRepository.findAllByReviewedAnnotationTermsId(reviewedAnnotationTermsId).isEmpty());
@@ -171,8 +166,9 @@ class ReviewedAnnotationControllerTest {
         reviewedAnnotationLinkRepository.saveAndFlush(
             new ReviewedAnnotationLinkEntity(termId1, reviewedAnnotationTermsId));
 
-        Long nonAdminUserId = jdbcTemplate.queryForObject("SELECT nextval('hibernate_sequence')", Long.class);
-        jdbcTemplate.update("INSERT INTO sec_user (id, version, username) VALUES (?, 0, 'nonadmin')", nonAdminUserId);
+        Long nonAdminUserId = jdbcTemplate.queryForObject(
+            "INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING id", Long.class,
+            UUID.randomUUID().toString());
 
         String response = mockMvc.perform(
                 put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId",
@@ -180,8 +176,7 @@ class ReviewedAnnotationControllerTest {
                     .content(objectMapper.writeValueAsString(Set.of(termId2)))).andExpect(status().isOk()).andReturn()
             .getResponse().getContentAsString();
 
-        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {
-        });
+        Set<Long> result = objectMapper.readValue(response, new TypeReference<>() {});
         assertTrue(result.isEmpty());
         assertEquals(Set.of(termId1), termIdsForAnnotation(reviewedAnnotationTermsId));
     }

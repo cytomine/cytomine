@@ -15,7 +15,6 @@ export default class AbstractSlice extends Model {
     this.uploadedFile = null;
     this.path = null;
     this.image = null;
-    this.mime = null;
 
     this.channel = null;
     this.zStack = null;
@@ -38,7 +37,7 @@ export default class AbstractSlice extends Model {
     }
 
     if (!this._uploader) {
-      let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/user.json`);
+      let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/user.json`);
       this._uploader = new User(data);
     }
 

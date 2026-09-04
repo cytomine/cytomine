@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd
+                        http://www.liquibase.org/xml/ns/mongodb http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
+
+    <!--
+    Initial MongoDB collections and indexes.
+    The `_id_` index is created automatically by MongoDB and is therefore not declared here.
+    -->
+
+    <changeSet id="mongo-annotationAction" author="cytomine">
+        <mongodb:createCollection collectionName="annotationAction"/>
+        <mongodb:createIndex collectionName="annotationAction">
+            <mongodb:keys>{ "user": 1, "image": 1, "created": -1 }</mongodb:keys>
+            <mongodb:options>{ "name": "user_1_image_1_created_-1" }</mongodb:options>
+        </mongodb:createIndex>
+    </changeSet>
+
+    <changeSet id="mongo-lastConnection" author="cytomine">
+        <mongodb:createCollection collectionName="lastConnection"/>
+        <mongodb:createIndex collectionName="lastConnection">
+            <mongodb:keys>{ "date": 1 }</mongodb:keys>
+            <mongodb:options>{ "name": "date_2", "expireAfterSeconds": 300 }</mongodb:options>
+        </mongodb:createIndex>
+    </changeSet>
+
+    <changeSet id="mongo-lastUserPosition" author="cytomine">
+        <mongodb:createCollection collectionName="lastUserPosition"/>
+        <mongodb:createIndex collectionName="lastUserPosition">
+            <mongodb:keys>{ "user": 1, "image": 1, "slice": 1, "created": -1 }</mongodb:keys>
+            <mongodb:options>{ "name": "user_1_image_1_slice_1_created_-1" }</mongodb:options>
+        </mongodb:createIndex>
+        <mongodb:createIndex collectionName="lastUserPosition">
+            <mongodb:keys>{ "location": "2d", "image": 1, "slice": 1 }</mongodb:keys>
+            <mongodb:options>{ "name": "location_2d_image_1_slice_1", "min": -2147483648, "max": 2147483647 }
+            </mongodb:options>
+        </mongodb:createIndex>
+        <mongodb:createIndex collectionName="lastUserPosition">
+            <mongodb:keys>{ "created": 1 }</mongodb:keys>
+            <mongodb:options>{ "name": "created_1", "expireAfterSeconds": 60 }</mongodb:options>
+        </mongodb:createIndex>
+        <mongodb:createIndex collectionName="lastUserPosition">
+            <mongodb:keys>{ "image": 1 }</mongodb:keys>
+            <mongodb:options>{ "name": "image_1" }</mongodb:options>
+        </mongodb:createIndex>
+    </changeSet>
+
+    <changeSet id="mongo-persistentConnection" author="cytomine">
+        <mongodb:createCollection collectionName="persistentConnection"/>
+        <mongodb:createIndex collectionName="persistentConnection">
+            <mongodb:keys>{ "user": 1, "created": -1 }</mongodb:keys>
+            <mongodb:options>{ "name": "user_1_created_-1" }</mongodb:options>
+        </mongodb:createIndex>
+    </changeSet>
+
+    <changeSet id="mongo-persistentImageConsultation" author="cytomine">
+        <mongodb:createCollection collectionName="persistentImageConsultation"/>
+        <mongodb:createIndex collectionName="persistentImageConsultation">
+            <mongodb:keys>{ "user": 1, "image": 1, "created": -1 }</mongodb:keys>
+            <mongodb:options>{ "name": "user_1_image_1_created_-1" }</mongodb:options>
+        </mongodb:createIndex>
+        <mongodb:createIndex collectionName="persistentImageConsultation">
+            <mongodb:keys>{ "image": 1 }</mongodb:keys>
+            <mongodb:options>{ "name": "image_1" }</mongodb:options>
+        </mongodb:createIndex>
+    </changeSet>
+
+    <changeSet id="mongo-persistentProjectConnection" author="cytomine">
+        <mongodb:createCollection collectionName="persistentProjectConnection"/>
+        <mongodb:createIndex collectionName="persistentProjectConnection">
+            <mongodb:keys>{ "project": 1, "created": -1 }</mongodb:keys>
+            <mongodb:options>{ "name": "project_1_created_-1" }</mongodb:options>
+        </mongodb:createIndex>
+        <mongodb:createIndex collectionName="persistentProjectConnection">
+            <mongodb:keys>{ "project": 1 }</mongodb:keys>
+            <mongodb:options>{ "name": "project_1" }</mongodb:options>
+        </mongodb:createIndex>
+    </changeSet>
+
+    <changeSet id="mongo-persistentUserPosition" author="cytomine">
+        <mongodb:createCollection collectionName="persistentUserPosition"/>
+        <mongodb:createIndex collectionName="persistentUserPosition">
+            <mongodb:keys>{ "user": 1, "image": 1, "slice": 1, "created": -1 }</mongodb:keys>
+            <mongodb:options>{ "name": "user_1_image_1_slice_1_created_-1" }</mongodb:options>
+        </mongodb:createIndex>
+        <mongodb:createIndex collectionName="persistentUserPosition">
+            <mongodb:keys>{ "location": "2d", "image": 1, "slice": 1 }</mongodb:keys>
+            <mongodb:options>{ "name": "location_2d_image_1_slice_1", "min": -2147483648, "max": 2147483647 }
+            </mongodb:options>
+        </mongodb:createIndex>
+        <mongodb:createIndex collectionName="persistentUserPosition">
+            <mongodb:keys>{ "image": 1 }</mongodb:keys>
+            <mongodb:options>{ "name": "image_1" }</mongodb:options>
+        </mongodb:createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -29,7 +29,7 @@ export default class AbstractImageCollection extends Collection {
    * @returns {this}
    */
   async fetchUnused() {
-    let {data} = await Cytomine.instance.api.get(`${this.callbackIdentifier}/unused.json`);
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/unused.json`);
     this._data = data.collection;
     return this;
   }

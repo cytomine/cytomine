@@ -17,6 +17,7 @@ import be.cytomine.authorization.CRDAuthorizationTest;
 import be.cytomine.domain.ontology.AnnotationLink;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.AnnotationLinkService;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -27,13 +28,13 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
 
-    private AnnotationLink annotationLink = null;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     AnnotationLinkService annotationLinkService;
+    @Autowired
+    private UrlApi urlApi;
+    private AnnotationLink annotationLink = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -57,7 +58,7 @@ public class AnnotationLinkAuthorizationTest extends CRDAuthorizationTest {
 
         annotationLinkService.add(builder.givenANotPersistedAnnotationLink(
             annotation, annotationLink.getGroup(), annotation.getImage()
-        ).toJsonObject());
+        ).toJsonObject(urlApi));
     }
 
     @Override

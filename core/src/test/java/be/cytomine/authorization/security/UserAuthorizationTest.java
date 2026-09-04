@@ -15,12 +15,15 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.AbstractAuthorizationTest;
+import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
+import be.cytomine.mapper.UserMapper;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.search.UserSearchExtension;
 import be.cytomine.service.security.AccountService;
-import be.cytomine.service.security.SecUserSecRoleService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
@@ -33,20 +36,20 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
-    @MockitoBean
-    private AccountService accountService;
-
     @Autowired
     ProjectMemberService projectMemberService;
-
     @Autowired
     UserService userService;
-
+    @Autowired
+    UserMapper userMapper;
     @Autowired
     BasicInstanceBuilder builder;
-
+    @MockitoBean
+    private AccountService accountService;
+    @MockitoBean
+    private OntologyHttpContract ontologyHttpContract;
     @Autowired
-    SecUserSecRoleService secSecUserSecRoleService;
+    private UrlApi urlApi;
 
     @Test
     @WithMockUser(username = GUEST)
@@ -56,8 +59,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         assertThat(userService.find(userNoAcl.getId())).isPresent();
         assertThat(userService.get(userNoAcl.getId())).isNotNull();
         assertThat(userService.findByUsername(userNoAcl.getUsername())).isPresent();
-        assertThat(userService.findByPublicKey(((User) userNoAcl).getPublicKey())).isPresent();
-        assertThat(userService.getAuthenticationRoles(userNoAcl)).isNotNull();
+        assertThat(userService.findByPublicKey(userNoAcl.getPublicKey())).isPresent();
+        assertThat(userService.getAuthenticationRoles(userMapper.map(userNoAcl))).isNotNull();
     }
 
     @Test
@@ -114,14 +117,14 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @WithMockUser(username = USER_NO_ACL)
     public void userCanAddUser() {
         User user = builder.givenANotPersistedUser();
-        expectOK(() -> userService.add(user.toJsonObject().withChange("password", UUID.randomUUID().toString())));
+        expectOK(() -> userService.add(user.toJsonObject(urlApi).withChange("password", UUID.randomUUID().toString())));
     }
 
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void userCanModifyHimself() {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
-        JsonObject userJson = user.toJsonObject()
+        JsonObject userJson = user.toJsonObject(urlApi)
             .withChange("name", "user_can_modify_himself")
             .withChange("firstname", "John")
             .withChange("lastname", "Doe")
@@ -138,7 +141,7 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @WithMockUser(username = SUPERADMIN)
     public void shouldUpdateUserNameWhenAdminModifiesUser() {
         User user = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
-        JsonObject userJson = user.toJsonObject()
+        JsonObject userJson = user.toJsonObject(urlApi)
             .withChange("name", "admin_can_modify_a_user")
             .withChange("firstname", "John")
             .withChange("lastname", "Doe")
@@ -157,15 +160,8 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
         User user = userRepository.findByUsernameLikeIgnoreCase(GUEST).get();
         expectForbidden(() -> userService.update(
             user,
-            user.toJsonObject().withChange("name", "user_can_modify_himself")
+            user.toJsonObject(urlApi).withChange("name", "user_can_modify_himself")
         ));
-    }
-
-    @Test
-    @WithMockUser(username = USER_NO_ACL)
-    public void userCannotDeleteAnotherUser() {
-        User user = builder.givenAUser();
-        expectForbidden(() -> userService.delete(user, null, null, false));
     }
 
     @Test
@@ -177,67 +173,31 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    public void adminCanDeleteAnotherUser() {
-        User user = builder.givenAUser();
-        expectOK(() -> userService.delete(user, null, null, false));
-    }
-
-    @Test
-    @WithMockUser(username = SUPERADMIN)
     public void shouldAddAndRemoveUserFromProjectWhenAdmin() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenCreator();
         Project project = builder.givenAProject();
-        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_ADMIN)
     public void shouldAddAndRemoveUserFromProjectWhenUserHasAdminRight() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenCreator();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_ADMIN, ADMINISTRATION);
-        expectOK(() -> projectMemberService.addUserToProject(user, project, false));
-        expectOK(() -> projectMemberService.deleteUserFromProject(user, project, false));
+        expectOK(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectOK(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
     }
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
     public void shouldDenyAddAndRemoveUserFromProjectWhenUserHasReadRight() {
-        User user = builder.givenAUser();
+        UserResponse user = builder.givenCreator();
         Project project = builder.givenAProject();
         builder.addUserToProject(project, USER_ACL_READ, READ);
-        expectForbidden(() -> projectMemberService.addUserToProject(user, project, false));
-        expectForbidden(() -> projectMemberService.deleteUserFromProject(user, project, false));
+        expectForbidden(() -> projectMemberService.addUserToProject(user.username(), project, false));
+        expectForbidden(() -> projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false));
     }
 
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void shouldDenyGrantingAdminRoleWhenUserIsNotSuperAdmin() {
-        User user = builder.givenAUser();
-        expectForbidden(() -> secSecUserSecRoleService.add(builder.givenANotPersistedUserRole(user, "ROLE_ADMIN")
-            .toJsonObject()));
-    }
-
-    @Test
-    @WithMockUser(username = SUPERADMIN)
-    public void shouldGrantAdminRoleWhenSuperAdmin() {
-        User user = builder.givenAUser();
-        expectOK(() -> secSecUserSecRoleService.add(builder.givenANotPersistedUserRole(user, "ROLE_ADMIN")
-            .toJsonObject()));
-    }
-
-    @Test
-    @WithMockUser(username = USER_ACL_READ)
-    public void shouldDenyRevokingRoleWhenUserIsNotSuperAdmin() {
-        User user = builder.givenAUser();
-        expectForbidden(() -> secSecUserSecRoleService.delete(builder.givenAUserRole(user), null, null, false));
-    }
-
-    @Test
-    @WithMockUser(username = SUPERADMIN)
-    public void shouldRevokeRoleWhenSuperAdmin() {
-        User user = builder.givenAUser();
-        expectOK(() -> secSecUserSecRoleService.delete(builder.givenAUserRole(user), null, null, false));
-    }
 }

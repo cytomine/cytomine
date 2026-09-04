@@ -15,8 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.ProjectDefaultLayer;
-import be.cytomine.domain.security.User;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectDefaultLayerService;
 
 @AutoConfigureMockMvc
@@ -24,14 +25,13 @@ import be.cytomine.service.project.ProjectDefaultLayerService;
 @Transactional
 public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
 
-
-    private ProjectDefaultLayer projectDefaultLayer = null;
-
     @Autowired
     ProjectDefaultLayerService projectDefaultLayerService;
-
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
+    private ProjectDefaultLayer projectDefaultLayer = null;
 
     @BeforeEach
     public void before() throws Exception {
@@ -67,17 +67,19 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
 
     @Override
     protected void whenIAddDomain() {
-        User user = builder.givenAUser();
-        builder.addUserToProject(projectDefaultLayer.getProject(), user.getUsername());
+        UserResponse user = builder.givenCreator();
+        builder.addUserToProject(projectDefaultLayer.getProject(), user.username());
         projectDefaultLayerService.add(
-            builder.givenANotPersistedProjectRepresentativeUser(projectDefaultLayer.getProject(), user).toJsonObject()
+            builder.givenANotPersistedProjectRepresentativeUser(projectDefaultLayer.getProject(), user.username(),
+                    user.id())
+                .toJsonObject(urlApi)
         );
     }
 
     @Override
     protected void whenIDeleteDomain() {
-        User user = projectDefaultLayer.getUser();
-        builder.addUserToProject(projectDefaultLayer.getProject(), user.getUsername());
+        UserResponse user = builder.getUser(projectDefaultLayer.getUser().getUsername());
+        builder.addUserToProject(projectDefaultLayer.getProject(), user.username());
         ProjectDefaultLayer projectDefaultLayerToDelete = builder.givenANotPersistedProjectDefaultLayer(
             projectDefaultLayer.getProject(),
             user
@@ -100,7 +102,6 @@ public class ProjectDefaultLayerAuthorizationTest extends CRDAuthorizationTest {
     protected Optional<Permission> minimalPermissionForEdit() {
         return Optional.of(BasePermission.WRITE);
     }
-
 
     @Override
     protected Optional<String> minimalRoleForCreate() {

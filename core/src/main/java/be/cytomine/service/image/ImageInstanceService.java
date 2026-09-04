@@ -30,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -47,7 +48,6 @@ import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.Track;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.ImageInstanceBounds;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
@@ -69,6 +69,7 @@ import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.meta.PropertyService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.ontology.TrackService;
@@ -101,7 +102,7 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 @Transactional
 public class ImageInstanceService extends ModelService {
 
-    private static List<String> ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH = List.of("width", "height");
+    private static final List<String> ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH = List.of("width", "height");
 
     private final EntityManager entityManager;
 
@@ -147,6 +148,7 @@ public class ImageInstanceService extends ModelService {
 
     private final MongoClient mongoClient;
 
+    private final UrlApi urlApi;
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
 
@@ -170,7 +172,7 @@ public class ImageInstanceService extends ModelService {
         Optional<ImageInstance> imageInstance = imageInstanceRepository.findById(id);
         String token = authHeader.replace("Bearer ", "");
         String username = TokenUtils.getUsernameFromToken(token);
-        User user = currentUserService.getCurrentUser(username);
+        UserResponse user = currentUserService.getCurrentUser(username);
         imageInstance.ifPresent(image -> securityACLService.check(image.container(), READ, user));
         return imageInstance;
     }
@@ -178,7 +180,6 @@ public class ImageInstanceService extends ModelService {
     public ImageInstance get(Long id) {
         return find(id).orElse(null);
     }
-
 
     public Optional<ImageInstance> next(ImageInstance imageInstance) {
         return imageInstanceRepository.findTopByProjectAndCreatedLessThanOrderByCreatedDesc(
@@ -236,7 +237,6 @@ public class ImageInstanceService extends ModelService {
             }
         }
 
-
         List<SearchParameterEntry> validParameters = SQLSearchParameter.getDomainAssociatedSearchParameters(
             ImageInstance.class,
             searchParameters,
@@ -244,7 +244,6 @@ public class ImageInstanceService extends ModelService {
         );
 
         String abstractImageAlias = "ai";
-        String imageInstanceAlias = "ii";
         validParameters.addAll(
             SQLSearchParameter.getDomainAssociatedSearchParameters(
                 AbstractImage.class,
@@ -263,8 +262,7 @@ public class ImageInstanceService extends ModelService {
                     getEntityManager()
                 )
                 .stream()
-                .map(
-                    x -> new SearchParameterEntry("mime." + x.getProperty(), x.getOperation(), x.getValue()))
+                .map(x -> new SearchParameterEntry("mime." + x.getProperty(), x.getOperation(), x.getValue()))
                 .collect(Collectors.toList()));
 
         for (SearchParameterEntry parameter : searchParameters) {
@@ -304,23 +302,22 @@ public class ImageInstanceService extends ModelService {
         return validParameters;
     }
 
-    public Page<Map<String, Object>> list(User user, List<SearchParameterEntry> searchParameters) {
-        return list(user, searchParameters, "created", "desc", 0L, 0L);
+    public Page<Map<String, Object>> list(long userId, List<SearchParameterEntry> searchParameters) {
+        return list(userId, searchParameters, "created", "desc", 0L, 0L);
     }
 
     public Page<Map<String, Object>> list(
-        User user,
+        long userId,
         List<SearchParameterEntry> searchParameters,
         String sortColumn,
         String sortDirection,
         Long max,
         Long offset
     ) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
+        securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
 
         String imageInstanceAlias = "ui";
         String abstractImageAlias = "ai";
-
 
         if (sortColumn == null) {
             sortColumn = "created";
@@ -345,13 +342,13 @@ public class ImageInstanceService extends ModelService {
 
         String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null
             ? imageInstanceAlias
-              + "."
-              + sortColumn
+            + "."
+            + sortColumn
             : null;
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(AbstractImage.class, sortColumn) != null ? abstractImageAlias
-                                                                                                  + "."
-                                                                                                  + sortColumn : null;
+                + "."
+                + sortColumn : null;
         }
         if (sortedProperty == null) {
             throw new CytomineMethodNotYetImplementedException("ImageInstance list sorted by "
@@ -375,7 +372,6 @@ public class ImageInstanceService extends ModelService {
             .filter(x -> x.getProperty().equals("ui.instanceFilename"))
             .forEach(searchParameterEntry -> searchParameterEntry.setProperty("name"));
 
-
         final String finalSortedProperty = sortedProperty;
         boolean joinAI = validatedSearchParameters.stream()
             .anyMatch(x -> x.getProperty().contains(abstractImageAlias + ".") || finalSortedProperty.contains(
@@ -388,7 +384,6 @@ public class ImageInstanceService extends ModelService {
             .filter(x -> x.getProperty().equals("name"))
             .findFirst()
             .orElse(null);
-
 
         String imageInstanceCondition = sqlSearchConditions.getData()
             .stream()
@@ -413,7 +408,7 @@ public class ImageInstanceService extends ModelService {
 
         select = "SELECT distinct " + imageInstanceAlias + ".* ";
         from = "FROM user_image " + imageInstanceAlias + " ";
-        where = "WHERE user_image_id = " + user.getId() + " ";
+        where = "WHERE user_image_id = " + userId + " ";
         search = "";
 
         if (!imageInstanceCondition.isBlank()) {
@@ -425,7 +420,7 @@ public class ImageInstanceService extends ModelService {
             search += abstractImageCondition;
         }
         if (!tagsCondition.isBlank()) {
-            from += "LEFT OUTER JOIN tag_domain_association tda ON ui.id = tda.domain_ident "
+            from += "LEFT OUTER JOIN tag_domain_association tda ON ui.id = tda.domain_id "
                 + "AND tda.domain_class_name = 'be.cytomine.domain.image.ImageInstance' ";
             search += " AND ";
             search += tagsCondition;
@@ -456,7 +451,6 @@ public class ImageInstanceService extends ModelService {
                 "COALESCE(" + imageInstanceAlias + ".instance_filename, " + abstractImageAlias + ".original_filename)"
             );
         }
-
 
         if (sortedProperty.contains(imageInstanceAlias + ".instance_filename")) {
             joinAI = true;
@@ -524,7 +518,7 @@ public class ImageInstanceService extends ModelService {
             JsonObject object = ImageInstance.getDataFromDomain(new ImageInstance().buildDomainFromJson(
                 result,
                 entityManager
-            ));
+            ), urlApi);
             object.put("projectBlind", result.get("projectBlind"));
             object.put("projectName", result.get("projectName"));
             results.add(result);
@@ -558,7 +552,7 @@ public class ImageInstanceService extends ModelService {
 
         String imageInstanceAlias = "ii";
         String abstractImageAlias = "ai";
-        String mimeAlias = "mime";
+        String contentTypeAlias = "mime";
 
         if (sortColumn == null) {
             sortColumn = "created";
@@ -577,11 +571,10 @@ public class ImageInstanceService extends ModelService {
             sortColumn = "countImageReviewedAnnotations";
         }
 
-
         String sortedProperty = ReflectionUtils.findField(ImageInstance.class, sortColumn) != null
             ? imageInstanceAlias
-              + "."
-              + sortColumn
+            + "."
+            + sortColumn
             : null;
         if (sortColumn.equals("blindedName")) {
             sortedProperty = imageInstanceAlias + ".baseImageId";
@@ -589,13 +582,13 @@ public class ImageInstanceService extends ModelService {
 
         if (sortedProperty == null) {
             sortedProperty = ReflectionUtils.findField(AbstractImage.class, sortColumn) != null ? abstractImageAlias
-                                                                                                  + "."
-                                                                                                  + sortColumn : null;
+                + "."
+                + sortColumn : null;
         }
         if (sortedProperty == null) {
-            sortedProperty = ReflectionUtils.findField(UploadedFile.class, sortColumn) != null ? mimeAlias
-                                                                                                 + "."
-                                                                                                 + sortColumn : null;
+            sortedProperty = ReflectionUtils.findField(UploadedFile.class, sortColumn) != null ? contentTypeAlias
+                + "."
+                + sortColumn : null;
         }
         if (sortedProperty == null) {
             throw new CytomineMethodNotYetImplementedException("ImageInstance list sorted by "
@@ -630,8 +623,9 @@ public class ImageInstanceService extends ModelService {
         boolean joinAI = validatedSearchParameters.stream()
             .anyMatch(x -> x.getProperty().contains(abstractImageAlias + ".") || finalSortedProperty.contains(
                 abstractImageAlias + "."));
-        boolean joinMime = validatedSearchParameters.stream()
-            .anyMatch(x -> x.getProperty().contains(mimeAlias + ".") || finalSortedProperty.contains(mimeAlias + "."));
+        boolean joinContentType = validatedSearchParameters.stream()
+            .anyMatch(x -> x.getProperty().contains(contentTypeAlias + ".") || finalSortedProperty.contains(
+                contentTypeAlias + "."));
         boolean joinImageGroup = validatedSearchParameters.stream()
             .anyMatch(x -> x.getProperty().contains(imageGroupAlias + ".") || finalSortedProperty.contains(
                 imageGroupAlias + ".")) || withImageGroup;
@@ -649,9 +643,9 @@ public class ImageInstanceService extends ModelService {
             .filter(x -> x.getProperty().startsWith(abstractImageAlias + "."))
             .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
-        String mimeCondition = sqlSearchConditions.getData()
+        String contentTypeCondition = sqlSearchConditions.getData()
             .stream()
-            .filter(x -> x.getProperty().startsWith(mimeAlias + "."))
+            .filter(x -> x.getProperty().startsWith(contentTypeAlias + "."))
             .map(SearchParameterEntry::getSql)
             .collect(Collectors.joining(" AND "));
         String tagsCondition = sqlSearchConditions.getData()
@@ -667,7 +661,7 @@ public class ImageInstanceService extends ModelService {
 
         if (blindedNameSearch != null) {
             joinAI = true;
-            blindedNameSearch = ((SearchParameterEntry) blindedNameSearch);
+            blindedNameSearch = blindedNameSearch;
 
             try {
                 securityACLService.checkIsAdminContainer(project, currentUserService.getCurrentUser());
@@ -696,12 +690,12 @@ public class ImageInstanceService extends ModelService {
             search += " AND ";
             search += abstractImageCondition;
         }
-        if (!mimeCondition.isBlank()) {
+        if (!contentTypeCondition.isBlank()) {
             search += " AND ";
-            search += mimeCondition;
+            search += contentTypeCondition;
         }
         if (!tagsCondition.isBlank()) {
-            from += "LEFT OUTER JOIN tag_domain_association tda ON ii.id = tda.domain_ident "
+            from += "LEFT OUTER JOIN tag_domain_association tda ON ii.id = tda.domain_id "
                 + "AND tda.domain_class_name = 'be.cytomine.domain.image.ImageInstance' ";
             search += " AND ";
             search += tagsCondition;
@@ -749,17 +743,17 @@ public class ImageInstanceService extends ModelService {
         String sort = " ORDER BY " + sortedProperty;
         sort += (sortDirection.equals("desc")) ? " DESC " : " ASC ";
 
-        if (joinAI || joinMime) {
+        if (joinAI || joinContentType) {
             select += ", " + ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH.stream()
                 .map(x -> abstractImageAlias + "." + x)
                 .collect(Collectors.joining(",")) + " ";
             from += "JOIN abstract_image " + abstractImageAlias + " ON " + abstractImageAlias
                 + ".id = " + imageInstanceAlias + ".base_image_id ";
         }
-        if (joinMime) {
-            select += ", " + mimeAlias + ".content_type ";
-            from += "JOIN uploaded_file  " + mimeAlias + " ON "
-                + mimeAlias + ".id = " + abstractImageAlias + ".uploaded_file_id ";
+        if (joinContentType) {
+            select += ", " + contentTypeAlias + ".content_type ";
+            from += "JOIN uploaded_file  " + contentTypeAlias + " ON "
+                + contentTypeAlias + ".id = " + abstractImageAlias + ".uploaded_file_id ";
         }
         if (joinImageGroup) {
             select += ", igii.group_id as image_group_id ";
@@ -810,7 +804,7 @@ public class ImageInstanceService extends ModelService {
             JsonObject object = ImageInstance.getDataFromDomain(new ImageInstance().buildDomainFromJson(
                 result,
                 entityManager
-            )); //TODO: select N+1
+            ), urlApi); //TODO: select N+1
             object.put("numberOfAnnotations", result.get("countImageAnnotations"));
             object.put("numberOfJobAnnotations", result.get("countImageJobAnnotations"));
             object.put("numberOfReviewedAnnotations", result.get("countImageReviewedAnnotations"));
@@ -847,13 +841,12 @@ public class ImageInstanceService extends ModelService {
         return PageUtils.buildPageFromPageResults(results, max, offset, count);
     }
 
-
-    public List<Map<String, Object>> listLight(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
+    public List<Map<String, Object>> listLight(UserResponse user) {
+        securityACLService.checkIsSameUser(currentUserService.getCurrentUser().id(), user);
         boolean isAdmin = currentRoleService.isAdminByNow(user);
         String request = "select * from user_image where user_image_id = :id order by instance_filename";
         Query query = getEntityManager().createNativeQuery(request, Tuple.class);
-        query.setParameter("id", user.getId());
+        query.setParameter("id", user.id());
         List<Tuple> resultList = query.getResultList();
 
         List<Map<String, Object>> results = new ArrayList<>();
@@ -879,7 +872,6 @@ public class ImageInstanceService extends ModelService {
         }
         return results;
     }
-
 
     public List<Map<String, Object>> listLight(Project project) {
         securityACLService.check(project, READ);
@@ -942,7 +934,7 @@ public class ImageInstanceService extends ModelService {
         );
 
         List<Bson> requests = new ArrayList<>();
-        requests.add(match(eq("user", currentUserService.getCurrentUser().getId())));
+        requests.add(match(eq("user", currentUserService.getCurrentUser().id())));
         requests.add(sort(descending("created")));
         requests.add(group("$image", Accumulators.max("created", "$created"), Accumulators.first("user", "$user")));
         requests.add(sort(ascending("_id")));
@@ -977,12 +969,10 @@ public class ImageInstanceService extends ModelService {
         return sliceInstanceRepository.findByBaseSliceAndImage(abstractSlice, imageInstance).orElse(null);
     }
 
-
     /**
      * Add the new domain with JSON data
      *
      * @param json New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     public CommandResponse add(JsonObject json) {
@@ -992,13 +982,13 @@ public class ImageInstanceService extends ModelService {
         if (json.isMissing("project")) {
             throw new WrongArgumentException("project not set");
         }
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
         securityACLService.check(json.getJSONAttrLong("project"), Project.class, READ);
         securityACLService.checkIsNotReadOnly(json.getJSONAttrLong("project"), Project.class);
 
-        json.put("user", currentUser.getId());
-        return executeCommand(new AddCommand(currentUser), null, json);
+        json.put("user", currentUser.id());
+        return executeCommand(new AddCommand(currentUser.id()), null, json);
 
     }
 
@@ -1020,7 +1010,7 @@ public class ImageInstanceService extends ModelService {
             p.setKey(property.getKey());
             p.setValue(property.getValue());
             p.setDomain(domain);
-            propertyService.add(p.toJsonObject());
+            propertyService.add(p.toJsonObject(urlApi));
         }
 
     }
@@ -1031,30 +1021,28 @@ public class ImageInstanceService extends ModelService {
 
     }
 
-
     /**
      * Update this domain with new data from json
      *
      * @param domain      Domain to update
      * @param jsonNewData New domain datas
-     *
      * @return Response structure (new domain data, old domain data..)
      */
     @Override
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), READ);
         securityACLService.checkUser(currentUser);
         securityACLService.check(jsonNewData.getJSONAttrLong("project"), Project.class, READ);
-        securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((ImageInstance) domain).getUser());
+        securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((ImageInstance) domain).getUserId());
         securityACLService.checkIsNotReadOnly(domain.container());
         securityACLService.checkIsNotReadOnly(jsonNewData.getJSONAttrLong("project"), Project.class);
 
-        jsonNewData.putIfAbsent("user", ((ImageInstance) domain).getUser().getId());
+        jsonNewData.putIfAbsent("user", ((ImageInstance) domain).getUserId());
 
-        JsonObject attributes = domain.toJsonObject();
+        JsonObject attributes = domain.toJsonObject(urlApi);
         CommandResponse commandResponse = executeCommand(
-            new EditCommand(currentUser, transaction),
+            new EditCommand(currentUser.id(), transaction),
             domain,
             jsonNewData
         );
@@ -1069,16 +1057,15 @@ public class ImageInstanceService extends ModelService {
 
         if (resolutionUpdated) {
             for (ReviewedAnnotation reviewedAnnotation : reviewedAnnotationRepository.findAllByImage(imageInstance)) {
-                reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject());
+                reviewedAnnotationService.update(reviewedAnnotation, reviewedAnnotation.toJsonObject(urlApi));
             }
             for (UserAnnotation userAnnotation : userAnnotationRepository.findAllByImage(imageInstance)) {
-                userAnnotationService.update(userAnnotation, userAnnotation.toJsonObject());
+                userAnnotationService.update(userAnnotation, userAnnotation.toJsonObject(urlApi));
             }
         }
 
         return commandResponse;
     }
-
 
     /**
      * Delete this domain
@@ -1087,22 +1074,21 @@ public class ImageInstanceService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
 
         securityACLService.checkUser(currentUser);
         securityACLService.check(domain.container(), READ);
-        securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((ImageInstance) domain).getUser());
+        securityACLService.checkFullOrRestrictedForOwner(domain.container(), ((ImageInstance) domain).getUserId());
 
         Project project = ((ImageInstance) domain).getProject();
         if (Lock.getInstance().lockProject(project)) {
             try {
                 log.debug("Delete image " + domain.getId());
-                Command c = new DeleteCommand(currentUser, transaction);
+                Command c = new DeleteCommand(currentUser.id(), transaction);
                 return executeCommand(c, domain, null);
             } finally {
                 Lock.getInstance().unlockProject(project);
@@ -1130,7 +1116,6 @@ public class ImageInstanceService extends ModelService {
         deleteDependentTrack(imageInstance, transaction, task);
     }
 
-
     private void deleteDependentReviewedAnnotation(ImageInstance image, Transaction transaction, Task task) {
         for (ReviewedAnnotation reviewedAnnotation : reviewedAnnotationRepository.findAllByImage(image)) {
             reviewedAnnotationService.delete(reviewedAnnotation, transaction, task, false);
@@ -1139,11 +1124,10 @@ public class ImageInstanceService extends ModelService {
 
     private void deleteDependentUserAnnotation(ImageInstance image, Transaction transaction, Task task) {
         for (UserAnnotation userAnnotation : userAnnotationRepository.findAllByImage(image)) {
-            log.debug("Delete userAnnotation : " + userAnnotation.getUser());
+            log.debug("Delete userAnnotation : " + userAnnotation.getUserId());
             userAnnotationService.delete(userAnnotation, transaction, task, false);
         }
     }
-
 
     private void deleteDependentAnnotationAction(ImageInstance image) {
         annotationActionRepository.deleteAllByImage(image.getId());
@@ -1190,7 +1174,6 @@ public class ImageInstanceService extends ModelService {
         );
     }
 
-
     @Override
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         // TODO: with new session?
@@ -1209,22 +1192,22 @@ public class ImageInstanceService extends ModelService {
     }
 
     public void startReview(ImageInstance imageInstance) {
-        securityACLService.checkFullOrRestrictedForOwner(imageInstance, imageInstance.getUser());
+        securityACLService.checkFullOrRestrictedForOwner(imageInstance, imageInstance.getUserId());
         imageInstance.setReviewStart(new Date());
-        imageInstance.setReviewUser(currentUserService.getCurrentUser());
+        imageInstance.setReviewUser(currentUserService.getCurrentUserOld());
         saveDomain(imageInstance);
     }
 
     public void stopReview(ImageInstance imageInstance, boolean cancelReview) {
-        if (imageInstance.getReviewStart() == null || imageInstance.getReviewUser() == null) {
+        if (imageInstance.getReviewStart() == null || imageInstance.getReviewUserId() == null) {
             throw new WrongArgumentException("Image is not in review mode: image.reviewStart="
                 + imageInstance.getReviewStart()
                 + " and image.reviewUser="
-                + imageInstance.getReviewUser());
+                + imageInstance.getReviewUserId());
         }
-        if (!currentUserService.getCurrentUser().getId().equals(imageInstance.getReviewUser().getId())) {
-            throw new WrongArgumentException("Review can only be validate or stop by " + imageInstance.getReviewUser()
-                .getUsername());
+        if (!(Objects.equals(currentUserService.getCurrentUser().id(), imageInstance.getReviewUserId()))) {
+            throw new WrongArgumentException(
+                "Review can only be validated or stopped by " + imageInstance.getReviewUserId());
         }
 
         if (cancelReview) {

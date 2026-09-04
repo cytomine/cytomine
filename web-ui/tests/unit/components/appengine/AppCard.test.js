@@ -1,14 +1,14 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 import VueRouter from 'vue-router';
 
 import AppCard from '@/components/appengine/AppCard';
 
-jest.mock('@/api', () => ({
+vi.mock('@/api', () => ({
   Cytomine: {
     instance: {
       api: {
-        post: jest.fn(),
+        post: vi.fn(),
       },
     },
   },
@@ -59,11 +59,11 @@ describe('AppCard.vue', () => {
 
   it('should use the correct router link', () => {
     const wrapper = createWrapper();
-    const link = wrapper.findComponent({name: 'RouterLink'});
+    const link = wrapper.findComponent({ name: 'RouterLink' });
 
     const expected = {
       path: `/apps/${mockApp.namespace}/${mockApp.version}`,
-      query: {host: undefined},
+      query: { host: undefined },
     };
     expect(link.props('to')).toStrictEqual(expected);
   });
@@ -71,7 +71,7 @@ describe('AppCard.vue', () => {
   it('should fallback to placeholder image when imageUrl is not provided', () => {
     const wrapper = createWrapper({
       propsData: {
-        app: {...mockApp, imageUrl: ''},
+        app: { ...mockApp, imageUrl: '' },
       }
     });
 

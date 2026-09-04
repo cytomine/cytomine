@@ -30,6 +30,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -62,9 +63,9 @@ import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.PermissionService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.ontology.AnnotationTermService;
-import be.cytomine.service.ontology.OntologyService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.search.ProjectSearchExtension;
 import be.cytomine.service.search.RetrievalService;
@@ -117,8 +118,6 @@ public class ProjectService extends ModelService {
 
     private final ReviewedAnnotationService reviewedAnnotationService;
 
-    private final OntologyService ontologyService;
-
     private final PermissionService permissionService;
 
     private final ProjectRepresentativeUserService projectRepresentativeUserService;
@@ -143,6 +142,8 @@ public class ProjectService extends ModelService {
 
     private final RetrievalService retrievalService;
 
+    private final UrlApi urlApi;
+
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
 
@@ -165,7 +166,7 @@ public class ProjectService extends ModelService {
     }
 
     public ProjectBounds computeBounds(Boolean withMembersCount) {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         if (currentRoleService.isAdminByNow(user)) {
             //if user is admin, we print all available project
             user = null;
@@ -210,7 +211,6 @@ public class ProjectService extends ModelService {
         List<Document> results = persistentImageConsultation.aggregate(requests)
             .into(new ArrayList<>());
 
-
         List<Map<String, Object>> data = results.stream()
             .map(x -> JsonObject.of("id", x.get("_id"), "date", x.get("date"), "opened", true))
             .collect(Collectors.toList());
@@ -220,8 +220,8 @@ public class ProjectService extends ModelService {
             List<DatedCytomineDomain> unopened = data.isEmpty()
                 ? projectRepository.listLastCreated()
                 : projectRepository.listLastCreated(data.stream()
-                    .map(x -> (Long) x.get("id"))
-                    .collect(Collectors.toList()));
+                .map(x -> (Long) x.get("id"))
+                .collect(Collectors.toList()));
             for (DatedCytomineDomain datedCytomineDomain : unopened) {
                 data.add(JsonObject.of(
                     "id", datedCytomineDomain.getId(),
@@ -244,7 +244,7 @@ public class ProjectService extends ModelService {
     }
 
     public Page<JsonObject> list(
-        User user,
+        UserResponse user,
         ProjectSearchExtension projectSearchExtension,
         List<SearchParameterEntry> searchParameters,
         String sortColumn,
@@ -389,7 +389,7 @@ public class ProjectService extends ModelService {
                 + "JOIN acl_object_identity as aclObjectId ON aclObjectId.object_id_identity = p.id "
                 + "JOIN acl_entry as aclEntry ON aclEntry.acl_object_identity = aclObjectId.id "
                 + "JOIN acl_sid as aclSid ON aclEntry.sid = aclSid.id ";
-            where = "WHERE aclSid.sid like '" + user.getUsername() + "' ";
+            where = "WHERE aclSid.sid like '" + user.username() + "' ";
         } else {
             select = "SELECT DISTINCT(p.id) as distinctId, p.* ";
             from = "FROM project p ";
@@ -410,7 +410,7 @@ public class ProjectService extends ModelService {
         }
 
         if (!tags.isBlank()) {
-            from += "LEFT OUTER JOIN tag_domain_association t ON p.id = t.domain_ident "
+            from += "LEFT OUTER JOIN tag_domain_association t ON p.id = t.domain_id "
                 + "AND t.domain_class_name = 'be.cytomine.domain.project.Project' ";
             search += " AND ";
             search += tags;
@@ -446,12 +446,12 @@ public class ProjectService extends ModelService {
         }
         if (projectSearchExtension.isWithCurrentUserRoles()) {
             // cannot use user param because it is set to null if user connected as admin
-            User currentUser = currentUserService.getCurrentUser();
+            UserResponse currentUser = currentUserService.getCurrentUser();
             select += ", (admin_project.id IS NOT NULL) AS is_admin, (repr.id IS NOT NULL) AS is_representative ";
             from += "LEFT OUTER JOIN admin_project "
-                + "ON admin_project.id = p.id AND admin_project.user_id = " + currentUser.getId() + " "
+                + "ON admin_project.id = p.id AND admin_project.user_id = " + currentUser.id() + " "
                 + "LEFT OUTER JOIN project_representative_user repr "
-                + "ON repr.project_id = p.id AND repr.user_id = " + currentUser.getId() + " ";
+                + "ON repr.project_id = p.id AND repr.user_id = " + currentUser.id() + " ";
 
             SearchParameterEntry searchedRole = searchParameters.stream()
                 .filter(x -> x.getProperty().equals("currentUserRole"))
@@ -656,19 +656,19 @@ public class ProjectService extends ModelService {
         );
     }
 
-    public List<NamedCytomineDomain> listByCreator(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return projectRepository.listByCreator(user);
+    public List<NamedCytomineDomain> listByCreatorId(long userId) {
+        securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
+        return projectRepository.listByCreator(userId);
     }
 
-    public List<NamedCytomineDomain> listByAdmin(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return projectRepository.listByAdmin(user);
+    public List<NamedCytomineDomain> listByAdminId(long userId) {
+        securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
+        return projectRepository.listByAdmin(userId);
     }
 
-    public List<NamedCytomineDomain> listByUser(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return projectRepository.listByUser(user);
+    public List<NamedCytomineDomain> listByUserId(long userId) {
+        securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
+        return projectRepository.listByUser(userId);
     }
 
     @Override
@@ -679,7 +679,7 @@ public class ProjectService extends ModelService {
     @Override
     public CommandResponse add(JsonObject jsonObject, Task task) {
         taskService.updateTask(task, 5, "Start creating project " + jsonObject.getJSONAttrStr("name"));
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkUser(currentUser);
 
         if (jsonObject.get("ontology") != null) {
@@ -687,7 +687,8 @@ public class ProjectService extends ModelService {
         }
 
         taskService.updateTask(task, 10, "Check retrieval consistency");
-        CommandResponse commandResponse = executeCommand(new AddCommand(currentUser), null, jsonObject);
+        CommandResponse commandResponse = executeCommand(new AddCommand(currentUser.id()), null,
+            jsonObject);
         Project project = (Project) commandResponse.getObject();
         taskService.updateTask(task, 20, "Project " + project.getName() + " created");
 
@@ -705,7 +706,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("addUserToProject project=" + project.getId() + " user=" + optionalUser.get().getId());
-                projectMemberService.addUserToProject(optionalUser.get(), project, false);
+                projectMemberService.addUserToProject(optionalUser.get().getUsername(), project, false);
                 progress = progress + (40 / users.size());
                 taskService.updateTask(
                     task,
@@ -719,11 +720,11 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent() && !Objects.equals(
                 optionalUser.get().getId(),
-                currentUserService.getCurrentUser().getId()
+                currentUserService.getCurrentUser().id()
             )) {
                 // current user is already in project
                 log.info("addUserToProject (admin) project=" + project.getId() + " user=" + optionalUser.get().getId());
-                projectMemberService.addUserToProject(optionalUser.get(), project, true);
+                projectMemberService.addUserToProject(optionalUser.get().getUsername(), project, true);
                 progress = progress + (40 / admins.size());
                 taskService.updateTask(
                     task,
@@ -745,10 +746,9 @@ public class ProjectService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction, Task task) {
         Project project = (Project) domain;
         taskService.updateTask(task, 5, "Start editing project " + project.getName());
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(project.container(), WRITE);
         Ontology ontology = project.getOntology();
-
 
         if (ontology != null && !Objects.equals(ontology.getId(), jsonNewData.getJSONAttrLong("ontology", 0L))) {
             boolean deleteTerms = jsonNewData.getJSONAttrBoolean("forceOntologyUpdate", false);
@@ -782,9 +782,8 @@ public class ProjectService extends ModelService {
             }
         }
 
-
         CommandResponse commandResponse = executeCommand(
-            new EditCommand(currentUser, transaction),
+            new EditCommand(currentUser.id(), transaction),
             domain,
             jsonNewData
         );
@@ -795,7 +794,6 @@ public class ProjectService extends ModelService {
         List<Long> users = jsonNewData.getJSONAttrListLong("users", null);
         List<Long> admins = jsonNewData.getJSONAttrListLong("admins", null);
         List<Long> representatives = jsonNewData.getJSONAttrListLong("representatives", null);
-
 
         if (users != null) {
             List<Long> projectOldUsers = userService.listUsers(project)
@@ -815,13 +813,12 @@ public class ProjectService extends ModelService {
                     .collect(Collectors.toList()); //[a,b,c]
             }
             projectNewUsers.addAll(nextAdmins);  //add admin as user too
-            projectNewUsers.add(currentUser.getId());
+            projectNewUsers.add(currentUser.id());
             projectNewUsers = projectNewUsers.stream().distinct().collect(Collectors.toList());
             log.info("projectOldUsers=" + projectOldUsers);
             log.info("projectNewUsers=" + projectNewUsers);
             changeProjectUser(project, projectNewUsers, projectOldUsers, false, task, 20);
         }
-
 
         if (admins != null) {
             List<Long> projectOldAdmins = userService.listAdmins(project)
@@ -830,7 +827,7 @@ public class ProjectService extends ModelService {
                 .sorted()
                 .collect(Collectors.toList()); //[a,b,c]
             List<Long> projectNewAdmins = admins.stream().sorted().collect(Collectors.toList()); //[a,b,x]
-            projectNewAdmins.add(currentUser.getId());
+            projectNewAdmins.add(currentUser.id());
             projectNewAdmins = projectNewAdmins.stream().distinct().collect(Collectors.toList());
             log.info("projectOldAdmins=" + projectOldAdmins);
             log.info("projectNewAdmins=" + projectNewAdmins);
@@ -841,7 +838,7 @@ public class ProjectService extends ModelService {
         if (representatives != null) {
             List<Long> projectOldReprs = projectRepresentativeUserService.listByProject(project)
                 .stream()
-                .map(x -> x.getUser().getId())
+                .map(x -> x.getUserId())
                 .sorted()
                 .collect(Collectors.toList()); //[a,b,c]
             List<Long> projectNewReprs = representatives.stream()
@@ -864,8 +861,8 @@ public class ProjectService extends ModelService {
                     log.info("projectAddReprs project=" + project + " user=" + optionalUser.get().getId());
                     ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                     pru.setProject(project);
-                    pru.setUser(optionalUser.get());
-                    projectRepresentativeUserService.add(pru.toJsonObject());
+                    pru.setUserId(optionalUser.get().getId());
+                    projectRepresentativeUserService.add(pru.toJsonObject(urlApi));
                 }
             }
 
@@ -875,22 +872,15 @@ public class ProjectService extends ModelService {
                     log.info("projectDeleteReprs project=" + project + " user=" + optionalUser.get().getId());
                     Optional<ProjectRepresentativeUser> repr = projectRepresentativeUserService.find(
                         project,
-                        optionalUser.get()
+                        optionalUser.get().getId()
                     );
                     repr.ifPresent(x -> projectRepresentativeUserService.delete(x, transaction, task, false));
                 }
             }
         }
-        if (ontology != null && !Objects.equals(ontology.getId(), jsonNewData.getJSONAttrLong("ontology"))) {
-            ontologyService.determineRightsForUsers(ontology, userService.listUsers(project));
-            if (project.getOntology() != null) {
-                ontologyService.determineRightsForUsers(project.getOntology(), userService.listUsers(project));
-            }
-        }
         return commandResponse;
 
     }
-
 
     private void changeProjectUser(
         Project project,
@@ -914,7 +904,7 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("addUserToProject project=" + project.getId() + " user=" + optionalUser.get().getId());
-                projectMemberService.addUserToProject(optionalUser.get(), project, admin);
+                projectMemberService.addUserToProject(optionalUser.get().getUsername(), project, admin);
                 progress = progress + (40 / projectAddUser.size());
                 taskService.updateTask(
                     task,
@@ -928,7 +918,8 @@ public class ProjectService extends ModelService {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
                 log.info("projectDeleteUser project=" + project.getId() + " user=" + optionalUser.get().getId());
-                projectMemberService.deleteUserFromProject(optionalUser.get(), project, admin);
+                projectMemberService.deleteUserFromProject(optionalUser.get().getUsername(), optionalUser.get().getId(),
+                    project, admin);
                 log.info("changeProjectUser " + permissionService.hasACLPermission(
                     project,
                     optionalUser.get().getUsername(),
@@ -988,7 +979,6 @@ public class ProjectService extends ModelService {
         return data;
     }
 
-
     /**
      * Delete this domain
      *
@@ -996,15 +986,14 @@ public class ProjectService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.check(domain.container(), ADMINISTRATION);
         securityACLService.checkIsNotReadOnly(domain.container());
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 
@@ -1023,7 +1012,7 @@ public class ProjectService extends ModelService {
             );
         }
 
-        if (projectRepresentativeUserService.find((Project) domain, (User) currentUserService.getCurrentUser())
+        if (projectRepresentativeUserService.find((Project) domain, currentUserService.getCurrentUser().id())
             .isEmpty()) {
             log.info("add creator "
                 + currentUserService.getCurrentUsername()
@@ -1031,12 +1020,11 @@ public class ProjectService extends ModelService {
                 + domain);
             ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
             pru.setProject((Project) domain);
-            pru.setUser((User) currentUserService.getCurrentUser());
-            projectRepresentativeUserService.add(pru.toJsonObject());
+            pru.setUserId(currentUserService.getCurrentUser().id());
+            projectRepresentativeUserService.add(pru.toJsonObject(urlApi));
         }
 
     }
-
 
     protected void beforeUpdate(CytomineDomain domain) {
         Project project = (Project) domain;
@@ -1059,7 +1047,6 @@ public class ProjectService extends ModelService {
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
         return List.of(domain.getId(), ((Project) domain).getName());
     }
-
 
     public void checkDoNotAlreadyExist(CytomineDomain domain) {
         Project project = (Project) domain;

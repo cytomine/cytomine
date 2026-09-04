@@ -1,21 +1,5 @@
 package be.cytomine.service.ontology;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
@@ -30,6 +14,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTerm;
@@ -41,17 +26,18 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.AnnotationTermRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class AnnotationTermServiceTests {
 
     @Autowired
@@ -68,6 +54,8 @@ public class AnnotationTermServiceTests {
 
     @Autowired
     WiremockRepository wiremockRepository;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void findAnnotationTermWithSuccess() {
@@ -110,7 +98,7 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
-            builder.givenAUser()
+            builder.getUserEntity(builder.givenAclUserNoAcl())
         )).contains(annotationTerm);
     }
 
@@ -119,28 +107,28 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
-        CommandResponse commandResponse = annotationTermService.add(annotationTerm.toJsonObject());
+        CommandResponse commandResponse = annotationTermService.add(annotationTerm.toJsonObject(urlApi));
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(
                 annotationTerm.getUserAnnotation(),
                 annotationTerm.getTerm(),
-                builder.givenSuperAdmin()
+                builder.getUserEntity(builder.givenSuperAdmin())
             )).isPresent();
         commandService.undo();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(
                 annotationTerm.getUserAnnotation(),
                 annotationTerm.getTerm(),
-                builder.givenSuperAdmin()
+                builder.getUserEntity(builder.givenSuperAdmin())
             )).isEmpty();
         commandService.redo();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(
                 annotationTerm.getUserAnnotation(),
                 annotationTerm.getTerm(),
-                builder.givenSuperAdmin()
+                builder.getUserEntity(builder.givenSuperAdmin())
             )).isPresent();
     }
 
@@ -149,10 +137,10 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
-        annotationTermService.add(annotationTerm.toJsonObject());
+        annotationTermService.add(annotationTerm.toJsonObject(urlApi));
         Assertions.assertThrows(
             AlreadyExistException.class,
-            () -> annotationTermService.add(annotationTerm.toJsonObject())
+            () -> annotationTermService.add(annotationTerm.toJsonObject(urlApi))
         );
     }
 
@@ -167,7 +155,6 @@ public class AnnotationTermServiceTests {
             annotationTerm.getTerm().getId(),
             null,
             annotationTerm.getUser().getId(),
-            annotationTerm.getUser(),
             null
         );
         assertThat(commandResponse).isNotNull();
@@ -182,7 +169,7 @@ public class AnnotationTermServiceTests {
         annotationTerm.setTerm(builder.givenATerm(builder.givenAnOntology()));
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> annotationTermService.add(annotationTerm.toJsonObject())
+            () -> annotationTermService.add(annotationTerm.toJsonObject(urlApi))
         );
     }
 
@@ -203,30 +190,36 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.givenSuperAdmin())).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
 
         commandService.undo();
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.givenSuperAdmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
 
         commandService.redo();
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, oldTerm, builder.givenSuperAdmin())).isEmpty();
+            .findByUserAnnotationAndTermAndUser(annotation, oldTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isEmpty();
     }
 
     @Test
     void addValidAnnotationTermAndDeleteOtherTermsNoImpactForTermsAddedByOtherUser() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
-        annotationTerm.setUser(builder.givenAUser());
+        annotationTerm.setUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
         builder.persistAndReturn(annotationTerm);
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
@@ -241,7 +234,8 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(annotation, oldTerm, annotationTerm.getUser())).isPresent();
 
@@ -251,7 +245,7 @@ public class AnnotationTermServiceTests {
     void addValidAnnotationTermAndDeleteOtherTermsWithForceForTermsAddedByOther() {
         UserAnnotation annotation = builder.givenAUserAnnotation();
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(annotation);
-        annotationTerm.setUser(builder.givenAUser());
+        annotationTerm.setUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
         Term oldTerm = annotationTerm.getTerm();
         Term newTerm = builder.givenATerm(annotation.getProject().getOntology());
         wiremockRepository.stubTerm(newTerm);
@@ -265,7 +259,8 @@ public class AnnotationTermServiceTests {
         assertThat(commandResponse.getStatus()).isEqualTo(200);
 
         assertThat(annotationTermRepository
-            .findByUserAnnotationAndTermAndUser(annotation, newTerm, builder.givenSuperAdmin())).isPresent();
+            .findByUserAnnotationAndTermAndUser(annotation, newTerm,
+                builder.getUserEntity(builder.givenSuperAdmin()))).isPresent();
         assertThat(annotationTermRepository
             .findByUserAnnotationAndTermAndUser(annotation, oldTerm, annotationTerm.getUser())).isEmpty();
 
@@ -293,7 +288,7 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
-        JsonObject jsonObject = annotationTerm.toJsonObject();
+        JsonObject jsonObject = annotationTerm.toJsonObject(urlApi);
         jsonObject.put("userannotation", -1L);
         Assertions.assertThrows(ObjectNotFoundException.class, () -> annotationTermService.add(jsonObject));
     }
@@ -303,7 +298,7 @@ public class AnnotationTermServiceTests {
         AnnotationTerm annotationTerm = builder.givenANotPersistedAnnotationTerm(
             builder.givenAUserAnnotation()
         );
-        JsonObject jsonObject = annotationTerm.toJsonObject();
+        JsonObject jsonObject = annotationTerm.toJsonObject(urlApi);
         jsonObject.put("term", -1L);
         Assertions.assertThrows(WrongArgumentException.class, () -> annotationTermService.add(jsonObject));
     }

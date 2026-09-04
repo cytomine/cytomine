@@ -1,33 +1,46 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AppBottomDrawer from '@/components/appengine/AppBottomDrawer.vue';
+import eventBus from '@/utils/event-bus';
 import Task from '@/utils/appengine/task';
 import TaskRun from '@/utils/appengine/task-run';
 
-jest.mock('@/utils/appengine/task', () => ({
-  fetchAll: jest.fn(),
-  fetchTaskRunStatus: jest.fn(),
-  createTaskRun: jest.fn(),
-  batchProvisionTask: jest.fn(),
-  singleProvisionTask: jest.fn(),
-  runTask: jest.fn(),
+vi.mock('@/utils/event-bus', () => ({
+  default: {
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
+  }
 }));
 
-jest.mock('@/utils/appengine/task-run', () => {
-  const mockConstructor = jest.fn().mockImplementation((resource) => ({
-    ...resource,
-    fetch: jest.fn(),
-    isTerminalState: jest.fn(() => false),
-    project: null,
-  }));
+vi.mock('@/utils/appengine/task', () => ({
+  default: {
+    fetchAll: vi.fn(),
+    fetchTaskRunStatus: vi.fn(),
+    createTaskRun: vi.fn(),
+    batchProvisionTask: vi.fn(),
+    singleProvisionTask: vi.fn(),
+    runTask: vi.fn(),
+  }
+}));
 
-  mockConstructor.fetchByProject = jest.fn();
+vi.mock('@/utils/appengine/task-run', () => {
+  const mockConstructor = vi.fn().mockImplementation(function (resource) {
+    return {
+      ...resource,
+      fetch: vi.fn(),
+      isTerminalState: vi.fn(() => false),
+      project: null,
+    };
+  });
 
-  return mockConstructor;
+  mockConstructor.fetchByProject = vi.fn();
+
+  return { default: mockConstructor };
 });
 
-jest.mock('@/utils/app', () => ({
-  formatTaskName: jest.fn(() => 'Mocked Task Run'),
+vi.mock('@/utils/app', () => ({
+  formatTaskName: vi.fn(() => 'Mocked Task Run'),
 }));
 
 describe('AppBottomDrawer.vue', () => {
@@ -44,11 +57,11 @@ describe('AppBottomDrawer.vue', () => {
     {
       taskRunId: 1,
       createdAt: '2024-01-01T10:00:00Z',
-      project: {id: 99},
+      project: { id: 99 },
     },
   ];
 
-  const createWrapper = ({data = {}, storeOverrides = {}} = {}) => {
+  const createWrapper = ({ data = {}, storeOverrides = {} } = {}) => {
     const mockStore = {
       getters: {
         'currentProject/project': {
@@ -56,7 +69,7 @@ describe('AppBottomDrawer.vue', () => {
         },
         'currentProject/currentViewer': {
           activeImage: 0,
-          images: [{imageInstance: {id: 777}}],
+          images: [{ imageInstance: { id: 777 } }],
         },
         ...storeOverrides,
       },
@@ -66,14 +79,11 @@ describe('AppBottomDrawer.vue', () => {
       mocks: {
         $buefy: {
           toast: {
-            open: jest.fn(),
+            open: vi.fn(),
           },
         },
-        $eventBus: {
-          $emit: jest.fn(),
-        },
         $router: {
-          push: jest.fn(),
+          push: vi.fn(),
         },
         $store: mockStore,
         $t: (key) => key,
@@ -110,7 +120,7 @@ describe('AppBottomDrawer.vue', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     Task.fetchAll.mockResolvedValue(mockTasks);
     TaskRun.fetchByProject.mockResolvedValue(mockTaskRuns);
   });
@@ -135,7 +145,7 @@ describe('AppBottomDrawer.vue', () => {
 
     expect(wrapper.vm.isCollapsed).toBe(false);
     expect(wrapper.emitted().collapse).toEqual([[false]]);
-    expect(wrapper.vm.$eventBus.$emit).toHaveBeenCalledWith('updateMapSize');
+    expect(eventBus.emit).toHaveBeenCalledWith('updateMapSize');
   });
 
   it('should reset inputs', () => {
@@ -159,32 +169,32 @@ describe('AppBottomDrawer.vue', () => {
     const wrapper = createWrapper({
       data: {
         inputs: {
-          threshold: {type: 'number', value: 0.8},
-          label: {type: 'string', value: 'tumour'},
+          threshold: { type: 'number', value: 0.8 },
+          label: { type: 'string', value: 'tumour' },
         },
       },
     });
 
     expect(wrapper.vm.getInputProvisions()).toEqual([
-      {parameterName: 'threshold', type: 'number', value: 0.8},
-      {parameterName: 'label', type: 'string', value: 'tumour'},
+      { parameterName: 'threshold', type: 'number', value: 0.8 },
+      { parameterName: 'label', type: 'string', value: 'tumour' },
     ]);
   });
 
   it('should run task with batch provisions when there is no binary data', async () => {
-    Task.createTaskRun.mockResolvedValue({id: 123});
-    Task.runTask.mockResolvedValue({resource: {id: 123, state: 'RUNNING'}});
+    Task.createTaskRun.mockResolvedValue({ id: 123 });
+    Task.runTask.mockResolvedValue({ resource: { id: 123, state: 'RUNNING' } });
 
     const wrapper = createWrapper({
       data: {
         selectedTask: mockTasks[0],
         inputs: {
-          threshold: {type: 'number', value: 0.8},
+          threshold: { type: 'number', value: 0.8 },
         },
       },
     });
 
-    Object.defineProperty(wrapper.vm, 'hasBinaryData', {value: false, writable: true});
+    Object.defineProperty(wrapper.vm, 'hasBinaryData', { value: false, writable: true });
 
     await wrapper.vm.runTask();
 
@@ -199,7 +209,7 @@ describe('AppBottomDrawer.vue', () => {
       99,
       123,
       [
-        {parameterName: 'threshold', type: 'number', value: 0.8},
+        { parameterName: 'threshold', type: 'number', value: 0.8 },
       ],
     );
 
@@ -209,11 +219,11 @@ describe('AppBottomDrawer.vue', () => {
   });
 
   it('should uns task with file provisions when binary data is present', async () => {
-    const file = new File(['content'], 'input.txt', {type: 'text/plain'});
+    const file = new File(['content'], 'input.txt', { type: 'text/plain' });
 
-    Task.createTaskRun.mockResolvedValue({id: 456});
+    Task.createTaskRun.mockResolvedValue({ id: 456 });
     Task.singleProvisionTask.mockResolvedValue();
-    Task.runTask.mockResolvedValue({resource: {id: 456, state: 'RUNNING'}});
+    Task.runTask.mockResolvedValue({ resource: { id: 456, state: 'RUNNING' } });
 
     const wrapper = createWrapper({
       data: {
@@ -227,7 +237,7 @@ describe('AppBottomDrawer.vue', () => {
       },
     });
 
-    Object.defineProperty(wrapper.vm, 'hasBinaryData', {value: true, writable: true});
+    Object.defineProperty(wrapper.vm, 'hasBinaryData', { value: true, writable: true });
 
     await wrapper.vm.runTask();
 

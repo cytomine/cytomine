@@ -21,6 +21,7 @@ module.exports = {
         ["/user-guide/annotations", "Annotations"],
         ["/user-guide/annotation-link", "Annotation Link"],
         ["/user-guide/storage", "Storage"],
+        ["/user-guide/appengine", "App Engine"],
       ],
     },
   ],
@@ -87,7 +88,7 @@ module.exports = {
                 title: "Examples",
                 collapsable: false,
                 children: [
-                    ["/dev-guide/algorithms/task/examples/complete-walkthrough-example", "Complete Walkthrough Example"],
+                    ["/dev-guide/algorithms/task/examples/example", "Complete Walkthrough Example"],
                     ["/dev-guide/algorithms/task/examples/others", "Others"],
                 ],
             },

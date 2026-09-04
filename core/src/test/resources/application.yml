@@ -46,9 +46,11 @@ spring:
 
   liquibase:
     change-log: classpath:config/liquibase/master.xml
+    contexts: test
 
   data:
     mongodb:
+      auto-index-creation: false
       authentication-database: admin
       username: ${MONGO_USER:mongoadmin}
       password: ${MONGO_PASS:password}
@@ -61,12 +63,6 @@ spring:
     port: 587
     username: CONFIGURE_YOUR_MAILGUN_CREDENTIALS # example: postmaster@sandboxdcb41...5909.mailgun.org
     password: CONFIGURE_YOUR_MAILGUN_CREDENTIALS # example: 0da253cf5...24-4662f38e
-
-mongock:
-  migration-scan-package:
-    be.cytomine.config.nosqlmigration
-
-  port: 8080
 
 javamelody:
   enabled: false
@@ -367,3 +363,8 @@ keycloak-client:
     client-id: core
   client-id: admin-cli
   url: ${IAM_URL:http://iam:8100}/iam
+
+meilisearch:
+  host: ${MEILISEARCH_URL:http://localhost:7700}
+  api-key: ${MEILISEARCH_KEY:masterKey}
+  index_id: imageMetadataIndex

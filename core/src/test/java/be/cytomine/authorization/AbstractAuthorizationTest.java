@@ -9,15 +9,16 @@ import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
 
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public abstract class AbstractAuthorizationTest {
 
@@ -58,11 +59,11 @@ public abstract class AbstractAuthorizationTest {
         // This code is called every execution of an authorization (a lot...)
         // So it is a "ugly" implementation of the 'addPermission' that is very fast.
 
-        User user = (User) currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
 
         Long aclClassId = permissionService.getAclClassId(container);
         //get acl sid for current user (run request)
-        Long sidCurrentUser = permissionService.getAclSid(user.getUsername());
+        Long sidCurrentUser = permissionService.getAclSid(user.username());
         //get acl object id
         Long aclObjectIdentity = permissionService.getAclObjectIdentity(container, aclClassId, sidCurrentUser);
 
@@ -82,6 +83,5 @@ public abstract class AbstractAuthorizationTest {
     protected void expectOK(Executable executable) {
         Assertions.assertDoesNotThrow(executable);
     }
-
 
 }

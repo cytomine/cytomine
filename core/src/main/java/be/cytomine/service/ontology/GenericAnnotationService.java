@@ -67,7 +67,7 @@ public class GenericAnnotationService {
 
         boolean projectAdmin = securityACLService.hasPermission(image.getProject(), ADMINISTRATION);
         if (!projectAdmin) {
-            layers = layers.stream().filter(x -> Objects.equals(x, currentUserService.getCurrentUser().getId()))
+            layers = layers.stream().filter(x -> Objects.equals(x, currentUserService.getCurrentUser().id()))
                 .collect(Collectors.toList());
         }
 

@@ -5,10 +5,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 
 import be.cytomine.common.repository.model.command.payload.response.RelationResponse;
 
-import static be.cytomine.common.repository.http.RelationHttpContract.ROOT_PATH;
-
-
-@HttpExchange(ROOT_PATH)
+@HttpExchange(RelationHttpContract.ROOT_PATH)
 public interface RelationHttpContract {
     String ROOT_PATH = "/relation";
 

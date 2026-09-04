@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -20,33 +19,30 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.controller.JsonResponseEntity;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.image.server.Storage;
-import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.ObjectNotFoundException;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.ImageInstanceService;
-import be.cytomine.service.image.server.StorageService;
-import be.cytomine.service.ontology.OntologyService;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
 import be.cytomine.service.search.UserSearchExtension;
-import be.cytomine.service.security.AccountService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
@@ -73,13 +69,11 @@ public class RestUserController extends RestCytomineController {
 
     private final ProjectRepresentativeUserService projectRepresentativeUserService;
 
-    private final OntologyService ontologyService;
-
-    private final StorageService storageService;
+    private final OntologyHttpContract ontologyHttpContract;
 
     private final ReportService reportService;
 
-    private final AccountService accountService;
+    private final UserMapper userMapper;
 
     @GetMapping("/project/{id}/admin.json")
     public ResponseEntity<String> showAdminByProject(
@@ -98,11 +92,10 @@ public class RestUserController extends RestCytomineController {
         log.debug("REST request to list representatives from project {}", id);
         Project project = projectService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("Project", id));
-        return responseSuccess(
-            projectRepresentativeUserService.listByProject(project)
-                .stream().map(ProjectRepresentativeUser::getUser)
-                .collect(Collectors.toList()), isFilterRequired()
-        );
+        List<Long> userIds = projectRepresentativeUserService.listByProject(project)
+            .stream().map(ProjectRepresentativeUser::getUserId)
+            .collect(Collectors.toList());
+        return responseSuccess(userService.list(userIds), isFilterRequired());
     }
 
     @GetMapping("/project/{id}/creator.json")
@@ -122,9 +115,9 @@ public class RestUserController extends RestCytomineController {
         @PathVariable Long id
     ) {
         log.debug("REST request to list user from ontology {}", id);
-        Ontology ontology = ontologyService.find(id)
+        OntologyResponse ontology = ontologyHttpContract.get(id, currentUserService.getCurrentUser().id())
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
-        return responseSuccess(userService.listUsers(ontology), isFilterRequired());
+        return responseSuccess(userService.listUsers(ontology.id()), isFilterRequired());
     }
 
     @GetMapping("/project/{id}/userlayer.json")
@@ -137,18 +130,8 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Project", id));
         ImageInstance image = imageInstanceService.find(idImage).orElse(null);
 
-        return responseSuccess(userService.listLayers(project, image), isFilterRequired());
+        return responseSuccess(userService.listLayers(project), isFilterRequired());
 
-    }
-
-    @GetMapping("/storage/{id}/user.json")
-    public ResponseEntity<String> showUserByStorage(
-        @PathVariable Long id
-    ) {
-        log.debug("REST request to list user from storage {}", id);
-        Storage storage = storageService.find(id)
-            .orElseThrow(() -> new ObjectNotFoundException("Storage", id));
-        return responseSuccess(userService.listUsers(storage), isFilterRequired());
     }
 
     @GetMapping("/user.json")
@@ -163,20 +146,6 @@ public class RestUserController extends RestCytomineController {
             userService.list(retrieveSearchParameters(), sortColumn, sortDirection, max, offset),
             isFilterRequired()
         );
-    }
-
-    @GetMapping("/user/{id}.json")
-    public ResponseEntity<String> getUser(
-        @PathVariable String id
-    ) {
-        log.debug("REST request to get User : {}", id);
-
-        Optional<User> user = userService.find(id);
-        if (user.isEmpty()) {
-            user = userService.findByUsername(id);
-        }
-
-        return user.map(u -> responseSuccess(u, isFilterRequired())).orElseGet(() -> responseNotFound("User", id));
     }
 
     /**
@@ -209,26 +178,26 @@ public class RestUserController extends RestCytomineController {
         @RequestParam(value = "content-Type", required = false, defaultValue = "") String contentType,
         @RequestParam(value = "date", required = false, defaultValue = "") String date
     ) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         String signature = ApiKeyFilter.generateKeys(
-            method, contentMD5, contenttype.isEmpty() ? contentType : contenttype, date, user
+            method, contentMD5, contenttype.isEmpty() ? contentType : contenttype, date, user.privateKey().get()
         );
-        return responseSuccess(JsonObject.of("signature", signature, "publicKey", user.getPublicKey()));
+        return responseSuccess(JsonObject.of("signature", signature, "publicKey", user.publicKey().orElse(null)));
     }
 
     @GetMapping("/user/current/keys")
     public ResponseEntity<String> getCurrentUserKeys() {
-        User user = currentUserService.getCurrentUser();
+        UserResponse user = currentUserService.getCurrentUser();
         return responseSuccess(JsonObject.of(
-                "primaryKey", user.getPublicKey(),
-                "secondaryKey", user.getPrivateKey()
+                "primaryKey", user.publicKey().orElse(null),
+                "secondaryKey", user.privateKey().orElse(null)
             )
         );
     }
 
     @PostMapping("/user/current/keys")
     public ResponseEntity<String> regenerateCurrentUserKeys() {
-        User user = userService.regenerateKeys(currentUserService.getCurrentUser());
+        User user = userService.regenerateKeys(currentUserService.getCurrentUserOld());
         return responseSuccess(JsonObject.of(
                 "primaryKey", user.getPublicKey(),
                 "secondaryKey", user.getPrivateKey()
@@ -238,33 +207,12 @@ public class RestUserController extends RestCytomineController {
 
     /******************************************************************************************************************/
 
-
     @GetMapping("/user/current.json")
     public ResponseEntity<String> getCurrentUser(
     ) {
         log.debug("REST request to get current User");
-        return responseSuccess(currentUserService.getCurrentUser());
+        return responseSuccess(currentUserService.getCurrentUserOld());
     }
-
-    @PostMapping("/user.json")
-    public ResponseEntity<String> createUser(@RequestBody String json) {
-        log.debug("REST request to save User : " + json);
-        return add(userService, json);
-    }
-
-    @PutMapping("/user/{id}.json")
-    public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody JsonObject json) {
-        log.debug("REST request to update User : {}", id);
-        return update(userService, json);
-    }
-
-    //TODO IAM: refactor so that only ADMIN role can delete IAM ACCOUNT
-    @DeleteMapping("/user/{id}.json")
-    public ResponseEntity<String> deleteUser(@PathVariable String id) {
-        log.debug("REST request to delete User: {}", id);
-        return delete(userService, JsonObject.of("id", Long.parseLong(id)), null);
-    }
-
 
     @GetMapping("/project/{id}/user.json")
     public ResponseEntity<String> showByProject(
@@ -304,7 +252,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.addUserToProject(user, project, false);
+        projectMemberService.addUserToProject(user.getUsername(), project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -338,7 +286,7 @@ public class RestUserController extends RestCytomineController {
 
         for (User user : users) {
             try {
-                projectMemberService.addUserToProject(user, project, false);
+                projectMemberService.addUserToProject(user.getUsername(), project, false);
             } catch (Exception e) {
                 errors.add(user.getId().toString());
             }
@@ -374,7 +322,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.deleteUserFromProject(user, project, false);
+        projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -408,7 +356,7 @@ public class RestUserController extends RestCytomineController {
 
         for (User user : users) {
             try {
-                projectMemberService.deleteUserFromProject(user, project, false);
+                projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, false);
             } catch (Exception e) {
                 errors.add(user.getId().toString());
             }
@@ -444,7 +392,7 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.addUserToProject(user, project, true);
+        projectMemberService.addUserToProject(user.getUsername(), project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -458,38 +406,10 @@ public class RestUserController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        if (!Objects.equals(currentUserService.getCurrentUser().getId(), user.getId())) {
+        if (!Objects.equals(currentUserService.getCurrentUser().id(), user.getId())) {
             securityACLService.check(project, ADMINISTRATION);
         }
-        projectMemberService.deleteUserFromProject(user, project, true);
-        return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
-    }
-
-    @PostMapping("/storage/{storage}/user/{user}.json")
-    public ResponseEntity<String> addUserToStorage(
-        @PathVariable("storage") Long storageId,
-        @PathVariable("user") Long userId
-    ) {
-        log.debug("REST request to add User {} to storage {}", userId, storageId);
-        User user = userService.find(userId)
-            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        Storage storage = storageService.find(storageId)
-            .orElseThrow(() -> new ObjectNotFoundException("Storage", storageId));
-        userService.addUserToStorage(user, storage);
-        return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
-    }
-
-    @DeleteMapping("/storage/{storage}/user/{user}.json")
-    public ResponseEntity<String> deleteUserFromStorage(
-        @PathVariable("storage") Long storageId,
-        @PathVariable("user") Long userId
-    ) {
-        log.debug("REST request to remove User {} from storage {}", userId, storageId);
-        User user = userService.find(userId)
-            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        Storage storage = storageService.find(storageId)
-            .orElseThrow(() -> new ObjectNotFoundException("Storage", storageId));
-        userService.deleteUserFromStorage(user, storage);
+        projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -592,7 +512,7 @@ public class RestUserController extends RestCytomineController {
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        return responseSuccess(userService.getResumeActivities(project, user), isFilterRequired());
+        return responseSuccess(userService.getResumeActivities(project, userMapper.map(user)), isFilterRequired());
     }
 
     boolean isFilterRequired() {

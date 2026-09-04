@@ -1,10 +1,8 @@
 ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG PYTHON_VERSION=3.10
+ARG SAM_WEIGHTS_IMAGE=registry.cytomine.org/cytomine/sam-weights:latest
 
-FROM ${PROXY_CACHE}/alpine AS weights
-RUN mkdir -p /app/weights && \
-    wget -q -O /app/weights/weights.pt \
-    "https://huggingface.co/TVM13/Cytomine-sam/resolve/main/weights.pt"
+FROM ${SAM_WEIGHTS_IMAGE} AS weights
 
 FROM ${PROXY_CACHE}/python:${PYTHON_VERSION}-slim-bullseye AS base
 
@@ -14,7 +12,7 @@ ENV PYTHONUNBUFFERED=1 \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/usr/local
 
-COPY --from=ghcr.io/astral-sh/uv:0.10.12 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.12.0 /uv /uvx /bin/
 
 WORKDIR /app
 
@@ -52,7 +50,7 @@ ENV PYTHONPATH=/app \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/usr/local
 
-COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.10.12 /uv /uvx /bin/
+COPY --from=registry.cytomine.org/github/ghcr.io/astral-sh/uv:0.12.0 /uv /uvx /bin/
 
 WORKDIR /app
 

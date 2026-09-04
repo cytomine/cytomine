@@ -1,21 +1,5 @@
 package be.cytomine.controller.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -27,8 +11,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +26,12 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractSlice;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static be.cytomine.service.middleware.ImageServerService.IMS_API_BASE_PATH;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
@@ -64,28 +49,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class AbstractSliceResourceTests {
 
     @Autowired
+    UrlApi urlApi;
+    @Autowired
     private BasicInstanceBuilder builder;
-
     @Autowired
     private MockMvc restAbstractSliceControllerMockMvc;
 
-    private static WireMockServer wireMockServer = new WireMockServer(8888);
-
-    @BeforeAll
-    public static void beforeAll() {
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
-    }
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     @Test
     @Transactional
@@ -159,7 +135,7 @@ public class AbstractSliceResourceTests {
         AbstractSlice abstractSlice = builder.givenANotPersistedAbstractSlice();
         restAbstractSliceControllerMockMvc.perform(post("/api/abstractslice.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(abstractSlice.toJSON()))
+                .content(abstractSlice.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -174,7 +150,7 @@ public class AbstractSliceResourceTests {
     @Transactional
     public void editValidAbstractSlice() throws Exception {
         AbstractSlice abstractSlice = builder.givenAnAbstractSlice();
-        JsonObject jsonObject = abstractSlice.toJsonObject();
+        JsonObject jsonObject = abstractSlice.toJsonObject(urlApi);
         jsonObject.put("time", 3);
         restAbstractSliceControllerMockMvc.perform(put("/api/abstractslice/{id}.json", abstractSlice.getId())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -212,7 +188,7 @@ public class AbstractSliceResourceTests {
 
         restAbstractSliceControllerMockMvc.perform(get("/api/abstractslice/{id}/user.json", image.getId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().getId()));
+            .andExpect(jsonPath("$.id").value(builder.givenSuperAdmin().id()));
     }
 
     @Test
@@ -231,7 +207,7 @@ public class AbstractSliceResourceTests {
             .toString()
             .getBytes();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -257,7 +233,6 @@ public class AbstractSliceResourceTests {
             .andExpect(jsonPath("$.errors").exists());
     }
 
-
     @Test
     @Transactional
     public void getAbstractSliceTile() throws Exception {
@@ -265,7 +240,7 @@ public class AbstractSliceResourceTests {
         byte[] mockResponse = UUID.randomUUID()
             .toString()
             .getBytes();
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         stubFor(get(urlEqualTo(IMS_API_BASE_PATH + "/image/" + URLEncoder.encode(
                 image.getPath(),
                 StandardCharsets.UTF_8
@@ -307,7 +282,7 @@ public class AbstractSliceResourceTests {
     public void getAbstractSliceCrop() throws Exception {
         AbstractSlice image = givenTestAbstractSlice();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
 
         byte[] mockResponse = UUID.randomUUID()
             .toString()
@@ -344,7 +319,7 @@ public class AbstractSliceResourceTests {
             .toString()
             .getBytes();
 
-        configureFor("localhost", 8888);
+        configureFor("localhost", wireMockServer.port());
         String url = "/image/"
             + URLEncoder.encode(image.getPath(), StandardCharsets.UTF_8).replace("%2F", "/")
             + "/window";
@@ -366,7 +341,6 @@ public class AbstractSliceResourceTests {
 
     private AbstractSlice givenTestAbstractSlice() {
         AbstractSlice image = builder.givenAnAbstractSlice();
-        image.setMime(builder.givenAMime("openslide/mrxs"));
         image.getImage().setWidth(109240);
         image.getImage().setHeight(220696);
         image.getUploadedFile().setFilename("1636379100999/CMU-2/CMU-2.mrxs");

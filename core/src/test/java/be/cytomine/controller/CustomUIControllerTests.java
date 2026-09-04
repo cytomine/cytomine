@@ -1,21 +1,5 @@
 package be.cytomine.controller;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repositorynosql.social.LastConnectionRepository;
 
+import static be.cytomine.BasicInstanceBuilder.ACL_USER_NO_ACL;
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -45,7 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
+@MockedUser
 public class CustomUIControllerTests {
 
     @Autowired
@@ -67,7 +56,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = ACL_USER_NO_ACL)
     public void loadCustomUiDefaultConfig() {
         assertThat(applicationProperties.getCustomUI()
             .getProject()
@@ -82,7 +71,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "superadmin")
+    @WithMockUser(username = SUPERADMIN)
     public void retrieveGlobalCustomUiAsSuperadmin() throws Exception {
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json"))
             .andExpect(status().isOk())
@@ -100,7 +89,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = ACL_USER_NO_ACL)
     public void retrieveGlobalCustomUiAsUser() throws Exception {
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json"))
             .andExpect(status().isOk())
@@ -117,7 +106,7 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "superadmin")
+    @WithMockUser(username = SUPERADMIN)
     public void retrieveProjectCustomUi() throws Exception {
         Project project = builder.givenAProject();
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
@@ -129,10 +118,10 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = ACL_USER_NO_ACL)
     public void retrieveProjectCustomUiAsContributor() throws Exception {
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, "user", READ);
+        builder.addUserToProject(project, ACL_USER_NO_ACL, READ);
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                 .param("project", project.getId().toString()))
             .andExpect(status().isOk())
@@ -141,20 +130,19 @@ public class CustomUIControllerTests {
 
     @Test
     @Transactional
-    @WithMockUser(username = "user")
+    @WithMockUser(username = ACL_USER_NO_ACL)
     public void retrieveProjectCustomUiAsManager() throws Exception {
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, "user", ADMINISTRATION);
+        builder.addUserToProject(project, ACL_USER_NO_ACL, ADMINISTRATION);
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/config.json")
                 .param("project", project.getId().toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.project-jobs-tab").value(false));
     }
 
-
     @Test
     @Transactional
-    @WithMockUser(username = "superadmin")
+    @WithMockUser(username = SUPERADMIN)
     public void retrieveProjectCustomUiAsSuperadmin() throws Exception {
         Project project = builder.givenAProject();
         restConfigurationControllerMockMvc.perform(get("/api/custom-ui/project/{project}.json", project.getId()))
@@ -164,10 +152,9 @@ public class CustomUIControllerTests {
             .andExpect(jsonPath("$.project-jobs-tab.CONTRIBUTOR_PROJECT").value(false));
     }
 
-
     @Test
     @Transactional
-    @WithMockUser(username = "superadmin")
+    @WithMockUser(username = SUPERADMIN)
     public void changeProjectCustomUi() throws Exception {
         Project project = builder.givenAProject();
 

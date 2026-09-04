@@ -1,7 +1,6 @@
 package be.cytomine;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -11,10 +10,8 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
@@ -24,7 +21,6 @@ import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.CompanionFile;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.domain.image.Mime;
 import be.cytomine.domain.image.NestedImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.image.UploadedFile;
@@ -61,9 +57,10 @@ import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.image.MimeRepository;
+import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
+import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -80,110 +77,93 @@ public class BasicInstanceBuilder {
 
     public static final String ROLE_GUEST = "ROLE_GUEST";
 
+    public static final String ADMIN = "admin";
+
+    public static final String ANOTHER_USER = "anotheruser";
+
+    public static final String SUPER_ADMIN = "superadmin";
+
+    public static final String SUPER_ADMIN_ACL = "SUPER_ADMIN_ACL";
+
+    public static final String ADMIN_ACL = "ADMIN_ACL";
+
+    public static final String ACL_USER_NO_ACL = "ACL_USER_NO_ACL";
+
+    public static final String USER_ACL_READ = "USER_ACL_READ";
+
+    public static final String USER_ACL_WRITE = "USER_ACL_WRITE";
+
+    public static final String USER_ACL_CREATE = "USER_ACL_CREATE";
+
+    public static final String USER_ACL_DELETE = "USER_ACL_DELETE";
+
+    public static final String USER_ACL_ADMIN = "USER_ACL_ADMIN";
+
+    public static final String CREATOR = "CREATOR";
+
+    public static final String GUEST_ACL = "GUEST_ACL";
+
     EntityManager em;
-
-    TransactionTemplate transactionTemplate;
-
     PermissionService permissionService;
-
     SecRoleRepository secRoleRepository;
-
-    MimeRepository mimeRepository;
-
     UserRepository userRepository;
+    UserMapper userMapper;
 
-    ApplicationBootstrap applicationBootstrap;
-
-    private User aUser;
-    private User anAdmin;
-    private User aGuest;
-
-    public BasicInstanceBuilder(
-        EntityManager em,
-        TransactionTemplate transactionTemplate,
-        UserRepository userRepository,
-        PermissionService permissionService,
-        SecRoleRepository secRoleRepository,
-        MimeRepository mimeRepository,
-        ApplicationBootstrap applicationBootstrap
-    ) {
-        if (secRoleRepository.count() == 0) {
-            applicationBootstrap.init();
-        }
+    public BasicInstanceBuilder(EntityManager em, UserRepository userRepository, PermissionService permissionService,
+        SecRoleRepository secRoleRepository, UserMapper userMapper) {
         this.em = em;
         this.userRepository = userRepository;
         this.permissionService = permissionService;
         this.secRoleRepository = secRoleRepository;
-        this.mimeRepository = mimeRepository;
-        this.transactionTemplate = transactionTemplate;
-
-        this.transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                aUser = userRepository.findByUsernameLikeIgnoreCase("user")
-                    .orElseGet(() -> givenDefaultUser());
-                anAdmin = userRepository.findByUsernameLikeIgnoreCase("admin")
-                    .orElseGet(() -> givenDefaultAdmin());
-            }
-        });
+        this.userMapper = userMapper;
     }
 
-    public User givenDefaultUser() {
-        if (aUser == null) {
-            aUser = givenAUser("user");
-        }
-        return aUser;
+    public UserResponse givenAdmin() {
+        return getUser(ADMIN);
     }
 
-    public User givenDefaultAdmin() {
-        if (anAdmin == null) {
-            anAdmin = givenAnAdmin("admin");
-        }
-        return anAdmin;
+    public UserResponse givenAnotherUser() {
+        return getUser(ANOTHER_USER);
     }
 
-    public User givenDefaultGuest() {
-        if (aGuest == null) {
-            aGuest = givenAGuest("guest");
-        }
-        return aGuest;
+    public UserResponse givenSuperAdminAcl() {
+        return getUser(SUPER_ADMIN_ACL);
     }
 
-
-    public User givenAUser(String username) {
-        User user = persistAndReturn(givenANotPersistedUser());
-        user.setUsername(username);
-        user = persistAndReturn(user);
-        addRole(user, ROLE_USER);
-        return user;
+    public UserResponse givenAdminAcl() {
+        return getUser(ADMIN_ACL);
     }
 
-    public User givenAUser() {
-        return givenAUser(randomString());
+    public UserResponse givenAclUserNoAcl() {
+        return getUser(ACL_USER_NO_ACL);
     }
 
-    public User givenAGuest(String username) {
-        User user = persistAndReturn(givenANotPersistedUser());
-        user.setUsername(username);
-        user = persistAndReturn(user);
-        addRole(user, ROLE_GUEST);
-        return user;
+    public UserResponse givenUserAclRead() {
+        return getUser(USER_ACL_READ);
     }
 
-    public User givenAGuest() {
-        return givenAGuest(randomString());
+    public UserResponse givenUserAclWrite() {
+        return getUser(USER_ACL_WRITE);
     }
 
-    public User givenAnAdmin(String username) {
-        User user = givenANotPersistedUser();
-        user.setUsername(username);
-        user = persistAndReturn(user);
-        addRole(user, ROLE_ADMIN);
-        return user;
+    public UserResponse givenUserAclCreate() {
+        return getUser(USER_ACL_CREATE);
     }
 
-    public User givenAnAdmin() {
-        return givenAnAdmin(randomString());
+    public UserResponse givenUserAclDelete() {
+        return getUser(USER_ACL_DELETE);
+    }
+
+    public UserResponse givenUserAclAdmin() {
+        return getUser(USER_ACL_ADMIN);
+    }
+
+    public UserResponse givenCreator() {
+        return getUser(CREATOR);
+    }
+
+    public UserResponse givenGuestAcl() {
+        return getUser(GUEST_ACL);
     }
 
     public RelationTerm givenANotPersistedRelationTerm(Relation relation, Term term1, Term term2) {
@@ -195,9 +175,27 @@ public class BasicInstanceBuilder {
         return relationTerm;
     }
 
-    public User givenSuperAdmin() {
-        return userRepository.findByUsernameLikeIgnoreCase("superadmin")
-            .orElseThrow(() -> new ObjectNotFoundException("superadmin not in db"));
+    public UserResponse givenSuperAdmin() {
+        return getUser(SUPER_ADMIN);
+    }
+
+    public UserResponse getUser(String username) {
+        return userMapper.map(getUserEntity(username));
+    }
+
+    public User getUserEntity(String username) {
+        return userRepository.findByUsernameLikeIgnoreCase(username)
+            .orElseThrow(() -> new ObjectNotFoundException(username + " not in db"));
+    }
+
+    public User getUserEntity(UserResponse user) {
+        return getUserEntity(user.username());
+    }
+
+    public UserResponse givenCurrentUser() {
+        return CurrentUserService.getSecurityCurrentUser().map(currentUser -> currentUser.getUser().username())
+            .flatMap(userRepository::findByUsernameLikeIgnoreCase).map(user -> userMapper.map(user))
+            .orElseGet(this::givenSuperAdmin);
     }
 
     public User givenANotPersistedUser() {
@@ -207,16 +205,6 @@ public class BasicInstanceBuilder {
         user.setUsername(randomString());
         user.generateKeys();
         return user;
-    }
-
-    public void addRole(User user, String authority) {
-        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
-        secSecUserSecRole.setSecUser(user);
-        secSecUserSecRole.setSecRole(secRoleRepository.findByAuthority(authority)
-            .orElseThrow(() -> new ObjectNotFoundException("authority " + authority + " does not exists")));
-        em.persist(secSecUserSecRole);
-        em.flush();
-        em.refresh(user);
     }
 
     public ImageFilterProject givenANotPersistedImageFilterProject(ImageFilter imageFilter, Project project) {
@@ -276,8 +264,7 @@ public class BasicInstanceBuilder {
 
     public Relation givenARelation() {
         return (Relation) em.createQuery("SELECT relation FROM Relation relation WHERE relation.name LIKE 'parent'")
-            .getResultList()
-            .get(0);
+            .getResultList().get(0);
     }
 
     public Ontology givenAnOntology() {
@@ -287,13 +274,13 @@ public class BasicInstanceBuilder {
     public Ontology givenANotPersistedOntology() {
         Ontology ontology = new Ontology();
         ontology.setName(randomString());
-        ontology.setUser(aUser);
+        ontology.setUserId(givenAclUserNoAcl().id());
         return ontology;
     }
 
-    public Project givenAProjectWithUser(User user) {
+    public Project givenAProjectWithUser(String username) {
         Project project = givenAProject();
-        addUserToProject(project, user.getUsername(), ADMINISTRATION);
+        addUserToProject(project, username, ADMINISTRATION);
         return project;
     }
 
@@ -316,15 +303,11 @@ public class BasicInstanceBuilder {
     }
 
     public void addUserToProject(Project project, String username, Permission permission) {
-        permissionService.addPermission(project, username, permission, this.givenSuperAdmin());
+        permissionService.addPermission(project, username, permission, this.givenSuperAdmin().username());
     }
 
     public void addUserToProject(Project project, String username) {
-        permissionService.addPermission(project, username, ADMINISTRATION, this.givenSuperAdmin());
-    }
-
-    public void addUserToStorage(Storage storage, String username, Permission permission) {
-        permissionService.addPermission(storage, username, permission);
+        permissionService.addPermission(project, username, ADMINISTRATION, this.givenSuperAdmin().username());
     }
 
     public <T> T persistAndReturn(T instance) {
@@ -341,7 +324,7 @@ public class BasicInstanceBuilder {
     public UploadedFile givenANotPersistedUploadedFile(String contentType) {
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setStorage(givenAStorage());
-        uploadedFile.setUser(givenSuperAdmin());
+        uploadedFile.setUser(getUserEntity(SUPER_ADMIN));
         uploadedFile.setFilename(randomString());
         uploadedFile.setOriginalFilename(randomString());
         uploadedFile.setExt("tif");
@@ -359,21 +342,18 @@ public class BasicInstanceBuilder {
         return givenAStorage(givenSuperAdmin());
     }
 
-    public Storage givenAStorage(User user) {
-        Storage storage = givenANotPersistedStorage();
-        storage.setUser(user);
+    public Storage givenAStorage(UserResponse user) {
+        Storage storage = givenANotPersistedStorage(user);
         storage = persistAndReturn(storage);
-        permissionService.addPermission(
-            storage, storage.getUser().getUsername(), ADMINISTRATION,
-            storage.getUser()
-        );
+        permissionService.addPermission(storage, storage.getUser().getUsername(), ADMINISTRATION,
+            storage.getUser().getUsername());
         return storage;
     }
 
-    public Storage givenANotPersistedStorage(User user) {
+    public Storage givenANotPersistedStorage(UserResponse user) {
         Storage storage = new Storage();
         storage.setName(randomString());
-        storage.setUser(user);
+        storage.setUser(getUserEntity(user));
         return storage;
     }
 
@@ -410,7 +390,7 @@ public class BasicInstanceBuilder {
         ImageInstance image = new ImageInstance();
         image.setBaseImage(abstractImage);
         image.setProject(project);
-        image.setUser(givenSuperAdmin());
+        image.setUser(getUserEntity(SUPER_ADMIN));
         return image;
     }
 
@@ -439,7 +419,6 @@ public class BasicInstanceBuilder {
 
     public AbstractSlice givenAnAbstractSlice(AbstractImage abstractImage, int c, int z, int t) {
         AbstractSlice slice = givenANotPersistedAbstractSlice(abstractImage, abstractImage.getUploadedFile());
-        slice.setMime(givenAMime("openslide/mrxs"));
         slice.setChannel(c);
         slice.setZStack(z);
         slice.setTime(t);
@@ -458,7 +437,6 @@ public class BasicInstanceBuilder {
         AbstractSlice slice = new AbstractSlice();
         slice.setImage(abstractImage);
         slice.setUploadedFile(uploadedFile);
-        slice.setMime(givenAMime());
         slice.setChannel(0);
         slice.setZStack(0);
         slice.setTime(0);
@@ -480,10 +458,8 @@ public class BasicInstanceBuilder {
 
     public SliceInstance givenASliceInstance(Project project) {
         AbstractImage image = givenAnAbstractImage();
-        SliceInstance sliceInstance = givenASliceInstance(
-            givenAnImageInstance(image, project),
-            givenAnAbstractSlice(image, 0, 0, 0)
-        );
+        SliceInstance sliceInstance =
+            givenASliceInstance(givenAnImageInstance(image, project), givenAnAbstractSlice(image, 0, 0, 0));
         return persistAndReturn(sliceInstance);
     }
 
@@ -499,23 +475,6 @@ public class BasicInstanceBuilder {
         return givenANotPersistedSliceInstance(givenAnImageInstance(), givenAnAbstractSlice());
     }
 
-    public Mime givenAMime() {
-        Optional<Mime> optionalMime = mimeRepository.findByMimeType("image/pyrtiff");
-        if (optionalMime.isPresent()) {
-            return optionalMime.get();
-        } else {
-            Mime mime = new Mime();
-            mime.setExtension("tif");
-            mime.setMimeType("image/pyrtiff");
-            return persistAndReturn(mime);
-        }
-    }
-
-    public Mime givenAMime(String mimeType) {
-        return mimeRepository.findByMimeType(mimeType)
-            .orElseThrow(() -> new ObjectNotFoundException("MimeType", mimeType));
-    }
-
     public NestedImageInstance givenANestedImageInstance() {
         return persistAndReturn(givenANotPersistedNestedImageInstance());
     }
@@ -525,7 +484,7 @@ public class BasicInstanceBuilder {
         NestedImageInstance nestedImageInstance = new NestedImageInstance();
         nestedImageInstance.setBaseImage(givenAnAbstractImage());
         nestedImageInstance.setProject(parent.getProject());
-        nestedImageInstance.setUser(givenSuperAdmin());
+        nestedImageInstance.setUser(getUserEntity(SUPER_ADMIN));
         nestedImageInstance.setParent(parent);
         nestedImageInstance.setX(1);
         nestedImageInstance.setY(2);
@@ -565,7 +524,7 @@ public class BasicInstanceBuilder {
 
     public UserAnnotation givenANotPersistedGuestAnnotation() {
         UserAnnotation annotation = new UserAnnotation();
-        annotation.setUser(givenAGuest());
+        annotation.setUserId(givenGuestAcl().id());
         try {
             annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
         } catch (ParseException ignored) {
@@ -579,7 +538,7 @@ public class BasicInstanceBuilder {
 
     public UserAnnotation givenANotPersistedUserAnnotation() {
         UserAnnotation annotation = new UserAnnotation();
-        annotation.setUser(givenSuperAdmin());
+        annotation.setUserId(givenSuperAdmin().id());
         try {
             annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
         } catch (ParseException ignored) {
@@ -601,7 +560,7 @@ public class BasicInstanceBuilder {
 
     public UserAnnotation givenANotPersistedUserAnnotation(SliceInstance sliceInstance) {
         UserAnnotation annotation = new UserAnnotation();
-        annotation.setUser(givenSuperAdmin());
+        annotation.setUserId(givenSuperAdmin().id());
         try {
             annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
         } catch (ParseException ignored) {
@@ -625,12 +584,12 @@ public class BasicInstanceBuilder {
         return persistAndReturn(givenAUserAnnotation(sliceInstance, givenSuperAdmin()));
     }
 
-    public UserAnnotation givenAUserAnnotation(SliceInstance sliceInstance, User user) {
+    public UserAnnotation givenAUserAnnotation(SliceInstance sliceInstance, UserResponse user) {
         UserAnnotation annotation = givenANotPersistedUserAnnotation();
         annotation.setSlice(sliceInstance);
         annotation.setImage(sliceInstance.getImage());
         annotation.setProject(sliceInstance.getProject());
-        annotation.setUser(user);
+        annotation.setUserId(user.id());
         return persistAndReturn(annotation);
     }
 
@@ -638,17 +597,17 @@ public class BasicInstanceBuilder {
         return persistAndReturn(givenANotPersistedUserAnnotation());
     }
 
-    public UserAnnotation givenAUserAnnotation(SliceInstance sliceInstance, String location, User user, Term term)
-        throws ParseException {
+    public UserAnnotation givenAUserAnnotation(SliceInstance sliceInstance, String location, UserResponse user,
+        Term term) throws ParseException {
         UserAnnotation annotation = givenANotPersistedUserAnnotation(sliceInstance);
         annotation.setLocation(new WKTReader().read(location));
-        annotation.setUser(user);
+        annotation.setUserId(user.id());
         persistAndReturn(annotation);
 
         if (term != null) {
             AnnotationTerm annotationTerm = new AnnotationTerm();
             annotationTerm.setUserAnnotation(annotation);
-            annotationTerm.setUser(user);
+            annotationTerm.setUser(getUserEntity(user));
             annotationTerm.setTerm(term);
             persistAndReturn(annotationTerm);
             em.refresh(annotation);
@@ -657,16 +616,13 @@ public class BasicInstanceBuilder {
     }
 
     public AnnotationTerm givenANotPersistedAnnotationTerm(UserAnnotation annotation) {
-        return givenANotPersistedAnnotationTerm(
-            annotation,
-            this.givenATerm(annotation.getProject().getOntology())
-        );
+        return givenANotPersistedAnnotationTerm(annotation, this.givenATerm(annotation.getProject().getOntology()));
     }
 
     public AnnotationTerm givenANotPersistedAnnotationTerm(UserAnnotation annotation, Term term) {
         AnnotationTerm annotationTerm = new AnnotationTerm();
         annotationTerm.setTerm(term);
-        annotationTerm.setUser(this.givenSuperAdmin());
+        annotationTerm.setUser(getUserEntity(this.givenCurrentUser()));
         annotationTerm.setUserAnnotation(annotation);
         return annotationTerm;
     }
@@ -676,23 +632,19 @@ public class BasicInstanceBuilder {
     }
 
     public AnnotationTerm givenAnAnnotationTerm(UserAnnotation annotation) {
-        return persistAndReturn(givenANotPersistedAnnotationTerm(
-            annotation,
-            this.givenATerm(annotation.getProject().getOntology())
-        ));
+        return persistAndReturn(
+            givenANotPersistedAnnotationTerm(annotation, this.givenATerm(annotation.getProject().getOntology())));
     }
 
     public AnnotationTerm givenAnAnnotationTerm() {
         UserAnnotation annotation = givenAUserAnnotation();
-        return persistAndReturn(givenANotPersistedAnnotationTerm(
-            annotation,
-            this.givenATerm(annotation.getProject().getOntology())
-        ));
+        return persistAndReturn(
+            givenANotPersistedAnnotationTerm(annotation, this.givenATerm(annotation.getProject().getOntology())));
     }
 
     public ReviewedAnnotation givenANotPersistedReviewedAnnotation() {
         ReviewedAnnotation annotation = new ReviewedAnnotation();
-        annotation.setUser(givenSuperAdmin());
+        annotation.setUserId(givenSuperAdmin().id());
         try {
             annotation.setLocation(new WKTReader().read("POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))"));
         } catch (ParseException ignored) {
@@ -703,7 +655,7 @@ public class BasicInstanceBuilder {
         annotation.setImage(userAnnotation.getImage());
         annotation.setProject(userAnnotation.getImage().getProject());
         annotation.putParentAnnotation(userAnnotation);
-        annotation.setReviewUser(givenSuperAdmin());
+        annotation.setReviewUser(getUserEntity(SUPER_ADMIN));
         annotation.setStatus(0);
         return annotation;
     }
@@ -716,7 +668,7 @@ public class BasicInstanceBuilder {
         annotation.getSlice().setProject(project);
         annotation.getImage().setProject(project);
         annotation.setProject(project);
-        annotation.setReviewUser(givenSuperAdmin());
+        annotation.setReviewUser(getUserEntity(SUPER_ADMIN));
         annotation.setStatus(0);
         return annotation;
     }
@@ -727,37 +679,29 @@ public class BasicInstanceBuilder {
 
     public ReviewedAnnotation givenAReviewedAnnotation(Project project) throws ParseException {
         SliceInstance sliceInstance = givenASliceInstance(givenAnImageInstance(project), givenAnAbstractSlice());
-        return givenAReviewedAnnotation(
-            sliceInstance,
-            "POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))",
-            givenSuperAdmin(),
-            givenATerm(project.getOntology())
-        );
+        return givenAReviewedAnnotation(sliceInstance, "POLYGON ((1983 2168, 2107 2160, 2047 2074, 1983 2168))",
+            givenSuperAdmin(), givenATerm(project.getOntology()));
     }
 
-    public ReviewedAnnotation givenAReviewedAnnotation(
-        SliceInstance sliceInstance,
-        String location,
-        User user,
-        Term term
-    ) throws ParseException {
+    public ReviewedAnnotation givenAReviewedAnnotation(SliceInstance sliceInstance, String location, UserResponse user,
+        Term term) throws ParseException {
         UserAnnotation userAnnotation = givenAUserAnnotation(sliceInstance, location, user, term);
 
         ReviewedAnnotation annotation = new ReviewedAnnotation();
         annotation.setImage(sliceInstance.getImage());
         annotation.setSlice(sliceInstance);
         annotation.setLocation(new WKTReader().read(location));
-        annotation.setUser(user);
+        annotation.setUserId(user.id());
         annotation.setProject(sliceInstance.getProject());
         annotation.putParentAnnotation(userAnnotation);
-        annotation.setReviewUser(givenSuperAdmin());
+        annotation.setReviewUser(getUserEntity(SUPER_ADMIN));
         annotation.setStatus(0);
         persistAndReturn(annotation);
 
         if (term != null) {
             AnnotationTerm annotationTerm = new AnnotationTerm();
             annotationTerm.setUserAnnotation(userAnnotation);
-            annotationTerm.setUser(user);
+            annotationTerm.setUser(getUserEntity(user));
             annotationTerm.setTerm(term);
             persistAndReturn(annotationTerm);
             annotation.getTerms().add(term);
@@ -773,8 +717,8 @@ public class BasicInstanceBuilder {
         SharedAnnotation sharedAnnotation = new SharedAnnotation();
         sharedAnnotation.setAnnotation(givenAUserAnnotation());
         sharedAnnotation.setComment("Rech. proj. pr proj. priv. Self Dem. Brt. Poss. S'adr. à l'hô. Mart");
-        sharedAnnotation.setSender(givenSuperAdmin());
-        sharedAnnotation.setReceivers(List.of(givenSuperAdmin()));
+        sharedAnnotation.setSender(getUserEntity(SUPER_ADMIN));
+        sharedAnnotation.setReceivers(List.of(getUserEntity(SUPER_ADMIN)));
         return sharedAnnotation;
     }
 
@@ -831,7 +775,7 @@ public class BasicInstanceBuilder {
         annotationIndex.setSlice(givenASliceInstance());
         annotationIndex.setCountAnnotation(1L);
         annotationIndex.setCountReviewedAnnotation(1L);
-        annotationIndex.setUser(givenSuperAdmin());
+        annotationIndex.setUser(getUserEntity(SUPER_ADMIN));
         return annotationIndex;
     }
 
@@ -873,7 +817,7 @@ public class BasicInstanceBuilder {
     public Tag givenANotPersistedTag(String name) {
         Tag tag = new Tag();
         tag.setName(name);
-        tag.setUser(givenSuperAdmin());
+        tag.setUser(getUserEntity(SUPER_ADMIN));
         return tag;
     }
 
@@ -889,22 +833,25 @@ public class BasicInstanceBuilder {
     }
 
     public ProjectRepresentativeUser givenAProjectRepresentativeUser() {
-        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin()));
+        return persistAndReturn(
+            givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin().username(),
+                givenSuperAdmin().id()));
     }
 
-    public ProjectRepresentativeUser givenAProjectRepresentativeUser(Project project, User user) {
-        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(project, user));
+    public ProjectRepresentativeUser givenAProjectRepresentativeUser(Project project, String username, long userId) {
+        return persistAndReturn(givenANotPersistedProjectRepresentativeUser(project, username, userId));
     }
 
     public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser() {
-        return givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin());
+        return givenANotPersistedProjectRepresentativeUser(givenAProject(), givenSuperAdmin().username(),
+            givenSuperAdmin().id());
     }
 
-    public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser(
-        Project project, User user) {
-        addUserToProject(project, user.getUsername());
+    public ProjectRepresentativeUser givenANotPersistedProjectRepresentativeUser(Project project, String username,
+        long userId) {
+        addUserToProject(project, username);
         ProjectRepresentativeUser projectRepresentativeUser = new ProjectRepresentativeUser();
-        projectRepresentativeUser.setUser(user);
+        projectRepresentativeUser.setUserId(userId);
         projectRepresentativeUser.setProject(project);
         return projectRepresentativeUser;
     }
@@ -913,7 +860,7 @@ public class BasicInstanceBuilder {
         return persistAndReturn(givenANotPersistedProjectDefaultLayer(givenAProject(), givenSuperAdmin()));
     }
 
-    public ProjectDefaultLayer givenAProjectDefaultLayer(Project project, User user) {
+    public ProjectDefaultLayer givenAProjectDefaultLayer(Project project, UserResponse user) {
         return persistAndReturn(givenANotPersistedProjectDefaultLayer(project, user));
     }
 
@@ -921,20 +868,18 @@ public class BasicInstanceBuilder {
         return givenANotPersistedProjectDefaultLayer(givenAProject(), givenSuperAdmin());
     }
 
-    public ProjectDefaultLayer givenANotPersistedProjectDefaultLayer(Project project, User user) {
-        addUserToProject(project, user.getUsername());
+    public ProjectDefaultLayer givenANotPersistedProjectDefaultLayer(Project project, UserResponse user) {
+        addUserToProject(project, user.username());
         ProjectDefaultLayer projectDefaultLayer = new ProjectDefaultLayer();
-        projectDefaultLayer.setUser(user);
+        projectDefaultLayer.setUser(getUserEntity(user));
         projectDefaultLayer.setProject(project);
         projectDefaultLayer.setHideByDefault(false);
         return projectDefaultLayer;
     }
 
     public SecUserSecRole givenAUserRole() {
-        return persistAndReturn(givenANotPersistedUserRole(
-            givenAGuest(),
-            secRoleRepository.findByAuthority(ROLE_USER).get()
-        ));
+        return persistAndReturn(givenANotPersistedUserRole(getUserEntity(GUEST_ACL),
+            secRoleRepository.findByAuthority(ROLE_USER).get()));
     }
 
     public SecUserSecRole givenAUserRole(User user) {
@@ -1026,11 +971,8 @@ public class BasicInstanceBuilder {
         return persistAndReturn(givenANotPersistedAnnotationGroup());
     }
 
-    public AnnotationLink givenANotPersistedAnnotationLink(
-        UserAnnotation annotation,
-        AnnotationGroup annotationGroup,
-        ImageInstance image
-    ) {
+    public AnnotationLink givenANotPersistedAnnotationLink(UserAnnotation annotation, AnnotationGroup annotationGroup,
+        ImageInstance image) {
         AnnotationLink annotationLink = new AnnotationLink();
         annotationLink.setAnnotationClassName(annotation.getClass().getName());
         annotationLink.setAnnotationIdent(annotation.getId());
@@ -1043,18 +985,12 @@ public class BasicInstanceBuilder {
     public AnnotationLink givenANotPersistedAnnotationLink() {
         Project project = givenAProject();
 
-        return givenANotPersistedAnnotationLink(
-            givenAUserAnnotation(project),
-            givenAnAnnotationGroup(project, givenAnImageGroup(project)),
-            givenAnImageInstance(project)
-        );
+        return givenANotPersistedAnnotationLink(givenAUserAnnotation(project),
+            givenAnAnnotationGroup(project, givenAnImageGroup(project)), givenAnImageInstance(project));
     }
 
-    public AnnotationLink givenAnAnnotationLink(
-        UserAnnotation annotation,
-        AnnotationGroup annotationGroup,
-        ImageInstance image
-    ) {
+    public AnnotationLink givenAnAnnotationLink(UserAnnotation annotation, AnnotationGroup annotationGroup,
+        ImageInstance image) {
         return persistAndReturn(givenANotPersistedAnnotationLink(annotation, annotationGroup, image));
     }
 
@@ -1069,7 +1005,7 @@ public class BasicInstanceBuilder {
     public TaskRun givenANotPersistedTaskRun(Project project, UUID taskRunId, ImageInstance image) {
         TaskRun taskRun = new TaskRun();
         taskRun.setProject(project);
-        taskRun.setUser(givenSuperAdmin());
+        taskRun.setUser(getUserEntity(SUPER_ADMIN));
         taskRun.setTaskRunId(taskRunId);
         taskRun.setImage(image);
         return taskRun;
@@ -1104,11 +1040,8 @@ public class BasicInstanceBuilder {
         return persistAndReturn(givenANotPersistedAnnotation());
     }
 
-    public TaskRunLayer givenANotPersistedTaskRunLayer(
-        AnnotationLayer annotationLayer,
-        TaskRun taskRun,
-        ImageInstance image
-    ) {
+    public TaskRunLayer givenANotPersistedTaskRunLayer(AnnotationLayer annotationLayer, TaskRun taskRun,
+        ImageInstance image) {
         TaskRunLayer taskRunLayer = new TaskRunLayer();
         taskRunLayer.setAnnotationLayer(annotationLayer);
         taskRunLayer.setTaskRun(taskRun);
@@ -1117,11 +1050,8 @@ public class BasicInstanceBuilder {
     }
 
     public TaskRunLayer givenANotPersistedTaskRunLayer() {
-        return givenANotPersistedTaskRunLayer(
-            givenAPersistedAnnotationLayer(),
-            givenATaskRun(),
-            givenAnImageInstance()
-        );
+        return givenANotPersistedTaskRunLayer(givenAPersistedAnnotationLayer(), givenATaskRun(),
+            givenAnImageInstance());
     }
 
     public TaskRunLayer givenAPersistedTaskRunLayer() {

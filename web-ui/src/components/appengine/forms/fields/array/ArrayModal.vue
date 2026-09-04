@@ -48,14 +48,14 @@
 </template>
 
 <script>
-import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect';
-import BooleanField from '@/components/appengine/forms/fields/BooleanField';
-import CytomineModal from '@/components/utils/CytomineModal';
-import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
-import ImageArrayField from '@/components/appengine/forms/fields/array/ImageArrayField';
-import IntegerField from '@/components/appengine/forms/fields/IntegerField';
-import NumberField from '@/components/appengine/forms/fields/NumberField';
-import StringField from '@/components/appengine/forms/fields/StringField';
+import BooleanField from '@/components/appengine/forms/fields/BooleanField.vue';
+import CytomineModal from '@/components/utils/CytomineModal.vue';
+import EnumerationField from '@/components/appengine/forms/fields/EnumerationField.vue';
+import GeometryArrayField from '@/components/appengine/forms/fields/array/GeometryArrayField.vue';
+import ImageArrayField from '@/components/appengine/forms/fields/array/ImageArrayField.vue';
+import IntegerField from '@/components/appengine/forms/fields/IntegerField.vue';
+import NumberField from '@/components/appengine/forms/fields/NumberField.vue';
+import StringField from '@/components/appengine/forms/fields/StringField.vue';
 
 export default {
   name: 'ArrayModal',
@@ -63,10 +63,10 @@ export default {
     CytomineModal,
   },
   props: {
-    active: {type: Boolean, default: false},
-    maxSize: {type: Number, default: null},
-    minSize: {type: Number, default: null},
-    type: {type: Object, required: true},
+    active: { type: Boolean, default: false },
+    maxSize: { type: Number, default: null },
+    minSize: { type: Number, default: null },
+    type: { type: Object, required: true },
   },
   data() {
     return {
@@ -79,7 +79,7 @@ export default {
       return PRIMITIVES.includes(this.type.id);
     },
     parameter() {
-      return {default: null, description: null, type: this.type};
+      return { default: null, description: null, type: this.type };
     },
     selectedPrimitiveField() {
       switch (this.type.id) {
@@ -100,7 +100,7 @@ export default {
     selectedComplexField() {
       switch (this.type.id) {
         case 'geometry':
-          return AnnotationMultiSelect;
+          return GeometryArrayField;
         case 'image':
           return ImageArrayField;
         default:
@@ -114,12 +114,12 @@ export default {
     },
     select() {
       if (this.items.length === 0) {
-        this.$notify({type: 'error', text: this.$t('notify-error-empty-list')});
+        this.$notify({ type: 'error', text: this.$t('notify-error-empty-list') });
         return;
       }
 
       if (this.minSize !== null && this.items.length < this.minSize) {
-        this.$notify({type: 'error', text: this.$t('notify-error-not-enough-item')});
+        this.$notify({ type: 'error', text: this.$t('notify-error-not-enough-item') });
         return;
       }
 
@@ -128,7 +128,7 @@ export default {
 
       this.items = [];
 
-      this.$notify({type: 'success', text: this.$t('notify-success-create-array-inputs')});
+      this.$notify({ type: 'success', text: this.$t('notify-success-create-array-inputs') });
     },
     add() {
       this.items.push(null);

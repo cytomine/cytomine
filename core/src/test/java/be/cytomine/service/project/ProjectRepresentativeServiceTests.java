@@ -1,21 +1,5 @@
 package be.cytomine.service.project;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,22 +12,26 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 
-
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class ProjectRepresentativeServiceTests {
 
     @Autowired
@@ -54,6 +42,8 @@ public class ProjectRepresentativeServiceTests {
 
     @Autowired
     BasicInstanceBuilder builder;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void getProjectRepresentativeUserWithSuccess() {
@@ -85,11 +75,11 @@ public class ProjectRepresentativeServiceTests {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser()
+            projectRepresentativeUser.getUserId()
         ).isPresent());
         assertThat(projectRepresentativeUser).isEqualTo(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser()
+            projectRepresentativeUser.getUserId()
         ).get());
     }
 
@@ -97,10 +87,9 @@ public class ProjectRepresentativeServiceTests {
     void findUnexistingProjectRepresentativeUserWithProjectAndUserReturnEmpty() {
         assertThat(projectRepresentativeUserService.find(
             builder.givenAProject(),
-            builder.givenSuperAdmin()
+            builder.givenSuperAdmin().id()
         )).isEmpty();
     }
-
 
     @Test
     void listAllProjectRepresentativeUserByProjectWithSuccess() {
@@ -122,7 +111,7 @@ public class ProjectRepresentativeServiceTests {
 
         CommandResponse
             commandResponse
-            = projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject());
+            = projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -139,7 +128,7 @@ public class ProjectRepresentativeServiceTests {
             = builder.givenANotPersistedProjectRepresentativeUser();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
-                projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject()
+                projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject(urlApi)
                     .withChange("project", 0L));
             }
         );
@@ -152,7 +141,8 @@ public class ProjectRepresentativeServiceTests {
             = builder.givenANotPersistedProjectRepresentativeUser();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
-                projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject().withChange("user", 0L));
+                projectRepresentativeUserService.add(
+                    projectRepresentativeUser.toJsonObject(urlApi).withChange("user", 0L));
             }
         );
     }
@@ -162,7 +152,8 @@ public class ProjectRepresentativeServiceTests {
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser();
         Assertions.assertThrows(
             AlreadyExistException.class, () -> {
-                projectRepresentativeUserService.add(projectRepresentativeUser.toJsonObject().withChange("id", null));
+                projectRepresentativeUserService.add(
+                    projectRepresentativeUser.toJsonObject(urlApi).withChange("id", null));
             }
         );
     }
@@ -170,9 +161,11 @@ public class ProjectRepresentativeServiceTests {
     @Test
     void deleteProjectRepresentativeUserWithSuccess() {
         ProjectRepresentativeUser projectRepresentativeUser1 = builder.givenAProjectRepresentativeUser();
+        UserResponse user = builder.givenUserAclRead();
         ProjectRepresentativeUser projectRepresentativeUser2 = builder.givenAProjectRepresentativeUser(
             projectRepresentativeUser1.getProject(),
-            builder.givenAUser()
+            user.username(),
+            user.id()
         );
         CommandResponse commandResponse = projectRepresentativeUserService.delete(
             projectRepresentativeUser1,
@@ -199,20 +192,21 @@ public class ProjectRepresentativeServiceTests {
 
     @Test
     void deletingLastRepresentativeUserFromProjectWillGrantCurrentUserAsRepresentative() {
+        UserResponse user = builder.givenUserAclRead();
         ProjectRepresentativeUser projectRepresentativeUser = builder.givenAProjectRepresentativeUser(
-            builder.givenAProject(), builder.givenAUser()
+            builder.givenAProject(), user.username(), user.id()
         );
         builder.addUserToProject(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser().getUsername(),
+            user.username(),
             ADMINISTRATION
         );
 
         assertThat(projectRepresentativeUserService.listByProject(projectRepresentativeUser.getProject())).hasSize(1);
 
-
         projectMemberService.deleteUserFromProject(
-            projectRepresentativeUser.getUser(),
+            user.username(),
+            user.id(),
             projectRepresentativeUser.getProject(),
             true
         );
@@ -220,11 +214,11 @@ public class ProjectRepresentativeServiceTests {
         assertThat(projectRepresentativeUserService.listByProject(projectRepresentativeUser.getProject())).hasSize(1);
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            projectRepresentativeUser.getUser()
+            projectRepresentativeUser.getUserId()
         )).isEmpty();
         assertThat(projectRepresentativeUserService.find(
             projectRepresentativeUser.getProject(),
-            builder.givenSuperAdmin()
+            builder.givenSuperAdmin().id()
         )).isPresent();
     }
 }

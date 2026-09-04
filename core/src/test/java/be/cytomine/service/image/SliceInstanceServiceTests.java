@@ -1,21 +1,5 @@
 package be.cytomine.service.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
@@ -31,6 +15,7 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.AnnotationIndex;
@@ -40,17 +25,18 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.UploadedFileRepository;
 import be.cytomine.service.CommandService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
 public class SliceInstanceServiceTests {
 
@@ -74,6 +60,8 @@ public class SliceInstanceServiceTests {
 
     @Autowired
     ImageInstanceService imageInstanceService;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void listAllSliceByImageInstance() {
@@ -95,7 +83,6 @@ public class SliceInstanceServiceTests {
 
         assertThat(sliceInstanceService.find(image1, 10, 100, 1000)).isPresent();
     }
-
 
     @Test
     void findSliceInstanceUnexistingCoordinatesReturnEmptyResponse() {
@@ -126,7 +113,7 @@ public class SliceInstanceServiceTests {
     void addValidSlicteInstanceWithSuccess() {
         SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
 
-        CommandResponse commandResponse = sliceInstanceService.add(sliceInstance.toJsonObject());
+        CommandResponse commandResponse = sliceInstanceService.add(sliceInstance.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -134,13 +121,12 @@ public class SliceInstanceServiceTests {
         SliceInstance created = sliceInstanceService.find(commandResponse.getObject().getId()).get();
     }
 
-
     @Test
     void addAlreadyExistingSliceInstance() {
         SliceInstance sliceInstance = builder.givenASliceInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                sliceInstanceService.add(sliceInstance.toJsonObject().withChange("image", null));
+                sliceInstanceService.add(sliceInstance.toJsonObject(urlApi).withChange("image", null));
             }
         );
     }
@@ -150,7 +136,7 @@ public class SliceInstanceServiceTests {
         SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                sliceInstanceService.add(sliceInstance.toJsonObject().withChange("image", null));
+                sliceInstanceService.add(sliceInstance.toJsonObject(urlApi).withChange("image", null));
             }
         );
     }
@@ -160,7 +146,7 @@ public class SliceInstanceServiceTests {
         SliceInstance sliceInstance = builder.givenANotPersistedSliceInstance();
         Assertions.assertThrows(
             ObjectNotFoundException.class, () -> {
-                sliceInstanceService.add(sliceInstance.toJsonObject().withChange("project", null));
+                sliceInstanceService.add(sliceInstance.toJsonObject(urlApi).withChange("project", null));
             }
         );
     }
@@ -173,7 +159,7 @@ public class SliceInstanceServiceTests {
         sliceInstance.setProject(project1);
         sliceInstance = builder.persistAndReturn(sliceInstance);
 
-        JsonObject jsonObject = sliceInstance.toJsonObject();
+        JsonObject jsonObject = sliceInstance.toJsonObject(urlApi);
         jsonObject.put("project", project2.getId());
 
         CommandResponse commandResponse = sliceInstanceService.edit(jsonObject, true);
@@ -217,6 +203,5 @@ public class SliceInstanceServiceTests {
         assertThat(entityManager.find(AnnotationIndex.class, annotationIndex.getId())).isNull();
 
     }
-
 
 }

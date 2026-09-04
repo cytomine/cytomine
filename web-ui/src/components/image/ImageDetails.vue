@@ -1,17 +1,3 @@
-<!-- Copyright (c) 2009-2022. Authors: see NOTICE file.
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.-->
-
 <template>
 <div class="image-details-wrapper">
   <b-message v-if="error" type="is-danger" has-icon icon-size="is-small" size="is-small">
@@ -297,24 +283,24 @@
 </template>
 
 <script>
-import {ImageInstance, ImageGroupImageInstanceCollection} from '@/api';
+import { ImageInstance, ImageGroupImageInstanceCollection } from '@/api';
 
-import {appendShortTermToken} from '@/utils/token-utils.js';
-import {formatMinutesSeconds} from '@/utils/slice-utils.js';
-import {get} from '@/utils/store-helpers';
+import { appendShortTermToken } from '@/utils/token-utils.js';
+import { formatMinutesSeconds } from '@/utils/slice-utils.js';
+import { get } from '@/utils/store-helpers';
 import vendorFromFormat from '@/utils/vendor';
 
-import AttachedFiles from '@/components/attached-file/AttachedFiles';
-import CalibrationModal from '@/components/image/CalibrationModal';
-import CytomineDescription from '@/components/description/CytomineDescription';
-import CytomineProperties from '@/components/property/CytomineProperties';
-import CytomineTags from '@/components/tag/CytomineTags';
-import ImageMetadataModal from '@/components/image/ImageMetadataModal';
-import ImageStatus from '@/components/image/ImageStatus';
-import ImageThumbnail from '@/components/image/ImageThumbnail';
-import MagnificationModal from '@/components/image/MagnificationModal';
-import RenameModal from '@/components/utils/RenameModal';
-import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal';
+import AttachedFiles from '@/components/attached-file/AttachedFiles.vue';
+import CalibrationModal from '@/components/image/CalibrationModal.vue';
+import CytomineDescription from '@/components/description/CytomineDescription.vue';
+import CytomineProperties from '@/components/property/CytomineProperties.vue';
+import CytomineTags from '@/components/tag/CytomineTags.vue';
+import ImageMetadataModal from '@/components/image/ImageMetadataModal.vue';
+import ImageStatus from '@/components/image/ImageStatus.vue';
+import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
+import MagnificationModal from '@/components/image/MagnificationModal.vue';
+import RenameModal from '@/components/utils/RenameModal.vue';
+import SimpleAddToImageGroupModal from '@/components/image-group/SimpleAddToImageGroupModal.vue';
 
 export default {
   name: 'image-details',
@@ -332,9 +318,9 @@ export default {
     SimpleAddToImageGroupModal,
   },
   props: {
-    image: {type: Object},
-    excludedProperties: {type: Array, default: () => []},
-    editable: {type: Boolean, default: false}
+    image: { type: Object },
+    excludedProperties: { type: Array, default: () => [] },
+    editable: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -408,7 +394,7 @@ export default {
         await this.image.stopReview(true);
       } catch (error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t(errorLabel)});
+        this.$notify({ type: 'error', text: this.$t(errorLabel) });
       }
     },
 
@@ -420,13 +406,13 @@ export default {
         await this.image.save();
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-rename', {imageName: this.image.instanceFilename})
+          text: this.$t('notif-success-image-rename', { imageName: this.image.instanceFilename })
         });
       } catch (error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-rename', {imageName: oldName})
+          text: this.$t('notif-error-image-rename', { imageName: oldName })
         });
       }
       this.isRenameModalActive = false;
@@ -435,7 +421,7 @@ export default {
     confirmDeletion() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-image'),
-        message: this.$t('delete-image-confirmation-message', {imageName: this.imageNameNotif}),
+        message: this.$t('delete-image-confirmation-message', { imageName: this.imageNameNotif }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -447,7 +433,7 @@ export default {
         await ImageInstance.delete(this.image.id);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-deletion', {imageName: this.imageNameNotif})
+          text: this.$t('notif-success-image-deletion', { imageName: this.imageNameNotif })
         });
         this.$emit('delete');
 
@@ -458,14 +444,14 @@ export default {
         console.log(err);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-deletion', {imageName: this.imageNameNotif})
+          text: this.$t('notif-error-image-deletion', { imageName: this.imageNameNotif })
         });
       }
     },
     confirmImageGroupLinkDeletion() {
       this.$buefy.dialog.confirm({
         title: this.$t('delete-image-group-link'),
-        message: this.$t('delete-image-group-link-confirmation-message', {imageName: this.imageNameNotif}),
+        message: this.$t('delete-image-group-link-confirmation-message', { imageName: this.imageNameNotif }),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
@@ -478,14 +464,14 @@ export default {
         await this.imageGroupLinks[0].delete();
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-image-group-link-deletion', {imageName: this.imageNameNotif})
+          text: this.$t('notif-success-image-group-link-deletion', { imageName: this.imageNameNotif })
         });
         this.imageGroupLinks.splice(0, 1);
       } catch (err) {
         console.log(err);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-image-group-link-deletion', {imageName: this.imageNameNotif})
+          text: this.$t('notif-error-image-group-link-deletion', { imageName: this.imageNameNotif })
         });
       }
     },
@@ -540,7 +526,7 @@ td.prop-content-half {
   max-width: 12rem;
 }
 
-::v-deep .image-thumbnail {
+:deep(.image-thumbnail) {
   max-height: 18rem;
   max-width: 50vw;
 }

@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,26 +18,34 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import be.cytomine.common.mapper.BaseMapperImpl;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.CropOffset;
 import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
+import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.dto.appengine.task.output.CollectionOutput;
 import be.cytomine.dto.appengine.task.output.GeometryOutput;
+import be.cytomine.mapper.RoleMapperImpl;
+import be.cytomine.mapper.UserMapperImpl;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
 import be.cytomine.repository.appengine.TaskRunRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.annotation.AnnotationLayerService;
 import be.cytomine.service.annotation.AnnotationService;
+import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.utils.GeometryService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -49,42 +58,43 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskRunServiceTest {
-
+    private final UserMapperImpl userMapper = userMapper();
     @Mock
     private AnnotationService annotationService;
-
     @Mock
     private AnnotationLayerService annotationLayerService;
-
     @Mock
     private AppEngineService appEngineService;
-
     @Mock
     private CurrentUserService currentUserService;
-
     @Mock
     private GeometryService geometryService;
-
     @Mock
     private ProjectService projectService;
-
     @Mock
     private SecurityACLService securityACLService;
-
     @Mock
     private TaskRunRepository taskRunRepository;
-
     @Mock
     private TaskRunLayerRepository taskRunLayerRepository;
-
     @Mock
     private AsyncService asyncService;
-
+    @Mock
+    private UserAnnotationService userAnnotationService;
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper();
-
     @InjectMocks
     private TaskRunService taskRunService;
+
+    private static UserMapperImpl userMapper() {
+        RoleMapperImpl roleMapper = new RoleMapperImpl();
+        ReflectionTestUtils.setField(roleMapper, "baseMapper", new BaseMapperImpl());
+
+        UserMapperImpl mapper = new UserMapperImpl();
+        ReflectionTestUtils.setField(mapper, "baseMapper", new BaseMapperImpl());
+        ReflectionTestUtils.setField(mapper, "roleMapper", roleMapper);
+        return mapper;
+    }
 
     @DisplayName("Successfully create annotations from geometry array output")
     @Test
@@ -169,8 +179,8 @@ public class TaskRunServiceTest {
         taskRunLayer.setParameterName("input");
         taskRunLayer.setOffsets(List.of(new CropOffset(0, 0)));
         AnnotationLayer annotationLayer = new AnnotationLayer();
-
-        doNothing().when(securityACLService).checkUser(currentUser);
+        UserResponse userResponse = userMapper.map(currentUser);
+        doNothing().when(securityACLService).checkUser(userResponse);
         doNothing().when(securityACLService).check(project, READ);
         doNothing().when(securityACLService).checkIsNotReadOnly(project);
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
@@ -178,7 +188,8 @@ public class TaskRunServiceTest {
         when(appEngineService.get("task-runs/" + taskRunId + "/outputs")).thenReturn(outputsJson);
         when(appEngineService.get("task-runs/" + taskRunId)).thenReturn(taskRunJson);
         when(appEngineService.getTaskRunOutputs(taskRunId)).thenReturn(List.of(collectionOutput));
-        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+        when(currentUserService.getCurrentUser()).thenReturn(userResponse);
+        when(currentUserService.getCurrentUserOld()).thenReturn(currentUser);
         when(geometryService.addOffset(
             any(Geometry.class),
             anyInt(),
@@ -276,11 +287,12 @@ public class TaskRunServiceTest {
         taskRunLayer.getOffsets().add(new CropOffset(0, 0));
 
         AnnotationLayer annotationLayer = new AnnotationLayer();
-
-        doNothing().when(securityACLService).checkUser(currentUser);
+        UserResponse userResponse = userMapper.map(currentUser);
+        doNothing().when(securityACLService).checkUser(userResponse);
         doNothing().when(securityACLService).check(project, READ);
         doNothing().when(securityACLService).checkIsNotReadOnly(project);
-        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+        when(currentUserService.getCurrentUser()).thenReturn(userResponse);
+        when(currentUserService.getCurrentUserOld()).thenReturn(currentUser);
         when(annotationLayerService.createLayerName(any(), any(), any())).thenReturn("layer-name");
         when(annotationLayerService.createAnnotationLayer("layer-name")).thenReturn(annotationLayer);
         when(appEngineService.get("task-runs/" + taskRunId + "/outputs")).thenReturn(outputsJson);
@@ -303,5 +315,59 @@ public class TaskRunServiceTest {
         verify(asyncService, times(1)).launchImageAdditionJob(
             ArgumentMatchers.any(), eq(projectId), eq(currentUser)
         );
+    }
+
+    @DisplayName("Successfully call provisionCollectionItem for each annotation in a geometry array")
+    @Test
+    public void shouldProvisionGeometryArrayForEachAnnotation() throws JsonProcessingException {
+        Long projectId = 1L;
+        UUID taskRunId = UUID.randomUUID();
+
+        JsonNode json = objectMapper.readTree("""
+            {
+                "parameterName": "test-parameter",
+                "type": {
+                    "id": "array",
+                    "subType": { "id": "geometry" }
+                },
+                "value": {
+                    "ids": [1, 2],
+                    "type": "annotation"
+                }
+            }
+            """);
+
+        User currentUser = new User();
+        Project project = new Project();
+        TaskRun taskRun = new TaskRun();
+
+        UserAnnotation annotation1 = new UserAnnotation();
+        annotation1.setWktLocation("POINT(1 2)");
+        UserAnnotation annotation2 = new UserAnnotation();
+        annotation2.setWktLocation("POINT(3 4)");
+
+        String geoJson1 = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0]}";
+        String geoJson2 = "{\"type\":\"Point\",\"coordinates\":[3.0,4.0]}";
+        UserResponse userResponse = userMapper.map(currentUser);
+        doNothing().when(securityACLService).checkUser(userResponse);
+        doNothing().when(securityACLService).check(project, READ);
+        doNothing().when(securityACLService).checkIsNotReadOnly(project);
+        when(currentUserService.getCurrentUser()).thenReturn(userResponse);
+        when(projectService.get(projectId)).thenReturn(project);
+        when(taskRunRepository.findByProjectIdAndTaskRunId(projectId, taskRunId)).thenReturn(Optional.of(taskRun));
+        when(userAnnotationService.get(1L)).thenReturn(annotation1);
+        when(userAnnotationService.get(2L)).thenReturn(annotation2);
+        when(geometryService.wktToGeoJson("POINT(1 2)")).thenReturn(geoJson1);
+        when(geometryService.wktToGeoJson("POINT(3 4)")).thenReturn(geoJson2);
+        when(appEngineService.putWithParams(any(), any(), any(), any()))
+            .thenReturn("{\"index\":0}")
+            .thenReturn("{\"index\":1}");
+
+        String result = taskRunService.provisionTaskRun(json, projectId, taskRunId, "test-parameter");
+
+        verify(appEngineService, times(2)).putWithParams(any(), any(), any(), any());
+        JsonNode resultNode = objectMapper.readTree(result);
+        assertTrue(resultNode.isArray());
+        assertEquals(2, resultNode.size());
     }
 }

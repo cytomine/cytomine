@@ -1,16 +1,3 @@
-#  * Copyright (c) 2020-2021. Authors: see NOTICE file.
-#  *
-#  * Licensed under the Apache License, Version 2.0 (the "License");
-#  * you may not use this file except in compliance with the License.
-#  * You may obtain a copy of the License at
-#  *
-#  *      http://www.apache.org/licenses/LICENSE-2.0
-#  *
-#  * Unless required by applicable law or agreed to in writing, software
-#  * distributed under the License is distributed on an "AS IS" BASIS,
-#  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  * See the License for the specific language governing permissions and
-#  * limitations under the License.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -256,12 +243,12 @@ class AbstractReader(ABC):
         self, channels: int | list[int] | None
     ) -> tuple[list, list]:
         if channels is None:
-            channels = np.arange(self.format.main_imd.n_channels)
+            ch = np.arange(self.format.main_imd.n_channels)
         else:
-            channels = np.asarray(ensure_list(channels))
+            ch = np.asarray(ensure_list(channels))
 
         spp = self.format.main_imd.n_samples
 
-        cc_idxs = channels // spp
-        s_idxs = channels % spp
+        cc_idxs = ch // spp
+        s_idxs = ch % spp
         return cc_idxs.tolist(), s_idxs.tolist()

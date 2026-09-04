@@ -1,0 +1,42 @@
+package be.cytomine.common.repository.utils;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+
+@Converter
+public class LongArrayToBytesConverter implements AttributeConverter<Long[], byte[]> {
+    @Override
+    public byte[] convertToDatabaseColumn(Long[] attribute) {
+        if (attribute == null) {
+            return null;
+        }
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             ObjectOutputStream out = new ObjectOutputStream(bos)) {
+            out.writeObject(attribute);
+            out.flush();
+            return bos.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("cannot serialize", e);
+        }
+    }
+
+    @Override
+    public Long[] convertToEntityAttribute(byte[] dbData) {
+        if (dbData == null) {
+            return null;
+        }
+        try (ByteArrayInputStream b = new ByteArrayInputStream(dbData)) {
+            try (ObjectInputStream o = new ObjectInputStream(b)) {
+                return (Long[]) o.readObject();
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("cannot deserialize", e);
+        }
+    }
+}

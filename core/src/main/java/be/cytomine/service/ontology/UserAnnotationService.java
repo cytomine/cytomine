@@ -20,6 +20,7 @@ import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -50,6 +51,7 @@ import be.cytomine.repository.ontology.UserAnnotationRepository;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.command.TransactionService;
 import be.cytomine.service.image.SliceCoordinatesService;
 import be.cytomine.service.image.SliceInstanceService;
@@ -110,6 +112,7 @@ public class UserAnnotationService extends ModelService {
     private final UserAnnotationRepository userAnnotationRepository;
 
     private final ValidateGeometryService validateGeometryService;
+    private final UrlApi urlApi;
 
     @Override
     public Class currentDomain() {
@@ -151,17 +154,15 @@ public class UserAnnotationService extends ModelService {
         return annotationListingService.executeRequest(userAnnotationListing);
     }
 
-
-    public Long count(User user, Project project) {
+    public Long count(long userId, Project project) {
         if (project != null) {
-            securityACLService.checkIsSameUserOrAdminContainer(project, user, currentUserService.getCurrentUser());
-            return userAnnotationRepository.countByUserAndProject(user, project);
+            securityACLService.checkIsSameUserOrAdminContainer(project, userId, currentUserService.getCurrentUser());
+            return userAnnotationRepository.countByUserIdAndProject(userId, project);
         } else {
-            securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-            return userAnnotationRepository.countByUser(user);
+            securityACLService.checkIsSameUser(userId, currentUserService.getCurrentUser());
+            return userAnnotationRepository.countByUserId(userId);
         }
     }
-
 
     public Long countByProject(Project project) {
         return countByProject(project, null, null);
@@ -184,9 +185,8 @@ public class UserAnnotationService extends ModelService {
      */
     public List<AnnotationLight> listLight() {
         securityACLService.checkAdmin(currentUserService.getCurrentUser());
-        return userAnnotationRepository.listLight();
+        return userAnnotationRepository.listLight(urlApi);
     }
-
 
     /**
      * Add the new domain with JSON data
@@ -225,7 +225,7 @@ public class UserAnnotationService extends ModelService {
         jsonObject.put("imageObject", image);
         jsonObject.put("projectObject", project);
 
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
 
         //Check if user has at least READ permission for the project
         securityACLService.check(project, READ, currentUser);
@@ -235,10 +235,10 @@ public class UserAnnotationService extends ModelService {
         securityACLService.checkGuest(currentUser);
         //If user info is missing from input, add it
         if (jsonObject.isMissing("user")) {
-            jsonObject.put("user", currentUser.getId());
+            jsonObject.put("user", currentUser.id());
             jsonObject.put("userObject", currentUser);
             // check if user is the owner of the annotation, if not check project editing mode and user role
-        } else if (!Objects.equals(jsonObject.getJSONAttrLong("user"), currentUser.getId())) {
+        } else if (!Objects.equals(jsonObject.getJSONAttrLong("user"), currentUser.id())) {
             securityACLService.checkFullOrRestrictedForOwner(project, null);
         }
 
@@ -252,7 +252,6 @@ public class UserAnnotationService extends ModelService {
         if (!annotationShape.isValid()) {
             throw new WrongArgumentException("Annotation location is not valid");
         }
-
 
         Envelope envelope = annotationShape.getEnvelopeInternal();
         boolean isSizeDefined = image.getBaseImage().getWidth() != null && image.getBaseImage().getHeight() != null;
@@ -319,13 +318,13 @@ public class UserAnnotationService extends ModelService {
         //Start transaction
         Transaction transaction = transactionService.start();
 
-        CommandResponse commandResponse = executeCommand(new AddCommand(currentUser, transaction), null, jsonObject);
+        CommandResponse commandResponse =
+            executeCommand(new AddCommand(currentUser.id(), transaction), null, jsonObject);
         UserAnnotation addedAnnotation = (UserAnnotation) commandResponse.getObject();
 
         if (addedAnnotation == null) {
             return commandResponse;
         }
-
 
         // Add annotation-term if any
         List<Long> termIds = new ArrayList<>();
@@ -339,8 +338,7 @@ public class UserAnnotationService extends ModelService {
                 addedAnnotation.getId(),
                 termId,
                 null,
-                currentUser.getId(),
-                currentUser,
+                currentUser.id(),
                 transaction
             );
             terms.add(((AnnotationTerm) (response.getObject())).getTerm());
@@ -348,9 +346,8 @@ public class UserAnnotationService extends ModelService {
 
         ((Map<String, Object>) commandResponse.getData().get("annotation")).put(
             "term",
-            terms.stream().map(x -> x.toJsonObject().getId()).toList()
+            terms.stream().map(x -> x.toJsonObject(urlApi).getId()).toList()
         );
-
 
         // Add properties if any
         Map<String, String> properties = new HashMap<>();
@@ -365,7 +362,7 @@ public class UserAnnotationService extends ModelService {
                 addedAnnotation.getId(),
                 key,
                 value,
-                currentUser,
+                currentUser.id(),
                 transaction
             );
         }
@@ -445,13 +442,13 @@ public class UserAnnotationService extends ModelService {
      * @return Response structure (new domain data, old domain data..)
      */
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         //Check if user has a role that allows to update annotations
         securityACLService.checkGuest(currentUser);
         //Check if user has at least READ permission for the project
         securityACLService.check(domain.container(), READ, currentUser);
         //Check if user is admin, the project mode and if is the owner of the annotation
-        securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation) domain).getUser());
+        securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation) domain).getUserId());
 
         // TODO: what about image/project ??
 
@@ -514,11 +511,10 @@ public class UserAnnotationService extends ModelService {
                 validateGeometryService.tryToMakeItValidIfNotValid(jsonNewData.getJSONAttrStr("location"))
             );
         }
-        CommandResponse result = executeCommand(new EditCommand(currentUser, null), domain, jsonNewData);
+        CommandResponse result = executeCommand(new EditCommand(currentUser.id(), null), domain, jsonNewData);
 
         return result;
     }
-
 
     protected void afterUpdate(CytomineDomain domain, CommandResponse response) {
         String query = "UPDATE annotation_link SET updated = NOW() WHERE annotation_ident = " + domain.getId();
@@ -527,7 +523,6 @@ public class UserAnnotationService extends ModelService {
         response.getData().put("annotation", response.getData().get("userannotation"));
         response.getData().remove("userannotation");
     }
-
 
     /**
      * Delete this domain
@@ -541,13 +536,13 @@ public class UserAnnotationService extends ModelService {
      */
     @Override
     public CommandResponse delete(CytomineDomain domain, Transaction transaction, Task task, boolean printMessage) {
-        User currentUser = currentUserService.getCurrentUser();
+        UserResponse currentUser = currentUserService.getCurrentUser();
         //Check if user has a role that allows to delete annotations
         securityACLService.checkGuest(currentUser);
         //Check if user has at least READ permission for the project
         securityACLService.check(domain.container(), READ, currentUser);
         //Check if user is admin, the project mode and if is the owner of the annotation
-        securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation) domain).getUser());
+        securityACLService.checkFullOrRestrictedForOwner(domain, ((UserAnnotation) domain).getUserId());
 
         try {
             retrievalService.deleteIndex((AnnotationDomain) domain);
@@ -555,7 +550,7 @@ public class UserAnnotationService extends ModelService {
             log.warn("Deleting annotation index failed: " + e.getMessage());
         }
 
-        Command c = new DeleteCommand(currentUser, transaction);
+        Command c = new DeleteCommand(currentUser.id(), transaction);
         return executeCommand(c, domain, null);
     }
 
@@ -588,13 +583,12 @@ public class UserAnnotationService extends ModelService {
         return collection;
     }
 
-
     public List<Object> getStringParamsI18n(CytomineDomain domain) {
         UserAnnotation annotation = (UserAnnotation) domain;
         return List.of(
-            currentUserService.getCurrentUser().toString(),
+            currentUserService.getCurrentUser().id(),
             annotation.getImage().getBlindInstanceFilename(),
-            ((UserAnnotation) domain).getUser().toString()
+            ((UserAnnotation) domain).getUserId()
         );
     }
 
@@ -604,7 +598,6 @@ public class UserAnnotationService extends ModelService {
         deleteDependentAnnotationTrack((UserAnnotation) domain, transaction, task);
         deleteDependentMetadata(domain, transaction, task);
     }
-
 
     public void deleteDependentAnnotationTerm(UserAnnotation ua, Transaction transaction) {
         for (AnnotationTerm annotationTerm : annotationTermService.list(ua)) {
@@ -673,13 +666,13 @@ public class UserAnnotationService extends ModelService {
                     "You cannot delete an annotation with substract! Use reject or delete tool.");
             }
 
-            JsonObject jsonObject = based.toJsonObject();
+            JsonObject jsonObject = based.toJsonObject(urlApi);
             based.setLocation(oldLocation);
             result = update(based, jsonObject);
 
             for (UserAnnotation other : allAnnotationWithSameTerm) {
                 other.setLocation(other.getLocation().difference(newGeometry));
-                update(other, other.toJsonObject());
+                update(other, other.toJsonObject(urlApi));
             }
         } else {
             log.info("doCorrectUserAnnotation : union");
@@ -691,12 +684,11 @@ public class UserAnnotationService extends ModelService {
                 based.setLocation(based.getLocation().union(other.getLocation()));
                 delete(other, null, null, false);
             }
-            JsonObject jsonObject = based.toJsonObject();
+            JsonObject jsonObject = based.toJsonObject(urlApi);
             based.setLocation(oldLocation);
             result = update(based, jsonObject);
         }
         return result;
     }
-
 
 }

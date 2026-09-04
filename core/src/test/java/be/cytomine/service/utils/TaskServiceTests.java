@@ -11,7 +11,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.project.Project;
 import be.cytomine.utils.Task;
 
@@ -20,8 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
 @WithMockUser(authorities = "ROLE_SUPER_ADMIN", username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class TaskServiceTests {
 
     @Autowired
@@ -38,7 +41,7 @@ public class TaskServiceTests {
     @Test
     public void taskWorkflow() {
         Project project = builder.givenAProject();
-        Task newTask = taskService.createNewTask(project, builder.givenSuperAdmin(), true);
+        Task newTask = taskService.createNewTask(project, builder.givenSuperAdmin().id(), true);
         assertThat(newTask).isNotNull();
         assertThat(newTask.getProgress()).isEqualTo(0);
 

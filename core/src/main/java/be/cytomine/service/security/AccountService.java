@@ -367,4 +367,20 @@ public class AccountService {
             .body(Error.of(ErrorCode.CORE_INVALID_ACCOUNT, errors))
         );
     }
+
+    public void delete(String username) throws UserManagementException {
+        log.info("deleting account {}", username);
+        if (username == null || username.isEmpty()) {
+            throw new UserManagementException("username is invalid", 400);
+        }
+        UsersResource users = keycloak.realm(realm).users();
+        try {
+            UserRepresentation userRep = users.searchByUsername(username, true).get(0);
+            users.delete(userRep.getId());
+            log.info("deleted account {} successfully", username);
+        } catch (NotFoundException e) {
+            log.info("deleted account {} not found in IAM", username);
+        }
+
+    }
 }

@@ -1,21 +1,5 @@
 package be.cytomine.service.image;
 
-/*
- * Copyright (c) 2009-2022. Authors: see NOTICE file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -31,7 +15,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +30,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.NestedImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -58,13 +44,14 @@ import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.ImageInstanceBounds;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
+import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.search.ImageSearchExtension;
 import be.cytomine.service.social.AnnotationActionService;
 import be.cytomine.service.social.ImageConsultationService;
@@ -74,6 +61,8 @@ import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
+import static be.cytomine.authorization.AbstractAuthorizationTest.USER_ACL_READ;
 import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 import static be.cytomine.service.social.UserPositionServiceTests.USER_VIEW;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -85,39 +74,35 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 @Transactional
+@MockedUser
 public class ImageInstanceServiceTests {
 
     @Autowired
     ImageInstanceService imageInstanceService;
-
     @Autowired
     BasicInstanceBuilder builder;
-
     @Autowired
     EntityManager entityManager;
-
     @Autowired
     AnnotationActionRepository annotationActionRepository;
-
     @Autowired
     AnnotationActionService annotationActionService;
-
     @Autowired
     UserPositionService userPositionService;
-
     @Autowired
     PersistentUserPositionRepository persistentUserPositionRepository;
-
     @Autowired
     ImageConsultationService imageConsultationService;
-
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
+    @Autowired
+    CurrentUserService currentUserService;
     @Autowired
     PersistentImageConsultationRepository persistentImageConsultationRepository;
-
-    private static WireMockServer wireMockServer;
+    @Autowired
+    private UrlApi urlApi;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -130,16 +115,9 @@ public class ImageInstanceServiceTests {
 
     @BeforeAll
     public static void beforeAll() {
-        wireMockServer = new WireMockServer(8888);
-        wireMockServer.start();
         WireMock.configureFor("localhost", wireMockServer.port());
 
         setupStub();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        wireMockServer.stop();
     }
 
     @BeforeEach
@@ -173,7 +151,6 @@ public class ImageInstanceServiceTests {
         Collections.shuffle(doubleChoices);
         List<String> stringChoices = new ArrayList<>(List.of("aaa", "zzzz", "AAAA"));
         Collections.shuffle(stringChoices);
-
 
         for (int k = 0; k < 2; k++) { // execute twice the creation of images (6 images)
             for (int i = 0; i < 3; i++) {
@@ -250,7 +227,6 @@ public class ImageInstanceServiceTests {
             .getMin()).isEqualTo(0L); //special case since default value is 0
         assertThat(imageInstanceBounds.getCountImageReviewedAnnotations().getMax()).isEqualTo(3L);
 
-
         assertThat(imageInstanceBounds.getMagnification().getList()).contains(1, 2, 3);
         assertThat(imageInstanceBounds.getMimeType().getList()).contains("aaa", "zzzz", "AAAA");
         assertThat(imageInstanceBounds.getFormat().getList()).contains("aaa", "zzzz", "AAAA");
@@ -310,7 +286,8 @@ public class ImageInstanceServiceTests {
         Date consultation = new Date();
         ImageInstance imageInstance1 = builder.givenAnImageInstance();
         ImageInstance imageInstance2 = builder.givenAnImageInstance(imageInstance1.getProject());
-        imageConsultationService.add(builder.givenSuperAdmin(), imageInstance1.getId(), "xxx", "view", consultation);
+        imageConsultationService.add(currentUserService.getCurrentUser().id(), imageInstance1.getId(), "xxx", "view",
+            consultation);
 
         ImageSearchExtension imageSearchExtension = new ImageSearchExtension();
         imageSearchExtension.setWithLastActivity(true);
@@ -383,11 +360,11 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    @WithMockUser("list_by_user_with_search")
+    @WithMockUser(USER_ACL_READ)
     void listByUserWithSearch() {
-        User user = builder.givenAUser("list_by_user_with_search");
+        UserResponse user = builder.givenUserAclRead();
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, user.getUsername(), BasePermission.ADMINISTRATION);
+        builder.addUserToProject(project, user.username(), BasePermission.ADMINISTRATION);
         ImageInstance img1 = builder.givenAnImageInstance(project);
         img1.getBaseImage().setWidth(499);
         img1.setInstanceFilename("TEST");
@@ -396,10 +373,8 @@ public class ImageInstanceServiceTests {
         ImageInstance img2 = builder.givenAnImageInstance(project);
         img2.getBaseImage().setWidth(501);
 
-
-        assertThat(imageInstanceService.list(user, new ArrayList<>()).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), new ArrayList<>()).stream().map(x -> x.get("id")))
             .contains(img1.getId(), img2.getId());
-
 
         List<SearchParameterEntry> searchParameterEntryList =
             new ArrayList<>(List.of(
@@ -407,14 +382,14 @@ public class ImageInstanceServiceTests {
                 new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000)
             )
             );
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
                 new SearchParameterEntry("numberOfAnnotations", SearchOperation.gte, 1))
             );
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
@@ -423,36 +398,35 @@ public class ImageInstanceServiceTests {
                 new SearchParameterEntry("numberOfAnnotations", SearchOperation.lte, 1000L)
             )
             );
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
-
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
                 new SearchParameterEntry("width", SearchOperation.lte, 1000)
             ));
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId(), img2.getId());
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
                 new SearchParameterEntry("width", SearchOperation.gte, 1000)
             ));
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .doesNotContain(img1.getId(), img2.getId());
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
                 new SearchParameterEntry("baseImage", SearchOperation.equals, img1.getBaseImage().getId())
             ));
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
 
         searchParameterEntryList =
             new ArrayList<>(List.of(
                 new SearchParameterEntry("name", SearchOperation.ilike, img1.getInstanceFilename())
             ));
-        assertThat(imageInstanceService.list(user, searchParameterEntryList).stream().map(x -> x.get("id")))
+        assertThat(imageInstanceService.list(user.id(), searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
     }
 
@@ -516,11 +490,11 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    @WithMockUser("list_by_project_with_search_with_blind_mode")
+    @WithMockUser(USER_ACL_READ)
     void listByProjectWithSearchWithBlindMode() {
-        User user = builder.givenAUser("list_by_project_with_search_with_blind_mode");
+        UserResponse user = builder.givenUserAclRead();
         Project project = builder.givenAProject();
-        builder.addUserToProject(project, user.getUsername(), BasePermission.WRITE);
+        builder.addUserToProject(project, user.username(), BasePermission.WRITE);
         project.setBlindMode(true);
         ImageInstance img1 = builder.givenAnImageInstance(project);
         img1.setInstanceFilename("TEST");
@@ -545,7 +519,6 @@ public class ImageInstanceServiceTests {
         assertThat(imageInstanceService.list(project, searchParameterEntryList).stream().map(x -> x.get("id")))
             .contains(img1.getId()).doesNotContain(img2.getId());
     }
-
 
     @Test
     void listAllImageIdsForProject() {
@@ -629,7 +602,7 @@ public class ImageInstanceServiceTests {
     void addValidImageInstanceWithSuccess() {
         ImageInstance imageInstance = builder.givenANotPersistedImageInstance();
 
-        CommandResponse commandResponse = imageInstanceService.add(imageInstance.toJsonObject());
+        CommandResponse commandResponse = imageInstanceService.add(imageInstance.toJsonObject(urlApi));
 
         assertThat(commandResponse).isNotNull();
         assertThat(commandResponse.getStatus()).isEqualTo(200);
@@ -642,7 +615,7 @@ public class ImageInstanceServiceTests {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Assertions.assertThrows(
             AlreadyExistException.class,
-            () -> imageInstanceService.add(imageInstance.toJsonObject().withChange("id", null))
+            () -> imageInstanceService.add(imageInstance.toJsonObject(urlApi).withChange("id", null))
         );
     }
 
@@ -651,7 +624,7 @@ public class ImageInstanceServiceTests {
         ImageInstance imageInstance = builder.givenANotPersistedImageInstance(null, builder.givenAProject());
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> imageInstanceService.add(imageInstance.toJsonObject())
+            () -> imageInstanceService.add(imageInstance.toJsonObject(urlApi))
         );
     }
 
@@ -666,7 +639,7 @@ public class ImageInstanceServiceTests {
         );
         imageInstance = builder.persistAndReturn(imageInstance);
 
-        JsonObject jsonObject = imageInstance.toJsonObject();
+        JsonObject jsonObject = imageInstance.toJsonObject(urlApi);
         jsonObject.put("project", project2.getId());
 
         CommandResponse commandResponse = imageInstanceService.edit(jsonObject, true);
@@ -684,7 +657,7 @@ public class ImageInstanceServiceTests {
         imageInstance.getBaseImage().setMagnification(10);
         builder.persistAndReturn(imageInstance.getBaseImage());
 
-        JsonObject jsonObject = imageInstance.toJsonObject();
+        JsonObject jsonObject = imageInstance.toJsonObject(urlApi);
         jsonObject.put("magnification", 20);
 
         CommandResponse commandResponse = imageInstanceService.update(imageInstance, jsonObject);
@@ -707,7 +680,8 @@ public class ImageInstanceServiceTests {
         Double perimeter = userAnnotation.getPerimeter();
         Double area = userAnnotation.getArea();
 
-        imageInstanceService.update(imageInstance, imageInstance.toJsonObject().withChange("physicalSizeX", 2.5d));
+        imageInstanceService.update(imageInstance,
+            imageInstance.toJsonObject(urlApi).withChange("physicalSizeX", 2.5d));
 
         assertThat(userAnnotation.getPerimeter()).isNotEqualTo(perimeter);
         assertThat(userAnnotation.getArea()).isNotEqualTo(area);
@@ -722,7 +696,8 @@ public class ImageInstanceServiceTests {
         Double perimeter = reviewedAnnotation.getPerimeter();
         Double area = reviewedAnnotation.getArea();
 
-        imageInstanceService.update(imageInstance, imageInstance.toJsonObject().withChange("physicalSizeX", 2.5d));
+        imageInstanceService.update(imageInstance,
+            imageInstance.toJsonObject(urlApi).withChange("physicalSizeX", 2.5d));
 
         assertThat(reviewedAnnotation.getPerimeter()).isNotEqualTo(perimeter);
         assertThat(reviewedAnnotation.getArea()).isNotEqualTo(area);
@@ -733,7 +708,7 @@ public class ImageInstanceServiceTests {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> imageInstanceService.add(imageInstance.toJsonObject().withChange("baseImage", null))
+            () -> imageInstanceService.add(imageInstance.toJsonObject(urlApi).withChange("baseImage", null))
         );
     }
 
@@ -742,10 +717,9 @@ public class ImageInstanceServiceTests {
         ImageInstance imageInstance = builder.givenAnImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class,
-            () -> imageInstanceService.add(imageInstance.toJsonObject().withChange("project", null))
+            () -> imageInstanceService.add(imageInstance.toJsonObject(urlApi).withChange("project", null))
         );
     }
-
 
     @Test
     void deleteImageInstanceWithSuccess() {
@@ -777,10 +751,10 @@ public class ImageInstanceServiceTests {
         );
         AttachedFile attachedFile = builder.givenAnAttachedFile(imageInstance);
 
-        annotationActionService.add(userAnnotation, builder.givenSuperAdmin(), "view", new Date());
+        annotationActionService.add(userAnnotation, builder.givenSuperAdmin().id(), "view", new Date());
         userPositionService.add(
             new Date(),
-            builder.givenSuperAdmin(),
+            builder.givenSuperAdmin().id(),
             sliceInstance,
             imageInstance,
             USER_VIEW,
@@ -788,7 +762,8 @@ public class ImageInstanceServiceTests {
             0d,
             false
         );
-        imageConsultationService.add(builder.givenSuperAdmin(), imageInstance.getId(), "xxx", "view", new Date());
+        imageConsultationService.add(builder.givenSuperAdmin().id(), imageInstance.getId(), "xxx", "view",
+            new Date());
 
         AssertionsForClassTypes.assertThat(entityManager.find(ReviewedAnnotation.class, reviewedAnnotation.getId()))
             .isNotNull();
@@ -825,7 +800,6 @@ public class ImageInstanceServiceTests {
         assertThat(persistentImageConsultationRepository.count()).isEqualTo(0);
         assertThat(persistentUserPositionRepository.count()).isEqualTo(0);
     }
-
 
     @Test
     void projectCounter() {

@@ -1,7 +1,5 @@
 """Store module"""
 
-from typing import Optional
-
 from redis import Redis  # type: ignore
 
 
@@ -29,7 +27,7 @@ class Store:
 
         self.prefix = f"{self.storage_name}:{self.index_name}"
 
-    def get(self, key: str) -> Optional[str]:
+    def get(self, key: str) -> str | None:
         """
         Retrieves the value associated with the given key.
 

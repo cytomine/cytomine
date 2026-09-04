@@ -19,4 +19,6 @@ public interface TermRelationRepository extends JpaRepository<TermRelationEntity
     @Query(value = "SELECT tr.* FROM relation_term tr JOIN term t ON t.id = tr.term1_id "
         + "WHERE t.ontology_id = :ontologyId AND tr.deleted IS NULL", nativeQuery = true)
     List<TermRelationEntity> findAllByOntologyId(@Param("ontologyId") long ontologyId);
+
+    Optional<TermRelationEntity> findByIdAndDeletedNull(long id);
 }

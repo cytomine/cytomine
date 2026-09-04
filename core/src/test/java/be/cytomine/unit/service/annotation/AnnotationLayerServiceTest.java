@@ -36,32 +36,22 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class AnnotationLayerServiceTest {
 
+    private static AnnotationLayer mockAnnotationLayer;
+    private static ImageInstance mockImage;
+    private static TaskRun mockTaskRun;
+    private static TaskRunLayer mockTaskRunLayer;
+    private static String name;
+    private static Project mockProject;
     @Mock
     private AnnotationLayerRepository annotationLayerRepository;
-
     @Mock
     private TaskRunRepository taskRunRepository;
-
     @Mock
     private TaskRunLayerRepository taskRunLayerRepository;
-
     @Mock
     private ImageInstanceService imageInstanceService;
-
     @InjectMocks
     private AnnotationLayerService annotationLayerService;
-
-    private static AnnotationLayer mockAnnotationLayer;
-
-    private static ImageInstance mockImage;
-
-    private static TaskRun mockTaskRun;
-
-    private static TaskRunLayer mockTaskRunLayer;
-
-    private static String name;
-
-    private static Project mockProject;
 
     @BeforeAll
     public static void setUp() {

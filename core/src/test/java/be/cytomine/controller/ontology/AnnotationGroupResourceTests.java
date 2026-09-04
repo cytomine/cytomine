@@ -17,12 +17,15 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
+import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.ontology.AnnotationGroup;
 import be.cytomine.domain.project.Project;
+import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.AnnotationGroupService;
 import be.cytomine.utils.JsonObject;
 
+import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,8 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "superadmin")
-@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class})
+@WithMockUser(username = SUPERADMIN)
+@Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class AnnotationGroupResourceTests {
 
     @Autowired
@@ -45,6 +48,8 @@ public class AnnotationGroupResourceTests {
 
     @Autowired
     private AnnotationGroupService annotationGroupService;
+    @Autowired
+    private UrlApi urlApi;
 
     @Test
     void findAnnotationGroupWithSuccess() {
@@ -64,7 +69,7 @@ public class AnnotationGroupResourceTests {
         AnnotationGroup annotationGroup = builder.givenANotPersistedAnnotationGroup();
         restAnnotationGroupControllerMockMvc.perform(post("/api/annotationgroup.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(annotationGroup.toJSON()))
+                .content(annotationGroup.toJSON(urlApi)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.callback").exists())
@@ -80,7 +85,7 @@ public class AnnotationGroupResourceTests {
     @Transactional
     public void editValidAnnotationGroup() throws Exception {
         AnnotationGroup annotationGroup = builder.givenAnAnnotationGroup();
-        JsonObject jsonObject = annotationGroup.toJsonObject();
+        JsonObject jsonObject = annotationGroup.toJsonObject(urlApi);
         String type = UUID.randomUUID().toString();
         jsonObject.put("type", type);
         restAnnotationGroupControllerMockMvc.perform(put("/api/annotationgroup/{id}.json", annotationGroup.getId())

@@ -17,8 +17,7 @@ public class Jackson3FormatMapper implements FormatMapper {
     @Override
     public <T> T fromString(CharSequence charSequence, JavaType<T> javaType, WrapperOptions wrapperOptions) {
         try {
-            return objectMapper.readValue(charSequence.toString(),
-                objectMapper.constructType(javaType.getJavaType()));
+            return objectMapper.readValue(charSequence.toString(), objectMapper.constructType(javaType.getJavaType()));
         } catch (JacksonException e) {
             throw new IllegalArgumentException("Could not deserialize JSON: " + charSequence, e);
         }

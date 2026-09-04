@@ -109,7 +109,7 @@ class AnnotationImporter:
 
 def feature_to_wkt(feature: dict, image_height: int) -> WktAnnotation:
     geometry = shape(feature["geometry"])
-    flipped_geometry = transform(lambda x, y: (x, image_height - y), geometry)
+    flipped_geometry = transform(lambda x, y, z=None: (x, image_height - y), geometry)
 
     return WktAnnotation(
         wkt=wkt.dumps(flipped_geometry),

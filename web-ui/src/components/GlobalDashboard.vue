@@ -114,12 +114,12 @@
 </template>
 
 <script>
-import {get} from '@/utils/store-helpers';
+import { get } from '@/utils/store-helpers';
 
-import ListImagesPreview from '@/components/image/ListImagesPreview';
-import ImagePreview from '@/components/image/ImagePreview';
+import ListImagesPreview from '@/components/image/ListImagesPreview.vue';
+import ImagePreview from '@/components/image/ImagePreview.vue';
 
-import {ImageInstanceCollection, ProjectCollection} from '@/api';
+import { ImageInstanceCollection, ProjectCollection } from '@/api';
 
 export default {
   name: 'global-dashboard',
@@ -197,7 +197,7 @@ export default {
       this.recentProjectsId = listRecent.map(recent => recent.id);
     },
     async fetchRecentImages() {
-      this.recentImages = await ImageInstanceCollection.fetchLastOpened({max: 1});
+      this.recentImages = await ImageInstanceCollection.fetchLastOpened({ max: 1 });
     },
   },
   async created() {

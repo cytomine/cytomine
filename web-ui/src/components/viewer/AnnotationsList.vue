@@ -75,13 +75,15 @@
 </template>
 
 <script>
-import {UserCollection} from '@/api';
+import eventBus from '@/utils/event-bus';
 
-import {get} from '@/utils/store-helpers';
+import { UserCollection } from '@/api';
 
-import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy';
-import OntologyTree from '@/components/ontology/OntologyTree';
-import TrackTree from '@/components/track/TrackTree';
+import { get } from '@/utils/store-helpers';
+
+import ListAnnotationsBy from '@/components/annotations/ListAnnotationsBy.vue';
+import OntologyTree from '@/components/ontology/OntologyTree.vue';
+import TrackTree from '@/components/track/TrackTree.vue';
 
 export default {
   name: 'annotations-list',
@@ -96,7 +98,7 @@ export default {
   data() {
     return {
       nbPerPage: 10,
-      noTermOption: {id: 0, name: this.$t('no-term')},
+      noTermOption: { id: 0, name: this.$t('no-term') },
 
       users: [],
 
@@ -273,8 +275,8 @@ export default {
     isSameView(annot) {
       return this.displayType === 'TERM' && this.sliceIds.includes(annot.slice);
     },
-    select({annot, options}) {
-      this.$emit('select', {annot, options: {trySameView: options.trySameView || this.isSameView(annot)}});
+    select({ annot, options }) {
+      this.$emit('select', { annot, options: { trySameView: options.trySameView || this.isSameView(annot) } });
     },
 
     shortkeyHandler(key) {
@@ -298,19 +300,19 @@ export default {
     await this.fetchUsers();
   },
   mounted() {
-    this.$eventBus.$on('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$on('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$on('editAnnotation', this.editAnnotationHandler);
-    this.$eventBus.$on('deleteAnnotation', this.deleteAnnotationHandler);
-    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+    eventBus.on('addAnnotation', this.addAnnotationHandler);
+    eventBus.on('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.on('editAnnotation', this.editAnnotationHandler);
+    eventBus.on('deleteAnnotation', this.deleteAnnotationHandler);
+    eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
   beforeDestroy() {
     // unsubscribe from all events
-    this.$eventBus.$off('addAnnotation', this.addAnnotationHandler);
-    this.$eventBus.$off('reloadAnnotations', this.reloadAnnotationsHandler);
-    this.$eventBus.$off('editAnnotation', this.editAnnotationHandler);
-    this.$eventBus.$off('deleteAnnotation', this.deleteAnnotationHandler);
-    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
+    eventBus.off('addAnnotation', this.addAnnotationHandler);
+    eventBus.off('reloadAnnotations', this.reloadAnnotationsHandler);
+    eventBus.off('editAnnotation', this.editAnnotationHandler);
+    eventBus.off('deleteAnnotation', this.deleteAnnotationHandler);
+    eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>
@@ -368,7 +370,7 @@ export default {
   height: 100%;
 }
 
->>> h2 {
+:deep(h2) {
   margin-bottom: 0;
 }
 
@@ -378,7 +380,7 @@ export default {
   min-width: 18em;
 }
 
->>> ul.pagination-list {
+:deep(ul.pagination-list) {
   justify-content: flex-end;
 }
 </style>

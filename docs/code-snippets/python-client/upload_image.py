@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 import os
 
 from cytomine import Cytomine
-from cytomine.models import StorageCollection, Project, UploadedFile
+from cytomine.models import StorageCollection, Project
 
 if __name__ == '__main__':
     parser = ArgumentParser(prog="Upload image example")
@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
         # To upload the image, we need to know the ID of your Cytomine storage.
         storages = StorageCollection().fetch()
-        my_storage = next(filter(lambda storage: storage.user == cytomine.current_user.id, storages))
+        my_storage = next(filter(lambda storage: storage.userId == cytomine.current_user.id, storages))
         if not my_storage:
             raise ValueError("Storage not found")
 

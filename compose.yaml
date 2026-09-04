@@ -163,7 +163,7 @@ services:
       KC_SMTP_PORT: 587
       KC_SMTP_USER: user
       KEYCLOAK_ADMIN: &KEYCLOAK_ADMIN admin
-      KEYCLOAK_ADMIN_PASSWORD: &KEYCLOAK_ADMIN_PASSWORD YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
+      KEYCLOAK_ADMIN_PASSWORD: &KEYCLOAK_ADMIN_PASSWORD masterpassword
     networks:
       host_network:
         ipv4_address: 172.16.238.9

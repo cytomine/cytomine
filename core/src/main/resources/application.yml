@@ -147,7 +147,7 @@ jwt:
 keycloak-client:
   admin:
     user: ${KEYCLOAK_ADMIN:admin}
-    password: ${KEYCLOAK_ADMIN_PASSWORD:password}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:masterpassword}
     realm: master
   target:
     realm: cytomine

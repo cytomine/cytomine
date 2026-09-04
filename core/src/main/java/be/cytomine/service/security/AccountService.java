@@ -75,6 +75,8 @@ public class AccountService {
             log.info("created account for user {} in IAM", account.username());
         } catch (ServerErrorException e) {
             throw new UserManagementException(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR.toString(), 500);
+        } catch (Exception e){
+            throw new UserManagementException(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR.toString(), 500);
         }
 
         // in case account wasn't successfully created in IAM

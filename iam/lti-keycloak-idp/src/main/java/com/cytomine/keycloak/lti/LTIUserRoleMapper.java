@@ -84,7 +84,7 @@ public class LTIUserRoleMapper extends AbstractIdentityProviderMapper {
     // TeachingAssistant map to USER, and GUEST is just the catch-all fallback.
     private static final String DEFAULT_ADMIN_ROLES_CSV = "";
     private static final String DEFAULT_USER_ROLES_CSV = "Instructor,TeachingAssistant";
-    private static final String DEFAULT_GUEST_ROLES_CSV = "Student";
+    private static final String DEFAULT_GUEST_ROLES_CSV = "Student,Learner";
 
     @Override
     public String[] getCompatibleProviders() {

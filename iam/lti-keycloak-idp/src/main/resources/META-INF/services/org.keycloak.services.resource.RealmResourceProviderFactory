@@ -1,2 +1,1 @@
 com.cytomine.keycloak.lti.LTILoginInitiationResourceProviderFactory
-com.cytomine.keycloak.lti.LTI11LaunchResourceProviderFactory

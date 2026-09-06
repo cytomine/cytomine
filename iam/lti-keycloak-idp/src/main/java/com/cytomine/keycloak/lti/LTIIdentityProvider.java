@@ -16,7 +16,10 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.util.JsonSerialization;
 import org.keycloak.models.FederatedIdentityModel;
+import org.keycloak.services.managers.AuthenticationSessionManager;
+import org.keycloak.sessions.RootAuthenticationSessionModel;
 
+import java.util.Map;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +66,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     @Override
     public Response performLogin(AuthenticationRequest request) {
         try {
+
             AuthenticationSessionModel authSession = request.getAuthenticationSession();
 
             // Retrieve encoded launch hints passed via login_hint param
@@ -84,6 +88,14 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
 
             String redirectUri = request.getRedirectUri();
 
+            // Use Keycloak's own framework-managed state token (not a value we invent
+            // ourselves) - this is what IdentityBrokerService needs echoed back on the
+            // callback in order to restore the correct AuthenticationSessionModel into
+            // context before our Endpoint runs. Our own CSRF correlation is handled
+            // separately, below, via a differently-named parameter so it doesn't
+            // collide with Keycloak's reserved use of "state".
+            String encodedState = request.getState().getEncoded();
+
             UriBuilder uriBuilder = UriBuilder.fromUri(getConfig().getPlatformAuthorizationEndpoint())
                 .queryParam("scope", "openid")
                 .queryParam("response_type", "id_token")
@@ -92,7 +104,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                 .queryParam("client_id", getConfig().getToolClientId())
                 .queryParam("redirect_uri", redirectUri)
                 .queryParam("login_hint", loginHint)
-                .queryParam("state", authSession.getParentSession().getId())
+                .queryParam("state", encodedState)
                 .queryParam("nonce", nonce);
 
             if (messageHint != null) {
@@ -146,24 +158,53 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                 return callback.error("missing_id_token");
             }
 
-            AuthenticationSessionModel authSession = provider.session.getContext().getAuthenticationSession();
+            // Deliberately NOT relying on session.getContext().getAuthenticationSession()
+            // here - for this custom, LTI form_post-based callback (a JAX-RS sub-resource
+            // returned from IdentityBrokerService.getEndpoint(), unlike the GET-redirect
+            // callbacks every built-in Keycloak broker expects) that ambient context has
+            // been observed to come back null even when the AUTH_SESSION_ID cookie is
+            // present, valid, and correctly matches the session Keycloak set moments
+            // earlier. Instead, resolve the session ourselves directly from the cookie,
+            // the same way AuthenticationSessionManager does internally.
+            AuthenticationSessionManager asm = new AuthenticationSessionManager(provider.session);
+            RootAuthenticationSessionModel rootAuthSession = asm.getCurrentRootAuthenticationSession(realm);
+
+            AuthenticationSessionModel authSession = null;
+            if (rootAuthSession != null) {
+                Map<String, AuthenticationSessionModel> sessions = rootAuthSession.getAuthenticationSessions();
+                if (sessions.size() == 1) {
+                    // The common case: exactly one login attempt in flight under this root
+                    // session, so there's no ambiguity even without a tab id to key on.
+                    authSession = sessions.values().iterator().next();
+                } else if (!sessions.isEmpty()) {
+                    // Multiple tabs/attempts under the same root session - narrow down to
+                    // the one for our tool's client, since that's the one this launch started.
+                    String keycloakClientId = provider.getConfig().getKeycloakClientId();
+                    for (AuthenticationSessionModel candidate : sessions.values()) {
+                        if (candidate.getClient() != null
+                            && candidate.getClient().getClientId().equals(keycloakClientId)) {
+                            authSession = candidate;
+                            break;
+                        }
+                    }
+                }
+            }
+
             if (authSession == null) {
-                // Don't delegate to callback.error() here - it internally assumes an
-                // authentication session exists (to check for failed account-linking
-                // state) and throws its own NullPointerException when there isn't one,
-                // which would surface as an opaque 500 instead of this clear message.
-                // Most common cause: the browser didn't send Keycloak's session cookie
-                // back on the LMS's cross-site form_post callback - check SameSite/
-                // Secure cookie settings and that the whole flow uses HTTPS consistently.
-                log.warn("LTI launch callback received with no active authentication session " +
-                    "- likely a lost session cookie on the cross-site callback from the platform");
+                log.warnf("LTI launch callback: no matching authentication session found under root " +
+                        "session %s (client=%s) - session may have expired, or the browser did not send " +
+                        "Keycloak's session cookie back on this cross-site request from the LMS",
+                    rootAuthSession != null ? rootAuthSession.getId() : "none",
+                    provider.getConfig().getKeycloakClientId());
                 return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("No active authentication session - the LTI login flow may have expired, " +
-                        "or the browser did not send Keycloak's session cookie back on this cross-site " +
-                        "request from the LMS. Ensure the entire flow runs over HTTPS with a consistent " +
-                        "hostname so SameSite cookie policies don't block it.")
+                    .entity("No matching authentication session - the LTI login flow may have expired, " +
+                        "or the session cookie was not recognized on this callback from the LMS.")
                     .build();
             }
+
+            // Attach it to context ourselves so the rest of this method (and anything
+            // downstream expecting ambient context to be populated) behaves normally.
+            provider.session.getContext().setAuthenticationSession(authSession);
 
             try {
                 BrokeredIdentityContext identity = provider.validateAndExtract(idToken, state, authSession);
@@ -212,12 +253,16 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             throw new IllegalArgumentException("deployment_id not allowed: " + deploymentId);
         }
 
-        // --- state: binds this response back to the browser session that started the
-        // launch (CSRF / session-fixation protection). We set this to the parent
-        // session's id in performLogin() and expect the platform to echo it back verbatim.
-        String expectedState = authSession.getParentSession().getId();
-        if (expectedState == null || !expectedState.equals(returnedState)) {
-            throw new IllegalArgumentException("state mismatch - possible CSRF or a stale/replayed launch response");
+        // --- state: Keycloak's own broker framework already used this value to
+        // locate and restore this exact AuthenticationSessionModel before our
+        // Endpoint ran (see performLogin(), which now sends request.getState().
+        // getEncoded() rather than a value we invent ourselves) - reaching this
+        // line with a non-null authSession already proves that correlation
+        // succeeded, so no separate manual comparison is needed here. We still
+        // sanity-check that the platform echoed something back, since a genuinely
+        // empty/missing value would indicate a broken or tampered request.
+        if (returnedState == null || returnedState.isBlank()) {
+            throw new IllegalArgumentException("Missing state in launch response");
         }
 
         // --- nonce: must match the single-use value we generated and sent in

@@ -6,21 +6,6 @@ import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * The LTI login-initiation request and the OIDC-style auth request that
- * follows it don't share a session yet, so we can't stash values in
- * server-side state between the two. Instead we pack the handful of values
- * we need (the real LTI login_hint, the optional lti_message_hint, and
- * target_link_uri) into a single JSON blob and carry it through as the
- * standard "login_hint" query parameter on /protocol/openid-connect/auth -
- * Keycloak stores that verbatim as a client note we can read back in
- * performLogin().
- *
- * This is a pragmatic shortcut, not a security boundary: nothing sensitive
- * goes in here (these are all values the browser/LMS already sees), and the
- * real trust decision still happens when the platform's signed id_token
- * comes back and is verified against its JWKS.
- */
 public final class LTILaunchHint {
 
     private LTILaunchHint() {}

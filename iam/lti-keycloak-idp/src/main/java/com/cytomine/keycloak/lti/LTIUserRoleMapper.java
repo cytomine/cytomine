@@ -17,42 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Maps every LTI 1.3 launch onto one of the "core" client's application
- * roles: ADMIN, USER, or GUEST.
- *
- * Which LTI context roles map to which Keycloak role is fully
- * admin-configurable via three console fields (one per Keycloak role - see
- * {@link #getConfigProperties()}), rather than hardcoded. Each field takes a
- * comma-separated list of LTI role short names (Instructor, Learner,
- * Student, TeachingAssistant, Administrator, ContentDeveloper, Mentor) or
- * full IMS role URIs for custom/institution-specific roles.
- *
- * SECURITY NOTE: unlike earlier versions of this mapper, ADMIN is no longer
- * structurally unreachable from an LTI launch - if an admin populates the
- * "LTI roles mapped to ADMIN" field, a launch carrying one of those LTI
- * roles WILL be granted ADMIN automatically. The field defaults to empty,
- * so out of the box nothing changes (ADMIN still requires manual grant in
- * the console) - but be deliberate before populating it, since it means
- * trusting whatever role claim the LMS sends for your highest privilege
- * tier. Consider whether the LMS's role claims are trustworthy/audited
- * enough for that before configuring it.
- *
- * Precedence when a launch's roles claim matches more than one configured
- * list: ADMIN > USER > GUEST. A launch that matches nothing in any list
- * (or an LTI_ROLES claim that's empty/missing) resolves to GUEST.
- *
- * On every login (new user AND existing user re-login), this also removes
- * any other core-client role previously granted by this mapper, so a user
- * whose LTI role changes between logins doesn't accumulate stale grants.
- */
 public class LTIUserRoleMapper extends AbstractIdentityProviderMapper {
 
     private static final Logger log = Logger.getLogger(LTIUserRoleMapper.class);
 
     public static final String PROVIDER_ID = "lti-core-role-mapper";
 
-    /** clientId of the Keycloak client that owns the ADMIN / USER / GUEST application roles. */
     private static final String CORE_CLIENT_ID = "core";
 
     private static final String ROLE_ADMIN = "ADMIN";
@@ -65,9 +35,6 @@ public class LTIUserRoleMapper extends AbstractIdentityProviderMapper {
     private static final String CONFIG_USER_ROLE_URIS = "userRoleUris";
     private static final String CONFIG_GUEST_ROLE_URIS = "guestRoleUris";
 
-    // Short names an admin can type instead of the full IMS URI. Anything
-    // typed that ISN'T one of these keys is treated as a literal role URI,
-    // so custom/institution-specific roles can be entered directly too.
     private static final Map<String, String> SHORT_NAME_TO_URI = new LinkedHashMap<>();
     static {
         SHORT_NAME_TO_URI.put("Instructor", "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor");
@@ -79,9 +46,6 @@ public class LTIUserRoleMapper extends AbstractIdentityProviderMapper {
         SHORT_NAME_TO_URI.put("Mentor", "http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor");
     }
 
-    // Defaults preserve the previous fixed behavior when an admin hasn't
-    // touched these fields: nothing auto-maps to ADMIN, Instructor/Learner/
-    // TeachingAssistant map to USER, and GUEST is just the catch-all fallback.
     private static final String DEFAULT_ADMIN_ROLES_CSV = "";
     private static final String DEFAULT_USER_ROLES_CSV = "Instructor,TeachingAssistant";
     private static final String DEFAULT_GUEST_ROLES_CSV = "Student,Learner";
@@ -139,7 +103,7 @@ public class LTIUserRoleMapper extends AbstractIdentityProviderMapper {
 
     @Override
     public String getDisplayType() {
-        return "LTI Core Role (ADMIN / USER / GUEST)";
+        return "LTI Core Roles";
     }
 
     @Override
@@ -192,11 +156,7 @@ public class LTIUserRoleMapper extends AbstractIdentityProviderMapper {
         }
     }
 
-    /**
-     * Checks the launch's LTI_ROLES claim against the three configured role
-     * lists in order ADMIN > USER > GUEST, returning the first match. Falls
-     * back to GUEST if nothing matches (or LTI_ROLES is empty/missing).
-     */
+
     private String resolveTargetRole(IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
         Set<String> launchRoles = extractLaunchRoles(context);
 
@@ -206,8 +166,7 @@ public class LTIUserRoleMapper extends AbstractIdentityProviderMapper {
         if (matchesAny(launchRoles, resolveConfiguredUris(mapperModel, CONFIG_USER_ROLE_URIS, DEFAULT_USER_ROLES_CSV))) {
             return ROLE_USER;
         }
-        // GUEST's own configured list is checked for symmetry/explicitness, but note
-        // it changes nothing: no match anywhere already falls through to GUEST below.
+
         matchesAny(launchRoles, resolveConfiguredUris(mapperModel, CONFIG_GUEST_ROLE_URIS, DEFAULT_GUEST_ROLES_CSV));
 
         return ROLE_GUEST;
@@ -229,11 +188,6 @@ public class LTIUserRoleMapper extends AbstractIdentityProviderMapper {
         return launchRoles.stream().anyMatch(configuredUris::contains);
     }
 
-    /**
-     * Reads one admin-configured CSV field and expands any short names to
-     * their full IMS URI. Falls back to the given default when the field is
-     * blank (e.g. an existing mapper instance saved before this field existed).
-     */
     private Set<String> resolveConfiguredUris(IdentityProviderMapperModel mapperModel, String configKey, String defaultCsv) {
         String csv = mapperModel.getConfig() == null ? null : mapperModel.getConfig().get(configKey);
         if (csv == null || csv.isBlank()) {

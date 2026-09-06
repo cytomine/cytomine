@@ -23,15 +23,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.keycloak.util.JsonSerialization;
 
-/**
- * Fetches a platform's JWKS document and verifies the signature on an LTI
- * launch id_token against it.
- *
- * This is intentionally minimal: a tiny in-memory cache keyed by JWKS URL,
- * refreshed every 10 minutes. For production, back this with Keycloak's
- * shared infinispan cache instead of a static map so it works correctly
- * across a clustered deployment.
- */
+
 public class LTIJwtValidator {
 
     private static final Logger log = Logger.getLogger(LTIJwtValidator.class);
@@ -42,26 +34,11 @@ public class LTIJwtValidator {
     private static final int FETCH_MAX_ATTEMPTS = 3;
     private static final Duration FETCH_RETRY_DELAY = Duration.ofMillis(300);
 
-    // DEV-ONLY: certificate validation AND hostname verification disabled for
-    // local testing against an untrusted platform cert whose SANs don't
-    // include "host.docker.internal" (the address the container actually
-    // uses to reach Moodle). This makes the JWKS fetch trust ANY server,
-    // valid or not, and skips checking whether the cert was even issued for
-    // the host being connected to - it means this code can no longer detect
-    // a man-in-the-middle impersonating the platform. This MUST be reverted
-    // (see the version-controlled diff that introduced this) before this is
-    // used against anything beyond a known local dev environment.
+    // review later
     private static final HttpClient HTTP;
     static {
         try {
-            // X509ExtendedTrustManager (not plain X509TrustManager) is required
-            // here: the JDK auto-wraps a plain X509TrustManager with its own
-            // AbstractTrustManagerWrapper, which performs hostname/SAN checking
-            // on its own and ignores the empty endpointIdentificationAlgorithm
-            // set via SSLParameters below for this HttpClient's connection path.
-            // Implementing the extended interface ourselves (including the
-            // Socket/SSLEngine overloads) signals the JDK to trust that we've
-            // already handled all checks, skipping its own wrapping entirely.
+
             TrustManager[] trustAllCerts = new TrustManager[] {
                 new X509ExtendedTrustManager() {
                     public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
@@ -76,8 +53,7 @@ public class LTIJwtValidator {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
 
-            // Empty algorithm = skip SAN/hostname matching entirely (separate
-            // check from certificate trust above).
+
             SSLParameters sslParameters = new SSLParameters();
             sslParameters.setEndpointIdentificationAlgorithm("");
 
@@ -85,10 +61,6 @@ public class LTIJwtValidator {
                 .connectTimeout(Duration.ofSeconds(5))
                 .sslContext(sslContext)
                 .sslParameters(sslParameters)
-                // Moodle can respond with a 303 redirect (e.g. when the
-                // request's Host header doesn't match its configured
-                // wwwroot) - follow it rather than treating it as a failure.
-                // NORMAL still refuses to silently downgrade HTTPS->HTTP.
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
         } catch (Exception e) {
@@ -102,14 +74,7 @@ public class LTIJwtValidator {
         }
     }
 
-    /**
-     * Verifies the JWS signature on rawJwt using the given platform JWKS URL.
-     * Returns the parsed JWSInput (already signature-verified) so the caller
-     * can go on to check claims (iss, aud, nonce, deployment_id, exp, ...).
-     *
-     * Throws JWSInputException / RuntimeException on any failure - callers
-     * must treat any exception here as "reject the launch".
-     */
+
     public JWSInput verify(String rawJwt, String jwksUrl) throws JWSInputException {
         JWSInput jws = new JWSInput(rawJwt);
         String kid = jws.getHeader().getKeyId();
@@ -134,12 +99,7 @@ public class LTIJwtValidator {
         return jws;
     }
 
-    /**
-     * Verifies the JWS signature using plain java.security, so this doesn't
-     * depend on internal Keycloak verifier classes that vary by version.
-     * Assumes RS256/RS384/RS512 or ES256/ES384/ES512 - LTI 1.3 platforms are
-     * required to support RS256 at minimum, which covers the common case.
-     */
+
     private boolean verifySignature(JWSInput jws, PublicKey publicKey) {
         try {
             String alg = jws.getHeader().getRawAlgorithm();

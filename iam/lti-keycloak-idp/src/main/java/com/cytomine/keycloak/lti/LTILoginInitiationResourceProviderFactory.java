@@ -5,13 +5,6 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resource.RealmResourceProviderFactory;
 
-/**
- * Registers the "lti" realm resource, i.e. everything under
- * /realms/{realm}/lti/... (currently just POST /lti/login-init).
- *
- * Discovered via
- * META-INF/services/org.keycloak.services.resource.RealmResourceProviderFactory
- */
 public class LTILoginInitiationResourceProviderFactory implements RealmResourceProviderFactory {
 
     public static final String ID = "lti";

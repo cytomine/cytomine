@@ -14,16 +14,6 @@ import org.keycloak.services.resource.RealmResourceProvider;
 
 import java.util.Optional;
 
-/**
- * Exposed at: /realms/{realm}/lti/login-init
- *
- * This is the URL you register with the LMS as the tool's "OIDC Login
- * Initiation URL". The LMS POSTs here first, before any Keycloak login
- * screen exists. We resolve which configured LTI IdP instance (by issuer +
- * tool client_id) this request belongs to, then redirect the browser into
- * Keycloak's normal /protocol/openid-connect/auth with kc_idp_hint set, so
- * from that point on it's a standard broker login.
- */
 public class LTILoginInitiationResourceProvider implements RealmResourceProvider {
 
     private static final Logger log = Logger.getLogger(LTILoginInitiationResourceProvider.class);
@@ -83,12 +73,6 @@ public class LTILoginInitiationResourceProvider implements RealmResourceProvider
                     .build();
         }
 
-        // NOTE: the tool's Keycloak client must have this exact redirect_uri
-        // registered under "Valid redirect URIs". Using target_link_uri
-        // directly is the simplest option (the LMS supplies where the tool
-        // lives), but if your tool needs a fixed callback path instead,
-        // swap this for a static URI and read target_link_uri back out of
-        // the LTI_TARGET_LINK_URI context data / a protocol mapper instead.
         String toolRedirectUri = targetLinkUri;
 
         String packedHint = LTILaunchHint.encode(loginHint, messageHint, targetLinkUri, deploymentId);

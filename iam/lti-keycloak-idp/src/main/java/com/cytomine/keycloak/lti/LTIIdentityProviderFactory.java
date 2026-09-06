@@ -7,9 +7,7 @@ import org.keycloak.provider.ProviderConfigProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Factory for LTI 1.3 Identity Provider.
- */
+
 public class LTIIdentityProviderFactory
         extends AbstractIdentityProviderFactory<LTIIdentityProvider> {
 

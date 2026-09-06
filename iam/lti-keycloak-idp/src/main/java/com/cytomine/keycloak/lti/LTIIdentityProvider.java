@@ -25,9 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Identity provider implementation for LTI 1.3 platform-initiated launches.
- */
+
 public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityProviderConfig> {
 
     private static final Logger log = Logger.getLogger(LTIIdentityProvider.class);
@@ -46,11 +44,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
 
     // Clock-skew tolerance applied to both directions of the exp/iat window.
     private static final long CLOCK_SKEW_LEEWAY_SECONDS = 60;
-    // Reject launches whose id_token was issued (iat) further in the past than this,
-    // independent of exp - keeps the acceptance window tight even if a platform
-    // sets an unusually long exp. 5 minutes matches common LTI/OIDC guidance.
     private static final long MAX_IAT_AGE_SECONDS = 300;
-
     private final LTIJwtValidator jwtValidator = new LTIJwtValidator();
 
     public LTIIdentityProvider(KeycloakSession session, LTIIdentityProviderConfig config) {
@@ -62,7 +56,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         return Response.ok(identity.getToken()).build();
     }
 
-    // Step A: redirect browser to LMS authorization endpoint
     @Override
     public Response performLogin(AuthenticationRequest request) {
         try {
@@ -88,12 +81,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
 
             String redirectUri = request.getRedirectUri();
 
-            // Use Keycloak's own framework-managed state token (not a value we invent
-            // ourselves) - this is what IdentityBrokerService needs echoed back on the
-            // callback in order to restore the correct AuthenticationSessionModel into
-            // context before our Endpoint runs. Our own CSRF correlation is handled
-            // separately, below, via a differently-named parameter so it doesn't
-            // collide with Keycloak's reserved use of "state".
             String encodedState = request.getState().getEncoded();
 
             UriBuilder uriBuilder = UriBuilder.fromUri(getConfig().getPlatformAuthorizationEndpoint())
@@ -108,14 +95,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                 .queryParam("nonce", nonce);
 
             if (messageHint != null) {
-                // lti_message_hint is platform-defined and opaque to us - Moodle, for
-                // example, sends raw JSON containing '{' and '}'. UriBuilder treats
-                // those as URI Template placeholder syntax rather than literal
-                // characters and won't percent-encode them automatically, so build()
-                // fails with "Illegal character in query" once such a value reaches
-                // it. Escape just the two characters UriBuilder can't handle safely
-                // on its own; everything else about this value still passes through
-                // queryParam's normal encoding.
                 String safeMessageHint = messageHint.replace("{", "%7B").replace("}", "%7D");
                 uriBuilder.queryParam("lti_message_hint", safeMessageHint);
             }
@@ -126,7 +105,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         }
     }
 
-    // Step B: receive and validate launch id_token
     @Override
     public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
         return new Endpoint(this, realm, callback, event);
@@ -158,14 +136,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                 return callback.error("missing_id_token");
             }
 
-            // Deliberately NOT relying on session.getContext().getAuthenticationSession()
-            // here - for this custom, LTI form_post-based callback (a JAX-RS sub-resource
-            // returned from IdentityBrokerService.getEndpoint(), unlike the GET-redirect
-            // callbacks every built-in Keycloak broker expects) that ambient context has
-            // been observed to come back null even when the AUTH_SESSION_ID cookie is
-            // present, valid, and correctly matches the session Keycloak set moments
-            // earlier. Instead, resolve the session ourselves directly from the cookie,
-            // the same way AuthenticationSessionManager does internally.
             AuthenticationSessionManager asm = new AuthenticationSessionManager(provider.session);
             RootAuthenticationSessionModel rootAuthSession = asm.getCurrentRootAuthenticationSession(realm);
 
@@ -173,12 +143,8 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             if (rootAuthSession != null) {
                 Map<String, AuthenticationSessionModel> sessions = rootAuthSession.getAuthenticationSessions();
                 if (sessions.size() == 1) {
-                    // The common case: exactly one login attempt in flight under this root
-                    // session, so there's no ambiguity even without a tab id to key on.
                     authSession = sessions.values().iterator().next();
                 } else if (!sessions.isEmpty()) {
-                    // Multiple tabs/attempts under the same root session - narrow down to
-                    // the one for our tool's client, since that's the one this launch started.
                     String keycloakClientId = provider.getConfig().getKeycloakClientId();
                     for (AuthenticationSessionModel candidate : sessions.values()) {
                         if (candidate.getClient() != null
@@ -202,8 +168,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                     .build();
             }
 
-            // Attach it to context ourselves so the rest of this method (and anything
-            // downstream expecting ambient context to be populated) behaves normally.
             provider.session.getContext().setAuthenticationSession(authSession);
 
             try {
@@ -253,21 +217,10 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             throw new IllegalArgumentException("deployment_id not allowed: " + deploymentId);
         }
 
-        // --- state: Keycloak's own broker framework already used this value to
-        // locate and restore this exact AuthenticationSessionModel before our
-        // Endpoint ran (see performLogin(), which now sends request.getState().
-        // getEncoded() rather than a value we invent ourselves) - reaching this
-        // line with a non-null authSession already proves that correlation
-        // succeeded, so no separate manual comparison is needed here. We still
-        // sanity-check that the platform echoed something back, since a genuinely
-        // empty/missing value would indicate a broken or tampered request.
         if (returnedState == null || returnedState.isBlank()) {
             throw new IllegalArgumentException("Missing state in launch response");
         }
 
-        // --- nonce: must match the single-use value we generated and sent in
-        // performLogin(). Consuming it immediately (removeClientNote) means even a
-        // resubmission of the exact same id_token against this same session is rejected.
         String expectedNonce = authSession.getClientNote(NOTE_NONCE);
         Object nonceClaim = claims.get("nonce");
         if (expectedNonce == null) {
@@ -278,8 +231,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         }
         authSession.removeClientNote(NOTE_NONCE);
 
-        // --- exp / iat: reject expired tokens and tokens issued implausibly far in
-        // the past or future, independent of whatever exp the platform set.
         long now = Instant.now().getEpochSecond();
 
         Number expClaim = (Number) claims.get("exp");

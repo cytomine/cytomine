@@ -96,7 +96,16 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                 .queryParam("nonce", nonce);
 
             if (messageHint != null) {
-                uriBuilder.queryParam("lti_message_hint", messageHint);
+                // lti_message_hint is platform-defined and opaque to us - Moodle, for
+                // example, sends raw JSON containing '{' and '}'. UriBuilder treats
+                // those as URI Template placeholder syntax rather than literal
+                // characters and won't percent-encode them automatically, so build()
+                // fails with "Illegal character in query" once such a value reaches
+                // it. Escape just the two characters UriBuilder can't handle safely
+                // on its own; everything else about this value still passes through
+                // queryParam's normal encoding.
+                String safeMessageHint = messageHint.replace("{", "%7B").replace("}", "%7D");
+                uriBuilder.queryParam("lti_message_hint", safeMessageHint);
             }
 
             return Response.seeOther(uriBuilder.build()).build();
@@ -137,14 +146,23 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                 return callback.error("missing_id_token");
             }
 
-            // Same access pattern as LTI11IdentityProvider.Endpoint (provider.session ...):
-            // the browser's cookie/redirect already ties this callback back to the exact
-            // authentication session that performLogin() started, which is what lets us
-            // compare the nonce/state we generated then against what came back now.
             AuthenticationSessionModel authSession = provider.session.getContext().getAuthenticationSession();
             if (authSession == null) {
-                log.warn("LTI launch callback received with no active authentication session");
-                return callback.error("missing_authentication_session");
+                // Don't delegate to callback.error() here - it internally assumes an
+                // authentication session exists (to check for failed account-linking
+                // state) and throws its own NullPointerException when there isn't one,
+                // which would surface as an opaque 500 instead of this clear message.
+                // Most common cause: the browser didn't send Keycloak's session cookie
+                // back on the LMS's cross-site form_post callback - check SameSite/
+                // Secure cookie settings and that the whole flow uses HTTPS consistently.
+                log.warn("LTI launch callback received with no active authentication session " +
+                    "- likely a lost session cookie on the cross-site callback from the platform");
+                return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("No active authentication session - the LTI login flow may have expired, " +
+                        "or the browser did not send Keycloak's session cookie back on this cross-site " +
+                        "request from the LMS. Ensure the entire flow runs over HTTPS with a consistent " +
+                        "hostname so SameSite cookie policies don't block it.")
+                    .build();
             }
 
             try {

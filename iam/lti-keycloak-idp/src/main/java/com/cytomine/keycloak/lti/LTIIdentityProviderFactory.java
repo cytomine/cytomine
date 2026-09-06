@@ -17,7 +17,7 @@ public class LTIIdentityProviderFactory
 
     @Override
     public String getName() {
-        return "LTI 1.3 (LMS Launch)";
+        return "LTI 1.3";
     }
 
     @Override

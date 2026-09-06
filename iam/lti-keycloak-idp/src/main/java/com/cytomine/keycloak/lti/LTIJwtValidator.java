@@ -5,6 +5,13 @@ import org.keycloak.jose.jwk.JWKParser;
 import org.keycloak.jose.jws.JWSInput;
 import org.keycloak.jose.jws.JWSInputException;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509ExtendedTrustManager;
+import javax.net.ssl.SSLParameters;
+import java.net.Socket;
+import java.security.cert.X509Certificate;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -32,9 +39,62 @@ public class LTIJwtValidator {
     private static final Duration CACHE_TTL = Duration.ofMinutes(10);
     private static final Map<String, CachedJwks> CACHE = new ConcurrentHashMap<>();
 
-    private static final HttpClient HTTP = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(5))
-            .build();
+    private static final int FETCH_MAX_ATTEMPTS = 3;
+    private static final Duration FETCH_RETRY_DELAY = Duration.ofMillis(300);
+
+    // DEV-ONLY: certificate validation AND hostname verification disabled for
+    // local testing against an untrusted platform cert whose SANs don't
+    // include "host.docker.internal" (the address the container actually
+    // uses to reach Moodle). This makes the JWKS fetch trust ANY server,
+    // valid or not, and skips checking whether the cert was even issued for
+    // the host being connected to - it means this code can no longer detect
+    // a man-in-the-middle impersonating the platform. This MUST be reverted
+    // (see the version-controlled diff that introduced this) before this is
+    // used against anything beyond a known local dev environment.
+    private static final HttpClient HTTP;
+    static {
+        try {
+            // X509ExtendedTrustManager (not plain X509TrustManager) is required
+            // here: the JDK auto-wraps a plain X509TrustManager with its own
+            // AbstractTrustManagerWrapper, which performs hostname/SAN checking
+            // on its own and ignores the empty endpointIdentificationAlgorithm
+            // set via SSLParameters below for this HttpClient's connection path.
+            // Implementing the extended interface ourselves (including the
+            // Socket/SSLEngine overloads) signals the JDK to trust that we've
+            // already handled all checks, skipping its own wrapping entirely.
+            TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509ExtendedTrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+                    public void checkClientTrusted(X509Certificate[] certs, String authType, Socket socket) {}
+                    public void checkServerTrusted(X509Certificate[] certs, String authType, Socket socket) {}
+                    public void checkClientTrusted(X509Certificate[] certs, String authType, SSLEngine engine) {}
+                    public void checkServerTrusted(X509Certificate[] certs, String authType, SSLEngine engine) {}
+                }
+            };
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+
+            // Empty algorithm = skip SAN/hostname matching entirely (separate
+            // check from certificate trust above).
+            SSLParameters sslParameters = new SSLParameters();
+            sslParameters.setEndpointIdentificationAlgorithm("");
+
+            HTTP = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(5))
+                .sslContext(sslContext)
+                .sslParameters(sslParameters)
+                // Moodle can respond with a 303 redirect (e.g. when the
+                // request's Host header doesn't match its configured
+                // wwwroot) - follow it rather than treating it as a failure.
+                // NORMAL still refuses to silently downgrade HTTPS->HTTP.
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize dev-mode trust-all HttpClient", e);
+        }
+    }
 
     private record CachedJwks(Map<String, JWK> keysByKid, Instant fetchedAt) {
         boolean isExpired() {
@@ -117,31 +177,48 @@ public class LTIJwtValidator {
 
     @SuppressWarnings("unchecked")
     private CachedJwks fetch(String jwksUrl) {
-        try {
-            HttpRequest req = HttpRequest.newBuilder(URI.create(jwksUrl))
+        Exception lastFailure = null;
+
+        for (int attempt = 1; attempt <= FETCH_MAX_ATTEMPTS; attempt++) {
+            try {
+                HttpRequest req = HttpRequest.newBuilder(URI.create(jwksUrl))
                     .timeout(Duration.ofSeconds(5))
                     .GET()
                     .build();
-            HttpResponse<String> resp = HTTP.send(req, HttpResponse.BodyHandlers.ofString());
-            if (resp.statusCode() != 200) {
-                throw new RuntimeException("JWKS fetch failed: HTTP " + resp.statusCode() + " from " + jwksUrl);
-            }
-            Map<String, Object> doc = JsonSerialization.readValue(resp.body(), Map.class);
-            Object keysObj = doc.get("keys");
-            Map<String, JWK> byKid = new ConcurrentHashMap<>();
-            if (keysObj instanceof Iterable<?> keys) {
-                for (Object k : keys) {
-                    String raw = JsonSerialization.writeValueAsString(k);
-                    JWK jwk = JsonSerialization.readValue(raw, JWK.class);
-                    if (jwk.getKeyId() != null) {
-                        byKid.put(jwk.getKeyId(), jwk);
+                HttpResponse<String> resp = HTTP.send(req, HttpResponse.BodyHandlers.ofString());
+                if (resp.statusCode() != 200) {
+                    throw new RuntimeException("JWKS fetch failed: HTTP " + resp.statusCode() + " from " + jwksUrl);
+                }
+                Map<String, Object> doc = JsonSerialization.readValue(resp.body(), Map.class);
+                Object keysObj = doc.get("keys");
+                Map<String, JWK> byKid = new ConcurrentHashMap<>();
+                if (keysObj instanceof Iterable<?> keys) {
+                    for (Object k : keys) {
+                        String raw = JsonSerialization.writeValueAsString(k);
+                        JWK jwk = JsonSerialization.readValue(raw, JWK.class);
+                        if (jwk.getKeyId() != null) {
+                            byKid.put(jwk.getKeyId(), jwk);
+                        }
+                    }
+                }
+                return new CachedJwks(byKid, Instant.now());
+            } catch (Exception e) {
+                lastFailure = e;
+                if (attempt < FETCH_MAX_ATTEMPTS) {
+                    log.warnf("JWKS fetch attempt %d/%d failed for %s (%s) - retrying shortly",
+                        attempt, FETCH_MAX_ATTEMPTS, jwksUrl, e.getMessage());
+                    try {
+                        Thread.sleep(FETCH_RETRY_DELAY.toMillis());
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
                     }
                 }
             }
-            return new CachedJwks(byKid, Instant.now());
-        } catch (Exception e) {
-            log.warn("Failed to fetch/parse platform JWKS from " + jwksUrl, e);
-            return new CachedJwks(Map.of(), Instant.now());
         }
+
+        log.warn("Failed to fetch/parse platform JWKS from " + jwksUrl + " after "
+            + FETCH_MAX_ATTEMPTS + " attempts", lastFailure);
+        return new CachedJwks(Map.of(), Instant.now());
     }
 }

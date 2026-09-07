@@ -132,7 +132,7 @@
             <div class="column filter"></div>
           </div>
 
-          <MetadataFilter @filter-change="onMetadataFilterChange" />
+          <MetadataFilter :project="project.name" @filter-change="onMetadataFilterChange" />
         </div>
       </b-collapse>
 

@@ -135,7 +135,7 @@ application:
   appEngine:
     enabled: ${APPENGINE_ENABLED:true}
     apiBasePath: ${APPENGINE_API_BASE_PATH:/app-engine/v1/}
-    apiUrl: ${APPENGINE_API_URL:http://localhost}
+    apiUrl: ${APPENGINE_API_URL:http://127.0.0.1:8082}
 
 jwt:
   auth:
@@ -147,13 +147,13 @@ jwt:
 keycloak-client:
   admin:
     user: ${KEYCLOAK_ADMIN:admin}
-    password: ${KEYCLOAK_ADMIN_PASSWORD:password}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:masterpassword}
     realm: master
   target:
     realm: cytomine
     client-id: core
   client-id: admin-cli
-  url: ${IAM_URL:http://iam:8100}/iam
+  url: ${IAM_URL:http://127.0.0.1:8100}/iam
 
 meilisearch:
   host: ${MEILISEARCH_URL:http://localhost:7700}

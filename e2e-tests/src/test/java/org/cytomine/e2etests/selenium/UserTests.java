@@ -93,6 +93,29 @@ public class UserTests {
     }
 
     @Test
+    void createUserWithUserRoleAndCreateProject() {
+        String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
+        String firstname = "Selenium";
+        String lastname = "User-" + randomUUID().toString().substring(0, 8);
+        String email = username + "@selenium.test";
+        String password = "Selenium1!";
+        String projectName = "selenium-" + randomUUID();
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password, "User");
+        cytomineSteps.logout(wait, cytomineUrl);
+
+        cytomineSteps.login(wait, cytomineUrl, username, password);
+        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
+        cytomineSteps.deleteProject(wait, projectURL);
+        cytomineSteps.deleteOntology(wait, ontologyURL);
+        cytomineSteps.logout(wait, cytomineUrl);
+
+        keycloakClient.deleteUser(username);
+    }
+
+    @Test
     void editUser() {
         String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
         String firstname = "Selenium";

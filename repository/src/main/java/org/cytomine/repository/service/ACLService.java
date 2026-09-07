@@ -13,6 +13,7 @@ public class ACLService {
     private static final int READ_MASK = 1;
     private static final int WRITE_MASK = 2;
     private static final int DELETE_MASK = 8;
+    private static final int ADMINISTRATION_MASK = 16;
 
     private static final String ONTOLOGY_CLASS = "be.cytomine.domain.ontology.Ontology";
     private static final String PROJECT_CLASS = "be.cytomine.domain.project.Project";
@@ -34,6 +35,10 @@ public class ACLService {
 
     public boolean canDeleteOntology(long userId, long ontologyId) {
         return isAdmin(userId) || hasPermission(userId, ontologyId, ONTOLOGY_CLASS, DELETE_MASK);
+    }
+
+    public void grantOntologyOwnerPermission(long userId, long ontologyId) {
+        grantOwnerPermission(userId, ontologyId, ONTOLOGY_CLASS);
     }
 
     public boolean canReadStorage(long userId, long storageId) {
@@ -102,6 +107,86 @@ public class ACLService {
             """;
 
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, userId));
+    }
+
+    private void grantOwnerPermission(long userId, long domainId, String domainClass) {
+        String username = jdbcTemplate.queryForObject(
+            "SELECT username FROM sec_user WHERE id = ?", String.class, userId);
+
+        Long sid = getOrInsertAclSid(username);
+        Long aclClassId = getOrInsertAclClass(domainClass);
+        Long aclObjectIdentity = getOrInsertAclObjectIdentity(domainId, aclClassId, sid);
+
+        List<Long> existingEntry = jdbcTemplate.queryForList(
+            "SELECT id FROM acl_entry WHERE acl_object_identity = ? AND sid = ? AND mask = ?",
+            Long.class,
+            aclObjectIdentity,
+            sid,
+            ADMINISTRATION_MASK
+        );
+        if (existingEntry.isEmpty()) {
+            int aceOrder = jdbcTemplate.queryForObject(
+                "SELECT COALESCE(MAX(ace_order), -1) + 1 FROM acl_entry WHERE acl_object_identity = ?",
+                Integer.class,
+                aclObjectIdentity
+            );
+            jdbcTemplate.update(
+                "INSERT INTO acl_entry(id, ace_order, acl_object_identity, audit_failure, audit_success, "
+                    + "granting, mask, sid) "
+                    + "VALUES (nextval('hibernate_sequence'), ?, ?, false, false, true, ?, ?)",
+                aceOrder,
+                aclObjectIdentity,
+                ADMINISTRATION_MASK,
+                sid
+            );
+        }
+    }
+
+    private Long getOrInsertAclSid(String username) {
+        List<Long> ids = jdbcTemplate.queryForList("SELECT id FROM acl_sid WHERE sid = ?", Long.class, username);
+        if (!ids.isEmpty()) {
+            return ids.getFirst();
+        }
+        jdbcTemplate.update(
+            "INSERT INTO acl_sid(id, principal, sid) VALUES (nextval('hibernate_sequence'), true, ?)", username);
+        return jdbcTemplate.queryForObject("SELECT id FROM acl_sid WHERE sid = ?", Long.class, username);
+    }
+
+    private Long getOrInsertAclClass(String domainClass) {
+        List<Long> ids = jdbcTemplate.queryForList("SELECT id FROM acl_class WHERE class = ?", Long.class,
+            domainClass);
+        if (!ids.isEmpty()) {
+            return ids.getFirst();
+        }
+        jdbcTemplate.update(
+            "INSERT INTO acl_class(id, class) VALUES (nextval('hibernate_sequence'), ?)", domainClass);
+        return jdbcTemplate.queryForObject("SELECT id FROM acl_class WHERE class = ?", Long.class, domainClass);
+    }
+
+    private Long getOrInsertAclObjectIdentity(long domainId, long aclClassId, long ownerSid) {
+        List<Long> ids = jdbcTemplate.queryForList(
+            "SELECT id FROM acl_object_identity WHERE object_id_identity = ? AND object_id_class = ?",
+            Long.class,
+            domainId,
+            aclClassId
+        );
+        if (!ids.isEmpty()) {
+            return ids.getFirst();
+        }
+        jdbcTemplate.update(
+            "INSERT INTO acl_object_identity(id, object_id_class, entries_inheriting, object_id_identity, "
+                + "owner_sid, parent_object) "
+                + "VALUES (nextval('hibernate_sequence'), ?, true, ?, ?, null)",
+            aclClassId,
+            domainId,
+            ownerSid
+        );
+        return jdbcTemplate.queryForObject(
+            "SELECT id FROM acl_object_identity WHERE object_id_identity = ? AND object_id_class = ?",
+            Long.class,
+            domainId,
+            aclClassId
+        );
     }
 
     private boolean hasPermission(long userId, long domainId, String domainClass, int requiredMask) {

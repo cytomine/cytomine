@@ -38,6 +38,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     private static final String CLAIM_CONTEXT = "https://purl.imsglobal.org/spec/lti/claim/context";
     private static final String CLAIM_LIS = "https://purl.imsglobal.org/spec/lti/claim/lis";
     private static final String CLAIM_CUSTOM = "https://purl.imsglobal.org/spec/lti/claim/custom";
+    private static final String CLAIM_EXT = "https://purl.imsglobal.org/spec/lti/claim/ext";
 
     // Authentication session notes
     static final String NOTE_TARGET_LINK_URI = "LTI_TARGET_LINK_URI";
@@ -272,6 +273,10 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         }
 
         // --- EXTRACT USER DETAILS FROM LTI CLAIMS ---
+        Map<String, Object> extParams = claims.get(CLAIM_EXT) instanceof Map<?, ?> map
+            ? (Map<String, Object>) map
+            : Map.of();
+
         Map<String, Object> customParams = claims.get(CLAIM_CUSTOM) instanceof Map<?, ?> map
             ? (Map<String, Object>) map
             : Map.of();
@@ -288,13 +293,23 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         if (email == null || email.isBlank()) {
             email = (String) customParams.get("user_email");
         }
+        if (email == null || email.isBlank()) {
+            email = (String) extParams.get("user_email");
+        }
 
         // 2. First and Last Name Extraction
         String firstName = (String) claims.get("given_name");
         String lastName = (String) claims.get("family_name");
 
+        if (firstName == null && extParams.get("user_firstname") != null) {
+            firstName = (String) extParams.get("user_firstname");
+        }
         if (firstName == null && customParams.get("user_firstname") != null) {
             firstName = (String) customParams.get("user_firstname");
+        }
+
+        if (lastName == null && extParams.get("user_lastname") != null) {
+            lastName = (String) extParams.get("user_lastname");
         }
         if (lastName == null && customParams.get("user_lastname") != null) {
             lastName = (String) customParams.get("user_lastname");
@@ -308,9 +323,16 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         }
 
         // 3. Username Extraction
-        String username = (String) customParams.get("user_username");
+        // Prioritize Moodle ext parameters, then custom params, then OIDC standard claims
+        String username = (String) extParams.get("user_username");
+        if (username == null || username.isBlank()) {
+            username = (String) customParams.get("user_username");
+        }
         if (username == null || username.isBlank()) {
             username = (String) claims.get("preferred_username");
+        }
+        if (username == null || username.isBlank()) {
+            username = (String) claims.get("username");
         }
         if (username == null || username.isBlank()) {
             username = (email != null && !email.isBlank()) ? email : subject;

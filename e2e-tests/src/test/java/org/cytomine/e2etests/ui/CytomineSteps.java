@@ -609,6 +609,19 @@ public class CytomineSteps {
         String email,
         String password
     ) {
+        createUser(wait, cytomineUrl, username, firstname, lastname, email, password, null);
+    }
+
+    public void createUser(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String username,
+        String firstname,
+        String lastname,
+        String email,
+        String password,
+        String role
+    ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
         webDriverUtils.clickButtonByText(wait, "New user");
@@ -618,9 +631,23 @@ public class CytomineSteps {
         webDriverUtils.bySendKeys(wait, By.name("lastname"), lastname);
         webDriverUtils.bySendKeys(wait, By.name("email"), email);
         webDriverUtils.bySendKeys(wait, By.name("password"), password);
+        if (role != null) {
+            selectUserRole(wait, role);
+        }
         webDriverUtils.clickButtonByText(wait, "Save");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully created')]"));
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[normalize-space(text())='" + username + "']"));
+    }
+
+    private void selectUserRole(Wait<WebDriver> wait, String role) {
+        By roleSelect = By.xpath(
+            "//div[contains(@class,'field') and contains(@class,'is-horizontal')]"
+                + "[.//label[normalize-space()='Role']]//select"
+        );
+        wait.until(d -> {
+            new Select(d.findElement(roleSelect)).selectByVisibleText(role);
+            return true;
+        });
     }
 
     public void editUser(

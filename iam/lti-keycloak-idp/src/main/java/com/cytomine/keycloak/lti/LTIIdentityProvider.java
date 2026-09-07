@@ -1,4 +1,5 @@
 package com.cytomine.keycloak.lti;
+
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.core.MediaType;
@@ -22,9 +23,7 @@ import org.keycloak.sessions.RootAuthenticationSessionModel;
 import java.util.Map;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
 
 public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityProviderConfig> {
 
@@ -37,6 +36,8 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     private static final String CLAIM_TARGET_LINK_URI = "https://purl.imsglobal.org/spec/lti/claim/target_link_uri";
     private static final String CLAIM_ROLES = "https://purl.imsglobal.org/spec/lti/claim/roles";
     private static final String CLAIM_CONTEXT = "https://purl.imsglobal.org/spec/lti/claim/context";
+    private static final String CLAIM_LIS = "https://purl.imsglobal.org/spec/lti/claim/lis";
+    private static final String CLAIM_CUSTOM = "https://purl.imsglobal.org/spec/lti/claim/custom";
 
     // Authentication session notes
     static final String NOTE_TARGET_LINK_URI = "LTI_TARGET_LINK_URI";
@@ -45,7 +46,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     // Clock-skew tolerance applied to both directions of the exp/iat window.
     private static final long CLOCK_SKEW_LEEWAY_SECONDS = 60;
     private static final long MAX_IAT_AGE_SECONDS = 300;
-    private final LTIJwtValidator jwtValidator = new LTIJwtValidator();
 
     public LTIIdentityProvider(KeycloakSession session, LTIIdentityProviderConfig config) {
         super(session, config);
@@ -59,7 +59,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     @Override
     public Response performLogin(AuthenticationRequest request) {
         try {
-
             AuthenticationSessionModel authSession = request.getAuthenticationSession();
 
             // Retrieve encoded launch hints passed via login_hint param
@@ -80,7 +79,6 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             authSession.setClientNote(NOTE_NONCE, nonce);
 
             String redirectUri = request.getRedirectUri();
-
             String encodedState = request.getState().getEncoded();
 
             UriBuilder uriBuilder = UriBuilder.fromUri(getConfig().getPlatformAuthorizationEndpoint())
@@ -174,6 +172,10 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                 BrokeredIdentityContext identity = provider.validateAndExtract(idToken, state, authSession);
                 identity.setIdpConfig(provider.getConfig());
                 identity.setIdp(provider);
+
+                // CRITICAL FIX: Ensure authenticationSession is attached to BrokeredIdentityContext
+                identity.setAuthenticationSession(authSession);
+
                 return callback.authenticated(identity);
             } catch (Exception e) {
                 log.warn("LTI launch validation failed", e);
@@ -186,6 +188,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     @SuppressWarnings("unchecked")
     BrokeredIdentityContext validateAndExtract(String rawIdToken, String returnedState,
                                                AuthenticationSessionModel authSession) throws Exception {
+        LTIJwtValidator jwtValidator = new LTIJwtValidator(this.session);
         JWSInput jws = jwtValidator.verify(rawIdToken, getConfig().getPlatformJwksUrl());
         Map<String, Object> claims = JsonSerialization.readValue(jws.readContentAsString(), Map.class);
 
@@ -252,24 +255,87 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             throw new IllegalArgumentException("Launch id_token is too old (iat too far in the past)");
         }
 
+        // --- PRINT CLAIMS TO LOGS FOR DEBUGGING ---
+        try {
+            String prettyClaims = JsonSerialization.writeValueAsPrettyString(claims);
+            log.infof("=== LTI ID TOKEN CLAIMS RECEIVED ===\n%s\n===================================", prettyClaims);
+        } catch (Exception e) {
+            log.infof("=== LTI ID TOKEN CLAIMS RECEIVED ===\n%s\n===================================", claims.toString());
+        }
+
         String subject = (String) claims.get(getConfig().getSubjectClaim());
+        if (subject == null || subject.isBlank()) {
+            subject = (String) claims.get("sub");
+        }
         if (subject == null || subject.isBlank()) {
             throw new IllegalArgumentException("Missing subject claim");
         }
 
+        // --- EXTRACT USER DETAILS FROM LTI CLAIMS ---
+        Map<String, Object> customParams = claims.get(CLAIM_CUSTOM) instanceof Map<?, ?> map
+            ? (Map<String, Object>) map
+            : Map.of();
+
+        Map<String, Object> lisClaim = claims.get(CLAIM_LIS) instanceof Map<?, ?> map
+            ? (Map<String, Object>) map
+            : Map.of();
+
+        // 1. Email Extraction
+        String email = (String) claims.get("email");
+        if (email == null || email.isBlank()) {
+            email = (String) lisClaim.get("person_sourcedid");
+        }
+        if (email == null || email.isBlank()) {
+            email = (String) customParams.get("user_email");
+        }
+
+        // 2. First and Last Name Extraction
+        String firstName = (String) claims.get("given_name");
+        String lastName = (String) claims.get("family_name");
+
+        if (firstName == null && customParams.get("user_firstname") != null) {
+            firstName = (String) customParams.get("user_firstname");
+        }
+        if (lastName == null && customParams.get("user_lastname") != null) {
+            lastName = (String) customParams.get("user_lastname");
+        }
+
+        // Composite full name fallback
+        if ((firstName == null || lastName == null) && claims.get("name") instanceof String fullName && !fullName.isBlank()) {
+            String[] parts = fullName.trim().split("\\s+", 2);
+            if (firstName == null) firstName = parts[0];
+            if (lastName == null) lastName = parts.length > 1 ? parts[1] : parts[0];
+        }
+
+        // 3. Username Extraction
+        String username = (String) customParams.get("user_username");
+        if (username == null || username.isBlank()) {
+            username = (String) claims.get("preferred_username");
+        }
+        if (username == null || username.isBlank()) {
+            username = (email != null && !email.isBlank()) ? email : subject;
+        }
+
+        // Fallbacks to avoid triggering Keycloak's Update Profile screen
+        if (email == null || email.isBlank()) {
+            email = username.contains("@") ? username : username + "@lti.local";
+        }
+        if (firstName == null || firstName.isBlank()) {
+            firstName = "LTI";
+        }
+        if (lastName == null || lastName.isBlank()) {
+            lastName = "User (" + subject + ")";
+        }
+
+        // Initialize BrokeredIdentityContext and set user profile properties
         BrokeredIdentityContext identity = new BrokeredIdentityContext(subject);
         identity.setIdpConfig(getConfig());
+        identity.setAuthenticationSession(authSession);
 
-        identity.setUsername(subject);
-        if (claims.get("email") != null) {
-            identity.setEmail((String) claims.get("email"));
-        }
-        if (claims.get("given_name") != null) {
-            identity.setFirstName((String) claims.get("given_name"));
-        }
-        if (claims.get("family_name") != null) {
-            identity.setLastName((String) claims.get("family_name"));
-        }
+        identity.setUsername(username);
+        identity.setEmail(email);
+        identity.setFirstName(firstName);
+        identity.setLastName(lastName);
 
         // Attach claims for identity provider mappers
         identity.getContextData().put("LTI_CLAIMS", claims);

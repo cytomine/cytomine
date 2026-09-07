@@ -167,11 +167,15 @@ services:
       KEYCLOAK_ADMIN: &KEYCLOAK_ADMIN admin
       KEYCLOAK_ADMIN_PASSWORD: &KEYCLOAK_ADMIN_PASSWORD YMjl7YGabNbQmjVOONxo9AYSiJyvioTnbsMyBwT8/Jg=
       KC_LOG_LEVEL: "INFO,org.keycloak.services.managers.AuthenticationSessionManager:DEBUG,org.keycloak.services.resources.IdentityBrokerService:DEBUG"
+      # Instruct Keycloak's outgoing HTTP SPI to permit unproxied internal/loopback connections
+      KC_SPI_CONNECTIONS_HTTP_CLIENT_DEFAULT_NO_PROXY: "localhost,127.0.0.1,host.docker.internal,172.16.238.1,172.16.238.0/24"
+      KC_SPI_CONNECTIONS_HTTP_CLIENT_DEFAULT_DISABLE_TRUST_MANAGER: "true"
     networks:
       host_network:
         ipv4_address: 172.16.238.9
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "host.docker.internal:172.16.238.1"
+      - "localhost:172.16.238.1"
 
   app-engine-db:
     image: *postgres-image

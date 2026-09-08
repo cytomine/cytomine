@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 
@@ -21,6 +23,10 @@ import be.cytomine.exceptions.WrongArgumentException;
 import static be.cytomine.utils.DateUtils.MONGO_DB_FORMAT;
 
 public class JsonObject extends HashMap<String, Object> implements JsonInput {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper()
+        .registerModule(new Jdk8Module())
+        .registerModule(new JavaTimeModule());
 
     public JsonObject() {
 
@@ -163,7 +169,7 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
 
     public static String toJsonString(Object o) {
         try {
-            return new ObjectMapper().writeValueAsString(o);
+            return MAPPER.writeValueAsString(o);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return "invalid json string";
@@ -172,7 +178,7 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
 
     public static Map<String, Object> toMap(String json) {
         try {
-            return new ObjectMapper().readValue(json, new TypeReference<>() {});
+            return MAPPER.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -181,7 +187,7 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
 
     public static <T> T toObject(String json, Class<? extends T> c) {
         try {
-            return new ObjectMapper().readValue(json, c);
+            return MAPPER.readValue(json, c);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
@@ -190,7 +196,7 @@ public class JsonObject extends HashMap<String, Object> implements JsonInput {
 
     public static JsonObject toJsonObject(String json) {
         try {
-            return new ObjectMapper().readValue(json, new TypeReference<>() {});
+            return MAPPER.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;

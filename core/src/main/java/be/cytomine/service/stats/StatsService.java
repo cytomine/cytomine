@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.common.repository.http.StatsHttpContract;
 import be.cytomine.common.repository.http.TermRelationHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import be.cytomine.common.repository.model.stat.payload.StatTerm;
 import be.cytomine.common.repository.model.stat.payload.StatUserTerm;
@@ -108,7 +109,7 @@ public class StatsService {
             counts.put(project.getName(), 0);
             percentage.put(project.getName(), 0);
 
-            List<Long> layers = userService.listLayers(project).stream().map(x -> x.getJSONAttrLong("id"))
+            List<Long> layers = userService.listLayers(project).stream().map(UserResponse::id)
                 .collect(Collectors.toList());
 
             if (!layers.isEmpty()) {
@@ -199,10 +200,10 @@ public class StatsService {
         List<Tuple> numberOfAnnotatedImagesByUser = q.getResultList();
         // Build empty result table
         Map<Long, JsonObject> result = new HashMap<>();
-        for (JsonObject user : userService.listLayers(project)) {
+        for (UserResponse user : userService.listLayers(project)) {
             JsonObject item = new JsonObject();
-            item.put("id", user.get("id"));
-            item.put("username", user.get("username"));
+            item.put("id", user.id());
+            item.put("username", user.username());
             item.put("value", 0);
             result.put(item.getId(), item);
         }
@@ -306,11 +307,11 @@ public class StatsService {
         // user Jakarta JPA Criteria API
 
         //build empty result table
-        for (JsonObject user : userService.listLayers(project)) {
+        for (UserResponse user : userService.listLayers(project)) {
             JsonObject item = new JsonObject();
-            item.put("id", user.get("id"));
-            item.put("key", user.get("username"));
-            item.put("username", user.get("username"));
+            item.put("id", user.id());
+            item.put("key", user.username());
+            item.put("username", user.username());
             item.put("value", 0);
             result.put(item.getId(), item);
         }

@@ -1,53 +1,53 @@
 <template>
 <cytomine-modal :active="active" :title="$t('add-images')" @close="$emit('update:active', false)">
-  <b-loading :is-full-page="false" :active="loading" class="small" />
-  <template v-if="!loading">
-    <template>
-      <b-input class="search-images" v-model="searchString" :placeholder="$t('search-placeholder')"
-      type="search" icon="search" />
+  <b-input
+    class="search-images"
+    v-model="searchString"
+    :placeholder="$t('search-placeholder')"
+    type="search"
+    icon="search"
+  />
 
-      <cytomine-table
-        :collection="imageCollection"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
-        :detailed="false"
-      >
-        <template #default="{row: image}">
-          <b-table-column :label="$t('overview')">
-            <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
-          </b-table-column>
+  <cytomine-table
+    :collection="imageCollection"
+    :currentPage.sync="currentPage"
+    :perPage.sync="perPage"
+    :sort.sync="sortField"
+    :order.sync="sortOrder"
+    :detailed="false"
+  >
+    <template #default="{row: image}">
+      <b-table-column :label="$t('overview')">
+        <image-thumbnail :image="image" :size="128" :key="`${image.id}-thumb-128`" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
+      </b-table-column>
 
-          <b-table-column field="originalFilename" :label="$t('name')" sortable>
-            {{ image.originalFilename }}
-          </b-table-column>
+      <b-table-column field="originalFilename" :label="$t('name')" sortable>
+        {{ image.originalFilename }}
+      </b-table-column>
 
-          <b-table-column field="created" :label="$t('created-on')" sortable>
-            {{ formatMomentDate(Number(image.created), 'll LT') }}
-          </b-table-column>
+      <b-table-column field="created" :label="$t('created-on')" sortable>
+        {{ formatMomentDate(Number(image.created), 'll LT') }}
+      </b-table-column>
 
-          <b-table-column label=" " centered>
-            <button v-if="wasAdded(image)" class="button is-small is-link" disabled>
-              {{$t('button-added')}}
-            </button>
-            <span v-else-if="isInProject(image)">
-              {{$t('already-in-project')}}
-            </span>
-            <button v-else class="button is-small is-link" @click="addImage(image)">
-              {{$t('button-add')}}
-            </button>
-          </b-table-column>
-        </template>
-
-        <template #empty>
-          <div class="content has-text-grey has-text-centered">
-            <p>{{$t('no-image')}}</p>
-          </div>
-        </template>
-      </cytomine-table>
+      <b-table-column label=" " centered>
+        <button v-if="wasAdded(image)" class="button is-small is-link" disabled>
+          {{$t('button-added')}}
+        </button>
+        <span v-else-if="isInProject(image)">
+          {{$t('already-in-project')}}
+        </span>
+        <button v-else class="button is-small is-link" @click="addImage(image)">
+          {{$t('button-add')}}
+        </button>
+      </b-table-column>
     </template>
-  </template>
+
+    <template #empty>
+      <div class="content has-text-grey has-text-centered">
+        <p>{{$t('no-image')}}</p>
+      </div>
+    </template>
+  </cytomine-table>
 </cytomine-modal>
 </template>
 
@@ -71,7 +71,6 @@ export default {
   },
   data() {
     return {
-      loading: true,
       perPage: 10,
       searchString: '',
       idsAddedImages: [],
@@ -133,9 +132,6 @@ export default {
     wasAdded(image) {
       return this.idsAddedImages.includes(image.id);
     }
-  },
-  async created() {
-    this.loading = false;
   }
 };
 </script>

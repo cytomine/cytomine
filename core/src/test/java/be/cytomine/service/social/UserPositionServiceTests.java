@@ -109,7 +109,7 @@ public class UserPositionServiceTests {
     void userPositionCreatePersistentAndExpiredPosition() {
         PersistentUserPosition persistentUserPosition = givenAPersistentUserPosition(
             new Date(),
-            builder.getUserEntity(builder.givenSuperAdmin()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             builder.givenASliceInstance()
         );
         assertThat(lastUserPositionRepository.count()).isEqualTo(1);

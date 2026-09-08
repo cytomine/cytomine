@@ -58,10 +58,10 @@ INTERNAL_URL_CORE = get_settings().internal_url_core
 
 @router.post("/import", tags=["Import"])
 def import_datasets(
-        request: Request,
-        background_tasks: BackgroundTasks,
-        config: Annotated[Settings, Depends(get_settings)],
-        storage_id: int = Query(..., description="The storage where to import the datasets"),
+    request: Request,
+    background_tasks: BackgroundTasks,
+    config: Annotated[Settings, Depends(get_settings)],
+    storage_id: int = Query(..., description="The storage where to import the datasets"),
 ) -> JobResponse:
     """
     Import datasets from a predefined folder without moving the data.

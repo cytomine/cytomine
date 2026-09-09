@@ -229,6 +229,12 @@ public abstract class RestCytomineController {
                     filterOneElement(json);
                     filtered.add(json);
                 }
+            } else if (!list.isEmpty()) {
+                for (Object o : list) {
+                    Map<String, Object> json = JsonObject.toMap(JsonObject.toJsonString(o));
+                    filterOneElement(json);
+                    filtered.add(json);
+                }
             }
         }
 

@@ -798,7 +798,7 @@ public class ProjectService extends ModelService {
         if (users != null) {
             List<Long> projectOldUsers = userService.listUsers(project)
                 .stream()
-                .map(CytomineDomain::getId)
+                .map(UserResponse::id)
                 .sorted()
                 .collect(Collectors.toList()); //[a,b,c]
             List<Long> projectNewUsers = users.stream().sorted().collect(Collectors.toList()); //[a,b,x]
@@ -808,7 +808,7 @@ public class ProjectService extends ModelService {
             } else {
                 nextAdmins = userService.listAdmins(project)
                     .stream()
-                    .map(CytomineDomain::getId)
+                    .map(UserResponse::id)
                     .sorted()
                     .collect(Collectors.toList()); //[a,b,c]
             }
@@ -823,7 +823,7 @@ public class ProjectService extends ModelService {
         if (admins != null) {
             List<Long> projectOldAdmins = userService.listAdmins(project)
                 .stream()
-                .map(CytomineDomain::getId)
+                .map(UserResponse::id)
                 .sorted()
                 .collect(Collectors.toList()); //[a,b,c]
             List<Long> projectNewAdmins = admins.stream().sorted().collect(Collectors.toList()); //[a,b,x]

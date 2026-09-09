@@ -1,11 +1,28 @@
 import asyncio
+import threading
+from functools import partial, wraps
+import anyio
+from anyio import CapacityLimiter
 
-from starlette.concurrency import run_in_threadpool
+_pims_thread_limiter = CapacityLimiter(100)  # Tune based on load testing
+
+
+def _with_thread_name(name, func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        threading.current_thread().name = name
+        return func(*args, **kwargs)
+    return wrapper
 
 
 async def exec_func_async(func, *args, **kwargs):
-    is_async = asyncio.iscoroutinefunction(func)
-    if is_async:
+    if asyncio.iscoroutinefunction(func):
         return await func(*args, **kwargs)
-    else:
-        return await run_in_threadpool(func, *args, **kwargs)
+
+    # Wrap the function so the worker thread sets its log name upon execution
+    named_func = _with_thread_name("Import Pool Worker", partial(func, *args, **kwargs))
+
+    return await anyio.to_thread.run_sync(
+        named_func,
+        limiter=_pims_thread_limiter
+    )

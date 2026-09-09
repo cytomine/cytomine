@@ -3,7 +3,6 @@ ARG GRADLE_VERSION=9.5.1-jdk21-alpine
 ARG PROXY_CACHE=registry.cytomine.org/docker
 
 FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION} AS jar-builder
-RUN mkdir -p /opt/gradle/.gradle
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
 
 WORKDIR /app
@@ -20,7 +19,8 @@ COPY ./registry-client/src /app/registry-client/src
 COPY ./repository/build.gradle /app/repository/build.gradle
 COPY ./repository/src /app/repository/src
 COPY ./settings.gradle /app/settings.gradle
-RUN gradle :repository:bootJar --no-daemon --console=verbose
+RUN --mount=type=cache,target=/opt/gradle/.gradle,id=gradle-cache,sharing=locked \
+    gradle :repository:bootJar --no-daemon --build-cache --console=verbose
 
 FROM ${PROXY_CACHE}/eclipse-temurin:${JAVA_VERSION} AS production
 WORKDIR /app

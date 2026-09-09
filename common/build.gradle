@@ -64,8 +64,6 @@ dependencies {
     // Test fixtures dependencies (shared test configurations)
     testFixturesImplementation 'org.springframework.boot:spring-boot-test'
     testFixturesImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testFixturesImplementation 'org.springframework.boot:spring-boot-webmvc-test'
-    testFixturesImplementation 'org.springframework.security:spring-security-test'
     testFixturesImplementation 'org.testcontainers:testcontainers-postgresql:2.0.3'
     testFixturesApi 'org.springframework.data:spring-data-commons'
     testFixturesApi 'com.fasterxml.jackson.core:jackson-annotations'

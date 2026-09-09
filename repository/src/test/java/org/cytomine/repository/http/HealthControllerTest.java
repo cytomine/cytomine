@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.SecurityMockMvcTestConfiguration;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;

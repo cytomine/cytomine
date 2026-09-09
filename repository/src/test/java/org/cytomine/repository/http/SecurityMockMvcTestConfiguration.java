@@ -1,4 +1,4 @@
-package be.cytomine.common;
+package org.cytomine.repository.http;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.MockMvcBuilderCustomizer;

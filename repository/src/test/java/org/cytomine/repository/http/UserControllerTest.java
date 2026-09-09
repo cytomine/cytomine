@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.SecurityMockMvcTestConfiguration;
 import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.Role;
 import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;

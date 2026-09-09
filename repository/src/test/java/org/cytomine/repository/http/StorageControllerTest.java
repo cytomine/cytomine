@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.SecurityMockMvcTestConfiguration;
 import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.storage.payload.CreateStorage;

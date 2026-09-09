@@ -57,7 +57,9 @@ public class UserEntity implements HasTimestampCUD {
     private boolean isDeveloper;
 
     @Column
-    private boolean enabled = true;
+    // we should make this column a `NOT NULL DEFAULT true`.
+    // `enabled = null` has no business meaning.
+    private Boolean enabled = true;
 
     @Column
     private String origin;

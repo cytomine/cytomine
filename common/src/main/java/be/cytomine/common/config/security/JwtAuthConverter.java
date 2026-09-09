@@ -1,4 +1,4 @@
-package be.cytomine.utils;
+package be.cytomine.common.config.security;
 
 import java.util.Collection;
 import java.util.Map;

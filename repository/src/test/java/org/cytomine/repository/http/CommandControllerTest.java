@@ -16,6 +16,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.SecurityMockMvcTestConfiguration;
 import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.model.command.CommandType;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 public class CommandControllerTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;

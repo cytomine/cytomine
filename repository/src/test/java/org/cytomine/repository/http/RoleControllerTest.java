@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.SecurityMockMvcTestConfiguration;
 import be.cytomine.common.repository.http.RoleHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import be.cytomine.common.repository.model.role.payload.CreateRole;
@@ -23,7 +24,7 @@ import be.cytomine.common.repository.model.role.payload.UpdateRole;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 class RoleControllerTest implements CRUDCommandTests<CreateRole, RoleResponse, UpdateRole> {
 

@@ -301,12 +301,16 @@ services:
   repository:
     image: cytomine/repository:latest
     restart: unless-stopped
+    depends_on:
+      - iam
     ports:
       - 8081:8081
     environment:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       POSTGIS_HOST: postgis
+      IAM_URL: http://iam:8100
+      IAM_EXTERNAL_URL: http://127.0.0.1:8100
     networks:
       host_network:
         ipv4_address: 172.16.238.18

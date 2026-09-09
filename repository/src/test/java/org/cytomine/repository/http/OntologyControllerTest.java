@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.SecurityMockMvcTestConfiguration;
 import be.cytomine.common.mapper.BaseMapper;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
@@ -32,7 +33,7 @@ import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, OntologyResponse, UpdateOntology> {
     @Autowired

@@ -24,6 +24,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.SecurityMockMvcTestConfiguration;
 import be.cytomine.common.repository.http.UserRoleHttpContract;
 import be.cytomine.common.repository.model.Role;
 import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
@@ -38,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRoleResponse, UpdateUserRole> {
 

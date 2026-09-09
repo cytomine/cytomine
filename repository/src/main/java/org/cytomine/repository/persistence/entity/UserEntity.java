@@ -55,6 +55,9 @@ public class UserEntity implements HasTimestampCUD {
     private boolean isDeveloper;
 
     @Column
+    private boolean enabled = true;
+
+    @Column
     private String origin;
 
     @Column

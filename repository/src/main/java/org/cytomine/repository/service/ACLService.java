@@ -41,6 +41,10 @@ public class ACLService {
         grantOwnerPermission(userId, ontologyId, ONTOLOGY_CLASS);
     }
 
+    public void grantStorageOwnerPermission(long userId, long storageId) {
+        grantOwnerPermission(userId, storageId, STORAGE_CLASS);
+    }
+
     public boolean canReadStorage(long userId, long storageId) {
         return isAdmin(userId) || hasPermission(userId, storageId, STORAGE_CLASS, READ_MASK);
     }
@@ -77,7 +81,7 @@ public class ACLService {
             SELECT aoi.object_id_identity
             FROM sec_user u
             JOIN acl_sid sid ON sid.sid = u.username
-            JOIN acl_entry ae ON ae.sid = sid.id AND (ae.mask & ?) > 0
+            JOIN acl_entry ae ON ae.sid = sid.id AND ae.mask >= ?
             JOIN acl_object_identity aoi ON aoi.id = ae.acl_object_identity
             JOIN acl_class ac ON ac.id = aoi.object_id_class AND ac.class = ?
             WHERE u.id = ?

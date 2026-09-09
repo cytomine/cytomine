@@ -71,14 +71,7 @@ public class UserCommandService
         Optional<RoleEntity> maybeRole = roleRepository.findByAuthorityAndDeletedNull(createPayload.role());
         RoleEntity roleEntity = maybeRole.orElseThrow(
             () -> new IllegalArgumentException(format("Role not found %s", createPayload.role())));
-        UserEntity entity = userMapper.mapToUserEntity(createPayload, userId, creationDate, Set.of(roleEntity));
-        if (entity.getPublicKey() == null) {
-            entity.setPublicKey(UUID.randomUUID().toString());
-        }
-        if (entity.getPrivateKey() == null) {
-            entity.setPrivateKey(UUID.randomUUID().toString());
-        }
-        return entity;
+        return userMapper.mapToUserEntity(createPayload, userId, creationDate, Set.of(roleEntity));
     }
 
     @Override

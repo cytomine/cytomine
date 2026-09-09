@@ -17,12 +17,14 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Version;
 import lombok.Data;
+import org.hibernate.annotations.DynamicInsert;
 
 import be.cytomine.common.repository.model.HasTimestampCUD;
 import be.cytomine.common.repository.utils.Language;
 
 @Entity(name = "sec_user")
 @Data
+@DynamicInsert // if fields are null here, they will fallback to default in postgres (useful for public/private keys)
 public class UserEntity implements HasTimestampCUD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

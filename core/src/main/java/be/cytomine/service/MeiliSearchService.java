@@ -70,6 +70,7 @@ public class MeiliSearchService {
                 .map(hit -> objectMapper.convertValue(hit, MeiliSearchImageResponse.class))
                 .collect(Collectors.toList());
         } catch (Exception e) {
+            log.warn("Could not search for '{}' at startup: {}", query, e.getMessage());
             throw new SearchException("search failed", 500, e.getMessage());
         }
     }

@@ -26,6 +26,7 @@ import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
 import be.cytomine.common.repository.model.command.request.DeleteUserCommand;
 import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateUserCommand;
+import be.cytomine.common.repository.model.storage.payload.CreateStorage;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.common.repository.model.user.payload.UpdateUser;
 
@@ -43,6 +44,7 @@ public class UserCommandService
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final UserRoleCommandService userRoleCommandService;
+    private final StorageCommandService storageCommandService;
 
     @Override
     public UserEntity updateEntityWithEntity(UserEntity entity, UpdateUser payload, Timestamp now) {
@@ -70,6 +72,12 @@ public class UserCommandService
         RoleEntity roleEntity = maybeRole.orElseThrow(
             () -> new IllegalArgumentException(format("Role not found %s", createPayload.role())));
         return userMapper.mapToUserEntity(createPayload, userId, creationDate, Set.of(roleEntity));
+    }
+
+    @Override
+    public void afterCreate(long userId, UserCommandPayload payload) {
+        storageCommandService.create(payload.id(), new CreateStorage(payload.username() + " storage"),
+            LocalDateTime.now());
     }
 
     @Override

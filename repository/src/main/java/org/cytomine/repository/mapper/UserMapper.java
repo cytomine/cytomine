@@ -29,16 +29,17 @@ public interface UserMapper {
     @Mapping(target = "updated", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "enabled", ignore = true)
     @Mapping(target = "created", source = "now")
     @Mapping(target = "developer", source = "entity.developer")
     @BeanMapping(ignoreUnmappedSourceProperties = {"role", "password"})
     UserEntity mapToUserEntity(CreateUser entity, long userId, Timestamp now, Set<RoleEntity> roles);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted", "enabled"})
     UserCommandPayload mapToUserCommandPayload(UserEntity entity);
 
     @Mapping(target = "isDeveloper", source = "entity.developer")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted", "enabled"})
     UserResponse mapToUserResponse(UserEntity entity);
 
     @Mapping(target = "email", source = "newEmail")

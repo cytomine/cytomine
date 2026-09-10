@@ -64,6 +64,11 @@ public class StorageCommandService
     }
 
     @Override
+    public void afterCreate(long userId, StorageCommandPayload payload) {
+        aclService.grantStorageOwnerPermission(userId, payload.id());
+    }
+
+    @Override
     public StorageEntity updateEntityWithEntity(StorageEntity entity, UpdateStorage payload, Timestamp now) {
         return storageMapper.update(entity, payload.name().orElse(entity.getName()), now);
     }

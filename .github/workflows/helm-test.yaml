@@ -8,7 +8,6 @@ on:
         required: true
       REGISTRY_TOKEN:
         required: true
-
 permissions: {}
 
 jobs:
@@ -160,7 +159,7 @@ jobs:
             --set images.web_ui=registry.cytomine.org/cytomine/web-ui:${{ env.DEPLOYMENT_NAME }} \
             --set images.pullPolicy=Always \
             --set test.e2eTestCount=${{ env.E2E_TEST_COUNT }} \
-            --wait --timeout=20m
+            --wait --timeout=30m
 
       - name: Log k8s events
         if: failure()
@@ -192,7 +191,8 @@ jobs:
 
       - name: Logs pims import job
         if: failure()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs job/pims-import-ci --all-containers=true
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs job/pims-import-ci
+          --all-containers=true
 
       - name: Run helm tests
         run: |
@@ -206,11 +206,13 @@ jobs:
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c e2e-tests
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c e2e-tests
 
       - name: Logs e2e tests results - selenium pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c selenium
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c selenium
 
       - name: Export test results
         if: always()

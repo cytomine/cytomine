@@ -32,7 +32,7 @@ import be.cytomine.common.repository.model.user.payload.UpdateUser;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResponse, UpdateUser> {
     @Autowired

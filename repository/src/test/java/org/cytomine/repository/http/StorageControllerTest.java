@@ -23,7 +23,7 @@ import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 public class StorageControllerTest implements CRUDCommandTests<CreateStorage, StorageResponse, UpdateStorage> {
     @Autowired

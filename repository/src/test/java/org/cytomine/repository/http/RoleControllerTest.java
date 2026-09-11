@@ -23,7 +23,7 @@ import be.cytomine.common.repository.model.role.payload.UpdateRole;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 class RoleControllerTest implements CRUDCommandTests<CreateRole, RoleResponse, UpdateRole> {
 

@@ -28,7 +28,7 @@ import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 class TermControllerTest implements CRUDCommandTests<CreateTerm, TermResponse, UpdateTerm> {
 

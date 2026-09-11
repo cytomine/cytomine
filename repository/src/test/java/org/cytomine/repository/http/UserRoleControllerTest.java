@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRoleResponse, UpdateUserRole> {
 

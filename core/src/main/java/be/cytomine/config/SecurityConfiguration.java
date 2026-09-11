@@ -17,11 +17,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import be.cytomine.common.config.security.JwtAuthConverter;
+import be.cytomine.common.config.security.TokenFromParameterFilter;
 import be.cytomine.config.security.ApiKeyFilter;
-import be.cytomine.config.security.TokenFromParameterFilter;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.UserRepository;
-import be.cytomine.utils.JwtAuthConverter;
 
 @Configuration
 @EnableWebSecurity

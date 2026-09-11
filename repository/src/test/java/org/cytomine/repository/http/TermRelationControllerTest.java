@@ -26,7 +26,7 @@ import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelati
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 class TermRelationControllerTest
     implements CRUDCommandTests<CreateTermRelation, TermRelationResponse, UpdateTermRelation> {

@@ -30,7 +30,7 @@ import be.cytomine.common.repository.model.tag.payload.UpdateTag;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 class TagControllerTest implements CRUDCommandTests<CreateTag, TagResponse, UpdateTag> {
     String apiURL = TagHttpContract.ROOT_PATH;

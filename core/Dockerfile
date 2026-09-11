@@ -6,39 +6,10 @@ ARG GRADLE_VERSION=9.5.1-jdk21
 ARG PROXY_CACHE=registry.cytomine.org/docker
 
 #######################################################################################
-# Stage: core dependencies download via gradle
-FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-alpine AS deps-downloader
-
-# We first copy the build.gradle file and the binaries stored in the source repository.
-# This way, we retrieve all gradle dependencies at the beginning. All these steps will be
-# cached by Docker unless build.gradle. This means that we only retrieve all dependencies
-# if we modify the dependencies definition.
-RUN mkdir -p /opt/gradle/.gradle
-ENV GRADLE_USER_HOME=/opt/gradle/.gradle
-
-WORKDIR /app
-COPY ./app-engine/build.gradle /app/app-engine/build.gradle
-COPY ./app-engine/src /app/app-engine/src
-COPY ./common/build.gradle /app/common/build.gradle
-COPY ./common/src /app/common/src
-COPY ./core/build.gradle /app/core/build.gradle
-COPY ./core/src /app/core/src
-COPY ./e2e-tests/build.gradle /app/e2e-tests/build.gradle
-COPY ./e2e-tests/src /app/e2e-tests/src
-COPY ./registry-client/build.gradle /app/registry-client/build.gradle
-COPY ./registry-client/src /app/registry-client/src
-COPY ./repository/build.gradle /app/repository/build.gradle
-COPY ./repository/src /app/repository/src
-COPY ./settings.gradle /app/settings.gradle
-
-RUN gradle :core:dependencies --no-daemon --console=verbose
-
-#######################################################################################
 ## Stage: building the core jar file
 FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION}-alpine AS jar-builder
 
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
-COPY --from=deps-downloader /opt/gradle/.gradle /opt/gradle/.gradle
 
 WORKDIR /app
 COPY ./app-engine/build.gradle /app/app-engine/build.gradle
@@ -58,8 +29,10 @@ COPY ./settings.gradle /app/settings.gradle
 ARG CORE_VERSION
 ENV CORE_VERSION=$CORE_VERSION
 
-RUN sed -i -- 's/version: 0.0.0/version: '$CORE_VERSION'/g' /app/core/src/main/resources/application.yml && \
-    gradle :core:bootJar --console=verbose
+RUN sed -i -- 's/version: 0.0.0/version: '$CORE_VERSION'/g' /app/core/src/main/resources/application.yml
+
+RUN --mount=type=cache,target=/opt/gradle/.gradle,id=gradle-cache,sharing=locked \
+    gradle :core:bootJar --build-cache --console=verbose
 
 #######################################################################################
 ## Stage: Cytomine core development image

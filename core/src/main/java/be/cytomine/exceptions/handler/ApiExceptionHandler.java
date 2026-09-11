@@ -217,7 +217,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(SearchException.class)
     public ResponseEntity<?> handleException(SearchException exception) {
         log.debug("SearchException");
-        JsonObject jsonObject = JsonObject.of("errors", Map.of("message", exception.getMessage()));
+        JsonObject jsonObject = JsonObject.of("errors", Map.of("message", exception.body));
         return JsonResponseEntity
             .status(HttpStatus.valueOf(exception.code))
             .body(jsonObject);

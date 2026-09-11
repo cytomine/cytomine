@@ -131,7 +131,7 @@ spec:
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
-              path: /ims/disk-usage
+              path: /ims/ping
               port: {{ .Values.pims.port }}
             periodSeconds: 5
             failureThreshold: 3

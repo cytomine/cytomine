@@ -6,6 +6,7 @@ from pims.api.exceptions import NotADirectoryProblem, check_path_existence
 from pims.api.utils.response import FastJsonResponse
 from pims.config import get_settings
 from pims.files.file import Path
+from pims.utils.concurrency import exec_func_async
 
 router = APIRouter(prefix=get_settings().api_base_path)
 api_tags = ['Housekeeping']
@@ -74,7 +75,7 @@ async def show_path_usage(directorypath: str) -> DiskUsage:
     if not path.is_dir():
         raise NotADirectoryProblem(directorypath)
 
-    return _serialize_usage(path)
+    return await exec_func_async(_serialize_usage, path)
 
 
 @router.get(
@@ -86,7 +87,7 @@ async def show_disk_usage() -> DiskUsage:
     """
     PIMS disk usage
     """
-    return _serialize_usage(Path.from_filepath("."))
+    return await exec_func_async(_serialize_usage, Path.from_filepath("."))
 
 
 class DiskUsageLegacy(BaseModel):
@@ -106,7 +107,7 @@ async def show_disk_usage_v1():
     """
     Get storage space (v1.x)
     """
-    data = _serialize_usage(Path.from_filepath("."))
+    data = await exec_func_async(_serialize_usage, Path.from_filepath("."))
     return {
         "available": data.mount_available_size,
         "used": data.mount_used_size,

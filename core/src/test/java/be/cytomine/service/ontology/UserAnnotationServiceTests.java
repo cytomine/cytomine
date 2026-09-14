@@ -123,7 +123,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            builder.getUserEntity(user1),
+            builder.getUserEntity(user1.username()),
             null,
             null,
             null
@@ -137,7 +137,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            builder.getUserEntity(user2),
+            builder.getUserEntity(user2.username()),
             List.of(term1.getId(), term2.getId()),
             null,
             null
@@ -151,7 +151,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            builder.getUserEntity(user2),
+            builder.getUserEntity(user2.username()),
             List.of(term1.getId()),
             null,
             null
@@ -170,7 +170,7 @@ public class UserAnnotationServiceTests {
         list = userAnnotationService.listIncluded(
             sliceInstance.getImage(),
             "POLYGON ((2 2, 3 2, 3 4, 2 4, 2 2))",
-            builder.getUserEntity(user1),
+            builder.getUserEntity(user1.username()),
             List.of(term1.getId(), term2.getId()),
             null,
             null

@@ -166,10 +166,10 @@ public class SecurityAclServiceTests {
         UserResponse user = builder.givenAclUserNoAcl();
         Assertions.assertThrows(
             ForbiddenException.class,
-            () -> securityACLService.checkIsSameUser(builder.getUserEntity(builder.givenSuperAdmin()), user)
+            () -> securityACLService.checkIsSameUser(builder.getUserEntity(builder.givenSuperAdmin().username()), user)
         );
         securityACLService.checkIsSameUser(user.id(), user);
-        securityACLService.checkIsSameUser(builder.getUserEntity(user), builder.givenSuperAdmin());
+        securityACLService.checkIsSameUser(builder.getUserEntity(user.username()), builder.givenSuperAdmin());
     }
 
     @WithMockUser(username = ACL_USER_NO_ACL)

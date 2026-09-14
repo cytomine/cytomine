@@ -19,7 +19,13 @@ spring:
     url: jdbc:postgresql://127.0.0.1:5432/docker
 
 application:
+  serverURL: http://127.0.0.1:8080
+  imageServerPublicKey: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
+  imageServerPrivateKey: d70607f5-c478-403c-be11-3dbc1716d1cf
   pimsURL: http://127.0.0.1:5001
   samURL: http://127.0.0.1:8000
   cbirURL: http://127.0.0.1:6000
   repositoryURL: http://127.0.0.1:8081
+  authentication:
+    jwt:
+      secret: d0K3EqpNgHn1huF_N1kXw.s4P1Wq;V3'W_UL4pY.EEDC+~wnmKQy3F+_3+gUGZJmnMGUl73.R+bOcQa8lv6lpG5VB~AI_3wMWtAP^TVY5xffO7PPKus_tP5~v6s8kH7Q7'CjqPqXL.D4plG3NJGKumP0IyoWulSwWvYpWx9SQ1D+mQZVvCbIWuM~N;M16~clqB_MRecEXXb~CRfw;ydav~her+s6+'WItURgb2rKkPSAc93kuySIjEYNa_;8zIJ0

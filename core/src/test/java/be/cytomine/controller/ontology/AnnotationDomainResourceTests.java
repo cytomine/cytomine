@@ -598,7 +598,7 @@ public class AnnotationDomainResourceTests {
     public void listUserAnnotationWithSeveralIdenticalTerm() throws Exception {
         AnnotationTerm annotationTerm = new AnnotationTerm();
         annotationTerm.setUserAnnotation(a1);
-        annotationTerm.setUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
+        annotationTerm.setUser(builder.getUserEntity(builder.givenAclUserNoAcl().username()));
         annotationTerm.setTerm(builder.givenATerm(project.getOntology()));
         builder.persistAndReturn(annotationTerm);
         em.refresh(a1);
@@ -913,7 +913,7 @@ public class AnnotationDomainResourceTests {
 
         r1.setImage(builder.givenAnImageInstance(project));
         r2.setUserId(this.me.id());
-        r2.setReviewUser(builder.getUserEntity(builder.givenAclUserNoAcl()));
+        r2.setReviewUser(builder.getUserEntity(builder.givenAclUserNoAcl().username()));
 
         restAnnotationDomainControllerMockMvc.perform(get("/api/annotation.json")
                 .param("reviewed", "true")

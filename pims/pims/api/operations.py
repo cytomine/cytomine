@@ -43,6 +43,7 @@ from pims.importer.listeners import CytomineListener
 from pims.schemas.auth import ApiCredentials, CytomineAuth
 from pims.schemas.operations import JobResponse
 from pims.tasks.queue import Task, send_task
+from pims.utils.concurrency import exec_func_async
 from pims.utils.iterables import ensure_list
 from pims.utils.strings import unique_name_generator
 
@@ -85,7 +86,7 @@ def import_datasets(
         signature=signature,
     )
 
-    background_tasks.add_task(run_import_datasets, cytomine_auth, api_credentials, storage_id)
+    background_tasks.add_task(exec_func_async, run_import_datasets, cytomine_auth, api_credentials, storage_id)
     return JobResponse(
         status="running",
         path=config.dataset_path,

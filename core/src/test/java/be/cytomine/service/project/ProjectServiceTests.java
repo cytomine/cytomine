@@ -188,13 +188,13 @@ public class ProjectServiceTests {
         // connection from another user
         givenAPersistentConnectionInProject(builder.givenAclUserNoAcl(), project1, DateUtils.addDays(new Date(), -7));
 
-        List<Map<String, Object>> results = projectService.listLastOpened(builder.getUserEntity(user1), 2L);
+        List<Map<String, Object>> results = projectService.listLastOpened(builder.getUserEntity(user1.username()), 2L);
         assertThat(results.get(0).get("id")).isEqualTo(project2.getId());
         assertThat(results.get(0).get("opened")).isEqualTo(true);
         assertThat(results.get(1).get("id")).isEqualTo(project1.getId());
         assertThat(results.get(1).get("opened")).isEqualTo(true);
 
-        results = projectService.listLastOpened(builder.getUserEntity(user1), 3L);
+        results = projectService.listLastOpened(builder.getUserEntity(user1.username()), 3L);
 
         assertThat(results).hasSize(3);
         assertThat(results.get(0).get("id")).isEqualTo(project2.getId());

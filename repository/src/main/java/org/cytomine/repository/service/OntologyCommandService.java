@@ -96,6 +96,11 @@ public class OntologyCommandService implements
     }
 
     @Override
+    public void afterCreate(long userId, OntologyCommandPayload payload) {
+        aclService.grantOntologyOwnerPermission(userId, payload.id());
+    }
+
+    @Override
     public boolean canWriteId(long userId, long id) {
         return aclService.canWriteOntology(userId, id);
     }

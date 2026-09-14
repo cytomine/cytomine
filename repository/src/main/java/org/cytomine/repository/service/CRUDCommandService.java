@@ -102,6 +102,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
         E entity = mapCreateToEntity(createPayload, userId, Timestamp.valueOf(now));
         E savedEntity = save(entity);
         P commandPayload = map(savedEntity);
+        afterCreate(userId, commandPayload);
         CreateCommandRequest<?> createCommandRequest = mapCreateCommand(userId, commandPayload);
         CommandV2Entity commandV2Entity =
             getCommandV2Repository().save(
@@ -120,6 +121,9 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
             R response = mapToResponse(saved);
             return new HttpCommandResponse(true, new UndoCommandResponse(response), commandId, command, Set.of());
         });
+    }
+
+    default void afterCreate(long userId, P payload) {
     }
 
     boolean canWriteId(long userId, long id);

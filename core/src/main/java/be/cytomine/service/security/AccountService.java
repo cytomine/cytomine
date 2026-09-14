@@ -54,6 +54,15 @@ public class AccountService {
     @Value("${keycloak-client.target.realm}")
     private String realm;
 
+    private static void deletePartiallyCreatedAccount(
+        UsersResource usersResource,
+        UserRepresentation user
+    ) {
+        UserRepresentation badAccount =
+            usersResource.searchByUsername(user.getUsername(), true).get(0);
+        usersResource.delete(badAccount.getId());
+    }
+
     public void createAccount(Account account) throws UserManagementException {
 
         log.info("Creating account for user {}", account.username());
@@ -182,15 +191,6 @@ public class AccountService {
     ) {
         return keycloak.realm(realm).users().get(userRepresentation.getId()).roles()
             .clientLevel(client.getId()).listAll();
-    }
-
-    private static void deletePartiallyCreatedAccount(
-        UsersResource usersResource,
-        UserRepresentation user
-    ) {
-        UserRepresentation badAccount =
-            usersResource.searchByUsername(user.getUsername(), true).get(0);
-        usersResource.delete(badAccount.getId());
     }
 
     public void update(Account account) {

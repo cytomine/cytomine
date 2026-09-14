@@ -366,10 +366,10 @@ public class AnnotationListingServiceTests {
         ReviewedAnnotation a3 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("c"), user2, term1);
         ReviewedAnnotation a4 = builder.givenAReviewedAnnotation(sliceInstance, POLYGONES.get("d"), user2, term2);
 
-        a1.setReviewUser(builder.getUserEntity(user1));
-        a2.setReviewUser(builder.getUserEntity(user1));
-        a3.setReviewUser(builder.getUserEntity(user2));
-        a4.setReviewUser(builder.getUserEntity(user2));
+        a1.setReviewUser(builder.getUserEntity(user1.username()));
+        a2.setReviewUser(builder.getUserEntity(user1.username()));
+        a3.setReviewUser(builder.getUserEntity(user2.username()));
+        a4.setReviewUser(builder.getUserEntity(user2.username()));
 
         ReviewedAnnotationListing reviewedAnnotationListing = new ReviewedAnnotationListing(entityManager);
         reviewedAnnotationListing.setSlice(sliceInstance.getId());

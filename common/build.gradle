@@ -46,6 +46,7 @@ dependencies {
     api 'org.springframework.boot:spring-boot-starter-security'
     api 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     api 'org.liquibase:liquibase-core'
+    api 'commons-codec:commons-codec'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     runtimeOnly 'org.postgresql:postgresql'
     compileOnly 'org.projectlombok:lombok'

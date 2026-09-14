@@ -1,9 +1,11 @@
 package be.cytomine.controller.repository;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import be.cytomine.common.config.security.CytomineAuthenticationSupport;
 import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.OntologyHttpContract;
@@ -67,16 +70,27 @@ public class RepositoryClient {
     ) throws IOException {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
-            String authorization = servletRequestAttributes.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
-            if (authorization != null) {
-                request.getHeaders().set(HttpHeaders.AUTHORIZATION, authorization);
-            }
+            resolveIncomingAuthorization(servletRequestAttributes.getRequest())
+                .ifPresent(auth -> request.getHeaders().set(HttpHeaders.AUTHORIZATION, auth));
         }
         return execution.execute(request, body);
     }
 
+    private Optional<String> resolveIncomingAuthorization(HttpServletRequest servletRequest) {
+        return Optional.ofNullable(servletRequest.getHeader(HttpHeaders.AUTHORIZATION))
+            .or(() -> Optional.ofNullable(servletRequest.getParameter("authorization")))
+            .map(this::normalizeAuthorization);
+    }
+
+    private String normalizeAuthorization(String authorization) {
+        if (authorization.startsWith("Bearer ") || authorization.startsWith(CytomineAuthenticationSupport.SCHEME)) {
+            return authorization;
+        }
+        return "Bearer " + authorization;
+    }
+
     @Bean
-    CommandHttpContract  commandHttpContract(RestClient repositoryRestClient) {
+    CommandHttpContract commandHttpContract(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, CommandHttpContract.class);
     }
 

@@ -14,7 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -216,12 +215,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(SearchException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDto handleException(SearchException exception) {
-        log.debug("SearchException caught: {}", exception.getMessage());
-
-        String message = (exception.body != null) ? exception.body : "Search processing failed";
-        return ErrorResponseDto.of(message);
+    public ResponseEntity<?> handleException(SearchException exception) {
+        log.debug("SearchException");
+        JsonObject jsonObject = JsonObject.of("errors", Map.of("message", exception.body));
+        return JsonResponseEntity
+            .status(HttpStatus.valueOf(exception.code))
+            .body(jsonObject);
     }
 }
-

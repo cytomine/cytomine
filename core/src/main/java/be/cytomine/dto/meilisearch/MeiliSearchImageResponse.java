@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
@@ -114,15 +113,11 @@ public class MeiliSearchImageResponse {
             if (value instanceof String string) {
                 this.meaning = string;
             } else if (value instanceof Map<?, ?> map) {
-                this.code = toStringOrNull(map.get("code"));
-                this.scheme = toStringOrNull(map.get("scheme"));
-                this.meaning = toStringOrNull(map.get("meaning"));
-                this.schemeVersion = toStringOrNull(map.get("scheme_version"));
+                this.code = (String) map.get("code");
+                this.scheme = (String) map.get("scheme");
+                this.meaning = (String) map.get("meaning");
+                this.schemeVersion = (String) map.get("scheme_version");
             }
-        }
-
-        private static String toStringOrNull(Object value) {
-            return value == null ? null : value.toString();
         }
     }
 
@@ -226,13 +221,9 @@ public class MeiliSearchImageResponse {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ImageOrientation {
-        @JsonProperty("image_row_x_component")
         private Double imageRowXComponent;
-        @JsonProperty("image_row_y_component")
         private Double imageRowYComponent;
-        @JsonProperty("image_column_x_component")
         private Double imageColumnXComponent;
-        @JsonProperty("image_column_y_component")
         private Double imageColumnYComponent;
         private Map<String, Object> attributes;
     }

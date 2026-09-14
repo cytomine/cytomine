@@ -35,7 +35,6 @@ dependencies {
     implementation 'org.seleniumhq.selenium:selenium-java'
     implementation group: 'org.keycloak', name: 'keycloak-admin-client', version: '24.0.2'
     implementation project(':common')
-    implementation 'org.springframework:spring-aspects'
 }
 
 tasks.named('test') {

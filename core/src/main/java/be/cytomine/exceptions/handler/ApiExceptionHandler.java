@@ -216,7 +216,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(SearchException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseDto handleException(SearchException exception) {
         log.debug("SearchException caught: {}", exception.getMessage());
 

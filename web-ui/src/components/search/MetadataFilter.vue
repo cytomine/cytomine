@@ -20,7 +20,6 @@
             :multiple="true"
             label="label"
             track-by="value"
-            :select-all-available="false"
             :allPlaceholder="$t('all')"
           />
         </b-field>

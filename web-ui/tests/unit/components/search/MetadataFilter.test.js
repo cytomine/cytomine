@@ -153,6 +153,31 @@ describe('MetadataFilter.vue', () => {
     ]);
   });
 
+  it('should build a disjunction of all the values when the whole facet is selected', async () => {
+    const wrapper = await createWrapper();
+    const allSites = wrapper.vm.facets.find(({ key }) => key === SITE).values;
+
+    await wrapper.setData({ selectedFacets: { [SITE]: allSites } });
+
+    expect(wrapper.vm.filters).toEqual([
+      `(${SITE} = "BONE, STERNUM" OR ${SITE} = "KIDNEY" OR ${SITE} = "LARGE INTESTINE, CECUM" OR ${SITE} = "LIVER")`,
+    ]);
+  });
+
+  it('should OR the whole facet selection alongside the other facets', async () => {
+    const wrapper = await createWrapper();
+    const allSites = wrapper.vm.facets.find(({ key }) => key === SITE).values;
+    const allStains = wrapper.vm.facets.find(({ key }) => key === 'slide.staining.stains.compound.meaning').values;
+    const singleStain = allStains[0];
+
+    await wrapper.setData({ selectedFacets: { [SITE]: allSites, 'slide.staining.stains.compound.meaning': [singleStain] } });
+
+    expect(wrapper.vm.filters).toEqual([
+      'slide.staining.stains.compound.meaning = "hematoxylin stain"',
+      `(${SITE} = "BONE, STERNUM" OR ${SITE} = "KIDNEY" OR ${SITE} = "LARGE INTESTINE, CECUM" OR ${SITE} = "LIVER")`,
+    ]);
+  });
+
   it('should combine the filters of the selected facets', async () => {
     const wrapper = await createWrapper();
 

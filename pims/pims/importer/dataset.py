@@ -8,7 +8,6 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-import isodate
 from isodate import Duration
 
 from bigpicture_metadata_interface import BPInterface

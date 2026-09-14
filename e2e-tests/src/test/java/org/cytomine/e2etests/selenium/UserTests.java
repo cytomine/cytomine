@@ -3,11 +3,10 @@ package org.cytomine.e2etests.selenium;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 
-import org.cytomine.e2etests.annotations.CreatedUser;
-import org.cytomine.e2etests.annotations.WithUserRoles;
-import org.cytomine.e2etests.annotations.WithUserRolesParameterResolver;
+import org.cytomine.e2etests.annotations.MultiUsersRunner;
 import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.AnnotationTools;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -26,17 +24,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 
 import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
 import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
 import static be.cytomine.common.repository.model.Role.ROLE_USER;
 import static java.util.UUID.randomUUID;
 
-@Import({AnnotationTools.class, CytomineSteps.class, KeycloakClient.class, SeleniumDriver.class, WebDriverUtils.class})
+@Import({
+    AnnotationTools.class, CytomineSteps.class, KeycloakClient.class, MultiUsersRunner.class,
+    SeleniumDriver.class, WebDriverUtils.class
+})
 @SpringBootTest
-@EnableSpringConfigured
-@ExtendWith(WithUserRolesParameterResolver.class)
 public class UserTests {
     @Autowired
     CytomineSteps cytomineSteps;
@@ -46,6 +44,9 @@ public class UserTests {
 
     @Autowired
     KeycloakClient keycloakClient;
+
+    @Autowired
+    MultiUsersRunner multiUsers;
 
     @Value("${cytomine.admin.password}")
     String adminPassword;
@@ -73,10 +74,11 @@ public class UserTests {
     }
 
     @Test
-    @WithUserRoles(userRoles = {ROLE_GUEST, ROLE_USER, ROLE_ADMIN})
-    void login(CreatedUser user) {
-        cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
-        cytomineSteps.logout(wait, cytomineUrl);
+    void login() {
+        multiUsers.run(List.of(ROLE_GUEST, ROLE_USER, ROLE_ADMIN), user -> {
+            cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
+            cytomineSteps.logout(wait, cytomineUrl);
+        });
     }
 
     @Test

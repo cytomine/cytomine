@@ -2,12 +2,10 @@ package org.cytomine.e2etests.annotations;
 
 import java.net.URL;
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
-import be.cytomine.common.repository.model.Role;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.CytomineSteps;
@@ -15,12 +13,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@Aspect
-@Configurable
-public class WithUserRolesAspect {
+import be.cytomine.common.repository.model.Role;
+
+@Component
+public class MultiUsersRunner {
 
     @Autowired
     CytomineSteps cytomineSteps;
@@ -40,20 +39,15 @@ public class WithUserRolesAspect {
     @Value("${cytomine.admin.password}")
     String adminPassword;
 
-    @Around("@annotation(withUserRoles)")
-    public Object aroundTestWithUserRoles(
-        ProceedingJoinPoint joinPoint,
-        WithUserRoles withUserRoles
-    ) throws Throwable {
+    public void run(List<Role> roles, Consumer<CreatedUser> test) {
         WebDriver adminDriver = seleniumDriver.driver();
         Wait<WebDriver> adminWait = new WebDriverWait(adminDriver, Duration.ofSeconds(60));
-        Object result = null;
         try {
             cytomineSteps.login(adminWait, cytomineUrl, adminUsername, adminPassword);
-            for (Role role : withUserRoles.userRoles()) {
+            for (Role role : roles) {
                 CreatedUser user = createUser(adminWait, role);
                 try {
-                    result = proceedWithUser(joinPoint, user);
+                    test.accept(user);
                 } finally {
                     keycloakClient.deleteUser(user.username());
                 }
@@ -62,13 +56,6 @@ public class WithUserRolesAspect {
         } finally {
             adminDriver.quit();
         }
-        return result;
-    }
-
-    private Object proceedWithUser(ProceedingJoinPoint joinPoint, CreatedUser user) throws Throwable {
-        Object[] args = joinPoint.getArgs();
-        args[args.length - 1] = user;
-        return joinPoint.proceed(args);
     }
 
     private CreatedUser createUser(Wait<WebDriver> wait, Role role) {

@@ -1,11 +1,9 @@
 package be.cytomine.controller.repository;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,12 +16,10 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import be.cytomine.common.config.security.CytomineAuthenticationSupport;
+import be.cytomine.config.security.IncomingAuthorizationContext;
 import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.OntologyHttpContract;
@@ -63,23 +59,23 @@ public class RepositoryClient {
             .build();
     }
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RepositoryClient.class);
+
     private ClientHttpResponse forwardAuthorizationHeader(
         HttpRequest request,
         byte[] body,
         ClientHttpRequestExecution execution
     ) throws IOException {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
-            resolveIncomingAuthorization(servletRequestAttributes.getRequest())
-                .ifPresent(auth -> request.getHeaders().set(HttpHeaders.AUTHORIZATION, auth));
-        }
-        return execution.execute(request, body);
-    }
-
-    private Optional<String> resolveIncomingAuthorization(HttpServletRequest servletRequest) {
-        return Optional.ofNullable(servletRequest.getHeader(HttpHeaders.AUTHORIZATION))
-            .or(() -> Optional.ofNullable(servletRequest.getParameter("authorization")))
-            .map(this::normalizeAuthorization);
+        java.util.Optional<String> incoming = IncomingAuthorizationContext.get();
+        log.warn("DIAG forward thread={} uri={} contextPresent={}",
+            Thread.currentThread().getName(), request.getURI(), incoming.isPresent());
+        incoming
+            .map(this::normalizeAuthorization)
+            .ifPresent(auth -> request.getHeaders().set(HttpHeaders.AUTHORIZATION, auth));
+        log.warn("DIAG headersAfterSet={} class={}", request.getHeaders(), request.getClass());
+        ClientHttpResponse response = execution.execute(request, body);
+        log.warn("DIAG response status={} headers={}", response.getStatusCode(), request.getHeaders());
+        return response;
     }
 
     private String normalizeAuthorization(String authorization) {

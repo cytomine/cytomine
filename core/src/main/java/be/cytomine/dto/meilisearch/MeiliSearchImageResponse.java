@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -87,7 +86,6 @@ public class MeiliSearchImageResponse {
 
     @Data
     @NoArgsConstructor
-    @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Compound {
@@ -96,9 +94,20 @@ public class MeiliSearchImageResponse {
         private String meaning;
         private String schemeVersion;
 
-        @JsonCreator
-        public Compound(String meaning) {
-            this.meaning = meaning;
+        @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+        public Compound(Object value) {
+            if (value instanceof String string) {
+                this.meaning = string;
+            } else if (value instanceof Map<?, ?> map) {
+                this.code = toStringOrNull(map.get("code"));
+                this.scheme = toStringOrNull(map.get("scheme"));
+                this.meaning = toStringOrNull(map.get("meaning"));
+                this.schemeVersion = toStringOrNull(map.get("scheme_version"));
+            }
+        }
+
+        private static String toStringOrNull(Object value) {
+            return value == null ? null : value.toString();
         }
     }
 
@@ -267,7 +276,7 @@ public class MeiliSearchImageResponse {
         private Compound extractionMethod;
         private Compound fixationType;
         private Compound anatomicalSite;
-        private List<Object> anatomicalSites;
+        private List<Compound> anatomicalSites;
         private AgeAtExtraction ageAtExtraction;
         private BiologicalBeing biologicalBeing;
         private List<Observation> observations;

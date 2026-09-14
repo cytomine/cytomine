@@ -70,6 +70,7 @@ public class MeiliSearchImageResponse {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class StainingInformation {
+        private Compound procedure;
         private List<StainDetail> stains;
         private Reference reference;
         private Map<String, Object> attributes;
@@ -81,6 +82,20 @@ public class MeiliSearchImageResponse {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class StainDetail {
         private Compound compound;
+        private Compound target;
+        private String reporterType;
+        private String reporterColor;
+        private AntibodyInformation antibodyInformation;
+        private Compound probe;
+        private Map<String, Object> attributes;
+    }
+
+    @Data
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class AntibodyInformation {
+        private String commercialName;
+        private String antibodyVendor;
         private Map<String, Object> attributes;
     }
 
@@ -246,7 +261,9 @@ public class MeiliSearchImageResponse {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SlideStaining {
+        private Compound procedure;
         private List<SlideStain> stains;
+        private Object raw;
     }
 
     @Data
@@ -255,6 +272,11 @@ public class MeiliSearchImageResponse {
     public static class SlideStain {
         private String type;
         private Compound compound;
+        private Compound target;
+        private String reporterType;
+        private String reporterColor;
+        private AntibodyInformation antibody;
+        private Compound probe;
     }
 
     @Data

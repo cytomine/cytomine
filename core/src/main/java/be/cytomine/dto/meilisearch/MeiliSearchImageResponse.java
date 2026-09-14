@@ -387,7 +387,7 @@ public class MeiliSearchImageResponse {
         private String requiredBigpictureAcknowledgements;
         private List<String> requiredCustomAcknowledgements;
         private List<String> requiredCitations;
-        private List<Object> licenses;
+        private List<String> licenses;
         private String legalBasisForSharingTheData;
         private String informedConsentFormDefinedUseRestrictions;
         private String customUseRestrictions;

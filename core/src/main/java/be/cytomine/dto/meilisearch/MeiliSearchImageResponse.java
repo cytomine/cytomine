@@ -191,7 +191,16 @@ public class MeiliSearchImageResponse {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Focus {
         private String focusMethod;
-        private Object extendedDepthOfField;
+        private ExtendedDepthOfField extendedDepthOfField;
+        private Map<String, Object> attributes;
+    }
+
+    @Data
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ExtendedDepthOfField {
+        private Integer numberOfFocalPlanes;
+        private Double distanceBetweenFocalPlanes;
         private Map<String, Object> attributes;
     }
 

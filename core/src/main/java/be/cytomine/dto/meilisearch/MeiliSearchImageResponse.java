@@ -50,7 +50,7 @@ public class MeiliSearchImageResponse {
         private Map<String, Object> attributes;
         private String name;
         private String uid;
-        private Object privateAttributes;
+        private Map<String, Object> privateAttributes;
     }
 
     @Data
@@ -63,7 +63,7 @@ public class MeiliSearchImageResponse {
         private Map<String, Object> attributes;
         private String name;
         private String uid;
-        private Object privateAttributes;
+        private Map<String, Object> privateAttributes;
     }
 
     @Data

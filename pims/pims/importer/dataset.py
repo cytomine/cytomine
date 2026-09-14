@@ -229,9 +229,34 @@ def run_import_datasets(
             annotation_summary=annotation_summary,
         )
 
+def humanize_duration(duration: Duration) -> str:
+    """Render an isodate.Duration as human-readable text, e.g. '63 days' or '1 year 2 months 30 days'."""
+    years = duration.years
+    months = duration.months
+    days = duration.days
+    hours, minutes, seconds = (
+        duration.seconds // 3600,
+        (duration.seconds % 3600) // 60,
+        duration.seconds % 60,
+    )
+    components = []
+    for unit_name, value in (
+        ("years", years),
+        ("months", months),
+        ("days", days),
+        ("hours", hours),
+        ("minutes", minutes),
+        ("seconds", seconds),
+    ):
+        if value:
+            value = int(value) if float(value).is_integer() else value
+            name = unit_name.rstrip("s") if value == 1 else unit_name
+            components.append(f"{value} {name}")
+    return " ".join(components) if components else "0 seconds"
+
 def dataclass_to_dict(obj: Any):
     """Recursively convert dataclass objects (and nested structures) to plain dicts.
-    Handles Code, CodeAttributes, Attributes, CustomAttributes, lists, dicts, enums, dates, UUIDs.
+    Handles Code, CodeAttributes, Attributes, CustomAttributes, lists, dicts, enums, dates, UUIDs, durations.
     """
     if obj is None:
         return None
@@ -242,7 +267,7 @@ def dataclass_to_dict(obj: Any):
     if isinstance(obj, datetime):
         return obj.isoformat()
     if isinstance(obj, Duration):
-        return isodate.duration_isoformat(obj)
+        return humanize_duration(obj)
     if isinstance(obj, uuid.UUID):
         return str(obj)
     if isinstance(obj, Code):

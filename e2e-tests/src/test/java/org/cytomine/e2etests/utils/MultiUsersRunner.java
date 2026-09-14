@@ -1,4 +1,4 @@
-package org.cytomine.e2etests.annotations;
+package org.cytomine.e2etests.utils;
 
 import java.net.URL;
 import java.time.Duration;
@@ -17,6 +17,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.Role;
+
+import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static be.cytomine.common.repository.model.Role.ROLE_USER;
 
 @Component
 public class MultiUsersRunner {
@@ -39,7 +43,15 @@ public class MultiUsersRunner {
     @Value("${cytomine.admin.password}")
     String adminPassword;
 
-    public void run(List<Role> roles, Consumer<CreatedUser> test) {
+    public void runAsAdmin(Wait<WebDriver> wait, Consumer<CreatedUser> test) {
+        run(wait, List.of( ROLE_ADMIN), test);
+    }
+
+    public void runAllRoles(Wait<WebDriver> wait, Consumer<CreatedUser> test) {
+        run(wait, List.of(ROLE_GUEST, ROLE_ADMIN, ROLE_USER), test);
+    }
+
+    public void run(Wait<WebDriver> wait, List<Role> roles, Consumer<CreatedUser> test) {
         WebDriver adminDriver = seleniumDriver.driver();
         Wait<WebDriver> adminWait = new WebDriverWait(adminDriver, Duration.ofSeconds(60));
         try {
@@ -47,7 +59,9 @@ public class MultiUsersRunner {
             for (Role role : roles) {
                 CreatedUser user = createUser(adminWait, role);
                 try {
+                    cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
                     test.accept(user);
+                    cytomineSteps.logout(wait, cytomineUrl);
                 } finally {
                     keycloakClient.deleteUser(user.username());
                 }

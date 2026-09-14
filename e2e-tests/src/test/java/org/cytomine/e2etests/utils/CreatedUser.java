@@ -1,4 +1,4 @@
-package org.cytomine.e2etests.annotations;
+package org.cytomine.e2etests.utils;
 
 import be.cytomine.common.repository.model.Role;
 

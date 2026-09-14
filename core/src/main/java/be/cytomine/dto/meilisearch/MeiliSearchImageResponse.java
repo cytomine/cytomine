@@ -263,7 +263,7 @@ public class MeiliSearchImageResponse {
     public static class SlideStaining {
         private Compound procedure;
         private List<SlideStain> stains;
-        private Object raw;
+        private Map<String, Object> raw;
     }
 
     @Data

@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '4.0.2'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'checkstyle'
+    id 'io.freefair.aspectj' version '9.5.0'
 }
 
 group = 'org.cytomine'
@@ -43,6 +44,8 @@ dependencies {
     testImplementation 'org.seleniumhq.selenium:selenium-java'
     implementation 'org.seleniumhq.selenium:selenium-java'
     implementation group: 'org.keycloak', name: 'keycloak-admin-client', version: '24.0.2'
+    implementation project(':common')
+    implementation 'org.springframework:spring-aspects'
 }
 
 tasks.named('test') {

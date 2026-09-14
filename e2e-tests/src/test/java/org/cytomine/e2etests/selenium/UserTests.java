@@ -5,6 +5,9 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Optional;
 
+import org.cytomine.e2etests.annotations.CreatedUser;
+import org.cytomine.e2etests.annotations.WithUserRoles;
+import org.cytomine.e2etests.annotations.WithUserRolesParameterResolver;
 import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.AnnotationTools;
@@ -15,6 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -22,11 +26,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 
+import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static be.cytomine.common.repository.model.Role.ROLE_USER;
 import static java.util.UUID.randomUUID;
 
 @Import({AnnotationTools.class, CytomineSteps.class, KeycloakClient.class, SeleniumDriver.class, WebDriverUtils.class})
 @SpringBootTest
+@EnableSpringConfigured
+@ExtendWith(WithUserRolesParameterResolver.class)
 public class UserTests {
     @Autowired
     CytomineSteps cytomineSteps;
@@ -57,16 +67,16 @@ public class UserTests {
 
     @AfterEach
     void tearDown(TestInfo testInfo) {
-        Screenshots.save(
-            driver,
-            "closing-" + testInfo.getTestMethod().map(Method::getName).orElseGet(() -> "no-name-" + randomUUID())
-        );
+        Screenshots.save(driver,
+            "closing-" + testInfo.getTestMethod().map(Method::getName).orElseGet(() -> "no-name-" + randomUUID()));
         driver.quit();
     }
 
     @Test
-    void login() {
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+    @WithUserRoles(userRoles = {ROLE_GUEST, ROLE_USER, ROLE_ADMIN})
+    void login(CreatedUser user) {
+        cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test

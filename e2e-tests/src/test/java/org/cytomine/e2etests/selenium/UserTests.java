@@ -3,6 +3,7 @@ package org.cytomine.e2etests.selenium;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Optional;
 
 import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
@@ -110,6 +111,27 @@ public class UserTests {
         String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
         cytomineSteps.deleteProject(wait, projectURL);
         cytomineSteps.deleteOntology(wait, ontologyURL);
+        cytomineSteps.logout(wait, cytomineUrl);
+
+        keycloakClient.deleteUser(username);
+    }
+
+    @Test
+    void createUserWithUserRoleAndUploadImage() {
+        String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
+        String firstname = "Selenium";
+        String lastname = "User-" + randomUUID().toString().substring(0, 8);
+        String email = username + "@selenium.test";
+        String password = "Selenium1!";
+        String imageName = "selenium-" + randomUUID() + ".png";
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password, "User");
+        cytomineSteps.logout(wait, cytomineUrl);
+
+        cytomineSteps.login(wait, cytomineUrl, username, password);
+        cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.empty());
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.logout(wait, cytomineUrl);
 
         keycloakClient.deleteUser(username);

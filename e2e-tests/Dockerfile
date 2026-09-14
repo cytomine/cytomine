@@ -20,8 +20,9 @@ COPY ./repository/src /app/repository/src
 COPY ./settings.gradle /app/settings.gradle
 COPY ./app-engine/src/test/resources/artifacts/com.cytomine.dummy.identity.geometry-1.0.0.zip /app/e2e-tests/src/test/resources/com.cytomine.dummy.identity.geometry-1.0.0.zip
 COPY ./app-engine/src/test/resources/artifacts/com.cytomine.dummy.identity.image-1.0.0.zip /app/e2e-tests/src/test/resources/com.cytomine.dummy.identity.image-1.0.0.zip
+RUN --mount=type=cache,target=/opt/gradle/.gradle,id=gradle-cache,sharing=locked \
+    GRADLE_USER_HOME=/opt/gradle/.gradle gradle :e2e-tests:clean :e2e-tests:compileJava :e2e-tests:bootJar :e2e-tests:testClasses --no-daemon --build-cache --console=verbose
 ENV GRADLE_USER_HOME=/tmp/gradle
-RUN gradle :e2e-tests:clean :e2e-tests:compileJava :e2e-tests:bootJar :e2e-tests:testClasses --no-daemon --console=verbose
 COPY ./e2e-tests/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

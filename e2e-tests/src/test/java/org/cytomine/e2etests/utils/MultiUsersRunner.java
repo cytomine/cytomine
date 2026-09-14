@@ -44,7 +44,7 @@ public class MultiUsersRunner {
     String adminPassword;
 
     public void runAsAdmin(Wait<WebDriver> wait, Consumer<CreatedUser> test) {
-        run(wait, List.of( ROLE_ADMIN), test);
+        run(wait, List.of(ROLE_ADMIN), test);
     }
 
     public void runAllRoles(Wait<WebDriver> wait, Consumer<CreatedUser> test) {

@@ -605,7 +605,8 @@ public class CytomineTests {
 
     @Test
     void login() {
-        multiUsers.runAllRoles(wait, user -> { });
+        multiUsers.runAllRoles(wait, user -> {
+        });
     }
 
     @Test

@@ -6,13 +6,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 public class IncomingAuthorizationFilter extends OncePerRequestFilter {
-
-    private static final Logger log = LoggerFactory.getLogger(IncomingAuthorizationFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -21,13 +17,15 @@ public class IncomingAuthorizationFilter extends OncePerRequestFilter {
         if (authorization == null) {
             authorization = request.getParameter("authorization");
         }
-        log.warn("DIAG capture thread={} uri={} authPresent={}",
-            Thread.currentThread().getName(), request.getRequestURI(), authorization != null);
-        IncomingAuthorizationContext.set(authorization);
+        IncomingAuthorizationContext.set(new IncomingAuthorizationContext.Headers(
+            authorization,
+            request.getHeader("date"),
+            request.getHeader("content-MD5"),
+            request.getHeader("Content-Type")
+        ));
         try {
             filterChain.doFilter(request, response);
         } finally {
-            log.warn("DIAG clear thread={} uri={}", Thread.currentThread().getName(), request.getRequestURI());
             IncomingAuthorizationContext.clear();
         }
     }

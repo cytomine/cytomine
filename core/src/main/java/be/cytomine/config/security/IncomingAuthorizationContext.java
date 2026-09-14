@@ -3,28 +3,34 @@ package be.cytomine.config.security;
 import java.util.Optional;
 
 /**
- * Holds the Authorization header of the request currently being handled by this thread, so it
- * can be forwarded to the repository service. Unlike {@link org.springframework.web.context.request.RequestContextHolder},
- * this is set and cleared explicitly by {@link IncomingAuthorizationFilter} around the synchronous
- * portion of request handling only, so it is never left stale on a Tomcat worker thread that gets
- * reused while an unrelated async request (e.g. a StreamingResponseBody download) is still in flight.
+ * Holds the request headers needed to re-authenticate the current request against the
+ * repository service, so they can be forwarded by {@link be.cytomine.controller.repository.RepositoryClient}.
+ * Set and cleared explicitly by {@link IncomingAuthorizationFilter} around the synchronous
+ * portion of request handling only, so it is never left stale on a reused worker thread.
+ *
+ * <p>All four fields are needed, not just Authorization: a CYTOMINE-scheme signature is an
+ * HMAC over {@code method + contentMd5 + contentType + date}, so repository must receive the
+ * same date/content-MD5/content-type the browser signed, or its recomputed signature won't match.
  */
 public final class IncomingAuthorizationContext {
 
-    private static final ThreadLocal<String> AUTHORIZATION = new ThreadLocal<>();
+    public record Headers(String authorization, String date, String contentMd5, String contentType) {
+    }
+
+    private static final ThreadLocal<Headers> HEADERS = new ThreadLocal<>();
 
     private IncomingAuthorizationContext() {
     }
 
-    static void set(String authorization) {
-        AUTHORIZATION.set(authorization);
+    static void set(Headers headers) {
+        HEADERS.set(headers);
     }
 
     static void clear() {
-        AUTHORIZATION.remove();
+        HEADERS.remove();
     }
 
-    public static Optional<String> get() {
-        return Optional.ofNullable(AUTHORIZATION.get());
+    public static Optional<Headers> get() {
+        return Optional.ofNullable(HEADERS.get());
     }
 }

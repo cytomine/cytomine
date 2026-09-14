@@ -59,23 +59,29 @@ public class RepositoryClient {
             .build();
     }
 
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RepositoryClient.class);
-
     private ClientHttpResponse forwardAuthorizationHeader(
         HttpRequest request,
         byte[] body,
         ClientHttpRequestExecution execution
     ) throws IOException {
-        java.util.Optional<String> incoming = IncomingAuthorizationContext.get();
-        log.warn("DIAG forward thread={} uri={} contextPresent={}",
-            Thread.currentThread().getName(), request.getURI(), incoming.isPresent());
-        incoming
-            .map(this::normalizeAuthorization)
-            .ifPresent(auth -> request.getHeaders().set(HttpHeaders.AUTHORIZATION, auth));
-        log.warn("DIAG headersAfterSet={} class={}", request.getHeaders(), request.getClass());
-        ClientHttpResponse response = execution.execute(request, body);
-        log.warn("DIAG response status={} headers={}", response.getStatusCode(), request.getHeaders());
-        return response;
+        IncomingAuthorizationContext.get().ifPresent(incoming -> {
+            HttpHeaders headers = request.getHeaders();
+            if (incoming.authorization() != null) {
+                headers.set(HttpHeaders.AUTHORIZATION, normalizeAuthorization(incoming.authorization()));
+            }
+            // A CYTOMINE-scheme signature is an HMAC over method + contentMd5 + contentType + date,
+            // so repository needs the exact values the caller signed to recompute a matching signature.
+            if (incoming.date() != null) {
+                headers.set("date", incoming.date());
+            }
+            if (incoming.contentMd5() != null) {
+                headers.set("content-MD5", incoming.contentMd5());
+            }
+            if (incoming.contentType() != null) {
+                headers.set(HttpHeaders.CONTENT_TYPE, incoming.contentType());
+            }
+        });
+        return execution.execute(request, body);
     }
 
     private String normalizeAuthorization(String authorization) {

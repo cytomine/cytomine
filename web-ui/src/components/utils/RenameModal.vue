@@ -1,14 +1,16 @@
 <template>
 <form @submit.prevent="rename()">
   <cytomine-modal :title="title" :active="active" @close="close()">
-    <b-field :label="$t('new-name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-      <b-input v-model="newName" name="name" v-validate="'required'" />
-    </b-field>
+    <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
+      <b-field :label="$t('new-name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+        <b-input name="name" :model-value="state.value" @update:model-value="field.handleChange" />
+      </b-field>
+    </field>
     <template #footer>
       <button class="button" type="button" @click="close()">
         {{$t('button-cancel')}}
       </button>
-      <button class="button is-link" :disabled="errors.any()">
+      <button class="button is-link" :disabled="!isValid">
         {{$t('button-save')}}
       </button>
     </template>
@@ -17,6 +19,9 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+
+import { required, rules, validateForm } from '@/utils/form.js';
 import CytomineModal from './CytomineModal.vue';
 
 export default {
@@ -26,32 +31,30 @@ export default {
     currentName: String,
     title: String
   },
-  components: { CytomineModal },
-  $_veeValidate: { validator: 'new' },
-  data() {
+  components: { CytomineModal, Field },
+  setup(props) {
+    const form = useForm({ defaultValues: { name: props.currentName || '' } });
     return {
-      newName: ''
+      form,
+      isValid: form.useStore(state => state.isValid),
+      nameRules: { onChange: rules(required) }
     };
   },
   watch: {
     active(active) {
       if (active) {
-        this.newName = this.currentName;
+        this.form.reset({ name: this.currentName });
       }
     }
   },
   methods: {
     async rename() {
-      let result = await this.$validator.validateAll();
-      if (!result) {
+      if (!await validateForm(this.form)) {
         return;
       }
-      this.$emit('rename', this.newName);
+      this.$emit('rename', this.form.state.values.name);
       this.$emit('update:active', false);
     }
-  },
-  async created() {
-    this.newName = this.currentName;
   }
 };
 </script>

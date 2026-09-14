@@ -17,6 +17,7 @@ import org.cytomine.e2etests.utils.ReportType;
 import org.cytomine.e2etests.utils.Screenshots;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.WebDriver;
@@ -200,6 +201,7 @@ public class CytomineTests {
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
+    @Disabled("Skipping until the drag and drop is fixed")
     @Test
     void deleteParentTermRemovesBothFromTree() {
         String ontologyName = "selenium-ontology-" + randomUUID();

@@ -92,17 +92,27 @@ describe('AppDashboardPage.vue', () => {
   const createWrapper = (options = {}) => shallowMount(
     AppDashboardPage,
     {
-      mocks: {
-        $i18n: { locale: 'en-GB' },
-        $t: (key) => key,
-      },
-      computed: {
-        currentProject: () => ({ id: '999' }),
-      },
-      stubs: {
-        'b-table': true,
-      },
       ...options,
+      global: {
+        // b-table's default slot is a scoped slot: rendering it against a stub
+        // would evaluate `{row}` with no slot props at all.
+        renderStubDefaultSlot: false,
+        mocks: {
+          $i18n: { locale: 'en-GB' },
+          $t: (key) => key,
+          // The `computed` mounting option is gone in Vue Test Utils v2, so the
+          // store the `get()` helper reads from has to be mocked instead.
+          $store: {
+            state: {
+              currentProject: { project: { id: '999' } },
+            },
+          },
+        },
+        stubs: {
+          'b-table': true,
+          ...(options.global?.stubs ?? {}),
+        }
+      }
     },
   );
 
@@ -211,6 +221,44 @@ describe('AppDashboardPage.vue', () => {
       await wrapper.vm.onDetailsOpen(run);
 
       expect(run.fetchLogs).not.toHaveBeenCalled();
+    });
+  });
+
+  // Issue 12 replaced `this.$set(run, '_activeTab', …)` with plain assignment.
+  // `_activeTab` never exists on a run coming back from the API — it is added
+  // here and then driven by `v-model` on the detail row's `b-tabs`.
+  describe('the _activeTab field added when a detail row opens', () => {
+    it('should default to the first tab', async () => {
+      const run = makeTaskRun({ inputs: [], outputs: [], logs: '' });
+      const wrapper = createWrapper();
+
+      await wrapper.vm.onDetailsOpen(run);
+
+      expect(run._activeTab).toBe(0);
+    });
+
+    it('should keep the tab the user had already selected', async () => {
+      const run = makeTaskRun({ inputs: [], outputs: [], logs: '', _activeTab: 2 });
+      const wrapper = createWrapper();
+
+      await wrapper.vm.onDetailsOpen(run);
+
+      expect(run._activeTab).toBe(2);
+    });
+
+    it('should open on the logs tab when logs are asked for by name', async () => {
+      const run = makeTaskRun({ inputs: [], outputs: [], logs: '' });
+      const openDetailRow = vi.fn();
+      // Assigning onto `$refs` does not survive the re-render `onDetailsOpen`
+      // awaits, so the method has to come from the stub itself.
+      const wrapper = createWrapper({
+        global: { stubs: { 'b-table': { template: '<div />', methods: { openDetailRow } } } }
+      });
+
+      await wrapper.vm.handleViewLogs(run);
+
+      expect(run._activeTab).toBe(1);
+      expect(openDetailRow).toHaveBeenCalledWith(run);
     });
   });
 

@@ -3,10 +3,13 @@ package be.cytomine.dto.meilisearch;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -78,12 +81,19 @@ public class MeiliSearchImageResponse {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Compound {
         private String code;
         private String scheme;
         private String meaning;
         private String schemeVersion;
+
+        @JsonCreator
+        public Compound(String meaning) {
+            this.meaning = meaning;
+        }
     }
 
     @Data

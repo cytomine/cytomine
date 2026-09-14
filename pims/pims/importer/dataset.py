@@ -8,6 +8,9 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
+import isodate
+from isodate import Duration
+
 from bigpicture_metadata_interface import BPInterface
 from bigpicture_metadata_interface.model.common import Attributes, Code, CodeAttributes
 from bigpicture_metadata_interface.model.dataset import Dataset
@@ -238,6 +241,8 @@ def dataclass_to_dict(obj: Any):
         return obj.value
     if isinstance(obj, datetime):
         return obj.isoformat()
+    if isinstance(obj, Duration):
+        return isodate.duration_isoformat(obj)
     if isinstance(obj, uuid.UUID):
         return str(obj)
     if isinstance(obj, Code):

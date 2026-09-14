@@ -25,6 +25,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Image {
         private String identifier;
         private Long abstractImageId;
@@ -54,6 +55,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SlideDetail {
         private String identifier;
         private StainingInformation stainingInformation;
@@ -66,6 +68,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class StainingInformation {
         private List<StainDetail> stains;
         private Reference reference;
@@ -75,6 +78,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class StainDetail {
         private Compound compound;
         private Map<String, Object> attributes;
@@ -84,6 +88,7 @@ public class MeiliSearchImageResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Compound {
         private String code;
         private String scheme;
@@ -98,6 +103,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Reference {
         private String alias;
         private String accession;
@@ -105,6 +111,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Scanner {
         private String scannerManufacturersName;
         private String manufacturersModelName;
@@ -115,6 +122,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ImagingSetting {
         private PixelSpacing pixelSpacing;
         private List<OpticalPath> opticalPaths;
@@ -125,6 +133,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PixelSpacing {
         private Double vertical;
         private Double horizontal;
@@ -133,6 +142,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class OpticalPath {
         private String identifier;
         private String colorSpace;
@@ -143,6 +153,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Illumination {
         private String type;
         private Double wavelength;
@@ -152,6 +163,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Focus {
         private String focusMethod;
         private Object extendedDepthOfField;
@@ -160,6 +172,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Size {
         private Double width;
         private Double height;
@@ -168,6 +181,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CompressionMethod {
         private String method;
         private Double ratio;
@@ -176,6 +190,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class FileEntry {
         private String filename;
         private String filetype;
@@ -186,6 +201,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SlideSummary {
         private String alias;
         private String identifier;
@@ -194,12 +210,14 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SlideStaining {
         private List<SlideStain> stains;
     }
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SlideStain {
         private String type;
         private Compound compound;
@@ -207,6 +225,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Block {
         private String alias;
         private String identifier;
@@ -215,6 +234,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Specimen {
         private String alias;
         private String identifier;
@@ -230,6 +250,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AgeAtExtraction {
         private String intervalStart;
         private String intervalLength;
@@ -238,6 +259,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class BiologicalBeing {
         private String alias;
         private String identifier;
@@ -250,6 +272,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Observation {
         private String observationAlias;
         private String identifier;
@@ -263,6 +286,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Observer {
         private String alias;
         private String identifier;
@@ -271,6 +295,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Dataset {
         private String alias;
         private String accession;
@@ -282,6 +307,7 @@ public class MeiliSearchImageResponse {
 
     @Data
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Policy {
         private String identifier;
         private String title;

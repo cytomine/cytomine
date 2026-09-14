@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -42,8 +43,8 @@ public class MeiliSearchImageResponse {
         private String compressionStatus;
         private List<CompressionMethod> compressionMethods;
         private String acquisitionDateTime;
-        private String imageOrigin;
-        private String imageOrientation;
+        private ImageOrigin imageOrigin;
+        private ImageOrientation imageOrientation;
         private String imageType;
         private List<FileEntry> files;
         private Reference reference;
@@ -176,6 +177,30 @@ public class MeiliSearchImageResponse {
     public static class Size {
         private Double width;
         private Double height;
+        private Map<String, Object> attributes;
+    }
+
+    @Data
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ImageOrigin {
+        private Double x;
+        private Double y;
+        private Map<String, Object> attributes;
+    }
+
+    @Data
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ImageOrientation {
+        @JsonProperty("image_row_x_component")
+        private Double imageRowXComponent;
+        @JsonProperty("image_row_y_component")
+        private Double imageRowYComponent;
+        @JsonProperty("image_column_x_component")
+        private Double imageColumnXComponent;
+        @JsonProperty("image_column_y_component")
+        private Double imageColumnYComponent;
         private Map<String, Object> attributes;
     }
 

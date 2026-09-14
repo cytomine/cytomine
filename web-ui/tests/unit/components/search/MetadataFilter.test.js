@@ -173,7 +173,7 @@ describe('MetadataFilter.vue', () => {
     await wrapper.setData({ selectedFacets: { [SITE]: allSites, 'slide.staining.stains.compound.meaning': [singleStain] } });
 
     expect(wrapper.vm.filters).toEqual([
-      `slide.staining.stains.compound.meaning = "hematoxylin stain"`,
+      'slide.staining.stains.compound.meaning = "hematoxylin stain"',
       `(${SITE} = "BONE, STERNUM" OR ${SITE} = "KIDNEY" OR ${SITE} = "LARGE INTESTINE, CECUM" OR ${SITE} = "LIVER")`,
     ]);
   });

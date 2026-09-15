@@ -14,6 +14,7 @@ import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTa
 @Mapper(componentModel = "spring", uses = be.cytomine.common.mapper.BaseMapper.class)
 public interface TagDomainAssociationMapper {
 
+    @Mapping(target = "tagName", ignore = true)
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})
     TagDomainAssociationResponse mapToResponse(TagDomainAssociationEntity entity);
 

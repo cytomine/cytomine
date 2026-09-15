@@ -1,6 +1,7 @@
 server:
   port: 8081
   max-http-request-header-size: 512KB
+  max-parameter-count: 100000
 
 spring:
   datasource:

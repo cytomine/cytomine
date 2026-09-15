@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.io.ParseException;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,13 +58,9 @@ import be.cytomine.service.search.ImageSearchExtension;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
-import be.cytomine.utils.RequestParams;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Sort;
-
 import be.cytomine.utils.OffsetBasedPageRequest;
 import be.cytomine.utils.PageUtils;
+import be.cytomine.utils.RequestParams;
 import be.cytomine.utils.filters.SearchOperation;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
@@ -160,11 +159,15 @@ public class RestImageInstanceController extends RestCytomineController {
         List<SearchParameterEntry> searchParameterEntryList = retrieveSearchParameters();
         boolean metadataSearchActive = !metadataSearch.isBlank() || !metadataFilter.isBlank();
         if (light) {
-            if (metadataSearchActive) addMetadataFilter(searchParameterEntryList, metadataSearch, metadataFilter);
+            if (metadataSearchActive) {
+                addMetadataFilter(searchParameterEntryList, metadataSearch, metadataFilter);
+            }
             return responseSuccess(
                 imageInstanceService.listLight(project), securityACLService.isFilterRequired(project));
         } else if (tree) {
-            if (metadataSearchActive) addMetadataFilter(searchParameterEntryList, metadataSearch, metadataFilter);
+            if (metadataSearchActive) {
+                addMetadataFilter(searchParameterEntryList, metadataSearch, metadataFilter);
+            }
             return responseSuccess(
                 imageInstanceService.listTree(
                     project,
@@ -174,7 +177,9 @@ public class RestImageInstanceController extends RestCytomineController {
                 securityACLService.isFilterRequired(project)
             );
         } else if (withLastActivity) {
-            if (metadataSearchActive) addMetadataFilter(searchParameterEntryList, metadataSearch, metadataFilter);
+            if (metadataSearchActive) {
+                addMetadataFilter(searchParameterEntryList, metadataSearch, metadataFilter);
+            }
             ImageSearchExtension imageSearchExtension = new ImageSearchExtension();
             imageSearchExtension.setWithLastActivity(withLastActivity);
             return responseSuccess(

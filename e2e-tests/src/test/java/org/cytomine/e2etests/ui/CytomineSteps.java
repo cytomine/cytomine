@@ -14,6 +14,7 @@ import java.util.UUID;
 import lombok.SneakyThrows;
 import org.cytomine.e2etests.utils.ReportType;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -42,6 +43,22 @@ public class CytomineSteps {
         webDriverUtils.bySendKeys(wait, By.id("password"), password);
         webDriverUtils.byClick(wait, By.cssSelector("input[type='submit']"));
         webDriverUtils.byIsDisplayed(wait, By.id("app"));
+    }
+
+    @SneakyThrows
+    public void loginNewlyCreatedUser(WebDriver driver, URL cytomineUrl, String username, String password) {
+        int maxAttempts = 6;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                login(new WebDriverWait(driver, Duration.ofSeconds(10)), cytomineUrl, username, password);
+                return;
+            } catch (TimeoutException e) {
+                if (attempt == maxAttempts) {
+                    throw e;
+                }
+                Thread.sleep(2000);
+            }
+        }
     }
 
     public void logout(Wait<WebDriver> wait, URL cytomineUrl) {

@@ -1,5 +1,6 @@
 package be.cytomine.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -30,6 +31,8 @@ import be.cytomine.exceptions.SearchException;
 @Service
 @RequiredArgsConstructor
 public class MeiliSearchService {
+
+    public record SearchWindow(List<Long> abstractImageIds, long totalHits) {}
 
     private static final int SEARCH_PAGE_SIZE = 1000;
     private static final String[] ABSTRACT_IMAGE_ID_ATTRIBUTE = {"image.abstract_image_id"};
@@ -96,6 +99,44 @@ public class MeiliSearchService {
         }
     }
 
+    public SearchWindow searchWindow(String query, List<String> filters, int page, int size) {
+        return searchWindow(query, filters, null, page, size);
+    }
+
+    public SearchWindow searchWindow(String query, List<String> filters, String datasetAlias, int page, int size) {
+        Index index = getIndexOrThrow(indexId);
+        try {
+            SearchRequest searchRequest = buildSearchRequest(query, filters, datasetAlias)
+                .setPage(page)
+                .setHitsPerPage(size)
+                .setAttributesToRetrieve(ABSTRACT_IMAGE_ID_ATTRIBUTE);
+            SearchResultPaginated result = (SearchResultPaginated) index.search(searchRequest);
+            List<Long> ids = decodeAbstractImageIdsInOrder(result);
+            long totalHits = result.getTotalHits();
+            return new SearchWindow(ids, totalHits);
+        } catch (Exception e) {
+            log.error("Could not search for '{}'", query, e);
+            throw new SearchException("search failed", 500, e.getMessage());
+        }
+    }
+
+    private List<Long> decodeAbstractImageIdsInOrder(Searchable result) {
+        List<Long> ids = new ArrayList<>();
+        for (Map<String, Object> hit : result.getHits()) {
+            Object image = hit.get("image");
+            if (image instanceof Map<?, ?> img) {
+                Object idObj = img.get("abstract_image_id");
+                if (idObj instanceof Number num) {
+                    long id = num.longValue();
+                    if (!ids.contains(id)) {
+                        ids.add(id);
+                    }
+                }
+            }
+        }
+        return ids;
+    }
+
     private SearchResultPaginated searchPage(Index index, String query, List<String> filters, int page) {
         SearchRequest searchRequest = buildSearchRequest(query, filters)
             .setPage(page)
@@ -115,10 +156,19 @@ public class MeiliSearchService {
     }
 
     private SearchRequest buildSearchRequest(String query, List<String> filters) {
+        return buildSearchRequest(query, filters, null);
+    }
+
+    private SearchRequest buildSearchRequest(String query, List<String> filters, String datasetAlias) {
         SearchRequest searchRequest = new SearchRequest(query != null ? query : "");
 
-        if (!filters.isEmpty()) {
-            String meiliFilter = filters.stream()
+        List<String> allFilters = new ArrayList<>(filters);
+        if (datasetAlias != null && !datasetAlias.isBlank()) {
+            allFilters.add("dataset.alias:" + datasetAlias);
+        }
+
+        if (!allFilters.isEmpty()) {
+            String meiliFilter = allFilters.stream()
                 .map(this::normalizeFilter)
                 .filter(f -> f != null && !f.trim().isEmpty())
                 .collect(Collectors.joining(" AND "));

@@ -53,7 +53,7 @@ public class MultiUsersRunner {
             cytomineSteps.login(adminWait, cytomineUrl, adminUsername, adminPassword);
             CreatedUser user = createUser(adminWait, role);
             try {
-                cytomineSteps.loginNewlyCreatedUser(driver, cytomineUrl, user.username(), user.password());
+                cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
                 test.accept(user);
                 cytomineSteps.logout(wait, cytomineUrl);
             } finally {

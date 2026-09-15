@@ -642,7 +642,7 @@ public class CytomineTests {
         cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
         cytomineSteps.logout(wait, cytomineUrl);
 
-        cytomineSteps.loginNewlyCreatedUser(driver, cytomineUrl, username, password);
+        cytomineSteps.login(wait, cytomineUrl, username, password);
         cytomineSteps.logout(wait, cytomineUrl);
 
         keycloakClient.deleteUser(username);

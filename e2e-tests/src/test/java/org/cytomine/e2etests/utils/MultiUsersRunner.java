@@ -54,18 +54,21 @@ public class MultiUsersRunner {
     public void run(Wait<WebDriver> wait, List<Role> roles, Consumer<CreatedUser> test) {
         for (Role role : roles) {
             WebDriver adminDriver = seleniumDriver.driver();
-            Wait<WebDriver> adminWait = new WebDriverWait(adminDriver, Duration.ofSeconds(60));
-            cytomineSteps.login(adminWait, cytomineUrl, adminUsername, adminPassword);
-            CreatedUser user = createUser(adminWait, role);
             try {
-                cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
-                test.accept(user);
-                cytomineSteps.logout(wait, cytomineUrl);
+                Wait<WebDriver> adminWait = new WebDriverWait(adminDriver, Duration.ofSeconds(60));
+                cytomineSteps.login(adminWait, cytomineUrl, adminUsername, adminPassword);
+                CreatedUser user = createUser(adminWait, role);
+                try {
+                    cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
+                    test.accept(user);
+                    cytomineSteps.logout(wait, cytomineUrl);
+                } finally {
+                    keycloakClient.deleteUser(user.username());
+                }
+                cytomineSteps.logout(adminWait, cytomineUrl);
             } finally {
-                keycloakClient.deleteUser(user.username());
+                adminDriver.quit();
             }
-            cytomineSteps.logout(adminWait, cytomineUrl);
-            adminDriver.quit();
         }
     }
 

@@ -5,7 +5,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
-import org.cytomine.repository.mapper.TagDomainAssociationMapper;
 import org.cytomine.repository.persistence.TagDomainAssociationRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.TagDomainAssociationCommandService;
@@ -30,16 +29,15 @@ import static be.cytomine.common.repository.http.TagDomainAssociationHttpContrac
 @RequestMapping(ROOT_PATH)
 public class TagDomainAssociationController implements TagDomainAssociationHttpContract {
     private final ACLService aclService;
-    private final TagDomainAssociationMapper mapper;
     private final TagDomainAssociationRepository repository;
     private final TagDomainAssociationCommandService service;
 
     @Override
     public Page<TagDomainAssociationResponse> readAll(@RequestParam long userId, Pageable pageable) {
         if (aclService.isAdmin(userId)) {
-            return repository.findAllByDeletedNull(pageable).map(mapper::mapToResponse);
+            return repository.findAllByDeletedNull(pageable).map(service::mapToResponse);
         }
-        return repository.findAllReadableByUser(userId, pageable).map(mapper::mapToResponse);
+        return repository.findAllReadableByUser(userId, pageable).map(service::mapToResponse);
     }
 
     @Override
@@ -54,7 +52,7 @@ public class TagDomainAssociationController implements TagDomainAssociationHttpC
         }
         return repository
             .findAllByDomainClassNameAndDomainIdAndDeletedNull(domainClassName, domainId, pageable)
-            .map(mapper::mapToResponse);
+            .map(service::mapToResponse);
     }
 
     @Override
@@ -72,7 +70,7 @@ public class TagDomainAssociationController implements TagDomainAssociationHttpC
     public Optional<TagDomainAssociationResponse> read(@PathVariable long id, @RequestParam long userId) {
         return repository.findByIdAndDeletedNull(id)
             .filter(e -> aclService.canReadDomain(userId, e.getDomainId(), e.getDomainClassName()))
-            .map(mapper::mapToResponse);
+            .map(service::mapToResponse);
     }
 
     @Override

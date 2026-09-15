@@ -10,6 +10,7 @@ public record TagDomainAssociationResponse(
     long tagId,
     String domainClassName,
     long domainId,
+    String tagName,
     LocalDateTime created,
     Optional<LocalDateTime> updated,
     Optional<LocalDateTime> deleted

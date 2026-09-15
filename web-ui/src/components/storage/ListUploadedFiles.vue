@@ -12,7 +12,7 @@
         icon="search"
       />
 
-      <MetadataFilter @filter-change="onMetadataFilterChange" />
+      <MetadataFilter :nb-results="nbResults" @filter-change="onMetadataFilterChange" />
 
       <cytomine-table
         :collection="uploadedFileCollection"
@@ -21,6 +21,7 @@
         :refreshInterval="tableRefreshInterval"
         :openedDetailed.sync="openedDetails"
         :detailed="false"
+        @setCollectionSize="nbResults = $event"
       >
         <template #default="{row: uFile}">
           <b-table-column :label="$t('preview')" width="80" class="image-overview">
@@ -91,6 +92,7 @@ export default {
       searchString: '',
       metadataSearch: '',
       metadataFilters: [],
+      nbResults: 0,
       openedDetails: [],
     };
   },

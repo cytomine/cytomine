@@ -99,7 +99,7 @@ jobs:
           target: ${{ matrix.image.target || '' }}
 
       - name: Cache Trivy DB
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ github.workspace }}/.cache/trivy
           key: trivy-${{ runner.os }}-${{ github.run_id }}

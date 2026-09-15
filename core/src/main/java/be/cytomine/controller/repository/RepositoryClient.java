@@ -1,17 +1,25 @@
 package be.cytomine.controller.repository;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import be.cytomine.common.config.security.CytomineAuthenticationSupport;
+import be.cytomine.config.security.IncomingAuthorizationContext;
 import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.OntologyHttpContract;
@@ -47,11 +55,44 @@ public class RepositoryClient {
         return RestClient.builder()
             .baseUrl(repositoryURL)
             .messageConverters(converters -> converters.addFirst(new MappingJackson2HttpMessageConverter(objectMapper)))
+            .requestInterceptor(this::forwardAuthorizationHeader)
             .build();
     }
 
+    private ClientHttpResponse forwardAuthorizationHeader(
+        HttpRequest request,
+        byte[] body,
+        ClientHttpRequestExecution execution
+    ) throws IOException {
+        IncomingAuthorizationContext.get().ifPresent(incoming -> {
+            HttpHeaders headers = request.getHeaders();
+            if (incoming.authorization() != null) {
+                headers.set(HttpHeaders.AUTHORIZATION, normalizeAuthorization(incoming.authorization()));
+            }
+            // A CYTOMINE-scheme signature is an HMAC over method + contentMd5 + contentType + date,
+            // so repository needs the exact values the caller signed to recompute a matching signature.
+            if (incoming.date() != null) {
+                headers.set("date", incoming.date());
+            }
+            if (incoming.contentMd5() != null) {
+                headers.set("content-MD5", incoming.contentMd5());
+            }
+            if (incoming.contentType() != null) {
+                headers.set(HttpHeaders.CONTENT_TYPE, incoming.contentType());
+            }
+        });
+        return execution.execute(request, body);
+    }
+
+    private String normalizeAuthorization(String authorization) {
+        if (authorization.startsWith("Bearer ") || authorization.startsWith(CytomineAuthenticationSupport.SCHEME)) {
+            return authorization;
+        }
+        return "Bearer " + authorization;
+    }
+
     @Bean
-    CommandHttpContract  commandHttpContract(RestClient repositoryRestClient) {
+    CommandHttpContract commandHttpContract(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, CommandHttpContract.class);
     }
 

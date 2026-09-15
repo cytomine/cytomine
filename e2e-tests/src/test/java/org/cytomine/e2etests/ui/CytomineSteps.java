@@ -938,9 +938,13 @@ public class CytomineSteps {
             wait,
             "//footer[contains(@class, 'modal-card-foot')]//button[normalize-space()='Add']"
         );
+        webDriverUtils.waitUntilByEmpty(
+            wait,
+            By.xpath("//div[contains(., 'The selected tags were correctly associated')]")
+        );
         webDriverUtils.byIsDisplayed(
             wait,
-            By.xpath("//div[contains(@class, 'tags-wrapper')]//*[contains(., '" + tagName + "')]")
+            By.xpath("//div[contains(@class, 'tags-wrapper')]//*[contains(., '" + tagName.toUpperCase() + "')]")
         );
     }
 }

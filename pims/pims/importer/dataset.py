@@ -205,6 +205,7 @@ def run_import_datasets(
                         flat_dict["id"] = flat_dict["image"]["identifier"] # MeiliSearch requires a unique 'id'
                         alias = image.reference.alias if image.reference else None
                         flat_dict["image"]["abstract_image_id"] = abstract_image_by_alias.get(alias)
+                        flat_dict["image"]["storage_id"] = int(storage_id)
                         indexing_payload.append(flat_dict)
 
                     logger.info(f"[{parent_dataset}] Prepared {len(indexing_payload)} images for indexing.")
@@ -467,6 +468,7 @@ def _configure_index(client, index) -> None:
     ]
     filterable_attributes = [
         "image.abstract_image_id",
+        "image.storage_id",
         "specimens.biological_being.animal_species.meaning",
         "specimens.anatomical_site.meaning",
         "specimens.biological_being.sex",

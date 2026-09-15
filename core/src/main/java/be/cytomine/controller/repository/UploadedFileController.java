@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
@@ -161,17 +163,39 @@ public class UploadedFileController {
         }
 
         List<String> filters = hasFilter ? List.of(metadataFilter) : List.of();
-        Set<Long> abstractImageIds = meiliSearchService.searchImageIds(metadataSearch, filters);
-        if (abstractImageIds.isEmpty()) {
+        int page = pageable.getPageNumber() + 1;
+        int size = pageable.getPageSize();
+        if (size <= 0) {
+            Set<Long> abstractImageIds = meiliSearchService.searchImageIds(metadataSearch, filters);
+            if (abstractImageIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            Set<Long> uploadedFileIds = abstractImageRepository.findUploadedFileIdsByAbstractImageIds(abstractImageIds);
+            if (uploadedFileIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            return uploadedFileHttpContract.getAll(userId, List.copyOf(uploadedFileIds), pageable);
+        }
+
+        MeiliSearchService.SearchWindow window = meiliSearchService.searchWindow(metadataSearch, filters, page, size);
+        if (window.abstractImageIds().isEmpty()) {
             return Page.empty(pageable);
         }
 
-        Set<Long> uploadedFileIds = abstractImageRepository.findUploadedFileIdsByAbstractImageIds(abstractImageIds);
-        if (uploadedFileIds.isEmpty()) {
+        List<Long> orderedUploadedFileIds = abstractImageRepository.findAllById(window.abstractImageIds())
+            .stream()
+            .map(ai -> ai.getUploadedFile().getId())
+            .toList();
+        if (orderedUploadedFileIds.isEmpty()) {
             return Page.empty(pageable);
         }
 
-        return uploadedFileHttpContract.getAll(userId, List.copyOf(uploadedFileIds), pageable);
+        Page<UploadedFileResponse> repoPage = uploadedFileHttpContract.getAll(
+            userId,
+            orderedUploadedFileIds,
+            PageRequest.of(0, orderedUploadedFileIds.size(), Sort.by("id").ascending())
+        );
+        return new PageImpl<>(repoPage.getContent(), pageable, window.totalHits());
     }
 
     private UploadedFileResponse withThumbnailUrl(UploadedFileResponse r, Long abstractImageId) {

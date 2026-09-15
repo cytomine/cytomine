@@ -51,7 +51,11 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.id("username"));
     }
 
-    @SneakyThrows
+    public void goToProjectTab(Wait<WebDriver> wait, String projectUrl, String tab) {
+        webDriverUtils.goTo(wait, projectUrl);
+        webDriverUtils.xpathClick(wait, "//nav[contains(@class, 'sidebar')]//a[normalize-space()='" + tab + "']");
+    }
+
     public String createProject(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl, String projectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='/projects']");
@@ -916,5 +920,27 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//a[normalize-space()='" + imageGroupName + "']");
         webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
+    }
+
+    public void addTagToImage(Wait<WebDriver> wait, String imageName, String tagName) {
+        webDriverUtils.xpathClick(
+            wait,
+            "//tr[.//td[@data-label='Name']//span[contains(., '" + imageName + "')]]"
+                + "//td[contains(@class,'chevron-cell')]//a[@role='button']"
+        );
+        webDriverUtils.byClick(wait, By.cssSelector("button.add-tag"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".modal-card .taginput input"), tagName);
+        webDriverUtils.xpathClick(
+            wait,
+            "//a[contains(@class, 'dropdown-item')][.//span[normalize-space()='" + tagName + "']]"
+        );
+        webDriverUtils.xpathClick(
+            wait,
+            "//footer[contains(@class, 'modal-card-foot')]//button[normalize-space()='Add']"
+        );
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//div[contains(@class, 'tags-wrapper')]//*[contains(., '" + tagName + "')]")
+        );
     }
 }

@@ -103,10 +103,6 @@ public class MeiliSearchService {
         }
     }
 
-    public SearchWindow searchWindow(String query, List<String> filters, int page, int size) {
-        return searchWindow(query, filters, null, null, page, size);
-    }
-
     public SearchWindow searchWindow(String query, List<String> filters, String datasetAlias, int page, int size) {
         return searchWindow(query, filters, datasetAlias, null, page, size);
     }
@@ -162,10 +158,6 @@ public class MeiliSearchService {
         return ids;
     }
 
-    private SearchResultPaginated searchPage(Index index, String query, List<String> filters, int page) {
-        return searchPage(index, query, filters, page, null);
-    }
-
     private SearchResultPaginated searchPage(
         Index index,
         String query,
@@ -194,10 +186,6 @@ public class MeiliSearchService {
         return buildSearchRequest(query, filters, null, null);
     }
 
-    private SearchRequest buildSearchRequest(String query, List<String> filters, String datasetAlias) {
-        return buildSearchRequest(query, filters, datasetAlias, null);
-    }
-
     private SearchRequest buildSearchRequest(
         String query,
         List<String> filters,
@@ -211,11 +199,7 @@ public class MeiliSearchService {
             allFilters.add("dataset.alias:" + datasetAlias);
         }
         if (storageIds != null) {
-            List<Long> effectiveStorageIds = storageIds.isEmpty() ? List.of(-1L) : storageIds;
-            String storageValues = effectiveStorageIds.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(", "));
-            allFilters.add("image.storage_id IN [" + storageValues + "]");
+            allFilters.add(imageStorageIdsFilter(storageIds));
         }
 
         if (!allFilters.isEmpty()) {
@@ -254,11 +238,7 @@ public class MeiliSearchService {
             List<String> filters = new ArrayList<>();
             projectDatasetAlias.filter(p -> !p.isBlank()).map(p -> "dataset.alias:" + p).ifPresent(filters::add);
             if (storageIds != null) {
-                List<Long> effectiveStorageIds = storageIds.isEmpty() ? List.of(-1L) : storageIds;
-                String storageValues = effectiveStorageIds.stream()
-                    .map(String::valueOf)
-                    .collect(Collectors.joining(", "));
-                filters.add("image.storage_id IN [" + storageValues + "]");
+                filters.add(imageStorageIdsFilter(storageIds));
             }
             SearchRequest searchRequest = buildSearchRequest(null, filters)
                 .setFacets(attributes)
@@ -279,6 +259,14 @@ public class MeiliSearchService {
             }
         }
         throw new SearchException("MeiliSearch index not found", 404, "index not found");
+    }
+
+    private String imageStorageIdsFilter(List<Long> storageIds) {
+        List<Long> effectiveStorageIds = storageIds.isEmpty() ? List.of(-1L) : storageIds;
+        String storageValues = effectiveStorageIds.stream()
+            .map(String::valueOf)
+            .collect(Collectors.joining(", "));
+        return "image.storage_id IN [" + storageValues + "]";
     }
 
     private String normalizeFilter(String filter) {

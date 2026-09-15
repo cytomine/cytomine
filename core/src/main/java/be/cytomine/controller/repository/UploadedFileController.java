@@ -32,10 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.http.UploadedFileHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
@@ -44,6 +42,7 @@ import be.cytomine.controller.utils.PageMapper;
 import be.cytomine.mapper.UploadedFileMapper;
 import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
+import be.cytomine.service.AccessibleStorageService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.MeiliSearchService.SearchWindow;
@@ -62,14 +61,13 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class UploadedFileController {
 
     public static final String UNABLE_TO_FIND_UPLOADED_FILE = "Unable to find uploaded file with id: %s";
-    private static final int ACCESSIBLE_STORAGES_PAGE_SIZE = 1000;
 
     private final AbstractImageRepository abstractImageRepository;
+    private final AccessibleStorageService accessibleStorageService;
     private final CurrentUserService currentUserService;
     private final ImageServerService imageServerService;
     private final MeiliSearchService meiliSearchService;
     private final PageMapper pageMapper;
-    private final StorageHttpContract storageHttpContract;
     private final UploadedFileHttpContract uploadedFileHttpContract;
     private final UploadedFileMapper uploadedFileMapper;
     private final UrlApi urlApi;
@@ -170,7 +168,7 @@ public class UploadedFileController {
         }
 
         List<String> filters = hasFilter ? List.of(metadataFilter) : List.of();
-        List<Long> storageIds = accessibleStorageIds(userId);
+        List<Long> storageIds = accessibleStorageService.ids(userId);
         int page = pageable.getPageNumber() + 1;
         int size = pageable.getPageSize();
 
@@ -202,17 +200,6 @@ public class UploadedFileController {
             PageRequest.of(0, orderedUploadedFileIds.size(), Sort.by("id").ascending())
         );
         return new PageImpl<>(repoPage.getContent(), pageable, window.totalHits());
-    }
-
-    private List<Long> accessibleStorageIds(long userId) {
-        List<Long> storageIds = new ArrayList<>();
-        int pageNumber = 0;
-        Page<StorageResponse> page;
-        do {
-            page = storageHttpContract.getAll(userId, PageRequest.of(pageNumber++, ACCESSIBLE_STORAGES_PAGE_SIZE));
-            page.getContent().stream().map(StorageResponse::id).forEach(storageIds::add);
-        } while (page.hasNext());
-        return storageIds;
     }
 
     private UploadedFileResponse withThumbnailUrl(UploadedFileResponse r, Long abstractImageId) {

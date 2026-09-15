@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.Index;
 import com.meilisearch.sdk.SearchRequest;
+import com.meilisearch.sdk.model.Pagination;
 import com.meilisearch.sdk.model.SearchResult;
 import com.meilisearch.sdk.model.SearchResultPaginated;
 import com.meilisearch.sdk.model.Searchable;
@@ -40,6 +41,9 @@ public class MeiliSearchService {
     @Value("${meilisearch.index_id}")
     private String indexId;
 
+    @Value("${meilisearch.max-total-hits:100000}")
+    private int maxTotalHits;
+
     private final Client meiliSearchClient;
     private final ObjectMapper objectMapper;
 
@@ -48,14 +52,21 @@ public class MeiliSearchService {
         try {
             for (Index index : meiliSearchClient.getIndexes().getResults()) {
                 if (indexId.equals(index.getUid())) {
+                    configurePagination(index);
                     return;
                 }
             }
             meiliSearchClient.createIndex(indexId);
             log.info("Created MeiliSearch index '{}'", indexId);
+            configurePagination(meiliSearchClient.getIndex(indexId));
         } catch (Exception e) {
-            log.warn("Could not create MeiliSearch index '{}' at startup: {}", indexId, e.getMessage());
+            log.warn("Could not create/configure MeiliSearch index '{}' at startup: {}", indexId, e.getMessage());
         }
+    }
+
+    private void configurePagination(Index index) {
+        index.updatePaginationSettings(new Pagination(maxTotalHits));
+        log.info("Set MeiliSearch index '{}' pagination.maxTotalHits to {}", indexId, maxTotalHits);
     }
 
     public List<MeiliSearchImageResponse> search(

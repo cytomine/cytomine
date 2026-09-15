@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.Index;
 import com.meilisearch.sdk.SearchRequest;
+import com.meilisearch.sdk.model.Pagination;
 import com.meilisearch.sdk.model.Results;
 import com.meilisearch.sdk.model.SearchResultPaginated;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,7 @@ public class MeiliSearchServiceTest {
     @BeforeEach
     public void setUp() {
         ReflectionTestUtils.setField(meiliSearchService, "indexId", INDEX_ID);
+        ReflectionTestUtils.setField(meiliSearchService, "maxTotalHits", 100000);
         ReflectionTestUtils.setField(meiliSearchService, "objectMapper", new ObjectMapper());
     }
 
@@ -57,9 +59,15 @@ public class MeiliSearchServiceTest {
     public void createIndexIfNotExistsShouldCreateIndexWhenMissing() {
         mockExistingIndexes();
 
+        Index index = mock(Index.class);
+        when(meiliSearchClient.getIndex(INDEX_ID)).thenReturn(index);
+
         meiliSearchService.createIndexIfNotExists();
 
         verify(meiliSearchClient, times(1)).createIndex(INDEX_ID);
+        ArgumentCaptor<Pagination> paginationCaptor = ArgumentCaptor.forClass(Pagination.class);
+        verify(index).updatePaginationSettings(paginationCaptor.capture());
+        assertEquals(100000, paginationCaptor.getValue().getMaxTotalHits());
     }
 
     @Test
@@ -71,6 +79,9 @@ public class MeiliSearchServiceTest {
         meiliSearchService.createIndexIfNotExists();
 
         verify(meiliSearchClient, never()).createIndex(INDEX_ID);
+        ArgumentCaptor<Pagination> paginationCaptor = ArgumentCaptor.forClass(Pagination.class);
+        verify(existing).updatePaginationSettings(paginationCaptor.capture());
+        assertEquals(100000, paginationCaptor.getValue().getMaxTotalHits());
     }
 
     @Test

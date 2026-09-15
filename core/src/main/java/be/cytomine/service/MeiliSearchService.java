@@ -82,14 +82,18 @@ public class MeiliSearchService {
     }
 
     public Set<Long> searchImageIds(String query, List<String> filters) {
+        return searchImageIds(query, filters, null);
+    }
+
+    public Set<Long> searchImageIds(String query, List<String> filters, List<Long> storageIds) {
         Index index = getIndexOrThrow(indexId);
 
         try {
-            SearchResultPaginated firstPage = searchPage(index, query, filters, 1);
+            SearchResultPaginated firstPage = searchPage(index, query, filters, 1, storageIds);
 
             Set<Long> abstractImageIds = collectAbstractImageIds(firstPage);
             for (int page = 2; page <= firstPage.getTotalPages(); page++) {
-                abstractImageIds.addAll(collectAbstractImageIds(searchPage(index, query, filters, page)));
+                abstractImageIds.addAll(collectAbstractImageIds(searchPage(index, query, filters, page, storageIds)));
             }
 
             return abstractImageIds;
@@ -100,13 +104,34 @@ public class MeiliSearchService {
     }
 
     public SearchWindow searchWindow(String query, List<String> filters, int page, int size) {
-        return searchWindow(query, filters, null, page, size);
+        return searchWindow(query, filters, null, null, page, size);
     }
 
     public SearchWindow searchWindow(String query, List<String> filters, String datasetAlias, int page, int size) {
+        return searchWindow(query, filters, datasetAlias, null, page, size);
+    }
+
+    public SearchWindow searchWindow(
+        String query,
+        List<String> filters,
+        List<Long> storageIds,
+        int page,
+        int size
+    ) {
+        return searchWindow(query, filters, null, storageIds, page, size);
+    }
+
+    public SearchWindow searchWindow(
+        String query,
+        List<String> filters,
+        String datasetAlias,
+        List<Long> storageIds,
+        int page,
+        int size
+    ) {
         Index index = getIndexOrThrow(indexId);
         try {
-            SearchRequest searchRequest = buildSearchRequest(query, filters, datasetAlias)
+            SearchRequest searchRequest = buildSearchRequest(query, filters, datasetAlias, storageIds)
                 .setPage(page)
                 .setHitsPerPage(size)
                 .setAttributesToRetrieve(ABSTRACT_IMAGE_ID_ATTRIBUTE);
@@ -138,7 +163,17 @@ public class MeiliSearchService {
     }
 
     private SearchResultPaginated searchPage(Index index, String query, List<String> filters, int page) {
-        SearchRequest searchRequest = buildSearchRequest(query, filters)
+        return searchPage(index, query, filters, page, null);
+    }
+
+    private SearchResultPaginated searchPage(
+        Index index,
+        String query,
+        List<String> filters,
+        int page,
+        List<Long> storageIds
+    ) {
+        SearchRequest searchRequest = buildSearchRequest(query, filters, null, storageIds)
             .setPage(page)
             .setHitsPerPage(SEARCH_PAGE_SIZE)
             .setAttributesToRetrieve(ABSTRACT_IMAGE_ID_ATTRIBUTE);
@@ -156,15 +191,31 @@ public class MeiliSearchService {
     }
 
     private SearchRequest buildSearchRequest(String query, List<String> filters) {
-        return buildSearchRequest(query, filters, null);
+        return buildSearchRequest(query, filters, null, null);
     }
 
     private SearchRequest buildSearchRequest(String query, List<String> filters, String datasetAlias) {
+        return buildSearchRequest(query, filters, datasetAlias, null);
+    }
+
+    private SearchRequest buildSearchRequest(
+        String query,
+        List<String> filters,
+        String datasetAlias,
+        List<Long> storageIds
+    ) {
         SearchRequest searchRequest = new SearchRequest(query != null ? query : "");
 
         List<String> allFilters = new ArrayList<>(filters);
         if (datasetAlias != null && !datasetAlias.isBlank()) {
             allFilters.add("dataset.alias:" + datasetAlias);
+        }
+        if (storageIds != null) {
+            List<Long> effectiveStorageIds = storageIds.isEmpty() ? List.of(-1L) : storageIds;
+            String storageValues = effectiveStorageIds.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", "));
+            allFilters.add("image.storage_id IN [" + storageValues + "]");
         }
 
         if (!allFilters.isEmpty()) {
@@ -191,13 +242,24 @@ public class MeiliSearchService {
     }
 
     public MeiliSearchFacetsResponse getFacetDistribution(Optional<String> projectDatasetAlias) {
+        return getFacetDistribution(projectDatasetAlias, null);
+    }
+
+    public MeiliSearchFacetsResponse getFacetDistribution(Optional<String> projectDatasetAlias, List<Long> storageIds) {
 
         Index index = getIndexOrThrow(indexId);
         try {
             String[] attributes = index.getFilterableAttributesSettings();
 
-            List<String> filters = 
-                projectDatasetAlias.filter(p -> !p.isBlank()).map(p -> "dataset.alias:" + p).stream().toList();
+            List<String> filters = new ArrayList<>();
+            projectDatasetAlias.filter(p -> !p.isBlank()).map(p -> "dataset.alias:" + p).ifPresent(filters::add);
+            if (storageIds != null) {
+                List<Long> effectiveStorageIds = storageIds.isEmpty() ? List.of(-1L) : storageIds;
+                String storageValues = effectiveStorageIds.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
+                filters.add("image.storage_id IN [" + storageValues + "]");
+            }
             SearchRequest searchRequest = buildSearchRequest(null, filters)
                 .setFacets(attributes)
                 .setLimit(0);

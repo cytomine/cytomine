@@ -14,6 +14,7 @@ import com.meilisearch.sdk.model.SearchResultPaginated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -167,5 +168,61 @@ public class MeiliSearchServiceTest {
 
         assertEquals(Set.of(11L, 22L), ids);
         verify(index, times(2)).search(any(SearchRequest.class));
+    }
+
+    private String captureSearchFilter(Index index) {
+        ArgumentCaptor<SearchRequest> captor = ArgumentCaptor.forClass(SearchRequest.class);
+        verify(index).search(captor.capture());
+        String[] filters = captor.getValue().getFilter();
+        return filters == null ? "" : String.join(" AND ", filters);
+    }
+
+    @Test
+    public void searchImageIdsShouldScopeByStorageIds() {
+        Index index = mock(Index.class);
+        when(index.getUid()).thenReturn(INDEX_ID);
+        mockExistingIndexes(index);
+        when(index.search(any(SearchRequest.class))).thenReturn(mock(SearchResultPaginated.class));
+
+        meiliSearchService.searchImageIds("query", List.of(), List.of(7L, 8L));
+
+        assertTrue(captureSearchFilter(index).contains("image.storage_id IN [7, 8]"));
+    }
+
+    @Test
+    public void searchWindowShouldScopeByStorageIds() {
+        Index index = mock(Index.class);
+        when(index.getUid()).thenReturn(INDEX_ID);
+        mockExistingIndexes(index);
+
+        SearchResultPaginated searchable = mock(SearchResultPaginated.class);
+        when(searchable.getHits()).thenReturn(new ArrayList<>(List.of(
+            hitWithAbstractImageId(11), hitWithAbstractImageId(22)
+        )));
+        when(searchable.getTotalHits()).thenReturn(42);
+        when(index.search(any(SearchRequest.class))).thenReturn(searchable);
+
+        MeiliSearchService.SearchWindow window =
+            meiliSearchService.searchWindow("query", List.of(), List.of(7L, 8L), 2, 20);
+
+        assertEquals(List.of(11L, 22L), window.abstractImageIds());
+        assertEquals(42L, window.totalHits());
+        assertTrue(captureSearchFilter(index).contains("image.storage_id IN [7, 8]"));
+    }
+
+    @Test
+    public void searchWindowShouldScopeToImpossibleStorageWhenScopeEmpty() {
+        Index index = mock(Index.class);
+        when(index.getUid()).thenReturn(INDEX_ID);
+        mockExistingIndexes(index);
+
+        SearchResultPaginated searchable = mock(SearchResultPaginated.class);
+        when(searchable.getHits()).thenReturn(new ArrayList<>());
+        when(searchable.getTotalHits()).thenReturn(0);
+        when(index.search(any(SearchRequest.class))).thenReturn(searchable);
+
+        meiliSearchService.searchWindow("query", List.of(), List.of(), 1, 20);
+
+        assertTrue(captureSearchFilter(index).contains("image.storage_id IN [-1]"));
     }
 }

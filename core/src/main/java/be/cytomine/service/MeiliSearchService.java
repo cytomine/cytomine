@@ -1,5 +1,6 @@
 package be.cytomine.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.Index;
 import com.meilisearch.sdk.SearchRequest;
+import com.meilisearch.sdk.model.Pagination;
 import com.meilisearch.sdk.model.SearchResult;
 import com.meilisearch.sdk.model.SearchResultPaginated;
 import com.meilisearch.sdk.model.Searchable;
@@ -31,11 +33,16 @@ import be.cytomine.exceptions.SearchException;
 @RequiredArgsConstructor
 public class MeiliSearchService {
 
+    public record SearchWindow(List<Long> abstractImageIds, long totalHits) {}
+
     private static final int SEARCH_PAGE_SIZE = 1000;
     private static final String[] ABSTRACT_IMAGE_ID_ATTRIBUTE = {"image.abstract_image_id"};
 
     @Value("${meilisearch.index_id}")
     private String indexId;
+
+    @Value("${meilisearch.max-total-hits:100000}")
+    private int maxTotalHits;
 
     private final Client meiliSearchClient;
     private final ObjectMapper objectMapper;
@@ -45,14 +52,21 @@ public class MeiliSearchService {
         try {
             for (Index index : meiliSearchClient.getIndexes().getResults()) {
                 if (indexId.equals(index.getUid())) {
+                    configurePagination(index);
                     return;
                 }
             }
             meiliSearchClient.createIndex(indexId);
             log.info("Created MeiliSearch index '{}'", indexId);
+            configurePagination(meiliSearchClient.getIndex(indexId));
         } catch (Exception e) {
-            log.warn("Could not create MeiliSearch index '{}' at startup: {}", indexId, e.getMessage());
+            log.warn("Could not create/configure MeiliSearch index '{}' at startup: {}", indexId, e.getMessage());
         }
+    }
+
+    private void configurePagination(Index index) {
+        index.updatePaginationSettings(new Pagination(maxTotalHits));
+        log.info("Set MeiliSearch index '{}' pagination.maxTotalHits to {}", indexId, maxTotalHits);
     }
 
     public List<MeiliSearchImageResponse> search(
@@ -79,14 +93,18 @@ public class MeiliSearchService {
     }
 
     public Set<Long> searchImageIds(String query, List<String> filters) {
+        return searchImageIds(query, filters, null);
+    }
+
+    public Set<Long> searchImageIds(String query, List<String> filters, List<Long> storageIds) {
         Index index = getIndexOrThrow(indexId);
 
         try {
-            SearchResultPaginated firstPage = searchPage(index, query, filters, 1);
+            SearchResultPaginated firstPage = searchPage(index, query, filters, 1, storageIds);
 
             Set<Long> abstractImageIds = collectAbstractImageIds(firstPage);
             for (int page = 2; page <= firstPage.getTotalPages(); page++) {
-                abstractImageIds.addAll(collectAbstractImageIds(searchPage(index, query, filters, page)));
+                abstractImageIds.addAll(collectAbstractImageIds(searchPage(index, query, filters, page, storageIds)));
             }
 
             return abstractImageIds;
@@ -96,8 +114,69 @@ public class MeiliSearchService {
         }
     }
 
-    private SearchResultPaginated searchPage(Index index, String query, List<String> filters, int page) {
-        SearchRequest searchRequest = buildSearchRequest(query, filters)
+    public SearchWindow searchWindow(String query, List<String> filters, String datasetAlias, int page, int size) {
+        return searchWindow(query, filters, datasetAlias, null, page, size);
+    }
+
+    public SearchWindow searchWindow(
+        String query,
+        List<String> filters,
+        List<Long> storageIds,
+        int page,
+        int size
+    ) {
+        return searchWindow(query, filters, null, storageIds, page, size);
+    }
+
+    public SearchWindow searchWindow(
+        String query,
+        List<String> filters,
+        String datasetAlias,
+        List<Long> storageIds,
+        int page,
+        int size
+    ) {
+        Index index = getIndexOrThrow(indexId);
+        try {
+            SearchRequest searchRequest = buildSearchRequest(query, filters, datasetAlias, storageIds)
+                .setPage(page)
+                .setHitsPerPage(size)
+                .setAttributesToRetrieve(ABSTRACT_IMAGE_ID_ATTRIBUTE);
+            SearchResultPaginated result = (SearchResultPaginated) index.search(searchRequest);
+            List<Long> ids = decodeAbstractImageIdsInOrder(result);
+            long totalHits = result.getTotalHits();
+            return new SearchWindow(ids, totalHits);
+        } catch (Exception e) {
+            log.error("Could not search for '{}'", query, e);
+            throw new SearchException("search failed", 500, e.getMessage());
+        }
+    }
+
+    private List<Long> decodeAbstractImageIdsInOrder(Searchable result) {
+        List<Long> ids = new ArrayList<>();
+        for (Map<String, Object> hit : result.getHits()) {
+            Object image = hit.get("image");
+            if (image instanceof Map<?, ?> img) {
+                Object idObj = img.get("abstract_image_id");
+                if (idObj instanceof Number num) {
+                    long id = num.longValue();
+                    if (!ids.contains(id)) {
+                        ids.add(id);
+                    }
+                }
+            }
+        }
+        return ids;
+    }
+
+    private SearchResultPaginated searchPage(
+        Index index,
+        String query,
+        List<String> filters,
+        int page,
+        List<Long> storageIds
+    ) {
+        SearchRequest searchRequest = buildSearchRequest(query, filters, null, storageIds)
             .setPage(page)
             .setHitsPerPage(SEARCH_PAGE_SIZE)
             .setAttributesToRetrieve(ABSTRACT_IMAGE_ID_ATTRIBUTE);
@@ -115,10 +194,27 @@ public class MeiliSearchService {
     }
 
     private SearchRequest buildSearchRequest(String query, List<String> filters) {
+        return buildSearchRequest(query, filters, null, null);
+    }
+
+    private SearchRequest buildSearchRequest(
+        String query,
+        List<String> filters,
+        String datasetAlias,
+        List<Long> storageIds
+    ) {
         SearchRequest searchRequest = new SearchRequest(query != null ? query : "");
 
-        if (!filters.isEmpty()) {
-            String meiliFilter = filters.stream()
+        List<String> allFilters = new ArrayList<>(filters);
+        if (datasetAlias != null && !datasetAlias.isBlank()) {
+            allFilters.add("dataset.alias:" + datasetAlias);
+        }
+        if (storageIds != null) {
+            allFilters.add(imageStorageIdsFilter(storageIds));
+        }
+
+        if (!allFilters.isEmpty()) {
+            String meiliFilter = allFilters.stream()
                 .map(this::normalizeFilter)
                 .filter(f -> f != null && !f.trim().isEmpty())
                 .collect(Collectors.joining(" AND "));
@@ -141,13 +237,20 @@ public class MeiliSearchService {
     }
 
     public MeiliSearchFacetsResponse getFacetDistribution(Optional<String> projectDatasetAlias) {
+        return getFacetDistribution(projectDatasetAlias, null);
+    }
+
+    public MeiliSearchFacetsResponse getFacetDistribution(Optional<String> projectDatasetAlias, List<Long> storageIds) {
 
         Index index = getIndexOrThrow(indexId);
         try {
             String[] attributes = index.getFilterableAttributesSettings();
 
-            List<String> filters = 
-                projectDatasetAlias.filter(p -> !p.isBlank()).map(p -> "dataset.alias:" + p).stream().toList();
+            List<String> filters = new ArrayList<>();
+            projectDatasetAlias.filter(p -> !p.isBlank()).map(p -> "dataset.alias:" + p).ifPresent(filters::add);
+            if (storageIds != null) {
+                filters.add(imageStorageIdsFilter(storageIds));
+            }
             SearchRequest searchRequest = buildSearchRequest(null, filters)
                 .setFacets(attributes)
                 .setLimit(0);
@@ -167,6 +270,14 @@ public class MeiliSearchService {
             }
         }
         throw new SearchException("MeiliSearch index not found", 404, "index not found");
+    }
+
+    private String imageStorageIdsFilter(List<Long> storageIds) {
+        List<Long> effectiveStorageIds = storageIds.isEmpty() ? List.of(-1L) : storageIds;
+        String storageValues = effectiveStorageIds.stream()
+            .map(String::valueOf)
+            .collect(Collectors.joining(", "));
+        return "image.storage_id IN [" + storageValues + "]";
     }
 
     private String normalizeFilter(String filter) {

@@ -159,3 +159,4 @@ meilisearch:
   host: ${MEILISEARCH_URL:http://localhost:7700}
   api-key: ${MEILISEARCH_KEY:masterKey}
   index_id: imageMetadataIndex
+  max-total-hits: ${MEILISEARCH_MAX_TOTAL_HITS:100000}

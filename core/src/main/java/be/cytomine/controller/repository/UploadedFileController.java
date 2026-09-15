@@ -1,6 +1,8 @@
 package be.cytomine.controller.repository;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,6 +12,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
@@ -28,8 +32,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.http.UploadedFileHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
@@ -40,6 +46,7 @@ import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.MeiliSearchService;
+import be.cytomine.service.MeiliSearchService.SearchWindow;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.middleware.ImageServerService.DownloadType;
@@ -55,12 +62,14 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class UploadedFileController {
 
     public static final String UNABLE_TO_FIND_UPLOADED_FILE = "Unable to find uploaded file with id: %s";
+    private static final int ACCESSIBLE_STORAGES_PAGE_SIZE = 1000;
 
     private final AbstractImageRepository abstractImageRepository;
     private final CurrentUserService currentUserService;
     private final ImageServerService imageServerService;
     private final MeiliSearchService meiliSearchService;
     private final PageMapper pageMapper;
+    private final StorageHttpContract storageHttpContract;
     private final UploadedFileHttpContract uploadedFileHttpContract;
     private final UploadedFileMapper uploadedFileMapper;
     private final UrlApi urlApi;
@@ -161,17 +170,60 @@ public class UploadedFileController {
         }
 
         List<String> filters = hasFilter ? List.of(metadataFilter) : List.of();
-        Set<Long> abstractImageIds = meiliSearchService.searchImageIds(metadataSearch, filters);
-        if (abstractImageIds.isEmpty()) {
-            return Page.empty(pageable);
+        List<Long> storageIds = accessibleStorageIds(userId);
+        int page = pageable.getPageNumber() + 1;
+        int size = pageable.getPageSize();
+        if (size <= 0) {
+            Set<Long> abstractImageIds = meiliSearchService.searchImageIds(metadataSearch, filters, storageIds);
+            if (abstractImageIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            Set<Long> uploadedFileIds = abstractImageRepository.findUploadedFileIdsByAbstractImageIds(abstractImageIds);
+            if (uploadedFileIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            return uploadedFileHttpContract.getAll(userId, List.copyOf(uploadedFileIds), pageable);
         }
 
-        Set<Long> uploadedFileIds = abstractImageRepository.findUploadedFileIdsByAbstractImageIds(abstractImageIds);
-        if (uploadedFileIds.isEmpty()) {
-            return Page.empty(pageable);
+        SearchWindow window = meiliSearchService.searchWindow(
+            metadataSearch,
+            filters,
+            storageIds,
+            page,
+            size
+        );
+        if (window.abstractImageIds().isEmpty()) {
+            return new PageImpl<>(List.of(), pageable, window.totalHits());
         }
 
-        return uploadedFileHttpContract.getAll(userId, List.copyOf(uploadedFileIds), pageable);
+        List<Long> orderedUploadedFileIds = new ArrayList<>(new LinkedHashSet<>(
+            abstractImageRepository.findAllById(window.abstractImageIds())
+                .stream()
+                .filter(ai -> ai.getUploadedFile() != null)
+                .map(ai -> ai.getUploadedFile().getId())
+                .toList()
+        ));
+        if (orderedUploadedFileIds.isEmpty()) {
+            return new PageImpl<>(List.of(), pageable, window.totalHits());
+        }
+
+        Page<UploadedFileResponse> repoPage = uploadedFileHttpContract.getAll(
+            userId,
+            orderedUploadedFileIds,
+            PageRequest.of(0, orderedUploadedFileIds.size(), Sort.by("id").ascending())
+        );
+        return new PageImpl<>(repoPage.getContent(), pageable, window.totalHits());
+    }
+
+    private List<Long> accessibleStorageIds(long userId) {
+        List<Long> storageIds = new ArrayList<>();
+        int pageNumber = 0;
+        Page<StorageResponse> page;
+        do {
+            page = storageHttpContract.getAll(userId, PageRequest.of(pageNumber++, ACCESSIBLE_STORAGES_PAGE_SIZE));
+            page.getContent().stream().map(StorageResponse::id).forEach(storageIds::add);
+        } while (page.hasNext());
+        return storageIds;
     }
 
     private UploadedFileResponse withThumbnailUrl(UploadedFileResponse r, Long abstractImageId) {

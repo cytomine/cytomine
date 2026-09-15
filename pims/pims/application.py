@@ -13,6 +13,8 @@ from pims.fastapi_tweaks import apply_fastapi_tweaks
 apply_fastapi_tweaks()
 
 import time
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ValidationError
@@ -28,28 +30,8 @@ from pims.api import (
     histograms, filters, colormaps
 )
 
-app = FastAPI(
-    title="Cytomine Python Image Management Server PIMS",
-    description="Cytomine Python Image Management Server (PIMS) HTTP API. "
-                "While this API is intended to be internal, a lot of the "
-                "following specification can be ported to the "
-                "external (public) Cytomine API.",
-    version=__version__,
-    docs_url=None,
-    redoc_url=f"{get_settings().api_base_path}/docs",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.on_event("startup")
-async def startup():
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
     # Check PIMS configuration
     try:
         settings = get_settings()
@@ -92,10 +74,30 @@ async def startup():
                 f"Timeout while connecting to cache \"{get_settings().cache_url}\": {str(e)}."
             )
 
+    yield
 
-@app.on_event("shutdown")
-async def shutdown() -> None:
     await shutdown_cache()
+
+
+app = FastAPI(
+    title="Cytomine Python Image Management Server PIMS",
+    description="Cytomine Python Image Management Server (PIMS) HTTP API. "
+                "While this API is intended to be internal, a lot of the "
+                "following specification can be ported to the "
+                "external (public) Cytomine API.",
+    version=__version__,
+    docs_url=None,
+    redoc_url=f"{get_settings().api_base_path}/docs",
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def _log(request_, response_, duration_):

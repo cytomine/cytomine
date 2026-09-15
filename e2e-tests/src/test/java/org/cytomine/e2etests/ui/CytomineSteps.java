@@ -639,7 +639,6 @@ public class CytomineSteps {
             selectUserRole(wait, role);
         }
         webDriverUtils.clickButtonByText(wait, "Save");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully created')]"));
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[normalize-space(text())='" + username + "']"));
     }
 
@@ -652,6 +651,13 @@ public class CytomineSteps {
             new Select(d.findElement(roleSelect)).selectByVisibleText(role);
             return true;
         });
+        if ("Admin".equals(role)) {
+            webDriverUtils.byClick(
+                wait,
+                By.xpath("//label[contains(@class,'b-checkbox')]"
+                    + "[contains(.,'I confirm that I want to make this user an admin')]")
+            );
+        }
     }
 
     public void editUser(

@@ -132,7 +132,7 @@
             <div class="column filter"></div>
           </div>
 
-          <MetadataFilter :project="project.name" @filter-change="onMetadataFilterChange" />
+          <MetadataFilter :project="project.name" :nb-results="nbImages" @filter-change="onMetadataFilterChange" />
         </div>
       </b-collapse>
 
@@ -145,6 +145,7 @@
         :sort.sync="sortField"
         :order.sync="sortOrder"
         :revision="revision"
+        @setCollectionSize="nbImages = $event"
       >
         <template #default="{row: image}">
           <b-table-column :label="$t('overview')" width="100" :visible="isPropDisplayed('overview')">
@@ -250,6 +251,7 @@ export default {
       error: false,
       images: [],
       addImageModal: false,
+      nbImages: 0,
       metadataSearch: '',
       metadataFilters: [],
       excludedProperties: [

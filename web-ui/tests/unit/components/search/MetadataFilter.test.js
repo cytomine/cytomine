@@ -255,7 +255,7 @@ describe('MetadataFilter.vue', () => {
       selectedFacets: { [SITE]: ['LIVER'], [SEX]: ['Male'] },
     });
 
-    wrapper.find('.metadata-filter > button').trigger('click');
+    wrapper.find('.metadata-search-actions button').trigger('click');
     await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.searchString).toBe('');
@@ -265,5 +265,34 @@ describe('MetadataFilter.vue', () => {
     await advance(300);
 
     expect(wrapper.emitted('filter-change').at(-1)).toEqual([{ query: '', filters: [] }]);
+  });
+
+  it('should not display the results count when there is no active search', async () => {
+    const wrapper = await createWrapper({ propsData: { nbResults: 47 } });
+
+    expect(wrapper.find('.metadata-results-count').exists()).toBe(false);
+  });
+
+  it('should display the number of matching images next to the clear button when a search is active', async () => {
+    const wrapper = await createWrapper({ propsData: { nbResults: 12 } });
+
+    await wrapper.setData({ searchString: 'liver' });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('.metadata-search-actions button').exists()).toBe(true);
+    expect(wrapper.find('.metadata-results-count').text()).toBe('12 images');
+  });
+
+  it('should hide the results count when the search is cleared', async () => {
+    const wrapper = await createWrapper({ propsData: { nbResults: 12 } });
+
+    await wrapper.setData({ searchString: 'liver', selectedFacets: { [SITE]: [opt('LIVER', 18)] } });
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('.metadata-results-count').exists()).toBe(true);
+
+    wrapper.find('.metadata-search-actions button').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('.metadata-results-count').exists()).toBe(false);
   });
 });

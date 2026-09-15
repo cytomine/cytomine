@@ -7,7 +7,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.cytomine.e2etests.api.KeycloakClient;
-import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
@@ -31,9 +30,6 @@ public class MultiUsersRunner {
     @Autowired
     KeycloakClient keycloakClient;
 
-    @Autowired
-    SeleniumDriver seleniumDriver;
-
     @Value("${cytomine.url}")
     URL cytomineUrl;
 
@@ -43,32 +39,27 @@ public class MultiUsersRunner {
     @Value("${cytomine.admin.password}")
     String adminPassword;
 
-    public void runAsAdmin(Wait<WebDriver> wait, Consumer<CreatedUser> test) {
-        run(wait, List.of(ROLE_ADMIN), test);
+    public void runAsAdmin(Wait<WebDriver> wait, WebDriver driver, Consumer<CreatedUser> test) {
+        run(wait, driver, List.of(ROLE_ADMIN), test);
     }
 
-    public void runAllRoles(Wait<WebDriver> wait, Consumer<CreatedUser> test) {
-        run(wait, List.of(ROLE_GUEST, ROLE_ADMIN, ROLE_USER), test);
+    public void runAllRoles(Wait<WebDriver> wait, WebDriver driver, Consumer<CreatedUser> test) {
+        run(wait, driver, List.of(ROLE_GUEST, ROLE_ADMIN, ROLE_USER), test);
     }
 
-    public void run(Wait<WebDriver> wait, List<Role> roles, Consumer<CreatedUser> test) {
+    public void run(Wait<WebDriver> wait, WebDriver driver, List<Role> roles, Consumer<CreatedUser> test) {
         for (Role role : roles) {
-            WebDriver adminDriver = seleniumDriver.driver();
+            Wait<WebDriver> adminWait = new WebDriverWait(driver, Duration.ofSeconds(60));
+            cytomineSteps.login(adminWait, cytomineUrl, adminUsername, adminPassword);
+            CreatedUser user = createUser(adminWait, role);
             try {
-                Wait<WebDriver> adminWait = new WebDriverWait(adminDriver, Duration.ofSeconds(60));
-                cytomineSteps.login(adminWait, cytomineUrl, adminUsername, adminPassword);
-                CreatedUser user = createUser(adminWait, role);
-                try {
-                    cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
-                    test.accept(user);
-                    cytomineSteps.logout(wait, cytomineUrl);
-                } finally {
-                    keycloakClient.deleteUser(user.username());
-                }
-                cytomineSteps.logout(adminWait, cytomineUrl);
+                cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
+                test.accept(user);
+                cytomineSteps.logout(wait, cytomineUrl);
             } finally {
-                adminDriver.quit();
+                keycloakClient.deleteUser(user.username());
             }
+            cytomineSteps.logout(adminWait, cytomineUrl);
         }
     }
 

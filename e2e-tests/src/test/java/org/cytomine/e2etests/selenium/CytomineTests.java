@@ -122,7 +122,7 @@ public class CytomineTests {
 
     @Test
     void listImagesInProject() {
-        multiUsers.run(wait, List.of(ROLE_ADMIN, ROLE_USER), user -> {
+        multiUsers.run(wait, driver, List.of(ROLE_ADMIN, ROLE_USER), user -> {
             Set<String> imageNames = Set.of(
                 "selenium-" + randomUUID() + ".png",
                 "selenium-" + randomUUID() + ".png",
@@ -605,7 +605,7 @@ public class CytomineTests {
 
     @Test
     void login() {
-        multiUsers.runAllRoles(wait, user -> {
+        multiUsers.runAllRoles(wait, driver, user -> {
         });
     }
 
@@ -629,7 +629,7 @@ public class CytomineTests {
 
     @Test
     void createProjectAndOntologyAndImage() {
-        multiUsers.run(wait, List.of(ROLE_ADMIN, ROLE_USER), user -> {
+        multiUsers.run(wait, driver, List.of(ROLE_ADMIN, ROLE_USER), user -> {
             String projectName = "selenium-" + randomUUID();
             String imageName = "selenium-" + randomUUID() + ".png";
 
@@ -645,7 +645,7 @@ public class CytomineTests {
 
     @Test
     void editUser() {
-        multiUsers.runAsAdmin(wait, admin -> {
+        multiUsers.runAsAdmin(wait, driver, admin -> {
             String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
             String firstname = "Selenium";
             String lastname = "User-" + randomUUID().toString().substring(0, 8);
@@ -660,7 +660,7 @@ public class CytomineTests {
 
     @Test
     void deleteUser() {
-        multiUsers.runAsAdmin(wait, admin -> {
+        multiUsers.runAsAdmin(wait, driver, admin -> {
             String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
             String firstname = "Selenium";
             String lastname = "User-" + randomUUID().toString().substring(0, 8);

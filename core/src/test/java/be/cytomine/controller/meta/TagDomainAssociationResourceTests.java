@@ -68,7 +68,7 @@ public class TagDomainAssociationResourceTests {
 
     private TagDomainAssociationResponse toResponse(TagDomainAssociation tda) {
         return new TagDomainAssociationResponse(tda.getId(), tda.getTag().getId(), tda.getDomainClassName(),
-            tda.getDomainIdent(), LocalDateTime.now(), Optional.empty(), Optional.empty());
+            tda.getDomainIdent(), tda.getTag().getName(), LocalDateTime.now(), Optional.empty(), Optional.empty());
     }
 
     @Test

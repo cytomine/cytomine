@@ -254,7 +254,7 @@ describe('MetadataFilter.vue', () => {
 
     await wrapper.setData({
       searchString: 'liver',
-      selectedFacets: { [SITE]: ['LIVER'], [SEX]: ['Male'] },
+      selectedFacets: { [SITE]: [opt('LIVER', 18)], [SEX]: [opt('Male', 47)] },
     });
 
     wrapper.find('.metadata-search-actions button').trigger('click');

@@ -29,6 +29,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import be.cytomine.dto.meilisearch.SearchWindow;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -216,8 +217,8 @@ public class MeiliSearchServiceTest {
         when(searchable.getTotalHits()).thenReturn(42);
         when(index.search(any(SearchRequest.class))).thenReturn(searchable);
 
-        MeiliSearchService.SearchWindow window =
-            meiliSearchService.searchWindow("query", List.of(), List.of(7L, 8L), 2, 20);
+        SearchWindow window =
+            meiliSearchService.searchWindow("query", List.of(), null, List.of(7L, 8L), 2, 20);
 
         assertEquals(List.of(11L, 22L), window.abstractImageIds());
         assertEquals(42L, window.totalHits());
@@ -235,7 +236,7 @@ public class MeiliSearchServiceTest {
         when(searchable.getTotalHits()).thenReturn(0);
         when(index.search(any(SearchRequest.class))).thenReturn(searchable);
 
-        meiliSearchService.searchWindow("query", List.of(), List.of(), 1, 20);
+        meiliSearchService.searchWindow("query", List.of(), null, List.of(), 1, 20);
 
         assertTrue(captureSearchFilter(index).contains("image.storage_id IN [-1]"));
     }

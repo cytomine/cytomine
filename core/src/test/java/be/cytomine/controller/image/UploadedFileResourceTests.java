@@ -34,8 +34,8 @@ import be.cytomine.common.repository.utils.SpringPage;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.dto.meilisearch.SearchWindow;
 import be.cytomine.service.MeiliSearchService;
-import be.cytomine.service.MeiliSearchService.SearchWindow;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.ADMIN;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;

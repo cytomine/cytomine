@@ -43,6 +43,7 @@ import be.cytomine.dto.image.CropParameter;
 import be.cytomine.dto.image.ImageParameter;
 import be.cytomine.dto.image.LabelParameter;
 import be.cytomine.dto.image.WindowParameter;
+import be.cytomine.dto.meilisearch.SearchWindow;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
@@ -218,7 +219,7 @@ public class RestImageInstanceController extends RestCytomineController {
                 int size = (int) maxItems;
 
                 List<String> meiliFilters = !metadataFilter.isBlank() ? List.of(metadataFilter) : List.of();
-                MeiliSearchService.SearchWindow window = meiliSearchService.searchWindow(
+                SearchWindow window = meiliSearchService.searchWindow(
                     metadataSearch, meiliFilters, project.getName(), page, size);
 
                 if (window.abstractImageIds().isEmpty()) {

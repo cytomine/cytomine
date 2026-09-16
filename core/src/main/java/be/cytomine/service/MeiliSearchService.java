@@ -29,14 +29,13 @@ import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchFacetsResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchImageResponse;
+import be.cytomine.dto.meilisearch.SearchWindow;
 import be.cytomine.exceptions.SearchException;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MeiliSearchService {
-
-    public record SearchWindow(List<Long> abstractImageIds, long totalHits) {}
 
     private static final int SEARCH_PAGE_SIZE = 1000;
     private static final String[] ABSTRACT_IMAGE_ID_ATTRIBUTE = {"image.abstract_image_id"};
@@ -124,17 +123,7 @@ public class MeiliSearchService {
         int page,
         int size
     ) {
-        return searchWindow(query, filters, accessibleStorageIds(userId), page, size);
-    }
-
-    public SearchWindow searchWindow(
-        String query,
-        List<String> filters,
-        List<Long> storageIds,
-        int page,
-        int size
-    ) {
-        return searchWindow(query, filters, null, storageIds, page, size);
+        return searchWindow(query, filters, null, accessibleStorageIds(userId), page, size);
     }
 
     public SearchWindow searchWindow(

@@ -39,12 +39,12 @@ import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFi
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
+import be.cytomine.dto.meilisearch.SearchWindow;
 import be.cytomine.mapper.UploadedFileMapper;
 import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.MeiliSearchService;
-import be.cytomine.service.MeiliSearchService.SearchWindow;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.middleware.ImageServerService.DownloadType;

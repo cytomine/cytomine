@@ -639,6 +639,7 @@ public class CytomineSteps {
             selectUserRole(wait, role);
         }
         webDriverUtils.clickButtonByText(wait, "Save");
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".content-wrapper input[type='search']"), lastname);
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[normalize-space(text())='" + username + "']"));
     }
 

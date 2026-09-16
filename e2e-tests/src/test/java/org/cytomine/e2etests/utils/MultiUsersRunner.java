@@ -66,7 +66,7 @@ public class MultiUsersRunner {
     private CreatedUser createUser(Wait<WebDriver> wait, Role role) {
         String username = "selenium-" + role.name().toLowerCase() + "-" + UUID.randomUUID().toString().substring(0, 8);
         String password = "Selenium1!";
-        cytomineSteps.createUser(wait, cytomineUrl, username, "Selenium", role.name(), username + "@selenium.test",
+        cytomineSteps.createUser(wait, cytomineUrl, username, "Selenium", username, username + "@selenium.test",
             password, label(role));
         return new CreatedUser(role, username, password);
     }

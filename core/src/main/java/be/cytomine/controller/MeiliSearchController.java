@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.dto.meilisearch.MeiliSearchFacetsResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchImageResponse;
-import be.cytomine.service.AccessibleStorageService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.MeiliSearchService;
 
@@ -24,7 +23,6 @@ import be.cytomine.service.MeiliSearchService;
 @RequiredArgsConstructor
 public class MeiliSearchController {
 
-    private final AccessibleStorageService accessibleStorageService;
     private final CurrentUserService currentUserService;
     private final MeiliSearchService meiliSearchService;
 
@@ -70,7 +68,7 @@ public class MeiliSearchController {
         }
 
         long userId = currentUserService.getCurrentUser().id();
-        return meiliSearchService.getFacetDistribution(Optional.empty(), accessibleStorageService.ids(userId));
+        return meiliSearchService.getFacetDistribution(userId);
 
     }
 }

@@ -21,8 +21,12 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.StorageHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchFacetsResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchImageResponse;
 import be.cytomine.exceptions.SearchException;
@@ -42,6 +46,7 @@ public class MeiliSearchService {
 
     private final Client meiliSearchClient;
     private final ObjectMapper objectMapper;
+    private final StorageHttpContract storageHttpContract;
 
     @PostConstruct
     public void createIndexIfNotExists() {
@@ -56,6 +61,11 @@ public class MeiliSearchService {
         } catch (Exception e) {
             log.warn("Could not create MeiliSearch index '{}' at startup: {}", indexId, e.getMessage());
         }
+    }
+
+    private List<Long> accessibleStorageIds(long userId) {
+        Page<StorageResponse> page = storageHttpContract.getAll(userId, PageRequest.of(0, Integer.MAX_VALUE));
+        return page.getContent().stream().map(StorageResponse::id).toList();
     }
 
     public List<MeiliSearchImageResponse> search(
@@ -105,6 +115,16 @@ public class MeiliSearchService {
 
     public SearchWindow searchWindow(String query, List<String> filters, String datasetAlias, int page, int size) {
         return searchWindow(query, filters, datasetAlias, null, page, size);
+    }
+
+    public SearchWindow searchWindow(
+        long userId,
+        String query,
+        List<String> filters,
+        int page,
+        int size
+    ) {
+        return searchWindow(query, filters, accessibleStorageIds(userId), page, size);
     }
 
     public SearchWindow searchWindow(
@@ -227,6 +247,10 @@ public class MeiliSearchService {
 
     public MeiliSearchFacetsResponse getFacetDistribution(Optional<String> projectDatasetAlias) {
         return getFacetDistribution(projectDatasetAlias, null);
+    }
+
+    public MeiliSearchFacetsResponse getFacetDistribution(long userId) {
+        return getFacetDistribution(Optional.empty(), accessibleStorageIds(userId));
     }
 
     public MeiliSearchFacetsResponse getFacetDistribution(Optional<String> projectDatasetAlias, List<Long> storageIds) {

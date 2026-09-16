@@ -42,7 +42,6 @@ import be.cytomine.controller.utils.PageMapper;
 import be.cytomine.mapper.UploadedFileMapper;
 import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
-import be.cytomine.service.AccessibleStorageService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.MeiliSearchService.SearchWindow;
@@ -63,7 +62,6 @@ public class UploadedFileController {
     public static final String UNABLE_TO_FIND_UPLOADED_FILE = "Unable to find uploaded file with id: %s";
 
     private final AbstractImageRepository abstractImageRepository;
-    private final AccessibleStorageService accessibleStorageService;
     private final CurrentUserService currentUserService;
     private final ImageServerService imageServerService;
     private final MeiliSearchService meiliSearchService;
@@ -168,14 +166,13 @@ public class UploadedFileController {
         }
 
         List<String> filters = hasFilter ? List.of(metadataFilter) : List.of();
-        List<Long> storageIds = accessibleStorageService.ids(userId);
         int page = pageable.getPageNumber() + 1;
         int size = pageable.getPageSize();
 
         SearchWindow window = meiliSearchService.searchWindow(
+            userId,
             metadataSearch,
             filters,
-            storageIds,
             page,
             size
         );

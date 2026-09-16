@@ -27,7 +27,6 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
@@ -45,7 +44,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -98,8 +97,7 @@ class UploadedFileResourceTests {
         long abstractImageId = abstractImage.getId();
         long uploadedFileId = abstractImage.getUploadedFile().getId();
 
-        stubAccessibleStorages();
-        when(meiliSearchService.searchWindow(any(), any(), anyList(), anyInt(), anyInt()))
+        when(meiliSearchService.searchWindow(anyLong(), any(), any(), anyInt(), anyInt()))
             .thenReturn(new SearchWindow(List.of(abstractImageId), 1L));
 
         WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all")).willReturn(
@@ -117,8 +115,7 @@ class UploadedFileResourceTests {
 
     @Test
     void shouldReturnEmptyCollectionWhenMetadataMatchesNoUploadedFile() throws Exception {
-        stubAccessibleStorages();
-        when(meiliSearchService.searchWindow(any(), any(), anyList(), anyInt(), anyInt()))
+        when(meiliSearchService.searchWindow(anyLong(), any(), any(), anyInt(), anyInt()))
             .thenReturn(new SearchWindow(List.of(), 0L));
 
         mockMvc.perform(get("/api/uploadedfile.json").param("metadataFilter", "specimens.biological_being.sex:Male"))
@@ -256,13 +253,5 @@ class UploadedFileResourceTests {
 
     private String emptyPageJson() throws Exception {
         return objectMapper.writeValueAsString(new SpringPage<>(List.of(), 0, 20, 0L));
-    }
-
-    private void stubAccessibleStorages() throws Exception {
-        StorageResponse storage = new StorageResponse(37L, 1L, "sample", LocalDateTime.of(2024, 1, 1, 0, 0),
-            Optional.empty(), Optional.empty());
-        WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/storages/all")).willReturn(
-            aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .withBody(objectMapper.writeValueAsString(new SpringPage<>(List.of(storage), 0, 1000, 1L)))));
     }
 }

@@ -1,8 +1,12 @@
 package be.cytomine.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +14,7 @@ import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.Index;
 import com.meilisearch.sdk.SearchRequest;
 import com.meilisearch.sdk.model.Results;
+import com.meilisearch.sdk.model.SearchResult;
 import com.meilisearch.sdk.model.SearchResultPaginated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,12 +23,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import be.cytomine.common.repository.http.StorageHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -37,6 +48,9 @@ public class MeiliSearchServiceTest {
 
     @Mock
     private Client meiliSearchClient;
+
+    @Mock
+    private StorageHttpContract storageHttpContract;
 
     @InjectMocks
     private MeiliSearchService meiliSearchService;
@@ -224,5 +238,67 @@ public class MeiliSearchServiceTest {
         meiliSearchService.searchWindow("query", List.of(), List.of(), 1, 20);
 
         assertTrue(captureSearchFilter(index).contains("image.storage_id IN [-1]"));
+    }
+
+    private Page<StorageResponse> pageOfStorages(Long... ids) {
+        List<StorageResponse> storages = Arrays.stream(ids)
+            .map(id -> new StorageResponse(id, 1L, "storage_" + id, LocalDateTime.of(2024, 1, 1, 0, 0),
+                Optional.empty(), Optional.empty()))
+            .toList();
+        return new PageImpl<>(storages);
+    }
+
+    private Index mockSearchableIndexWithEmptyResults() {
+        Index index = mock(Index.class);
+        when(index.getUid()).thenReturn(INDEX_ID);
+        mockExistingIndexes(index);
+
+        SearchResultPaginated searchable = mock(SearchResultPaginated.class);
+        when(searchable.getHits()).thenReturn(new ArrayList<>());
+        when(searchable.getTotalHits()).thenReturn(0);
+        when(index.search(any(SearchRequest.class))).thenReturn(searchable);
+        return index;
+    }
+
+    @Test
+    public void searchWindowShouldResolveUserStoragesInOneCall() {
+        when(storageHttpContract.getAll(eq(7L), any())).thenReturn(pageOfStorages(7L, 8L));
+
+        Index index = mockSearchableIndexWithEmptyResults();
+
+        meiliSearchService.searchWindow(7L, "query", List.of(), 1, 20);
+
+        assertTrue(captureSearchFilter(index).contains("image.storage_id IN [7, 8]"));
+        verify(storageHttpContract, times(1)).getAll(eq(7L), any());
+    }
+
+    @Test
+    public void searchWindowShouldScopeToImpossibleStorageWhenUserHasNoStorage() {
+        when(storageHttpContract.getAll(eq(7L), any())).thenReturn(pageOfStorages());
+
+        Index index = mockSearchableIndexWithEmptyResults();
+
+        meiliSearchService.searchWindow(7L, "query", List.of(), 1, 20);
+
+        assertTrue(captureSearchFilter(index).contains("image.storage_id IN [-1]"));
+        verify(storageHttpContract, times(1)).getAll(eq(7L), any());
+    }
+
+    @Test
+    public void getFacetDistributionShouldResolveUserStorages() {
+        when(storageHttpContract.getAll(eq(7L), any())).thenReturn(pageOfStorages(7L, 8L));
+
+        Index index = mock(Index.class);
+        when(index.getUid()).thenReturn(INDEX_ID);
+        mockExistingIndexes(index);
+        when(index.getFilterableAttributesSettings()).thenReturn(new String[]{"image.storage_id"});
+        SearchResult result = mock(SearchResult.class);
+        when(result.getFacetDistribution()).thenReturn(Map.of());
+        when(index.search(any(SearchRequest.class))).thenReturn(result);
+
+        meiliSearchService.getFacetDistribution(7L);
+
+        assertTrue(captureSearchFilter(index).contains("image.storage_id IN [7, 8]"));
+        verify(storageHttpContract, times(1)).getAll(eq(7L), any());
     }
 }

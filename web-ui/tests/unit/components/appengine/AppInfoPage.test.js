@@ -1,5 +1,4 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import VueRouter from 'vue-router';
 
 import AppInfoPage from '@/components/appengine/AppInfoPage.vue';
 import Task from '@/utils/appengine/task';
@@ -22,8 +21,6 @@ vi.mock('@/utils/appengine/task', () => ({
 }));
 
 const localVue = createLocalVue();
-localVue.use(VueRouter);
-const router = new VueRouter();
 
 describe('AppInfoPage.vue', () => {
   const mockTask = {
@@ -39,13 +36,14 @@ describe('AppInfoPage.vue', () => {
     Task.fetchNamespaceVersion.mockResolvedValue(mockTask);
   });
 
-  const createWrapper = () => {
+  const createWrapper = ({ host } = {}) => {
     return shallowMount(AppInfoPage, {
       localVue,
-      router,
       mocks: {
         $notify: vi.fn(),
         $t: (key) => key,
+        $route: { params: { namespace: 'ns', version: '1.0.0' }, query: { host } },
+        $router: { push: vi.fn() },
       },
       stubs: {
         'b-button': {
@@ -86,12 +84,22 @@ describe('AppInfoPage.vue', () => {
     expect(wrapper.text()).toContain(mockTask.description);
   });
 
-  it('should render action buttons', async () => {
+  it('should render the install button on the app store page', async () => {
+    const wrapper = createWrapper({ host: 'https://store.example.com' });
+    await flushPromises();
+
+    expect(wrapper.vm.task.host).toBe('https://store.example.com');
+    expect(wrapper.text()).toContain('go-back');
+    expect(wrapper.text()).toContain('install');
+  });
+
+  it('should not render the install button on the installed app page', async () => {
     const wrapper = createWrapper();
     await flushPromises();
 
+    expect(wrapper.vm.task.host).toBeUndefined();
     expect(wrapper.text()).toContain('go-back');
-    expect(wrapper.text()).toContain('install');
+    expect(wrapper.text()).not.toContain('install');
     expect(wrapper.text()).toContain('button-delete');
   });
 

@@ -11,6 +11,7 @@
         />
         <div class="panel-actions">
           <b-button
+            v-if="task.host !== undefined"
             class="is-link"
             icon-pack="fa"
             icon-left="download"

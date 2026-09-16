@@ -118,6 +118,8 @@ services:
       WEB_CONCURRENCY: ${WEB_CONCURRENCY:-8}
       MEILISEARCH_URL: &MEILISEARCH_URL http://meilisearch:7700
       MEILISEARCH_KEY: &MEILI_MASTER_KEY kpnJgyFjMNj4Ljk7_Z0lM009ILFACv93fYJRPluMShk
+      # Max matching docs per query; counts clamp above it, >20000 slows searches.
+      MEILISEARCH_MAX_TOTAL_HITS: ${MEILISEARCH_MAX_TOTAL_HITS:-20000}
     networks:
       host_network:
         ipv4_address: 172.16.238.8

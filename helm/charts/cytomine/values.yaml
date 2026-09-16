@@ -279,6 +279,8 @@ meilisearch:
   port: 7700
   storage: 1Gi
   storageClassName:
+  # Max matching docs per query; counts clamp above it, >20000 slows searches.
+  maxTotalHits: 20000
   resources:
     requests:
       memory: 256Mi

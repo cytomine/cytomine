@@ -423,7 +423,7 @@ def _extract_staining_info(staining):
         return {"raw": dataclass_to_dict(staining)}
 
 def _configure_index(client, index) -> None:
-    """Configure searchable and filterable attributes on the MeiliSearch index."""
+    """Configure searchable, filterable and pagination settings on the MeiliSearch index."""
     searchable_attributes = [
         "image.identifier",
         "image.uid",
@@ -482,5 +482,8 @@ def _configure_index(client, index) -> None:
     task = index.update_settings({
         "searchableAttributes": searchable_attributes,
         "filterableAttributes": filterable_attributes,
+        "pagination": {
+            "maxTotalHits": get_settings().meilisearch_max_total_hits,
+        },
     })
     client.wait_for_task(task.task_uid)

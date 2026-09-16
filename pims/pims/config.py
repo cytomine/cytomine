@@ -56,6 +56,7 @@ class ReadableSettings(BaseSettings):
     # MeiliSearch Configuration
     meilisearch_url: str = "http://meilisearch:7700"
     meilisearch_key: str | None = None
+    meilisearch_max_total_hits: int = 20_000
 
     @property
     def meilisearch_client(self) -> Client:

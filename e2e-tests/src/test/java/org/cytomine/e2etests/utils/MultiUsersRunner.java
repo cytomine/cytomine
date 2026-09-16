@@ -52,6 +52,7 @@ public class MultiUsersRunner {
             Wait<WebDriver> adminWait = new WebDriverWait(driver, Duration.ofSeconds(60));
             cytomineSteps.login(adminWait, cytomineUrl, adminUsername, adminPassword);
             CreatedUser user = createUser(adminWait, role);
+            cytomineSteps.logout(adminWait, cytomineUrl);
             try {
                 cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
                 test.accept(user);
@@ -59,7 +60,6 @@ public class MultiUsersRunner {
             } finally {
                 keycloakClient.deleteUser(user.username());
             }
-            cytomineSteps.logout(adminWait, cytomineUrl);
         }
     }
 

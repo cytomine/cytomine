@@ -682,7 +682,8 @@ public class CytomineSteps {
         webDriverUtils.byClear(wait, By.name("lastname"));
         webDriverUtils.bySendKeys(wait, By.name("lastname"), newLastname);
         webDriverUtils.clickButtonByText(wait, "Save");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully updated')]"));
+        webDriverUtils.byClear(wait, By.cssSelector(".content-wrapper input[type='search']"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".content-wrapper input[type='search']"), newLastname);
         webDriverUtils.byIsDisplayed(
             wait,
             By.xpath("//td[contains(normalize-space(text()), '" + newFirstname + " " + newLastname + "')]")

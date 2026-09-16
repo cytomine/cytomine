@@ -23,7 +23,7 @@ data:
     INTERNAL_URL_CORE: http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }}
     DEBUG: 'true'
     MEILISEARCH_URL: http://meilisearch.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.meilisearch.port }}
-    MEILISEARCH_MAX_TOTAL_HITS: "{{ .Values.meilisearch.maxTotalHits }}"
+    MEILISEARCH_MAX_TOTAL_HITS: "{{ .Values.pims.maxTotalHits }}"
 {{ end }}
 ---
 {{ if .Values.pims.deploy }}

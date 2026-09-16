@@ -12,9 +12,13 @@ import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.HostPathVolumeSourceBuilder;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodBuilder;
+import io.fabric8.kubernetes.api.model.PodSecurityContext;
+import io.fabric8.kubernetes.api.model.PodSecurityContextBuilder;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceRequirements;
 import io.fabric8.kubernetes.api.model.ResourceRequirementsBuilder;
+import io.fabric8.kubernetes.api.model.SecurityContext;
+import io.fabric8.kubernetes.api.model.SecurityContextBuilder;
 import io.fabric8.kubernetes.api.model.Volume;
 import io.fabric8.kubernetes.api.model.VolumeBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -131,6 +135,24 @@ public class KubernetesScheduler implements SchedulerHandler {
 
         ResourceRequirements helperContainersResources = helperContainersResourcesBuilder.build();
 
+        SecurityContext containerSecurityContext = new SecurityContextBuilder()
+            .withAllowPrivilegeEscalation(false)
+            .withRunAsNonRoot(true)
+            .withNewCapabilities()
+            .withDrop("ALL")
+            .endCapabilities()
+            .withNewSeccompProfile()
+            .withType("RuntimeDefault")
+            .endSeccompProfile()
+            .build();
+
+        PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
+            .withRunAsNonRoot(true)
+            .withNewSeccompProfile()
+            .withType("RuntimeDefault")
+            .endSeccompProfile()
+            .build();
+
         // Define task resources for the task
         ResourceRequirementsBuilder taskResourcesBuilder = new ResourceRequirements().toBuilder()
             .addToRequests("cpu", new Quantity(Integer.toString(task.getCpus())))
@@ -178,6 +200,7 @@ public class KubernetesScheduler implements SchedulerHandler {
             .withImagePullPolicy("IfNotPresent")
             .withCommand("/bin/sh", "-c", fetchInputs + and + unzipInputs)
             .withResources(helperContainersResources)
+            .withSecurityContext(containerSecurityContext)
             .addNewVolumeMount()
             .withName("inputs")
             .withMountPath(task.getInputFolder())
@@ -215,6 +238,7 @@ public class KubernetesScheduler implements SchedulerHandler {
             .withImagePullPolicy("IfNotPresent")
             .withCommand("/bin/sh", "-c", command)
             .withResources(helperContainersResources)
+            .withSecurityContext(containerSecurityContext)
             .addNewVolumeMount().withName("outputs").withMountPath(task.getOutputFolder()).endVolumeMount()
             .withEnv(new EnvVarBuilder().withName("POD_NAME").withNewValueFrom().withNewFieldRef()
                 .withFieldPath("metadata.name").endFieldRef().endValueFrom().build())
@@ -224,6 +248,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         Container permissionContainer = new ContainerBuilder().withName("permissions").withImage(taskRunnerImage)
             .withImagePullPolicy("IfNotPresent").withCommand("/bin/sh", "-c", permissions)
             .withResources(helperContainersResources)
+            .withSecurityContext(containerSecurityContext)
             .addNewVolumeMount().withName("inputs").withMountPath(task.getInputFolder()).endVolumeMount()
             .addNewVolumeMount().withName("outputs").withMountPath(task.getOutputFolder()).endVolumeMount()
             .build();
@@ -236,6 +261,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         PodBuilder podBuilder = new PodBuilder().withNewMetadata().withName(podName).withNamespace(tasksNamespace)
             .withLabels(Map.of("runId", runId, "app", "task")).endMetadata().withNewSpec()
             .withHostNetwork(useHostNetwork).withServiceAccountName("app-engine")
+            .withSecurityContext(podSecurityContext)
             .addNewInitContainerLike(permissionContainer).and().withRestartPolicy("Never").endSpec();
 
         Pod pod = podBuilder.build();
@@ -252,7 +278,8 @@ public class KubernetesScheduler implements SchedulerHandler {
         Container symlinksCreatorContainer =
             new ContainerBuilder().withName("symlinks-creator").withImage(taskRunnerImage)
                 .withImagePullPolicy("IfNotPresent").withCommand("/bin/sh", "-c", createSymlinks.toString())
-                .withResources(helperContainersResources).addNewVolumeMount().withName("inputs")
+                .withResources(helperContainersResources).withSecurityContext(containerSecurityContext)
+                .addNewVolumeMount().withName("inputs")
                 .withMountPath(task.getInputFolder()).endVolumeMount().addNewVolumeMount().withName("images-datasets")
                 .withMountPath("/datasets").withReadOnly(true) // to avoid corrupting the dataset
                 .endVolumeMount().build();
@@ -267,6 +294,7 @@ public class KubernetesScheduler implements SchedulerHandler {
             new ContainerBuilder().withName("task").withImage(imageName).withImagePullPolicy("IfNotPresent")
                 // request and limit task resources
                 .withResources(taskResources)
+                .withSecurityContext(containerSecurityContext)
                 // Mount volumes for inputs and outputs
                 .addNewVolumeMount().withName("inputs").withMountPath(task.getInputFolder()).endVolumeMount()
                 .addNewVolumeMount().withName("outputs").withMountPath(task.getOutputFolder()).endVolumeMount()

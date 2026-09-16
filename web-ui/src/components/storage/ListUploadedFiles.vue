@@ -12,7 +12,7 @@
         icon="search"
       />
 
-      <MetadataFilter @filter-change="onMetadataFilterChange" />
+      <MetadataFilter :nb-results="nbResults" @filter-change="onMetadataFilterChange" />
 
       <cytomine-table
         :collection="uploadedFileCollection"
@@ -21,6 +21,7 @@
         :refreshInterval="tableRefreshInterval"
         v-model:openedDetailed="openedDetails"
         :detailed="false"
+        @setCollectionSize="nbResults = $event"
       >
         <b-table-column v-slot="{row: uFile}" :label="$t('preview')" width="80" class="image-overview">
           <image-thumbnail v-if="uFile.thumbnailUrl" :url="uFile.thumbnailUrl" :size="128" :key="uFile.thumbnailUrl" :extra-parameters="{authorization: 'Bearer ' + shortTermToken }"/>
@@ -88,6 +89,7 @@ export default {
       searchString: '',
       metadataSearch: '',
       metadataFilters: [],
+      nbResults: 0,
       openedDetails: [],
     };
   },

@@ -14,7 +14,9 @@ import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.TagDomainAssociationMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TagDomainAssociationRepository;
+import org.cytomine.repository.persistence.TagRepository;
 import org.cytomine.repository.persistence.entity.TagDomainAssociationEntity;
+import org.cytomine.repository.persistence.entity.TagEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.TagDomainAssociationCommandPayload;
@@ -37,6 +39,7 @@ public class TagDomainAssociationCommandService implements
         TagDomainAssociationEntity, TagDomainAssociationResponse> {
 
     private final TagDomainAssociationRepository tagDomainAssociationRepository;
+    private final TagRepository tagRepository;
     private final TagDomainAssociationMapper tagDomainAssociationMapper;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
@@ -70,7 +73,20 @@ public class TagDomainAssociationCommandService implements
 
     @Override
     public TagDomainAssociationResponse mapToResponse(TagDomainAssociationEntity entity) {
-        return tagDomainAssociationMapper.mapToResponse(entity);
+        TagDomainAssociationResponse response = tagDomainAssociationMapper.mapToResponse(entity);
+        String tagName = entity.getTagId() == null
+            ? null
+            : tagRepository.findByIdAndDeletedNull(entity.getTagId()).map(TagEntity::getName).orElse(null);
+        return new TagDomainAssociationResponse(
+            response.id(),
+            response.tagId(),
+            response.domainClassName(),
+            response.domainId(),
+            tagName,
+            response.created(),
+            response.updated(),
+            response.deleted()
+        );
     }
 
     @Override

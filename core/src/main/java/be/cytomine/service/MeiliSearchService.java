@@ -3,6 +3,8 @@ package be.cytomine.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,7 +31,8 @@ import be.cytomine.exceptions.SearchException;
 @RequiredArgsConstructor
 public class MeiliSearchService {
 
-    private static final int SEARCH_PAGE_SIZE = 100;
+    private static final int SEARCH_PAGE_SIZE = 1000;
+    private static final String[] ABSTRACT_IMAGE_ID_ATTRIBUTE = {"image.abstract_image_id"};
 
     @Value("${meilisearch.index_id}")
     private String indexId;
@@ -88,6 +91,7 @@ public class MeiliSearchService {
 
             return abstractImageIds;
         } catch (Exception e) {
+            log.error("Could not search for '{}'", query, e);
             throw new SearchException("search failed", 500, e.getMessage());
         }
     }
@@ -95,16 +99,18 @@ public class MeiliSearchService {
     private SearchResultPaginated searchPage(Index index, String query, List<String> filters, int page) {
         SearchRequest searchRequest = buildSearchRequest(query, filters)
             .setPage(page)
-            .setHitsPerPage(SEARCH_PAGE_SIZE);
+            .setHitsPerPage(SEARCH_PAGE_SIZE)
+            .setAttributesToRetrieve(ABSTRACT_IMAGE_ID_ATTRIBUTE);
         return (SearchResultPaginated) index.search(searchRequest);
     }
 
     private Set<Long> collectAbstractImageIds(Searchable result) {
         return result.getHits().stream()
-            .map(hit -> objectMapper.convertValue(hit, MeiliSearchImageResponse.class))
-            .map(MeiliSearchImageResponse::getImage)
-            .filter(image -> image != null && image.getAbstractImageId() != null)
-            .map(MeiliSearchImageResponse.Image::getAbstractImageId)
+            .map(hit -> hit.get("image"))
+            .filter(image -> image instanceof Map<?, ?>)
+            .map(image -> ((Map<?, ?>) image).get("abstract_image_id"))
+            .filter(Objects::nonNull)
+            .map(id -> ((Number) id).longValue())
             .collect(Collectors.toCollection(HashSet::new));
     }
 

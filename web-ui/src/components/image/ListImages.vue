@@ -132,7 +132,7 @@
             <div class="column filter"></div>
           </div>
 
-          <MetadataFilter :project="project.name" @filter-change="onMetadataFilterChange" />
+          <MetadataFilter :project="project.name" :nb-results="nbImages" @filter-change="onMetadataFilterChange" />
         </div>
       </b-collapse>
 
@@ -145,6 +145,7 @@
         v-model:sort="sortField"
         v-model:order="sortOrder"
         :revision="revision"
+        @setCollectionSize="nbImages = $event"
       >
         <b-table-column
           v-slot="{row: image}"
@@ -266,6 +267,7 @@ export default {
       error: false,
       images: [],
       addImageModal: false,
+      nbImages: 0,
       metadataSearch: '',
       metadataFilters: [],
       excludedProperties: [

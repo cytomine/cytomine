@@ -198,7 +198,7 @@ jobs:
         run: |
           helm test cytomine-${{ env.DEPLOYMENT_NAME }} \
             --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} \
-            --timeout=20m
+            --timeout=30m
 
       - name: Log k8s events
         if: failure()

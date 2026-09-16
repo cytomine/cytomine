@@ -674,7 +674,7 @@ public class CytomineTests {
             String password = "Selenium1!";
 
             cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
-            cytomineSteps.editUser(wait, cytomineUrl, username, "UpdatedFirst", "UpdatedLast");
+            cytomineSteps.editUser(wait, cytomineUrl, username, lastname, "UpdatedFirst", "UpdatedLast");
             keycloakClient.deleteUser(username);
         });
     }
@@ -689,7 +689,7 @@ public class CytomineTests {
             String password = "Selenium1!";
 
             cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
-            cytomineSteps.deleteUser(wait, cytomineUrl, username);
+            cytomineSteps.deleteUser(wait, cytomineUrl, username, lastname);
         });
     }
 }

@@ -665,11 +665,13 @@ public class CytomineSteps {
         Wait<WebDriver> wait,
         URL cytomineUrl,
         String username,
+        String lastname,
         String newFirstname,
         String newLastname
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".content-wrapper input[type='search']"), lastname);
         webDriverUtils.xpathClick(
             wait,
             "//tr[.//td[normalize-space(text())='" + username + "']]//button[contains(text(), 'Edit')]"
@@ -690,10 +692,12 @@ public class CytomineSteps {
     public void deleteUser(
         Wait<WebDriver> wait,
         URL cytomineUrl,
-        String username
+        String username,
+        String lastname
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".content-wrapper input[type='search']"), lastname);
         webDriverUtils.xpathClick(
             wait,
             "//tr[.//td[normalize-space(text())='" + username + "']]//button[contains(text(), 'Delete')]"

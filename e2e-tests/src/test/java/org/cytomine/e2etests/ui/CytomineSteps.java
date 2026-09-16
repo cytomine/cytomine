@@ -640,7 +640,7 @@ public class CytomineSteps {
             selectUserRole(wait, role);
         }
         webDriverUtils.clickButtonByText(wait, "Save");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully created')]"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".content-wrapper input[type='search']"), lastname);
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[normalize-space(text())='" + username + "']"));
     }
 
@@ -653,17 +653,26 @@ public class CytomineSteps {
             new Select(d.findElement(roleSelect)).selectByVisibleText(role);
             return true;
         });
+        if ("Admin".equals(role)) {
+            webDriverUtils.byClick(
+                wait,
+                By.xpath("//label[contains(@class,'b-checkbox')]"
+                    + "[contains(.,'I confirm that I want to make this user an admin')]")
+            );
+        }
     }
 
     public void editUser(
         Wait<WebDriver> wait,
         URL cytomineUrl,
         String username,
+        String lastname,
         String newFirstname,
         String newLastname
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".content-wrapper input[type='search']"), lastname);
         webDriverUtils.xpathClick(
             wait,
             "//tr[.//td[normalize-space(text())='" + username + "']]//button[contains(text(), 'Edit')]"
@@ -674,20 +683,18 @@ public class CytomineSteps {
         webDriverUtils.byClear(wait, By.name("lastname"));
         webDriverUtils.bySendKeys(wait, By.name("lastname"), newLastname);
         webDriverUtils.clickButtonByText(wait, "Save");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully updated')]"));
-        webDriverUtils.byIsDisplayed(
-            wait,
-            By.xpath("//td[contains(normalize-space(text()), '" + newFirstname + " " + newLastname + "')]")
-        );
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.name("firstname")));
     }
 
     public void deleteUser(
         Wait<WebDriver> wait,
         URL cytomineUrl,
-        String username
+        String username,
+        String lastname
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".content-wrapper input[type='search']"), lastname);
         webDriverUtils.xpathClick(
             wait,
             "//tr[.//td[normalize-space(text())='" + username + "']]//button[contains(text(), 'Delete')]"

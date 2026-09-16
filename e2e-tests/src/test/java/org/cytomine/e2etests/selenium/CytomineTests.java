@@ -9,10 +9,12 @@ import java.util.Optional;
 import java.util.Set;
 
 import lombok.SneakyThrows;
+import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.AnnotationTools;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.cytomine.e2etests.ui.WebDriverUtils;
+import org.cytomine.e2etests.utils.MultiUsersRunner;
 import org.cytomine.e2etests.utils.ReportType;
 import org.cytomine.e2etests.utils.Screenshots;
 import org.junit.jupiter.api.AfterEach;
@@ -28,10 +30,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
+import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static be.cytomine.common.repository.model.Role.ROLE_USER;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toSet;
 
-@Import({SeleniumDriver.class, AnnotationTools.class, CytomineSteps.class, WebDriverUtils.class})
+@Import({
+    AnnotationTools.class, CytomineSteps.class, KeycloakClient.class, MultiUsersRunner.class,
+    SeleniumDriver.class, WebDriverUtils.class
+})
 @SpringBootTest
 public class CytomineTests {
     @Autowired
@@ -53,6 +60,12 @@ public class CytomineTests {
 
     @Autowired
     CytomineSteps cytomineSteps;
+
+    @Autowired
+    KeycloakClient keycloakClient;
+
+    @Autowired
+    MultiUsersRunner multiUsers;
 
     @BeforeEach
     void setUp() {
@@ -89,17 +102,6 @@ public class CytomineTests {
     }
 
     @Test
-    void createAndDeleteProject() {
-        String projectName = "selenium-" + randomUUID();
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
-        String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
-        cytomineSteps.deleteProject(wait, projectURL);
-        cytomineSteps.deleteOntology(wait, ontologyURL);
-        cytomineSteps.logout(wait, cytomineUrl);
-    }
-
-    @Test
     void listProjects() {
         Set<String> projectNames = Set.of(
             "selenium-" + randomUUID(),
@@ -120,24 +122,25 @@ public class CytomineTests {
     }
 
     @Test
-    public void listImagesInProject() {
-        Set<String> imageNames = Set.of(
-            "selenium-" + randomUUID() + ".png",
-            "selenium-" + randomUUID() + ".png",
-            "selenium-" + randomUUID() + ".png"
-        );
-        String projectName = "selenium-" + randomUUID();
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
-        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-        imageNames.forEach(name -> cytomineSteps.addImage(wait, cytomineUrl, name, Optional.of(projectName)));
+    void listImagesInProject() {
+        multiUsers.run(wait, driver, List.of(ROLE_ADMIN, ROLE_USER), user -> {
+            Set<String> imageNames = Set.of(
+                "selenium-" + randomUUID() + ".png",
+                "selenium-" + randomUUID() + ".png",
+                "selenium-" + randomUUID() + ".png"
+            );
+            String projectName = "selenium-" + randomUUID();
 
-        cytomineSteps.listImagesInProject(wait, projectUrl, imageNames);
+            String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+            String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+            imageNames.forEach(name -> cytomineSteps.addImage(wait, cytomineUrl, name, Optional.of(projectName)));
 
-        cytomineSteps.deleteProject(wait, projectUrl);
-        cytomineSteps.deleteOntology(wait, ontologyUrl);
-        imageNames.forEach(imageName -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName));
-        cytomineSteps.logout(wait, cytomineUrl);
+            cytomineSteps.listImagesInProject(wait, projectUrl, imageNames);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            imageNames.forEach(imageName -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName));
+        });
     }
 
     @Test
@@ -146,15 +149,6 @@ public class CytomineTests {
         cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
         String ontologyURL = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
         cytomineSteps.deleteOntology(wait, ontologyURL);
-        cytomineSteps.logout(wait, cytomineUrl);
-    }
-
-    @Test
-    void addImageToStorageNoProject() {
-        String imageName = "selenium-" + randomUUID() + ".png";
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.empty());
-        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.logout(wait, cytomineUrl);
     }
 
@@ -630,5 +624,74 @@ public class CytomineTests {
         cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         cytomineSteps.deleteTag(wait, cytomineUrl, tagName);
         cytomineSteps.logout(wait, cytomineUrl);
+    }
+
+    @Test
+    void login() {
+        multiUsers.runAllRoles(wait, driver, user -> {
+        });
+    }
+
+    @Test
+    void createNewUserAndLoginAsUser() {
+        String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
+        String firstname = "Selenium";
+        String lastname = "User-" + randomUUID().toString().substring(0, 8);
+        String email = username + "@selenium.test";
+        String password = "Selenium1!";
+
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
+        cytomineSteps.logout(wait, cytomineUrl);
+
+        cytomineSteps.login(wait, cytomineUrl, username, password);
+        cytomineSteps.logout(wait, cytomineUrl);
+
+        keycloakClient.deleteUser(username);
+    }
+
+    @Test
+    void createProjectAndOntologyAndImage() {
+        multiUsers.run(wait, driver, List.of(ROLE_ADMIN, ROLE_USER), user -> {
+            String projectName = "selenium-" + randomUUID();
+            String imageName = "selenium-" + randomUUID() + ".png";
+
+            String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+            String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
+            cytomineSteps.deleteProject(wait, projectURL);
+            cytomineSteps.deleteOntology(wait, ontologyURL);
+
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.empty());
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        });
+    }
+
+    @Test
+    void editUser() {
+        multiUsers.runAsAdmin(wait, driver, admin -> {
+            String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
+            String firstname = "Selenium";
+            String lastname = "User-" + randomUUID().toString().substring(0, 8);
+            String email = username + "@selenium.test";
+            String password = "Selenium1!";
+
+            cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
+            cytomineSteps.editUser(wait, cytomineUrl, username, lastname, "UpdatedFirst", "UpdatedLast");
+            keycloakClient.deleteUser(username);
+        });
+    }
+
+    @Test
+    void deleteUser() {
+        multiUsers.runAsAdmin(wait, driver, admin -> {
+            String username = "selenium-user-" + randomUUID().toString().substring(0, 8);
+            String firstname = "Selenium";
+            String lastname = "User-" + randomUUID().toString().substring(0, 8);
+            String email = username + "@selenium.test";
+            String password = "Selenium1!";
+
+            cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
+            cytomineSteps.deleteUser(wait, cytomineUrl, username, lastname);
+        });
     }
 }

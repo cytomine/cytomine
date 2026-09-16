@@ -64,6 +64,7 @@ class TagDomainAssociationControllerTest
             updatePayload.tagId().orElse(response.tagId()),
             updatePayload.domainClassName().orElse(response.domainClassName()),
             updatePayload.domainId().orElse(response.domainId()),
+            response.tagName(),
             response.created(),
             Optional.of(updatedTime),
             response.deleted()

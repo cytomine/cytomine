@@ -51,7 +51,11 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.id("username"));
     }
 
-    @SneakyThrows
+    public void goToProjectTab(Wait<WebDriver> wait, String projectUrl, String tab) {
+        webDriverUtils.goTo(wait, projectUrl);
+        webDriverUtils.xpathClick(wait, "//nav[contains(@class, 'sidebar')]//a[normalize-space()='" + tab + "']");
+    }
+
     public String createProject(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl, String projectName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
         webDriverUtils.xpathClick(wait, "//a[@href='/projects']");
@@ -635,7 +639,7 @@ public class CytomineSteps {
             selectUserRole(wait, role);
         }
         webDriverUtils.clickButtonByText(wait, "Save");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully created')]"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".content-wrapper input[type='search']"), lastname);
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[normalize-space(text())='" + username + "']"));
     }
 
@@ -648,17 +652,26 @@ public class CytomineSteps {
             new Select(d.findElement(roleSelect)).selectByVisibleText(role);
             return true;
         });
+        if ("Admin".equals(role)) {
+            webDriverUtils.byClick(
+                wait,
+                By.xpath("//label[contains(@class,'b-checkbox')]"
+                    + "[contains(.,'I confirm that I want to make this user an admin')]")
+            );
+        }
     }
 
     public void editUser(
         Wait<WebDriver> wait,
         URL cytomineUrl,
         String username,
+        String lastname,
         String newFirstname,
         String newLastname
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".content-wrapper input[type='search']"), lastname);
         webDriverUtils.xpathClick(
             wait,
             "//tr[.//td[normalize-space(text())='" + username + "']]//button[contains(text(), 'Edit')]"
@@ -669,20 +682,18 @@ public class CytomineSteps {
         webDriverUtils.byClear(wait, By.name("lastname"));
         webDriverUtils.bySendKeys(wait, By.name("lastname"), newLastname);
         webDriverUtils.clickButtonByText(wait, "Save");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully updated')]"));
-        webDriverUtils.byIsDisplayed(
-            wait,
-            By.xpath("//td[contains(normalize-space(text()), '" + newFirstname + " " + newLastname + "')]")
-        );
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.name("firstname")));
     }
 
     public void deleteUser(
         Wait<WebDriver> wait,
         URL cytomineUrl,
-        String username
+        String username,
+        String lastname
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".content-wrapper input[type='search']"), lastname);
         webDriverUtils.xpathClick(
             wait,
             "//tr[.//td[normalize-space(text())='" + username + "']]//button[contains(text(), 'Delete')]"
@@ -916,5 +927,31 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//a[normalize-space()='" + imageGroupName + "']");
         webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
+    }
+
+    public void addTagToImage(Wait<WebDriver> wait, String imageName, String tagName) {
+        webDriverUtils.xpathClick(
+            wait,
+            "//tr[.//td[@data-label='Name']//span[contains(., '" + imageName + "')]]"
+                + "//td[contains(@class,'chevron-cell')]//a[@role='button']"
+        );
+        webDriverUtils.byClick(wait, By.cssSelector("button.add-tag"));
+        webDriverUtils.bySendKeys(wait, By.cssSelector(".modal-card .taginput input"), tagName);
+        webDriverUtils.xpathClick(
+            wait,
+            "//a[contains(@class, 'dropdown-item')][.//span[normalize-space()='" + tagName + "']]"
+        );
+        webDriverUtils.xpathClick(
+            wait,
+            "//footer[contains(@class, 'modal-card-foot')]//button[normalize-space()='Add']"
+        );
+        webDriverUtils.waitUntilByEmpty(
+            wait,
+            By.xpath("//div[contains(., 'The selected tags were correctly associated')]")
+        );
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath("//div[contains(@class, 'tags-wrapper')]//*[contains(., '" + tagName.toUpperCase() + "')]")
+        );
     }
 }

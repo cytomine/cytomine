@@ -13,7 +13,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 import org.springframework.util.StringUtils;
 
-@SpringBootApplication(scanBasePackages = {"org.cytomine.repository", "be.cytomine.common.mapper"})
+@SpringBootApplication(scanBasePackages = {
+    "org.cytomine.repository", "be.cytomine.common.mapper", "be.cytomine.common.config.security"
+})
 @Import({ObjectMapperFactory.class})
 @Slf4j
 public class RepositoryApp {

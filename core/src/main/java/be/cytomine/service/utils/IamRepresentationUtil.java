@@ -15,7 +15,6 @@ import be.cytomine.exceptions.UserManagementException;
 @Slf4j
 public class IamRepresentationUtil {
 
-
     public static UserRepresentation getAccountRepresentation(Account account) {
         log.info("Retrieving account {}", account.username());
         UserRepresentation user = new UserRepresentation();
@@ -49,13 +48,12 @@ public class IamRepresentationUtil {
         if (user.getAttributes() == null) {
             user.setAttributes(new HashMap<>());
         }
+
         try {
             user.getAttributes().put("isDeveloper", Collections.singletonList(account.isDeveloper() ? "1" : "0"));
-            user.getAttributes().put("user_locale", Collections.singletonList(account.userLocale()));
-
+            user.getAttributes().put("locale", Collections.singletonList(account.locale()));
         } catch (NullPointerException e) {
             throw new UserManagementException(500, ErrorCode.CORE_CUSTOM_ATTRIBUTES_NOT_SET);
         }
     }
-
 }

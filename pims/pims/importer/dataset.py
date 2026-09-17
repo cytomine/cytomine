@@ -205,6 +205,7 @@ def run_import_datasets(
                         flat_dict["id"] = flat_dict["image"]["identifier"] # MeiliSearch requires a unique 'id'
                         alias = image.reference.alias if image.reference else None
                         flat_dict["image"]["abstract_image_id"] = abstract_image_by_alias.get(alias)
+                        flat_dict["image"]["storage_id"] = int(storage_id)
                         indexing_payload.append(flat_dict)
 
                     logger.info(f"[{parent_dataset}] Prepared {len(indexing_payload)} images for indexing.")
@@ -422,7 +423,7 @@ def _extract_staining_info(staining):
         return {"raw": dataclass_to_dict(staining)}
 
 def _configure_index(client, index) -> None:
-    """Configure searchable and filterable attributes on the MeiliSearch index."""
+    """Configure searchable, filterable and pagination settings on the MeiliSearch index."""
     searchable_attributes = [
         "image.identifier",
         "image.uid",
@@ -467,6 +468,7 @@ def _configure_index(client, index) -> None:
     ]
     filterable_attributes = [
         "image.abstract_image_id",
+        "image.storage_id",
         "specimens.biological_being.animal_species.meaning",
         "specimens.anatomical_site.meaning",
         "specimens.biological_being.sex",
@@ -480,5 +482,8 @@ def _configure_index(client, index) -> None:
     task = index.update_settings({
         "searchableAttributes": searchable_attributes,
         "filterableAttributes": filterable_attributes,
+        "pagination": {
+            "maxTotalHits": get_settings().meilisearch_max_total_hits,
+        },
     })
     client.wait_for_task(task.task_uid)

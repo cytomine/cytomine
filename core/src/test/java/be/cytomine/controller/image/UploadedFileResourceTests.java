@@ -34,6 +34,7 @@ import be.cytomine.common.repository.utils.SpringPage;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractImage;
+import be.cytomine.dto.meilisearch.SearchWindow;
 import be.cytomine.service.MeiliSearchService;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.ADMIN;
@@ -42,6 +43,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -94,7 +97,8 @@ class UploadedFileResourceTests {
         long abstractImageId = abstractImage.getId();
         long uploadedFileId = abstractImage.getUploadedFile().getId();
 
-        when(meiliSearchService.searchImageIds(any(), any())).thenReturn(Set.of(abstractImageId));
+        when(meiliSearchService.searchWindow(anyLong(), any(), any(), anyInt(), anyInt()))
+            .thenReturn(new SearchWindow(List.of(abstractImageId), 1L));
 
         WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all")).willReturn(
             aResponse().withStatus(HttpStatus.OK.value()).withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
@@ -111,7 +115,8 @@ class UploadedFileResourceTests {
 
     @Test
     void shouldReturnEmptyCollectionWhenMetadataMatchesNoUploadedFile() throws Exception {
-        when(meiliSearchService.searchImageIds(any(), any())).thenReturn(Set.of(-999L));
+        when(meiliSearchService.searchWindow(anyLong(), any(), any(), anyInt(), anyInt()))
+            .thenReturn(new SearchWindow(List.of(), 0L));
 
         mockMvc.perform(get("/api/uploadedfile.json").param("metadataFilter", "specimens.biological_being.sex:Male"))
             .andExpect(status().isOk())

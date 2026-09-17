@@ -28,6 +28,7 @@ public class MeiliSearchImageResponse {
     public static class Image {
         private String identifier;
         private Long abstractImageId;
+        private Long storageId;
         private SlideDetail slide;
         private Scanner scanner;
         private ImagingSetting imagingSetting;

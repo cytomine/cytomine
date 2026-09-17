@@ -38,6 +38,9 @@ public class UserEntity implements HasTimestampCUD {
     private String username;
 
     @Column
+    private String reference;
+
+    @Column
     private String firstname;
 
     @Column

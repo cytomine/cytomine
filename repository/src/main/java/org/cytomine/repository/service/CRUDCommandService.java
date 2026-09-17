@@ -126,6 +126,22 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
     default void afterCreate(long userId, P payload) {
     }
 
+    default Optional<HttpCommandResponse> createSelf(C createPayload, LocalDateTime now) {
+        E entity = mapCreateToEntity(createPayload, 0L, Timestamp.valueOf(now));
+        E savedEntity = save(entity);
+        P commandPayload = map(savedEntity);
+        long selfId = commandPayload.id();
+        afterCreate(selfId, commandPayload);
+        CreateCommandRequest<?> createCommandRequest = mapCreateCommand(selfId, commandPayload);
+        CommandV2Entity commandV2Entity =
+            getCommandV2Repository().save(
+                getCommandMapper().map(createCommandRequest, now, null, selfId, Optional.empty()));
+        R response = mapToResponse(savedEntity);
+        return Optional.of(
+            new HttpCommandResponse(true, response, commandV2Entity.getId(), createCommandRequest.getCommand(),
+                Set.of()));
+    }
+
     boolean canWriteId(long userId, long id);
 
     boolean canDeleteId(long userId, long id);

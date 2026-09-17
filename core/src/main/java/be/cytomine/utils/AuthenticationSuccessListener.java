@@ -16,7 +16,9 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
@@ -26,7 +28,6 @@ import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
-import be.cytomine.service.image.server.StorageService;
 import be.cytomine.service.project.ProjectMemberService;
 
 @RequiredArgsConstructor
@@ -41,7 +42,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     private final SecRoleRepository secRoleRepository;
 
-    private final StorageService storageService;
+    private final UserHttpContract userHttpContract;
 
     private final UserRepository userRepository;
 
@@ -65,6 +66,16 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     private AuthenticationSuccessListener self() {
         return applicationContext.getBean(AuthenticationSuccessListener.class);
+    }
+
+    private static String highestRole(Set<String> rolesFromAuthentication) {
+        if (rolesFromAuthentication.contains("ROLE_ADMIN")) {
+            return "ROLE_ADMIN";
+        }
+        if (rolesFromAuthentication.contains("ROLE_USER")) {
+            return "ROLE_USER";
+        }
+        return "ROLE_GUEST";
     }
 
     @Override
@@ -96,24 +107,28 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
         } else if (userByReference.isEmpty()) {
 
-            User newUser = new User();
-            newUser.setUsername(jwtAuthenticationToken.getName());
-            newUser.setReference(sub.toString());
-            newUser.setName(tokenAttributes.get("name").toString());
-            newUser.setFirstname(tokenAttributes.get("given_name") != null
-                ? tokenAttributes.get("given_name").toString() : "");
-            newUser.setLastname(tokenAttributes.get("family_name") != null
-                ? tokenAttributes.get("family_name").toString() : "");
-            newUser.setEmail(tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "");
-            // generate keys for public/private keys authentication
-            newUser.generateKeys();
+            CreateUser createUser = new CreateUser(
+                jwtAuthenticationToken.getName(),
+                Optional.ofNullable(tokenAttributes.get("name")).map(Object::toString),
+                Optional.of(tokenAttributes.get("given_name") != null
+                    ? tokenAttributes.get("given_name").toString() : ""),
+                Optional.of(tokenAttributes.get("family_name") != null
+                    ? tokenAttributes.get("family_name").toString() : ""),
+                tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "",
+                Optional.empty(),
+                false,
+                highestRole(rolesFromAuthentication),
+                "EN",
+                Optional.empty(),
+                Optional.empty(),
+                null,
+                Optional.of(sub.toString())
+            );
+            userHttpContract.selfRegister(createUser);
 
-            //save domain into the database
-            User savedUser = userRepository.save(newUser);
+            User savedUser = userRepository.findByReference(sub.toString())
+                .orElseThrow(() -> new IllegalStateException("User not found after self-registration: " + sub));
             UserResponse userResponse = userMapper.map(savedUser);
-
-            self().setCumulativeRole(rolesFromAuthentication, savedUser);
-            storageService.initUserStorage(savedUser.getId());
 
             self().updateProjectsMembership(projects, savedUser);
 

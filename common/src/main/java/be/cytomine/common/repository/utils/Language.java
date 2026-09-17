@@ -5,9 +5,6 @@ import java.util.Map;
 
 public enum Language {
     // see https://fr.wikipedia.org/wiki/Liste_des_codes_ISO_639-1
-    ARABIC("AR"),
-    GERMAN("DE"),
-    GREEK("EL"),
     ENGLISH("EN"),
     FRENCH("FR"),
     DUTCH("NL"),
@@ -30,6 +27,22 @@ public enum Language {
 
     public static Language findByCode(String c) {
         return map.get(c);
+    }
+
+    public static Language resolve(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String normalized = value.trim().toUpperCase();
+        Language byCode = map.get(normalized);
+        if (byCode != null) {
+            return byCode;
+        }
+        try {
+            return Language.valueOf(normalized);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public static Language findByOrdinal(Integer ordinal) {

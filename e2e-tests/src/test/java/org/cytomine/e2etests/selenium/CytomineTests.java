@@ -96,6 +96,7 @@ public class CytomineTests {
 
             cytomineSteps.deleteTag(wait, cytomineUrl, renamedTagName);
             cytomineSteps.deleteTag(wait, cytomineUrl, secondTagName);
+            cytomineSteps.logout(wait, cytomineUrl);
         });
     }
 
@@ -618,19 +619,7 @@ public class CytomineTests {
             cytomineSteps.deleteTag(wait, cytomineUrl, tagName);
         });
     }
-
-    @Test
-    void login() {
-        multiUsers.runAllRoles(wait, driver, user -> {
-        });
-    }
-
-    @Test
-    void createNewUserAndLoginAsUser() {
-        multiUsers.run(wait, driver, List.of(ROLE_USER), user -> {
-        });
-    }
-
+    
     @Test
     void createProjectAndOntologyAndImage() {
         multiUsers.run(wait, driver, List.of(ROLE_ADMIN, ROLE_USER), user -> {

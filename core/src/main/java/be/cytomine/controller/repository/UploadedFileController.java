@@ -1,6 +1,8 @@
 package be.cytomine.controller.repository;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,6 +12,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
@@ -35,6 +39,7 @@ import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFi
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
+import be.cytomine.dto.meilisearch.SearchWindow;
 import be.cytomine.mapper.UploadedFileMapper;
 import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
@@ -161,17 +166,37 @@ public class UploadedFileController {
         }
 
         List<String> filters = hasFilter ? List.of(metadataFilter) : List.of();
-        Set<Long> abstractImageIds = meiliSearchService.searchImageIds(metadataSearch, filters);
-        if (abstractImageIds.isEmpty()) {
-            return Page.empty(pageable);
+        int page = pageable.getPageNumber() + 1;
+        int size = pageable.getPageSize();
+
+        SearchWindow window = meiliSearchService.searchWindow(
+            userId,
+            metadataSearch,
+            filters,
+            page,
+            size
+        );
+        if (window.abstractImageIds().isEmpty()) {
+            return new PageImpl<>(List.of(), pageable, window.totalHits());
         }
 
-        Set<Long> uploadedFileIds = abstractImageRepository.findUploadedFileIdsByAbstractImageIds(abstractImageIds);
-        if (uploadedFileIds.isEmpty()) {
-            return Page.empty(pageable);
+        List<Long> orderedUploadedFileIds = new ArrayList<>(new LinkedHashSet<>(
+            abstractImageRepository.findAllById(window.abstractImageIds())
+                .stream()
+                .filter(ai -> ai.getUploadedFile() != null)
+                .map(ai -> ai.getUploadedFile().getId())
+                .toList()
+        ));
+        if (orderedUploadedFileIds.isEmpty()) {
+            return new PageImpl<>(List.of(), pageable, window.totalHits());
         }
 
-        return uploadedFileHttpContract.getAll(userId, List.copyOf(uploadedFileIds), pageable);
+        Page<UploadedFileResponse> repoPage = uploadedFileHttpContract.getAll(
+            userId,
+            orderedUploadedFileIds,
+            PageRequest.of(0, orderedUploadedFileIds.size(), Sort.by("id").ascending())
+        );
+        return new PageImpl<>(repoPage.getContent(), pageable, window.totalHits());
     }
 
     private UploadedFileResponse withThumbnailUrl(UploadedFileResponse r, Long abstractImageId) {

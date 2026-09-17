@@ -25,7 +25,12 @@
         </b-field>
       </div>
 
-      <b-button icon-left="times" @click="clear()">{{ $t('button-clear') }}</b-button>
+      <div class="metadata-search-actions">
+        <b-button icon-left="times" @click="clear()">{{ $t('button-clear') }}</b-button>
+        <span v-if="hasSearch && nbResults !== null" class="metadata-results-count">
+          {{ nbResults }} {{ $t('images') }}
+        </span>
+      </div>
     </template>
   </div>
 </template>
@@ -57,6 +62,10 @@ export default {
       type: String,
       default: null,
     },
+    nbResults: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
@@ -66,6 +75,10 @@ export default {
     };
   },
   computed: {
+    hasSearch() {
+      return this.searchString.length > 0
+        || Object.values(this.selectedFacets).some(values => values.length > 0);
+    },
     filters() {
       return Object.entries(this.selectedFacets)
         .filter(([, values]) => values.length > 0)
@@ -134,6 +147,17 @@ export default {
 
 .metadata-filter h1 {
   margin-bottom: 1rem;
+}
+
+.metadata-search-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.metadata-results-count {
+  color: #4a4a4a;
 }
 
 .facet-filters {

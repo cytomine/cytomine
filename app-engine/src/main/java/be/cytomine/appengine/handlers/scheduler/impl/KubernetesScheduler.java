@@ -138,6 +138,8 @@ public class KubernetesScheduler implements SchedulerHandler {
         SecurityContext containerSecurityContext = new SecurityContextBuilder()
             .withAllowPrivilegeEscalation(false)
             .withRunAsNonRoot(true)
+            .withRunAsUser(20000L)
+            .withRunAsGroup(20000L)
             .withNewCapabilities()
             .withDrop("ALL")
             .endCapabilities()
@@ -148,6 +150,19 @@ public class KubernetesScheduler implements SchedulerHandler {
 
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
             .withRunAsNonRoot(true)
+            .withRunAsUser(20000L)
+            .withRunAsGroup(20000L)
+            .withFsGroup(20000L)
+            .withNewSeccompProfile()
+            .withType("RuntimeDefault")
+            .endSeccompProfile()
+            .build();
+
+        SecurityContext permissionsSecurityContext = new SecurityContextBuilder()
+            .withAllowPrivilegeEscalation(false)
+            .withRunAsNonRoot(false)
+            .withRunAsUser(0L)
+            .withRunAsGroup(0L)
             .withNewSeccompProfile()
             .withType("RuntimeDefault")
             .endSeccompProfile()
@@ -248,7 +263,7 @@ public class KubernetesScheduler implements SchedulerHandler {
         Container permissionContainer = new ContainerBuilder().withName("permissions").withImage(taskRunnerImage)
             .withImagePullPolicy("IfNotPresent").withCommand("/bin/sh", "-c", permissions)
             .withResources(helperContainersResources)
-            .withSecurityContext(containerSecurityContext)
+            .withSecurityContext(permissionsSecurityContext)
             .addNewVolumeMount().withName("inputs").withMountPath(task.getInputFolder()).endVolumeMount()
             .addNewVolumeMount().withName("outputs").withMountPath(task.getOutputFolder()).endVolumeMount()
             .build();

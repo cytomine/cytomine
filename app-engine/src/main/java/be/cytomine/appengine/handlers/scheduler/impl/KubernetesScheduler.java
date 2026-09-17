@@ -208,8 +208,8 @@ public class KubernetesScheduler implements SchedulerHandler {
         }
 
 
-        String fetchInputs = "curl -L -o inputs.zip " + url + "/inputs.zip";
-        String unzipInputs = "time unzip -o inputs.zip -d " + task.getInputFolder();
+        String fetchInputs = "curl -L -o " + task.getInputFolder() + "/inputs.zip " + url + "/inputs.zip";
+        String unzipInputs = "time unzip -o " + task.getInputFolder() + "/inputs.zip -d " + task.getInputFolder();
 
         Container inputContainer = new ContainerBuilder().withName("inputs-provisioning")
             .withImage(taskRunnerImage)

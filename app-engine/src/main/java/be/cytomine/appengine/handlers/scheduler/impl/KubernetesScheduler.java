@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
+import io.fabric8.kubernetes.api.model.EmptyDirVolumeSource;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.HostPathVolumeSourceBuilder;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -277,7 +278,7 @@ public class KubernetesScheduler implements SchedulerHandler {
             .withLabels(Map.of("runId", runId, "app", "task")).endMetadata().withNewSpec()
             .withHostNetwork(useHostNetwork).withServiceAccountName("app-engine")
             .withSecurityContext(podSecurityContext)
-            .addNewInitContainerLike(permissionContainer).and().withRestartPolicy("Never").endSpec();
+            .withRestartPolicy("Never").endSpec();
 
         Pod pod = podBuilder.build();
         PodBuilder newPodBuilder = new PodBuilder(pod);
@@ -288,6 +289,8 @@ public class KubernetesScheduler implements SchedulerHandler {
         // Add inputContainer conditionally
         if (isClusterMode) {
             initContainers.add(inputContainer);
+        } else {
+            initContainers.add(permissionContainer);
         }
 
         Container symlinksCreatorContainer =
@@ -320,13 +323,18 @@ public class KubernetesScheduler implements SchedulerHandler {
         containers.add(outputContainer);
 
         // Add inputs and outputs volumes conditionally
-        volumes.add(new VolumeBuilder().withName("inputs")
-            .withHostPath(new HostPathVolumeSourceBuilder().withPath(baseInputPath + runId).build()).build());
-        volumes.add(new VolumeBuilder().withName("outputs")
-            .withHostPath(new HostPathVolumeSourceBuilder().withPath(baseOutputPath + runId).build()).build());
-        // add another host path volume to where the datasets of large images is
-        volumes.add(new VolumeBuilder().withName("images-datasets")
-            .withHostPath(new HostPathVolumeSourceBuilder().withPath(imagesDatasetsPath).build()).build());
+        if (isClusterMode) {
+            volumes.add(new VolumeBuilder().withName("inputs").withEmptyDir(new EmptyDirVolumeSource()).build());
+            volumes.add(new VolumeBuilder().withName("outputs").withEmptyDir(new EmptyDirVolumeSource()).build());
+        } else {
+            volumes.add(new VolumeBuilder().withName("inputs")
+                .withHostPath(new HostPathVolumeSourceBuilder().withPath(baseInputPath + runId).build()).build());
+            volumes.add(new VolumeBuilder().withName("outputs")
+                .withHostPath(new HostPathVolumeSourceBuilder().withPath(baseOutputPath + runId).build()).build());
+            // add another host path volume to where the datasets of large images is
+            volumes.add(new VolumeBuilder().withName("images-datasets")
+                .withHostPath(new HostPathVolumeSourceBuilder().withPath(imagesDatasetsPath).build()).build());
+        }
 
         newPodBuilder = newPodBuilder.editOrNewSpec().withInitContainers(initContainers).withContainers(containers)
             .withVolumes(volumes).endSpec();

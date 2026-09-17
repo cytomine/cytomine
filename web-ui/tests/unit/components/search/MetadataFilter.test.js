@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
@@ -42,16 +42,18 @@ const emptySelection = Object.fromEntries(Object.keys(facets).map((key) => [key,
 const advance = async (ms) => vi.advanceTimersByTimeAsync(ms);
 
 const createWrapper = async (options = {}) => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
+  const { global: globalOptions, ...rest } = options;
 
   const wrapper = mount(MetadataFilter, {
-    localVue,
-    mocks: {
-      $t: (message) => message,
-      $tc: (message) => message,
+    global: {
+      plugins: [Buefy],
+      mocks: {
+        $t: (message) => message,
+        $tc: (message) => message,
+      },
+      ...globalOptions,
     },
-    ...options,
+    ...rest,
   });
   await advance(0);
   return wrapper;
@@ -252,7 +254,7 @@ describe('MetadataFilter.vue', () => {
 
     await wrapper.setData({
       searchString: 'liver',
-      selectedFacets: { [SITE]: ['LIVER'], [SEX]: ['Male'] },
+      selectedFacets: { [SITE]: [opt('LIVER', 18)], [SEX]: [opt('Male', 47)] },
     });
 
     wrapper.find('.metadata-search-actions button').trigger('click');

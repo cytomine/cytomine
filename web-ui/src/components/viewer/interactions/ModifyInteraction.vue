@@ -1,54 +1,45 @@
-<template>
-<div>
-  <vl-interaction-modify
-    v-if="activeEditTool === 'modify'"
-    :source="selectSource"
-    ref="olModifyInteraction"
-    :delete-condition="deleteCondition"
-    :insert-vertex-condition="insertVertexCondition"
-    @modifystart="startEdit"
-    @modifyend="endEdit"
-  />
-
-  <vl-interaction-translate
-    v-if="activeEditTool === 'translate'"
-    :source="selectSource"
-    @translatestart="startEdit"
-    @translateend="endEdit"
-  />
-
-  <vl-interaction-rescale
-    v-if="activeEditTool === 'rescale'"
-    :source="selectSource"
-    @rescalestart="startEdit"
-    @rescaleend="endEdit"
-  />
-
-  <vl-interaction-rotate
-    v-if="activeEditTool === 'rotate'"
-    :source="selectSource"
-    @rotatestart="startEdit"
-    @rotateend="endEdit"
-  />
-</div>
-</template>
+<!-- Renderless: this component only owns whichever ol interaction the active
+     edit tool needs. `vue3-openlayers` has no component for three of the four
+     (translate, rotate, rescale) and its `<ol-interaction-modify>` builds a
+     plain `ol/interaction/Modify`, not the rectangle-aware subclass. -->
+<template><div class="modify-interaction" /></template>
 
 <script>
+import { markRaw } from 'vue';
+
 import eventBus from '@/utils/event-bus';
 
 import WKT from 'ol/format/WKT';
-import { Action } from '@/utils/annotation-utils.js';
+import Translate from 'ol/interaction/Translate';
 import { singleClick } from 'ol/events/condition';
+import RotateFeatureInteraction from 'ol-rotate-feature';
+import RescaleFeatureInteraction from 'ol-rescale-feature';
+
+import { Action } from '@/utils/annotation-utils.js';
 import { isRectangle } from '@/utils/geometry-utils';
+import ModifyInteractionOl from '@/viewer-ol/modify.js';
+import { injectViewerContext } from '@/viewer-ol/context.js';
+
+const EDIT_EVENTS = {
+  modify: ['modifystart', 'modifyend'],
+  translate: ['translatestart', 'translateend'],
+  rescale: ['rescalestart', 'rescaleend'],
+  rotate: ['rotatestart', 'rotateend']
+};
 
 export default {
   name: 'modify-interaction',
+  inject: {
+    ...injectViewerContext,
+    olMap: { from: 'map', default: null }
+  },
   props: {
     index: String
   },
   data() {
     return {
       format: new WKT(),
+      interaction: null
     };
   },
   computed: {
@@ -63,6 +54,10 @@ export default {
     },
     selectSource() {
       return `select-target-${this.index}`;
+    },
+    /** The `Collection` of features `SelectInteraction` has selected. */
+    selectedOlFeatures() {
+      return this.viewerContext ? this.viewerContext.resolve(this.selectSource) : null;
     },
     activeEditTool() {
       return this.imageWrapper.draw.activeEditTool;
@@ -82,13 +77,68 @@ export default {
     },
     insertVertexCondition() {
       return function () {
-        return !this.features_.getArray().every(function (feature) {
+        // `Modify.features_` is a plain array since ol 6, not the Collection
+        // that was passed in, so there is no `getArray()` any more.
+        return !this.features_.every(function (feature) {
           return isRectangle(feature.getGeometry());
         });
       };
     }
   },
+  watch: {
+    activeEditTool: 'rebuildInteraction',
+    selectedOlFeatures: 'rebuildInteraction'
+  },
   methods: {
+    buildInteraction() {
+      let features = this.selectedOlFeatures;
+      if (!this.olMap || !features || !EDIT_EVENTS[this.activeEditTool]) {
+        return;
+      }
+
+      let interaction;
+      switch (this.activeEditTool) {
+        case 'modify':
+          interaction = new ModifyInteractionOl({
+            features,
+            deleteCondition: this.deleteCondition,
+            insertVertexCondition: this.insertVertexCondition
+          });
+          break;
+        case 'translate':
+          interaction = new Translate({ features });
+          break;
+        case 'rescale':
+          interaction = new RescaleFeatureInteraction({ features });
+          break;
+        case 'rotate':
+          interaction = new RotateFeatureInteraction({ features });
+          break;
+      }
+
+      let [startEvent, endEvent] = EDIT_EVENTS[this.activeEditTool];
+      interaction.on(startEvent, this.startEdit);
+      interaction.on(endEvent, this.endEdit);
+
+      this.olMap.addInteraction(interaction);
+      this.interaction = markRaw(interaction);
+    },
+
+    destroyInteraction() {
+      if (!this.interaction) {
+        return;
+      }
+      if (this.olMap) {
+        this.olMap.removeInteraction(this.interaction);
+      }
+      this.interaction = null;
+    },
+
+    rebuildInteraction() {
+      this.destroyInteraction();
+      this.buildInteraction();
+    },
+
     startEdit() {
       this.ongoingEdit = true;
     },
@@ -116,6 +166,12 @@ export default {
       });
       this.ongoingEdit = false;
     },
+  },
+  mounted() {
+    this.buildInteraction();
+  },
+  beforeUnmount() {
+    this.destroyInteraction();
   }
 };
 </script>

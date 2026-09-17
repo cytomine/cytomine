@@ -1,56 +1,21 @@
-import Vue from 'vue';
-import axios from 'axios';
-import constants from '@/utils/constants.js';
-import { getKeycloak } from '@/keycloak.js';
-
-import VueRouter from 'vue-router';
-import router from './routes.js';
-Vue.use(VueRouter);
-
-import i18n from './lang.js';
-
-import store from './store/store.js';
-
-import Buefy from 'buefy';
-Vue.use(Buefy, { defaultIconPack: 'fas' });
-
-import VeeValidate, { Validator } from 'vee-validate';
-Validator.extend('positive', value => Number(value) > 0);
-Vue.use(VeeValidate, {
-  i18nRootKey: 'validations',
-  i18n,
-  inject: false
-});
-
-import Notifications from 'vue-notification';
-Vue.use(Notifications);
-
-import VTooltip from 'v-tooltip';
-Vue.use(VTooltip);
-
 import { vOnClickOutside } from '@vueuse/components';
-Vue.directive('click-outside', vOnClickOutside);
+import axios from 'axios';
+import Buefy from 'buefy';
+import FloatingVue from 'floating-vue';
+import Notifications from '@kyvg/vue3-notification';
+import { createApp } from 'vue';
 
-import VueLayers from 'vuelayers';
-import CytomineSource from './vuelayers-suppl/cytomine-source';
-import RasterSource from './vuelayers-suppl/raster-source';
-import TranslateInteraction from './vuelayers-suppl/translate-interaction';
-import RotateInteraction from './vuelayers-suppl/rotate-interaction';
-import ModifyInteraction from './vuelayers-suppl/modify-interaction';
-import RescaleInteraction from './vuelayers-suppl/rescale-interaction';
-Vue.use(VueLayers);
-Vue.use(CytomineSource);
-Vue.use(RasterSource);
-Vue.use(TranslateInteraction);
-Vue.use(RotateInteraction);
-Vue.use(ModifyInteraction);
-Vue.use(RescaleInteraction);
+import App from '@/App.vue';
+import { getKeycloak } from '@/keycloak.js';
+import i18n from '@/lang.js';
+import router from '@/routes.js';
+import store from '@/store/store.js';
+import constants from '@/utils/constants.js';
+import ViewerOpenLayers from '@/viewer-ol';
 
+import '@he-tree/vue/style/default.css';
 import 'chart.js/auto';
-
-import App from './App.vue';
-
-Vue.config.productionTip = false;
+import 'vue-color/style.css';
 
 // Load configuration before initializing Keycloak
 axios.get('/configuration.json').then(response => {
@@ -64,16 +29,16 @@ axios.get('/configuration.json').then(response => {
 
   // Now initialize Keycloak with loaded config
   const keycloak = getKeycloak();
-  keycloak
-    .init({
-      onLoad: 'login-required'
-    })
-    .then(() => {
-      new Vue({
-        render: h => h(App),
-        router,
-        store,
-        i18n
-      }).$mount('#app');
-    });
+  keycloak.init({ onLoad: 'login-required' }).then(() => {
+    const app = createApp(App);
+    app.use(i18n);
+    app.use(router);
+    app.use(store);
+    app.use(Buefy, { defaultIconPack: 'fas' });
+    app.use(FloatingVue);
+    app.use(Notifications);
+    app.use(ViewerOpenLayers);
+    app.directive('click-outside', vOnClickOutside);
+    app.mount('#app');
+  });
 });

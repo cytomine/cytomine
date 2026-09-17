@@ -12,14 +12,16 @@ describe('AnnotatedImagesByTermChart.js', () => {
   };
 
   const createWrapper = () => shallowMount(AnnotatedImagesByTermChart, {
-    propsData: {
+    props: {
       project: mockProject,
       startDate: 0,
       endDate: 1,
     },
-    mocks: {
-      $t: (key) => key,
-    },
+    global: {
+      mocks: {
+        $t: (key) => key,
+      }
+    }
   });
 
   it('should fetch term stats into labels/data, falling back to no-term for a missing key', async () => {

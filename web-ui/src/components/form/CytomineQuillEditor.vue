@@ -79,7 +79,7 @@
           :class="['ql-picker', expandedSpecialChars ? 'ql-expanded' : '', 'ql-special-characters']"
           :title="$t('ql-special-character')"
           @click="expandedSpecialChars = !expandedSpecialChars"
-          v-click-outside="() => expandedSpecialChars = false"
+          v-on-click-outside="() => expandedSpecialChars = false"
         >
           <span class="ql-picker-label" tabindex="0" role="button">
             <svg viewBox="0 0 18 18">
@@ -110,8 +110,9 @@ import Quill from 'quill';
 
 export default {
   name: 'cytomine-quill-editor',
+  emits: ['update:modelValue'],
   props: {
-    value: String,
+    modelValue: String,
     placeholder: String
   },
   data() {
@@ -124,7 +125,7 @@ export default {
     };
   },
   watch: {
-    value(value) {
+    modelValue(value) {
       if (this.quill && value !== this.quill.root.innerHTML) {
         this.quill.root.innerHTML = value || '';
       }
@@ -150,12 +151,12 @@ export default {
       }
     });
 
-    if (this.value) {
-      this.quill.root.innerHTML = this.value;
+    if (this.modelValue) {
+      this.quill.root.innerHTML = this.modelValue;
     }
 
     this.quill.on('text-change', () => {
-      this.$emit('input', this.quill.root.innerHTML);
+      this.$emit('update:modelValue', this.quill.root.innerHTML);
     });
   }
 };

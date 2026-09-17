@@ -1,6 +1,6 @@
 <template>
 <div class="tags-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <template v-if="!loading">
     <b-field grouped group-multiline>
       <em v-if="error">{{$t('error-fetch-tags')}}</em>
@@ -57,7 +57,6 @@ export default {
       // (http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/)
 
       this.$buefy.modal.open({
-        parent: this,
         component: AddTagDomainAssociationModal,
         props: { associatedTags: this.associatedTags },
         hasModalCard: true,

@@ -1,3 +1,4 @@
+import { h } from 'vue';
 import { Line } from 'vue-chartjs';
 import _ from 'lodash';
 
@@ -202,13 +203,11 @@ export default {
       return Math.floor(this.findBin(value) * this.binSize);
     },
   },
-  render(h) {
+  render() {
     return h('div', { class: this.cssClasses }, [
       h(Line, {
-        props: {
-          data: this.chartData,
-          options: this.chartOptions,
-        },
+        data: this.chartData,
+        options: this.chartOptions,
       }),
     ]);
   },

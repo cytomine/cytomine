@@ -96,7 +96,6 @@ public class CytomineTests {
 
             cytomineSteps.deleteTag(wait, cytomineUrl, renamedTagName);
             cytomineSteps.deleteTag(wait, cytomineUrl, secondTagName);
-            cytomineSteps.logout(wait, cytomineUrl);
         });
     }
 

@@ -28,8 +28,14 @@ public class WebDriverUtils {
 
     void byClick(Wait<WebDriver> wait, By by) {
         waitLoading(wait);
-        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(by));
-        element.click();
+        wait.until(d -> {
+            try {
+                ExpectedConditions.elementToBeClickable(by).apply(d).click();
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
     }
 
     void byClear(Wait<WebDriver> wait, By by) {

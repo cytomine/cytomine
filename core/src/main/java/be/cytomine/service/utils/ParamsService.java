@@ -27,16 +27,18 @@ import be.cytomine.utils.JsonObject;
 @AllArgsConstructor
 public class ParamsService {
 
-    private static Map<String, String> PARAMETER_ASSOCIATION = Map.of(
-        "showBasic", "basic",
-        "showMeta", "meta",
-        "showWKT", "wkt",
-        "showGIS", "gis",
-        "showTerm", "term",
-        "showImage", "image",
-        "showUser", "user",
-        "showSlice", "slice",
-        "showTrack", "track"
+    private static Map<String, String> PARAMETER_ASSOCIATION = Map.ofEntries(
+        Map.entry("showBasic", "basic"),
+        Map.entry("showMeta", "meta"),
+        Map.entry("showWKT", "wkt"),
+        Map.entry("showGIS", "gis"),
+        Map.entry("showTerm", "term"),
+        Map.entry("showImage", "image"),
+        Map.entry("showUser", "user"),
+        Map.entry("showSlice", "slice"),
+        Map.entry("showTrack", "track"),
+        Map.entry("showImageGroup", "imageGroup"),
+        Map.entry("showLink", "group")
     );
     private final UserRepository userRepository;
     private final ImageInstanceService imageInstanceService;

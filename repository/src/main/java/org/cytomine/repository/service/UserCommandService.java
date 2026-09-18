@@ -13,6 +13,7 @@ import org.cytomine.repository.mapper.UserMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.persistence.UserRepository;
+import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.cytomine.repository.persistence.entity.RoleEntity;
 import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
@@ -78,6 +79,21 @@ public class UserCommandService
     public void afterCreate(long userId, UserCommandPayload payload) {
         storageCommandService.create(payload.id(), new CreateStorage(payload.username() + " storage"),
             LocalDateTime.now());
+    }
+
+    public Optional<HttpCommandResponse> createSelf(CreateUser createPayload, LocalDateTime now) {
+        UserEntity entity = mapCreateToEntity(createPayload, 0L, Timestamp.valueOf(now));
+        UserEntity savedEntity = save(entity);
+        UserCommandPayload commandPayload = map(savedEntity);
+        long selfId = commandPayload.id();
+        afterCreate(selfId, commandPayload);
+        CreateCommandRequest<?> createCommandRequest = mapCreateCommand(selfId, commandPayload);
+        CommandV2Entity commandV2Entity = commandV2Repository.save(
+            commandMapper.map(createCommandRequest, now, null, selfId, Optional.empty()));
+        UserResponse response = mapToResponse(savedEntity);
+        return Optional.of(
+            new HttpCommandResponse(true, response, commandV2Entity.getId(), createCommandRequest.getCommand(),
+                Set.of()));
     }
 
     @Override

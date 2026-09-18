@@ -257,7 +257,7 @@ export default {
   methods: {
     async fetchStorages() {
       try {
-        this.storages = (await StorageCollection.fetchAll()).array;
+        this.storages = (await StorageCollection.fetchAll({nbPerPage: 20})).array;
         this.storages.forEach(v => {
           v.extendedName = v.name;
           if (this.currentAccount.isDeveloper) {

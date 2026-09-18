@@ -44,7 +44,7 @@ public class PermissionService {
     }
 
     List<Integer> getPermissionInACL(CytomineDomain domain, String username) {
-        return aclRepository.listMaskForUsers(domain.getId(), username);
+        return aclRepository.listMaskForUsers(domain.getId(), getAclClassId(domain), username);
     }
 
     public void deletePermission(CytomineDomain domain, String username, Permission permission) {
@@ -52,12 +52,12 @@ public class PermissionService {
             "Current mask for user {} on domain {} before request: {}",
             username,
             domain.getId(),
-            aclRepository.listMaskForUsers(domain.getId(), username)
+            aclRepository.listMaskForUsers(domain.getId(), getAclClassId(domain), username)
         );
         if (hasACLPermission(domain, username, permission)) {
             log.info("Delete permission for {}, {}, {}", username, permission.getMask(), domain.getId());
 
-            Long aclObjectIdentity = aclRepository.getAclObjectIdentityFromDomainId(domain.getId());
+            Long aclObjectIdentity = aclRepository.getAclObjectIdentityFromDomainId(domain.getId(), getAclClassId(domain));
             int mask = permission.getMask();
             Long sid = aclRepository.getAclSid(username);
 
@@ -83,7 +83,7 @@ public class PermissionService {
             "Current mask for user {} on domain {} after request: {}",
             username,
             domain.getId(),
-            aclRepository.listMaskForUsers(domain.getId(), username)
+            aclRepository.listMaskForUsers(domain.getId(), getAclClassId(domain), username)
         );
     }
 
@@ -148,10 +148,10 @@ public class PermissionService {
     }
 
     public Long getAclObjectIdentity(CytomineDomain domain, Long aclClassId, Long aclSidId) {
-        Long aclObjectIdentityId = aclRepository.getAclObjectIdentityFromDomainId(domain.getId());
+        Long aclObjectIdentityId = aclRepository.getAclObjectIdentityFromDomainId(domain.getId(), aclClassId);
         if (aclObjectIdentityId == null) {
             aclRepository.insertAclObjectIdentity(aclClassId, domain.getId(), aclSidId);
-            aclObjectIdentityId = aclRepository.getAclObjectIdentityFromDomainId(domain.getId());
+            aclObjectIdentityId = aclRepository.getAclObjectIdentityFromDomainId(domain.getId(), aclClassId);
         }
         return aclObjectIdentityId;
     }

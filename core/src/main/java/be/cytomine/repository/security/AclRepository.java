@@ -17,38 +17,44 @@ public interface AclRepository extends JpaRepository<User, Long> {
         "select count(user) "
             + "from AclObjectIdentity as aclObjectId, AclEntry as aclEntry, AclSid as aclSid, User as user "
             + "where aclObjectId.objectId = :projectId "
+            + "and aclObjectId.objectIdClass.id = :classId "
             + "and aclEntry.aclObjectIdentity = aclObjectId "
             + "and aclEntry.sid = aclSid "
             + "and aclSid.sid = user.username "
             + "and user.id = :userId"
     )
-    Long countEntries(long projectId, long userId);
+    Long countEntries(long projectId, long userId, long classId);
 
 
     @Query(value =
         "SELECT mask "
             + "FROM acl_object_identity aoi, acl_sid sid, acl_entry ae "
             + "WHERE aoi.object_id_identity = :domainId "
+            + "AND aoi.object_id_class = :classId "
             + "AND sid.sid = :username "
             + "AND ae.acl_object_identity = aoi.id "
             + "AND ae.sid = sid.id ",
         nativeQuery = true
     )
-    List<Integer> listMaskForUsers(Long domainId, String username);
+    List<Integer> listMaskForUsers(Long domainId, Long classId, String username);
 
     @Query(value =
         "SELECT mask "
             + "FROM acl_object_identity aoi, acl_sid sid, acl_entry ae "
             + "WHERE aoi.object_id_identity = :domainId "
+            + "AND aoi.object_id_class = :classId "
             + "AND sid.sid = :humanUsername "
             + "AND ae.acl_object_identity = aoi.id "
             + "AND ae.sid = sid.id ",
         nativeQuery = true
     )
-    List<Integer> listMaskForUsers(Long domainId);
+    List<Integer> listMaskForUsers(Long domainId, Long classId);
 
-    @Query(value = "SELECT id FROM acl_object_identity WHERE object_id_identity = :domainId", nativeQuery = true)
-    Long getAclObjectIdentityFromDomainId(Long domainId);
+    @Query(value =
+        "SELECT id FROM acl_object_identity "
+            + "WHERE object_id_identity = :domainId AND object_id_class = :classId",
+        nativeQuery = true)
+    Long getAclObjectIdentityFromDomainId(Long domainId, Long classId);
 
     @Query(value = "SELECT id FROM acl_sid WHERE sid = :username", nativeQuery = true)
     Long getAclSidFromUsername(String username);
@@ -118,9 +124,10 @@ public interface AclRepository extends JpaRepository<User, Long> {
             "select user "
                 + "from AclObjectIdentity as aclObjectId, AclSid as aclSid, User as user "
                 + "where aclObjectId.objectId = :domainId "
+                + "and aclObjectId.objectIdClass.id = :classId "
                 + "and aclObjectId.ownerSid = aclSid "
                 + "and aclSid.sid = user.username"
     )
-    List<User> listCreators(Long domainId);
+    List<User> listCreators(Long domainId, Long classId);
 
 }

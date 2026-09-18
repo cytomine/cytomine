@@ -656,35 +656,41 @@ public class CytomineTests {
 
     @Test
     void linkAnnotationsBetweenImages() {
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-        String projectName = "selenium-" + randomUUID();
-        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
-        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+        multiUsers.runAsAdmin(wait, driver, admin -> {
+            String projectName = "selenium-" + randomUUID();
+            String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+            String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
 
-        String firstImageName = "selenium-" + randomUUID() + ".png";
-        String secondImageName = "selenium-" + randomUUID() + ".png";
-        cytomineSteps.addImage(wait, cytomineUrl, firstImageName, Optional.of(projectName));
-        cytomineSteps.addImage(wait, cytomineUrl, secondImageName, Optional.of(projectName));
+            String firstImageName = "selenium-" + randomUUID() + ".png";
+            String secondImageName = "selenium-" + randomUUID() + ".png";
+            try {
+                cytomineSteps.addImage(wait, cytomineUrl, firstImageName, Optional.of(projectName));
+                cytomineSteps.addImage(wait, cytomineUrl, secondImageName, Optional.of(projectName));
 
-        String imageGroupName = "selenium-" + randomUUID();
-        cytomineSteps.createImageGroup(wait, projectUrl, imageGroupName, Set.of(firstImageName, secondImageName));
-        cytomineSteps.openImageGroupInViewer(wait, projectUrl, imageGroupName);
+                String imageGroupName = "selenium-" + randomUUID();
+                cytomineSteps.createImageGroup(wait, projectUrl, imageGroupName,
+                    Set.of(firstImageName, secondImageName));
+                cytomineSteps.openImageGroupInViewer(wait, projectUrl, imageGroupName);
 
-        annotationTools.drawRectangleAnnotationInCell(wait, driver, 1);
-        annotationTools.drawRectangleAnnotationInCell(wait, driver, 2);
+                annotationTools.drawRectangleAnnotationInCell(wait, driver, 1);
+                annotationTools.drawRectangleAnnotationInCell(wait, driver, 2);
 
-        cytomineSteps.linkAnnotationToOtherView(wait);
-        cytomineSteps.verifyLinkedAnnotationInDetails(wait);
+                cytomineSteps.linkAnnotationToOtherView(wait);
+                cytomineSteps.verifyLinkedAnnotationInDetails(wait);
 
-        cytomineSteps.unlinkAnnotationFromView(wait);
-        cytomineSteps.verifyAnnotationUnlinkedInDetails(wait);
+                cytomineSteps.unlinkAnnotationFromView(wait);
+                cytomineSteps.verifyAnnotationUnlinkedInDetails(wait);
 
-        cytomineSteps.deleteImageGroup(wait, projectUrl, imageGroupName);
-        cytomineSteps.deleteProject(wait, projectUrl);
-        cytomineSteps.deleteOntology(wait, ontologyUrl);
-        cytomineSteps.deleteImage(wait, cytomineUrl, firstImageName);
-        cytomineSteps.deleteImage(wait, cytomineUrl, secondImageName);
-        cytomineSteps.logout(wait, cytomineUrl);
+                cytomineSteps.deleteImageGroup(wait, projectUrl, imageGroupName);
+            } finally {
+                cleanup(
+                    () -> cytomineSteps.deleteProject(wait, projectUrl),
+                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
+                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, firstImageName),
+                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, secondImageName)
+                );
+            }
+        });
     }
 
     @Test

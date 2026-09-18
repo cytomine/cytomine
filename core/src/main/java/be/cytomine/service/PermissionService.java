@@ -57,7 +57,8 @@ public class PermissionService {
         if (hasACLPermission(domain, username, permission)) {
             log.info("Delete permission for {}, {}, {}", username, permission.getMask(), domain.getId());
 
-            Long aclObjectIdentity = aclRepository.getAclObjectIdentityFromDomainId(domain.getId(), getAclClassId(domain));
+            Long aclObjectIdentity =
+                aclRepository.getAclObjectIdentityFromDomainId(domain.getId(), getAclClassId(domain));
             int mask = permission.getMask();
             Long sid = aclRepository.getAclSid(username);
 

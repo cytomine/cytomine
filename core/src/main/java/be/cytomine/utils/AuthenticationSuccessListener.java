@@ -1,12 +1,12 @@
 package be.cytomine.utils;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +29,10 @@ import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.project.ProjectMemberService;
+
+import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static be.cytomine.common.repository.model.Role.ROLE_USER;
 
 @RequiredArgsConstructor
 @Component
@@ -55,27 +59,26 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     private static Set<String> extractRolesFromAuthentication(JwtAuthenticationToken jwtAuthenticationToken) {
         Set<String> rolesFromAuthentication = new HashSet<>();
         jwtAuthenticationToken.getAuthorities().forEach((authority) -> {
-            if (authority.getAuthority().equals("ROLE_USER")
-                || authority.getAuthority().equals("ROLE_ADMIN")
-                || authority.getAuthority().equals("ROLE_GUEST")) {
+            if (authority.getAuthority().equals(ROLE_USER.toString()) || authority.getAuthority()
+                .equals(ROLE_ADMIN.toString()) || authority.getAuthority().equals(ROLE_GUEST.toString())) {
                 rolesFromAuthentication.add(authority.getAuthority());
             }
         });
         return rolesFromAuthentication;
     }
 
-    private AuthenticationSuccessListener self() {
-        return applicationContext.getBean(AuthenticationSuccessListener.class);
+    private static String highestRole(Set<String> rolesFromAuthentication) {
+        if (rolesFromAuthentication.contains(ROLE_ADMIN.toString())) {
+            return ROLE_ADMIN.toString();
+        }
+        if (rolesFromAuthentication.contains(ROLE_USER.toString())) {
+            return ROLE_USER.toString();
+        }
+        return ROLE_GUEST.toString();
     }
 
-    private static String highestRole(Set<String> rolesFromAuthentication) {
-        if (rolesFromAuthentication.contains("ROLE_ADMIN")) {
-            return "ROLE_ADMIN";
-        }
-        if (rolesFromAuthentication.contains("ROLE_USER")) {
-            return "ROLE_USER";
-        }
-        return "ROLE_GUEST";
+    private AuthenticationSuccessListener self() {
+        return applicationContext.getBean(AuthenticationSuccessListener.class);
     }
 
     @Override
@@ -87,18 +90,26 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     protected void saveUserOfToken(JwtAuthenticationToken jwtAuthenticationToken) {
         Set<String> rolesFromAuthentication = extractRolesFromAuthentication(jwtAuthenticationToken);
-        Map<String, Object> tokenAttributes = jwtAuthenticationToken.getTokenAttributes();
-        List<String> projects = (List<String>) tokenAttributes.getOrDefault("projects", Collections.emptyList());
+        Map<String, List<String>> tokenAttributes = jwtAuthenticationToken.getTokenAttributes()
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() instanceof List)
+            .map(entry ->
+                Map.entry(entry.getKey(),
+                    ((List<?>) entry.getValue()).stream().filter(a -> a instanceof String).map(a -> (String) a)
+                        .toList()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        List<String> projects = tokenAttributes.getOrDefault("projects", List.of());
         UUID sub = UUID.fromString(tokenAttributes.get("sub").toString());
         Optional<User> userByReference = userRepository.findByReference(sub.toString());
         Optional<User> userByUsername = userRepository.findByUsername(jwtAuthenticationToken.getName());
         if (userByUsername.isPresent() && userByReference.isEmpty()) {
             User user = userByUsername.get();
             user.setReference(sub.toString());
-            user.setFirstname(tokenAttributes.get("given_name") != null
-                ? tokenAttributes.get("given_name").toString() : "");
-            user.setLastname(tokenAttributes.get("family_name") != null
-                ? tokenAttributes.get("family_name").toString() : "");
+            user.setFirstname(
+                tokenAttributes.get("given_name") != null ? tokenAttributes.get("given_name").toString() : "");
+            user.setLastname(
+                tokenAttributes.get("family_name") != null ? tokenAttributes.get("family_name").toString() : "");
             user.setEmail(tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "");
             userRepository.save(user);
 
@@ -107,23 +118,14 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
         } else if (userByReference.isEmpty()) {
 
-            CreateUser createUser = new CreateUser(
-                jwtAuthenticationToken.getName(),
-                Optional.ofNullable(tokenAttributes.get("name")).map(Object::toString),
-                Optional.of(tokenAttributes.get("given_name") != null
-                    ? tokenAttributes.get("given_name").toString() : ""),
-                Optional.of(tokenAttributes.get("family_name") != null
-                    ? tokenAttributes.get("family_name").toString() : ""),
-                tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "",
-                Optional.empty(),
-                false,
-                highestRole(rolesFromAuthentication),
-                "EN",
-                Optional.empty(),
-                Optional.empty(),
-                null,
-                Optional.of(sub.toString())
-            );
+            CreateUser createUser = new CreateUser(jwtAuthenticationToken.getName(),
+                Optional.ofNullable(tokenAttributes.get("name")).map(Object::toString), Optional.of(
+                tokenAttributes.get("given_name") != null ? tokenAttributes.get("given_name").toString() : ""),
+                Optional.of(
+                    tokenAttributes.get("family_name") != null ? tokenAttributes.get("family_name").toString() : ""),
+                tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "", Optional.empty(),
+                false, highestRole(rolesFromAuthentication), "EN", Optional.empty(), Optional.empty(), null,
+                Optional.of(sub.toString()));
             userHttpContract.selfRegister(createUser);
 
             User savedUser = userRepository.findByReference(sub.toString())
@@ -144,20 +146,16 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     }
 
     @Transactional
-    protected void updateRolesAndAdminSession(
-        JwtAuthenticationToken jwtAuthenticationToken,
-        User user,
-        Set<String> rolesFromAuthentication
-    ) {
+    protected void updateRolesAndAdminSession(JwtAuthenticationToken jwtAuthenticationToken, User user,
+        Set<String> rolesFromAuthentication) {
 
         secSecUserSecRoleRepository.deleteAllByIdInBatch(
-            secSecUserSecRoleRepository.findAllBySecUser(user).stream()
-                .map(SecUserSecRole::getId).toList());
+            secSecUserSecRoleRepository.findAllBySecUser(user).stream().map(SecUserSecRole::getId).toList());
         secSecUserSecRoleRepository.flush();
         // Guest > User > Admin
         self().setCumulativeRole(rolesFromAuthentication, user);
         UserResponse userResponse = userMapper.map(user);
-        if (rolesFromAuthentication.contains("ROLE_ADMIN")) {
+        if (rolesFromAuthentication.contains(ROLE_ADMIN.toString())) {
             if (currentRoleService.hasCurrentUserAdminRole(userResponse)) {
                 currentRoleService.activeAdminSession(userResponse, jwtAuthenticationToken);
             }
@@ -173,16 +171,14 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         List<Project> permittedUserProjects = projectRepository.findByNameIn(projects);
         List<Project> actualUserProjects = projectRepository.findAllProjectForUser(user.getUsername());
 
-        List<Project> projectsToAdd = permittedUserProjects.stream()
-            .filter(p -> !actualUserProjects.contains(p))
-            .toList();
+        List<Project> projectsToAdd =
+            permittedUserProjects.stream().filter(p -> !actualUserProjects.contains(p)).toList();
         for (Project project : projectsToAdd) {
             projectMemberService.addUserToProjectWithAdmin(user, project, false);
         }
 
-        List<Project> projectsToRemove = actualUserProjects.stream()
-            .filter(p -> !permittedUserProjects.contains(p))
-            .toList();
+        List<Project> projectsToRemove =
+            actualUserProjects.stream().filter(p -> !permittedUserProjects.contains(p)).toList();
 
         for (Project project : projectsToRemove) {
             projectMemberService.deleteUserFromProjectWithAdmin(user, project, false);
@@ -197,12 +193,12 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     protected void setCumulativeRole(Set<String> rolesFromAuthentication, User user) {
 
         SecUserSecRole secSecUserSecRole = new SecUserSecRole();
-        if (rolesFromAuthentication.contains("ROLE_ADMIN")) {
-            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority("ROLE_ADMIN"));
-        } else if (rolesFromAuthentication.contains("ROLE_USER")) {
-            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority("ROLE_USER"));
+        if (rolesFromAuthentication.contains(ROLE_ADMIN.toString())) {
+            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_ADMIN.toString()));
+        } else if (rolesFromAuthentication.contains(ROLE_USER.toString())) {
+            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_USER.toString()));
         } else {
-            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority("ROLE_GUEST"));
+            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_GUEST.toString()));
         }
         secSecUserSecRole.setSecUser(user);
         secSecUserSecRoleRepository.save(secSecUserSecRole);

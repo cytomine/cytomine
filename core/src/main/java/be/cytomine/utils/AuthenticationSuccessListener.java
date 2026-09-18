@@ -90,7 +90,16 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     protected void saveUserOfToken(JwtAuthenticationToken jwtAuthenticationToken) {
         Set<String> rolesFromAuthentication = extractRolesFromAuthentication(jwtAuthenticationToken);
-        Map<String, List<String>> tokenAttributes = jwtAuthenticationToken.getTokenAttributes()
+        Map<String, String> stringTokenAttributes = jwtAuthenticationToken.getTokenAttributes()
+            .entrySet()
+            .stream()
+            .filter(entry -> entry.getValue() instanceof String)
+            .map(entry ->
+                Map.entry(entry.getKey(),
+                    (String) entry.getValue()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        Map<String, List<String>> listTokenAttributes = jwtAuthenticationToken.getTokenAttributes()
             .entrySet()
             .stream()
             .filter(entry -> entry.getValue() instanceof List)
@@ -99,18 +108,19 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                     ((List<?>) entry.getValue()).stream().filter(a -> a instanceof String).map(a -> (String) a)
                         .toList()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        List<String> projects = tokenAttributes.getOrDefault("projects", List.of());
-        UUID sub = UUID.fromString(tokenAttributes.get("sub").toString());
+
+        List<String> projects = listTokenAttributes.getOrDefault("projects", List.of());
+        UUID sub = UUID.fromString(stringTokenAttributes.get("sub"));
         Optional<User> userByReference = userRepository.findByReference(sub.toString());
         Optional<User> userByUsername = userRepository.findByUsername(jwtAuthenticationToken.getName());
         if (userByUsername.isPresent() && userByReference.isEmpty()) {
             User user = userByUsername.get();
             user.setReference(sub.toString());
             user.setFirstname(
-                tokenAttributes.get("given_name") != null ? tokenAttributes.get("given_name").toString() : "");
+                stringTokenAttributes.get("given_name") != null ? stringTokenAttributes.get("given_name") : "");
             user.setLastname(
-                tokenAttributes.get("family_name") != null ? tokenAttributes.get("family_name").toString() : "");
-            user.setEmail(tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "");
+                stringTokenAttributes.get("family_name") != null ? stringTokenAttributes.get("family_name") : "");
+            user.setEmail(stringTokenAttributes.get("email") != null ? stringTokenAttributes.get("email") : "");
             userRepository.save(user);
 
             self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
@@ -119,11 +129,11 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         } else if (userByReference.isEmpty()) {
 
             CreateUser createUser = new CreateUser(jwtAuthenticationToken.getName(),
-                Optional.ofNullable(tokenAttributes.get("name")).map(Object::toString), Optional.of(
-                tokenAttributes.get("given_name") != null ? tokenAttributes.get("given_name").toString() : ""),
+                Optional.ofNullable(stringTokenAttributes.get("name")).map(Object::toString), Optional.of(
+                stringTokenAttributes.get("given_name") != null ? stringTokenAttributes.get("given_name") : ""),
                 Optional.of(
-                    tokenAttributes.get("family_name") != null ? tokenAttributes.get("family_name").toString() : ""),
-                tokenAttributes.get("email") != null ? tokenAttributes.get("email").toString() : "", Optional.empty(),
+                    stringTokenAttributes.get("family_name") != null ? stringTokenAttributes.get("family_name") : ""),
+                stringTokenAttributes.get("email") != null ? stringTokenAttributes.get("email") : "", Optional.empty(),
                 false, highestRole(rolesFromAuthentication), "EN", Optional.empty(), Optional.empty(), null,
                 Optional.of(sub.toString()));
             userHttpContract.selfRegister(createUser);

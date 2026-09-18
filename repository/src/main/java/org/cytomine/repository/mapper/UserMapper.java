@@ -31,11 +31,11 @@ public interface UserMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"role", "password"})
     UserEntity mapToUserEntity(CreateUser entity, long userId, Timestamp now, Set<RoleEntity> roles);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted", "enabled"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted", "enabled", "reference"})
     UserCommandPayload mapToUserCommandPayload(UserEntity entity);
 
     @Mapping(target = "isDeveloper", source = "entity.developer")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted", "enabled"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted", "enabled", "reference"})
     UserResponse mapToUserResponse(UserEntity entity);
 
     @Mapping(target = "email", source = "newEmail")

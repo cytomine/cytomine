@@ -41,6 +41,11 @@ public class UserController implements UserHttpContract {
     }
 
     @Override
+    public Optional<HttpCommandResponse> selfRegister(CreateUser createUser) {
+        return service.createSelf(createUser, LocalDateTime.now().truncatedTo(MICROS));
+    }
+
+    @Override
     public Optional<HttpCommandResponse> update(long id, long userId, UpdateUser updateUser) {
         return service.update(userId, id, updateUser, LocalDateTime.now().truncatedTo(MICROS));
     }

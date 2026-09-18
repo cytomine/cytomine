@@ -18,11 +18,7 @@ import be.cytomine.common.repository.utils.Language;
 public interface UserMapper {
 
     default Language mapToLanguage(String language) {
-        if (language.length() > 2) {
-            return Language.valueOf(language);
-        } else {
-            return Language.findByCode(language);
-        }
+        return Language.resolve(language);
     }
 
     @Mapping(target = "id", ignore = true)
@@ -35,11 +31,11 @@ public interface UserMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"role", "password"})
     UserEntity mapToUserEntity(CreateUser entity, long userId, Timestamp now, Set<RoleEntity> roles);
 
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted", "enabled"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted", "enabled", "reference"})
     UserCommandPayload mapToUserCommandPayload(UserEntity entity);
 
     @Mapping(target = "isDeveloper", source = "entity.developer")
-    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted", "enabled"})
+    @BeanMapping(ignoreUnmappedSourceProperties = {"version", "created", "updated", "deleted", "enabled", "reference"})
     UserResponse mapToUserResponse(UserEntity entity);
 
     @Mapping(target = "email", source = "newEmail")

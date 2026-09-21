@@ -42,6 +42,7 @@ import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.security.AclRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.UserAnnotationService;
@@ -115,6 +116,9 @@ public class ProjectResourceTests {
     private UrlApi urlApi;
     @MockitoBean
     private OntologyHttpContract ontologyHttpContract;
+
+    @MockitoBean
+    private MeiliSearchService meiliSearchService;
 
     @Autowired
     private CurrentUserService currentUserService;

@@ -246,12 +246,6 @@ public class MeiliSearchService {
         }
     }
 
-    /**
-     * Append a project name to the {@code image.projects} list of every document whose abstract image is
-     * part of the given ids. The list is a live membership: each project name appears at most once.
-     *
-     * @return The number of documents actually updated
-     */
     public int addProjectToImages(Collection<Long> abstractImageIds, String projectName) {
         Index index = getIndexOrThrow(indexId);
         try {
@@ -272,12 +266,6 @@ public class MeiliSearchService {
         }
     }
 
-    /**
-     * Remove a project name from the {@code image.projects} list of every document whose abstract image is
-     * part of the given ids (image removed from a project, or project deletion).
-     *
-     * @return The number of documents actually updated
-     */
     public int removeProjectFromImages(Collection<Long> abstractImageIds, String projectName) {
         Index index = getIndexOrThrow(indexId);
         try {
@@ -298,12 +286,6 @@ public class MeiliSearchService {
         }
     }
 
-    /**
-     * Replace an old project name with a new one in the {@code image.projects} list of every document that
-     * still contains the old name (project renamed).
-     *
-     * @return The number of documents actually updated
-     */
     public int renameProjectInImages(String oldProjectName, String newProjectName) {
         Index index = getIndexOrThrow(indexId);
         try {
@@ -337,9 +319,6 @@ public class MeiliSearchService {
         return documents;
     }
 
-    /**
-     * Search all full documents matching a filter, walking every page.
-     */
     @SuppressWarnings("unchecked")
     private List<Map<String, Object>> searchFullDocuments(Index index, String filter) throws MeilisearchException {
         List<Map<String, Object>> documents = new ArrayList<>();
@@ -411,9 +390,7 @@ public class MeiliSearchService {
             return false;
         }
         int firstIndex = projectNames.indexOf(oldProjectName);
-        while (projectNames.remove(oldProjectName)) {
-            // remove every occurrence
-        }
+        projectNames.removeAll(List.of(oldProjectName));
         if (!projectNames.contains(newProjectName)) {
             projectNames.add(Math.min(firstIndex, projectNames.size()), newProjectName);
         }

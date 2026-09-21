@@ -42,11 +42,6 @@ public class ProjectFromSearchAsyncService {
 
     private final ImageInstanceService imageInstanceService;
 
-    /**
-     * Re-runs the metadata search with the same query/filters, creates one image instance per matching abstract image
-     * in the given project (skipping abstract images already in it), and tags each created batch in the metadata
-     * index. Progress is reported on the given task.
-     */
     @Async
     public void run(Long taskId, Long projectId, String query, List<String> filters) {
         Task task = taskService.get(taskId);

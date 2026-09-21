@@ -1133,10 +1133,6 @@ public class ImageInstanceService extends ModelService {
         }
     }
 
-    /**
-     * Delete all image instances of a project: one bulk removal of the project name from the metadata of every
-     * concerned abstract image, then a per-image delete with project tagging deferred.
-     */
     public void deleteAllForProject(Project project, Transaction transaction, Task task) {
         List<ImageInstance> imageInstances = imageInstanceRepository.findAllByProject(project);
         List<Long> abstractImageIds = imageInstances.stream()

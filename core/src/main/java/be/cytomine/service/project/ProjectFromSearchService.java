@@ -40,11 +40,6 @@ public class ProjectFromSearchService {
 
     private final ProjectFromSearchAsyncService projectFromSearchAsyncService;
 
-    /**
-     * Creates the project (with the requested ontology), starts a task and schedules the async job that actually
-     * imports the images. Returns a {@link ProjectFromSearchResponse} so the caller can poll the task without ever
-     * receiving the image list.
-     */
     public ProjectFromSearchResponse createAndSchedule(ProjectFromSearchRequest request) {
         long userId = currentUserService.getCurrentUser().id();
         String name = request.name();

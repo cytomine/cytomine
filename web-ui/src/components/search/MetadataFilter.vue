@@ -97,7 +97,6 @@ export default {
       return Object.entries(this.selectedFacets)
         .filter(([, values]) => values.length > 0)
         .map(([key, values]) => {
-          // Keep filters that are composed of several words with commas
           let clause = values
             .map(({ value }) => `${key} = "${value.replace(/"/g, '\\"')}"`)
             .join(' OR ');

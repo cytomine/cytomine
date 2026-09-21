@@ -102,6 +102,10 @@ public class MeiliSearchService {
         return searchImageIds(query, filters, null);
     }
 
+    public Set<Long> searchImageIds(long userId, String query, List<String> filters) {
+        return searchImageIds(query, filters, accessibleStorageIds(userId));
+    }
+
     public Set<Long> searchImageIds(String query, List<String> filters, List<Long> storageIds) {
         Index index = getIndexOrThrow(indexId);
 

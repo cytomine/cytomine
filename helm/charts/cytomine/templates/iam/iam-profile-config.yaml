@@ -141,7 +141,6 @@ data:
           "validations": {
             "options": {
               "options": [
-                "no",
                 "nl",
                 "en",
                 "es",

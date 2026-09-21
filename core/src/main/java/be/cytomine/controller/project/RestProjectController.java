@@ -31,9 +31,11 @@ import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.appengine.TaskRunService;
+import be.cytomine.service.project.MetadataProjectBackfillService;
 import be.cytomine.service.project.ProjectFromSearchService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ProjectSearchExtension;
+import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
@@ -65,6 +67,10 @@ public class RestProjectController extends RestCytomineController {
     private final UserHttpContract userHttpContract;
 
     private final ProjectFromSearchService projectFromSearchService;
+
+    private final MetadataProjectBackfillService metadataProjectBackfillService;
+
+    private final SecurityACLService securityACLService;
 
     /**
      * List all ontology visible for the current user For each ontology, print the terms tree
@@ -134,6 +140,13 @@ public class RestProjectController extends RestCytomineController {
             log.error("add from search error:" + e.msg, e);
             return buildJson(Map.of("success", false, "errors", e.getMessage(), "errorValues", e.getValues()), e.code);
         }
+    }
+
+    @PostMapping("/project/backfill-metadata-projects.json")
+    public ResponseEntity<String> backfillMetadataProjects() {
+        log.debug("REST request to backfill image.projects memberships");
+        securityACLService.checkAdmin(currentUserService.getCurrentUser());
+        return responseSuccess(metadataProjectBackfillService.backfill());
     }
 
     @DeleteMapping("/project/{id}.json")

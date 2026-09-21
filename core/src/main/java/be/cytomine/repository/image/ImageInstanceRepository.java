@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -56,6 +57,13 @@ public interface ImageInstanceRepository
     Optional<ImageInstance> findByProjectAndBaseImage(Project project, AbstractImage baseImage);
 
     List<ImageInstance> findAllByBaseImage_IdInAndProject(Collection<Long> baseImageIds, Project project);
+
+    @Query(
+        value = "SELECT DISTINCT project_id, base_image_id FROM image_instance",
+        nativeQuery = true,
+        countQuery = "SELECT COUNT(DISTINCT project_id, base_image_id) FROM image_instance"
+    )
+    List<Object[]> findDistinctProjectBaseImagePairs(Pageable pageable);
 
     Optional<ImageInstance> findTopByProjectAndCreatedLessThanOrderByCreatedDesc(Project project, Date created);
 

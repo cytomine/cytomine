@@ -141,10 +141,6 @@ export default {
       } else {
         this.$notify({ type: 'success', text: this.$t('notif-success-project-from-search') });
       }
-
-      if (this.task && this.task.project) {
-        this.$router.push(`/project/${this.task.project}/images`);
-      }
     }
   }
 };

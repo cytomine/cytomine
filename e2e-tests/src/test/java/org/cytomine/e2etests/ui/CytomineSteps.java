@@ -453,7 +453,10 @@ public class CytomineSteps {
         By searchInput = By.xpath("//input[@placeholder='Search user...']");
         webDriverUtils.byClick(wait, searchInput);
         webDriverUtils.bySendKeys(wait, searchInput, username);
-        webDriverUtils.byHitEnter(wait, searchInput);
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//a[contains(@class,'dropdown-item') and contains(.,'" + username + "')]")
+        );
         webDriverUtils.byClick(
             wait,
             By.xpath(
@@ -927,6 +930,64 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(wait, "//a[normalize-space()='" + imageGroupName + "']");
         webDriverUtils.waitLoading(wait);
         webDriverUtils.byIsDisplayed(wait, By.cssSelector(".draw-tools-wrapper"));
+    }
+
+    public void linkAnnotationToOtherView(Wait<WebDriver> wait) {
+        String cell = "(//div[contains(@class, 'map-cell')])[1]";
+
+        webDriverUtils.byIsDisplayed(wait, By.xpath(cell + "//div[contains(@class, 'annotation-details-container')]"));
+
+        webDriverUtils.xpathClick(
+            wait,
+            cell + "//button[.//i[contains(@class, 'fa-link')] and not(.//i[contains(@class, 'fa-paste')])]"
+        );
+
+        String linkableView = cell + "//div[contains(@class, 'special-paste-container')]"
+            + "//a[contains(@class, 'panel-block') and not(contains(@class, 'is-disabled'))]";
+        webDriverUtils.byIsDisplayed(wait, By.xpath(linkableView));
+        webDriverUtils.xpathClick(wait, linkableView);
+
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(., 'Annotation successfully linked')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(., 'Annotation successfully linked')]"));
+    }
+
+    public void verifyLinkedAnnotationInDetails(Wait<WebDriver> wait) {
+        String cell = "(//div[contains(@class, 'map-cell')])[1]";
+
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath(
+                cell + "//div[contains(@class, 'annotation-details-container')]"
+                    + "//tr[.//h5[contains(normalize-space(), 'Linked annotations')]]"
+                    + "//div[contains(@class, 'annot-preview')]"
+            )
+        );
+    }
+
+    public void unlinkAnnotationFromView(Wait<WebDriver> wait) {
+        String cell = "(//div[contains(@class, 'map-cell')])[1]";
+        String linkBlock = cell + "//div[contains(@class, 'buttons') and ./div[contains(@class, "
+            + "'special-paste-selection')]/button[.//i[contains(@class, 'fa-link')] "
+            + "and not(.//i[contains(@class, 'fa-paste')])]]";
+
+        webDriverUtils.xpathClick(wait, linkBlock + "/button");
+        webDriverUtils.clickButtonByText(wait, "Confirm");
+
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(., 'Annotation successfully unlinked')]"));
+        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(., 'Annotation successfully unlinked')]"));
+    }
+
+    public void verifyAnnotationUnlinkedInDetails(Wait<WebDriver> wait) {
+        String cell = "(//div[contains(@class, 'map-cell')])[1]";
+
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath(
+                cell + "//div[contains(@class, 'annotation-details-container')]"
+                    + "//tr[.//h5[contains(normalize-space(), 'Linked annotations')]]"
+                    + "//em[contains(normalize-space(), 'No linked annotation')]"
+            )
+        );
     }
 
     public void addTagToImage(Wait<WebDriver> wait, String imageName, String tagName) {

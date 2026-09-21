@@ -553,7 +553,8 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.project.ontology").value(project.getOntology().getId()));
 
         project = projectRepository.findByName("add_valid_project").get();
-        assertThat(aclRepository.listMaskForUsers(project.getId(), currentUsername))
+        assertThat(aclRepository.listMaskForUsers(project.getId(),
+            aclRepository.getAclClassId(Project.class.getName()), currentUsername))
             .contains(ADMINISTRATION.getMask());
     }
 

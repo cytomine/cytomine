@@ -453,7 +453,10 @@ public class CytomineSteps {
         By searchInput = By.xpath("//input[@placeholder='Search user...']");
         webDriverUtils.byClick(wait, searchInput);
         webDriverUtils.bySendKeys(wait, searchInput, username);
-        webDriverUtils.byHitEnter(wait, searchInput);
+        webDriverUtils.byClick(
+            wait,
+            By.xpath("//a[contains(@class,'dropdown-item') and contains(.,'" + username + "')]")
+        );
         webDriverUtils.byClick(
             wait,
             By.xpath(

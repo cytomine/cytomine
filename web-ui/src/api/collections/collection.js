@@ -132,6 +132,10 @@ export default class Collection {
 
   getParameters() {
     let params = {};
+    if (this.max > 0) {
+      params.page = this._curPage;
+      params.size = this.max;
+    }
     for (let key in this) {
       let value = this[key];
       if (!key.startsWith('_') && value !== null) {

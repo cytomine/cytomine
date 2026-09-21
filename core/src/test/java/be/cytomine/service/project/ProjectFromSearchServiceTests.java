@@ -101,11 +101,8 @@ public class ProjectFromSearchServiceTests {
         Task task = task(77L);
         when(taskService.createNewTask(any(Project.class), eq(5L), eq(false))).thenReturn(task);
 
-        ProjectFromSearchRequest request = new ProjectFromSearchRequest();
-        request.setName("MyProject");
-        request.setOntologyMode("NEW");
-        request.setQuery("nucleus");
-        request.setFilters(List.of("channel=red"));
+        ProjectFromSearchRequest request =
+            new ProjectFromSearchRequest("MyProject", "NEW", null, "nucleus", List.of("channel=red"));
 
         ProjectFromSearchResponse result = service().createAndSchedule(request);
 
@@ -115,9 +112,9 @@ public class ProjectFromSearchServiceTests {
         assertEquals(42L, projectJson.getValue().get("ontology"));
         verify(projectFromSearchAsyncService).run(77L, 9L, "nucleus", List.of("channel=red"));
 
-        assertEquals(9L, result.getProject().getId());
-        assertEquals("MyProject", result.getProject().getName());
-        assertEquals(77L, result.getTask().getId());
+        assertEquals(9L, result.project().id());
+        assertEquals("MyProject", result.project().name());
+        assertEquals(77L, result.task().id());
     }
 
     @Test
@@ -130,10 +127,7 @@ public class ProjectFromSearchServiceTests {
         Task task = task(77L);
         when(taskService.createNewTask(any(Project.class), eq(5L), eq(false))).thenReturn(task);
 
-        ProjectFromSearchRequest request = new ProjectFromSearchRequest();
-        request.setName("MyProject");
-        request.setOntologyMode("EXISTING");
-        request.setOntologyId(33L);
+        ProjectFromSearchRequest request = new ProjectFromSearchRequest("MyProject", "EXISTING", 33L, null, null);
 
         service().createAndSchedule(request);
 
@@ -151,8 +145,7 @@ public class ProjectFromSearchServiceTests {
         Task task = task(77L);
         when(taskService.createNewTask(any(Project.class), eq(5L), eq(false))).thenReturn(task);
 
-        ProjectFromSearchRequest request = new ProjectFromSearchRequest();
-        request.setName("MyProject");
+        ProjectFromSearchRequest request = new ProjectFromSearchRequest("MyProject", null, null, null, null);
 
         service().createAndSchedule(request);
 
@@ -167,7 +160,7 @@ public class ProjectFromSearchServiceTests {
     void shouldRejectMissingProjectName() {
         stubCurrentUser(5L);
 
-        ProjectFromSearchRequest request = new ProjectFromSearchRequest();
+        ProjectFromSearchRequest request = new ProjectFromSearchRequest(null, null, null, null, null);
 
         assertThrows(WrongArgumentException.class, () -> service().createAndSchedule(request));
         verifyNoInteractions(ontologyHttpContract);
@@ -178,15 +171,10 @@ public class ProjectFromSearchServiceTests {
     void shouldRejectExistingOntologyWhenIdOrContentIsMissing() {
         stubCurrentUser(5L);
 
-        ProjectFromSearchRequest withoutId = new ProjectFromSearchRequest();
-        withoutId.setName("MyProject");
-        withoutId.setOntologyMode("EXISTING");
+        ProjectFromSearchRequest withoutId = new ProjectFromSearchRequest("MyProject", "EXISTING", null, null, null);
         assertThrows(WrongArgumentException.class, () -> service().createAndSchedule(withoutId));
 
-        ProjectFromSearchRequest notFound = new ProjectFromSearchRequest();
-        notFound.setName("MyProject");
-        notFound.setOntologyMode("EXISTING");
-        notFound.setOntologyId(33L);
+        ProjectFromSearchRequest notFound = new ProjectFromSearchRequest("MyProject", "EXISTING", 33L, null, null);
         when(ontologyHttpContract.getLight(33L, 5L)).thenReturn(Optional.empty());
         assertThrows(WrongArgumentException.class, () -> service().createAndSchedule(notFound));
     }
@@ -196,8 +184,7 @@ public class ProjectFromSearchServiceTests {
         stubCurrentUser(5L);
         when(projectService.add(any(JsonObject.class))).thenThrow(new AlreadyExistException("Project already exists"));
 
-        ProjectFromSearchRequest request = new ProjectFromSearchRequest();
-        request.setName("MyProject");
+        ProjectFromSearchRequest request = new ProjectFromSearchRequest("MyProject", null, null, null, null);
 
         assertThrows(AlreadyExistException.class, () -> service().createAndSchedule(request));
         verifyNoInteractions(ontologyHttpContract);

@@ -47,11 +47,11 @@ public class ProjectFromSearchService {
      */
     public ProjectFromSearchResponse createAndSchedule(ProjectFromSearchRequest request) {
         long userId = currentUserService.getCurrentUser().id();
-        String name = request.getName();
+        String name = request.name();
         if (name == null || name.isBlank()) {
             throw new WrongArgumentException("Project name is required");
         }
-        Long ontologyId = resolveOntology(userId, name, request.getOntologyMode(), request.getOntologyId());
+        Long ontologyId = resolveOntology(userId, name, request.ontologyMode(), request.ontologyId());
 
         JsonObject projectJson = new JsonObject();
         projectJson.put("name", name);
@@ -63,8 +63,8 @@ public class ProjectFromSearchService {
 
         Task task = taskService.createNewTask(project, userId, false);
 
-        List<String> filters = request.getFilters() != null ? request.getFilters() : List.of();
-        projectFromSearchAsyncService.run(task.getId(), project.getId(), request.getQuery(), filters);
+        List<String> filters = request.filters() != null ? request.filters() : List.of();
+        projectFromSearchAsyncService.run(task.getId(), project.getId(), request.query(), filters);
 
         return new ProjectFromSearchResponse(
             new ProjectReference(project.getId(), project.getName()),

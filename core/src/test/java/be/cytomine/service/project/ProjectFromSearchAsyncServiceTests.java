@@ -27,6 +27,7 @@ import be.cytomine.utils.Task;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
@@ -172,6 +173,76 @@ public class ProjectFromSearchAsyncServiceTests {
         verify(taskService, never()).finishTask(task);
         verify(meiliSearchService, never()).addProjectToImages(any(), anyString());
         verify(imageInstanceService, never()).setTagMode(any());
+    }
+
+    @Test
+    void shouldTagEarlierChunksWhenALaterImageFailsToCreate() {
+        Task task = task(1L);
+        Project project = project(7L);
+        when(project.getName()).thenReturn("MyProject");
+        when(taskService.get(1L)).thenReturn(task);
+        when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
+
+        UserResponse user = mock(UserResponse.class);
+        when(user.id()).thenReturn(5L);
+        when(currentUserService.getCurrentUser()).thenReturn(user);
+        Set<Long> ids = new java.util.HashSet<>();
+        for (long i = 1; i <= 101; i++) {
+            ids.add(i);
+        }
+        when(meiliSearchService.searchImageIds(5L, "query", List.of())).thenReturn(ids);
+        when(imageInstanceRepository.findAllByBaseImageIdInAndProject(any(), eq(project))).thenReturn(List.of());
+        when(imageInstanceService.add(any(JsonObject.class))).thenAnswer(invocation -> {
+            JsonObject json = invocation.getArgument(0);
+            long baseImage = ((Number) json.get("baseImage")).longValue();
+            if (baseImage == 101L) {
+                throw new RuntimeException("boom");
+            }
+            CommandResponse response = new CommandResponse();
+            response.setObject(imageInstanceWithBaseImage(baseImage));
+            response.setStatus(200);
+            return response;
+        });
+
+        asyncService().run(1L, 7L, "query", List.of());
+
+        verify(meiliSearchService).addProjectToImages(argThat(list -> list.size() == 100), eq("MyProject"));
+        verify(taskService).updateTask(eq(task), eq(100), org.mockito.ArgumentMatchers.startsWith("Error:"));
+        verify(taskService, never()).finishTask(task);
+        verify(imageInstanceService).setTagMode(ImageInstanceService.TagMode.DEFER);
+        verify(imageInstanceService).setTagMode(ImageInstanceService.TagMode.NORMAL);
+    }
+
+    @Test
+    void shouldReportWarningWhenMetadataTaggingFails() {
+        Task task = task(1L);
+        Project project = project(7L);
+        when(project.getName()).thenReturn("MyProject");
+        when(taskService.get(1L)).thenReturn(task);
+        when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
+
+        UserResponse user = mock(UserResponse.class);
+        when(user.id()).thenReturn(5L);
+        when(currentUserService.getCurrentUser()).thenReturn(user);
+        when(meiliSearchService.searchImageIds(5L, "query", List.of())).thenReturn(Set.of(10L, 11L));
+        when(imageInstanceRepository.findAllByBaseImageIdInAndProject(any(), eq(project))).thenReturn(List.of());
+        when(imageInstanceService.add(any(JsonObject.class))).thenAnswer(invocation -> {
+            CommandResponse response = new CommandResponse();
+            JsonObject json = invocation.getArgument(0);
+            response.setObject(imageInstanceWithBaseImage(((Number) json.get("baseImage")).longValue()));
+            response.setStatus(200);
+            return response;
+        });
+        when(meiliSearchService.addProjectToImages(any(), anyString()))
+            .thenThrow(new SearchException("meili down", 500, "boom"));
+
+        asyncService().run(1L, 7L, "query", List.of());
+
+        verify(meiliSearchService).addProjectToImages(List.of(10L, 11L), "MyProject");
+        verify(taskService).updateTask(
+            eq(task), eq(93), org.mockito.ArgumentMatchers.startsWith("Warning:")
+        );
+        verify(taskService).finishTask(task);
     }
 
     @Test

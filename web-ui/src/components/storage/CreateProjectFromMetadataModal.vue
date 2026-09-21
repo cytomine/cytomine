@@ -133,8 +133,15 @@ export default {
       this.$emit('update:active', false);
 
       let comments = (this.task && this.task.comments) || [];
-      let matched = comments.find(comment => /^\s*Matched \d+ images/.test(comment));
-      let count = matched ? Number.parseInt(matched.match(/\d+/)[0], 10) : null;
+
+      let error = comments.find(comment => /^\s*\d+%:Error:/.test(comment));
+      if (error) {
+        this.$notify({ type: 'error', text: this.$t('notif-error-project-from-search') });
+        return;
+      }
+
+      let matched = comments.find(comment => /^\s*\d+%:Matched (\d+) images/.test(comment));
+      let count = matched ? Number.parseInt(matched.match(/^\s*\d+%:Matched (\d+) images/)[1], 10) : null;
 
       if (count !== null && !Number.isNaN(count)) {
         this.$notify({ type: 'success', text: this.$t('notif-success-project-from-search-created', { count }) });

@@ -44,8 +44,8 @@ public class ProjectFromSearchAsyncService {
 
     /**
      * Re-runs the metadata search with the same query/filters, creates one image instance per matching abstract image
-     * in the given project (skipping abstract images already in it), then tags all created images in one metadata
-     * pass. Progress is reported on the given task.
+     * in the given project (skipping abstract images already in it), and tags each created batch in the metadata
+     * index. Progress is reported on the given task.
      */
     @Async
     public void run(Long taskId, Long projectId, String query, List<String> filters) {
@@ -61,6 +61,7 @@ public class ProjectFromSearchAsyncService {
         Set<Long> abstractImageIds = new HashSet<>();
         List<Long> createdAbstractImageIds = new ArrayList<>();
         int skipped = 0;
+        boolean taggingWarning = false;
         try {
             taskService.updateTask(task, 5, "Searching images");
             long userId = currentUserService.getCurrentUser().id();
@@ -85,6 +86,9 @@ public class ProjectFromSearchAsyncService {
                             createdAbstractImageIds.add(instance.getBaseImage().getId());
                         }
                     }
+                    if (!tagProjectMemberships(toCreate, project)) {
+                        taggingWarning = true;
+                    }
                     progress = Math.min(
                         90,
                         progress + (int) ((70.0 / Math.max(1, remaining.size())) * chunk.size())
@@ -100,15 +104,9 @@ public class ProjectFromSearchAsyncService {
             return;
         }
 
-        if (!createdAbstractImageIds.isEmpty()) {
-            try {
-                meiliSearchService.addProjectToImages(createdAbstractImageIds, project.getName());
-            } catch (Exception e) {
-                log.warn("Could not tag project '{}' in metadata after create-from-search", project.getName(), e);
-                taskService.updateTask(task, 90, "Warning: images created but metadata tagging failed");
-            }
+        if (taggingWarning) {
+            taskService.updateTask(task, 93, "Warning: images created but some metadata tagging failed");
         }
-
         taskService.updateTask(
             task,
             95,
@@ -117,6 +115,19 @@ public class ProjectFromSearchAsyncService {
                 + ", skipped " + skipped
         );
         taskService.finishTask(task);
+    }
+
+    private boolean tagProjectMemberships(List<Long> abstractImageIds, Project project) {
+        if (abstractImageIds.isEmpty()) {
+            return true;
+        }
+        try {
+            meiliSearchService.addProjectToImages(abstractImageIds, project.getName());
+            return true;
+        } catch (Exception e) {
+            log.warn("Could not tag project '{}' in metadata after create-from-search", project.getName(), e);
+            return false;
+        }
     }
 
     private List<Long> filterOutAlreadyInProject(List<Long> abstractImageIds, Project project) {

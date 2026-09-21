@@ -148,61 +148,6 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
-{{ if and (.Values.iam.lsaaiClientIdSecretName) (and .Values.iam.lsaaiClientSecretSecretName .Values.iam.lsaaiEndpoint) }}
-      # https://stackoverflow.com/a/75794013
-      - name: fetch-auth-config
-        image: {{ .Values.images.curl }}
-        command: ["/bin/sh", "-c"]
-        args: ["cat /opt/keycloak-auth/kcadm.config | grep token | sed -E 's/(token)|\"|:| |,//g' > /opt/keycloak-auth/token"]
-        volumeMounts:
-        - name: kc-auth
-          mountPath: "/opt/keycloak-auth"
-        securityContext:
-        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
-
-      - name: import-lsaai-config
-        image: {{ .Values.images.curl }}
-        command: ["/bin/sh", "-c"]
-        args: ["AUTH=$(cat /opt/keycloak-auth/token) && curl -s -X POST -H \"Authorization: bearer $AUTH\" -H 'content-type: application/json' {{ include "cytomine.iamInternalUrl" . }}/admin/realms/cytomine/identity-provider/import-config -d '{\"fromUrl\":\"'{{ .Values.iam.lsaaiEndpoint }}'\",\"providerId\":\"oidc\"}' > /opt/keycloak-auth/import-config.json && cat /opt/keycloak-auth/import-config.json"]
-        volumeMounts:
-        - name: kc-auth
-          mountPath: "/opt/keycloak-auth"
-        securityContext:
-        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
-
-
-      - name: add-provider-lsaai-instance
-        image: "{{ .Values.images.iam }}"
-        command: ["/bin/sh", "-c"]
-        args: ["JSON=$(cat /opt/keycloak-auth/import-config.json) && /opt/keycloak/bin/kcadm.sh create identity-provider/instances -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s alias=oidc -s enabled=true -s displayName='Life Science' -s config=$JSON -s config.clientId=$(LSAAI_CLIENT_ID) -s config.clientSecret=$(LSAAI_CLIENT_SECRET) -s config.backchannelSupported='true' || true"]
-        volumeMounts:
-        - name: kc-auth
-          mountPath: "/opt/keycloak-auth"
-        securityContext:
-        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
-        env:
-        - name: LSAAI_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.iam.lsaaiClientSecretSecretName }}
-              key: clientSecret
-        - name: LSAAI_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.iam.lsaaiClientIdSecretName }}
-              key: clientId
-
-      - name: add-provider-lsaai-mapper
-        image: "{{ .Values.images.iam }}"
-        command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances/oidc/mappers -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s identityProviderAlias=oidc -s identityProviderMapper=oidc-hardcoded-role-idp-mapper -s name=oidc-mapper -s config.role=core.ADMIN -s config.syncMode=INHERIT || true"]
-        volumeMounts:
-        - name: kc-auth
-          mountPath: "/opt/keycloak-auth"
-        securityContext:
-        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
-
-{{ end }}
       - name: update-user-profile-schema
         image: "{{ .Values.images.iam }}"
         command: [ "/bin/sh", "-c" ]
@@ -259,6 +204,61 @@ spec:
             mountPath: "/opt/keycloak-auth"
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+
+{{ if and (.Values.iam.lsaaiClientIdSecretName) (and .Values.iam.lsaaiClientSecretSecretName .Values.iam.lsaaiEndpoint) }}
+      # https://stackoverflow.com/a/75794013
+      - name: fetch-auth-config
+        image: {{ .Values.images.curl }}
+        command: ["/bin/sh", "-c"]
+        args: ["cat /opt/keycloak-auth/kcadm.config | grep token | sed -E 's/(token)|\"|:| |,//g' > /opt/keycloak-auth/token"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+
+      - name: import-lsaai-config
+        image: {{ .Values.images.curl }}
+        command: ["/bin/sh", "-c"]
+        args: ["AUTH=$(cat /opt/keycloak-auth/token) && curl -s -X POST -H \"Authorization: bearer $AUTH\" -H 'content-type: application/json' {{ include "cytomine.iamInternalUrl" . }}/admin/realms/cytomine/identity-provider/import-config -d '{\"fromUrl\":\"'{{ .Values.iam.lsaaiEndpoint }}'\",\"providerId\":\"oidc\"}' > /opt/keycloak-auth/import-config.json && cat /opt/keycloak-auth/import-config.json"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+
+
+      - name: add-provider-lsaai-instance
+        image: "{{ .Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args: ["JSON=$(cat /opt/keycloak-auth/import-config.json) && /opt/keycloak/bin/kcadm.sh create identity-provider/instances -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s providerId=oidc -s alias=oidc -s enabled=true -s displayName='Life Science' -s config=$JSON -s config.clientId=$(LSAAI_CLIENT_ID) -s config.clientSecret=$(LSAAI_CLIENT_SECRET) -s config.backchannelSupported='true' || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+        env:
+        - name: LSAAI_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.iam.lsaaiClientSecretSecretName }}
+              key: clientSecret
+        - name: LSAAI_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.iam.lsaaiClientIdSecretName }}
+              key: clientId
+
+      - name: add-provider-lsaai-mapper
+        image: "{{ .Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances/oidc/mappers -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s identityProviderAlias=oidc -s identityProviderMapper=oidc-hardcoded-role-idp-mapper -s name=oidc-mapper -s config.role=core.ADMIN -s config.syncMode=INHERIT || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+{{ end }}
 
       containers:
       - name: check-job-done

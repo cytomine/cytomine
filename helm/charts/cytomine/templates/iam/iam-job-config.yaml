@@ -46,6 +46,16 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
+      - name: enable-internationalization
+        image: "{{ .Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh update realms/cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s internationalizationEnabled=true -s 'supportedLocales=[\"en\",\"fr\",\"es\",\"nl\"]' -s defaultLocale=en"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+
       - name: create-user
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
@@ -192,6 +202,7 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
+{{ end }}
       - name: update-user-profile-schema
         image: "{{ .Values.images.iam }}"
         command: [ "/bin/sh", "-c" ]
@@ -249,7 +260,6 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
-{{ end }}
       containers:
       - name: check-job-done
         image: "{{ .Values.images.iam }}"

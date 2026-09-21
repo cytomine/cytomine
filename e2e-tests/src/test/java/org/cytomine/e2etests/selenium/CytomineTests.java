@@ -48,6 +48,12 @@ public class CytomineTests {
     @Value("${cytomine.url}")
     URL cytomineUrl;
 
+    @Value("${cytomine.admin.username}")
+    String adminUsername;
+
+    @Value("${cytomine.admin.password}")
+    String adminPassword;
+
     @Autowired
     AnnotationTools annotationTools;
 
@@ -338,45 +344,42 @@ public class CytomineTests {
 
     @Test
     void uploadAndDeleteTask() {
-        multiUsers.runAsAdmin(wait, driver, admin -> {
-            String zipName = "com.cytomine.dummy.identity.image-1.0.0.zip";
+        String zipName = "com.cytomine.dummy.identity.image-1.0.0.zip";
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
 
-            cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
-            cytomineSteps.deleteTask(wait, cytomineUrl, "identity with image");
-        });
+        cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
+        cytomineSteps.deleteTask(wait, cytomineUrl, "identity with image");
+
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
     void runTaskAndDeleteRun() {
-        multiUsers.runAsAdmin(wait, driver, admin -> {
-            String imageName = "selenium-" + randomUUID() + ".png";
-            String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
-            String projectName = "selenium-" + randomUUID();
-            String taskName = "identity with geometry";
-            String taskVersion = "1.0.0";
+        String imageName = "selenium-" + randomUUID() + ".png";
+        String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
+        String projectName = "selenium-" + randomUUID();
+        String taskName = "identity with geometry";
+        String taskVersion = "1.0.0";
 
-            cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
-            String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
-            String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectUrl);
-                annotationTools.drawRectangleAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+        cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+        cytomineSteps.openImageInViewer(wait, projectUrl);
+        annotationTools.drawRectangleAnnotation(wait, driver);
+        cytomineSteps.verifyAnnotationCreated(wait);
 
-                cytomineSteps.selectTask(wait, taskName, taskVersion);
-                cytomineSteps.selectAnnotationForGeometryInput(wait);
-                cytomineSteps.runTask(wait, driver);
-                cytomineSteps.deleteTaskRun(wait, projectUrl, taskName);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteTask(wait, cytomineUrl, taskName),
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-                );
-            }
-        });
+        cytomineSteps.selectTask(wait, taskName, taskVersion);
+        cytomineSteps.selectAnnotationForGeometryInput(wait);
+        cytomineSteps.runTask(wait, driver);
+        cytomineSteps.deleteTaskRun(wait, projectUrl, taskName);
+
+        cytomineSteps.deleteTask(wait, cytomineUrl, taskName);
+        cytomineSteps.deleteProject(wait, projectUrl);
+        cytomineSteps.deleteOntology(wait, ontologyUrl);
+        cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -599,12 +602,13 @@ public class CytomineTests {
 
     @Test
     void checkProjectAfterPimsImport() {
-        multiUsers.runAsAdmin(wait, driver, admin -> {
-            String projectName = "test-project";
-            String imageName = "wsi";
+        String projectName = "test-project";
+        String imageName = "wsi";
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
 
-            cytomineSteps.checkPimsImportProject(wait, cytomineUrl, projectName, imageName);
-        });
+        cytomineSteps.checkPimsImportProject(wait, cytomineUrl, projectName, imageName);
+
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test

@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -164,7 +163,8 @@ public class ProjectFromSearchAsyncServiceTests {
         UserResponse user = mock(UserResponse.class);
         when(user.id()).thenReturn(5L);
         when(currentUserService.getCurrentUser()).thenReturn(user);
-        when(meiliSearchService.searchImageIds(5L, "query", List.of())).thenThrow(new SearchException("search failed", 500, "boom"));
+        when(meiliSearchService.searchImageIds(5L, "query", List.of()))
+            .thenThrow(new SearchException("search failed", 500, "boom"));
 
         asyncService().run(1L, 7L, "query", List.of());
 

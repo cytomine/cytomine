@@ -51,8 +51,8 @@ import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
-import be.cytomine.service.PermissionService;
 import be.cytomine.service.MeiliSearchService;
+import be.cytomine.service.PermissionService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.search.ProjectSearchExtension;
@@ -760,7 +760,8 @@ public class ProjectServiceTests {
     void updateProjectWithoutNameChangeShouldNotRenameMetadataScoping() {
         Project project = builder.givenAProject();
 
-        projectService.update(project, project.toJsonObject(urlApi).withChange("ontology", builder.givenAnOntology().getId()));
+        projectService.update(project,
+            project.toJsonObject(urlApi).withChange("ontology", builder.givenAnOntology().getId()));
 
         verify(meiliSearchService, org.mockito.Mockito.never()).renameProjectInImages(any(), any());
     }

@@ -34,7 +34,7 @@ describe('AppInfoPage.vue', () => {
     Task.fetchNamespaceVersion.mockResolvedValue(mockTask);
   });
 
-  const createWrapper = () => {
+  const createWrapper = ({ host } = {}) => {
     return shallowMount(AppInfoPage, {
       global: {
         mocks: {
@@ -44,7 +44,7 @@ describe('AppInfoPage.vue', () => {
           // component reads in `created` is mocked directly.
           $route: {
             params: { namespace: 'mock-namespace', version: '1.0.0' },
-            query: {},
+            query: { host },
           },
           $router: { push: vi.fn() },
         },
@@ -88,12 +88,22 @@ describe('AppInfoPage.vue', () => {
     expect(wrapper.text()).toContain(mockTask.description);
   });
 
-  it('should render action buttons', async () => {
+  it('should render the install button on the app store page', async () => {
+    const wrapper = createWrapper({ host: 'https://store.example.com' });
+    await flushPromises();
+
+    expect(wrapper.vm.task.host).toBe('https://store.example.com');
+    expect(wrapper.text()).toContain('go-back');
+    expect(wrapper.text()).toContain('install');
+  });
+
+  it('should not render the install button on the installed app page', async () => {
     const wrapper = createWrapper();
     await flushPromises();
 
+    expect(wrapper.vm.task.host).toBeUndefined();
     expect(wrapper.text()).toContain('go-back');
-    expect(wrapper.text()).toContain('install');
+    expect(wrapper.text()).not.toContain('install');
     expect(wrapper.text()).toContain('button-delete');
   });
 

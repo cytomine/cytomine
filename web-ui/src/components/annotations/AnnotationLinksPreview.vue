@@ -34,14 +34,11 @@
 </template>
 
 <script>
+import { Annotation, Cytomine } from '@/api';
 import eventBus from '@/utils/event-bus';
-
 import { get } from '@/utils/store-helpers';
 
 import AnnotationPreview from '@/components/annotations/AnnotationPreview.vue';
-import constants from '@/utils/constants';
-
-import { Annotation } from '@/api';
 
 export default {
   name: 'annotation-links-preview',
@@ -86,8 +83,8 @@ export default {
           updated: link.updated,
           image: link.image,
           instanceFilename: this.images.find(image => image.id === link.image).instanceFilename,
-          url: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`,
-          cropURL: `${constants.CYTOMINE_CORE_HOST}/api/annotation/${link.annotation}/crop.png`
+          url: `${Cytomine.instance.coreUrl}annotation/${link.annotation}/crop.png`,
+          cropURL: `${Cytomine.instance.coreUrl}annotation/${link.annotation}/crop.png`
         });
       });
       annots.sort((a, b) => a.instanceFilename.localeCompare(b.instanceFilename));

@@ -185,14 +185,6 @@ public class AccountService {
         return client;
     }
 
-    private List<RoleRepresentation> getClientLevelUserRoles(
-        UserRepresentation userRepresentation,
-        ClientRepresentation client
-    ) {
-        return keycloak.realm(realm).users().get(userRepresentation.getId()).roles()
-            .clientLevel(client.getId()).listAll();
-    }
-
     public void update(Account account) {
         log.info("Updating account {}", account);
         // validate account
@@ -328,15 +320,12 @@ public class AccountService {
             if (account.email() == null || account.email().isEmpty()) {
                 errors.put("email", "this property is required");
             }
-            if (account.userLocale() == null || account.userLocale().isEmpty()) {
-                errors.put("user_locale", "this property is required");
+            if (account.locale() == null || account.locale().isEmpty()) {
+                errors.put("locale", "this property is required");
             } else {
-                List<String> cytomineLocales = List.of("en", "es", "nl", "fr", "no");
-                if (!cytomineLocales.contains(account.userLocale())) {
-                    errors.put(
-                        "user_locale", "unknown locales [" + account.userLocale()
-                            + "] , allowed roles [en, es, nl, fr, no]"
-                    );
+                List<String> cytomineLocales = List.of("en", "es", "nl", "fr");
+                if (!cytomineLocales.contains(account.locale())) {
+                    errors.put("locale", "unknown local " + account.locale() + ", allowed roles [en, es, nl, fr]");
                 }
             }
             if (account.roles() == null || account.roles().isEmpty()) {

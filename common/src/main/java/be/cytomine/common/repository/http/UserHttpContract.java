@@ -31,6 +31,9 @@ public interface UserHttpContract {
     @PostExchange
     Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateUser createUser);
 
+    @PostExchange("/self-register")
+    Optional<HttpCommandResponse> selfRegister(@Valid @RequestBody CreateUser createUser);
+
     @PutExchange("/{id}")
     Optional<HttpCommandResponse> update(@PathVariable long id,
         @RequestParam long userId,

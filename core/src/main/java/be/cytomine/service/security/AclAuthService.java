@@ -14,7 +14,8 @@ public class AclAuthService {
 
     private final AclRepository aclRepository;
 
-    public List<Integer> get(Long domainId, User user) {
-        return aclRepository.listMaskForUsers(domainId, user.getUsername());
+    public List<Integer> get(Long domainId, String domainClassName, User user) {
+        return aclRepository.listMaskForUsers(domainId, aclRepository.getAclClassId(domainClassName),
+            user.getUsername());
     }
 }

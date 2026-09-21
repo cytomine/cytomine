@@ -443,7 +443,8 @@ public class SecurityACLService {
 
     public boolean isUserInProject(long userId, Project project) {
         this.check(project, READ);
-        return (aclRepository.countEntries(project.getId(), userId) > 0);
+        return (aclRepository.countEntries(project.getId(), userId,
+            aclRepository.getAclClassId(Project.class.getName())) > 0);
     }
 
     public void checkIsUserInProject(User user, Project project) {

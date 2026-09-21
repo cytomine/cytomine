@@ -10,12 +10,12 @@ public record Account(
     String email,
     boolean emailVerified,
     boolean isDeveloper,
-    String userLocale,
+    String locale,
     List<String> roles
 ) {
     public Account {
-        if (userLocale == null) {
-            userLocale = "";
+        if (locale == null) {
+            locale = "";
         }
     }
 

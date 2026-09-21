@@ -38,7 +38,6 @@ import be.cytomine.domain.command.CommandHistory;
 import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.EditCommand;
 import be.cytomine.domain.command.Transaction;
-import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.Project;

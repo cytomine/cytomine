@@ -127,7 +127,7 @@ public class ProjectFromSearchAsyncService {
             );
             if (!chunk.isEmpty()) {
                 for (ImageInstance instance
-                    : imageInstanceRepository.findAllByBaseImage_IdInAndProject(chunk, project)) {
+                    : imageInstanceRepository.findAllByBaseImageIdInAndProject(chunk, project)) {
                     alreadyInProject.add(instance.getBaseImage().getId());
                 }
             }

@@ -101,7 +101,7 @@ public class ProjectFromSearchAsyncServiceTests {
         when(user.id()).thenReturn(5L);
         when(currentUserService.getCurrentUser()).thenReturn(user);
         when(meiliSearchService.searchImageIds(5L, "query", List.of("tag=value"))).thenReturn(Set.of(10L, 11L));
-        when(imageInstanceRepository.findAllByBaseImage_IdInAndProject(any(), eq(project))).thenReturn(List.of());
+        when(imageInstanceRepository.findAllByBaseImageIdInAndProject(any(), eq(project))).thenReturn(List.of());
         when(imageInstanceService.add(any(JsonObject.class))).thenAnswer(invocation -> {
             CommandResponse response = new CommandResponse();
             JsonObject json = invocation.getArgument(0);
@@ -137,7 +137,7 @@ public class ProjectFromSearchAsyncServiceTests {
         when(currentUserService.getCurrentUser()).thenReturn(user);
         when(meiliSearchService.searchImageIds(5L, "", List.of())).thenReturn(Set.of(10L, 11L));
         List<ImageInstance> existing = List.of(imageInstanceWithBaseImage(10L));
-        when(imageInstanceRepository.findAllByBaseImage_IdInAndProject(any(), eq(project))).thenReturn(existing);
+        when(imageInstanceRepository.findAllByBaseImageIdInAndProject(any(), eq(project))).thenReturn(existing);
         when(imageInstanceService.add(any(JsonObject.class))).thenAnswer(invocation -> {
             CommandResponse response = new CommandResponse();
             JsonObject json = invocation.getArgument(0);

@@ -80,9 +80,8 @@
 </template>
 
 <script>
-import constants from '@/utils/constants';
 import AnnotationProfileProjectionChart from '@/components/charts/AnnotationProfileProjectionChart';
-import { SliceInstanceCollection } from '@/api';
+import { Cytomine, SliceInstanceCollection } from '@/api';
 import { formatMinutesSeconds } from '@/utils/slice-utils';
 
 export default {
@@ -106,7 +105,7 @@ export default {
   computed: {
     downloadURL() {
       let axis = (this.spatialAxis) ? '?axis=xy' : '';
-      return `${constants.CYTOMINE_CORE_HOST}/api/annotation/${this.annotation.id}/profile/projections.csv${axis}`;
+      return `${Cytomine.instance.coreUrl}annotation/${this.annotation.id}/profile/projections.csv${axis}`;
     },
     isLine() {
       return this.annotation.location && this.annotation.location.includes('LINESTRING');

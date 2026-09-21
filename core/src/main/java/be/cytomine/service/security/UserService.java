@@ -610,7 +610,8 @@ public class UserService extends ModelService {
 
     public Optional<User> findCreator(Project project) {
         securityACLService.check(project, READ);
-        return aclRepository.listCreators(project.getId()).stream().findFirst();
+        return aclRepository.listCreators(project.getId(), aclRepository.getAclClassId(Project.class.getName()))
+            .stream().findFirst();
     }
 
     public List<UserResponse> listUsers(Project project) {

@@ -148,6 +148,48 @@ public class AnnotationTools {
         drawRectangle(wait, driver);
     }
 
+    private String mapCellPrefix(int cell) {
+        return "(//div[contains(@class, 'map-cell')])[" + cell + "]";
+    }
+
+    private void selectDrawToolInCell(Wait<WebDriver> wait, int cell, String iconClass) {
+        String prefix = mapCellPrefix(cell);
+        webDriverUtils.xpathClick(wait, prefix + "//button[.//i[contains(@class, '" + iconClass + "')]]");
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath(prefix + "//button[contains(@class, 'is-selected') and .//i[contains(@class, '"
+                + iconClass + "')]]")
+        );
+    }
+
+    @SneakyThrows
+    public void drawRectangleAnnotationInCell(Wait<WebDriver> wait, WebDriver driver, int cell) {
+        selectDrawToolInCell(wait, cell, "fa-square");
+
+        By canvasLocator = By.xpath(mapCellPrefix(cell) + "//div[contains(@class, 'ol-viewport')]//canvas");
+        WebElement mapCanvas = webDriverUtils.waitForCanvasReady(wait, canvasLocator);
+
+        int canvasWidth = mapCanvas.getSize().getWidth();
+        int canvasHeight = mapCanvas.getSize().getHeight();
+        int startX = canvasWidth / 4;
+        int startY = canvasHeight / 4;
+        int endX = canvasWidth * 3 / 4;
+        int endY = canvasHeight * 3 / 4;
+
+        Actions actions = new Actions(driver);
+        actions.moveToElement(
+                mapCanvas,
+                startX - canvasWidth / DEFAULT_CANVA_OFFSET,
+                startY - canvasHeight / DEFAULT_CANVA_OFFSET
+            )
+            .click()
+            .moveToElement(mapCanvas, endX - canvasWidth / 2, endY - canvasHeight / 2)
+            .click()
+            .perform();
+
+        Thread.sleep(2000);
+    }
+
     public void drawRandomRectangleAnnotation(Wait<WebDriver> wait, WebDriver driver) {
         selectDrawTool(wait, "fa-square");
         int xOffset = new Random().nextInt(3) + DEFAULT_CANVA_OFFSET;

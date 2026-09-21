@@ -31,6 +31,7 @@ from pims.files.file import Path
 from pims.importer.annotation import AnnotationImporter
 from pims.importer.image import ImageImporter
 from pims.importer.metadata import MetadataValidator
+from pims.importer.metadata_projects import fetch_existing_project_memberships, merge_project_memberships
 from pims.importer.ontology import OntologyImporter
 from pims.importer.utils import get_project
 from pims.schemas.auth import ApiCredentials, CytomineAuth
@@ -209,6 +210,17 @@ def run_import_datasets(
                         indexing_payload.append(flat_dict)
 
                     logger.info(f"[{parent_dataset}] Prepared {len(indexing_payload)} images for indexing.")
+
+                    abstract_image_ids = {
+                        int(payload["image"]["abstract_image_id"])
+                        for payload in indexing_payload
+                        if payload["image"].get("abstract_image_id") is not None
+                    }
+                    existing_projects = fetch_existing_project_memberships(index, abstract_image_ids)
+                    for payload in indexing_payload:
+                        abstract_image_id = payload["image"].get("abstract_image_id")
+                        current = existing_projects.get(int(abstract_image_id)) if abstract_image_id is not None else None
+                        payload["image"]["projects"] = merge_project_memberships(current, project.name)
 
                     batch_size = 200
                     for i in range(0, len(indexing_payload), batch_size):
@@ -477,7 +489,7 @@ def _configure_index(client, index) -> None:
         "specimens.fixation_type.meaning",
         "block.block_preparation.meaning",
         "specimens.specimen_type.meaning",
-        "dataset.alias",
+        "image.projects",
     ]
     task = index.update_settings({
         "searchableAttributes": searchable_attributes,

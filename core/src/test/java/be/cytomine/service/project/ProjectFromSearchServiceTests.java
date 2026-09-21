@@ -3,7 +3,6 @@ package be.cytomine.service.project;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,10 +19,11 @@ import be.cytomine.common.repository.model.command.payload.response.UserResponse
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.domain.project.Project;
+import be.cytomine.dto.project.ProjectFromSearchRequest;
+import be.cytomine.dto.project.ProjectFromSearchResponse;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.UrlApi;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -58,13 +58,10 @@ public class ProjectFromSearchServiceTests {
     @Mock
     private ProjectFromSearchAsyncService projectFromSearchAsyncService;
 
-    @Mock
-    private UrlApi urlApi;
-
     private ProjectFromSearchService service() {
         return new ProjectFromSearchService(
             projectService, ontologyHttpContract, taskService, currentUserService,
-            projectFromSearchAsyncService, urlApi
+            projectFromSearchAsyncService
         );
     }
 
@@ -81,10 +78,6 @@ public class ProjectFromSearchServiceTests {
     private Task task(long id) {
         Task task = mock(Task.class);
         when(task.getId()).thenReturn((Long) id);
-        JsonObject taskJson = new JsonObject();
-        taskJson.put("id", id);
-        taskJson.put("progress", 0);
-        when(task.toJsonObject(urlApi)).thenReturn(taskJson);
         return task;
     }
 
@@ -108,13 +101,13 @@ public class ProjectFromSearchServiceTests {
         Task task = task(77L);
         when(taskService.createNewTask(any(Project.class), eq(5L), eq(false))).thenReturn(task);
 
-        JsonObject json = new JsonObject();
-        json.put("name", "MyProject");
-        json.put("ontologyMode", "NEW");
-        json.put("query", "nucleus");
-        json.put("filters", List.of("channel=red"));
+        ProjectFromSearchRequest request = new ProjectFromSearchRequest();
+        request.setName("MyProject");
+        request.setOntologyMode("NEW");
+        request.setQuery("nucleus");
+        request.setFilters(List.of("channel=red"));
 
-        Map<String, Object> result = service().createAndSchedule(json);
+        ProjectFromSearchResponse result = service().createAndSchedule(request);
 
         ArgumentCaptor<JsonObject> projectJson = ArgumentCaptor.forClass(JsonObject.class);
         verify(projectService).add(projectJson.capture());
@@ -122,11 +115,9 @@ public class ProjectFromSearchServiceTests {
         assertEquals(42L, projectJson.getValue().get("ontology"));
         verify(projectFromSearchAsyncService).run(77L, 9L, "nucleus", List.of("channel=red"));
 
-        Map<String, Object> projectData = (Map<String, Object>) result.get("project");
-        assertEquals(9L, projectData.get("id"));
-        assertEquals("MyProject", projectData.get("name"));
-        JsonObject taskData = (JsonObject) result.get("task");
-        assertEquals(77L, taskData.get("id"));
+        assertEquals(9L, result.getProject().getId());
+        assertEquals("MyProject", result.getProject().getName());
+        assertEquals(77L, result.getTask().getId());
     }
 
     @Test
@@ -139,12 +130,12 @@ public class ProjectFromSearchServiceTests {
         Task task = task(77L);
         when(taskService.createNewTask(any(Project.class), eq(5L), eq(false))).thenReturn(task);
 
-        JsonObject json = new JsonObject();
-        json.put("name", "MyProject");
-        json.put("ontologyMode", "EXISTING");
-        json.put("ontologyId", 33L);
+        ProjectFromSearchRequest request = new ProjectFromSearchRequest();
+        request.setName("MyProject");
+        request.setOntologyMode("EXISTING");
+        request.setOntologyId(33L);
 
-        service().createAndSchedule(json);
+        service().createAndSchedule(request);
 
         verify(ontologyHttpContract, never()).create(eq(5L), any(CreateOntology.class));
         ArgumentCaptor<JsonObject> projectJson = ArgumentCaptor.forClass(JsonObject.class);
@@ -160,10 +151,10 @@ public class ProjectFromSearchServiceTests {
         Task task = task(77L);
         when(taskService.createNewTask(any(Project.class), eq(5L), eq(false))).thenReturn(task);
 
-        JsonObject json = new JsonObject();
-        json.put("name", "MyProject");
+        ProjectFromSearchRequest request = new ProjectFromSearchRequest();
+        request.setName("MyProject");
 
-        service().createAndSchedule(json);
+        service().createAndSchedule(request);
 
         verifyNoInteractions(ontologyHttpContract);
         ArgumentCaptor<JsonObject> projectJson = ArgumentCaptor.forClass(JsonObject.class);
@@ -176,9 +167,9 @@ public class ProjectFromSearchServiceTests {
     void shouldRejectMissingProjectName() {
         stubCurrentUser(5L);
 
-        JsonObject json = new JsonObject();
+        ProjectFromSearchRequest request = new ProjectFromSearchRequest();
 
-        assertThrows(WrongArgumentException.class, () -> service().createAndSchedule(json));
+        assertThrows(WrongArgumentException.class, () -> service().createAndSchedule(request));
         verifyNoInteractions(ontologyHttpContract);
         verifyNoInteractions(projectService);
     }
@@ -187,15 +178,15 @@ public class ProjectFromSearchServiceTests {
     void shouldRejectExistingOntologyWhenIdOrContentIsMissing() {
         stubCurrentUser(5L);
 
-        JsonObject withoutId = new JsonObject();
-        withoutId.put("name", "MyProject");
-        withoutId.put("ontologyMode", "EXISTING");
+        ProjectFromSearchRequest withoutId = new ProjectFromSearchRequest();
+        withoutId.setName("MyProject");
+        withoutId.setOntologyMode("EXISTING");
         assertThrows(WrongArgumentException.class, () -> service().createAndSchedule(withoutId));
 
-        JsonObject notFound = new JsonObject();
-        notFound.put("name", "MyProject");
-        notFound.put("ontologyMode", "EXISTING");
-        notFound.put("ontologyId", 33L);
+        ProjectFromSearchRequest notFound = new ProjectFromSearchRequest();
+        notFound.setName("MyProject");
+        notFound.setOntologyMode("EXISTING");
+        notFound.setOntologyId(33L);
         when(ontologyHttpContract.getLight(33L, 5L)).thenReturn(Optional.empty());
         assertThrows(WrongArgumentException.class, () -> service().createAndSchedule(notFound));
     }
@@ -205,10 +196,10 @@ public class ProjectFromSearchServiceTests {
         stubCurrentUser(5L);
         when(projectService.add(any(JsonObject.class))).thenThrow(new AlreadyExistException("Project already exists"));
 
-        JsonObject json = new JsonObject();
-        json.put("name", "MyProject");
+        ProjectFromSearchRequest request = new ProjectFromSearchRequest();
+        request.setName("MyProject");
 
-        assertThrows(AlreadyExistException.class, () -> service().createAndSchedule(json));
+        assertThrows(AlreadyExistException.class, () -> service().createAndSchedule(request));
         verifyNoInteractions(ontologyHttpContract);
     }
 }

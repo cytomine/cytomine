@@ -1,8 +1,6 @@
 package be.cytomine.service.project;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +11,12 @@ import be.cytomine.common.repository.model.command.payload.response.ApplyCommand
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import be.cytomine.domain.project.Project;
+import be.cytomine.dto.project.ProjectFromSearchRequest;
+import be.cytomine.dto.project.ProjectFromSearchResponse;
+import be.cytomine.dto.project.ProjectFromSearchResponse.ProjectReference;
+import be.cytomine.dto.project.ProjectFromSearchResponse.TaskReference;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.CurrentUserService;
-import be.cytomine.service.UrlApi;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -39,22 +40,18 @@ public class ProjectFromSearchService {
 
     private final ProjectFromSearchAsyncService projectFromSearchAsyncService;
 
-    private final UrlApi urlApi;
-
     /**
      * Creates the project (with the requested ontology), starts a task and schedules the async job that actually
-     * imports the images. Returns {@code {project, task}} so the caller can poll the task without ever receiving the
-     * image list.
+     * imports the images. Returns a {@link ProjectFromSearchResponse} so the caller can poll the task without ever
+     * receiving the image list.
      */
-    public Map<String, Object> createAndSchedule(JsonObject json) {
+    public ProjectFromSearchResponse createAndSchedule(ProjectFromSearchRequest request) {
         long userId = currentUserService.getCurrentUser().id();
-        String name = json.getJSONAttrStr("name");
+        String name = request.getName();
         if (name == null || name.isBlank()) {
             throw new WrongArgumentException("Project name is required");
         }
-        Long ontologyId = resolveOntology(
-            userId, name, json.getJSONAttrStr("ontologyMode", "NO"), json.getJSONAttrLong("ontologyId", null)
-        );
+        Long ontologyId = resolveOntology(userId, name, request.getOntologyMode(), request.getOntologyId());
 
         JsonObject projectJson = new JsonObject();
         projectJson.put("name", name);
@@ -66,14 +63,15 @@ public class ProjectFromSearchService {
 
         Task task = taskService.createNewTask(project, userId, false);
 
-        String query = json.getJSONAttrStr("query", null);
-        List<String> filters = filters(json);
-        projectFromSearchAsyncService.run(task.getId(), project.getId(), query, filters);
+        List<String> filters = request.getFilters() != null ? request.getFilters() : List.of();
+        projectFromSearchAsyncService.run(task.getId(), project.getId(), request.getQuery(), filters);
 
-        JsonObject projectData = new JsonObject();
-        projectData.put("id", project.getId());
-        projectData.put("name", project.getName());
-        return Map.of("project", projectData, "task", task.toJsonObject(urlApi));
+        return new ProjectFromSearchResponse(
+            new ProjectReference(project.getId(), project.getName()),
+            new TaskReference(
+                task.getId(), task.getProgress(), task.getProjectIdent(), task.getUserIdent(), task.isPrintInActivity()
+            )
+        );
     }
 
     private Long resolveOntology(long userId, String projectName, String ontologyMode, Long ontologyId) {
@@ -93,13 +91,5 @@ public class ProjectFromSearchService {
             return ontologyId;
         }
         return null;
-    }
-
-    private List<String> filters(JsonObject json) {
-        Object filters = json.get("filters");
-        if (filters instanceof List<?> list) {
-            return list.stream().map(String::valueOf).toList();
-        }
-        return new ArrayList<>();
     }
 }

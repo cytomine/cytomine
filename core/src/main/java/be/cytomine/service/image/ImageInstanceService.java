@@ -68,6 +68,7 @@ import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.meta.PropertyService;
@@ -151,6 +152,23 @@ public class ImageInstanceService extends ModelService {
     private final UrlApi urlApi;
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
+
+    private final MeiliSearchService meiliSearchService;
+
+    public enum TagMode {
+        NORMAL,
+        DEFER
+    }
+
+    private static final ThreadLocal<TagMode> tagMode = ThreadLocal.withInitial(() -> TagMode.NORMAL);
+
+    public void setTagMode(TagMode mode) {
+        tagMode.set(mode);
+    }
+
+    private boolean projectTaggingDeferred() {
+        return tagMode.get() == TagMode.DEFER;
+    }
 
     @Override
     public Class currentDomain() {
@@ -1013,12 +1031,47 @@ public class ImageInstanceService extends ModelService {
             propertyService.add(p.toJsonObject(urlApi));
         }
 
+        if (!projectTaggingDeferred()) {
+            Project project = ((ImageInstance) domain).getProject();
+            if (project != null && project.getName() != null && ai != null) {
+                try {
+                    meiliSearchService.addProjectToImages(List.of(ai.getId()), project.getName());
+                } catch (Exception e) {
+                    log.warn(
+                        "Could not add project '{}' to metadata of abstract image {}",
+                        project.getName(),
+                        ai.getId(),
+                        e
+                    );
+                }
+            }
+        }
+
     }
 
     protected void beforeDelete(CytomineDomain domain, CommandResponse response) {
         List<SliceInstance> sliceInstances = sliceInstanceRepository.findAllByImage((ImageInstance) domain);
         sliceInstanceRepository.deleteAll(sliceInstances);
 
+    }
+
+    protected void afterDelete(CytomineDomain domain, CommandResponse response) {
+        if (!projectTaggingDeferred()) {
+            AbstractImage ai = ((ImageInstance) domain).getBaseImage();
+            Project project = ((ImageInstance) domain).getProject();
+            if (project != null && project.getName() != null && ai != null) {
+                try {
+                    meiliSearchService.removeProjectFromImages(List.of(ai.getId()), project.getName());
+                } catch (Exception e) {
+                    log.warn(
+                        "Could not remove project '{}' from metadata of abstract image {}",
+                        project.getName(),
+                        ai.getId(),
+                        e
+                    );
+                }
+            }
+        }
     }
 
     /**
@@ -1095,6 +1148,38 @@ public class ImageInstanceService extends ModelService {
             }
         } else {
             throw new ServerException("Cannot acquire lock for project " + project.getId() + " , tryLock return false");
+        }
+    }
+
+    /**
+     * Delete all image instances of a project: one bulk removal of the project name from the metadata of every
+     * concerned abstract image, then a per-image delete with project tagging deferred.
+     */
+    public void deleteAllForProject(Project project, Transaction transaction, Task task) {
+        List<ImageInstance> imageInstances = imageInstanceRepository.findAllByProject(project);
+        List<Long> abstractImageIds = imageInstances.stream()
+            .map(imageInstance -> imageInstance.getBaseImage().getId())
+            .distinct()
+            .collect(Collectors.toList());
+        if (!abstractImageIds.isEmpty() && project.getName() != null) {
+            try {
+                meiliSearchService.removeProjectFromImages(abstractImageIds, project.getName());
+            } catch (Exception e) {
+                log.warn(
+                    "Could not remove project '{}' from metadata of {} abstract images",
+                    project.getName(),
+                    abstractImageIds.size(),
+                    e
+                );
+            }
+        }
+        setTagMode(TagMode.DEFER);
+        try {
+            for (ImageInstance imageInstance : imageInstances) {
+                this.delete(imageInstance, transaction, task, false);
+            }
+        } finally {
+            setTagMode(TagMode.NORMAL);
         }
     }
 

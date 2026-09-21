@@ -61,6 +61,7 @@ import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.UrlApi;
@@ -141,6 +142,8 @@ public class ProjectService extends ModelService {
     private final ProjectRepresentativeUserRepository projectRepresentativeUserRepository;
 
     private final RetrievalService retrievalService;
+
+    private final MeiliSearchService meiliSearchService;
 
     private final UrlApi urlApi;
 
@@ -782,12 +785,27 @@ public class ProjectService extends ModelService {
             }
         }
 
+        String oldName = project.getName();
+
         CommandResponse commandResponse = executeCommand(
             new EditCommand(currentUser.id(), transaction),
             domain,
             jsonNewData
         );
         project = (Project) commandResponse.getObject();
+
+        if (oldName != null && project.getName() != null && !oldName.equals(project.getName())) {
+            try {
+                meiliSearchService.renameProjectInImages(oldName, project.getName());
+            } catch (Exception e) {
+                log.warn(
+                    "Could not rename project '{}' to '{}' in image metadata",
+                    oldName,
+                    project.getName(),
+                    e
+                );
+            }
+        }
 
         taskService.updateTask(task, 20, "Project " + project.getName() + " edited");
 
@@ -1074,9 +1092,7 @@ public class ProjectService extends ModelService {
             task,
             (task != null ? "Delete " + imageInstanceRepository.countAllByProject(project) + " images" : "")
         );
-        for (ImageInstance imageInstance : imageInstanceRepository.findAllByProject(project)) {
-            imageInstanceService.delete(imageInstance, transaction, task, false);
-        }
+        imageInstanceService.deleteAllForProject(project, transaction, task);
     }
 
     @Override

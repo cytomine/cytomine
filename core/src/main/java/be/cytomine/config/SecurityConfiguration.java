@@ -57,7 +57,8 @@ public class SecurityConfiguration {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-            .addFilterBefore(new IncomingAuthorizationFilter(), BasicAuthenticationFilter.class)
+            .addFilterBefore(new TokenFromParameterFilter(), BearerTokenAuthenticationFilter.class)
+            .addFilterBefore(new IncomingAuthorizationFilter(), BearerTokenAuthenticationFilter.class)
             // Deprecated. Kept as transitional in 2024.2
             .addFilterBefore(new ApiKeyFilter(userRepository, userMapper), BasicAuthenticationFilter.class)
             .exceptionHandling((exceptionHandling) ->
@@ -84,7 +85,6 @@ public class SecurityConfiguration {
                     .requestMatchers("/**").permitAll() // TODO IAM: remove ?
             );
         http
-            .addFilterBefore(new TokenFromParameterFilter(), BearerTokenAuthenticationFilter.class)
             .oauth2ResourceServer((oauth2) -> oauth2
                 .jwt(jwtAuthConverter -> jwtAuthConverter.jwtAuthenticationConverter(customJwtAuthConverter)));
         return http.build();

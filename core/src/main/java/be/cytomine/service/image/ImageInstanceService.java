@@ -1034,16 +1034,7 @@ public class ImageInstanceService extends ModelService {
         if (!projectTaggingDeferred()) {
             Project project = ((ImageInstance) domain).getProject();
             if (project != null && project.getName() != null && ai != null) {
-                try {
-                    meiliSearchService.addProjectToImages(List.of(ai.getId()), project.getName());
-                } catch (Exception e) {
-                    log.warn(
-                        "Could not add project '{}' to metadata of abstract image {}",
-                        project.getName(),
-                        ai.getId(),
-                        e
-                    );
-                }
+                meiliSearchService.addProjectToImages(List.of(ai.getId()), project.getName());
             }
         }
 
@@ -1060,16 +1051,7 @@ public class ImageInstanceService extends ModelService {
             AbstractImage ai = ((ImageInstance) domain).getBaseImage();
             Project project = ((ImageInstance) domain).getProject();
             if (project != null && project.getName() != null && ai != null) {
-                try {
-                    meiliSearchService.removeProjectFromImages(List.of(ai.getId()), project.getName());
-                } catch (Exception e) {
-                    log.warn(
-                        "Could not remove project '{}' from metadata of abstract image {}",
-                        project.getName(),
-                        ai.getId(),
-                        e
-                    );
-                }
+                meiliSearchService.removeProjectFromImages(List.of(ai.getId()), project.getName());
             }
         }
     }
@@ -1162,16 +1144,7 @@ public class ImageInstanceService extends ModelService {
             .distinct()
             .collect(Collectors.toList());
         if (!abstractImageIds.isEmpty() && project.getName() != null) {
-            try {
-                meiliSearchService.removeProjectFromImages(abstractImageIds, project.getName());
-            } catch (Exception e) {
-                log.warn(
-                    "Could not remove project '{}' from metadata of {} abstract images",
-                    project.getName(),
-                    abstractImageIds.size(),
-                    e
-                );
-            }
+            meiliSearchService.removeProjectFromImages(abstractImageIds, project.getName());
         }
         setTagMode(TagMode.DEFER);
         try {

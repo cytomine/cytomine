@@ -49,6 +49,7 @@ import be.cytomine.dto.NamedCytomineDomain;
 import be.cytomine.dto.ProjectBounds;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.exceptions.ForbiddenException;
+import be.cytomine.exceptions.SearchException;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.service.MeiliSearchService;
@@ -76,6 +77,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -754,6 +756,19 @@ public class ProjectServiceTests {
         projectService.update(project, project.toJsonObject(urlApi).withChange("name", "NEW NAME"));
 
         verify(meiliSearchService).renameProjectInImages(oldName, "NEW NAME");
+    }
+
+    @Test
+    void updateProjectNameShouldPropagateMetadataRenamingFailure() {
+        Project project = builder.givenAProject();
+        String oldName = project.getName();
+        when(meiliSearchService.renameProjectInImages(any(), any()))
+            .thenThrow(new SearchException("meili down", 500, "boom"));
+
+        Assertions.assertThrows(
+            SearchException.class,
+            () -> projectService.update(project, project.toJsonObject(urlApi).withChange("name", "NEW NAME"))
+        );
     }
 
     @Test

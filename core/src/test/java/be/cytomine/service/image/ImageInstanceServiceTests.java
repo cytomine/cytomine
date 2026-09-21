@@ -48,6 +48,7 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.image.ImageInstanceBounds;
 import be.cytomine.exceptions.AlreadyExistException;
+import be.cytomine.exceptions.SearchException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
@@ -79,6 +80,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -876,6 +878,20 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
+    void addShouldPropagateProjectTaggingFailure() {
+        Project project = builder.givenAProject();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
+        ImageInstance imageInstance = builder.givenANotPersistedImageInstance(abstractImage, project);
+        when(meiliSearchService.addProjectToImages(any(), any()))
+            .thenThrow(new SearchException("meili down", 500, "boom"));
+
+        Assertions.assertThrows(
+            SearchException.class,
+            () -> imageInstanceService.add(imageInstance.toJsonObject(urlApi))
+        );
+    }
+
+    @Test
     void addShouldSkipProjectTaggingWhenDeferred() {
         imageInstanceService.setTagMode(ImageInstanceService.TagMode.DEFER);
         try {
@@ -900,6 +916,20 @@ public class ImageInstanceServiceTests {
         imageInstanceService.delete(imageInstance, null, null, false);
 
         verify(meiliSearchService).removeProjectFromImages(List.of(abstractImage.getId()), project.getName());
+    }
+
+    @Test
+    void deleteShouldPropagateProjectTaggingFailure() {
+        Project project = builder.givenAProject();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
+        ImageInstance imageInstance = builder.givenAnImageInstance(abstractImage, project);
+        when(meiliSearchService.removeProjectFromImages(any(), any()))
+            .thenThrow(new SearchException("meili down", 500, "boom"));
+
+        Assertions.assertThrows(
+            SearchException.class,
+            () -> imageInstanceService.delete(imageInstance, null, null, false)
+        );
     }
 
     @Test
@@ -941,5 +971,19 @@ public class ImageInstanceServiceTests {
         entityManager.clear();
         assertThat(entityManager.find(ImageInstance.class, firstImageInstance.getId())).isNull();
         assertThat(entityManager.find(ImageInstance.class, secondImageInstance.getId())).isNull();
+    }
+
+    @Test
+    void deleteAllForProjectShouldPropagateProjectTaggingFailure() {
+        Project project = builder.givenAProject();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
+        builder.givenAnImageInstance(abstractImage, project);
+        when(meiliSearchService.removeProjectFromImages(any(), any()))
+            .thenThrow(new SearchException("meili down", 500, "boom"));
+
+        Assertions.assertThrows(
+            SearchException.class,
+            () -> imageInstanceService.deleteAllForProject(project, null, null)
+        );
     }
 }

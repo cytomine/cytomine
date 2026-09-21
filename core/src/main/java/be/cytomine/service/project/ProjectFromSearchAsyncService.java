@@ -66,11 +66,12 @@ public class ProjectFromSearchAsyncService {
             taskService.updateTask(task, 5, "Searching images");
             long userId = currentUserService.getCurrentUser().id();
             abstractImageIds.addAll(meiliSearchService.searchImageIds(userId, query, filters));
+            taskService.updateTask(task, 10, "Preparing images");
 
             List<Long> remaining = new ArrayList<>(abstractImageIds);
             imageInstanceService.setTagMode(ImageInstanceService.TagMode.DEFER);
             try {
-                int progress = 20;
+                int progress = 15;
                 for (int from = 0; from < remaining.size(); from += CREATE_CHUNK_SIZE) {
                     List<Long> chunk = remaining.subList(
                         from, Math.min(from + CREATE_CHUNK_SIZE, remaining.size())
@@ -85,15 +86,21 @@ public class ProjectFromSearchAsyncService {
                         if (instance != null) {
                             createdAbstractImageIds.add(instance.getBaseImage().getId());
                         }
+                        int target = Math.min(
+                            90,
+                            15 + (int) ((75.0 / Math.max(1, remaining.size()))
+                                * createdAbstractImageIds.size())
+                        );
+                        if (target > progress) {
+                            progress = target;
+                            taskService.updateTask(
+                                task, progress, "Created " + createdAbstractImageIds.size() + " images"
+                            );
+                        }
                     }
                     if (!tagProjectMemberships(toCreate, project)) {
                         taggingWarning = true;
                     }
-                    progress = Math.min(
-                        90,
-                        progress + (int) ((70.0 / Math.max(1, remaining.size())) * chunk.size())
-                    );
-                    taskService.updateTask(task, progress, "Created " + createdAbstractImageIds.size() + " images");
                 }
             } finally {
                 imageInstanceService.setTagMode(ImageInstanceService.TagMode.NORMAL);

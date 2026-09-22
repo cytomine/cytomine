@@ -45,7 +45,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role # we need to restrict that by namespace (Role not ClusterRole)
 metadata:
-  name: pod-starter-for-{{ include "cytomine.appEngineTasksNamespace" . }}
+  name: pod-starter-app-engine
   namespace: {{ include "cytomine.appEngineTasksNamespace" . }}
 rules:
 - apiGroups: [""] # "" indicates the core API group
@@ -56,7 +56,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: pod-starter-app-engine-{{ include "cytomine.appEngineTasksNamespace" . }}
+  name: pod-starter-app-engine
   namespace: {{ include "cytomine.appEngineTasksNamespace" . }}
 subjects:
 - kind: ServiceAccount
@@ -69,5 +69,5 @@ subjects:
   namespace: {{ .Release.Namespace }}
 roleRef:
   kind: Role #this must be Role or ClusterRole
-  name: pod-starter-for-{{ include "cytomine.appEngineTasksNamespace" . }} # this must match the name of the Role or ClusterRole you wish to bind to
+  name: pod-starter-app-engine
   apiGroup: ""

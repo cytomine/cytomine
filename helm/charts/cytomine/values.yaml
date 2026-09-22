@@ -187,6 +187,9 @@ core:
 pims:
   deploy: true
   port: 5000
+  # Max matching docs per query for the MeiliSearch index it configures on import;
+  # counts clamp above it, >20000 slows searches.
+  maxTotalHits: 20000
   resources:
     requests:
       memory: 4Gi

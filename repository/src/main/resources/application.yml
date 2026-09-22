@@ -1,6 +1,5 @@
 server:
   port: 8081
-  max-http-request-header-size: 512KB
 
 spring:
   datasource:

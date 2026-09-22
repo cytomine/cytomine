@@ -204,12 +204,12 @@ export default {
             ).save()
           ]);
         } else if (!this.annotationGroupId && view.annotationGroupId) {
-          let group = view.annotationGroupId;
+          group = view.annotationGroupId;
           await new AnnotationLink(
             { annotationIdent: this.annotation.id, image: this.annotation.image, group }
           ).save();
         } else if (this.annotationGroupId && !view.annotationGroupId) {
-          let group = this.annotationGroupId;
+          group = this.annotationGroupId;
           await new AnnotationLink(
             { annotationIdent: view.annot.id, image: view.annot.image, group }
           ).save();

@@ -136,12 +136,11 @@ data:
           "multivalued": false
         },
         {
-          "name": "user_locale",
+          "name": "locale",
           "displayName": "locale",
           "validations": {
             "options": {
               "options": [
-                "no",
                 "nl",
                 "en",
                 "es",

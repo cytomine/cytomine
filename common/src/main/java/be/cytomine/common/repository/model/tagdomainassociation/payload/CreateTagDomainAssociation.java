@@ -1,9 +1,10 @@
 package be.cytomine.common.repository.model.tagdomainassociation.payload;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotBlank;
 
 public record CreateTagDomainAssociation(
-    long tagId,
+    @JsonAlias("tag") long tagId,
     @NotBlank String domainClassName,
-    long domainId
+    @JsonAlias("domainIdent") long domainId
 ) {}

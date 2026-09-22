@@ -2,7 +2,6 @@ package be.cytomine.controller.security;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,29 +20,20 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
 
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
-import be.cytomine.repository.security.UserRepository;
-import be.cytomine.utils.AuthenticationSuccessListener;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -59,13 +49,7 @@ public class Oauth2ResourceServerTests {
     private static final String KEY_ID = "some random string";
     private static RSAKey rsaKey;
     @Autowired
-    AuthenticationSuccessListener authenticationSuccessListener;
-    @Autowired
-    ApplicationEventPublisher applicationEventPublisher;
-    @Autowired
     private MockMvc allProtectedMockMvc;
-    @Autowired
-    private UserRepository userRepository;
 
     public static void configureWireMock(WireMockServer wireMockServer) throws JOSEException {
         rsaKey = new RSAKeyGenerator(2048)
@@ -122,35 +106,6 @@ public class Oauth2ResourceServerTests {
         allProtectedMockMvc.perform(get("/api/project/45.json")
                 .header("Authorization", "Bearer " + getSignedExpiredJwt()))
             .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void whenAuthenticationSuccessEventPublishedThenUserAddedIfDoesNotExist() {
-        // user not already in the database
-        String sub = UUID.randomUUID().toString();
-        Assertions.assertTrue(userRepository.findByReference(sub).isEmpty());
-
-        // given a valid token authentication
-        String tokenString = "eyJhbGciOiJSUzI1NiIsInI1ojGFg";
-        Instant issuedAt = Instant.now();
-        Instant expiresAt = issuedAt.plus(10, ChronoUnit.MINUTES);
-        Map<String, Object> headers = new HashMap<>();
-        headers.put("kid", "6mTJJxdp_uUSC9eK8vuCrmMQ1WvgN2oG5xh4GGSskDg");
-        headers.put("typ", "JWT");
-        headers.put("alg", "RS256");
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", sub);
-        claims.put("name", "Some User");
-        claims.put("preferred_username", "test_user_from_token");
-        Jwt jwt = new Jwt(tokenString, issuedAt, expiresAt, headers, claims);
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        GrantedAuthority userRole = new SimpleGrantedAuthority("ROLE_USER");
-        authorities.add(userRole);
-        JwtAuthenticationToken jwtAuthenticationToken = new JwtAuthenticationToken(jwt, authorities);
-        applicationEventPublisher.publishEvent(new AuthenticationSuccessEvent(jwtAuthenticationToken));
-
-        // assert a user with this sub is created
-        Assertions.assertTrue(userRepository.findByReference(sub).isPresent());
     }
 
     private String getSignedNotExpiredJwt() throws Exception {

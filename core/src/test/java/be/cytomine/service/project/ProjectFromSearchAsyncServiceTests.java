@@ -3,6 +3,8 @@ package be.cytomine.service.project;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -186,10 +188,7 @@ public class ProjectFromSearchAsyncServiceTests {
         UserResponse user = mock(UserResponse.class);
         when(user.id()).thenReturn(5L);
         when(currentUserService.getCurrentUser()).thenReturn(user);
-        Set<Long> ids = new java.util.HashSet<>();
-        for (long i = 1; i <= 101; i++) {
-            ids.add(i);
-        }
+        Set<Long> ids = LongStream.rangeClosed(1, 101).boxed().collect(Collectors.toSet());
         when(meiliSearchService.searchImageIds(5L, "query", List.of())).thenReturn(ids);
         when(imageInstanceRepository.findAllByBaseImageIdInAndProject(any(), eq(project))).thenReturn(List.of());
         when(imageInstanceService.add(any(JsonObject.class))).thenAnswer(invocation -> {

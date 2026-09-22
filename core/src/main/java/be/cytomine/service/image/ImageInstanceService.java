@@ -1144,9 +1144,7 @@ public class ImageInstanceService extends ModelService {
         }
         setTagMode(TagMode.DEFER);
         try {
-            for (ImageInstance imageInstance : imageInstances) {
-                this.delete(imageInstance, transaction, task, false);
-            }
+            imageInstances.forEach(imageInstance -> this.delete(imageInstance, transaction, task, false));
         } finally {
             setTagMode(TagMode.NORMAL);
         }

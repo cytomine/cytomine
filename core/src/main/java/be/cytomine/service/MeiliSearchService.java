@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -250,12 +251,9 @@ public class MeiliSearchService {
         Index index = getIndexOrThrow(indexId);
         try {
             List<Map<String, Object>> documents = fetchDocumentsByAbstractImageIds(index, abstractImageIds);
-            int updated = 0;
-            for (Map<String, Object> document : documents) {
-                if (appendProjectName(document, projectName)) {
-                    updated++;
-                }
-            }
+            int updated = (int) documents.stream()
+                .filter(document -> appendProjectName(document, projectName))
+                .count();
             if (updated > 0) {
                 writeDocuments(index, documents);
             }
@@ -270,12 +268,9 @@ public class MeiliSearchService {
         Index index = getIndexOrThrow(indexId);
         try {
             List<Map<String, Object>> documents = fetchDocumentsByAbstractImageIds(index, abstractImageIds);
-            int updated = 0;
-            for (Map<String, Object> document : documents) {
-                if (removeProjectName(document, projectName)) {
-                    updated++;
-                }
-            }
+            int updated = (int) documents.stream()
+                .filter(document -> removeProjectName(document, projectName))
+                .count();
             if (updated > 0) {
                 writeDocuments(index, documents);
             }
@@ -291,12 +286,9 @@ public class MeiliSearchService {
         try {
             String filter = normalizeFilter(PROJECTS_ATTRIBUTE + ":" + oldProjectName);
             List<Map<String, Object>> documents = searchFullDocuments(index, filter);
-            int updated = 0;
-            for (Map<String, Object> document : documents) {
-                if (replaceProjectName(document, oldProjectName, newProjectName)) {
-                    updated++;
-                }
-            }
+            int updated = (int) documents.stream()
+                .filter(document -> replaceProjectName(document, oldProjectName, newProjectName))
+                .count();
             if (updated > 0) {
                 writeDocuments(index, documents);
             }
@@ -310,13 +302,16 @@ public class MeiliSearchService {
     private List<Map<String, Object>> fetchDocumentsByAbstractImageIds(Index index, Collection<Long> abstractImageIds)
         throws MeilisearchException {
         List<Long> ids = new ArrayList<>(abstractImageIds);
-        List<Map<String, Object>> documents = new ArrayList<>();
-        for (int from = 0; from < ids.size(); from += FILTER_CHUNK_SIZE) {
-            List<Long> chunk = ids.subList(from, Math.min(from + FILTER_CHUNK_SIZE, ids.size()));
-            String values = chunk.stream().map(String::valueOf).collect(Collectors.joining(", "));
-            documents.addAll(searchFullDocuments(index, "image.abstract_image_id IN [" + values + "]"));
-        }
-        return documents;
+        return IntStream
+            .iterate(0, from -> from < ids.size(), from -> from + FILTER_CHUNK_SIZE)
+            .mapToObj(from -> ids.subList(from, Math.min(from + FILTER_CHUNK_SIZE, ids.size())))
+            .flatMap(chunk -> searchFullDocuments(index, abstractImageIdsFilter(chunk)).stream())
+            .toList();
+    }
+
+    private String abstractImageIdsFilter(List<Long> abstractImageIds) {
+        String values = abstractImageIds.stream().map(String::valueOf).collect(Collectors.joining(", "));
+        return "image.abstract_image_id IN [" + values + "]";
     }
 
     @SuppressWarnings("unchecked")

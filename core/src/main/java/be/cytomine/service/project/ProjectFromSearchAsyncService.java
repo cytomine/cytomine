@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -133,18 +135,14 @@ public class ProjectFromSearchAsyncService {
     }
 
     private List<Long> filterOutAlreadyInProject(List<Long> abstractImageIds, Project project) {
-        Set<Long> alreadyInProject = new HashSet<>();
-        for (int from = 0; from < abstractImageIds.size(); from += DUP_CHECK_CHUNK_SIZE) {
-            List<Long> chunk = abstractImageIds.subList(
+        Set<Long> alreadyInProject = IntStream
+            .iterate(0, from -> from < abstractImageIds.size(), from -> from + DUP_CHECK_CHUNK_SIZE)
+            .mapToObj(from -> abstractImageIds.subList(
                 from, Math.min(from + DUP_CHECK_CHUNK_SIZE, abstractImageIds.size())
-            );
-            if (!chunk.isEmpty()) {
-                for (ImageInstance instance
-                    : imageInstanceRepository.findAllByBaseImageIdInAndProject(chunk, project)) {
-                    alreadyInProject.add(instance.getBaseImage().getId());
-                }
-            }
-        }
+            ))
+            .flatMap(chunk -> imageInstanceRepository.findAllByBaseImageIdInAndProject(chunk, project).stream())
+            .map(imageInstance -> imageInstance.getBaseImage().getId())
+            .collect(Collectors.toSet());
         return abstractImageIds.stream().filter(id -> !alreadyInProject.contains(id)).toList();
     }
 }

@@ -150,7 +150,7 @@ export default {
       try {
         this.$store.dispatch('logout');
         this.changeLanguage();
-        await getKeycloak().logout();
+        await getKeycloak().logout({ redirectUri: window.location.origin });
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-logout') });

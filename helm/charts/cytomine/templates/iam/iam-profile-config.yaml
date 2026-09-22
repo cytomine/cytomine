@@ -141,7 +141,6 @@ data:
           "validations": {
             "options": {
               "options": [
-                "no",
                 "nl",
                 "en",
                 "es",
@@ -154,10 +153,12 @@ data:
           },
           "permissions": {
             "view": [
-              "admin"
+              "admin",
+              "user"
             ],
             "edit": [
-              "admin"
+              "admin",
+              "user"
             ]
           },
           "multivalued": false

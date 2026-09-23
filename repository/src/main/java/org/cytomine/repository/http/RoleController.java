@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.RoleMapper;
 import org.cytomine.repository.persistence.RoleRepository;
+import org.cytomine.repository.service.CurrentUserService;
 import org.cytomine.repository.service.RoleCommandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ public class RoleController implements RoleHttpContract {
     private final RoleCommandService service;
     private final RoleRepository repository;
     private final RoleMapper mapper;
+    private final CurrentUserService currentUserService;
 
     @Override
     public Page<RoleResponse> list(Pageable pageable) {
@@ -41,17 +43,18 @@ public class RoleController implements RoleHttpContract {
     }
 
     @Override
-    public Optional<HttpCommandResponse> create(long userId, CreateRole payload) {
-        return service.create(userId, payload, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> create(CreateRole payload) {
+        return service.create(currentUserService.getCurrentUserId(), payload, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> update(long id, long userId, UpdateRole payload) {
-        return service.update(userId, id, payload, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> update(long id, UpdateRole payload) {
+        return service.update(currentUserService.getCurrentUserId(), id, payload,
+            LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> delete(long id) {
+        return service.delete(currentUserService.getCurrentUserId(), id, LocalDateTime.now().truncatedTo(MICROS));
     }
 }

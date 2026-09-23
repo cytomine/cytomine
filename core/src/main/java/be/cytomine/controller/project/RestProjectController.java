@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.UserHttpContract;
@@ -24,11 +26,15 @@ import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.command.CommandHistory;
 import be.cytomine.domain.project.Project;
+import be.cytomine.dto.project.ProjectFromSearchRequest;
+import be.cytomine.dto.project.ProjectFromSearchResponse;
+import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.appengine.TaskRunService;
+import be.cytomine.service.project.ProjectFromSearchService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ProjectSearchExtension;
 import be.cytomine.service.security.UserService;
@@ -60,6 +66,8 @@ public class RestProjectController extends RestCytomineController {
     private final TaskRunService taskRunService;
 
     private final UserHttpContract userHttpContract;
+
+    private final ProjectFromSearchService projectFromSearchService;
 
     /**
      * List all ontology visible for the current user For each ontology, print the terms tree
@@ -120,6 +128,17 @@ public class RestProjectController extends RestCytomineController {
         return update(projectService, json, existingTask);
     }
 
+    @PostMapping("/project/from-search")
+    public ProjectFromSearchResponse addFromSearch(@RequestBody ProjectFromSearchRequest request) {
+        log.debug("REST request to create project from metadata search : " + request);
+        try {
+            return projectFromSearchService.createAndSchedule(request);
+        } catch (CytomineException e) {
+            log.error("add from search error:" + e.msg, e);
+            throw new ResponseStatusException(HttpStatus.valueOf(e.code), e.msg);
+        }
+    }
+
     @DeleteMapping("/project/{id}.json")
     public ResponseEntity<String> delete(@PathVariable String id, @RequestParam(required = false) Long task) {
         log.debug("REST request to delete Project : " + id);
@@ -155,7 +174,7 @@ public class RestProjectController extends RestCytomineController {
     @GetMapping("/ontology/{id}/project.json")
     public ResponseEntity<String> listByOntology(@PathVariable Long id) {
         log.debug("REST request to list project with ontology {}", id);
-        long ontologyId = ontologyHttpContract.getLight(id, currentUserService.getCurrentUser().id())
+        long ontologyId = ontologyHttpContract.getLight(id)
             .map(OntologyLight::id)
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
         return responseSuccess(projectService.listByOntology(ontologyId));
@@ -171,8 +190,7 @@ public class RestProjectController extends RestCytomineController {
         @RequestParam(required = false, defaultValue = "0") Long offset
     ) {
         log.debug("REST request to list project with user {}", id);
-        UserResponse currentUser = currentUserService.getCurrentUser();
-        UserResponse user = userHttpContract.get(id, currentUser.id())
+        UserResponse user = userHttpContract.get(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
         Page<JsonObject> result = projectService.list(
             user, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", max, offset
@@ -191,8 +209,7 @@ public class RestProjectController extends RestCytomineController {
         @RequestParam(required = false, defaultValue = "false") Boolean user
     ) {
         log.debug("REST request to list project with user {}", id);
-        long currentUserId = currentUserService.getCurrentUser().id();
-        long requestedUserId = userHttpContract.get(id, currentUserId)
+        long requestedUserId = userHttpContract.get(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id)).id();
 
         if (creator) {

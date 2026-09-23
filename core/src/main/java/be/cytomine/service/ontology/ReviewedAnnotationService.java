@@ -285,7 +285,7 @@ public class ReviewedAnnotationService extends ModelService {
 
         reviewedAnnotationHttpContract.replaceAllTermIds(
             commandResponse.getObject().getId(),
-            currentUserService.getCurrentUser().id(), termsToAdd
+            termsToAdd
         );
 
         return commandResponse;

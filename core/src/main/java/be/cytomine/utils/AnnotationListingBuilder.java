@@ -46,13 +46,12 @@ public class AnnotationListingBuilder {
 
     private final ProjectService projectService;
 
-    public byte[] buildAnnotationReport(Long project, String users, JsonObject params, String terms, String format,
-        long requesterId) {
+    public byte[] buildAnnotationReport(Long project, String users, JsonObject params, String terms, String format) {
         List<Map<String, Object>> annotations = buildAnnotationList(params, users);
-        Set<String> termNames = getTermNames(terms, requesterId);
+        Set<String> termNames = getTermNames(terms);
         Set<String> userNames = getUserNames(users);
         return reportService.generateAnnotationsReport(projectService.get(project).getName(), termNames, userNames,
-            annotations, format, requesterId);
+            annotations, format);
     }
 
     public List<Map<String, Object>> buildAnnotationList(JsonObject params, String users) {
@@ -183,10 +182,10 @@ public class AnnotationListingBuilder {
     /**
      * From a string representing the list of terms ids, get a set of terms name.
      */
-    public Set<String> getTermNames(String terms, long userId) {
+    public Set<String> getTermNames(String terms) {
         return Arrays.stream(terms.split(",")).filter(termId -> !termId.equals("0"))
             .filter(termId -> !termId.equals("-1")).filter(termId -> !termId.isBlank())
-            .flatMap(termId -> termHttpContract.findTermByID(Long.parseLong(termId), userId).stream())
+            .flatMap(termId -> termHttpContract.findTermByID(Long.parseLong(termId)).stream())
             .map(TermResponse::name).collect(toSet());
     }
 

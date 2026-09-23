@@ -44,7 +44,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -97,7 +96,7 @@ class UploadedFileResourceTests {
         long abstractImageId = abstractImage.getId();
         long uploadedFileId = abstractImage.getUploadedFile().getId();
 
-        when(meiliSearchService.searchWindow(anyLong(), any(), any(), anyInt(), anyInt()))
+        when(meiliSearchService.searchWindow(any(), any(), anyInt(), anyInt()))
             .thenReturn(new SearchWindow(List.of(abstractImageId), 1L));
 
         WiremockRepository.SERVER.stubFor(WireMock.get(urlPathEqualTo("/uploaded-files/all")).willReturn(
@@ -115,7 +114,7 @@ class UploadedFileResourceTests {
 
     @Test
     void shouldReturnEmptyCollectionWhenMetadataMatchesNoUploadedFile() throws Exception {
-        when(meiliSearchService.searchWindow(anyLong(), any(), any(), anyInt(), anyInt()))
+        when(meiliSearchService.searchWindow(any(), any(), anyInt(), anyInt()))
             .thenReturn(new SearchWindow(List.of(), 0L));
 
         mockMvc.perform(get("/api/uploadedfile.json").param("metadataFilter", "specimens.biological_being.sex:Male"))

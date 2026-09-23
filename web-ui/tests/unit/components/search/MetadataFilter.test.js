@@ -297,4 +297,53 @@ describe('MetadataFilter.vue', () => {
 
     expect(wrapper.find('.metadata-results-count').exists()).toBe(false);
   });
+
+  it('should not display the create-project button by default', async () => {
+    const wrapper = await createWrapper({ propsData: { nbResults: 12 } });
+
+    await wrapper.setData({ searchString: 'liver' });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('.create-project-from-search').exists()).toBe(false);
+  });
+
+  it('should hide the create-project button when there is no active search', async () => {
+    const wrapper = await createWrapper({ propsData: { createProject: true } });
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('.create-project-from-search').exists()).toBe(false);
+  });
+
+  it('should display the create-project button when the prop is set and a search is active', async () => {
+    const wrapper = await createWrapper({ propsData: { createProject: true } });
+
+    await wrapper.setData({ searchString: 'liver' });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('.create-project-from-search').exists()).toBe(true);
+  });
+
+  it('should emit create-project-from-search with the current query and filters', async () => {
+    const wrapper = await createWrapper({ propsData: { createProject: true } });
+
+    await wrapper.setData({ selectedFacets: { [SITE]: [opt('LIVER', 18)] } });
+    await wrapper.vm.$nextTick();
+
+    wrapper.find('.create-project-from-search').trigger('click');
+
+    expect(wrapper.emitted('create-project-from-search').at(-1)).toEqual([{
+      query: '',
+      filters: [`${SITE} = "LIVER"`],
+    }]);
+  });
+
+  it('should label the image.projects facet as Projects', async () => {
+    fetchFacets.mockResolvedValue({ ...facets, 'image.projects': { 'My project': 3 } });
+
+    const wrapper = await createWrapper();
+
+    const labels = wrapper.findAll('.facet-filters .label').wrappers.map(label => label.text());
+    expect(labels).toContain('Projects');
+  });
 });

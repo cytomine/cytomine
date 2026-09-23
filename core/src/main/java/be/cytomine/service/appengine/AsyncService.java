@@ -109,7 +109,7 @@ public class AsyncService {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        StorageResponse userStorage = storageHttpContract.getAll(currentUser.getId(), Pageable.unpaged()).stream()
+        StorageResponse userStorage = storageHttpContract.getAll(Pageable.unpaged()).stream()
             .filter(storageResponse -> storageResponse.name().contains(currentUser.getUsername())).findFirst()
             .orElseThrow(() -> new ObjectNotFoundException("User with storage", currentUser.getId()));
         String queryString = "?idStorage=" + userStorage.id() + "&idProject=" + projectId;

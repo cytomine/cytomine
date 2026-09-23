@@ -115,7 +115,7 @@ public class AnnotationTermService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         //Check if user has a role that allows to associate terms with annotations
         securityACLService.checkGuest(currentUser);
-        UserResponse creator = userHttpContract.get(jsonObject.getJSONAttrLong("user", -1L), currentUser.id())
+        UserResponse creator = userHttpContract.get(jsonObject.getJSONAttrLong("user", -1L))
             .orElse(currentUser);
         jsonObject.put("user", creator.id());
 
@@ -160,7 +160,7 @@ public class AnnotationTermService extends ModelService {
         long currentUser,
         Transaction transaction
     ) {
-        termRepository.findTermByID(idTerm, currentUser)
+        termRepository.findTermByID(idTerm)
             .orElseThrow(() -> new ObjectNotFoundException("Term", idExpectedTerm));
         UserAnnotation userAnnotation = userAnnotationRepository.findById(idUserAnnotation)
             .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", idUserAnnotation));
@@ -202,7 +202,7 @@ public class AnnotationTermService extends ModelService {
             return addAnnotationTerm(idAnnotation, idTerm, null,
                 currentUser.id(), transaction);
         } else if (annotation instanceof ReviewedAnnotation) {
-            reviewedAnnotationHttpContract.replaceAllTermIds(idAnnotation, currentUser.id(), Set.of(idTerm));
+            reviewedAnnotationHttpContract.replaceAllTermIds(idAnnotation, Set.of(idTerm));
             CommandResponse commandResponse = new CommandResponse();
             commandResponse.setStatus(200);
             return commandResponse;

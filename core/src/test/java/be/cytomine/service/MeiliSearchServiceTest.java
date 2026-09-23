@@ -16,6 +16,7 @@ import com.meilisearch.sdk.SearchRequest;
 import com.meilisearch.sdk.model.Results;
 import com.meilisearch.sdk.model.SearchResult;
 import com.meilisearch.sdk.model.SearchResultPaginated;
+import com.meilisearch.sdk.model.TaskInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,9 +34,11 @@ import be.cytomine.dto.meilisearch.SearchWindow;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -263,31 +266,31 @@ public class MeiliSearchServiceTest {
 
     @Test
     public void searchWindowShouldResolveUserStoragesInOneCall() {
-        when(storageHttpContract.getAll(eq(7L), any())).thenReturn(pageOfStorages(7L, 8L));
+        when(storageHttpContract.getAll(any())).thenReturn(pageOfStorages(7L, 8L));
 
         Index index = mockSearchableIndexWithEmptyResults();
 
-        meiliSearchService.searchWindow(7L, "query", List.of(), 1, 20);
+        meiliSearchService.searchWindow("query", List.of(), 1, 20);
 
         assertTrue(captureSearchFilter(index).contains("image.storage_id IN [7, 8]"));
-        verify(storageHttpContract, times(1)).getAll(eq(7L), any());
+        verify(storageHttpContract, times(1)).getAll(any());
     }
 
     @Test
     public void searchWindowShouldScopeToImpossibleStorageWhenUserHasNoStorage() {
-        when(storageHttpContract.getAll(eq(7L), any())).thenReturn(pageOfStorages());
+        when(storageHttpContract.getAll(any())).thenReturn(pageOfStorages());
 
         Index index = mockSearchableIndexWithEmptyResults();
 
-        meiliSearchService.searchWindow(7L, "query", List.of(), 1, 20);
+        meiliSearchService.searchWindow("query", List.of(), 1, 20);
 
         assertTrue(captureSearchFilter(index).contains("image.storage_id IN [-1]"));
-        verify(storageHttpContract, times(1)).getAll(eq(7L), any());
+        verify(storageHttpContract, times(1)).getAll(any());
     }
 
     @Test
     public void getFacetDistributionShouldResolveUserStorages() {
-        when(storageHttpContract.getAll(eq(7L), any())).thenReturn(pageOfStorages(7L, 8L));
+        when(storageHttpContract.getAll(any())).thenReturn(pageOfStorages(7L, 8L));
 
         Index index = mock(Index.class);
         when(index.getUid()).thenReturn(INDEX_ID);
@@ -297,9 +300,151 @@ public class MeiliSearchServiceTest {
         when(result.getFacetDistribution()).thenReturn(Map.of());
         when(index.search(any(SearchRequest.class))).thenReturn(result);
 
-        meiliSearchService.getFacetDistribution(7L);
+        meiliSearchService.getFacetDistribution();
 
         assertTrue(captureSearchFilter(index).contains("image.storage_id IN [7, 8]"));
-        verify(storageHttpContract, times(1)).getAll(eq(7L), any());
+        verify(storageHttpContract, times(1)).getAll(any());
+    }
+
+    @Test
+    public void getFacetDistributionShouldScopeByProjectName() {
+        Index index = mock(Index.class);
+        when(index.getUid()).thenReturn(INDEX_ID);
+        mockExistingIndexes(index);
+        when(index.getFilterableAttributesSettings()).thenReturn(new String[]{"image.projects"});
+        SearchResult result = mock(SearchResult.class);
+        when(result.getFacetDistribution()).thenReturn(Map.of());
+        when(index.search(any(SearchRequest.class))).thenReturn(result);
+
+        meiliSearchService.getFacetDistribution(Optional.of("my project"));
+
+        assertTrue(captureSearchFilter(index).contains("image.projects = \"my project\""));
+    }
+
+    @Test
+    public void searchWindowShouldScopeByProjectName() {
+        Index index = mock(Index.class);
+        when(index.getUid()).thenReturn(INDEX_ID);
+        mockExistingIndexes(index);
+        when(index.search(any(SearchRequest.class))).thenReturn(mock(SearchResultPaginated.class));
+
+        meiliSearchService.searchWindow("query", List.of(), "my project", null, 1, 20);
+
+        assertTrue(captureSearchFilter(index).contains("image.projects = \"my project\""));
+    }
+
+    private HashMap<String, Object> hitWithProjects(Long abstractImageId, String... projects) {
+        HashMap<String, Object> image = new HashMap<>();
+        image.put("abstract_image_id", abstractImageId);
+        image.put("projects", Arrays.asList(projects));
+        HashMap<String, Object> hit = new HashMap<>();
+        hit.put("id", "id-" + abstractImageId);
+        hit.put("image", image);
+        return hit;
+    }
+
+    private Index mockWriteIndex(HashMap<String, Object>... hits) {
+        Index index = mock(Index.class);
+        when(index.getUid()).thenReturn(INDEX_ID);
+        mockExistingIndexes(index);
+        SearchResultPaginated searchable = mock(SearchResultPaginated.class);
+        when(searchable.getHits()).thenReturn(new ArrayList<>(Arrays.asList(hits)));
+        when(searchable.getTotalPages()).thenReturn(hits.length == 0 ? 0 : 1);
+        when(index.search(any(SearchRequest.class))).thenReturn(searchable);
+        TaskInfo taskInfo = mock(TaskInfo.class);
+        lenient().when(taskInfo.getTaskUid()).thenReturn(42);
+        lenient().when(index.addDocuments(anyString())).thenReturn(taskInfo);
+        return index;
+    }
+
+    private List<Object> documentProjects(Index index) {
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(index).addDocuments(captor.capture());
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            List<Map<String, Object>> docs = mapper.readValue(
+                captor.getValue(),
+                new com.fasterxml.jackson.core.type.TypeReference<>() {}
+            );
+            @SuppressWarnings("unchecked")
+            Object image = docs.get(0).get("image");
+            @SuppressWarnings("unchecked")
+            List<Object> projects = (List<Object>) ((Map<String, Object>) image).get("projects");
+            return projects;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void addProjectToImagesShouldMergeProjectName() {
+        Index index = mockWriteIndex(hitWithProjects(11L, "Existing"));
+
+        int updated = meiliSearchService.addProjectToImages(List.of(11L), "NewProject");
+
+        assertEquals(1, updated);
+        assertEquals(List.of("Existing", "NewProject"), documentProjects(index));
+        verify(index).waitForTask(42);
+    }
+
+    @Test
+    public void addProjectToImagesShouldNotRewriteWhenAlreadyPresent() {
+        Index index = mockWriteIndex(hitWithProjects(11L, "NewProject"));
+
+        int updated = meiliSearchService.addProjectToImages(List.of(11L), "NewProject");
+
+        assertEquals(0, updated);
+        verify(index, never()).addDocuments(anyString());
+    }
+
+    @Test
+    public void addProjectToImagesShouldHandleMissingProjectsList() {
+        Index index = mockWriteIndex(hitWithAbstractImageId(11L));
+
+        int updated = meiliSearchService.addProjectToImages(List.of(11L), "NewProject");
+
+        assertEquals(1, updated);
+        assertEquals(List.of("NewProject"), documentProjects(index));
+    }
+
+    @Test
+    public void removeProjectFromImagesShouldDropTheName() {
+        Index index = mockWriteIndex(hitWithProjects(11L, "A", "B"));
+
+        int updated = meiliSearchService.removeProjectFromImages(List.of(11L), "A");
+
+        assertEquals(1, updated);
+        assertEquals(List.of("B"), documentProjects(index));
+    }
+
+    @Test
+    public void removeProjectFromImagesShouldNotRewriteWhenAbsent() {
+        Index index = mockWriteIndex(hitWithProjects(11L, "B"));
+
+        int updated = meiliSearchService.removeProjectFromImages(List.of(11L), "A");
+
+        assertEquals(0, updated);
+        verify(index, never()).addDocuments(anyString());
+    }
+
+    @Test
+    public void renameProjectInImagesShouldReplaceNameInPlace() {
+        Index index = mockWriteIndex(hitWithProjects(11L, "Old", "Other"));
+
+        int updated = meiliSearchService.renameProjectInImages("Old", "New");
+
+        assertEquals(1, updated);
+        assertEquals(List.of("New", "Other"), documentProjects(index));
+        assertFalse(captureSearchFilter(index).contains("dataset.alias"));
+    }
+
+    @Test
+    public void renameProjectInImagesShouldNotDuplicateWhenNewNamePresent() {
+        Index index = mockWriteIndex(hitWithProjects(11L, "Old", "New"));
+
+        int updated = meiliSearchService.renameProjectInImages("Old", "New");
+
+        assertEquals(1, updated);
+        assertEquals(List.of("New"), documentProjects(index));
     }
 }

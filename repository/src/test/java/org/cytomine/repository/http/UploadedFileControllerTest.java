@@ -28,6 +28,7 @@ import be.cytomine.common.repository.model.command.payload.response.UploadedFile
 import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
 import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 
+import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -85,15 +86,15 @@ public class UploadedFileControllerTest
         );
     }
 
-    private long createUploadedFile(String stringUserId) throws Exception {
-        String response = mockMvc.perform(post(apiURL).param("userId", stringUserId).contentType(APPLICATION_JSON)
+    private long createUploadedFile(String username) throws Exception {
+        String response = mockMvc.perform(post(apiURL).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createPayload))).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
         return objectMapper.readValue(response, HttpCommandResponse.class).data().id();
     }
 
-    private List<Long> getAllIds(String stringUserId, String... uploadedFileIds) throws Exception {
-        var request = get(apiURL + "/all").param("userId", stringUserId);
+    private List<Long> getAllIds(String username, String... uploadedFileIds) throws Exception {
+        var request = get(apiURL + "/all").with(authenticatedAs(username));
         if (uploadedFileIds.length > 0) {
             request = request.param("uploadedFileIds", uploadedFileIds);
         }
@@ -111,30 +112,30 @@ public class UploadedFileControllerTest
     @SneakyThrows
     void getAllShouldReturnUploadedFileWhenNoIdFilter() {
         long userId = createUser();
-        String stringUserId = String.valueOf(userId);
-        long uploadedFileId = createUploadedFile(stringUserId);
+        String username = getUsername(userId);
+        long uploadedFileId = createUploadedFile(username);
 
-        assertTrue(getAllIds(stringUserId).contains(uploadedFileId));
+        assertTrue(getAllIds(username).contains(uploadedFileId));
     }
 
     @Test
     @SneakyThrows
     void getAllShouldReturnOnlyUploadedFilesMatchingIdFilter() {
         long userId = createUser();
-        String stringUserId = String.valueOf(userId);
-        long uploadedFileId = createUploadedFile(stringUserId);
+        String username = getUsername(userId);
+        long uploadedFileId = createUploadedFile(username);
 
-        assertEquals(List.of(uploadedFileId), getAllIds(stringUserId, String.valueOf(uploadedFileId)));
+        assertEquals(List.of(uploadedFileId), getAllIds(username, String.valueOf(uploadedFileId)));
     }
 
     @Test
     @SneakyThrows
     void getAllShouldExcludeUploadedFilesNotMatchingIdFilter() {
         long userId = createUser();
-        String stringUserId = String.valueOf(userId);
-        long uploadedFileId = createUploadedFile(stringUserId);
+        String username = getUsername(userId);
+        long uploadedFileId = createUploadedFile(username);
 
-        assertFalse(getAllIds(stringUserId, String.valueOf(uploadedFileId + 1_000_000)).contains(uploadedFileId));
+        assertFalse(getAllIds(username, String.valueOf(uploadedFileId + 1_000_000)).contains(uploadedFileId));
     }
 
     @Override

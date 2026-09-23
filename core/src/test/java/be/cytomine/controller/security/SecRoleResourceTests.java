@@ -93,7 +93,7 @@ public class SecRoleResourceTests {
     public void shouldCreateRoleAndReturnCommandResponse() throws Exception {
         UUID commandId = UUID.randomUUID();
         RoleResponse role = roleResponse(1L, "ROLE_NEW");
-        when(roleHttpContract.create(any(Long.class), any())).thenReturn(
+        when(roleHttpContract.create(any())).thenReturn(
             Optional.of(new HttpCommandResponse(true, role, commandId, Commands.CREATE_ROLE, Set.of())));
 
         mockMvc.perform(post("/api/role.json")
@@ -110,7 +110,7 @@ public class SecRoleResourceTests {
     public void shouldUpdateRoleAndReturnCommandResponse() throws Exception {
         UUID commandId = UUID.randomUUID();
         RoleResponse role = roleResponse(1L, "ROLE_UPDATED");
-        when(roleHttpContract.update(eq(1L), any(Long.class), any())).thenReturn(
+        when(roleHttpContract.update(eq(1L), any())).thenReturn(
             Optional.of(new HttpCommandResponse(true, role, commandId, Commands.UPDATE_ROLE, Set.of())));
 
         mockMvc.perform(put("/api/role/{id}.json", 1L)
@@ -124,7 +124,7 @@ public class SecRoleResourceTests {
     @Test
     @Transactional
     public void shouldReturnNotFoundWhenUpdatingNonExistentRole() throws Exception {
-        when(roleHttpContract.update(eq(0L), any(Long.class), any())).thenReturn(Optional.empty());
+        when(roleHttpContract.update(eq(0L), any())).thenReturn(Optional.empty());
 
         mockMvc.perform(put("/api/role/{id}.json", 0L)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -137,7 +137,7 @@ public class SecRoleResourceTests {
     public void shouldDeleteRoleAndReturnCommandResponse() throws Exception {
         UUID commandId = UUID.randomUUID();
         RoleResponse role = roleResponse(1L, "ROLE_GUEST");
-        when(roleHttpContract.delete(eq(1L), any(Long.class))).thenReturn(
+        when(roleHttpContract.delete(eq(1L))).thenReturn(
             Optional.of(new HttpCommandResponse(true, role, commandId, Commands.DELETE_ROLE, Set.of())));
 
         mockMvc.perform(delete("/api/role/{id}.json", 1L))
@@ -149,7 +149,7 @@ public class SecRoleResourceTests {
     @Test
     @Transactional
     public void shouldReturnNotFoundWhenDeletingNonExistentRole() throws Exception {
-        when(roleHttpContract.delete(eq(0L), any(Long.class))).thenReturn(Optional.empty());
+        when(roleHttpContract.delete(eq(0L))).thenReturn(Optional.empty());
 
         mockMvc.perform(delete("/api/role/{id}.json", 0L))
             .andExpect(status().isNotFound());

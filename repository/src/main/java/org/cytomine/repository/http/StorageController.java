@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.StorageMapper;
 import org.cytomine.repository.persistence.StorageRepository;
 import org.cytomine.repository.service.ACLService;
+import org.cytomine.repository.service.CurrentUserService;
 import org.cytomine.repository.service.StorageCommandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,9 +31,11 @@ public class StorageController implements StorageHttpContract {
     private final StorageCommandService service;
     private final StorageMapper mapper;
     private final StorageRepository repository;
+    private final CurrentUserService currentUserService;
 
     @Override
-    public Page<StorageResponse> getAll(long userId, Pageable pageable) {
+    public Page<StorageResponse> getAll(Pageable pageable) {
+        long userId = currentUserService.getCurrentUserId();
         if (aclService.isAdmin(userId)) {
             return repository.findAllByDeletedNull(pageable).map(mapper::mapToStorageResponse);
         }
@@ -40,24 +43,25 @@ public class StorageController implements StorageHttpContract {
     }
 
     @Override
-    public Optional<StorageResponse> get(long id, long userId) {
+    public Optional<StorageResponse> get(long id) {
         return repository.findByIdAndDeletedNull(id)
-            .filter(entity -> aclService.canReadStorage(userId, entity.getId()))
+            .filter(entity -> aclService.canReadStorage(currentUserService.getCurrentUserId(), entity.getId()))
             .map(mapper::mapToStorageResponse);
     }
 
     @Override
-    public Optional<HttpCommandResponse> create(long userId, CreateStorage payload) {
-        return service.create(userId, payload, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> create(CreateStorage payload) {
+        return service.create(currentUserService.getCurrentUserId(), payload, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> update(long id, long userId, UpdateStorage payload) {
-        return service.update(userId, id, payload, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> update(long id, UpdateStorage payload) {
+        return service.update(currentUserService.getCurrentUserId(), id, payload,
+            LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> delete(long id) {
+        return service.delete(currentUserService.getCurrentUserId(), id, LocalDateTime.now().truncatedTo(MICROS));
     }
 }

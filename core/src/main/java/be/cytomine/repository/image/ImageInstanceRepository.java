@@ -1,5 +1,6 @@
 package be.cytomine.repository.image;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +54,12 @@ public interface ImageInstanceRepository
     Optional<ImageInstance> findByProjectIdAndBaseImageId(Long projectId, Long baseImageId);
 
     Optional<ImageInstance> findByProjectAndBaseImage(Project project, AbstractImage baseImage);
+
+    @Query("SELECT ii FROM ImageInstance ii WHERE ii.baseImage.id IN :baseImageIds AND ii.project = :project")
+    List<ImageInstance> findAllByBaseImageIdInAndProject(
+        Collection<Long> baseImageIds,
+        Project project
+    );
 
     Optional<ImageInstance> findTopByProjectAndCreatedLessThanOrderByCreatedDesc(Project project, Date created);
 

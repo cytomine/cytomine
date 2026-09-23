@@ -31,7 +31,6 @@ import be.cytomine.common.repository.model.tag.payload.UpdateTag;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.meta.Tag;
-import be.cytomine.service.CurrentUserService;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.hamcrest.Matchers.greaterThan;
@@ -66,14 +65,10 @@ public class TagResourceTests {
     @MockitoBean
     private TagHttpContract httpContract;
 
-    @Autowired
-    private CurrentUserService currentUserService;
-
     @Test
     public void listAllTags() throws Exception {
         Tag tag = builder.givenATag();
-        long userId = currentUserService.getCurrentUser().id();
-        when(httpContract.list(eq(userId), any(Pageable.class)))
+        when(httpContract.list(any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(toResponse(tag))));
 
         mockMvc.perform(get("/api/tag.json"))
@@ -85,8 +80,7 @@ public class TagResourceTests {
     @Test
     public void shouldReturnTagWithAllExpectedFields() throws Exception {
         Tag tag = builder.givenATag();
-        long userId = currentUserService.getCurrentUser().id();
-        when(httpContract.read(eq(tag.getId()), eq(userId))).thenReturn(Optional.of(toResponse(tag)));
+        when(httpContract.read(eq(tag.getId()))).thenReturn(Optional.of(toResponse(tag)));
 
         mockMvc.perform(get("/api/tag/{id}.json", tag.getId()))
             .andExpect(status().isOk())
@@ -99,9 +93,8 @@ public class TagResourceTests {
     @Test
     public void addValidTag() throws Exception {
         Tag tag = builder.givenATag();
-        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
-        when(httpContract.create(eq(userId), any())).thenReturn(Optional.of(
+        when(httpContract.create(any())).thenReturn(Optional.of(
             new HttpCommandResponse(true, toResponse(tag), commandId, Commands.CREATE_TAG, Set.of())));
 
         String createTagJson = objectMapper.writeValueAsString(new CreateTag(tag.getName()));
@@ -117,8 +110,7 @@ public class TagResourceTests {
     @Test
     public void addTagWithNoWriteAccessReturnsEmpty() throws Exception {
         Tag tag = builder.givenATag();
-        long userId = currentUserService.getCurrentUser().id();
-        when(httpContract.create(eq(userId), any())).thenReturn(Optional.empty());
+        when(httpContract.create(any())).thenReturn(Optional.empty());
 
         String createTagJson = objectMapper.writeValueAsString(new CreateTag(tag.getName()));
 
@@ -130,9 +122,8 @@ public class TagResourceTests {
     @Test
     public void editValidTag() throws Exception {
         Tag tag = builder.givenATag();
-        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
-        when(httpContract.update(eq(tag.getId()), eq(userId), any())).thenReturn(Optional.of(
+        when(httpContract.update(eq(tag.getId()), any())).thenReturn(Optional.of(
             new HttpCommandResponse(true, toResponse(tag), commandId, Commands.UPDATE_TAG, Set.of())));
 
         String updateTagJson = objectMapper.writeValueAsString(new UpdateTag(Optional.of(tag.getName())));
@@ -148,8 +139,7 @@ public class TagResourceTests {
     @Test
     public void failWhenEditingTagDoesNotExists() throws Exception {
         Tag tag = builder.givenATag();
-        long userId = currentUserService.getCurrentUser().id();
-        when(httpContract.update(eq(tag.getId()), eq(userId), any())).thenReturn(Optional.empty());
+        when(httpContract.update(eq(tag.getId()), any())).thenReturn(Optional.empty());
 
         String updateTagJson = objectMapper.writeValueAsString(new UpdateTag(Optional.of(tag.getName())));
 
@@ -160,9 +150,8 @@ public class TagResourceTests {
     @Test
     public void deleteTag() throws Exception {
         Tag tag = builder.givenATag();
-        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
-        when(httpContract.delete(eq(tag.getId()), eq(userId))).thenReturn(Optional.of(
+        when(httpContract.delete(eq(tag.getId()))).thenReturn(Optional.of(
             new HttpCommandResponse(true, toResponse(tag), commandId, Commands.DELETE_TAG, Set.of())));
 
         mockMvc.perform(delete("/api/tag/{id}.json", tag.getId()))
@@ -175,8 +164,7 @@ public class TagResourceTests {
 
     @Test
     public void failWhenDeleteTagNotExists() throws Exception {
-        long userId = currentUserService.getCurrentUser().id();
-        when(httpContract.delete(eq(0L), eq(userId))).thenReturn(Optional.empty());
+        when(httpContract.delete(eq(0L))).thenReturn(Optional.empty());
 
         mockMvc.perform(delete("/api/tag/{id}.json", 0))
             .andExpect(status().isNotFound());

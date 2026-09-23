@@ -25,27 +25,24 @@ public interface UploadedFileHttpContract {
     String ROOT_PATH = "/uploaded-files";
 
     @GetExchange("/{id}")
-    Optional<UploadedFileResponse> get(@PathVariable long id, @RequestParam long userId);
+    Optional<UploadedFileResponse> get(@PathVariable long id);
 
     @PostExchange
     Optional<HttpCommandResponse> create(
-        @RequestParam long userId,
         @Valid @RequestBody CreateUploadedFile payload
     );
 
     @PutExchange("/{id}")
     Optional<HttpCommandResponse> update(
         @PathVariable long id,
-        @RequestParam long userId,
         @RequestBody UpdateUploadedFile payload
     );
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
+    Optional<HttpCommandResponse> delete(@PathVariable long id);
 
     @GetExchange("/all")
     Page<UploadedFileResponse> getAll(
-        @RequestParam long userId,
         @RequestParam(required = false) List<Long> uploadedFileIds,
         Pageable pageable
     );

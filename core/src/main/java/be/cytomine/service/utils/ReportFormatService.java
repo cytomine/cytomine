@@ -113,8 +113,7 @@ public class ReportFormatService {
      *
      * @return {@code Object[][]}
      */
-    public Object[][] formatAnnotationsForReport(List<ReportColumn> columns, List<Map<String, Object>> data,
-        long userId) {
+    public Object[][] formatAnnotationsForReport(List<ReportColumn> columns, List<Map<String, Object>> data) {
         Object[] headers = getColumnHeaders(columns);
         Object[][] report = initReport(data, headers);
 
@@ -122,7 +121,7 @@ public class ReportFormatService {
             Map<String, Object> element = data.get(i);
             for (int j = 0; j < headers.length; j++) {
 
-                Object value = getAnnotationValue(element.get(headers[j]), element, headers[j].toString(), userId);
+                Object value = getAnnotationValue(element.get(headers[j]), element, headers[j].toString());
 
                 if (value == null) {
                     value = "";
@@ -139,7 +138,7 @@ public class ReportFormatService {
      *
      * @return String
      */
-    private Object getAnnotationValue(Object value, Map<String, Object> annotation, String header, long userId) {
+    private Object getAnnotationValue(Object value, Map<String, Object> annotation, String header) {
         Point centroid = (Point) annotation.get("centroid");
         switch (header) {
             case "user":
@@ -147,7 +146,7 @@ public class ReportFormatService {
             case "filename":
                 return annotation.get("instanceFilename");
             case "term":
-                return String.join("- ", getTermsName(value, userId));
+                return String.join("- ", getTermsName(value));
             case "area":
             case "perimeter":
                 return StringUtils.decimalFormatter(value);
@@ -164,7 +163,7 @@ public class ReportFormatService {
      * @param value Object representing the list of term ids
      * @return String[] terms name
      */
-    public String[] getTermsName(Object value, long userId) {
+    public String[] getTermsName(Object value) {
         String[] termsId = value.toString()
             .replace("[", "")
             .replace("]", "")
@@ -174,7 +173,7 @@ public class ReportFormatService {
         if (!termsId[0].trim().isEmpty()) {
             int k = 0;
             for (String termId : termsId) {
-                termNames[k] = getTermName(Long.parseLong(termId.trim()), userId).orElse(null);
+                termNames[k] = getTermName(Long.parseLong(termId.trim())).orElse(null);
                 k++;
             }
         }
@@ -204,9 +203,9 @@ public class ReportFormatService {
      *
      * @return String term name
      */
-    private Optional<String> getTermName(Long termId, long userId) {
+    private Optional<String> getTermName(Long termId) {
         return Optional.ofNullable(termNameCache.get(termId))
-            .or(() -> termService.findTermByID(termId, userId)
+            .or(() -> termService.findTermByID(termId)
                 .map(TermResponse::name))
             .map(term -> {
                 termNameCache.put(termId, term);

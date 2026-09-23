@@ -42,6 +42,7 @@ import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.repository.security.AclRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.UserAnnotationService;
@@ -115,6 +116,9 @@ public class ProjectResourceTests {
     private UrlApi urlApi;
     @MockitoBean
     private OntologyHttpContract ontologyHttpContract;
+
+    @MockitoBean
+    private MeiliSearchService meiliSearchService;
 
     @Autowired
     private CurrentUserService currentUserService;
@@ -831,7 +835,7 @@ public class ProjectResourceTests {
         UserResponse user = currentUserService.getCurrentUser();
         builder.addUserToProject(project, user.username());
         Long ontologyId = project.getOntology().getId();
-        when(ontologyHttpContract.getLight(ontologyId, user.id())).thenReturn(
+        when(ontologyHttpContract.getLight(ontologyId)).thenReturn(
             Optional.of(new OntologyLight(ontologyId, "ontology")));
         restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", ontologyId))
             .andExpect(status().isOk())
@@ -846,7 +850,7 @@ public class ProjectResourceTests {
         UserResponse user = currentUserService.getCurrentUser();
         builder.addUserToProject(project, user.username());
         Long ontologyId = project.getOntology().getId();
-        when(ontologyHttpContract.getLight(ontologyId, user.id())).thenReturn(
+        when(ontologyHttpContract.getLight(ontologyId)).thenReturn(
             Optional.of(new OntologyLight(ontologyId, "ontology")));
         restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", 0L))
             .andExpect(status().isNotFound());

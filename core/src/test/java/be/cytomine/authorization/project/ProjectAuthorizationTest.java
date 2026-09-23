@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
@@ -35,6 +36,7 @@ import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.project.ProjectRepresentativeUserRepository;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.meta.AttachedFileService;
@@ -93,6 +95,8 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
 
     @Autowired
     private UrlApi urlApi;
+    @MockitoBean
+    private MeiliSearchService meiliSearchService;
     private Project project = null;
 
     private static void setupStub() {

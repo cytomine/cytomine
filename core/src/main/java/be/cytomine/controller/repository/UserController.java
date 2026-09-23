@@ -22,7 +22,6 @@ import be.cytomine.common.repository.model.command.payload.response.UserResponse
 import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.common.repository.model.user.payload.UpdateUser;
 import be.cytomine.dto.Account;
-import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.security.AccountService;
 
 import static java.lang.String.format;
@@ -38,14 +37,12 @@ public class UserController {
     public static final String ILLEGAL_DELETE_OPERATION = "should NOT delete \'admin\' or \'ImageServer1\' users";
 
     private final AccountService accountService;
-    private final CurrentUserService currentUserService;
     private final UserHttpContract userHttpContract;
 
     @GetMapping("/user/{id}.json")
     public UserResponse show(@PathVariable long id) {
         log.debug("REST request to get User : {}", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return userHttpContract.get(id, userId)
+        return userHttpContract.get(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
     }
 
@@ -53,9 +50,8 @@ public class UserController {
     @PostMapping("/user.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateUser createUser) {
         log.debug("REST request to save User");
-        long userId = currentUserService.getCurrentUser().id();
         accountService.createAccount(toAccount(createUser));
-        return userHttpContract.create(userId, createUser);
+        return userHttpContract.create(createUser);
     }
 
     private Account toAccount(CreateUser createUser) {
@@ -88,19 +84,16 @@ public class UserController {
 
     @PutMapping("/user/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateUser updateUser) {
-        log.debug("REST request to update User : {}", id);
-        long userId = currentUserService.getCurrentUser().id();
         log.debug("REST request to update User : {} with info {}", id, updateUser);
         accountService.update(toAccount(updateUser));
-        return userHttpContract.update(id, userId, updateUser)
+        return userHttpContract.update(id, updateUser)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
     }
 
     @DeleteMapping("/user/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("REST request to delete User : {}", id);
-        long userId = currentUserService.getCurrentUser().id();
-        UserResponse response = userHttpContract.get(id, userId)
+        UserResponse response = userHttpContract.get(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
         String userName = response.username();
         if (userName.equalsIgnoreCase("admin")
@@ -108,7 +101,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, format(ILLEGAL_DELETE_OPERATION));
         }
         accountService.delete(response.username());
-        return userHttpContract.delete(id, userId)
+        return userHttpContract.delete(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_USER, id)));
     }
 }

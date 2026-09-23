@@ -2,7 +2,7 @@ import logging
 import os
 import uuid
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import fields, is_dataclass
 from datetime import datetime
 from enum import Enum
@@ -41,6 +41,42 @@ logger = logging.getLogger("pims.app")
 DATASET_ROOT = Path(get_settings().dataset_path)
 WRITING_PATH = Path(get_settings().writing_path)
 FILE_ROOT_PATH = Path(get_settings().root)
+
+
+def merge_project_memberships(existing_projects: Iterable[str] | None, project_name: str) -> list[str]:
+    """Union-append ``project_name`` to the ``image.projects`` list, preserving order and never duplicating."""
+    projects = list(existing_projects) if existing_projects else []
+    if project_name not in projects:
+        projects.append(project_name)
+    return projects
+
+
+def fetch_existing_project_memberships(index, abstract_image_ids: Iterable[int]) -> dict[int, list[str]]:
+    """Fetch the current ``image.projects`` values of every document whose abstract image is in the given ids.
+
+    Used to seed memberships on (re)index, so a full document replacement never wipes project memberships written
+    by core lifecycle hooks.
+    """
+    ids = sorted(set(abstract_image_ids))
+    memberships: dict[int, list[str]] = {}
+    batch_size = 1000
+    for from_ in range(0, len(ids), batch_size):
+        chunk = ids[from_: from_ + batch_size]
+        in_filter = "image.abstract_image_id IN [" + ", ".join(str(image_id) for image_id in chunk) + "]"
+        response = index.search(
+            "",
+            {
+                "filter": [in_filter],
+                "attributesToRetrieve": ["image.abstract_image_id", "image.projects"],
+            },
+        )
+        for hit in response.get("hits") or []:
+            image = hit.get("image") or {}
+            abstract_image_id = image.get("abstract_image_id")
+            if abstract_image_id is None:
+                continue
+            memberships[int(abstract_image_id)] = list(image.get("projects") or [])
+    return memberships
 
 
 class BucketParser:
@@ -209,6 +245,17 @@ def run_import_datasets(
                         indexing_payload.append(flat_dict)
 
                     logger.info(f"[{parent_dataset}] Prepared {len(indexing_payload)} images for indexing.")
+
+                    abstract_image_ids = {
+                        int(payload["image"]["abstract_image_id"])
+                        for payload in indexing_payload
+                        if payload["image"].get("abstract_image_id") is not None
+                    }
+                    existing_projects = fetch_existing_project_memberships(index, abstract_image_ids)
+                    for payload in indexing_payload:
+                        abstract_image_id = payload["image"].get("abstract_image_id")
+                        current = existing_projects.get(int(abstract_image_id)) if abstract_image_id is not None else None
+                        payload["image"]["projects"] = merge_project_memberships(current, project.name)
 
                     batch_size = 200
                     for i in range(0, len(indexing_payload), batch_size):
@@ -477,7 +524,7 @@ def _configure_index(client, index) -> None:
         "specimens.fixation_type.meaning",
         "block.block_preparation.meaning",
         "specimens.specimen_type.meaning",
-        "dataset.alias",
+        "image.projects",
     ]
     task = index.update_settings({
         "searchableAttributes": searchable_attributes,

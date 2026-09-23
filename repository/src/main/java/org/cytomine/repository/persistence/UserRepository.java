@@ -13,8 +13,6 @@ import be.cytomine.common.repository.model.command.payload.response.UserResponse
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByIdAndDeletedNull(long id);
 
-    Optional<UserEntity> findByUsernameLikeIgnoreCase(String query);
-
     Page<UserResponse> findByIdIn(Set<Long> ids, Pageable pageable);
 
     Optional<UserEntity> findByUsername(String username);

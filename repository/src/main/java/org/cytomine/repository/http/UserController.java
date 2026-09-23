@@ -57,7 +57,7 @@ public class UserController implements UserHttpContract {
 
     @Override
     public Optional<UserResponse> search(String username) {
-        return repository.findByUsernameLikeIgnoreCase(username).map(mapper::mapToUserResponse);
+        return repository.findByUsername(username).map(mapper::mapToUserResponse);
     }
 
     @Override

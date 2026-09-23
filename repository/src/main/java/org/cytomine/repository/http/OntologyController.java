@@ -8,6 +8,7 @@ import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.OntologyRepository;
 import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.service.ACLService;
+import org.cytomine.repository.service.CurrentUserService;
 import org.cytomine.repository.service.OntologyCommandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,36 +34,41 @@ public class OntologyController implements OntologyHttpContract {
     private final UserRepository userRepository;
     private final ACLService aclService;
     private final OntologyMapper ontologyMapper;
+    private final CurrentUserService currentUserService;
 
     @Override
-    public Optional<OntologyResponse> get(long id, long userId) {
+    public Optional<OntologyResponse> get(long id) {
         return repository.findByIdAndDeletedNull(id)
-            .filter(ontologyEntity -> aclService.canReadOntology(userId, ontologyEntity.getId()))
+            .filter(ontologyEntity ->
+                aclService.canReadOntology(currentUserService.getCurrentUserId(), ontologyEntity.getId()))
             .map(ontologyMapper::mapToOntologyResponse);
 
     }
 
     @Override
-    public Optional<OntologyLight> getLight(long id, long userId) {
+    public Optional<OntologyLight> getLight(long id) {
         return repository.findByIdAndDeletedNull(id)
-            .filter(ontologyEntity -> aclService.canReadOntology(userId, ontologyEntity.getId())).flatMap(
-                ontologyEntity -> userRepository.findById(ontologyEntity.getUserId())
-                    .map(user -> ontologyMapper.mapToOntologyLight(ontologyEntity)));
+            .filter(ontologyEntity -> aclService.canReadOntology(currentUserService.getCurrentUserId(),
+                ontologyEntity.getId()))
+            .flatMap(ontologyEntity -> userRepository.findById(ontologyEntity.getUserId())
+                .map(user -> ontologyMapper.mapToOntologyLight(ontologyEntity)));
     }
 
     @Override
-    public Optional<HttpCommandResponse> create(long userId, CreateOntology createPayload) {
-        return service.create(userId, createPayload, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> create(CreateOntology createPayload) {
+        return service.create(currentUserService.getCurrentUserId(), createPayload,
+            LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> update(long id, long userId, UpdateOntology updateOntology) {
-        return service.update(userId, id, updateOntology, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> update(long id, UpdateOntology updateOntology) {
+        return service.update(currentUserService.getCurrentUserId(), id, updateOntology,
+            LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> delete(long id) {
+        return service.delete(currentUserService.getCurrentUserId(), id, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override

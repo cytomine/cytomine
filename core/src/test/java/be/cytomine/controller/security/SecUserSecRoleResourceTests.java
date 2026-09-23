@@ -31,7 +31,6 @@ import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -95,7 +94,7 @@ public class SecUserSecRoleResourceTests {
     public void addValidRole() throws Exception {
         UUID commandId = UUID.randomUUID();
         UserRoleResponse response = userRoleResponse(1L, 2L, 10L);
-        when(userRoleHttpContract.create(anyLong(), any())).thenReturn(
+        when(userRoleHttpContract.create(any())).thenReturn(
             Optional.of(new HttpCommandResponse(true, response, commandId, Commands.CREATE_USER_ROLE, Set.of())));
 
         mockMvc.perform(post("/api/user/{user}/role.json", 2L)
@@ -112,7 +111,7 @@ public class SecUserSecRoleResourceTests {
         UUID commandId = UUID.randomUUID();
         UserRoleResponse userRole = userRoleResponse(5L, 2L, 10L);
         when(userRoleHttpContract.getByUserIdAndRoleId(2L, 10L)).thenReturn(Optional.of(userRole));
-        when(userRoleHttpContract.delete(eq(5L), anyLong())).thenReturn(
+        when(userRoleHttpContract.delete(eq(5L))).thenReturn(
             Optional.of(new HttpCommandResponse(true, userRole, commandId, Commands.DELETE_USER_ROLE, Set.of())));
 
         mockMvc.perform(delete("/api/user/{user}/role/{role}.json", 2L, 10L))

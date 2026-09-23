@@ -835,7 +835,7 @@ public class ProjectResourceTests {
         UserResponse user = currentUserService.getCurrentUser();
         builder.addUserToProject(project, user.username());
         Long ontologyId = project.getOntology().getId();
-        when(ontologyHttpContract.getLight(ontologyId, user.id())).thenReturn(
+        when(ontologyHttpContract.getLight(ontologyId)).thenReturn(
             Optional.of(new OntologyLight(ontologyId, "ontology")));
         restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", ontologyId))
             .andExpect(status().isOk())
@@ -850,7 +850,7 @@ public class ProjectResourceTests {
         UserResponse user = currentUserService.getCurrentUser();
         builder.addUserToProject(project, user.username());
         Long ontologyId = project.getOntology().getId();
-        when(ontologyHttpContract.getLight(ontologyId, user.id())).thenReturn(
+        when(ontologyHttpContract.getLight(ontologyId)).thenReturn(
             Optional.of(new OntologyLight(ontologyId, "ontology")));
         restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", 0L))
             .andExpect(status().isNotFound());

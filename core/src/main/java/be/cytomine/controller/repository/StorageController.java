@@ -22,7 +22,6 @@ import be.cytomine.common.repository.model.storage.payload.CreateStorage;
 import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
-import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -35,45 +34,39 @@ public class StorageController {
 
     public static final String UNABLE_TO_FIND_STORAGE = "Unable to find storage with id: %s";
 
-    private final CurrentUserService currentUserService;
     private final PageMapper pageMapper;
     private final StorageHttpContract storageHttpContract;
 
     @GetMapping("/storage.json")
     public CollectionResponse<StorageResponse> getAllReadableByUser(Pageable pageable) {
         log.debug("GET /storage.json");
-        long userId = currentUserService.getCurrentUser().id();
-        return pageMapper.toCollectionResponse(storageHttpContract.getAll(userId, pageable));
+        return pageMapper.toCollectionResponse(storageHttpContract.getAll(pageable));
     }
 
     @PostMapping("/storage.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateStorage payload) {
         log.debug("POST /storage.json - {}", payload);
-        long userId = currentUserService.getCurrentUser().id();
-        return storageHttpContract.create(userId, payload);
+        return storageHttpContract.create(payload);
     }
 
     @GetMapping("/storage/{id}.json")
     public StorageResponse show(@PathVariable long id) {
         log.debug("GET /storage/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return storageHttpContract.get(id, userId)
+        return storageHttpContract.get(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_STORAGE, id)));
     }
 
     @PutMapping("/storage/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateStorage payload) {
         log.debug("PUT /storage/{}.json - {}", id, payload);
-        long userId = currentUserService.getCurrentUser().id();
-        return storageHttpContract.update(id, userId, payload)
+        return storageHttpContract.update(id, payload)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_STORAGE, id)));
     }
 
     @DeleteMapping("/storage/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("DELETE /storage/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return storageHttpContract.delete(id, userId)
+        return storageHttpContract.delete(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_STORAGE, id)));
     }
 }

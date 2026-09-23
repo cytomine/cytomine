@@ -93,13 +93,13 @@ public class ParamServiceTests {
             )
         );
 
-        assertThat(paramsService.getParamsTermList(null, project, 1))
+        assertThat(paramsService.getParamsTermList(null, project))
             .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
-        assertThat(paramsService.getParamsTermList("null", project, 1))
+        assertThat(paramsService.getParamsTermList("null", project))
             .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
-        assertThat(paramsService.getParamsTermList(termInProject.getId() + "_" + termNotInProject.getId(), project, 1))
+        assertThat(paramsService.getParamsTermList(termInProject.getId() + "_" + termNotInProject.getId(), project))
             .contains(termInProject.getId()).doesNotContain(termNotInProject.getId());
-        assertThat(paramsService.getParamsTermList(termNotInProject.getId() + "", project, 1))
+        assertThat(paramsService.getParamsTermList(termNotInProject.getId() + "", project))
             .doesNotContain(termInProject.getId(), termNotInProject.getId());
     }
 

@@ -20,7 +20,6 @@ import be.cytomine.common.repository.model.command.payload.response.TagDomainAss
 import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
-import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -33,15 +32,13 @@ public class TagDomainAssociationController {
 
     public static final String UNABLE_TO_FIND_TDA = "Unable to find tag domain association with id: %s";
 
-    private final CurrentUserService currentUserService;
     private final PageMapper pageMapper;
     private final TagDomainAssociationHttpContract httpContract;
 
     @GetMapping("/tag_domain_association.json")
     public CollectionResponse<TagDomainAssociationResponse> readAll(Pageable pageable) {
         log.debug("GET /tag_domain_association.json");
-        long userId = currentUserService.getCurrentUser().id();
-        return pageMapper.toCollectionResponse(httpContract.readAll(userId, pageable));
+        return pageMapper.toCollectionResponse(httpContract.readAll(pageable));
     }
 
     @GetMapping("/domain/{domainClassName}/{domainId}/tag_domain_association.json")
@@ -51,12 +48,10 @@ public class TagDomainAssociationController {
         Pageable pageable
     ) {
         log.debug("GET /domain/{}/{}/tag_domain_association.json", domainClassName, domainId);
-        long userId = currentUserService.getCurrentUser().id();
         return pageMapper.toCollectionResponse(
             httpContract.readAllByDomain(
                 domainClassName,
                 domainId,
-                userId,
                 pageable
             )
         );
@@ -68,23 +63,20 @@ public class TagDomainAssociationController {
     })
     public Optional<HttpCommandResponse> create(@RequestBody CreateTagDomainAssociation payload) {
         log.debug("POST /tag_domain_association.json - {}", payload);
-        long userId = currentUserService.getCurrentUser().id();
-        return httpContract.create(userId, payload);
+        return httpContract.create(payload);
     }
 
     @GetMapping("/tag_domain_association/{id}.json")
     TagDomainAssociationResponse read(@PathVariable long id) {
         log.debug("GET /tag_domain_association/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return httpContract.read(id, userId)
+        return httpContract.read(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TDA, id)));
     }
 
     @DeleteMapping("/tag_domain_association/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("DELETE /tag_domain_association/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return httpContract.delete(id, userId)
+        return httpContract.delete(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TDA, id)));
     }
 }

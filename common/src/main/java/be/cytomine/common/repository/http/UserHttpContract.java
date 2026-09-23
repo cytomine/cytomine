@@ -26,21 +26,20 @@ public interface UserHttpContract {
     String ROOT_PATH = "/users";
 
     @GetExchange("/{id}")
-    Optional<UserResponse> get(@PathVariable long id, @RequestParam long userId);
+    Optional<UserResponse> get(@PathVariable long id);
 
     @PostExchange
-    Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateUser createUser);
+    Optional<HttpCommandResponse> create(@Valid @RequestBody CreateUser createUser);
 
     @PostExchange("/self-register")
     Optional<HttpCommandResponse> selfRegister(@Valid @RequestBody CreateUser createUser);
 
     @PutExchange("/{id}")
     Optional<HttpCommandResponse> update(@PathVariable long id,
-        @RequestParam long userId,
         @RequestBody UpdateUser updateUser);
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
+    Optional<HttpCommandResponse> delete(@PathVariable long id);
 
     @GetExchange("/search/{username}")
     Optional<UserResponse> search(@PathVariable String username);

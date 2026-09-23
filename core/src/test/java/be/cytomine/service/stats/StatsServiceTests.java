@@ -266,16 +266,15 @@ public class StatsServiceTests {
     @Test
     void statsTermSlide() {
         Project project = builder.givenAProject();
-        long userId = builder.givenSuperAdmin().id();
 
-        when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
+        when(statsHttpContract.findTermsByProject(project.getId(), Optional.empty(), Optional.empty(),
             Pageable.unpaged())).thenReturn(new PageImpl<>(List.of()));
         List<StatTerm> results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
         assertThat(results).hasSize(0);
 
         Term term = builder.givenATerm(project.getOntology());
 
-        when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
+        when(statsHttpContract.findTermsByProject(project.getId(), Optional.empty(), Optional.empty(),
             Pageable.unpaged())).thenReturn(
                 new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 0))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
@@ -288,7 +287,7 @@ public class StatsServiceTests {
         builder.givenAnAnnotationTerm(annotation1, term);
         builder.persistAndReturn(annotation1);
 
-        when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
+        when(statsHttpContract.findTermsByProject(project.getId(), Optional.empty(), Optional.empty(),
             Pageable.unpaged())).thenReturn(
                 new PageImpl<>(List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 1))));
         results = statsService.statTermSlide(project, Optional.empty(), Optional.empty());
@@ -298,7 +297,7 @@ public class StatsServiceTests {
 
         Term term2 = builder.givenATerm(project.getOntology());
 
-        when(statsHttpContract.findTermsByProject(project.getId(), userId, Optional.empty(), Optional.empty(),
+        when(statsHttpContract.findTermsByProject(project.getId(), Optional.empty(), Optional.empty(),
             Pageable.unpaged())).thenReturn(new PageImpl<>(
             List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 1),
                 new StatTerm(term2.getId(), term2.getName(), term2.getColor(), 0))));
@@ -307,7 +306,7 @@ public class StatsServiceTests {
 
         Optional<LocalDateTime> startDate = Optional.of(LocalDateTime.now().minusDays(42));
         Optional<LocalDateTime> endDate = Optional.of(LocalDateTime.now().minusDays(20));
-        when(statsHttpContract.findTermsByProject(project.getId(), userId, startDate, endDate,
+        when(statsHttpContract.findTermsByProject(project.getId(), startDate, endDate,
             Pageable.unpaged())).thenReturn(new PageImpl<>(
             List.of(new StatTerm(term.getId(), term.getName(), term.getColor(), 0),
                 new StatTerm(term2.getId(), term2.getName(), term2.getColor(), 0))));
@@ -320,9 +319,8 @@ public class StatsServiceTests {
     @Test
     void statsTerm() {
         Project project = builder.givenAProject();
-        long userId = builder.givenSuperAdmin().id();
 
-        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), eq(Optional.empty()),
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(Optional.empty()),
             eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(new PageImpl<>(List.of()));
         List<JsonObject> results = statsService.statTerm(project, null, null, false);
 
@@ -333,7 +331,7 @@ public class StatsServiceTests {
         long termId = annotationTerm.getTerm().getId();
         Term term = annotationTerm.getTerm();
 
-        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), eq(Optional.empty()),
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(Optional.empty()),
             eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(
                 new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 1))));
         results = statsService.statTerm(project, null, null, false);
@@ -346,7 +344,7 @@ public class StatsServiceTests {
         builder.givenAnAnnotationTerm(annotation1, annotationTerm.getTerm());
         builder.persistAndReturn(annotation1);
 
-        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), eq(Optional.empty()),
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(Optional.empty()),
             eq(Optional.empty()), eq(Pageable.unpaged()))).thenReturn(
                 new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 2))));
         results = statsService.statTerm(project, null, null, false);
@@ -354,7 +352,7 @@ public class StatsServiceTests {
         assertThat(results.getFirst().getId()).isEqualTo(annotationTerm.getTerm().getId());
         assertThat(results.getFirst().get("value")).isEqualTo(2L);
 
-        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(), any(),
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), any(), any(),
             eq(Pageable.unpaged()))).thenReturn(
                 new PageImpl<>(List.of(new StatTerm(termId, term.getName(), term.getColor(), 0))));
         results = statsService.statTerm(project, DateUtils.addDays(new Date(), -40), DateUtils.addDays(new Date(), -20),
@@ -426,10 +424,9 @@ public class StatsServiceTests {
 
         Term term = annotation1.getTerms().getFirst();
         UserResponse superAdmin = builder.givenSuperAdmin();
-        when(statsHttpContract.findUserTermsByProject(project.getId(), superAdmin.id(),
-            Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(
-                new FlatStatUserTerm(superAdmin.id(), superAdmin.username(),
-                    new StatTerm(term.getId(), term.getName(), term.getColor(), 2)))));
+        when(statsHttpContract.findUserTermsByProject(project.getId(), Pageable.unpaged())).thenReturn(new PageImpl<>(
+            List.of(new FlatStatUserTerm(superAdmin.id(), superAdmin.username(),
+                new StatTerm(term.getId(), term.getName(), term.getColor(), 2)))));
 
         Set<StatTerm> terms;
 

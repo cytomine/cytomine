@@ -93,13 +93,13 @@ public class ParamsService {
      * Retrieve all images id from paramsImages request string (format images=x,y,z or x_y_z) Just get images from
      * project
      */
-    public List<Long> getParamsTermList(String paramsTerms, Project project, long userId) {
+    public List<Long> getParamsTermList(String paramsTerms, Project project) {
         if (paramsTerms != null && !paramsTerms.equals("null")) {
             if (!paramsTerms.isEmpty()) {
                 List<Long> termsIdsFromParams = Arrays.stream(paramsTerms.split(paramsTerms.contains("_") ? "_" : ","))
                     .map(Long::parseLong)
                     .toList();
-                return termHttpContract.findAllTermIdsByProject(project.getId(), userId)
+                return termHttpContract.findAllTermIdsByProject(project.getId())
                     .stream()
                     .distinct()
                     .filter(termsIdsFromParams::contains)
@@ -108,7 +108,7 @@ public class ParamsService {
                 return new ArrayList<>();
             }
         } else {
-            return termHttpContract.findAllTermIdsByProject(project.getId(), userId).stream().toList();
+            return termHttpContract.findAllTermIdsByProject(project.getId()).stream().toList();
         }
     }
 

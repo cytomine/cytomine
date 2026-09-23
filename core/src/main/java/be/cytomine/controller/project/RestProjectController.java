@@ -174,7 +174,7 @@ public class RestProjectController extends RestCytomineController {
     @GetMapping("/ontology/{id}/project.json")
     public ResponseEntity<String> listByOntology(@PathVariable Long id) {
         log.debug("REST request to list project with ontology {}", id);
-        long ontologyId = ontologyHttpContract.getLight(id, currentUserService.getCurrentUser().id())
+        long ontologyId = ontologyHttpContract.getLight(id)
             .map(OntologyLight::id)
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
         return responseSuccess(projectService.listByOntology(ontologyId));
@@ -190,8 +190,7 @@ public class RestProjectController extends RestCytomineController {
         @RequestParam(required = false, defaultValue = "0") Long offset
     ) {
         log.debug("REST request to list project with user {}", id);
-        UserResponse currentUser = currentUserService.getCurrentUser();
-        UserResponse user = userHttpContract.get(id, currentUser.id())
+        UserResponse user = userHttpContract.get(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
         Page<JsonObject> result = projectService.list(
             user, new ProjectSearchExtension(), new ArrayList<>(), "created", "desc", max, offset
@@ -210,8 +209,7 @@ public class RestProjectController extends RestCytomineController {
         @RequestParam(required = false, defaultValue = "false") Boolean user
     ) {
         log.debug("REST request to list project with user {}", id);
-        long currentUserId = currentUserService.getCurrentUser().id();
-        long requestedUserId = userHttpContract.get(id, currentUserId)
+        long requestedUserId = userHttpContract.get(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id)).id();
 
         if (creator) {

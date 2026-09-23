@@ -24,35 +24,32 @@ public interface TermRelationHttpContract {
     String ROOT_PATH = "/term_relations";
 
     @GetExchange("/{id}")
-    Optional<TermRelationResponse> findTermRelationByID(@PathVariable long id, @RequestParam long userId);
+    Optional<TermRelationResponse> findTermRelationByID(@PathVariable long id);
 
     @GetExchange("/term/{termId}")
-    Set<Long> findTermRelationsIdsByTermId(@PathVariable long termId, @RequestParam long userId);
+    Set<Long> findTermRelationsIdsByTermId(@PathVariable long termId);
 
     @GetExchange("/ontology/{ontologyId}")
-    List<TermRelationResponse> findAllByOntologyId(@PathVariable long ontologyId, @RequestParam long userId);
+    List<TermRelationResponse> findAllByOntologyId(@PathVariable long ontologyId);
 
     @GetExchange("/ontology/{ontologyId}/ids")
-    Set<Long> findAllIdsByOntologyId(@PathVariable long ontologyId, @RequestParam long userId);
+    Set<Long> findAllIdsByOntologyId(@PathVariable long ontologyId);
 
 
     @PostExchange
-    Optional<HttpCommandResponse> create(@RequestParam long userId,
-        @Valid @RequestBody CreateTermRelation createTermRelation);
+    Optional<HttpCommandResponse> create(@Valid @RequestBody CreateTermRelation createTermRelation);
 
     @PutExchange("/{id}")
     Optional<HttpCommandResponse> update(@PathVariable long id,
-        @RequestParam long userId,
         @RequestBody UpdateTermRelation updateTermRelation);
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
+    Optional<HttpCommandResponse> delete(@PathVariable long id);
 
     @DeleteExchange("/all")
-    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids, @RequestParam long userId);
+    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids);
 
     @DeleteExchange("/term1/{idTerm1}/term2/{idTerm2}")
     Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1,
-        @PathVariable long idTerm2,
-        @RequestParam long userId);
+        @PathVariable long idTerm2);
 }

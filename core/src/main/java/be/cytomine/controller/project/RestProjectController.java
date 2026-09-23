@@ -128,7 +128,7 @@ public class RestProjectController extends RestCytomineController {
         return update(projectService, json, existingTask);
     }
 
-    @PostMapping("/project/from-search.json")
+    @PostMapping("/project/from-search")
     public ProjectFromSearchResponse addFromSearch(@RequestBody ProjectFromSearchRequest request) {
         log.debug("REST request to create project from metadata search : " + request);
         try {

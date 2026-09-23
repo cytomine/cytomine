@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.image.AbstractImage;
@@ -58,8 +57,8 @@ public interface ImageInstanceRepository
 
     @Query("SELECT ii FROM ImageInstance ii WHERE ii.baseImage.id IN :baseImageIds AND ii.project = :project")
     List<ImageInstance> findAllByBaseImageIdInAndProject(
-        @Param("baseImageIds") Collection<Long> baseImageIds,
-        @Param("project") Project project
+        Collection<Long> baseImageIds,
+        Project project
     );
 
     Optional<ImageInstance> findTopByProjectAndCreatedLessThanOrderByCreatedDesc(Project project, Date created);

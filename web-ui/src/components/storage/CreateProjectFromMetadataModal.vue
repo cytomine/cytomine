@@ -1,5 +1,5 @@
 <template>
-<form @submit.prevent="createProject(); loading = true">
+<form @submit.prevent="createProject()">
   <b-loading :active="loading && !task" :is-full-page="false" />
 
   <cytomine-modal :active="active" :title="$t('create-project')" @close="$emit('update:active', false)">
@@ -104,6 +104,7 @@ export default {
       if (!result) {
         return;
       }
+      this.loading = true;
 
       try {
         let payload = {
@@ -116,7 +117,7 @@ export default {
           payload.ontologyId = this.selectedOntology;
         }
 
-        let { data } = await Cytomine.instance.api.post('project/from-search.json', payload);
+        let { data } = await Cytomine.instance.api.post('project/from-search', payload);
 
         this.loading = false;
         this.task = data.task;

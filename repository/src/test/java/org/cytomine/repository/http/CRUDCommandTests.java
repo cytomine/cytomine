@@ -22,6 +22,7 @@ import be.cytomine.common.repository.model.command.payload.response.ApplyCommand
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
 
+import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -58,9 +59,10 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
     }
 
     default long createUser() {
+        String username = UUID.randomUUID().toString();
         long userId = getJdbcTemplate().queryForObject(
             "INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING ID", Long.class,
-            UUID.randomUUID().toString());
+            username);
 
         getJdbcTemplate().update("INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_ADMIN', NOW() "
             + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
@@ -88,14 +90,18 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         return userId;
     }
 
+    default String getUsername(long userId) {
+        return getJdbcTemplate().queryForObject("SELECT username FROM sec_user WHERE id = ?", String.class, userId);
+    }
+
     @Test
     @SneakyThrows
     default void baseTest() {
         // Create Entity
         long userId = createUser();
-        String stringUserId = String.valueOf(userId);
+        String username = getUsername(userId);
         String response = getMockMvc().perform(
-                post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
+                post(getApiURL()).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
@@ -106,14 +112,16 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         // Get the Entity with Sub Entities
         String get = getMockMvc().perform(
-                get(getApiURL() + "/" + result.data().id()).param("userId", stringUserId).contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + result.data().id()).with(authenticatedAs(username))
+                    .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         ApplyCommandResponse getResponse = getObjectMapper().readValue(get, ApplyCommandResponse.class);
         R getResponseData = (R) getResponse;
 
         // Update Entity
         String update = getMockMvc().perform(
-                put(getApiURL() + "/" + result.data().id()).param("userId", stringUserId).contentType(APPLICATION_JSON)
+                put(getApiURL() + "/" + result.data().id()).with(authenticatedAs(username))
+                    .contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getUpdatePayload()))).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
@@ -127,7 +135,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         // Delete Entity
         String delete = getMockMvc().perform(
                 delete(getApiURL() + "/" + result.data().id())
-                    .param("userId", stringUserId).contentType(APPLICATION_JSON))
+                    .with(authenticatedAs(username)).contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
         assertEquals(getApplyCommandResponseMapper().setDeleteTime(updateDataResult, Optional.of(
@@ -141,10 +149,10 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
     default void createCommandTest() {
         // Create Entity
         long userId = createUser();
-        String stringUserId = String.valueOf(userId);
+        String username = getUsername(userId);
 
         Optional<HttpCommandResponse> maybeFirstCreate = getObjectMapper().readValue(getMockMvc().perform(
-                post(getApiURL()).param("userId", stringUserId).contentType(APPLICATION_JSON)
+                post(getApiURL()).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString(), new TypeReference<>() {}
         );
@@ -156,8 +164,9 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Set<? extends ApplyCommandResponse> ignored = createSubEntities(userId, firstCreate.data().id());
 
         // Get the Entity with Sub Entities
-        String get = getMockMvc().perform(get(getApiURL() + "/" + firstCreate.data().id()).param("userId", stringUserId)
-            .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String get = getMockMvc().perform(get(getApiURL() + "/" + firstCreate.data().id())
+                .with(authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
 
         ApplyCommandResponse getResponse = getObjectMapper().readValue(get, ApplyCommandResponse.class);
         R getResponseData = (R) getResponse;
@@ -167,7 +176,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         // Undo (Entity Creation)
         Optional<HttpCommandResponse> undoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
-                post(CommandController.ROOT_PATH + "/undo/" + commandID).param("userId", stringUserId)
+                post(CommandController.ROOT_PATH + "/undo/" + commandID).with(authenticatedAs(username))
                     .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
             .getContentAsString(), new TypeReference<>() {});
 
@@ -179,7 +188,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             undoCommandResponse.map(HttpCommandResponse::data));
 
         String emptyResponseString = getMockMvc().perform(
-                get(getApiURL() + "/" + entityID).param("userId", stringUserId)
+                get(getApiURL() + "/" + entityID).with(authenticatedAs(username))
                     .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString,
@@ -189,8 +198,9 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         // Undo (Undo (Entity Creation)) -> Recreate Entity
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
-                post(CommandController.ROOT_PATH + "/undo/" + undoCommandResponse.get().commandId()).param("userId",
-                    stringUserId).contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
+                post(CommandController.ROOT_PATH + "/undo/" + undoCommandResponse.get().commandId())
+                    .with(authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
+            .andReturn().getResponse()
             .getContentAsString(), new TypeReference<>() {});
         LocalDateTime updateTime = redoCommandResponse.stream().findFirst()
             .orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data().updated()
@@ -202,7 +212,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             redoCommandResponse.map(HttpCommandResponse::data));
 
         String redoGetResponseString = getMockMvc().perform(
-                get(getApiURL() + "/" + entityID).param("userId", stringUserId)
+                get(getApiURL() + "/" + entityID).with(authenticatedAs(username))
                     .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 

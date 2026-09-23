@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.config.security.CytomineAuthenticationSupport;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.KeysResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.controller.JsonResponseEntity;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
@@ -116,7 +116,7 @@ public class RestUserController extends RestCytomineController {
         @PathVariable Long id
     ) {
         log.debug("REST request to list user from ontology {}", id);
-        OntologyResponse ontology = ontologyHttpContract.get(id, currentUserService.getCurrentUser().id())
+        OntologyResponse ontology = ontologyHttpContract.get(id)
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
         return responseSuccess(userService.listUsers(ontology.id()), isFilterRequired());
     }
@@ -180,7 +180,7 @@ public class RestUserController extends RestCytomineController {
         @RequestParam(value = "date", required = false, defaultValue = "") String date
     ) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         UserResponse user = currentUserService.getCurrentUser();
-        String signature = ApiKeyFilter.generateKeys(
+        String signature = CytomineAuthenticationSupport.generateSignature(
             method, contentMD5, contenttype.isEmpty() ? contentType : contenttype, date, user.privateKey().get()
         );
         return responseSuccess(JsonObject.of("signature", signature, "publicKey", user.publicKey().orElse(null)));

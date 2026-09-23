@@ -104,10 +104,10 @@ public class ReportService {
     public byte[] generateAnnotationsReport(
         String projectName, Set<String> terms,
         Set<String> users, List<Map<String, Object>> data,
-        String format, long userId
+        String format
     ) throws ServerException {
         Object[][] dataForReport =
-            reportFormatService.formatAnnotationsForReport(ANNOTATION_REPORT_COLUMNS, data, userId);
+            reportFormatService.formatAnnotationsForReport(ANNOTATION_REPORT_COLUMNS, data);
         return generateReport(
             getAnnotationReportTitle(projectName, terms, users), dataForReport,
             ANNOTATION_REPORT_COLUMNS, format

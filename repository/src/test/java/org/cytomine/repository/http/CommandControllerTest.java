@@ -23,6 +23,7 @@ import be.cytomine.common.repository.model.command.payload.response.CommandV2Res
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
 
+import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 public class CommandControllerTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -47,10 +48,11 @@ public class CommandControllerTest {
     private final String apiUrl = CommandHttpContract.ROOT_PATH;
 
     private long createUser() {
+        String username = UUID.randomUUID().toString();
         long userId = jdbcTemplate.queryForObject(
             "INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING ID",
             Long.class,
-            UUID.randomUUID().toString()
+            username
         );
 
         jdbcTemplate.update(
@@ -66,9 +68,14 @@ public class CommandControllerTest {
         return userId;
     }
 
+    private String getUsername(long userId) {
+        return jdbcTemplate.queryForObject("SELECT username FROM sec_user WHERE id = ?", String.class, userId);
+    }
+
     @SneakyThrows
     private HttpCommandResponse createCommand(long userId) {
-        String response = mockMvc.perform(post(OntologyHttpContract.ROOT_PATH).param("userId", String.valueOf(userId))
+        String response = mockMvc.perform(post(OntologyHttpContract.ROOT_PATH)
+                .with(authenticatedAs(getUsername(userId)))
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new CreateOntology(UUID.randomUUID().toString()))))
             .andExpect(status().isOk())
@@ -85,7 +92,7 @@ public class CommandControllerTest {
         long userId = createUser();
         HttpCommandResponse command = createCommand(userId);
 
-        mockMvc.perform(get(apiUrl + "/" + command.commandId()).param("userId", String.valueOf(userId))
+        mockMvc.perform(get(apiUrl + "/" + command.commandId()).with(authenticatedAs(getUsername(userId)))
                 .contentType(APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(command.commandId().toString()))
@@ -97,8 +104,10 @@ public class CommandControllerTest {
     void getUnknownCommandTest() {
         long userId = createUser();
 
-        String response = mockMvc.perform(get(apiUrl + "/" + UUID.randomUUID()).param("userId", String.valueOf(userId))
-            .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String response = mockMvc.perform(get(apiUrl + "/" + UUID.randomUUID())
+                .with(authenticatedAs(getUsername(userId)))
+                .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
+            .getContentAsString();
 
         assertEquals(
             Optional.empty(),
@@ -113,7 +122,7 @@ public class CommandControllerTest {
         HttpCommandResponse first = createCommand(userId);
         HttpCommandResponse second = createCommand(userId);
 
-        mockMvc.perform(get(apiUrl + "/all").param("userId", String.valueOf(userId))
+        mockMvc.perform(get(apiUrl + "/all").with(authenticatedAs(getUsername(userId)))
                 .param("sort", "created,desc")
                 .contentType(APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -128,9 +137,8 @@ public class CommandControllerTest {
         long userId = createUser();
         HttpCommandResponse command = createCommand(userId);
 
-        String response = mockMvc.perform(post(apiUrl + "/undo/" + command.commandId()).param(
-                "userId",
-                String.valueOf(userId)
+        String response = mockMvc.perform(post(apiUrl + "/undo/" + command.commandId()).with(
+                authenticatedAs(getUsername(userId))
             ).contentType(APPLICATION_JSON))
             .andExpect(status().isOk())
             .andReturn()

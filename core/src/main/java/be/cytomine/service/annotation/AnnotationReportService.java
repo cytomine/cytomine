@@ -43,7 +43,7 @@ public class AnnotationReportService {
 
     private final TermHttpContract termHttpContract;
 
-    public byte[] downloadDocumentByProject(JsonObject params, Project project, long userId) {
+    public byte[] downloadDocumentByProject(JsonObject params, Project project) {
 
         Long idProject = params.getJSONAttrLong("project");
         boolean reviewed = params.getJSONAttrBoolean("reviewed", false);
@@ -59,7 +59,7 @@ public class AnnotationReportService {
             .orElseGet(() -> projectService.getUserIdsFromProject(project.getId()));
 
         String terms =
-            termsParam == null || termsParam.isBlank() ? termHttpContract.findAllTermIdsByProject(idProject, userId)
+            termsParam == null || termsParam.isBlank() ? termHttpContract.findAllTermIdsByProject(idProject)
                 .stream().map(String::valueOf).collect(
                     Collectors.joining(",")) :
                 termsParam;
@@ -70,16 +70,16 @@ public class AnnotationReportService {
 
         log.info("Download report for project {} with users {} and terms {}", idProject, userIds, terms);
 
-        return annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format, userId);
+        return annotationListingBuilder.buildAnnotationReport(idProject, userIds, params, terms, format);
     }
 
-    public Map<String, Object> exportAnnotations(Long projectId, long userId) {
+    public Map<String, Object> exportAnnotations(Long projectId) {
         JsonObject params = JsonObject.of("project", projectId);
         params.put("showDefault", true);
         params.put("showWKT", true);
         params.put("showGIS", true);
 
-        Map<Long, String> termNames = termHttpContract.findTermsByProject(projectId, userId, Pageable.unpaged())
+        Map<Long, String> termNames = termHttpContract.findTermsByProject(projectId, Pageable.unpaged())
             .stream()
             .collect(Collectors.toMap(TermResponse::id, TermResponse::name));
 

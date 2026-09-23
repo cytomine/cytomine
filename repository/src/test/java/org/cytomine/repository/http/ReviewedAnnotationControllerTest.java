@@ -22,6 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
 
+import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Transactional
 class ReviewedAnnotationControllerTest {
 
@@ -46,14 +47,16 @@ class ReviewedAnnotationControllerTest {
     private ObjectMapper objectMapper;
 
     private Long userId;
+    private String username;
     private Long reviewedAnnotationTermsId;
     private Long termId1;
     private Long termId2;
 
     @BeforeEach
     void setUp() {
+        username = UUID.randomUUID().toString();
         userId = jdbcTemplate.queryForObject("INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING id",
-            Long.class, UUID.randomUUID().toString());
+            Long.class, username);
         jdbcTemplate.update(
             "INSERT INTO sec_role (version, authority) SELECT 0, 'ROLE_ADMIN' "
                 + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
@@ -102,7 +105,7 @@ class ReviewedAnnotationControllerTest {
     @SneakyThrows
     void replaceAllTermIdsWhenNoExistingLinksCreatesAndReturnsNewLinks() {
         String response = mockMvc.perform(
-                put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
+                put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).with(authenticatedAs(username))
                     .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId1))))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
@@ -118,7 +121,7 @@ class ReviewedAnnotationControllerTest {
             new ReviewedAnnotationLinkEntity(termId1, reviewedAnnotationTermsId));
 
         String response = mockMvc.perform(
-                put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
+                put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).with(authenticatedAs(username))
                     .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId2))))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
@@ -134,7 +137,7 @@ class ReviewedAnnotationControllerTest {
             new ReviewedAnnotationLinkEntity(termId1, reviewedAnnotationTermsId));
 
         String response = mockMvc.perform(
-                put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
+                put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).with(authenticatedAs(username))
                     .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of(termId1))))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
@@ -150,7 +153,7 @@ class ReviewedAnnotationControllerTest {
             new ReviewedAnnotationLinkEntity(termId1, reviewedAnnotationTermsId));
 
         String response = mockMvc.perform(
-                put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId", userId.toString())
+                put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).with(authenticatedAs(username))
                     .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Set.of())))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
@@ -166,13 +169,14 @@ class ReviewedAnnotationControllerTest {
         reviewedAnnotationLinkRepository.saveAndFlush(
             new ReviewedAnnotationLinkEntity(termId1, reviewedAnnotationTermsId));
 
-        Long nonAdminUserId = jdbcTemplate.queryForObject(
+        String nonAdminUsername = UUID.randomUUID().toString();
+        jdbcTemplate.queryForObject(
             "INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING id", Long.class,
-            UUID.randomUUID().toString());
+            nonAdminUsername);
 
         String response = mockMvc.perform(
-                put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).param("userId",
-                        nonAdminUserId.toString()).contentType(MediaType.APPLICATION_JSON)
+                put("/reviewed-annotations/terms/{id}", reviewedAnnotationTermsId).with(
+                        authenticatedAs(nonAdminUsername)).contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(Set.of(termId2)))).andExpect(status().isOk()).andReturn()
             .getResponse().getContentAsString();
 

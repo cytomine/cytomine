@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.UploadedFileMapper;
 import org.cytomine.repository.persistence.UploadedFileRepository;
 import org.cytomine.repository.service.ACLService;
+import org.cytomine.repository.service.CurrentUserService;
 import org.cytomine.repository.service.UploadedFileCommandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,31 +32,34 @@ public class UploadedFileController implements UploadedFileHttpContract {
     private final UploadedFileCommandService service;
     private final UploadedFileMapper mapper;
     private final UploadedFileRepository repository;
+    private final CurrentUserService currentUserService;
 
     @Override
-    public Optional<UploadedFileResponse> get(long id, long userId) {
+    public Optional<UploadedFileResponse> get(long id) {
         return repository.findByIdAndDeletedNull(id)
-            .filter(entity -> aclService.canReadStorage(userId, entity.getStorageId()))
+            .filter(entity -> aclService.canReadStorage(currentUserService.getCurrentUserId(),
+                entity.getStorageId()))
             .map(mapper::mapToUploadedFileResponse);
     }
 
     @Override
-    public Optional<HttpCommandResponse> create(long userId, CreateUploadedFile payload) {
-        return service.create(userId, payload, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> create(CreateUploadedFile payload) {
+        return service.create(currentUserService.getCurrentUserId(), payload, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> update(long id, long userId, UpdateUploadedFile payload) {
-        return service.update(userId, id, payload, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> update(long id, UpdateUploadedFile payload) {
+        return service.update(currentUserService.getCurrentUserId(), id, payload,
+            LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> delete(long id) {
+        return service.delete(currentUserService.getCurrentUserId(), id, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Page<UploadedFileResponse> getAll(long userId, List<Long> uploadedFileIds, Pageable pageable) {
-        return service.getAll(userId, uploadedFileIds, pageable);
+    public Page<UploadedFileResponse> getAll(List<Long> uploadedFileIds, Pageable pageable) {
+        return service.getAll(currentUserService.getCurrentUserId(), uploadedFileIds, pageable);
     }
 }

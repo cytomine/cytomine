@@ -23,7 +23,7 @@ import be.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTa
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 class TagDomainAssociationControllerTest
     implements CRUDCommandTests<CreateTagDomainAssociation, TagDomainAssociationResponse, UpdateTagDomainAssociation> {

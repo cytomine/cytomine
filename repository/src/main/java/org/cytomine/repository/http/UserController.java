@@ -7,6 +7,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.mapper.UserMapper;
 import org.cytomine.repository.persistence.UserRepository;
+import org.cytomine.repository.service.CurrentUserService;
 import org.cytomine.repository.service.UserCommandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,15 +30,17 @@ public class UserController implements UserHttpContract {
     private final UserCommandService service;
     private final UserMapper mapper;
     private final UserRepository repository;
+    private final CurrentUserService currentUserService;
 
     @Override
-    public Optional<UserResponse> get(long id, long userId) {
+    public Optional<UserResponse> get(long id) {
         return repository.findByIdAndDeletedNull(id).map(mapper::mapToUserResponse);
     }
 
     @Override
-    public Optional<HttpCommandResponse> create(long userId, CreateUser createUser) {
-        return service.create(userId, createUser, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> create(CreateUser createUser) {
+        return service.create(currentUserService.getCurrentUserId(), createUser,
+            LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
@@ -46,18 +49,19 @@ public class UserController implements UserHttpContract {
     }
 
     @Override
-    public Optional<HttpCommandResponse> update(long id, long userId, UpdateUser updateUser) {
-        return service.update(userId, id, updateUser, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> update(long id, UpdateUser updateUser) {
+        return service.update(currentUserService.getCurrentUserId(), id, updateUser,
+            LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return service.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> delete(long id) {
+        return service.delete(currentUserService.getCurrentUserId(), id, LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
     public Optional<UserResponse> search(String username) {
-        return repository.findByUsernameLikeIgnoreCase(username).map(mapper::mapToUserResponse);
+        return repository.findByUsername(username).map(mapper::mapToUserResponse);
     }
 
     @Override

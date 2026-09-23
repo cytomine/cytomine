@@ -31,6 +31,7 @@ import be.cytomine.common.repository.model.userrole.payload.role.payload.CreateU
 import be.cytomine.common.repository.model.userrole.payload.role.payload.UpdateUserRole;
 
 import static java.lang.String.format;
+import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -38,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
-@Import(PostGisTestConfiguration.class)
+@Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 @Getter
 class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRoleResponse, UpdateUserRole> {
 
@@ -75,17 +76,18 @@ class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRol
     void defineTest() {
         long userId = createUser();
         long targetUserId = createUser();
+        String username = getUsername(userId);
         String stringResultGuest = mockMvc.perform(
-                put(getApiURL() + format("/define/%s/role/%s", targetUserId, Role.ROLE_GUEST)).param("userId",
-                    String.valueOf(userId)).contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn()
-            .getResponse().getContentAsString();
+                put(getApiURL() + format("/define/%s/role/%s", targetUserId, Role.ROLE_GUEST)).with(
+                        authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
         Set<UserRoleResponse> resultGuest = getObjectMapper().readValue(stringResultGuest, new TypeReference<>() {
         });
         assertEquals(4, resultGuest.size());
         String stringResultAdmin = mockMvc.perform(
-                put(getApiURL() + format("/define/%s/role/%s", targetUserId, Role.ROLE_SUPER_ADMIN)).param("userId",
-                    String.valueOf(userId)).contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn()
-            .getResponse().getContentAsString();
+                put(getApiURL() + format("/define/%s/role/%s", targetUserId, Role.ROLE_SUPER_ADMIN)).with(
+                        authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
         Set<UserRoleResponse> resultAdmin = getObjectMapper().readValue(stringResultAdmin, new TypeReference<>() {
         });
         assertEquals(4, resultAdmin.size());

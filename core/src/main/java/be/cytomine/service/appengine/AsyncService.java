@@ -24,9 +24,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import be.cytomine.common.config.security.CytomineAuthenticationSupport;
 import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
-import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -85,8 +85,10 @@ public class AsyncService {
         }
         // signature
         String signatureDate = Instant.now().toString();
-        String signature = ApiKeyFilter.generateKeys("POST", "", "", signatureDate, currentUser.getPrivateKey());
-        String authorizationHeader = "CYTOMINE " + currentUser.getPublicKey() + ":" + signature;
+        String signature =
+            CytomineAuthenticationSupport.generateSignature("POST", "", "", signatureDate, currentUser.getPrivateKey());
+        String authorizationHeader =
+            CytomineAuthenticationSupport.buildAuthorizationHeader(currentUser.getPublicKey(), signature);
         String contentTypeFull = null;
 
         // Prepare headers
@@ -107,7 +109,7 @@ public class AsyncService {
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-        StorageResponse userStorage = storageHttpContract.getAll(currentUser.getId(), Pageable.unpaged()).stream()
+        StorageResponse userStorage = storageHttpContract.getAll(Pageable.unpaged()).stream()
             .filter(storageResponse -> storageResponse.name().contains(currentUser.getUsername())).findFirst()
             .orElseThrow(() -> new ObjectNotFoundException("User with storage", currentUser.getId()));
         String queryString = "?idStorage=" + userStorage.id() + "&idProject=" + projectId;

@@ -82,7 +82,7 @@ public class ReportFormatServiceTests {
     public void annotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
-            buildAnnotations(true), 1
+            buildAnnotations(true)
         );
         assertArrayEquals(expectedDataObject, dataObject);
     }
@@ -91,7 +91,7 @@ public class ReportFormatServiceTests {
     public void incompleteAnnotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
-            buildAnnotations(false), 1
+            buildAnnotations(false)
         );
         assertArrayEquals(expectedDataObject, dataObject);
     }
@@ -100,7 +100,7 @@ public class ReportFormatServiceTests {
     public void reviewedAnnotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
-            buildAnnotations(true), 1
+            buildAnnotations(true)
         );
         assertArrayEquals(expectedDataObject, dataObject);
     }
@@ -109,7 +109,7 @@ public class ReportFormatServiceTests {
     public void incompleteReviewedAnnotationsToReportFormat() {
         Object[][] dataObject = reportFormatService.formatAnnotationsForReport(
             ReportService.ANNOTATION_REPORT_COLUMNS,
-            buildAnnotations(false), 1
+            buildAnnotations(false)
         );
         assertArrayEquals(expectedDataObject, dataObject);
     }

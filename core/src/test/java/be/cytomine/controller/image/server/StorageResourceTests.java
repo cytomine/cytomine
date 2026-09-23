@@ -73,8 +73,7 @@ public class StorageResourceTests {
     @Transactional
     public void shouldListReadableStorages() throws Exception {
         Storage storage = builder.givenAStorage(builder.givenAdmin());
-        long userId = currentUserService.getCurrentUser().id();
-        when(storageHttpContract.getAll(eq(userId), any(Pageable.class))).thenReturn(
+        when(storageHttpContract.getAll(any(Pageable.class))).thenReturn(
             new PageImpl<>(List.of(toResponse(storage))));
 
         mockMvc.perform(get("/api/storage.json")).andExpect(status().isOk())
@@ -85,8 +84,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void shouldReturnEmptyCollectionWhenNoStoragesAreReadable() throws Exception {
-        long userId = currentUserService.getCurrentUser().id();
-        when(storageHttpContract.getAll(eq(userId), any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
+        when(storageHttpContract.getAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         mockMvc.perform(get("/api/storage.json")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(0)));
@@ -96,8 +94,7 @@ public class StorageResourceTests {
     @Transactional
     public void shouldReturnStorageWithExpectedFieldsWhenItExists() throws Exception {
         Storage storage = builder.givenAStorage(builder.givenAdmin());
-        long userId = currentUserService.getCurrentUser().id();
-        when(storageHttpContract.get(eq(storage.getId()), eq(userId))).thenReturn(Optional.of(toResponse(storage)));
+        when(storageHttpContract.get(eq(storage.getId()))).thenReturn(Optional.of(toResponse(storage)));
 
         mockMvc.perform(get("/api/storage/{id}.json", storage.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(storage.getId().intValue()))
@@ -108,8 +105,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void shouldReturnNotFoundWhenStorageDoesNotExist() throws Exception {
-        long userId = currentUserService.getCurrentUser().id();
-        when(storageHttpContract.get(eq(0L), eq(userId))).thenReturn(Optional.empty());
+        when(storageHttpContract.get(eq(0L))).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/storage/{id}.json", 0)).andExpect(status().isNotFound());
     }
@@ -120,7 +116,7 @@ public class StorageResourceTests {
         Storage storage = basicInstanceBuilder.givenANotPersistedStorage(builder.givenAdmin());
         long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
-        when(storageHttpContract.create(eq(userId), any())).thenReturn(Optional.of(new HttpCommandResponse(true,
+        when(storageHttpContract.create(any())).thenReturn(Optional.of(new HttpCommandResponse(true,
             new StorageResponse(1L, userId, storage.getName(), LocalDateTime.now(), Optional.empty(), Optional.empty()),
             commandId, Commands.CREATE_STORAGE, Set.of())));
 
@@ -135,9 +131,8 @@ public class StorageResourceTests {
     @Transactional
     public void shouldUpdateStorageAndReturnCommandResponse() throws Exception {
         Storage storage = builder.givenAStorage(builder.givenAdmin());
-        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
-        when(storageHttpContract.update(eq(storage.getId()), eq(userId), any())).thenReturn(Optional.of(
+        when(storageHttpContract.update(eq(storage.getId()), any())).thenReturn(Optional.of(
             new HttpCommandResponse(true, toResponse(storage), commandId, Commands.UPDATE_STORAGE, Set.of())));
 
         mockMvc.perform(put("/api/storage/{id}.json", storage.getId()).contentType(MediaType.APPLICATION_JSON)
@@ -153,7 +148,7 @@ public class StorageResourceTests {
     public void shouldReturnNotFoundWhenUpdatingNonExistentStorage() throws Exception {
         Storage storage = basicInstanceBuilder.givenANotPersistedStorage(builder.givenAdmin());
         long userId = currentUserService.getCurrentUser().id();
-        when(storageHttpContract.update(eq(0L), eq(userId), any())).thenReturn(Optional.empty());
+        when(storageHttpContract.update(eq(0L), any())).thenReturn(Optional.empty());
 
         mockMvc.perform(
                 put("/api/storage/{id}.json", 0).contentType(MediaType.APPLICATION_JSON)
@@ -165,9 +160,8 @@ public class StorageResourceTests {
     @Transactional
     public void shouldDeleteStorageAndReturnCommandResponse() throws Exception {
         Storage storage = builder.givenAStorage(builder.givenAdmin());
-        long userId = currentUserService.getCurrentUser().id();
         UUID commandId = UUID.randomUUID();
-        when(storageHttpContract.delete(eq(storage.getId()), eq(userId))).thenReturn(Optional.of(
+        when(storageHttpContract.delete(eq(storage.getId()))).thenReturn(Optional.of(
             new HttpCommandResponse(true, toResponse(storage), commandId, Commands.DELETE_STORAGE, Set.of())));
 
         mockMvc.perform(delete("/api/storage/{id}.json", storage.getId()).contentType(MediaType.APPLICATION_JSON))
@@ -180,8 +174,7 @@ public class StorageResourceTests {
     @Test
     @Transactional
     public void shouldReturnNotFoundWhenDeletingNonExistentStorage() throws Exception {
-        long userId = currentUserService.getCurrentUser().id();
-        when(storageHttpContract.delete(eq(0L), eq(userId))).thenReturn(Optional.empty());
+        when(storageHttpContract.delete(eq(0L))).thenReturn(Optional.empty());
 
         mockMvc.perform(delete("/api/storage/{id}.json", 0).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound());

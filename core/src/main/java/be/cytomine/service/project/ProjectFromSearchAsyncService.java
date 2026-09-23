@@ -18,7 +18,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.utils.TaskService;
@@ -37,8 +36,6 @@ public class ProjectFromSearchAsyncService {
     private final MeiliSearchService meiliSearchService;
 
     private final TaskService taskService;
-
-    private final CurrentUserService currentUserService;
 
     private final ProjectRepository projectRepository;
 
@@ -68,8 +65,7 @@ public class ProjectFromSearchAsyncService {
         boolean taggingWarning = false;
         try {
             taskService.updateTask(task, 5, "Searching images");
-            long userId = currentUserService.getCurrentUser().id();
-            abstractImageIds.addAll(meiliSearchService.searchImageIds(userId, query, filters));
+            abstractImageIds.addAll(meiliSearchService.searchImageIds(query, filters));
             taskService.updateTask(task, 10, "Preparing images");
 
             List<Long> remaining = new ArrayList<>(abstractImageIds);

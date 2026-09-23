@@ -48,7 +48,7 @@ public class ProjectFromSearchService {
         if (name == null || name.isBlank()) {
             throw new WrongArgumentException("Project name is required");
         }
-        Long ontologyId = resolveOntology(userId, name, request.ontologyMode(), request.ontologyId());
+        Long ontologyId = resolveOntology(name, request.ontologyMode(), request.ontologyId());
 
         JsonObject projectJson = new JsonObject();
         projectJson.put("name", name);
@@ -72,9 +72,9 @@ public class ProjectFromSearchService {
         );
     }
 
-    private Long resolveOntology(long userId, String projectName, String ontologyMode, Long ontologyId) {
+    private Long resolveOntology(String projectName, String ontologyMode, Long ontologyId) {
         if (ONTOLOGY_MODE_NEW.equals(ontologyMode)) {
-            return ontologyHttpContract.create(userId, new CreateOntology(projectName))
+            return ontologyHttpContract.create(new CreateOntology(projectName))
                 .map(HttpCommandResponse::data)
                 .map(ApplyCommandResponse::id)
                 .orElseThrow(() -> new WrongArgumentException("Could not create ontology '" + projectName + "'"));
@@ -83,7 +83,7 @@ public class ProjectFromSearchService {
             if (ontologyId == null) {
                 throw new WrongArgumentException("Ontology id is required when using an existing ontology");
             }
-            if (ontologyHttpContract.getLight(ontologyId, userId).isEmpty()) {
+            if (ontologyHttpContract.getLight(ontologyId).isEmpty()) {
                 throw new WrongArgumentException("Ontology " + ontologyId + " not found");
             }
             return ontologyId;

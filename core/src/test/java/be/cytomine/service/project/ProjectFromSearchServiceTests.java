@@ -95,7 +95,7 @@ public class ProjectFromSearchServiceTests {
         );
         HttpCommandResponse command =
             new HttpCommandResponse(false, ontology, null, "Add", Set.of());
-        when(ontologyHttpContract.create(eq(5L), any(CreateOntology.class))).thenReturn(Optional.of(command));
+        when(ontologyHttpContract.create(any(CreateOntology.class))).thenReturn(Optional.of(command));
         CommandResponse projectResponse = projectResponse(9L, "MyProject");
         when(projectService.add(any(JsonObject.class))).thenReturn(projectResponse);
         Task task = task(77L);
@@ -121,7 +121,7 @@ public class ProjectFromSearchServiceTests {
     void shouldUseExistingOntologyWithoutCreatingOne() {
         stubCurrentUser(5L);
         OntologyLight light = mock(OntologyLight.class);
-        when(ontologyHttpContract.getLight(33L, 5L)).thenReturn(Optional.of(light));
+        when(ontologyHttpContract.getLight(33L)).thenReturn(Optional.of(light));
         CommandResponse projectResponse = projectResponse(9L, "MyProject");
         when(projectService.add(any(JsonObject.class))).thenReturn(projectResponse);
         Task task = task(77L);
@@ -131,7 +131,7 @@ public class ProjectFromSearchServiceTests {
 
         service().createAndSchedule(request);
 
-        verify(ontologyHttpContract, never()).create(eq(5L), any(CreateOntology.class));
+        verify(ontologyHttpContract, never()).create(any(CreateOntology.class));
         ArgumentCaptor<JsonObject> projectJson = ArgumentCaptor.forClass(JsonObject.class);
         verify(projectService).add(projectJson.capture());
         assertEquals(33L, projectJson.getValue().get("ontology"));
@@ -175,7 +175,7 @@ public class ProjectFromSearchServiceTests {
         assertThrows(WrongArgumentException.class, () -> service().createAndSchedule(withoutId));
 
         ProjectFromSearchRequest notFound = new ProjectFromSearchRequest("MyProject", "EXISTING", 33L, null, null);
-        when(ontologyHttpContract.getLight(33L, 5L)).thenReturn(Optional.empty());
+        when(ontologyHttpContract.getLight(33L)).thenReturn(Optional.empty());
         assertThrows(WrongArgumentException.class, () -> service().createAndSchedule(notFound));
     }
 

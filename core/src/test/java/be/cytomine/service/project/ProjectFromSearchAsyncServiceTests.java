@@ -12,7 +12,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.security.IncomingAuthorizationContext;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
@@ -20,7 +19,6 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.SearchException;
 import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.utils.TaskService;
@@ -51,9 +49,6 @@ public class ProjectFromSearchAsyncServiceTests {
     private TaskService taskService;
 
     @Mock
-    private CurrentUserService currentUserService;
-
-    @Mock
     private ProjectRepository projectRepository;
 
     @Mock
@@ -64,8 +59,7 @@ public class ProjectFromSearchAsyncServiceTests {
 
     private ProjectFromSearchAsyncService asyncService() {
         return new ProjectFromSearchAsyncService(
-            meiliSearchService, taskService, currentUserService, projectRepository, imageInstanceRepository,
-            imageInstanceService
+            meiliSearchService, taskService, projectRepository, imageInstanceRepository, imageInstanceService
         );
     }
 
@@ -102,10 +96,7 @@ public class ProjectFromSearchAsyncServiceTests {
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
 
-        UserResponse user = mock(UserResponse.class);
-        when(user.id()).thenReturn(5L);
-        when(currentUserService.getCurrentUser()).thenReturn(user);
-        when(meiliSearchService.searchImageIds(5L, "query", List.of("tag=value"))).thenReturn(Set.of(10L, 11L));
+        when(meiliSearchService.searchImageIds("query", List.of("tag=value"))).thenReturn(Set.of(10L, 11L));
         when(imageInstanceRepository.findAllByBaseImageIdInAndProject(any(), eq(project))).thenReturn(List.of());
         when(imageInstanceService.add(any(JsonObject.class))).thenAnswer(invocation -> {
             CommandResponse response = new CommandResponse();
@@ -137,10 +128,7 @@ public class ProjectFromSearchAsyncServiceTests {
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
 
-        UserResponse user = mock(UserResponse.class);
-        when(user.id()).thenReturn(5L);
-        when(currentUserService.getCurrentUser()).thenReturn(user);
-        when(meiliSearchService.searchImageIds(5L, "", List.of())).thenReturn(Set.of(10L, 11L));
+        when(meiliSearchService.searchImageIds("", List.of())).thenReturn(Set.of(10L, 11L));
         List<ImageInstance> existing = List.of(imageInstanceWithBaseImage(10L));
         when(imageInstanceRepository.findAllByBaseImageIdInAndProject(any(), eq(project))).thenReturn(existing);
         when(imageInstanceService.add(any(JsonObject.class))).thenAnswer(invocation -> {
@@ -166,10 +154,7 @@ public class ProjectFromSearchAsyncServiceTests {
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
 
-        UserResponse user = mock(UserResponse.class);
-        when(user.id()).thenReturn(5L);
-        when(currentUserService.getCurrentUser()).thenReturn(user);
-        when(meiliSearchService.searchImageIds(5L, "query", List.of()))
+        when(meiliSearchService.searchImageIds("query", List.of()))
             .thenThrow(new SearchException("search failed", 500, "boom"));
 
         asyncService().run(1L, 7L, "query", List.of(), null);
@@ -188,11 +173,8 @@ public class ProjectFromSearchAsyncServiceTests {
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
 
-        UserResponse user = mock(UserResponse.class);
-        when(user.id()).thenReturn(5L);
-        when(currentUserService.getCurrentUser()).thenReturn(user);
         Set<Long> ids = LongStream.rangeClosed(1, 101).boxed().collect(Collectors.toSet());
-        when(meiliSearchService.searchImageIds(5L, "query", List.of())).thenReturn(ids);
+        when(meiliSearchService.searchImageIds("query", List.of())).thenReturn(ids);
         when(imageInstanceRepository.findAllByBaseImageIdInAndProject(any(), eq(project))).thenReturn(List.of());
         when(imageInstanceService.add(any(JsonObject.class))).thenAnswer(invocation -> {
             JsonObject json = invocation.getArgument(0);
@@ -223,10 +205,7 @@ public class ProjectFromSearchAsyncServiceTests {
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
 
-        UserResponse user = mock(UserResponse.class);
-        when(user.id()).thenReturn(5L);
-        when(currentUserService.getCurrentUser()).thenReturn(user);
-        when(meiliSearchService.searchImageIds(5L, "query", List.of())).thenReturn(Set.of(10L, 11L));
+        when(meiliSearchService.searchImageIds("query", List.of())).thenReturn(Set.of(10L, 11L));
         when(imageInstanceRepository.findAllByBaseImageIdInAndProject(any(), eq(project))).thenReturn(List.of());
         when(imageInstanceService.add(any(JsonObject.class))).thenAnswer(invocation -> {
             CommandResponse response = new CommandResponse();
@@ -253,7 +232,7 @@ public class ProjectFromSearchAsyncServiceTests {
 
         asyncService().run(99L, 7L, "query", List.of(), null);
 
-        verify(meiliSearchService, never()).searchImageIds(any(long.class), any(), any());
+        verify(meiliSearchService, never()).searchImageIds(any(), any());
     }
 
     @Test
@@ -264,14 +243,10 @@ public class ProjectFromSearchAsyncServiceTests {
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
 
-        UserResponse user = mock(UserResponse.class);
-        when(user.id()).thenReturn(5L);
-        when(currentUserService.getCurrentUser()).thenReturn(user);
-
         IncomingAuthorizationContext.Headers headers =
             new IncomingAuthorizationContext.Headers("Bearer token", "2026-09-23", "md5", "application/json");
 
-        when(meiliSearchService.searchImageIds(5L, "query", List.of())).thenAnswer(invocation -> {
+        when(meiliSearchService.searchImageIds("query", List.of())).thenAnswer(invocation -> {
             assertEquals(headers, IncomingAuthorizationContext.get().orElse(null),
                 "headers should be restored in the async thread for outbound repository calls");
             return Set.of(10L);

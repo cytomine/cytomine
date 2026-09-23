@@ -271,7 +271,7 @@ count-viewers,no viewer | viewer | {count} viewers,aucun visualisateur | visuali
 create-image-group,Create new image group,Créer un nouveau groupe d'images,Crear nuevo grupo de imágenes,Maak een nieuwe afbeeldingsgroep
 create-ontology,Create ontology,Créer une ontologie,Crear ontología,Ontologie creëeren
 create-ontology-for-project,Create ontology using project name,Créer une ontologie ayant le même nom que le projet,Crear ontología usando el nombre del proyecto,Maak een ontologie met dezelfde naam als het project
-create-project-from-search,New Project From Results,Nouveau projet à partir des résultats,Nuevo proyecto a partir de los resultados,Nieuw project uit resultaten
+create-project-from-search,New project from results,Nouveau projet à partir des résultats,Nuevo proyecto a partir de los resultados,Nieuw project uit resultaten
 create-project,Create project,Créer un projet,Crear proyecto,Een project aanmaken
 create-tag,Create tag,Créer un tag,Crear etiqueta,Een tag maken
 create-term,Create term,Créer un terme,Crear término,Een term creëeren

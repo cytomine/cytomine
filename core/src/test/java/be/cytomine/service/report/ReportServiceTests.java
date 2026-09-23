@@ -95,9 +95,9 @@ public class ReportServiceTests {
         when(mockPdfWriterService.writePDF(any(), any(), any(), anyBoolean(), anyBoolean()))
             .thenReturn(returnedReport);
         byte[] generatedReport =
-            reportService.generateAnnotationsReport("projectName", terms, users, dataMap, "pdf", 1);
+            reportService.generateAnnotationsReport("projectName", terms, users, dataMap, "pdf");
         verify(mockReportFormatService, times(1))
-            .formatAnnotationsForReport(ReportService.ANNOTATION_REPORT_COLUMNS, dataMap, 1);
+            .formatAnnotationsForReport(ReportService.ANNOTATION_REPORT_COLUMNS, dataMap);
         verify(mockPdfWriterService, times(1))
             .writePDF(any(), any(), any(), anyBoolean(), anyBoolean());
         assertArrayEquals(returnedReport, generatedReport);
@@ -108,9 +108,9 @@ public class ReportServiceTests {
         when(mockSpreadsheetWriterService.writeSpreadsheet(any()))
             .thenReturn(returnedReport);
         byte[] generatedReport =
-            reportService.generateAnnotationsReport("projectName", terms, users, dataMap, "csv", 1);
+            reportService.generateAnnotationsReport("projectName", terms, users, dataMap, "csv");
         verify(mockReportFormatService, times(1))
-            .formatAnnotationsForReport(ReportService.ANNOTATION_REPORT_COLUMNS, dataMap, 1);
+            .formatAnnotationsForReport(ReportService.ANNOTATION_REPORT_COLUMNS, dataMap);
         verify(mockSpreadsheetWriterService, times(1))
             .writeSpreadsheet(any());
         assertArrayEquals(returnedReport, generatedReport);
@@ -121,9 +121,9 @@ public class ReportServiceTests {
         when(mockSpreadsheetWriterService.writeSpreadsheetXLS(any()))
             .thenReturn(returnedReport);
         byte[] generatedReport =
-            reportService.generateAnnotationsReport("projectName", terms, users, dataMap, "xls", 1);
+            reportService.generateAnnotationsReport("projectName", terms, users, dataMap, "xls");
         verify(mockReportFormatService, times(1))
-            .formatAnnotationsForReport(ReportService.ANNOTATION_REPORT_COLUMNS, dataMap, 1);
+            .formatAnnotationsForReport(ReportService.ANNOTATION_REPORT_COLUMNS, dataMap);
         verify(mockSpreadsheetWriterService, times(1))
             .writeSpreadsheetXLS(any());
         assertArrayEquals(returnedReport, generatedReport);

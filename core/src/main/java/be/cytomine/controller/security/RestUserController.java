@@ -116,7 +116,7 @@ public class RestUserController extends RestCytomineController {
         @PathVariable Long id
     ) {
         log.debug("REST request to list user from ontology {}", id);
-        OntologyResponse ontology = ontologyHttpContract.get(id, currentUserService.getCurrentUser().id())
+        OntologyResponse ontology = ontologyHttpContract.get(id)
             .orElseThrow(() -> new ObjectNotFoundException("Ontology", id));
         return responseSuccess(userService.listUsers(ontology.id()), isFilterRequired());
     }

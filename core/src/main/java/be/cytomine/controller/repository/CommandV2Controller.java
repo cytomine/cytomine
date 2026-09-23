@@ -19,7 +19,6 @@ import be.cytomine.common.repository.model.command.payload.response.CommandV2Res
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
-import be.cytomine.service.CurrentUserService;
 
 @RestController
 @RequestMapping("/api")
@@ -27,24 +26,21 @@ import be.cytomine.service.CurrentUserService;
 @RequiredArgsConstructor
 public class CommandV2Controller {
     private final CommandHttpContract commandHttpContract;
-    private final CurrentUserService currentUserService;
     private final PageMapper pageMapper;
 
     @GetMapping("/commands")
     public CollectionResponse<CommandV2Response<?>> getAll(
         @SortDefault(sort = "created", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        long userId = currentUserService.getCurrentUser().id();
-        log.debug("GET /commands for user {}", userId);
+        log.debug("GET /commands");
 
-        return pageMapper.toCollectionResponse(commandHttpContract.getAllForUser(userId, pageable));
+        return pageMapper.toCollectionResponse(commandHttpContract.getAllForUser(pageable));
     }
 
     @PostMapping("/commands/undo/{commandId}")
     public Optional<HttpCommandResponse> undo(@PathVariable UUID commandId) {
-        long userId = currentUserService.getCurrentUser().id();
-        log.debug("POST /commands/undo/{} for user {}", commandId, userId);
+        log.debug("POST /commands/undo/{}", commandId);
 
-        return commandHttpContract.undo(commandId, userId);
+        return commandHttpContract.undo(commandId);
     }
 }

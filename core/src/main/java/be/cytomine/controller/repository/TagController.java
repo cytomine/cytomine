@@ -24,7 +24,6 @@ import be.cytomine.common.repository.model.tag.payload.CreateTag;
 import be.cytomine.common.repository.model.tag.payload.UpdateTag;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
-import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -36,7 +35,6 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class TagController {
     public static final String UNABLE_TO_FIND_TAG = "Unable to find tag with id: %s";
 
-    private final CurrentUserService currentUserService;
     private final PageMapper pageMapper;
     private final TagHttpContract tagHttpContract;
 
@@ -45,38 +43,33 @@ public class TagController {
         @SortDefault(sort = "created", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         log.debug("GET /tag.json");
-        long userId = currentUserService.getCurrentUser().id();
-        return pageMapper.toCollectionResponse(tagHttpContract.list(userId, pageable));
+        return pageMapper.toCollectionResponse(tagHttpContract.list(pageable));
     }
 
     @GetMapping("/tag/{id}.json")
     public TagResponse read(@PathVariable long id) {
         log.debug("GET /tag/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return tagHttpContract.read(id, userId)
+        return tagHttpContract.read(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TAG, id)));
     }
 
     @PostMapping("/tag.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateTag payload) {
         log.debug("POST /tag.json - {}", payload);
-        long userId = currentUserService.getCurrentUser().id();
-        return tagHttpContract.create(userId, payload);
+        return tagHttpContract.create(payload);
     }
 
     @PutMapping("/tag/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateTag payload) {
         log.debug("PUT /tag/{}.json - {}", id, payload);
-        long userId = currentUserService.getCurrentUser().id();
-        return tagHttpContract.update(id, userId, payload)
+        return tagHttpContract.update(id, payload)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TAG, id)));
     }
 
     @DeleteMapping("/tag/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("DELETE /tag/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return tagHttpContract.delete(id, userId)
+        return tagHttpContract.delete(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TAG, id)));
     }
 }

@@ -279,15 +279,14 @@ public class RestReviewedAnnotationController extends RestCytomineController {
 
         terms =
             terms == null || terms.isBlank()
-                ? termHttpContract.findAllTermIdsByProject(idProject, currentUserService.getCurrentUser().id())
+                ? termHttpContract.findAllTermIdsByProject(idProject)
                 .stream().map(String::valueOf).collect(
                     Collectors.joining(",")) :
                 terms;
 
         JsonObject params = mergeQueryParamsAndBodyParams();
         params.put("reviewed", true);
-        byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, users, params, terms, format,
-            currentUserService.getCurrentUser().id());
+        byte[] report = annotationListingBuilder.buildAnnotationReport(idProject, users, params, terms, format);
         responseReportFile(reportService.getAnnotationReportFileName(format, idProject), report, format);
     }
 

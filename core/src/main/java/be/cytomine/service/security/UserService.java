@@ -974,7 +974,7 @@ public class UserService extends ModelService {
         if (user instanceof User) {
             for (OntologyLight ontology : springPageCrawler.getAllPages(
                 pageable -> ontologyHttpContract.getAllLightForUser(user.getId(), pageable))) {
-                ontologyHttpContract.delete(ontology.id(), user.getId());
+                ontologyHttpContract.delete(ontology.id());
             }
         }
     }
@@ -988,9 +988,8 @@ public class UserService extends ModelService {
     }
 
     public void deleteDependentSecUserSecRole(User user, Transaction transaction, Task task) {
-        long requestingUserId = currentUserService.getCurrentUser().id();
         for (SecUserSecRole secSecUserSecRole : secSecUserSecRoleRepository.findAllBySecUser(user)) {
-            userRoleHttpContract.delete(secSecUserSecRole.getId(), requestingUserId);
+            userRoleHttpContract.delete(secSecUserSecRole.getId());
         }
     }
 

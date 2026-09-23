@@ -24,7 +24,7 @@ public class MockedUserTestExecutionListener implements TestExecutionListener, O
 
         when(userHttpContract.search(anyString())).thenAnswer(invocation ->
             userRepository.findByUsernameLikeIgnoreCase(invocation.getArgument(0)).map(userMapper::map));
-        when(userHttpContract.get(anyLong(), anyLong())).thenAnswer(invocation ->
+        when(userHttpContract.get(anyLong())).thenAnswer(invocation ->
             userRepository.findById(invocation.<Long>getArgument(0)).map(userMapper::map));
     }
 

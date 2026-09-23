@@ -98,7 +98,7 @@ export default {
     ImageThumbnail,
     MetadataFilter,
     'uploaded-file-status': UploadedFileStatusComponent,
-    'create-project-from-metadata-modal': CreateProjectFromMetadataModal
+    CreateProjectFromMetadataModal
   },
   data() {
     return {

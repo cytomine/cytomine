@@ -33,4 +33,22 @@ public final class IncomingAuthorizationContext {
     public static Optional<Headers> get() {
         return Optional.ofNullable(HEADERS.get());
     }
+
+    /**
+     * Run the given action with the incoming headers restored in the current thread, so that
+     * {@code RepositoryClient} can still authenticate outbound calls made from async/scheduled
+     * threads where the per-request {@link ThreadLocal} is not populated.
+     */
+    public static void runWithHeaders(Headers headers, Runnable action) {
+        if (headers == null) {
+            action.run();
+            return;
+        }
+        HEADERS.set(headers);
+        try {
+            action.run();
+        } finally {
+            HEADERS.remove();
+        }
+    }
 }

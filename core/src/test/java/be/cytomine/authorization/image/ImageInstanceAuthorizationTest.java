@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
@@ -19,6 +20,7 @@ import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.exceptions.WrongArgumentException;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;
 
@@ -36,6 +38,8 @@ public class ImageInstanceAuthorizationTest extends CRUDAuthorizationTest {
     BasicInstanceBuilder builder;
     @Autowired
     private UrlApi urlApi;
+    @MockitoBean
+    private MeiliSearchService meiliSearchService;
     private ImageInstance imageInstance = null;
 
     @BeforeEach

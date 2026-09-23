@@ -68,6 +68,7 @@ import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.ModelService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.meta.PropertyService;
@@ -151,6 +152,23 @@ public class ImageInstanceService extends ModelService {
     private final UrlApi urlApi;
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
+
+    private final MeiliSearchService meiliSearchService;
+
+    public enum TagMode {
+        NORMAL,
+        DEFER
+    }
+
+    private static final ThreadLocal<TagMode> tagMode = ThreadLocal.withInitial(() -> TagMode.NORMAL);
+
+    public void setTagMode(TagMode mode) {
+        tagMode.set(mode);
+    }
+
+    private boolean projectTaggingDeferred() {
+        return tagMode.get() == TagMode.DEFER;
+    }
 
     @Override
     public Class currentDomain() {
@@ -1013,12 +1031,29 @@ public class ImageInstanceService extends ModelService {
             propertyService.add(p.toJsonObject(urlApi));
         }
 
+        if (!projectTaggingDeferred()) {
+            Project project = ((ImageInstance) domain).getProject();
+            if (project != null && project.getName() != null && ai != null) {
+                meiliSearchService.addProjectToImages(List.of(ai.getId()), project.getName());
+            }
+        }
+
     }
 
     protected void beforeDelete(CytomineDomain domain, CommandResponse response) {
         List<SliceInstance> sliceInstances = sliceInstanceRepository.findAllByImage((ImageInstance) domain);
         sliceInstanceRepository.deleteAll(sliceInstances);
 
+    }
+
+    protected void afterDelete(CytomineDomain domain, CommandResponse response) {
+        if (!projectTaggingDeferred()) {
+            AbstractImage ai = ((ImageInstance) domain).getBaseImage();
+            Project project = ((ImageInstance) domain).getProject();
+            if (project != null && project.getName() != null && ai != null) {
+                meiliSearchService.removeProjectFromImages(List.of(ai.getId()), project.getName());
+            }
+        }
     }
 
     /**
@@ -1095,6 +1130,23 @@ public class ImageInstanceService extends ModelService {
             }
         } else {
             throw new ServerException("Cannot acquire lock for project " + project.getId() + " , tryLock return false");
+        }
+    }
+
+    public void deleteAllForProject(Project project, Transaction transaction, Task task) {
+        List<ImageInstance> imageInstances = imageInstanceRepository.findAllByProject(project);
+        List<Long> abstractImageIds = imageInstances.stream()
+            .map(imageInstance -> imageInstance.getBaseImage().getId())
+            .distinct()
+            .collect(Collectors.toList());
+        if (!abstractImageIds.isEmpty() && project.getName() != null) {
+            meiliSearchService.removeProjectFromImages(abstractImageIds, project.getName());
+        }
+        setTagMode(TagMode.DEFER);
+        try {
+            imageInstances.forEach(imageInstance -> this.delete(imageInstance, transaction, task, false));
+        } finally {
+            setTagMode(TagMode.NORMAL);
         }
     }
 

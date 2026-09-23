@@ -110,7 +110,7 @@ public class ProjectFromSearchServiceTests {
         verify(projectService).add(projectJson.capture());
         assertEquals("MyProject", projectJson.getValue().get("name"));
         assertEquals(42L, projectJson.getValue().get("ontology"));
-        verify(projectFromSearchAsyncService).run(77L, 9L, "nucleus", List.of("channel=red"));
+        verify(projectFromSearchAsyncService).run(77L, 9L, "nucleus", List.of("channel=red"), null);
 
         assertEquals(9L, result.project().id());
         assertEquals("MyProject", result.project().name());

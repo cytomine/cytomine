@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.config.security.IncomingAuthorizationContext;
+import be.cytomine.config.security.IncomingAuthorizationContext.Headers;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repository.image.ImageInstanceRepository;
@@ -45,7 +47,7 @@ public class ProjectFromSearchAsyncService {
     private final ImageInstanceService imageInstanceService;
 
     @Async
-    public void run(Long taskId, Long projectId, String query, List<String> filters) {
+    public void run(Long taskId, Long projectId, String query, List<String> filters, Headers headers) {
         Task task = taskService.get(taskId);
         Project project = task != null && projectId != null
             ? projectRepository.findById(projectId).orElse(null)
@@ -54,7 +56,12 @@ public class ProjectFromSearchAsyncService {
             log.error("Cannot run create-from-search job: task {} or project {} not found", taskId, projectId);
             return;
         }
+        IncomingAuthorizationContext.runWithHeaders(
+            headers, () -> createMatchingInstances(task, project, query, filters)
+        );
+    }
 
+    private void createMatchingInstances(Task task, Project project, String query, List<String> filters) {
         Set<Long> abstractImageIds = new HashSet<>();
         List<Long> createdAbstractImageIds = new ArrayList<>();
         int skipped = 0;
@@ -103,7 +110,7 @@ public class ProjectFromSearchAsyncService {
                 imageInstanceService.setTagMode(ImageInstanceService.TagMode.NORMAL);
             }
         } catch (Exception e) {
-            log.error("Create-from-search job failed for project {} (task {})", projectId, taskId, e);
+            log.error("Create-from-search job failed for project {} (task {})", project.getId(), task.getId(), e);
             taskService.updateTask(task, 100, "Error: " + e.getMessage());
             return;
         }

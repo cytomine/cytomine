@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.security.IncomingAuthorizationContext;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
@@ -27,6 +28,8 @@ import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -112,7 +115,7 @@ public class ProjectFromSearchAsyncServiceTests {
             return response;
         });
 
-        asyncService().run(1L, 7L, "query", List.of("tag=value"));
+        asyncService().run(1L, 7L, "query", List.of("tag=value"), null);
 
         verify(taskService).updateTask(task, 5, "Searching images");
         verify(imageInstanceService).add(createAddCommand(10L, 7L));
@@ -148,7 +151,7 @@ public class ProjectFromSearchAsyncServiceTests {
             return response;
         });
 
-        asyncService().run(1L, 7L, "", List.of());
+        asyncService().run(1L, 7L, "", List.of(), null);
 
         verify(imageInstanceService).add(createAddCommand(11L, 7L));
         verify(imageInstanceService, never()).add(createAddCommand(10L, 7L));
@@ -169,7 +172,7 @@ public class ProjectFromSearchAsyncServiceTests {
         when(meiliSearchService.searchImageIds(5L, "query", List.of()))
             .thenThrow(new SearchException("search failed", 500, "boom"));
 
-        asyncService().run(1L, 7L, "query", List.of());
+        asyncService().run(1L, 7L, "query", List.of(), null);
 
         verify(taskService).updateTask(eq(task), eq(100), org.mockito.ArgumentMatchers.startsWith("Error:"));
         verify(taskService, never()).finishTask(task);
@@ -203,7 +206,7 @@ public class ProjectFromSearchAsyncServiceTests {
             return response;
         });
 
-        asyncService().run(1L, 7L, "query", List.of());
+        asyncService().run(1L, 7L, "query", List.of(), null);
 
         verify(meiliSearchService).addProjectToImages(argThat(list -> list.size() == 100), eq("MyProject"));
         verify(taskService).updateTask(eq(task), eq(100), org.mockito.ArgumentMatchers.startsWith("Error:"));
@@ -235,7 +238,7 @@ public class ProjectFromSearchAsyncServiceTests {
         when(meiliSearchService.addProjectToImages(any(), anyString()))
             .thenThrow(new SearchException("meili down", 500, "boom"));
 
-        asyncService().run(1L, 7L, "query", List.of());
+        asyncService().run(1L, 7L, "query", List.of(), null);
 
         verify(meiliSearchService).addProjectToImages(List.of(10L, 11L), "MyProject");
         verify(taskService).updateTask(
@@ -248,8 +251,41 @@ public class ProjectFromSearchAsyncServiceTests {
     void shouldDoNothingWhenTaskOrProjectIsMissing() {
         when(taskService.get(99L)).thenReturn(null);
 
-        asyncService().run(99L, 7L, "query", List.of());
+        asyncService().run(99L, 7L, "query", List.of(), null);
 
         verify(meiliSearchService, never()).searchImageIds(any(long.class), any(), any());
+    }
+
+    @Test
+    void shouldForwardIncomingAuthorizationHeadersWhileRunning() {
+        Task task = task(1L);
+        Project project = project(7L);
+        when(project.getName()).thenReturn("MyProject");
+        when(taskService.get(1L)).thenReturn(task);
+        when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
+
+        UserResponse user = mock(UserResponse.class);
+        when(user.id()).thenReturn(5L);
+        when(currentUserService.getCurrentUser()).thenReturn(user);
+
+        IncomingAuthorizationContext.Headers headers =
+            new IncomingAuthorizationContext.Headers("Bearer token", "2026-09-23", "md5", "application/json");
+
+        when(meiliSearchService.searchImageIds(5L, "query", List.of())).thenAnswer(invocation -> {
+            assertEquals(headers, IncomingAuthorizationContext.get().orElse(null),
+                "headers should be restored in the async thread for outbound repository calls");
+            return Set.of(10L);
+        });
+        when(imageInstanceService.add(any(JsonObject.class))).thenAnswer(invocation -> {
+            CommandResponse response = new CommandResponse();
+            JsonObject json = invocation.getArgument(0);
+            response.setObject(imageInstanceWithBaseImage(((Number) json.get("baseImage")).longValue()));
+            response.setStatus(200);
+            return response;
+        });
+
+        asyncService().run(1L, 7L, "query", List.of(), headers);
+
+        assertTrue(IncomingAuthorizationContext.get().isEmpty(), "headers should be cleared after the job runs");
     }
 }

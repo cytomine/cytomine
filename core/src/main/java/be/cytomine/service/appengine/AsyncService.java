@@ -24,9 +24,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import be.cytomine.common.config.security.CytomineAuthenticationSupport;
 import be.cytomine.common.repository.http.StorageHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
-import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -85,8 +85,10 @@ public class AsyncService {
         }
         // signature
         String signatureDate = Instant.now().toString();
-        String signature = ApiKeyFilter.generateKeys("POST", "", "", signatureDate, currentUser.getPrivateKey());
-        String authorizationHeader = "CYTOMINE " + currentUser.getPublicKey() + ":" + signature;
+        String signature =
+            CytomineAuthenticationSupport.generateSignature("POST", "", "", signatureDate, currentUser.getPrivateKey());
+        String authorizationHeader =
+            CytomineAuthenticationSupport.buildAuthorizationHeader(currentUser.getPublicKey(), signature);
         String contentTypeFull = null;
 
         // Prepare headers

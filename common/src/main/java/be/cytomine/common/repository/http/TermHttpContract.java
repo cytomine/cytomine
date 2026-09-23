@@ -25,31 +25,30 @@ public interface TermHttpContract {
     String ROOT_PATH = "/terms";
 
     @GetExchange("/{id}")
-    Optional<TermResponse> findTermByID(@PathVariable long id, @RequestParam long userId);
+    Optional<TermResponse> findTermByID(@PathVariable long id);
 
     @PostExchange
-    Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateTerm createTerm);
+    Optional<HttpCommandResponse> create(@Valid @RequestBody CreateTerm createTerm);
 
     @PutExchange("/{id}")
     Optional<HttpCommandResponse> update(@PathVariable long id,
-        @RequestParam long userId,
         @RequestBody UpdateTerm updateTerm);
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
+    Optional<HttpCommandResponse> delete(@PathVariable long id);
 
     @DeleteExchange("/all")
-    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids, @RequestParam long userId);
+    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids);
 
     @GetExchange("/project/{id}")
-    Page<TermResponse> findTermsByProject(@PathVariable long id, @RequestParam long userId, Pageable pageable);
+    Page<TermResponse> findTermsByProject(@PathVariable long id, Pageable pageable);
 
     @GetExchange("/ontology/{id}")
-    Page<TermResponse> findTermsByOntology(@PathVariable long id, @RequestParam long userId, Pageable pageable);
+    Page<TermResponse> findTermsByOntology(@PathVariable long id, Pageable pageable);
 
     @GetExchange("/ontology/{id}/all-terms")
-    Set<Long> findAllTermIdsByOntology(@PathVariable long id, @RequestParam long userId);
+    Set<Long> findAllTermIdsByOntology(@PathVariable long id);
 
     @GetExchange("/project/{id}/all-terms")
-    Set<Long> findAllTermIdsByProject(@PathVariable long id, @RequestParam long userId);
+    Set<Long> findAllTermIdsByProject(@PathVariable long id);
 }

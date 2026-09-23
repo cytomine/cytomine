@@ -22,7 +22,6 @@ import be.cytomine.common.repository.model.term.payload.CreateTerm;
 import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
-import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -36,48 +35,41 @@ public class TermController {
     public static final String UNABLE_TO_FIND_TERM = "Unable to find term with id: %s";
     private final TermHttpContract termHttpContract;
     private final PageMapper pageMapper;
-    private final CurrentUserService currentUserService;
 
     @PostMapping("term.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateTerm createTerm) {
-        long userId = currentUserService.getCurrentUser().id();
-        return termHttpContract.create(userId, createTerm);
+        return termHttpContract.create(createTerm);
     }
 
     @GetMapping("term/{id}.json")
     public TermResponse term(@PathVariable long id) {
         log.debug("REST request to get term {}", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return termHttpContract.findTermByID(id, userId)
+        return termHttpContract.findTermByID(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM, id)));
     }
 
     @PutMapping("term/{id}.json")
     public HttpCommandResponse update(@PathVariable Long id, @RequestBody UpdateTerm updateTerm) {
-        long userId = currentUserService.getCurrentUser().id();
-
-        return termHttpContract.update(id, userId, updateTerm)
+        return termHttpContract.update(id, updateTerm)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM, id)));
     }
 
     @DeleteMapping("term/{id}.json")
     public HttpCommandResponse delete(@PathVariable Long id) {
         log.debug("REST request to delete term {}", id);
-        return termHttpContract.delete(id, currentUserService.getCurrentUser().id())
+        return termHttpContract.delete(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM, id)));
     }
 
     @GetMapping("project/{id}/term.json")
     public CollectionResponse<TermResponse> listByProject(@PathVariable Long id, Pageable pageable) {
         log.debug("REST request to list terms for project {}", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return pageMapper.toCollectionResponse(termHttpContract.findTermsByProject(id, userId, pageable));
+        return pageMapper.toCollectionResponse(termHttpContract.findTermsByProject(id, pageable));
     }
 
     @GetMapping("ontology/{id}/term.json")
     public CollectionResponse<TermResponse> listByOntology(@PathVariable Long id, Pageable pageable) {
         log.debug("REST request to list terms for ontology {}", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return pageMapper.toCollectionResponse(termHttpContract.findTermsByOntology(id, userId, pageable));
+        return pageMapper.toCollectionResponse(termHttpContract.findTermsByOntology(id, pageable));
     }
 }

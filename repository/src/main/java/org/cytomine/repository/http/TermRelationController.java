@@ -11,10 +11,10 @@ import org.cytomine.repository.persistence.RelationRepository;
 import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.entity.TermRelationEntity;
 import org.cytomine.repository.service.ACLService;
+import org.cytomine.repository.service.CurrentUserService;
 import org.cytomine.repository.service.TermRelationCommandService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TermRelationHttpContract;
@@ -37,10 +37,11 @@ public class TermRelationController implements TermRelationHttpContract {
     private final RelationRepository relationRepository;
     private final TermRelationCommandService termRelationCommandService;
     private final ACLService aclService;
+    private final CurrentUserService currentUserService;
 
     @Override
-    public List<TermRelationResponse> findAllByOntologyId(long ontologyId, long userId) {
-        if (!aclService.canReadOntology(userId, ontologyId)) {
+    public List<TermRelationResponse> findAllByOntologyId(long ontologyId) {
+        if (!aclService.canReadOntology(currentUserService.getCurrentUserId(), ontologyId)) {
             return List.of();
         }
         return termRelationRepository.findAllByOntologyId(ontologyId)
@@ -50,8 +51,8 @@ public class TermRelationController implements TermRelationHttpContract {
     }
 
     @Override
-    public Set<Long> findAllIdsByOntologyId(long ontologyId, long userId) {
-        if (!aclService.canReadOntology(userId, ontologyId)) {
+    public Set<Long> findAllIdsByOntologyId(long ontologyId) {
+        if (!aclService.canReadOntology(currentUserService.getCurrentUserId(), ontologyId)) {
             return Set.of();
         }
         return termRelationRepository.findAllByOntologyId(ontologyId)
@@ -61,15 +62,16 @@ public class TermRelationController implements TermRelationHttpContract {
     }
 
     @Override
-    public Optional<TermRelationResponse> findTermRelationByID(long id, long userId) {
+    public Optional<TermRelationResponse> findTermRelationByID(long id) {
         return termRelationRepository.findByIdAndDeletedNull(id)
             .flatMap(termEntity -> termRepository.findByIdAndDeletedNull(termEntity.getTerm1Id())
-                .filter(term1 -> aclService.canReadOntology(userId, term1.getOntologyId()))
+                .filter(term1 -> aclService.canReadOntology(currentUserService.getCurrentUserId(),
+                    term1.getOntologyId()))
                 .map(term1 -> termRelationMapper.mapToTermRelationResponse(termEntity)));
     }
 
     @Override
-    public Set<Long> findTermRelationsIdsByTermId(long termId, long userId) {
+    public Set<Long> findTermRelationsIdsByTermId(long termId) {
         return termRelationRepository.findAllByTerm1IdOrTerm2Id(termId, termId)
             .stream()
             .map(TermRelationEntity::getId)
@@ -77,38 +79,40 @@ public class TermRelationController implements TermRelationHttpContract {
     }
 
     @Override
-    public Optional<HttpCommandResponse> create(long userId, CreateTermRelation createTermRelation) {
-        return termRelationCommandService.create(userId, createTermRelation, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> create(CreateTermRelation createTermRelation) {
+        return termRelationCommandService.create(currentUserService.getCurrentUserId(), createTermRelation,
+            LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> update(long id, long userId, UpdateTermRelation updateTermRelation) {
-        return termRelationCommandService.update(userId,
+    public Optional<HttpCommandResponse> update(long id, UpdateTermRelation updateTermRelation) {
+        return termRelationCommandService.update(currentUserService.getCurrentUserId(),
             id,
             updateTermRelation,
             LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Optional<HttpCommandResponse> delete(long id, long userId) {
-        return termRelationCommandService.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS));
+    public Optional<HttpCommandResponse> delete(long id) {
+        return termRelationCommandService.delete(currentUserService.getCurrentUserId(), id,
+            LocalDateTime.now().truncatedTo(MICROS));
     }
 
     @Override
-    public Set<HttpCommandResponse> deleteAll(Set<Long> ids, long userId) {
+    public Set<HttpCommandResponse> deleteAll(Set<Long> ids) {
         return ids.stream()
-            .map(id -> termRelationCommandService.delete(userId, id, LocalDateTime.now().truncatedTo(MICROS)))
+            .map(id -> termRelationCommandService.delete(currentUserService.getCurrentUserId(), id,
+                LocalDateTime.now().truncatedTo(MICROS)))
             .flatMap(Optional::stream)
             .collect(toSet());
     }
 
     @Override
     public Optional<HttpCommandResponse> deleteByTerms(@PathVariable long idTerm1,
-        @PathVariable long idTerm2,
-        @RequestParam long userId) {
+        @PathVariable long idTerm2) {
         long parentRelationId = relationRepository.findParent().getId();
         return termRelationRepository.findByRelationIdAndTerm1IdAndTerm2Id(parentRelationId, idTerm1, idTerm2)
-            .flatMap(entity -> termRelationCommandService.delete(userId,
+            .flatMap(entity -> termRelationCommandService.delete(currentUserService.getCurrentUserId(),
                 entity.getId(),
                 LocalDateTime.now().truncatedTo(MICROS)));
     }

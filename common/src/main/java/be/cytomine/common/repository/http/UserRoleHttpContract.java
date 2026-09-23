@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.DeleteExchange;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
@@ -33,14 +32,14 @@ public interface UserRoleHttpContract {
     Optional<UserRoleResponse> get(@PathVariable long id);
 
     @PostExchange
-    Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateUserRole payload);
+    Optional<HttpCommandResponse> create(@Valid @RequestBody CreateUserRole payload);
 
     @PutExchange("/{id}")
-    Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
+    Optional<HttpCommandResponse> update(@PathVariable long id,
         @RequestBody UpdateUserRole payload);
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
+    Optional<HttpCommandResponse> delete(@PathVariable long id);
 
     @GetExchange("/by-user/{userId}")
     Page<UserRoleResponse> listByUserId(@PathVariable long userId, Pageable pageable);
@@ -49,6 +48,6 @@ public interface UserRoleHttpContract {
     Optional<UserRoleResponse> getByUserIdAndRoleId(@PathVariable long userId, @PathVariable long roleId);
 
     @PutExchange("/define/{targetUserId}/role/{targetRole}")
-    Set<UserRoleResponse> define(@RequestParam long userId, @PathVariable long targetUserId,
+    Set<UserRoleResponse> define(@PathVariable long targetUserId,
         @PathVariable Role targetRole);
 }

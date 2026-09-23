@@ -20,14 +20,12 @@ public interface StatsHttpContract {
 
     @GetExchange("/project/{projectId}")
     Page<StatTerm> findTermsByProject(@PathVariable long projectId,
-        @RequestParam long userId,
         @RequestParam(required = false) Optional<LocalDateTime> startDate,
         @RequestParam(required = false) Optional<LocalDateTime> endDate,
         Pageable pageable);
 
     @GetExchange("/per-user/project/{projectId}")
     Page<FlatStatUserTerm> findUserTermsByProject(@PathVariable long projectId,
-        @RequestParam long userId,
         Pageable pageable);
 
     @GetExchange("/per-term-and-image/project/{projectId}")

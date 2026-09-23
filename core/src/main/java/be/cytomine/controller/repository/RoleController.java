@@ -22,7 +22,6 @@ import be.cytomine.common.repository.model.role.payload.CreateRole;
 import be.cytomine.common.repository.model.role.payload.UpdateRole;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
-import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -35,7 +34,6 @@ public class RoleController {
 
     private static final String UNABLE_TO_FIND_ROLE = "Unable to find role with id: %s";
 
-    private final CurrentUserService currentUserService;
     private final RoleHttpContract roleHttpContract;
     private final PageMapper pageMapper;
 
@@ -55,23 +53,20 @@ public class RoleController {
     @PostMapping("/role.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateRole payload) {
         log.debug("POST /role.json - {}", payload);
-        long userId = currentUserService.getCurrentUser().id();
-        return roleHttpContract.create(userId, payload);
+        return roleHttpContract.create(payload);
     }
 
     @PutMapping("/role/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateRole payload) {
         log.debug("PUT /role/{}.json - {}", id, payload);
-        long userId = currentUserService.getCurrentUser().id();
-        return roleHttpContract.update(id, userId, payload)
+        return roleHttpContract.update(id, payload)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_ROLE, id)));
     }
 
     @DeleteMapping("/role/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("DELETE /role/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return roleHttpContract.delete(id, userId)
+        return roleHttpContract.delete(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_ROLE, id)));
     }
 }

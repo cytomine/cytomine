@@ -223,10 +223,8 @@ public class StatsService {
         Optional<LocalDateTime> endDate
     ) {
         securityACLService.check(project, READ);
-        Long userId = currentUserService.getCurrentUser().id();
         return statsHttpContract.findTermsByProject(
             project.getId(),
-            userId,
             startDate,
             endDate,
             Pageable.unpaged()
@@ -247,7 +245,6 @@ public class StatsService {
 
     public List<JsonObject> statTerm(Project project, Date startDate, Date endDate, boolean leafsOnly) {
         securityACLService.check(project, READ);
-        Long userId = currentUserService.getCurrentUser().id();
         Optional<LocalDateTime> start = Optional.ofNullable(startDate)
             .map(d -> d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         Optional<LocalDateTime> end = Optional.ofNullable(endDate)
@@ -255,11 +252,10 @@ public class StatsService {
 
         Set<Long> nonLeafTermIds = leafsOnly ? termRelationHttpContract.findAllByOntologyId(
             project.getOntology()
-            .getId(),
-            userId
+            .getId()
         ).stream().map(TermRelationResponse::term1Id).collect(toSet()) : Set.of();
 
-        return statsHttpContract.findTermsByProject(project.getId(), userId, start, end, Pageable.unpaged())
+        return statsHttpContract.findTermsByProject(project.getId(), start, end, Pageable.unpaged())
             .stream()
             .filter(s -> !leafsOnly || !nonLeafTermIds.contains(s.id()))
             .map(s -> JsonObject.of("id", s.id(), "username", s.name(), "value", s.count(), "color", s.color()))
@@ -268,10 +264,9 @@ public class StatsService {
 
     public List<StatUserTerm> statUserAnnotations(Project project) {
         securityACLService.check(project, READ);
-        Long userId = currentUserService.getCurrentUser().id();
 
         return statsMapper.mapToUserTerms(
-            statsHttpContract.findUserTermsByProject(project.getId(), userId, Pageable.unpaged()).toSet()
+            statsHttpContract.findUserTermsByProject(project.getId(), Pageable.unpaged()).toSet()
         ).stream().toList();
     }
 

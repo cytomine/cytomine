@@ -25,20 +25,20 @@ public interface OntologyHttpContract {
     String ROOT_PATH = "/ontologies";
 
     @GetExchange("/{id}")
-    Optional<OntologyResponse> get(@PathVariable long id, @RequestParam long userId);
+    Optional<OntologyResponse> get(@PathVariable long id);
 
     @GetExchange("/{id}/light")
-    Optional<OntologyLight> getLight(@PathVariable long id, @RequestParam long userId);
+    Optional<OntologyLight> getLight(@PathVariable long id);
 
     @PostExchange
-    Optional<HttpCommandResponse> create(@RequestParam long userId, @Valid @RequestBody CreateOntology createPayload);
+    Optional<HttpCommandResponse> create(@Valid @RequestBody CreateOntology createPayload);
 
     @PutExchange("/{id}")
-    Optional<HttpCommandResponse> update(@PathVariable long id, @RequestParam long userId,
+    Optional<HttpCommandResponse> update(@PathVariable long id,
         @RequestBody UpdateOntology updateOntology);
 
     @DeleteExchange("/{id}")
-    Optional<HttpCommandResponse> delete(@PathVariable long id, @RequestParam long userId);
+    Optional<HttpCommandResponse> delete(@PathVariable long id);
 
     @GetExchange("/all-light")
     Page<OntologyLight> getAllLightForUser(@RequestParam long userId, Pageable pageable);

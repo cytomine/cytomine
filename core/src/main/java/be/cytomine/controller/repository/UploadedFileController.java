@@ -43,12 +43,10 @@ import be.cytomine.dto.meilisearch.SearchWindow;
 import be.cytomine.mapper.UploadedFileMapper;
 import be.cytomine.repository.image.AbstractImageRepository;
 import be.cytomine.repository.image.AbstractImageRepository.AbstractImageIds;
-import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.middleware.ImageServerService.DownloadType;
-import be.cytomine.utils.TokenUtils;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -62,7 +60,6 @@ public class UploadedFileController {
     public static final String UNABLE_TO_FIND_UPLOADED_FILE = "Unable to find uploaded file with id: %s";
 
     private final AbstractImageRepository abstractImageRepository;
-    private final CurrentUserService currentUserService;
     private final ImageServerService imageServerService;
     private final MeiliSearchService meiliSearchService;
     private final PageMapper pageMapper;
@@ -77,9 +74,7 @@ public class UploadedFileController {
         @SortDefault(sort = "created", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         log.debug("GET /uploadedfile.json");
-        long userId = currentUserService.getCurrentUser().id();
-
-        Page<UploadedFileResponse> page = getPage(userId, metadataSearch, metadataFilter, pageable);
+        Page<UploadedFileResponse> page = getPage(metadataSearch, metadataFilter, pageable);
         Set<Long> ids = page.getContent().stream().map(UploadedFileResponse::id).collect(Collectors.toSet());
         Map<Long, Long> abstractImageIdByUploadedFileId = abstractImageRepository
             .findIdsByUploadedFileIds(ids)
@@ -94,15 +89,13 @@ public class UploadedFileController {
     @PostMapping("/uploadedfile.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateUploadedFile payload) {
         log.debug("POST /uploadedfile.json - {}", payload);
-        long userId = currentUserService.getCurrentUser().id();
-        return uploadedFileHttpContract.create(userId, payload);
+        return uploadedFileHttpContract.create(payload);
     }
 
     @GetMapping("/uploadedfile/{id}.json")
     public UploadedFileResponse show(@PathVariable Long id) {
         log.debug("GET /uploadedFile/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
-        UploadedFileResponse response = uploadedFileHttpContract.get(id, userId)
+        UploadedFileResponse response = uploadedFileHttpContract.get(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
         Long abstractImageId = abstractImageRepository.findIdByUploadedFileId(id).orElse(null);
         return withThumbnailUrl(response, abstractImageId);
@@ -111,16 +104,14 @@ public class UploadedFileController {
     @PutMapping("/uploadedfile/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateUploadedFile payload) {
         log.debug("PUT /uploadedfile/{}.json - {}", id, payload);
-        long userId = currentUserService.getCurrentUser().id();
-        return uploadedFileHttpContract.update(id, userId, payload)
+        return uploadedFileHttpContract.update(id, payload)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
     }
 
     @DeleteMapping("/uploadedfile/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("DELETE /uploadedfile/{}.json", id);
-        long userId = currentUserService.getCurrentUser().id();
-        return uploadedFileHttpContract.delete(id, userId)
+        return uploadedFileHttpContract.delete(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
     }
 
@@ -130,10 +121,7 @@ public class UploadedFileController {
         @RequestParam String authorization
     ) throws IOException {
         log.debug("GET /uploadedfile/{}/download", id);
-        String username = TokenUtils.getUsernameFromToken(authorization.replace("Bearer ", ""));
-        long userId = currentUserService.getCurrentUser(username).id();
-
-        UploadedFileResponse uploadedFile = uploadedFileHttpContract.get(id, userId)
+        UploadedFileResponse uploadedFile = uploadedFileHttpContract.get(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_UPLOADED_FILE, id)));
 
         StreamingResponseBody stream = outputStream -> imageServerService.streamDownload(
@@ -154,7 +142,6 @@ public class UploadedFileController {
     }
 
     private Page<UploadedFileResponse> getPage(
-        long userId,
         String metadataSearch,
         String metadataFilter,
         Pageable pageable
@@ -162,7 +149,7 @@ public class UploadedFileController {
         boolean hasSearch = !metadataSearch.isBlank();
         boolean hasFilter = !metadataFilter.isBlank();
         if (!hasSearch && !hasFilter) {
-            return uploadedFileHttpContract.getAll(userId, null, pageable);
+            return uploadedFileHttpContract.getAll(null, pageable);
         }
 
         List<String> filters = hasFilter ? List.of(metadataFilter) : List.of();
@@ -170,7 +157,6 @@ public class UploadedFileController {
         int size = pageable.getPageSize();
 
         SearchWindow window = meiliSearchService.searchWindow(
-            userId,
             metadataSearch,
             filters,
             page,
@@ -192,7 +178,6 @@ public class UploadedFileController {
         }
 
         Page<UploadedFileResponse> repoPage = uploadedFileHttpContract.getAll(
-            userId,
             orderedUploadedFileIds,
             PageRequest.of(0, orderedUploadedFileIds.size(), Sort.by("id").ascending())
         );

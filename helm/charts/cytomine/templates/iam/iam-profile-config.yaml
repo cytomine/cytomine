@@ -153,10 +153,12 @@ data:
           },
           "permissions": {
             "view": [
-              "admin"
+              "admin",
+              "user"
             ],
             "edit": [
-              "admin"
+              "admin",
+              "user"
             ]
           },
           "multivalued": false

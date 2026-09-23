@@ -203,18 +203,13 @@ public class UserService extends ModelService {
 
     private final UrlApi urlApi;
 
-    public Optional<User> find(Long id) {
-        securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userRepository.findById(id);
-    }
-
     public Optional<User> find(UUID sub) {
         return userRepository.findByReference(String.valueOf(sub));
     }
 
-    public Optional<User> find(String id) {
+    public Optional<UserResponse> find(long requesterId, String id) {
         try {
-            return find(Long.valueOf(id));
+            return userHttpContract.get(requesterId,Long.valueOf(id));
         } catch (NumberFormatException ex) {
             return findByUsername(id);
         }
@@ -224,8 +219,8 @@ public class UserService extends ModelService {
         return userRepository.findAllByReferenceIn(ids);
     }
 
-    public Optional<UserResponse> findUserResponse(long id) {
-        return find(id).map(userMapper::map);
+    public Optional<UserResponse> findUserResponse(long requesterId,long id) {
+        return find(requesterId,String.valueOf(id));
     }
 
     public Optional<User> findUser(Long id) {
@@ -233,14 +228,14 @@ public class UserService extends ModelService {
         return userRepository.findById(id);
     }
 
-    public User get(Long id) {
+    public UserResponse get(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return find(id).orElse(null);
     }
 
-    public Optional<User> findByUsername(String username) {
+    public Optional<UserResponse> findByUsername(String username) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userRepository.findByUsernameLikeIgnoreCase(username);
+        return userHttpContract.search(username);
     }
 
     public Optional<User> findByUsernameWithAdmin(String username) {

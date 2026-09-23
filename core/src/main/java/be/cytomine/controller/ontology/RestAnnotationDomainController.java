@@ -277,7 +277,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
         Long idUser = params.getJSONAttrLong("user");
         User user = null;
         if (idUser != 0) {
-            user = userService.find(params.getJSONAttrLong("user")).orElse(null);
+            user = userService.find((long) params.getJSONAttrLong("user")).orElse(null);
         }
 
         //get term

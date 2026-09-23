@@ -123,8 +123,7 @@ public class RestImageInstanceController extends RestCytomineController {
     @GetMapping("/user/{id}/imageinstance/light.json")
     public ResponseEntity<String> listLightByUser(@PathVariable long id) {
         log.debug("REST request to get image instance light by user {}", id);
-        UserResponse currentUser = currentUserService.getCurrentUser();
-        UserResponse userResponse = userHttpContract.get(id, currentUser.id())
+        UserResponse userResponse = userHttpContract.get(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
         return responseSuccess(imageInstanceService.listLight(userResponse));
     }

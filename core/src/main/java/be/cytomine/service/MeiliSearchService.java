@@ -62,8 +62,8 @@ public class MeiliSearchService {
         }
     }
 
-    private List<Long> accessibleStorageIds(long userId) {
-        Page<StorageResponse> page = storageHttpContract.getAll(userId, PageRequest.of(0, Integer.MAX_VALUE));
+    private List<Long> accessibleStorageIds() {
+        Page<StorageResponse> page = storageHttpContract.getAll(PageRequest.of(0, Integer.MAX_VALUE));
         return page.getContent().stream().map(StorageResponse::id).toList();
     }
 
@@ -117,13 +117,12 @@ public class MeiliSearchService {
     }
 
     public SearchWindow searchWindow(
-        long userId,
         String query,
         List<String> filters,
         int page,
         int size
     ) {
-        return searchWindow(query, filters, null, accessibleStorageIds(userId), page, size);
+        return searchWindow(query, filters, null, accessibleStorageIds(), page, size);
     }
 
     public SearchWindow searchWindow(
@@ -238,8 +237,8 @@ public class MeiliSearchService {
         return getFacetDistribution(projectDatasetAlias, null);
     }
 
-    public MeiliSearchFacetsResponse getFacetDistribution(long userId) {
-        return getFacetDistribution(Optional.empty(), accessibleStorageIds(userId));
+    public MeiliSearchFacetsResponse getFacetDistribution() {
+        return getFacetDistribution(Optional.empty(), accessibleStorageIds());
     }
 
     public MeiliSearchFacetsResponse getFacetDistribution(Optional<String> projectDatasetAlias, List<Long> storageIds) {

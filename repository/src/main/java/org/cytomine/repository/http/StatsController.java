@@ -30,7 +30,6 @@ public class StatsController implements StatsHttpContract {
     @Override
     public Page<StatTerm> findTermsByProject(
         long projectId,
-        long userId,
         Optional<LocalDateTime> startDate,
         Optional<LocalDateTime> endDate,
         Pageable pageable
@@ -44,7 +43,7 @@ public class StatsController implements StatsHttpContract {
     }
 
     @Override
-    public Page<FlatStatUserTerm> findUserTermsByProject(long projectId, long userId, Pageable pageable) {
+    public Page<FlatStatUserTerm> findUserTermsByProject(long projectId, Pageable pageable) {
         return termRepository.findAllByUsersByProjectForStats(projectId, pageable).map(statsMapper::map);
     }
 

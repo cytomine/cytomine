@@ -166,12 +166,11 @@ public class StatsResourceTests {
     @Test
     void statsTerm() throws Exception {
         Project project = builder.givenAProject();
-        long userId = builder.givenSuperAdmin().id();
         long ontologyId = project.getOntology().getId();
         long projectId = project.getId();
 
-        when(termRelationHttpContract.findAllByOntologyId(eq(ontologyId), eq(userId))).thenReturn(List.of());
-        when(statsHttpContract.findTermsByProject(eq(projectId), eq(userId), any(), any(), any(Pageable.class)))
+        when(termRelationHttpContract.findAllByOntologyId(eq(ontologyId))).thenReturn(List.of());
+        when(statsHttpContract.findTermsByProject(eq(projectId), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(new StatTerm(0L, "No term", "#fff", 0))));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/term.json", project.getId()))
@@ -182,7 +181,7 @@ public class StatsResourceTests {
         entityManager.refresh(project.getOntology());
 
         Term term = annotationTerm.getTerm();
-        when(statsHttpContract.findTermsByProject(eq(projectId), eq(userId), any(), any(), any(Pageable.class)))
+        when(statsHttpContract.findTermsByProject(eq(projectId), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(
                 new StatTerm(0L, "No term", "#fff", 0),
                 new StatTerm(term.getId(), term.getName(), term.getColor(), 1)
@@ -229,9 +228,8 @@ public class StatsResourceTests {
     @Test
     void statsTermSlide() throws Exception {
         Project project = builder.givenAProject();
-        long userId = builder.givenSuperAdmin().id();
 
-        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(), any(), any(Pageable.class)))
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(new StatTerm(0L, "No term", "#fff", 0))));
 
         restStatsControllerMockMvc.perform(get("/api/project/{project}/stats/termslide.json", project.getId()))
@@ -240,7 +238,7 @@ public class StatsResourceTests {
 
         Term term = builder.givenATerm(project.getOntology());
 
-        when(statsHttpContract.findTermsByProject(eq(project.getId()), eq(userId), any(), any(), any(Pageable.class)))
+        when(statsHttpContract.findTermsByProject(eq(project.getId()), any(), any(), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(
                 new StatTerm(0L, "No term", "#fff", 0),
                 new StatTerm(term.getId(), term.getName(), term.getColor(), 0)
@@ -334,7 +332,7 @@ public class StatsResourceTests {
         entityManager.refresh(annotation2);
 
         UserResponse superAdmin = builder.givenSuperAdmin();
-        when(statsHttpContract.findUserTermsByProject(eq(project.getId()), eq(superAdmin.id()), any(Pageable.class)))
+        when(statsHttpContract.findUserTermsByProject(eq(project.getId()), any(Pageable.class)))
             .thenReturn(new PageImpl<>(List.of(
                 new FlatStatUserTerm(superAdmin.id(), superAdmin.username(),
                     new StatTerm(sharedTerm.getId(), sharedTerm.getName(), sharedTerm.getColor(), 2))

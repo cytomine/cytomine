@@ -67,7 +67,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -282,7 +281,7 @@ public class UserResourceTests {
         Project project = builder.givenAProjectWithOntology(ontology);
         builder.addUserToProject(project, projectAdmin.username(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.username(), READ);
-        when(ontologyHttpContract.get(eq(ontology.getId()), anyLong())).thenReturn(
+        when(ontologyHttpContract.get(eq(ontology.getId()))).thenReturn(
             Optional.ofNullable(ontologyMapper.map(ontology)));
 
         restUserControllerMockMvc.perform(get("/api/ontology/{id}/user.json", ontology.getId()))

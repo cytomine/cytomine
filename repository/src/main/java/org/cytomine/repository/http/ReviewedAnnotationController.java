@@ -10,6 +10,7 @@ import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.ReviewedAnnotationLinkEntity;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.cytomine.repository.service.ACLService;
+import org.cytomine.repository.service.CurrentUserService;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,12 +26,14 @@ public class ReviewedAnnotationController implements ReviewedAnnotationHttpContr
     private final ReviewedAnnotationLinkRepository reviewedAnnotationLinkRepository;
     private final ACLService aclService;
     private final TermRepository termRepository;
+    private final CurrentUserService currentUserService;
 
     @Override
     @PutMapping("/terms/{reviewedAnnotationTermsId}")
     @Transactional
-    public Set<Long> replaceAllTermIds(long reviewedAnnotationTermsId, long userId, Set<Long> newLinks) {
+    public Set<Long> replaceAllTermIds(long reviewedAnnotationTermsId, Set<Long> newLinks) {
 
+        long userId = currentUserService.getCurrentUserId();
         if (!termRepository.findAllById(newLinks)
             .stream()
             .map(TermEntity::getOntologyId)

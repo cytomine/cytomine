@@ -22,7 +22,6 @@ import be.cytomine.common.repository.model.command.payload.response.UserRoleResp
 import be.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
-import be.cytomine.service.CurrentUserService;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -35,7 +34,6 @@ public class UserRoleController {
 
     private static final String UNABLE_TO_FIND_USER_ROLE = "Unable to find user role for user %s and role %s";
 
-    private final CurrentUserService currentUserService;
     private final UserRoleHttpContract userRoleHttpContract;
     private final PageMapper pageMapper;
 
@@ -62,18 +60,16 @@ public class UserRoleController {
         @RequestBody CreateUserRole createUserRole
     ) {
         log.debug("POST /user/{}/role.json", userId);
-        long requestingUserId = currentUserService.getCurrentUser().id();
-        return userRoleHttpContract.create(requestingUserId, createUserRole);
+        return userRoleHttpContract.create(createUserRole);
     }
 
     @DeleteMapping("/user/{userId}/role/{roleId}.json")
     public HttpCommandResponse delete(@PathVariable long userId, @PathVariable long roleId) {
         log.debug("DELETE /user/{}/role/{}.json", userId, roleId);
-        long requestingUserId = currentUserService.getCurrentUser().id();
         UserRoleResponse userRole = userRoleHttpContract.getByUserIdAndRoleId(userId, roleId)
             .orElseThrow(() -> new ResponseStatusException(
                 NOT_FOUND, format(UNABLE_TO_FIND_USER_ROLE, userId, roleId)));
-        return userRoleHttpContract.delete(userRole.id(), requestingUserId)
+        return userRoleHttpContract.delete(userRole.id())
             .orElseThrow(() -> new ResponseStatusException(
                 NOT_FOUND, format(UNABLE_TO_FIND_USER_ROLE, userId, roleId)));
     }
@@ -85,8 +81,7 @@ public class UserRoleController {
         Pageable pageable
     ) {
         log.debug("PUT /user/{}/role/{}/define.json", targetUserId, role);
-        long userId = currentUserService.getCurrentUser().id();
-        userRoleHttpContract.define(userId, targetUserId, role);
-        return pageMapper.toCollectionResponse(userRoleHttpContract.listByUserId(userId, pageable));
+        userRoleHttpContract.define(targetUserId, role);
+        return pageMapper.toCollectionResponse(userRoleHttpContract.listByUserId(targetUserId, pageable));
     }
 }

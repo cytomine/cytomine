@@ -101,6 +101,10 @@ spec:
                 secretKeyRef:
                   name: core-secret
                   key: IMAGE_SERVER_PUBLIC_KEY
+            - name: IAM_URL
+              value: http://iam.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.iam.port }}
+            - name: IAM_EXTERNAL_URL
+              value: {{ include "core.url" . }}
 
           volumeMounts:
             - name: temp

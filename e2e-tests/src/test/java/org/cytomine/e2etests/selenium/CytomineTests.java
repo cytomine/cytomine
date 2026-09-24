@@ -343,18 +343,7 @@ public class CytomineTests {
     }
 
     @Test
-    void uploadAndDeleteTask() {
-        String zipName = "com.cytomine.dummy.identity.image-1.0.0.zip";
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-
-        cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
-        cytomineSteps.deleteTask(wait, cytomineUrl, "identity with image");
-
-        cytomineSteps.logout(wait, cytomineUrl);
-    }
-
-    @Test
-    void runTaskAndDeleteRun() {
+    void uploadAndRunAndDeleteTaskRun() {
         String imageName = "selenium-" + randomUUID() + ".png";
         String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
         String projectName = "selenium-" + randomUUID();

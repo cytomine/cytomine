@@ -84,10 +84,7 @@ public class MeiliSearchService {
         }
     }
 
-    /**
-     * Ensure the index declares the filterable attributes core relies on (search / facets / project tagging).
-     * Merged as a union with any already-configured attributes so PIMS-configured settings are never lost.
-     */
+    // Union with existing attributes so PIMS-configured settings are never lost.
     private void ensureIndexConfigured(Index index) throws MeilisearchException {
         Set<String> filterableAttributes = new LinkedHashSet<>();
         String[] existing = index.getFilterableAttributesSettings();

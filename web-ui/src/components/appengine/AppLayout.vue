@@ -8,8 +8,8 @@
   </div>
 
   <div v-else>
-    <b-message :title="$t('appengine-not-enabled-title')" type="is-info">
-      {{ $t('appengine-not-enabled-description') }}
+    <b-message :title="$t('app-engine-not-enabled-title')" type="is-info">
+      {{ $t('app-engine-not-enabled-description') }}
     </b-message>
   </div>
 </template>

@@ -24,8 +24,8 @@
             <b-checkbox
               v-if="term.id"
               size="is-small"
-              :value="terms[termsMapping[term.id]].visible"
-              @input="toggleTermVisibility(termsMapping[term.id])"
+              :model-value="terms[termsMapping[term.id]].visible"
+              @update:model-value="toggleTermVisibility(termsMapping[term.id])"
             />
 
             <b-checkbox v-else size="is-small" v-model="displayNoTerm" />
@@ -180,7 +180,7 @@ input[type="range"].slider {
   padding: 0 !important;
 }
 
-:deep(.ontology-tree .sl-vue-tree-node-item), :deep(.ontology-tree .no-result) {
+:deep(.ontology-tree .tree-node-item), :deep(.ontology-tree .no-result) {
   line-height: 2;
   font-size: 0.9em;
 }

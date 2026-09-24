@@ -5,7 +5,7 @@
   </span>
   <div v-else class="tags has-addons">
     <span class="tag" :class="tagClass" :data-status="result">{{ $t(labels[file.status]) }}</span>
-    <span class="tag is-light">{{ $tc("count-files", file.nbChildren + 1, { count: file.nbChildren + 1 }) }}</span>
+    <span class="tag is-light">{{ $t("count-files", file.nbChildren + 1, { count: file.nbChildren + 1 }) }}</span>
   </div>
 </div>
 <span v-else :class="['icon', textClass]">

@@ -13,16 +13,18 @@ describe('AppListPanel.vue', () => {
   const createWrapper = (options = {}) => shallowMount(
     AppListPanel,
     {
-      propsData: {
+      props: {
         applications: mockApplications,
       },
-      mocks: {
-        $t: (key) => key,
-      },
-      stubs: {
-        AppCard: true,
-      },
       ...options,
+      global: {
+        mocks: {
+          $t: (key) => key,
+        },
+        stubs: {
+          AppCard: true,
+        }
+      }
     },
   );
 
@@ -51,14 +53,14 @@ describe('AppListPanel.vue', () => {
 
     const appCards = wrapper.findAllComponents(AppCard);
 
-    appCards.wrappers.forEach((cardWrapper, index) => {
+    appCards.forEach((cardWrapper, index) => {
       expect(cardWrapper.props('app')).toEqual(mockApplications[index]);
     });
   });
 
   it('should handle empty applications array', async () => {
     const wrapper = createWrapper({
-      propsData: {
+      props: {
         applications: [],
       }
     });

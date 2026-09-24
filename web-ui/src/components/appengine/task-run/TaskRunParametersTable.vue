@@ -1,34 +1,37 @@
 <template>
   <b-table :data="parameters" narrowed>
-    <template #default="props">
-      <b-table-column field="name" :label="$t('app-engine.parameter.name')">
-        {{ props.row.parameterName }}
-      </b-table-column>
+    <b-table-column v-slot="props" field="name" :label="$t('app-engine.parameter.name')">
+      {{ props.row.parameterName }}
+    </b-table-column>
 
-      <b-table-column field="type" :label="$t('app-engine.parameter.type')">
-        {{ props.row.type }}
-      </b-table-column>
+    <b-table-column v-slot="props" field="type" :label="$t('app-engine.parameter.type')">
+      {{ props.row.type }}
+    </b-table-column>
 
-      <b-table-column
+    <!--
+      Buefy 3 discovers the columns once, so the per-row choice between the
+      three shapes of this cell moves from a v-if on the column to a v-if
+      inside it. All three declared the same field and label anyway.
+    -->
+    <b-table-column v-slot="props" field="value" :label="$t('app-engine.parameter.value')">
+      <button
         v-if="['FILE', 'IMAGE'].includes(props.row.type)"
-        field="value"
-        :label="$t('app-engine.parameter.value')"
+        class="button is-link is-small"
+        @click="downloadFile(props.row)"
       >
-        <button class="button is-link is-small" @click="downloadFile(props.row)">{{ $t('button-download') }}</button>
-      </b-table-column>
+        {{ $t('button-download') }}
+      </button>
 
-      <b-table-column
+      <button
         v-else-if="props.row.type === 'GEOMETRY'"
-        field="value"
-        :label="$t('app-engine.parameter.value')"
+        class="button is-link is-small"
+        @click="downloadGeometry(props.row)"
       >
-        <button class="button is-link is-small" @click="downloadGeometry(props.row)">{{ $t('button-download')}}</button>
-      </b-table-column>
+        {{ $t('button-download')}}
+      </button>
 
-      <b-table-column v-else field="value" :label="$t('app-engine.parameter.value')">
-        {{ props.row.value }}
-      </b-table-column>
-    </template>
+      <template v-else>{{ props.row.value }}</template>
+    </b-table-column>
   </b-table>
 </template>
 

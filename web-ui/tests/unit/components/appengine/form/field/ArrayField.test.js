@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ArrayField from '@/components/appengine/forms/fields/ArrayField';
@@ -19,7 +19,6 @@ vi.mock('@/utils/image-utils', () => ({
 }));
 
 describe('ArrayField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -30,25 +29,25 @@ describe('ArrayField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(ArrayField, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
-      propsData: {
+      props: {
         parameter: mockParameter,
-        value: null,
+        modelValue: null,
       },
       data() {
         return {
           selectParameters: false,
         };
       },
-      stubs: {
-        ArrayModal: true,
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (message) => message,
+        },
+        stubs: {
+          ArrayModal: true,
+        }
       }
     });
   });
@@ -71,7 +70,7 @@ describe('ArrayField.vue', () => {
   });
 
   it('The component should render provisioned text when there is a value', async () => {
-    await wrapper.setProps({ value: [42] });
+    await wrapper.setProps({ modelValue: [42] });
 
     expect(wrapper.find('.state-container').exists()).toBe(true);
     expect(wrapper.find('.state-container').text()).toBe('provisioned');

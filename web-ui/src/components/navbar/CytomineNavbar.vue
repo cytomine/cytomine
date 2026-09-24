@@ -1,7 +1,7 @@
 <template>
 <nav class="navbar is-light" role="navigation">
   <div class="navbar-brand">
-    <router-link to="/" exact class="navbar-item">
+    <router-link to="/" class="navbar-item">
       <img src="@/assets/logo.svg" id="logo" alt="Cytomine">
     </router-link>
     <a role="" class="navbar-burger" :class="{'is-active':openedTopMenu}" @click="openedTopMenu=!openedTopMenu">
@@ -132,7 +132,6 @@ export default {
     openHotkeysModal() {
       if (!this.hotkeysModal) {
         this.hotkeysModal = this.$buefy.modal.open({
-          parent: this,
           component: HotkeysModal,
           hasModalCard: true,
           onCancel: () => this.hotkeysModal = null,
@@ -141,7 +140,6 @@ export default {
     },
     openAboutModal() {
       this.$buefy.modal.open({
-        parent: this,
         component: AboutCytomineModal,
         hasModalCard: true
       });
@@ -180,9 +178,5 @@ export default {
 .navbar {
   font-weight: 600;
   z-index: 500 !important;
-
-  .fas, .far {
-    padding-right: 0.5rem;
-  }
 }
 </style>

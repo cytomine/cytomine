@@ -67,6 +67,8 @@ annotations-vs-contributors-chart-info-message,This chart presents the number of
 annotations-vs-terms-chart-info-message,This chart presents the number of manual annotation associated to each term. Only annotations created during the selected period are taken into account.,Ce graphique présente le nombre d'annotations manuelles associées à chaque terme. Seules les annotations créées durant la période sélectionnée sont prises en compte.,Este cuadro presenta el número de anotaciones manuales asociadas a cada término. Solo se tienen en cuenta las anotaciones creadas durante el período seleccionado.,"Dit diagram toont het aantal handmatige annotaties dat aan elke term is gekoppeld. Alleen annotaties die tijdens de geselecteerde periode zijn gemaakt, worden in aanmerking genomen."
 api-keys,API keys,Clés API,Claves API,API-sleutels
 app-dashboard,App Dashboard,Tableau de bord de l'application,Panel de la aplicación,Applicatiedashboard
+app-engine-not-enabled-description,App Engine is not enabled on your Cytomine instance. Contact your administrator.,App Engine n'est pas activé sur votre instance Cytomine. Contactez votre administrateur.,App Engine no está habilitado en su instancia de Cytomine. Póngase en contacto con su administrador.,App Engine is niet ingeschakeld op uw Cytomine-instantie. Neem contact op met uw beheerder.
+app-engine-not-enabled-title,App Engine is not enabled,App Engine n'est pas activé,App Engine no está habilitado,App Engine is niet ingeschakeld
 app-engine.ae-history,Tasks History,Historique des tâches,Historial de tareas,Eerdere taken
 app-engine.ae-run-task,Run Task,Exécuter la tâche,Ejecutar la tarea,Voer taak uit
 app-engine.applications,Applications,Applications,Aplicaciones,Toepassingen

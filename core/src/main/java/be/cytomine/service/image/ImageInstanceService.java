@@ -1034,7 +1034,11 @@ public class ImageInstanceService extends ModelService {
         if (!projectTaggingDeferred()) {
             Project project = ((ImageInstance) domain).getProject();
             if (project != null && project.getName() != null && ai != null) {
-                meiliSearchService.addProjectToImages(List.of(ai.getId()), project.getName());
+                try {
+                    meiliSearchService.addProjectToImages(List.of(ai.getId()), project.getName());
+                } catch (Exception e) {
+                    log.warn("Could not tag project '{}' on image '{}' in metadata", project.getName(), ai.getId(), e);
+                }
             }
         }
 
@@ -1051,7 +1055,12 @@ public class ImageInstanceService extends ModelService {
             AbstractImage ai = ((ImageInstance) domain).getBaseImage();
             Project project = ((ImageInstance) domain).getProject();
             if (project != null && project.getName() != null && ai != null) {
-                meiliSearchService.removeProjectFromImages(List.of(ai.getId()), project.getName());
+                try {
+                    meiliSearchService.removeProjectFromImages(List.of(ai.getId()), project.getName());
+                } catch (Exception e) {
+                    log.warn("Could not remove project '{}' from image '{}' in metadata",
+                        project.getName(), ai.getId(), e);
+                }
             }
         }
     }
@@ -1140,7 +1149,11 @@ public class ImageInstanceService extends ModelService {
             .distinct()
             .collect(Collectors.toList());
         if (!abstractImageIds.isEmpty() && project.getName() != null) {
-            meiliSearchService.removeProjectFromImages(abstractImageIds, project.getName());
+            try {
+                meiliSearchService.removeProjectFromImages(abstractImageIds, project.getName());
+            } catch (Exception e) {
+                log.warn("Could not remove project '{}' from images in metadata", project.getName(), e);
+            }
         }
         setTagMode(TagMode.DEFER);
         try {

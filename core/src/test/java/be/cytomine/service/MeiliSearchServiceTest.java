@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.lenient;
@@ -78,10 +79,12 @@ public class MeiliSearchServiceTest {
         Index created = mockConfiguredFilterableIndex();
         mockUpdateFilterableAttributes(created);
         when(meiliSearchClient.getIndex(INDEX_ID)).thenReturn(created);
+        when(meiliSearchClient.createIndex(INDEX_ID)).thenReturn(new TaskInfo());
 
         meiliSearchService.createIndexIfNotExists();
 
         verify(meiliSearchClient, times(1)).createIndex(INDEX_ID);
+        verify(meiliSearchClient).waitForTask(anyInt());
         verify(created).updateFilterableAttributesSettings(argThat(attrs -> attrs.length == 3
             && Arrays.asList(attrs).containsAll(List.of(
                 "image.abstract_image_id", "image.storage_id", "image.projects"))));

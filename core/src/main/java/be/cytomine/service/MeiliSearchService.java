@@ -75,7 +75,8 @@ public class MeiliSearchService {
                 }
             }
             if (!indexFound) {
-                meiliSearchClient.createIndex(indexId);
+                TaskInfo taskInfo = meiliSearchClient.createIndex(indexId);
+                meiliSearchClient.waitForTask(taskInfo.getTaskUid());
                 log.info("Created MeiliSearch index '{}'", indexId);
                 ensureIndexConfigured(meiliSearchClient.getIndex(indexId));
             }

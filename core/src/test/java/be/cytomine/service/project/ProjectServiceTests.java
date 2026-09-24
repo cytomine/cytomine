@@ -759,16 +759,16 @@ public class ProjectServiceTests {
     }
 
     @Test
-    void updateProjectNameShouldPropagateMetadataRenamingFailure() {
+    void updateProjectNameShouldNotFailWhenMetadataRenamingFails() {
         Project project = builder.givenAProject();
         String oldName = project.getName();
         when(meiliSearchService.renameProjectInImages(any(), any()))
             .thenThrow(new SearchException("meili down", 500, "boom"));
 
-        Assertions.assertThrows(
-            SearchException.class,
-            () -> projectService.update(project, project.toJsonObject(urlApi).withChange("name", "NEW NAME"))
-        );
+        Assertions.assertDoesNotThrow(() ->
+            projectService.update(project, project.toJsonObject(urlApi).withChange("name", "NEW NAME")));
+
+        verify(meiliSearchService).renameProjectInImages(oldName, "NEW NAME");
     }
 
     @Test

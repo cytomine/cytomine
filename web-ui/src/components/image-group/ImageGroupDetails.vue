@@ -13,7 +13,7 @@
         </router-link>
       </td>
     </tr>
-    <tr v-if="isPropDisplayed('id') && currentUser.isDeveloper">
+    <tr v-if="isPropDisplayed('id') && currentAccount.isDeveloper">
       <td class="prop-label">{{$t('id')}}</td>
       <td class="prop-content" colspan="3">{{imageGroup.id}}</td>
     </tr>
@@ -153,6 +153,7 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     project: get('currentProject/project'),
     blindMode() {
       return ((this.$store.state.currentProject.project || {}).blindMode) || false;

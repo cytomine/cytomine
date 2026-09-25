@@ -15,7 +15,7 @@
         </tr>
       </template>
 
-      <template v-if="currentUser.isDeveloper">
+      <template v-if="currentAccount.isDeveloper">
         <tr>
           <td><strong>{{ $t('id') }}</strong></td>
           <td>{{ annotation.id }}</td>
@@ -52,7 +52,7 @@ export default {
   },
   computed: {
     configUI: get('currentProject/configUI'),
-    currentUser: get('currentUser/user'),
+    currentAccount: get('currentUser/account'),
     annotationURL() {
       return `/project/${this.annotation.project}/image/${this.annotation.image}/annotation/${this.annotation.id}`;
     },

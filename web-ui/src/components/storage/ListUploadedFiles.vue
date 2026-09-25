@@ -12,7 +12,12 @@
         icon="search"
       />
 
-      <MetadataFilter :nb-results="nbResults" @filter-change="onMetadataFilterChange" />
+      <MetadataFilter
+        :nb-results="nbResults"
+        :create-project="true"
+        @filter-change="onMetadataFilterChange"
+        @create-project-from-search="onCreateProjectFromMetadata"
+      />
 
       <cytomine-table
         :collection="uploadedFileCollection"
@@ -63,18 +68,26 @@
         </template>
       </cytomine-table>
     </div>
+
+    <create-project-from-metadata-modal
+      :active.sync="createProjectModal"
+      :query="metadataSearch"
+      :filters="metadataFilters"
+      :ontologies="ontologies"
+    />
   </div>
 </template>
 
 <script>
 import { get } from '@/utils/store-helpers';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
-import { UploadedFileCollection, UploadedFile } from '@/api';
+import { UploadedFileCollection, UploadedFile, OntologyCollection } from '@/api';
 import filesize from 'filesize';
 import _ from 'lodash';
 import CytomineTable from '@/components/utils/CytomineTable.vue';
 import MetadataFilter from '@/components/search/MetadataFilter.vue';
 import UploadedFileStatusComponent from './UploadedFileStatus.vue';
+import CreateProjectFromMetadataModal from './CreateProjectFromMetadataModal.vue';
 import { appendShortTermToken } from '@/utils/token-utils';
 import { formatDate } from '@/utils/date';
 
@@ -84,7 +97,8 @@ export default {
     CytomineTable,
     ImageThumbnail,
     MetadataFilter,
-    'uploaded-file-status': UploadedFileStatusComponent
+    'uploaded-file-status': UploadedFileStatusComponent,
+    CreateProjectFromMetadataModal
   },
   data() {
     return {
@@ -94,6 +108,8 @@ export default {
       metadataFilters: [],
       nbResults: 0,
       openedDetails: [],
+      createProjectModal: false,
+      ontologies: [],
     };
   },
   props: {
@@ -128,6 +144,12 @@ export default {
     onMetadataFilterChange({ query, filters }) {
       this.metadataSearch = query;
       this.metadataFilters = filters;
+    },
+    async onCreateProjectFromMetadata() {
+      if (!this.ontologies.length) {
+        this.ontologies = (await OntologyCollection.fetchAll({ light: true })).array;
+      }
+      this.createProjectModal = true;
     },
     updatedTree() {
       this.$emit('update:revision', this.revision + 1); // updating the table will result in new files objects => the uf details will also be updated

@@ -27,6 +27,15 @@
 
       <div class="metadata-search-actions">
         <b-button icon-left="times" @click="clear()">{{ $t('button-clear') }}</b-button>
+        <b-button
+          v-if="createProject && hasSearch"
+          class="create-project-from-search"
+          icon-left="plus"
+          type="is-link"
+          @click="$emit('create-project-from-search', { query: searchString, filters: filters })"
+        >
+          {{ $t('create-project-from-search') }}
+        </b-button>
         <span v-if="hasSearch && nbResults !== null" class="metadata-results-count">
           {{ nbResults }} {{ $t('images') }}
         </span>
@@ -50,6 +59,7 @@ const FACET_LABELS = {
   'specimens.fixation_type.meaning': 'Fixation type',
   'block.block_preparation.meaning': 'Block preparation',
   'specimens.specimen_type.meaning': 'Specimen type',
+  'image.projects': 'Projects',
 };
 
 export default {
@@ -65,6 +75,10 @@ export default {
     nbResults: {
       type: Number,
       default: null,
+    },
+    createProject: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -83,7 +97,6 @@ export default {
       return Object.entries(this.selectedFacets)
         .filter(([, values]) => values.length > 0)
         .map(([key, values]) => {
-          // Keep filters that are composed of several words with commas
           let clause = values
             .map(({ value }) => `${key} = "${value.replace(/"/g, '\\"')}"`)
             .join(' OR ');

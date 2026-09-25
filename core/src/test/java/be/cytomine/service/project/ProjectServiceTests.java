@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
@@ -48,8 +49,10 @@ import be.cytomine.dto.NamedCytomineDomain;
 import be.cytomine.dto.ProjectBounds;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.exceptions.ForbiddenException;
+import be.cytomine.exceptions.SearchException;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.UserAnnotationService;
@@ -71,6 +74,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -107,6 +114,9 @@ public class ProjectServiceTests {
     ProjectRepresentativeUserService projectRepresentativeUserService;
     @Autowired
     private UrlApi urlApi;
+
+    @MockitoBean
+    MeiliSearchService meiliSearchService;
 
     private static void setupStub() {
         /* Simulate call to PIMS */
@@ -739,6 +749,39 @@ public class ProjectServiceTests {
     }
 
     @Test
+    void updateProjectNameShouldRenameMetadataScoping() {
+        Project project = builder.givenAProject();
+        String oldName = project.getName();
+
+        projectService.update(project, project.toJsonObject(urlApi).withChange("name", "NEW NAME"));
+
+        verify(meiliSearchService).renameProjectInImages(oldName, "NEW NAME");
+    }
+
+    @Test
+    void updateProjectNameShouldNotFailWhenMetadataRenamingFails() {
+        Project project = builder.givenAProject();
+        String oldName = project.getName();
+        when(meiliSearchService.renameProjectInImages(any(), any()))
+            .thenThrow(new SearchException("meili down", 500, "boom"));
+
+        Assertions.assertDoesNotThrow(() ->
+            projectService.update(project, project.toJsonObject(urlApi).withChange("name", "NEW NAME")));
+
+        verify(meiliSearchService).renameProjectInImages(oldName, "NEW NAME");
+    }
+
+    @Test
+    void updateProjectWithoutNameChangeShouldNotRenameMetadataScoping() {
+        Project project = builder.givenAProject();
+
+        projectService.update(project,
+            project.toJsonObject(urlApi).withChange("ontology", builder.givenAnOntology().getId()));
+
+        verify(meiliSearchService, org.mockito.Mockito.never()).renameProjectInImages(any(), any());
+    }
+
+    @Test
     void updateProjectWithAnotherOntology() {
         Project project = builder.givenAProject();
         Ontology anotherOntology = builder.givenAnOntology();
@@ -905,6 +948,16 @@ public class ProjectServiceTests {
         AssertionsForClassTypes.assertThat(commandResponse).isNotNull();
         AssertionsForClassTypes.assertThat(commandResponse.getStatus()).isEqualTo(200);
         AssertionsForClassTypes.assertThat(projectService.find(project.getId()).isEmpty());
+    }
+
+    @Test
+    void deleteProjectWithImagesRemovesProjectFromMetadataInOneBulckCall() {
+        Project project = builder.givenAProject();
+        builder.givenAnImageInstance(project);
+
+        projectService.delete(project, null, null, true);
+
+        verify(meiliSearchService).removeProjectFromImages(any(), eq(project.getName()));
     }
 
     @Test

@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.UserHttpContract;
@@ -24,11 +26,15 @@ import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.command.CommandHistory;
 import be.cytomine.domain.project.Project;
+import be.cytomine.dto.project.ProjectFromSearchRequest;
+import be.cytomine.dto.project.ProjectFromSearchResponse;
+import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.appengine.TaskRunService;
+import be.cytomine.service.project.ProjectFromSearchService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ProjectSearchExtension;
 import be.cytomine.service.security.UserService;
@@ -60,6 +66,8 @@ public class RestProjectController extends RestCytomineController {
     private final TaskRunService taskRunService;
 
     private final UserHttpContract userHttpContract;
+
+    private final ProjectFromSearchService projectFromSearchService;
 
     /**
      * List all ontology visible for the current user For each ontology, print the terms tree
@@ -118,6 +126,17 @@ public class RestProjectController extends RestCytomineController {
         log.debug("REST request to edit Project : " + id);
         Task existingTask = taskService.get(task);
         return update(projectService, json, existingTask);
+    }
+
+    @PostMapping("/project/from-search")
+    public ProjectFromSearchResponse addFromSearch(@RequestBody ProjectFromSearchRequest request) {
+        log.debug("REST request to create project from metadata search : " + request);
+        try {
+            return projectFromSearchService.createAndSchedule(request);
+        } catch (CytomineException e) {
+            log.error("add from search error:" + e.msg, e);
+            throw new ResponseStatusException(HttpStatus.valueOf(e.code), e.msg);
+        }
     }
 
     @DeleteMapping("/project/{id}.json")

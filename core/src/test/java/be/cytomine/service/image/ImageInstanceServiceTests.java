@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
@@ -34,6 +35,7 @@ import be.cytomine.common.repository.model.command.payload.response.UserResponse
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
+import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.NestedImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -46,11 +48,13 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.image.ImageInstanceBounds;
 import be.cytomine.exceptions.AlreadyExistException;
+import be.cytomine.exceptions.SearchException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 import be.cytomine.repositorynosql.social.PersistentImageConsultationRepository;
 import be.cytomine.repositorynosql.social.PersistentUserPositionRepository;
 import be.cytomine.service.CurrentUserService;
+import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.search.ImageSearchExtension;
 import be.cytomine.service.social.AnnotationActionService;
@@ -71,6 +75,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = CytomineCoreApplication.class)
 @AutoConfigureMockMvc
@@ -103,6 +113,9 @@ public class ImageInstanceServiceTests {
     PersistentImageConsultationRepository persistentImageConsultationRepository;
     @Autowired
     private UrlApi urlApi;
+
+    @MockitoBean
+    MeiliSearchService meiliSearchService;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -851,5 +864,127 @@ public class ImageInstanceServiceTests {
         assertThat(imageInstance.getReviewStart()).isNull();
         assertThat(imageInstance.getReviewStop()).isNull();
         assertThat(imageInstance.getReviewUser()).isNull();
+    }
+
+    @Test
+    void addShouldTagProjectInMetadata() {
+        Project project = builder.givenAProject();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
+        ImageInstance imageInstance = builder.givenANotPersistedImageInstance(abstractImage, project);
+
+        imageInstanceService.add(imageInstance.toJsonObject(urlApi));
+
+        verify(meiliSearchService).addProjectToImages(List.of(abstractImage.getId()), project.getName());
+    }
+
+    @Test
+    void addShouldNotFailWhenProjectTaggingFails() {
+        Project project = builder.givenAProject();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
+        ImageInstance imageInstance = builder.givenANotPersistedImageInstance(abstractImage, project);
+        when(meiliSearchService.addProjectToImages(any(), any()))
+            .thenThrow(new SearchException("meili down", 500, "boom"));
+
+        Assertions.assertDoesNotThrow(() -> imageInstanceService.add(imageInstance.toJsonObject(urlApi)));
+
+        verify(meiliSearchService).addProjectToImages(List.of(abstractImage.getId()), project.getName());
+    }
+
+    @Test
+    void addShouldSkipProjectTaggingWhenDeferred() {
+        imageInstanceService.setTagMode(ImageInstanceService.TagMode.DEFER);
+        try {
+            Project project = builder.givenAProject();
+            AbstractImage abstractImage = builder.givenAnAbstractImage();
+            ImageInstance imageInstance = builder.givenANotPersistedImageInstance(abstractImage, project);
+
+            imageInstanceService.add(imageInstance.toJsonObject(urlApi));
+
+            verify(meiliSearchService, never()).addProjectToImages(any(), any());
+        } finally {
+            imageInstanceService.setTagMode(ImageInstanceService.TagMode.NORMAL);
+        }
+    }
+
+    @Test
+    void deleteShouldRemoveProjectFromMetadata() {
+        Project project = builder.givenAProject();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
+        ImageInstance imageInstance = builder.givenAnImageInstance(abstractImage, project);
+
+        imageInstanceService.delete(imageInstance, null, null, false);
+
+        verify(meiliSearchService).removeProjectFromImages(List.of(abstractImage.getId()), project.getName());
+    }
+
+    @Test
+    void deleteShouldNotFailWhenProjectTaggingFails() {
+        Project project = builder.givenAProject();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
+        ImageInstance imageInstance = builder.givenAnImageInstance(abstractImage, project);
+        when(meiliSearchService.removeProjectFromImages(any(), any()))
+            .thenThrow(new SearchException("meili down", 500, "boom"));
+
+        Assertions.assertDoesNotThrow(() -> imageInstanceService.delete(imageInstance, null, null, false));
+
+        verify(meiliSearchService).removeProjectFromImages(List.of(abstractImage.getId()), project.getName());
+    }
+
+    @Test
+    void deleteShouldSkipProjectTaggingWhenDeferred() {
+        imageInstanceService.setTagMode(ImageInstanceService.TagMode.DEFER);
+        try {
+            Project project = builder.givenAProject();
+            AbstractImage abstractImage = builder.givenAnAbstractImage();
+            ImageInstance imageInstance = builder.givenAnImageInstance(abstractImage, project);
+
+            imageInstanceService.delete(imageInstance, null, null, false);
+
+            verify(meiliSearchService, never()).removeProjectFromImages(any(), any());
+        } finally {
+            imageInstanceService.setTagMode(ImageInstanceService.TagMode.NORMAL);
+        }
+    }
+
+    @Test
+    void deleteAllForProjectShouldBulkRemoveProjectNameOnce() {
+        Project project = builder.givenAProject();
+        AbstractImage firstAbstractImage = builder.givenAnAbstractImage();
+        AbstractImage secondAbstractImage = builder.givenAnAbstractImage();
+        ImageInstance firstImageInstance = builder.givenAnImageInstance(firstAbstractImage, project);
+        ImageInstance secondImageInstance = builder.givenAnImageInstance(secondAbstractImage, project);
+
+        imageInstanceService.deleteAllForProject(project, null, null);
+
+        verify(meiliSearchService).removeProjectFromImages(
+            argThat(ids -> ids != null
+                && ids.size() == 2
+                && ids.contains(firstAbstractImage.getId())
+                && ids.contains(secondAbstractImage.getId())),
+            eq(project.getName())
+        );
+        verify(meiliSearchService, never()).addProjectToImages(any(), any());
+
+        entityManager.flush();
+        entityManager.clear();
+        assertThat(entityManager.find(ImageInstance.class, firstImageInstance.getId())).isNull();
+        assertThat(entityManager.find(ImageInstance.class, secondImageInstance.getId())).isNull();
+    }
+
+    @Test
+    void deleteAllForProjectShouldNotFailWhenProjectTaggingFails() {
+        Project project = builder.givenAProject();
+        AbstractImage abstractImage = builder.givenAnAbstractImage();
+        ImageInstance imageInstance = builder.givenAnImageInstance(abstractImage, project);
+        when(meiliSearchService.removeProjectFromImages(any(), any()))
+            .thenThrow(new SearchException("meili down", 500, "boom"));
+
+        Assertions.assertDoesNotThrow(() -> imageInstanceService.deleteAllForProject(project, null, null));
+
+        verify(meiliSearchService).removeProjectFromImages(any(), eq(project.getName()));
+
+        entityManager.flush();
+        entityManager.clear();
+        assertThat(entityManager.find(ImageInstance.class, imageInstance.getId())).isNull();
     }
 }

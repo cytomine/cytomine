@@ -2,10 +2,11 @@ package be.cytomine.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.common.utils.ParserUtils;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.exceptions.WrongArgumentException;
@@ -33,7 +36,7 @@ import static java.util.stream.Collectors.toSet;
 @Component
 public class AnnotationListingBuilder {
 
-    private final UserService userService;
+    private final ParserUtils parserUtils;
 
     private final EntityManager entityManager;
 
@@ -188,20 +191,20 @@ public class AnnotationListingBuilder {
     public Set<String> getTermNames(String terms) {
         return Arrays.stream(terms.split(",")).filter(termId -> !termId.equals("0"))
             .filter(termId -> !termId.equals("-1")).filter(termId -> !termId.isBlank())
-            .flatMap(termId -> termHttpContract.findTermByID(Long.parseLong(termId)).stream())
-            .map(TermResponse::name).collect(toSet());
+            .flatMap(termId -> termHttpContract.findTermByID(Long.parseLong(termId)).stream()).map(TermResponse::name)
+            .collect(toSet());
     }
 
     /**
      * From a string representing the list of users ids, get a set of users name.
      */
     public Set<String> getUserNames(String users) {
-        Set<String> userNames = new HashSet<>();
-        for (String userId : users.split(",")) {
-            if (!userId.isEmpty()) {
-                userHttpContract.get(Long.parseLong(userId)).ifPresent(u -> userNames.add(u.username()));
-            }
-        }
-        return userNames;
+        return Arrays.stream(users.split(",")).filter(u -> !u.isBlank())
+            .map(parserUtils::parseLong)
+            .flatMap(Optional::stream)
+            .map(userHttpContract::get)
+            .flatMap(Optional::stream)
+            .map(UserResponse::username)
+            .collect(Collectors.toSet());
     }
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.project.Project;
@@ -22,7 +23,6 @@ import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.security.UserService;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -43,9 +43,8 @@ public class ProjectMemberService {
 
     private final SecurityACLService securityACLService;
 
-    private final UserService userService;
     private final UserMapper userMapper;
-
+    private final UserHttpContract userHttpContract;
     private final UrlApi urlApi;
 
     public void addUserToProject(String username, Project project, boolean admin) {
@@ -70,32 +69,35 @@ public class ProjectMemberService {
         }
     }
 
-    public void addUserToProjectWithAdmin(User user, Project project, boolean admin) {
+    public void addUserToProjectWithAdmin(String username, Project project, boolean admin) {
         log.info("service.addUserToProject");
         if (project != null) {
-            Optional<User> adminAsCurrentUserOptional = userService.findByUsernameWithAdmin("admin");
-            User adminUser = null;
-            if (adminAsCurrentUserOptional.isPresent()) {
-                adminUser = adminAsCurrentUserOptional.get();
-            }
-            log.info("addUserToProject project=" + project + " user=" + user + " ADMIN=" + admin);
-            synchronized (this.getClass()) {
-                if (admin) {
-                    permissionService.addPermission(project, user.getUsername(), ADMINISTRATION,
-                        adminUser.getUsername());
-                }
-                permissionService.addPermission(project, user.getUsername(), READ, adminUser.getUsername());
-                if (project.getOntology() != null) {
-                    log.info(
-                        "addUserToProject ontology=" + project.getOntology() + " user=" + user + " ADMIN=" + admin);
-                    permissionService.addPermission(project.getOntology(), user.getUsername(), READ,
-                        adminUser.getUsername());
-                    if (admin) {
-                        permissionService.addPermission(project.getOntology(), user.getUsername(), ADMINISTRATION,
-                            adminUser.getUsername());
+            userHttpContract.search("admin").map(
+                adminUser -> {
+                    log.info("addUserToProject project=" + project + " user=" + username + " ADMIN=" + admin);
+                    permissionService.addPermission(project, username, ADMINISTRATION,
+                        adminUser.username());
+
+                    permissionService.addPermission(project, username, READ, adminUser.username());
+                    if (project.getOntology() != null) {
+                        log.info(
+                            "addUserToProject ontology=" + project.getOntology() + " user=" + username + " ADMIN="
+                                + admin);
+                        permissionService.addPermission(project.getOntology(), username, READ,
+                            adminUser.username());
+                        if (admin) {
+                            permissionService.addPermission(project.getOntology(), username,
+                                ADMINISTRATION,
+                                adminUser.username());
+                        }
                     }
+
+                    return null;
                 }
-            }
+
+            );
+
+
         }
     }
 
@@ -217,7 +219,7 @@ public class ProjectMemberService {
 
     private void removeOntologyRightIfNecessary(Project project, long userId, String username, boolean admin) {
         // we remove the right ONLY if user has no other project with this ontology
-        UserResponse user = userService.findUserResponse(userId).orElseThrow();
+        UserResponse user = userHttpContract.get(userId).orElseThrow();
         List<Project> projects = securityACLService.getProjectList(user, project.getOntology().getId());
         List<Project> otherProjects = new ArrayList<>(projects);
         otherProjects.remove(project);

@@ -207,9 +207,9 @@ public class UserService extends ModelService {
         return userRepository.findByReference(String.valueOf(sub));
     }
 
-    public Optional<UserResponse> find(long requesterId, String id) {
+    public Optional<UserResponse> find( long id) {
         try {
-            return userHttpContract.get(requesterId,Long.valueOf(id));
+            return userHttpContract.get(Long.parseLong(id));
         } catch (NumberFormatException ex) {
             return findByUsername(id);
         }

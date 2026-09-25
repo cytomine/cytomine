@@ -36,6 +36,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
@@ -85,6 +87,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final ReportService reportService;
 
     private final UserService userService;
+
+    private final UserHttpContract userHttpContract;
 
     private final CurrentUserService currentUserService;
 
@@ -271,9 +275,9 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         //get user
         Long idUser = params.getJSONAttrLong("user");
-        User user = null;
+        UserResponse user = null;
         if (idUser != 0) {
-            user = userService.find((long) params.getJSONAttrLong("user")).orElse(null);
+            user = userHttpContract.get(idUser).orElse(null);
         }
 
         //get term
@@ -285,7 +289,7 @@ public class RestAnnotationDomainController extends RestCytomineController {
             response = reviewedAnnotationService.listIncluded(image, geometry, terms, annotation, propertiesToShow);
         } else {
             //goto user annotation
-            response = userAnnotationService.listIncluded(image, geometry, user, terms, annotation, propertiesToShow);
+            response = userAnnotationService.listIncluded(image, geometry, user.id(), terms, annotation, propertiesToShow);
         }
         return response;
     }

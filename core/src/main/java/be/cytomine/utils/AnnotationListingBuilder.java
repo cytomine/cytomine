@@ -13,6 +13,7 @@ import org.locationtech.jts.io.ParseException;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.dto.annotation.AnnotationResult;
@@ -39,6 +40,8 @@ public class AnnotationListingBuilder {
     private final ParamsService paramsService;
 
     private final TermHttpContract termHttpContract;
+
+    private final UserHttpContract userHttpContract;
 
     private final AnnotationListingService annotationListingService;
 
@@ -196,7 +199,7 @@ public class AnnotationListingBuilder {
         Set<String> userNames = new HashSet<>();
         for (String userId : users.split(",")) {
             if (!userId.isEmpty()) {
-                userNames.add(userService.get(Long.parseLong(userId)).getUsername());
+                userHttpContract.get(Long.parseLong(userId)).ifPresent(u -> userNames.add(u.username()));
             }
         }
         return userNames;

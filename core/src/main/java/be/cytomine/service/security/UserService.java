@@ -207,30 +207,13 @@ public class UserService extends ModelService {
         return userRepository.findByReference(String.valueOf(sub));
     }
 
-    public Optional<UserResponse> find( long id) {
-        try {
-            return userHttpContract.get(Long.parseLong(id));
-        } catch (NumberFormatException ex) {
-            return findByUsername(id);
-        }
-    }
-
     public List<User> find(List<String> ids) {
         return userRepository.findAllByReferenceIn(ids);
-    }
-
-    public Optional<UserResponse> findUserResponse(long requesterId,long id) {
-        return find(requesterId,String.valueOf(id));
     }
 
     public Optional<User> findUser(Long id) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return userRepository.findById(id);
-    }
-
-    public UserResponse get(Long id) {
-        securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return find(id).orElse(null);
     }
 
     public Optional<UserResponse> findByUsername(String username) {

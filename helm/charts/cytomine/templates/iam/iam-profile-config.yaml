@@ -128,9 +128,13 @@ data:
             ]
           },
           "permissions": {
-            "view": [],
+            "view": [
+              "admin",
+              "user"
+            ],
             "edit": [
-              "admin"
+              "admin",
+              "user"
             ]
           },
           "multivalued": false

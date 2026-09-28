@@ -32,6 +32,7 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.config.properties.ApplicationProperties;
@@ -68,6 +69,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @WithMockUser(username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
+@MockedUser
 public class UserAnnotationResourceTests {
 
     @Autowired

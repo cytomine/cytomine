@@ -1,10 +1,13 @@
 package be.cytomine.service.security;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -22,11 +25,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
@@ -78,6 +85,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 import static org.springframework.security.acls.domain.BasePermission.WRITE;
@@ -125,6 +135,10 @@ public class UserServiceTests {
     private UserMapper userMapper;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserHttpContract userHttpContract;
+    @Autowired
+    private WiremockRepository wiremockRepository;
 
     private static void setupStub() {
         /* Simulate call to CBIR */
@@ -155,6 +169,45 @@ public class UserServiceTests {
         projectConnectionRepository.deleteAll();
         lastUserPositionRepository.deleteAll();
         persistentUserPositionRepository.deleteAll();
+    }
+
+    private UserHttpContract wiremockUserHttpContract() {
+        RestClient restClient = RestClient.builder()
+            .baseUrl("http://localhost:" + wireMockServer.port())
+            .build();
+        return HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient))
+            .build()
+            .createClient(UserHttpContract.class);
+    }
+
+    private void answerUserServiceWithWiremock() {
+        UserHttpContract contract = wiremockUserHttpContract();
+        when(userHttpContract.search(anyString()))
+            .thenAnswer(invocation -> contract.search(invocation.getArgument(0)));
+        when(userHttpContract.get(anyLong()))
+            .thenAnswer(invocation -> contract.get(invocation.getArgument(0)));
+    }
+
+    private UserResponse givenWiremockUser(long id, String username) {
+        UserResponse user = new UserResponse(
+            id,
+            username,
+            username.toLowerCase(Locale.ROOT) + "@test.cytomine.local",
+            Optional.of("firstname lastname"),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            false,
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            LocalDateTime.of(2024, 1, 1, 0, 0),
+            Optional.of(username + "-private-key"),
+            Optional.of(username + "-public-key"),
+            Set.of()
+        );
+        wiremockRepository.stubUser(user);
+        return user;
     }
 
     PersistentProjectConnection givenAPersistentConnectionInProject(User user, Project project, Date created) {
@@ -198,7 +251,7 @@ public class UserServiceTests {
 
     @Test
     void findUnexistingUserReturnEmpty() {
-        assertThat(userService.find(0L)).isEmpty();
+        assertThat(userService.findUser(0L)).isEmpty();
     }
 
     @Test
@@ -211,7 +264,7 @@ public class UserServiceTests {
     @Test
     void findUserByUsername() {
         UserResponse user = builder.givenUserAclRead();
-        User expected = builder.getUserEntity(user.username());
+        UserResponse expected = builder.getUser(user.username());
         assertThat(userService.findByUsername(user.username())).isPresent().contains(expected);
         assertThat(userService.findByUsername(user.username().toUpperCase(Locale.ROOT)))
             .isPresent().contains(expected);
@@ -224,6 +277,46 @@ public class UserServiceTests {
         UserResponse user = builder.givenUserAclRead();
         UserResponse expected = builder.getUser(user.username());
         assertThat(userService.findByPublicKey(user.publicKey().orElseThrow())).isPresent().contains(expected);
+    }
+
+    @Test
+    void findUserByUsernameWithWiremock() {
+        answerUserServiceWithWiremock();
+        UserResponse user = givenWiremockUser(4242L, "wiremockuser");
+
+        Optional<UserResponse> found = userService.findByUsername(user.username());
+
+        assertThat(found).isPresent();
+        assertThat(found.get().id()).isEqualTo(user.id());
+        assertThat(found.get().username()).isEqualTo(user.username());
+        assertThat(found.get().email()).isEqualTo(user.email());
+    }
+
+    @Test
+    void findUnexistingUserByUsernameWithWiremock() {
+        answerUserServiceWithWiremock();
+
+        assertThat(userService.findByUsername("unknown-wiremock-user")).isEmpty();
+    }
+
+    @Test
+    void findUserByIdWithWiremock() {
+        answerUserServiceWithWiremock();
+        UserResponse user = givenWiremockUser(4243L, "wiremockuserbyid");
+
+        Optional<UserResponse> found = userHttpContract.get(user.id());
+
+        assertThat(found).isPresent();
+        assertThat(found.get().id()).isEqualTo(user.id());
+        assertThat(found.get().username()).isEqualTo(user.username());
+        assertThat(found.get().email()).isEqualTo(user.email());
+    }
+
+    @Test
+    void findUnexistingUserByIdWithWiremock() {
+        answerUserServiceWithWiremock();
+
+        assertThat(userHttpContract.get(987654321L)).isEmpty();
     }
 
     @Test

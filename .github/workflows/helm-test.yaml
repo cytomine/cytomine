@@ -166,24 +166,6 @@ jobs:
         if: failure()
         run: kubectl get events --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} --sort-by='.lastTimestamp'
 
-      - name: Debug iam-config job
-        if: failure()
-        run: |
-          NS=cytomine-${{ env.DEPLOYMENT_NAME }}
-
-          echo "=== iam-config job ==="
-          kubectl -n $NS describe job iam-config || true
-
-          echo "=== iam-config pods ==="
-          kubectl -n $NS get pods -l job-name=iam-config -o wide || true
-
-          for pod in $(kubectl -n $NS get pods -l job-name=iam-config -o jsonpath='{.items[*].metadata.name}'); do
-            echo "===== describe $pod ====="
-            kubectl -n $NS describe pod $pod || true
-            echo "===== logs $pod (all containers, incl. init) ====="
-            kubectl -n $NS logs $pod --all-containers=true --prefix=true || true
-          done
-
       - name: Get gateway IP
         run: |
           NS=cytomine-${{ env.DEPLOYMENT_NAME }}

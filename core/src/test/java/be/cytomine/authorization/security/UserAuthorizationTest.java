@@ -56,8 +56,6 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     public void everyBodyCanReadUser() {
         User userNoAcl = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
         assertThat(userService.findUser(userNoAcl.getId())).isPresent();
-        assertThat(userService.find(userNoAcl.getId())).isPresent();
-        assertThat(userService.get(userNoAcl.getId())).isNotNull();
         assertThat(userService.findByUsername(userNoAcl.getUsername())).isPresent();
         assertThat(userService.findByPublicKey(userNoAcl.getPublicKey())).isPresent();
         assertThat(userService.getAuthenticationRoles(userMapper.map(userNoAcl))).isNotNull();

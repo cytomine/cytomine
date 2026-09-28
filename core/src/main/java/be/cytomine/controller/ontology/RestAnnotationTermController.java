@@ -174,13 +174,9 @@ public class RestAnnotationTermController extends RestCytomineController {
 
         TermResponse term = termHttpContract.findTermByID(idTerm)
             .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm));
-        long userId =
-            maybeIdUser.map(idUser -> userHttpContract.get(idUser).map(UserResponse::id)
-                .orElseGet(
-                    // why bother actually? We received a wrong userId
-                    () -> currentUserService.getCurrentUser().id()
-                ))
-                .orElse(-1L);
+        long userId = maybeIdUser
+            .flatMap(idUser -> userHttpContract.get(idUser).map(UserResponse::id))
+            .orElseGet(() -> currentUserService.getCurrentUser().id());
         return delete(
             annotationTermService,
             JsonObject.of(

@@ -189,7 +189,7 @@ public class UserPositionServiceTests {
         // all filters
         results = userPositionService.list(
             sliceInstance.getImage(),
-            mainUser,
+            Optional.of(mainUser.getId()),
             sliceInstance,
             beforeFirstPosition.getTime(),
             afterLastPosition.getTime(),
@@ -201,7 +201,7 @@ public class UserPositionServiceTests {
         // no user filters
         results = userPositionService.list(
             sliceInstance.getImage(),
-            null,
+            Optional.empty(),
             sliceInstance,
             beforeFirstPosition.getTime(),
             afterLastPosition.getTime(),
@@ -213,7 +213,7 @@ public class UserPositionServiceTests {
         // no date before filters
         results = userPositionService.list(
             sliceInstance.getImage(),
-            null,
+            Optional.empty(),
             sliceInstance,
             null,
             afterLastPosition.getTime(),
@@ -225,7 +225,7 @@ public class UserPositionServiceTests {
         // no date filters
         results = userPositionService.list(
             sliceInstance.getImage(),
-            null,
+            Optional.empty(),
             sliceInstance,
             null,
             null,
@@ -237,7 +237,7 @@ public class UserPositionServiceTests {
         // date restriction but in range
         results = userPositionService.list(
             sliceInstance.getImage(),
-            null,
+            Optional.empty(),
             sliceInstance,
             beforeFirstPosition.getTime(),
             afterLastPosition.getTime(),
@@ -249,7 +249,7 @@ public class UserPositionServiceTests {
         // date restriction but only old
         results = userPositionService.list(
             sliceInstance.getImage(),
-            null,
+            Optional.empty(),
             sliceInstance,
             DateUtils.addDays(oldPosition, -1).getTime(),
             DateUtils.addDays(oldPosition, 1).getTime(),
@@ -277,7 +277,7 @@ public class UserPositionServiceTests {
 
         List<Map<String, Object>> summarize = userPositionService.summarize(
             sliceInstance.getImage(),
-            mainUser,
+            Optional.of(mainUser.getId()),
             sliceInstance,
             beforeFirstPosition.getTime(),
             afterLastPosition.getTime()
@@ -309,7 +309,7 @@ public class UserPositionServiceTests {
 
         List<Map<String, Object>> summarize = userPositionService.summarize(
             sliceInstance.getImage(),
-            mainUser,
+            Optional.of(mainUser.getId()),
             sliceInstance,
             beforeFirstPosition.getTime(),
             afterLastPosition.getTime()
@@ -347,7 +347,7 @@ public class UserPositionServiceTests {
 
         List<Map<String, Object>> summarize = userPositionService.summarize(
             sliceInstance.getImage(),
-            mainUser,
+            Optional.of(mainUser.getId()),
             sliceInstance,
             beforeFirstPosition.getTime(),
             afterLastPosition.getTime()
@@ -356,7 +356,7 @@ public class UserPositionServiceTests {
 
         summarize = userPositionService.summarize(
             sliceInstance.getImage(),
-            mainUser,
+            Optional.of(mainUser.getId()),
             sliceInstance,
             DateUtils.addDays(oldPosition, 2).getTime(),
             afterLastPosition.getTime()
@@ -365,7 +365,7 @@ public class UserPositionServiceTests {
 
         summarize = userPositionService.summarize(
             sliceInstance.getImage(),
-            mainUser,
+            Optional.of(mainUser.getId()),
             sliceInstance,
             DateUtils.addDays(oldPosition, 4).getTime(),
             afterLastPosition.getTime()

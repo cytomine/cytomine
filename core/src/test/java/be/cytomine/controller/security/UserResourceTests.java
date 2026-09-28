@@ -348,6 +348,7 @@ public class UserResourceTests {
     @Transactional
     public void getUserWithItsUserKeyId() throws Exception {
         UserResponse currentUser = builder.givenSuperAdmin();
+        wiremockRepository.stubUser(currentUser);
         restUserControllerMockMvc.perform(get("/api/user/{id}/keys.json", builder.givenSuperAdmin().id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.privateKey").value(currentUser.privateKey().orElse(null)));
@@ -359,6 +360,7 @@ public class UserResourceTests {
     public void getKeysFromOtherUserIsForbidden() throws Exception {
         wiremockRepository.stubUser(builder.givenAclUserNoAcl());
         UserResponse user = builder.givenSuperAdmin();
+        wiremockRepository.stubUser(user);
         restUserControllerMockMvc.perform(get("/api/user/{id}/keys.json", user.id()))
             .andExpect(status().isForbidden());
         restUserControllerMockMvc.perform(get("/api/userkey/{publicKey}/keys.json", user.publicKey().orElse(null)))

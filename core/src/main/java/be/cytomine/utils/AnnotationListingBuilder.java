@@ -27,7 +27,6 @@ import be.cytomine.repository.UserAnnotationListing;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.ParamsService;
 
 import static java.util.stream.Collectors.toSet;

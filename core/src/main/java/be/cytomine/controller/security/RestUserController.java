@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -165,12 +166,20 @@ public class RestUserController extends RestCytomineController {
     }
 
     @Deprecated
-    @GetMapping("/user/{username}/keys.json")
-    public ResponseEntity<String> keysById(@PathVariable String username) {
-        UserResponse user = userHttpContract.search(username)
-            .orElseThrow(() -> new ObjectNotFoundException("User", Map.of("username", username).toString()));
-        securityACLService.checkIsSameUser(user.id(), currentUserService.getCurrentUser());
-        return responseSuccess(JsonObject.of("privateKey", user.privateKey(), "publicKey", user.publicKey()));
+    @GetMapping("/user/{id}/keys.json")
+    public ResponseEntity<String> keysById(@PathVariable String id) {
+        Optional<UserResponse> user;
+        try {
+            user = userService.findUser(Long.valueOf(id)).map(userMapper::map);
+        } catch (NumberFormatException e) {
+            user = userHttpContract.search(id);
+        }
+        UserResponse found = user
+            .orElseThrow(() -> new ObjectNotFoundException("User", Map.of("id or username", id).toString()));
+        securityACLService.checkIsSameUser(found.id(), currentUserService.getCurrentUser());
+        return responseSuccess(
+            JsonObject.of("privateKey", found.privateKey().orElse(null), "publicKey", found.publicKey().orElse(null))
+        );
     }
 
     @Deprecated

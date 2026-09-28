@@ -28,7 +28,6 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.json.JsonInput;
 import be.cytomine.dto.json.JsonMultipleObject;
 import be.cytomine.dto.json.JsonSingleObject;
@@ -38,7 +37,6 @@ import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.meta.PropertyService;
 import be.cytomine.service.project.ProjectService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.GeometryUtils;
 import be.cytomine.utils.JsonObject;
 
@@ -56,7 +54,6 @@ public class RestPropertyController extends RestCytomineController {
 
     private final AnnotationDomainRepository annotationDomainRepository;
 
-    private final UserService userService;
 
     private final UserHttpContract userHttpContract;
 
@@ -153,7 +150,8 @@ public class RestPropertyController extends RestCytomineController {
         if (bbox != null) {
             boundingbox = GeometryUtils.createBoundingBox(bbox);
         }
-        return responseSuccess(propertyService.listAnnotationCenterPosition(user.id(), imageInstance, boundingbox, key));
+        return responseSuccess(propertyService.listAnnotationCenterPosition(
+            user.id(), imageInstance, boundingbox, key));
     }
 
     @GetMapping("/project/{project}/key/{key}/property.json")

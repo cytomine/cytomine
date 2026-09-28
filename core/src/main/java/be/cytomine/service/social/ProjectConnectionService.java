@@ -599,8 +599,9 @@ public class ProjectConnectionService {
             securityACLService.checkAdmin(currentUserService.getCurrentUser());
         } else if (project != null) {
             securityACLService.check(project, ADMINISTRATION);
-        } else
+        } else {
             userId.ifPresent(aLong -> securityACLService.checkIsSameUser(aLong, currentUserService.getCurrentUser()));
+        }
 
         if (beforeThan == null) {
             beforeThan = new Date().getTime();

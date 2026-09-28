@@ -22,7 +22,6 @@ import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.PersistentImageConsultation;
 import be.cytomine.domain.social.PersistentProjectConnection;
 import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
@@ -30,7 +29,6 @@ import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.social.ProjectConnectionService;
 import be.cytomine.utils.JsonObject;
 
@@ -46,7 +44,6 @@ public class RestProjectConnectionController extends RestCytomineController {
 
     private final ProjectService projectService;
 
-    private final UserService userService;
 
     private final UserHttpContract userHttpContract;
 
@@ -126,7 +123,7 @@ public class RestProjectConnectionController extends RestCytomineController {
             ));
         } else if (period != null) {
             return responseSuccess(projectConnectionService.numberOfProjectConnections(
-                period, afterThan, null, project, null
+                period, afterThan, null, project, Optional.empty()
             ));
         } else {
             return responseSuccess(projectConnectionService.numberOfConnectionsByProjectAndUser(
@@ -154,7 +151,7 @@ public class RestProjectConnectionController extends RestCytomineController {
             ));
         } else if (period != null) {
             return responseSuccess(projectConnectionService.numberOfProjectConnections(
-                period, afterThan, null, project, Optional.of( user.id())
+                period, afterThan, null, project, Optional.of(user.id())
             ));
         } else {
             return responseSuccess(projectConnectionService.numberOfConnectionsByProjectAndUser(
@@ -171,7 +168,7 @@ public class RestProjectConnectionController extends RestCytomineController {
         @RequestParam(required = true) String period
     ) {
         return responseSuccess(projectConnectionService.numberOfProjectConnections(
-            period, afterThan, beforeThan, null, null
+            period, afterThan, beforeThan, null, Optional.empty()
         ));
     }
 

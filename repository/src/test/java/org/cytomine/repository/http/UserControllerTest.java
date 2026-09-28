@@ -81,7 +81,8 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
         return new UserResponse(response.id(), response.username(), updatePayload.email().orElse(response.email()),
             updatePayload.name().or(response::name), updatePayload.lastname().or(response::lastname),
             updatePayload.firstname().or(response::firstname), updatePayload.language().or(response::language),
-            response.isDeveloper(), updatePayload.origin().or(response::origin), Optional.of(updatedTime),
+            updatePayload.developer().orElse(response.isDeveloper()), updatePayload.origin().or(response::origin),
+            Optional.of(updatedTime),
             response.deleted(), response.created(), updatePayload.privateKey().or(response::privateKey),
             updatePayload.publicKey().or(response::publicKey), response.roles());
     }

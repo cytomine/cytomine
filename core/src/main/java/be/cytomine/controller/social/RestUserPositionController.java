@@ -1,6 +1,7 @@
 package be.cytomine.controller.social;
 
 import java.util.Date;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
@@ -50,6 +52,8 @@ public class RestUserPositionController extends RestCytomineController {
     private final UserService userService;
 
     private final SecurityACLService securityACLService;
+
+    private final UserHttpContract userHttpContract;
 
     @PostMapping("/imageinstance/{id}/position.json")
     public ResponseEntity<String> addFromImageInstance(
@@ -140,7 +144,7 @@ public class RestUserPositionController extends RestCytomineController {
     @GetMapping(value = {"/imageinstance/{image}/positions.json", "/imageinstance/{image}/position.json"})
     public ResponseEntity<String> list(
         @PathVariable("image") Long imageId,
-        @RequestParam(value = "user", required = false) Long userId,
+        @RequestParam(value = "user", required = false) Optional<Long> userId,
         @RequestParam(value = "slice", required = false) Long sliceId,
         @RequestParam(required = false) Long afterThan,
         @RequestParam(required = false) Long beforeThan,
@@ -150,10 +154,10 @@ public class RestUserPositionController extends RestCytomineController {
     ) {
         ImageInstance imageInstance =
             imageInstanceService.find(imageId).orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageId));
-        User user = null;
-        if (userId != null) {
-            user = userService.find(userId).orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        }
+        Optional<Long> user =
+            userId.map(id -> userHttpContract.get(id).orElseThrow(() -> new ObjectNotFoundException("User",
+                userId))).map(UserResponse::id);
+
         SliceInstance sliceInstance = null;
         if (sliceId != null) {
             sliceInstance = sliceInstanceService.find(sliceId)

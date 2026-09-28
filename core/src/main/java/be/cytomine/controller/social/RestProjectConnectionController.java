@@ -3,6 +3,7 @@ package be.cytomine.controller.social;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
@@ -44,6 +47,8 @@ public class RestProjectConnectionController extends RestCytomineController {
     private final ProjectService projectService;
 
     private final UserService userService;
+
+    private final UserHttpContract userHttpContract;
 
     private final ReportService reportService;
 
@@ -98,10 +103,10 @@ public class RestProjectConnectionController extends RestCytomineController {
     ) {
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
-        return responseSuccess(projectConnectionService.getConnectionByUserAndProject(user, project, max, offset));
+        return responseSuccess(projectConnectionService.getConnectionByUserAndProject(user.id(), project, max, offset));
 
     }
 
@@ -141,7 +146,7 @@ public class RestProjectConnectionController extends RestCytomineController {
     ) {
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         if (heatmap) {
             return responseSuccess(projectConnectionService.numberOfConnectionsByProjectOrderedByHourAndDays(
@@ -149,11 +154,11 @@ public class RestProjectConnectionController extends RestCytomineController {
             ));
         } else if (period != null) {
             return responseSuccess(projectConnectionService.numberOfProjectConnections(
-                period, afterThan, null, project, user
+                period, afterThan, null, project, Optional.of( user.id())
             ));
         } else {
             return responseSuccess(projectConnectionService.numberOfConnectionsByProjectAndUser(
-                project, List.of(user.getId()), "created", "desc", 0L, 0L
+                project, List.of(user.id()), "created", "desc", 0L, 0L
             ));
         }
     }
@@ -180,7 +185,7 @@ public class RestProjectConnectionController extends RestCytomineController {
     ) {
         Project project = projectService.find(projectId).orElse(null);
         return responseSuccess(projectConnectionService.averageOfProjectConnections(
-            period, afterThan, beforeThan, project, userService.find(userId).map(User::getId).orElse(null)
+            period, afterThan, beforeThan, project, userHttpContract.get(userId).map(UserResponse::id).orElse(null)
         ));
     }
 
@@ -210,11 +215,11 @@ public class RestProjectConnectionController extends RestCytomineController {
     ) throws IOException {
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
         Page<PersistentProjectConnection> page = projectConnectionService.getConnectionByUserAndProject(
-            user, project, max, offset
+            user.id(), project, max, offset
         );
 
         if (export != null && export.equals("csv")) {
@@ -225,7 +230,7 @@ public class RestProjectConnectionController extends RestCytomineController {
             }
 
             byte[] report = reportService.generateConnectionHistoryReport(
-                project.getName(), user.getUsername(), projectConnectionDataList
+                project.getName(), user.username(), projectConnectionDataList
             );
             responseReportFile(
                 reportService.getConnectionHistoryReportFileName(

@@ -252,11 +252,11 @@ public class RestUserController extends RestCytomineController {
         @PathVariable("user") Long userId
     ) {
         log.debug("REST request to add User {} to project {}", userId, projectId);
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.addUserToProject(user.getUsername(), project, false);
+        projectMemberService.addUserToProject(user.username(), project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -322,11 +322,11 @@ public class RestUserController extends RestCytomineController {
         @PathVariable("user") Long userId
     ) {
         log.debug("REST request to remove User {} from project {}", userId, projectId);
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, false);
+        projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -392,11 +392,11 @@ public class RestUserController extends RestCytomineController {
         @PathVariable("user") Long userId
     ) {
         log.debug("REST request to add User {} to project {}", userId, projectId);
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.addUserToProject(user.getUsername(), project, true);
+        projectMemberService.addUserToProject(user.username(), project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -406,14 +406,14 @@ public class RestUserController extends RestCytomineController {
         @PathVariable("user") Long userId
     ) {
         log.debug("REST request to remove User {} from project {}", userId, projectId);
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        if (!Objects.equals(currentUserService.getCurrentUser().id(), user.getId())) {
+        if (!Objects.equals(currentUserService.getCurrentUser().id(), user.id())) {
             securityACLService.check(project, ADMINISTRATION);
         }
-        projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, true);
+        projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 

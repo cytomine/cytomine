@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.project.Project;
@@ -42,6 +43,8 @@ public class RestImageConsultationController extends RestCytomineController {
     private final ProjectService projectService;
 
     private final UserService userService;
+
+    private final UserHttpContract userHttpContract;
 
     private final ReportService reportService;
 
@@ -85,15 +88,15 @@ public class RestImageConsultationController extends RestCytomineController {
     ) {
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        User user = userService.find(userId).orElseThrow(() -> new ObjectNotFoundException("User", userId));
+        UserResponse user = userHttpContract.get(userId).orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
         if (distinctImages) {
             return responseSuccess(imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
-                project, user
+                project, user.id()
             ));
         } else {
             return responseSuccess(imageConsultationService.listImageConsultationByProjectAndUserNoImageDistinct(
-                project, user, max, offset
+                project, user.id(), max, offset
             ));
         }
     }

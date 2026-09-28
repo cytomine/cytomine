@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.config.security.CytomineAuthenticationSupport;
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.KeysResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.common.utils.ParserUtils;
 import be.cytomine.controller.JsonResponseEntity;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
@@ -72,9 +75,13 @@ public class RestUserController extends RestCytomineController {
 
     private final OntologyHttpContract ontologyHttpContract;
 
+    private final UserHttpContract userHttpContract;
+
     private final ReportService reportService;
 
     private final UserMapper userMapper;
+
+    private final ParserUtils parserUtils;
 
     @GetMapping("/project/{id}/admin.json")
     public ResponseEntity<String> showAdminByProject(
@@ -164,10 +171,16 @@ public class RestUserController extends RestCytomineController {
     @Deprecated
     @GetMapping("/user/{id}/keys.json")
     public ResponseEntity<String> keysById(@PathVariable String id) {
-        User user = userService.find(id)
+        Optional<UserResponse> user =
+            parserUtils.parseLong(id).flatMap(userHttpContract::get)
+                .or(() -> userHttpContract.search(id));
+
+        UserResponse found = user
             .orElseThrow(() -> new ObjectNotFoundException("User", Map.of("id or username", id).toString()));
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return responseSuccess(JsonObject.of("privateKey", user.getPrivateKey(), "publicKey", user.getPublicKey()));
+        securityACLService.checkIsSameUser(found.id(), currentUserService.getCurrentUser());
+        return responseSuccess(
+            JsonObject.of("privateKey", found.privateKey().orElse(null), "publicKey", found.publicKey().orElse(null))
+        );
     }
 
     @Deprecated
@@ -249,11 +262,11 @@ public class RestUserController extends RestCytomineController {
         @PathVariable("user") Long userId
     ) {
         log.debug("REST request to add User {} to project {}", userId, projectId);
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.addUserToProject(user.getUsername(), project, false);
+        projectMemberService.addUserToProject(user.username(), project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -319,11 +332,11 @@ public class RestUserController extends RestCytomineController {
         @PathVariable("user") Long userId
     ) {
         log.debug("REST request to remove User {} from project {}", userId, projectId);
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, false);
+        projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -389,11 +402,11 @@ public class RestUserController extends RestCytomineController {
         @PathVariable("user") Long userId
     ) {
         log.debug("REST request to add User {} to project {}", userId, projectId);
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        projectMemberService.addUserToProject(user.getUsername(), project, true);
+        projectMemberService.addUserToProject(user.username(), project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 
@@ -403,14 +416,14 @@ public class RestUserController extends RestCytomineController {
         @PathVariable("user") Long userId
     ) {
         log.debug("REST request to remove User {} from project {}", userId, projectId);
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        if (!Objects.equals(currentUserService.getCurrentUser().id(), user.getId())) {
+        if (!Objects.equals(currentUserService.getCurrentUser().id(), user.id())) {
             securityACLService.check(project, ADMINISTRATION);
         }
-        projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, true);
+        projectMemberService.deleteUserFromProject(user.username(), user.id(), project, true);
         return responseSuccess(JsonObject.of("data", JsonObject.of("message", "OK")).toJsonString());
     }
 

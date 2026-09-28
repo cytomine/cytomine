@@ -43,5 +43,8 @@ data:
       "emailVerified": true,
       "email": "admin@cytomine.org",
       "firstName": "Admin",
-      "lastName": "Admin"
+      "lastName": "Admin",
+      "attributes": {
+        "isDeveloper": ["0"]
+      }
     }

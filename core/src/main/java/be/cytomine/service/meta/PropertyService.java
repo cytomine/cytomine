@@ -212,7 +212,7 @@ public class PropertyService extends ModelService {
     }
 
     public List<Map<String, Object>> listAnnotationCenterPosition(
-        User user,
+        long userId,
         ImageInstance image,
         Geometry boundingbox,
         String key
@@ -227,7 +227,7 @@ public class PropertyService extends ModelService {
                 + image.getId()
                 + "' "
                 + "AND ua.user_id = '"
-                + user.getId()
+                + userId
                 + "' "
                 + (boundingbox != null ? "AND ST_Intersects(ua.location,ST_GeometryFromText('"
                 + boundingbox

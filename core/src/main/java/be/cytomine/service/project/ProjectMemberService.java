@@ -157,8 +157,8 @@ public class ProjectMemberService {
 
     public void deleteUserFromProjectWithAdmin(User user, Project project, boolean admin) {
         if (project != null) {
-            Optional<User> adminAsCurrentUserOptional = userService.findByUsernameWithAdmin("admin");
-            User adminUser = null;
+            Optional<UserResponse> adminAsCurrentUserOptional = userHttpContract.search("admin");
+            UserResponse adminUser = null;
             if (adminAsCurrentUserOptional.isPresent()) {
                 adminUser = adminAsCurrentUserOptional.get();
             }
@@ -192,23 +192,23 @@ public class ProjectMemberService {
                 && projectRepresentativeUserService.listByProjectWithAdmin(project).get(0).getUserId()
                 .equals(user.getId());
             if (hasLostAccessToProject && isLastRepresentative) {
-                if (!securityACLService.getProjectList(userMapper.map(adminUser), null).contains(project)) {
+                if (!securityACLService.getProjectList(adminUser, null).contains(project)) {
                     // if current user is not in project (= SUPERADMIN), add to the project
-                    addUserToProject(adminUser.getUsername(), project, true);
+                    addUserToProject(adminUser.username(), project, true);
                 }
                 assert adminUser != null;
-                log.info("add current user " + adminUser.getUsername() + " as representative for project "
+                log.info("add current user " + adminUser.username() + " as representative for project "
                     + project.getId());
                 ProjectRepresentativeUser pru = new ProjectRepresentativeUser();
                 pru.setProject(project);
-                pru.setUserId(adminUser.getId());
-                projectRepresentativeUserService.add(pru.toJsonObject(urlApi), adminUser);
+                pru.setUserId(adminUser.id());
+                projectRepresentativeUserService.add(pru.toJsonObject(urlApi), adminUser.id());
 
                 Optional<ProjectRepresentativeUser> foundRepOptional =
                     projectRepresentativeUserService.find(project, user.getId());
                 if (foundRepOptional.isPresent()) {
                     ProjectRepresentativeUser foundRep = foundRepOptional.get();
-                    projectRepresentativeUserService.deleteWithAdmin(foundRep, null, adminUser.getId());
+                    projectRepresentativeUserService.deleteWithAdmin(foundRep, null, adminUser.id());
                 }
 
             }

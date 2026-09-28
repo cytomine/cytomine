@@ -2,6 +2,7 @@ package be.cytomine.controller.ontology;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.CurrentUserService;
@@ -30,7 +32,6 @@ import be.cytomine.service.ontology.AnnotationTermService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -47,9 +48,9 @@ public class RestAnnotationTermController extends RestCytomineController {
 
     private final UserAnnotationService userAnnotationService;
 
-    private final UserService userService;
-
     private final TermHttpContract termHttpContract;
+
+    private final UserHttpContract userHttpContract;
 
     private final SecurityACLService securityACLService;
 
@@ -71,8 +72,9 @@ public class RestAnnotationTermController extends RestCytomineController {
         } else if (idUser == null && annotation.isReviewedAnnotation()) {
             results.addAll(reviewedAnnotationService.listTerms((ReviewedAnnotation) annotation));
         } else if (idUser != null) {
-            User user = userService.find(idUser).orElseThrow(() -> new ObjectNotFoundException("User", idUser));
-            results.addAll(annotationTermService.list((UserAnnotation) annotation, user));
+            UserResponse user = userHttpContract.get(idUser).orElseThrow(() -> new ObjectNotFoundException("User",
+                idUser));
+            results.addAll(annotationTermService.list((UserAnnotation) annotation, user.id()));
         }
         return responseSuccess(results);
     }
@@ -88,9 +90,9 @@ public class RestAnnotationTermController extends RestCytomineController {
         log.debug("REST request to list terms for annotation {} not defined by user {}", idAnnotation, idNotUser);
         UserAnnotation annotation = userAnnotationService.find(idAnnotation)
             .orElseThrow(() -> new ObjectNotFoundException("UserAnnotation", idAnnotation));
-        User user = (User) userService.find(idNotUser)
+        UserResponse user = userHttpContract.get(idNotUser)
             .orElseThrow(() -> new ObjectNotFoundException("User", idNotUser));
-        return responseSuccess(annotationTermService.listAnnotationTermNotDefinedByUser(annotation, user));
+        return responseSuccess(annotationTermService.listAnnotationTermNotDefinedByUser(annotation, user.id()));
     }
 
     @GetMapping({
@@ -112,16 +114,16 @@ public class RestAnnotationTermController extends RestCytomineController {
             .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm));
 
         if (idUser != null) {
-            User user = userService.find(idUser)
+            UserResponse user = userHttpContract.get(idUser)
                 .orElseThrow(() -> new ObjectNotFoundException("User", idUser));
 
-            return responseSuccess(annotationTermService.find(annotation, term.id(), user)
+            return responseSuccess(annotationTermService.find(annotation, term.id(), user.id())
                 .orElseThrow(() -> new ObjectNotFoundException(
                     "AnnotationTerm", annotation + "-" + term + "-" + idUser))
             );
         } else {
             // user is not set, we will get the annotation-term from all user
-            return responseSuccess(annotationTermService.find(annotation, term.id(), null)
+            return responseSuccess(annotationTermService.find(annotation, term.id())
                 .orElseThrow(() -> new ObjectNotFoundException("AnnotationTerm", annotation + "-" + term + "-null")));
         }
     }
@@ -157,24 +159,28 @@ public class RestAnnotationTermController extends RestCytomineController {
 
     @DeleteMapping({
         "/annotation/{idAnnotation}/term/{idTerm}.json",
-        "/annotation/{idAnnotation}/term/{idTerm}/user/{idUser}.json"
+        "/annotation/{idAnnotation}/term/{idTerm}/user/{maybeIdUser}.json"
     })
     public ResponseEntity<String> delete(
         @PathVariable Long idAnnotation,
         @PathVariable Long idTerm,
-        @PathVariable(required = false) Long idUser
+        @PathVariable(required = false) Optional<Long> maybeIdUser
     ) {
         log.debug(
-            "REST request to get annotation term with annotation {} term {} user {}", idAnnotation, idTerm, idUser
+            "REST request to get annotation term with annotation {} term {} user {}", idAnnotation, idTerm, maybeIdUser
         );
         AnnotationDomain annotation = userAnnotationService.find(idAnnotation)
             .orElseThrow(() -> new ObjectNotFoundException("Annotation", idAnnotation));
 
         TermResponse term = termHttpContract.findTermByID(idTerm)
             .orElseThrow(() -> new ObjectNotFoundException("Term", idTerm));
-        long userId = userService.find(idUser != null ? idUser : -1L)
-            .map(CytomineDomain::getId)
-            .orElse(currentUserService.getCurrentUser().id());
+        long userId =
+            maybeIdUser.map(idUser -> userHttpContract.get(idUser).map(UserResponse::id)
+                .orElseGet(
+                    // why bother actually? We received a wrong userId
+                    () -> currentUserService.getCurrentUser().id()
+                ))
+                .orElse(-1L);
         return delete(
             annotationTermService,
             JsonObject.of(

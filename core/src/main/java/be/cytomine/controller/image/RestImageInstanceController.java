@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -91,8 +92,6 @@ public class RestImageInstanceController extends RestCytomineController {
 
     private final SecurityACLService securityACLService;
 
-    private final CurrentUserService currentUserService;
-
     private final UserHttpContract userHttpContract;
 
     @GetMapping("/imageinstance/{id}.json")
@@ -107,11 +106,11 @@ public class RestImageInstanceController extends RestCytomineController {
     @GetMapping("/user/{id}/imageinstance.json")
     public ResponseEntity<String> listByUser(@PathVariable Long id) {
         log.debug("REST request to get image instance by user {}", id);
-        User user = userService.find(id)
+        UserResponse user = userHttpContract.get(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
         RequestParams requestParams = retrievePageableParameters();
         return responseSuccess(imageInstanceService.list(
-            user.getId(),
+            user.id(),
             retrieveSearchParameters(),
             requestParams.getSort(),
             requestParams.getOrder(),

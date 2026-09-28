@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
@@ -55,6 +57,8 @@ public class RestPropertyController extends RestCytomineController {
     private final AnnotationDomainRepository annotationDomainRepository;
 
     private final UserService userService;
+
+    private final UserHttpContract userHttpContract;
 
     @GetMapping("/project/{project}/property.json")
     public ResponseEntity<String> listByProject(
@@ -143,13 +147,13 @@ public class RestPropertyController extends RestCytomineController {
         log.debug("REST request to list annotation position");
         ImageInstance imageInstance = imageInstanceService.find(imageInstanceId)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageInstanceId));
-        User user = userService.find(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Geometry boundingbox = null;
         if (bbox != null) {
             boundingbox = GeometryUtils.createBoundingBox(bbox);
         }
-        return responseSuccess(propertyService.listAnnotationCenterPosition(user, imageInstance, boundingbox, key));
+        return responseSuccess(propertyService.listAnnotationCenterPosition(user.id(), imageInstance, boundingbox, key));
     }
 
     @GetMapping("/project/{project}/key/{key}/property.json")

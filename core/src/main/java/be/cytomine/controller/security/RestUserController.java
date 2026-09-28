@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.config.security.CytomineAuthenticationSupport;
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.KeysResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
@@ -71,6 +72,8 @@ public class RestUserController extends RestCytomineController {
     private final ProjectRepresentativeUserService projectRepresentativeUserService;
 
     private final OntologyHttpContract ontologyHttpContract;
+
+    private final UserHttpContract userHttpContract;
 
     private final ReportService reportService;
 
@@ -162,12 +165,12 @@ public class RestUserController extends RestCytomineController {
     }
 
     @Deprecated
-    @GetMapping("/user/{id}/keys.json")
-    public ResponseEntity<String> keysById(@PathVariable String id) {
-        User user = userService.find(id)
-            .orElseThrow(() -> new ObjectNotFoundException("User", Map.of("id or username", id).toString()));
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return responseSuccess(JsonObject.of("privateKey", user.getPrivateKey(), "publicKey", user.getPublicKey()));
+    @GetMapping("/user/{username}/keys.json")
+    public ResponseEntity<String> keysById(@PathVariable String username) {
+        UserResponse user = userHttpContract.search(username)
+            .orElseThrow(() -> new ObjectNotFoundException("User", Map.of("username", username).toString()));
+        securityACLService.checkIsSameUser(user.id(), currentUserService.getCurrentUser());
+        return responseSuccess(JsonObject.of("privateKey", user.privateKey(), "publicKey", user.publicKey()));
     }
 
     @Deprecated

@@ -6,10 +6,12 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.KeysResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.common.repository.utils.SpringPageCrawler;
 import be.cytomine.common.utils.ParserUtils;
 import be.cytomine.controller.JsonResponseEntity;
 import be.cytomine.controller.RestCytomineController;
@@ -79,9 +82,9 @@ public class RestUserController extends RestCytomineController {
 
     private final ReportService reportService;
 
-    private final UserMapper userMapper;
-
     private final ParserUtils parserUtils;
+
+    private final SpringPageCrawler springPageCrawler;
 
     @GetMapping("/project/{id}/admin.json")
     public ResponseEntity<String> showAdminByProject(
@@ -100,10 +103,12 @@ public class RestUserController extends RestCytomineController {
         log.debug("REST request to list representatives from project {}", id);
         Project project = projectService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("Project", id));
-        List<Long> userIds = projectRepresentativeUserService.listByProject(project)
+        Set<Long> userIds = projectRepresentativeUserService.listByProject(project)
             .stream().map(ProjectRepresentativeUser::getUserId)
-            .collect(Collectors.toList());
-        return responseSuccess(userService.list(userIds), isFilterRequired());
+            .collect(Collectors.toSet());
+        return responseSuccess(
+            springPageCrawler.getAllPages(p -> userHttpContract.findByIdsIn(userIds, p)).stream().toList(),
+            isFilterRequired());
     }
 
     @GetMapping("/project/{id}/creator.json")
@@ -293,16 +298,18 @@ public class RestUserController extends RestCytomineController {
             }
         }
 
-        List<User> users = userService.list(usersValidIds);
+        Set<UserResponse> users =
+            springPageCrawler.getAllPages(p -> userHttpContract.findByIdsIn(new HashSet<>(usersValidIds),
+            p));
 
         wrongIds.addAll(usersIds);
-        wrongIds.removeAll(users.stream().map(x -> String.valueOf(x.getId())).toList());
+        wrongIds.removeAll(users.stream().map(x -> String.valueOf(x.id())).toList());
 
-        for (User user : users) {
+        for (UserResponse user : users) {
             try {
-                projectMemberService.addUserToProject(user.getUsername(), project, false);
+                projectMemberService.addUserToProject(user.username(), project, false);
             } catch (Exception e) {
-                errors.add(user.getId().toString());
+                errors.add(String.valueOf(user.id()));
             }
         }
         if (!errors.isEmpty()) {
@@ -363,16 +370,19 @@ public class RestUserController extends RestCytomineController {
             }
         }
 
-        List<User> users = userService.list(usersValidIds);
+
+        Set<UserResponse> users =
+            springPageCrawler.getAllPages(p -> userHttpContract.findByIdsIn(new HashSet<>(usersValidIds),
+                p));
 
         wrongIds.addAll(usersIds);
-        wrongIds.removeAll(users.stream().map(x -> String.valueOf(x.getId())).toList());
+        wrongIds.removeAll(users.stream().map(x -> String.valueOf(x.id())).toList());
 
-        for (User user : users) {
+        for (UserResponse user : users) {
             try {
-                projectMemberService.deleteUserFromProject(user.getUsername(), user.getId(), project, false);
+                projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false);
             } catch (Exception e) {
-                errors.add(user.getId().toString());
+                errors.add(String.valueOf(user.id()));
             }
         }
         if (!errors.isEmpty()) {
@@ -436,7 +446,7 @@ public class RestUserController extends RestCytomineController {
     ) {
         log.debug("REST request to list user layers from project {}", id);
 
-        User user = userService.findUser(id)
+        UserResponse user = userHttpContract.get(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
 
         List<UserResponse> friends;
@@ -456,7 +466,7 @@ public class RestUserController extends RestCytomineController {
                 //get user project online
                 Project project = projectService.find(projectId)
                     .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-                friends = userService.getAllFriendsUsersOnline(user, project);
+                friends = userService.getAllFriendsUsersOnline( project);
             } else {
                 //get friends online
                 friends = userService.getAllFriendsUsersOnline(user);
@@ -521,12 +531,12 @@ public class RestUserController extends RestCytomineController {
     ) {
         log.debug("REST request to list activities for user {} and for project {}", userId, projectId);
 
-        User user = userService.findUser(userId)
+        UserResponse user = userHttpContract.get(userId)
             .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        return responseSuccess(userService.getResumeActivities(project, userMapper.map(user)), isFilterRequired());
+        return responseSuccess(userService.getResumeActivities(project, user), isFilterRequired());
     }
 
     boolean isFilterRequired() {

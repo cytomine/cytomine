@@ -49,8 +49,6 @@ public class RestUserPositionController extends RestCytomineController {
 
     private final CurrentUserService currentUserService;
 
-    private final UserService userService;
-
     private final SecurityACLService securityACLService;
 
     private final UserHttpContract userHttpContract;
@@ -128,15 +126,15 @@ public class RestUserPositionController extends RestCytomineController {
     ) {
         ImageInstance imageInstance =
             imageInstanceService.find(imageId).orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageId));
-        User user = userService.findUser(userId).orElseThrow(() -> new ObjectNotFoundException("User", userId));
+        long validUserId = userHttpContract.get(userId).map(UserResponse::id).orElseThrow(() -> new ObjectNotFoundException("User", userId));
         SliceInstance sliceInstance = null;
         if (sliceId != null) {
             sliceInstance = sliceInstanceService.find(sliceId)
                 .orElseThrow(() -> new ObjectNotFoundException("SliceInstance", sliceId));
         }
-        userPositionService.addAsFollower(user, currentUserService.getCurrentUserOld(), imageInstance);
+        userPositionService.addAsFollower(validUserId, currentUserService.getCurrentUserOld(), imageInstance);
         return responseSuccess(userPositionService.lastPositionByUser(
-                imageInstance, sliceInstance, user, broadcast).map(LastUserPosition::toJsonObjectSocial)
+                imageInstance, sliceInstance, validUserId, broadcast).map(LastUserPosition::toJsonObjectSocial)
             .orElse(new JsonObject())
         );
     }

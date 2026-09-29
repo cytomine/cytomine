@@ -286,7 +286,7 @@ public class RestUserController extends RestCytomineController {
         List<String> usersIds = Arrays.stream(userIds.split(",")).toList();
 
         String errorMessage = "";
-        List<String> errors = new ArrayList<>();
+        List<Long> errors = new ArrayList<>();
         List<String> wrongIds = new ArrayList<>();
         List<Long> usersValidIds = new ArrayList<>();
         for (String userId : usersIds) {
@@ -308,11 +308,11 @@ public class RestUserController extends RestCytomineController {
             try {
                 projectMemberService.addUserToProject(user.username(), project, false);
             } catch (Exception e) {
-                errors.add(String.valueOf(user.id()));
+                errors.add(user.id());
             }
         }
         if (!errors.isEmpty()) {
-            errorMessage += "Cannot add theses users to the project ${project.id} : " + String.join(",", errors) + ". ";
+            errorMessage += "Cannot add theses users to the project ${project.id} : " + errors + ". ";
         }
         if (!wrongIds.isEmpty()) {
             errorMessage += String.join(",", wrongIds) + " are not well formatted ids";
@@ -358,7 +358,7 @@ public class RestUserController extends RestCytomineController {
         List<String> usersIds = Arrays.stream(userIds.split(",")).toList();
 
         String errorMessage = "";
-        List<String> errors = new ArrayList<>();
+        List<Long> errors = new ArrayList<>();
         List<String> wrongIds = new ArrayList<>();
         List<Long> usersValidIds = new ArrayList<>();
         for (String userId : usersIds) {
@@ -381,11 +381,11 @@ public class RestUserController extends RestCytomineController {
             try {
                 projectMemberService.deleteUserFromProject(user.username(), user.id(), project, false);
             } catch (Exception e) {
-                errors.add(String.valueOf(user.id()));
+                errors.add(user.id());
             }
         }
         if (!errors.isEmpty()) {
-            errorMessage += "Cannot add theses users to the project ${project.id} : " + String.join(",", errors) + ". ";
+            errorMessage += "Cannot add theses users to the project ${project.id} : " + errors + ". ";
         }
         if (!wrongIds.isEmpty()) {
             errorMessage += String.join(",", wrongIds) + " are not well formatted ids";

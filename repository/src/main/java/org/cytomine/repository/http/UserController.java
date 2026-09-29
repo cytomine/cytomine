@@ -66,6 +66,6 @@ public class UserController implements UserHttpContract {
 
     @Override
     public Page<UserResponse> findByIdsIn(Set<Long> ids, Pageable pageable) {
-        return repository.findByIdIn(ids, pageable);
+        return repository.findByIdIn(ids, pageable).map(mapper::mapToUserResponse);
     }
 }

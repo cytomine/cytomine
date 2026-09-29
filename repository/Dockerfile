@@ -1,4 +1,4 @@
-ARG JAVA_VERSION=21-jre
+ARG JAVA_VERSION=25-jre
 ARG GRADLE_VERSION=9.5.1-jdk21-alpine
 ARG PROXY_CACHE=registry.cytomine.org/docker
 

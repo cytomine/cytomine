@@ -42,7 +42,6 @@ import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.mapper.UserMapper;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.project.ProjectMemberService;
@@ -300,7 +299,7 @@ public class RestUserController extends RestCytomineController {
 
         Set<UserResponse> users =
             springPageCrawler.getAllPages(p -> userHttpContract.findByIdsIn(new HashSet<>(usersValidIds),
-            p));
+                p));
 
         wrongIds.addAll(usersIds);
         wrongIds.removeAll(users.stream().map(x -> String.valueOf(x.id())).toList());
@@ -466,7 +465,7 @@ public class RestUserController extends RestCytomineController {
                 //get user project online
                 Project project = projectService.find(projectId)
                     .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-                friends = userService.getAllFriendsUsersOnline( project);
+                friends = userService.getAllFriendsUsersOnline(project);
             } else {
                 //get friends online
                 friends = userService.getAllFriendsUsersOnline(user);

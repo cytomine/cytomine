@@ -19,7 +19,6 @@ import be.cytomine.common.repository.model.command.payload.response.UserResponse
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastUserPosition;
 import be.cytomine.dto.image.AreaDTO;
 import be.cytomine.dto.image.Point;
@@ -28,7 +27,6 @@ import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.SliceInstanceService;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.social.UserPositionService;
 import be.cytomine.utils.JsonObject;
 
@@ -126,7 +124,8 @@ public class RestUserPositionController extends RestCytomineController {
     ) {
         ImageInstance imageInstance =
             imageInstanceService.find(imageId).orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageId));
-        long validUserId = userHttpContract.get(userId).map(UserResponse::id).orElseThrow(() -> new ObjectNotFoundException("User", userId));
+        long validUserId = userHttpContract.get(userId).map(UserResponse::id)
+            .orElseThrow(() -> new ObjectNotFoundException("User", userId));
         SliceInstance sliceInstance = null;
         if (sliceId != null) {
             sliceInstance = sliceInstanceService.find(sliceId)

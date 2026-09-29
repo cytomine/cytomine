@@ -194,6 +194,15 @@ public class WiremockRepository {
             )
         );
 
+        SERVER.stubFor(WireMock.get(urlPathEqualTo("/users/by-ids"))
+            .atPriority(10)
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody("{\"content\":[],\"number\":0,\"size\":1,\"totalElements\":0}")
+            )
+        );
+
         SERVER.stubFor(WireMock.put(urlPathMatching("/users/\\d+"))
             .willReturn(aResponse()
                 .withStatus(HttpStatus.OK.value())
@@ -266,6 +275,23 @@ public class WiremockRepository {
                 .withStatus(HttpStatus.OK.value())
                 .withHeader("Content-Type", "application/json")
                 .withBody(body)
+            )
+        );
+    }
+
+    @SneakyThrows
+    public void stubUsersByIds(UserResponse... users) {
+        SERVER.stubFor(WireMock.get(urlPathEqualTo("/users/by-ids"))
+            .withQueryParam("page", equalTo("0"))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.OK.value())
+                .withHeader("Content-Type", "application/json")
+                .withBody(objectMapper.writeValueAsString(Map.of(
+                    "content", List.of(users),
+                    "number", 0,
+                    "size", users.length,
+                    "totalElements", users.length
+                )))
             )
         );
     }

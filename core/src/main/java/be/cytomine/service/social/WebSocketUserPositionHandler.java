@@ -183,7 +183,7 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
             Optional<LastUserPosition> lastPosition = userPositionService.lastPositionByUserBypassACL(
                 imgInstance,
                 null,
-                user.get(),
+                user.get().getId(),
                 false
             );
             if (lastPosition.isPresent()) {

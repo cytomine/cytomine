@@ -133,13 +133,14 @@ public class UserPositionServiceTests {
             = givenAPersistentUserPosition(new Date(), anotherUser, builder.givenASliceInstance());
 
         Optional<LastUserPosition> lastUserPosition
-            = userPositionService.lastPositionByUser(sliceInstance.getImage(), sliceInstance, mainUser, false);
+            = userPositionService.lastPositionByUser(sliceInstance.getImage(), sliceInstance, mainUser.getId(), false);
         assertThat(lastUserPosition).isPresent();
         assertThat(lastUserPosition.get().getUser()).isEqualTo(mainUser.getId());
         assertThat(lastUserPosition.get().getLocation()).isEqualTo(USER_VIEW.toMongodbLocation().getCoordinates());
 
         lastUserPosition
-            = userPositionService.lastPositionByUser(sliceInstance.getImage(), sliceInstance, anotherUser, false);
+            = userPositionService.lastPositionByUser(
+                sliceInstance.getImage(), sliceInstance, anotherUser.getId(), false);
         assertThat(lastUserPosition).isPresent();
         assertThat(lastUserPosition.get().getUser()).isEqualTo(anotherUser.getId());
         assertThat(lastUserPosition.get().getSlice()).isEqualTo(sliceInstance.getId());
@@ -456,7 +457,7 @@ public class UserPositionServiceTests {
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
 
         Assertions.assertThat(UserPositionService.followers.get(followerAndImageId)).isNull();
-        userPositionService.addAsFollower(broadcaster, follower, imageInstance);
+        userPositionService.addAsFollower(broadcaster.getId(), follower, imageInstance);
         Assertions.assertThat(UserPositionService.followers.get(followerAndImageId)).isNotNull();
     }
 
@@ -470,7 +471,7 @@ public class UserPositionServiceTests {
         UserPositionService.followers.put(followerAndImageId, false);
 
         Assertions.assertThat(UserPositionService.followers.get(followerAndImageId)).isEqualTo(false);
-        userPositionService.addAsFollower(broadcaster, follower, imageInstance);
+        userPositionService.addAsFollower(broadcaster.getId(), follower, imageInstance);
         Assertions.assertThat(UserPositionService.followers.get(followerAndImageId)).isEqualTo(true);
     }
 

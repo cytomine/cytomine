@@ -123,8 +123,8 @@ public class UserPositionService {
         return persistedPosition;
     }
 
-    public void addAsFollower(User broadcaster, User follower, ImageInstance imageInstance) {
-        String broadcasterAndImageId = broadcaster.getId().toString() + "/" + imageInstance.getId().toString();
+    public void addAsFollower(long broadcasterId, User follower, ImageInstance imageInstance) {
+        String broadcasterAndImageId = broadcasterId + "/" + imageInstance.getId().toString();
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
 
         if (broadcasters.containsKey(broadcasterAndImageId)) {
@@ -147,12 +147,12 @@ public class UserPositionService {
     public Optional<LastUserPosition> lastPositionByUser(
         ImageInstance image,
         SliceInstance slice,
-        User user,
+        long userId,
         boolean broadcast
     ) {
         securityACLService.check(image, READ);
 
-        return getLastUserPosition(image, slice, user, broadcast);
+        return getLastUserPosition(image, slice, userId, broadcast);
     }
 
     /**
@@ -162,20 +162,20 @@ public class UserPositionService {
     public Optional<LastUserPosition> lastPositionByUserBypassACL(
         ImageInstance image,
         SliceInstance slice,
-        User user,
+        long userId,
         boolean broadcast
     ) {
-        return getLastUserPosition(image, slice, user, broadcast);
+        return getLastUserPosition(image, slice, userId, broadcast);
     }
 
     private Optional<LastUserPosition> getLastUserPosition(
         ImageInstance image,
         SliceInstance slice,
-        User user,
+        long userId,
         boolean broadcast
     ) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("user").is(user.getId()));
+        query.addCriteria(Criteria.where("user").is(userId));
         query.addCriteria(Criteria.where("image").is(image.getId()));
         if (slice != null) {
             query.addCriteria(Criteria.where("slice").is(slice.getId()));

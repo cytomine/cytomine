@@ -46,4 +46,6 @@ public interface OntologyHttpContract {
     @GetExchange("/all")
     Page<OntologyResponse> getAllForUser(@RequestParam long userId, Pageable pageable);
 
+    @GetExchange("/{id}/users")
+    Page<OntologyResponse> getAllUsersForOntology(@PathVariable long id, Pageable pageable);
 }

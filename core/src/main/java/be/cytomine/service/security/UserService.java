@@ -203,14 +203,6 @@ public class UserService extends ModelService {
 
     private final UrlApi urlApi;
 
-    public Optional<User> find(UUID sub) {
-        return userRepository.findByReference(String.valueOf(sub));
-    }
-
-    public List<User> find(List<String> ids) {
-        return userRepository.findAllByReferenceIn(ids);
-    }
-
     public Optional<UserResponse> findByPublicKey(String publicKey) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return userRepository.findByPublicKey(publicKey).map(userMapper::map);
@@ -592,10 +584,6 @@ public class UserService extends ModelService {
     public List<User> listUsers(Storage storage) {
         securityACLService.check(storage, READ);
         return userRepository.findAllUsersByStorageId(storage.getId());
-    }
-
-    public List<UserResponse> listAll(Project project) {
-        return new ArrayList<>(listUsers(project));
     }
 
     /**

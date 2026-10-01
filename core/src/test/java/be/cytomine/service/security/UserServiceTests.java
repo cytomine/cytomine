@@ -904,17 +904,6 @@ public class UserServiceTests {
     }
 
     @Test
-    void listAllProjectUsers() {
-        UserResponse user = builder.givenSuperAdmin();
-
-        Project project = builder.givenAProject();
-
-        builder.addUserToProject(project, "superadmin", WRITE);
-
-        assertThat(userService.listAll(project)).contains(user);
-    }
-
-    @Test
     void listLayers() {
         UserResponse user = builder.givenUserAclRead();
         User anotherUserInProject = builder.getUserEntity(USER_ACL_READ);

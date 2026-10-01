@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -202,14 +201,6 @@ public class UserService extends ModelService {
     private final SpringPageCrawler springPageCrawler;
 
     private final UrlApi urlApi;
-
-    public Optional<User> find(UUID sub) {
-        return userRepository.findByReference(String.valueOf(sub));
-    }
-
-    public List<User> find(List<String> ids) {
-        return userRepository.findAllByReferenceIn(ids);
-    }
 
     public Optional<UserResponse> findByPublicKey(String publicKey) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
@@ -592,10 +583,6 @@ public class UserService extends ModelService {
     public List<User> listUsers(Storage storage) {
         securityACLService.check(storage, READ);
         return userRepository.findAllUsersByStorageId(storage.getId());
-    }
-
-    public List<UserResponse> listAll(Project project) {
-        return new ArrayList<>(listUsers(project));
     }
 
     /**

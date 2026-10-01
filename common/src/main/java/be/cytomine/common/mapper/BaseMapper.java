@@ -14,7 +14,7 @@ import org.mapstruct.Mapper;
  * It's tempting to add a
  * `T map(Optional&lt;T&gt; value)`
  * here, but then ObjectMapper does a lot of obscure chained calls.
- * Be careful.
+ * Be careful
  */
 @Mapper(componentModel = "spring")
 public interface BaseMapper {
@@ -51,7 +51,9 @@ public interface BaseMapper {
         return value.orElse(null);
     }
 
-    default Long map(Optional<Long> value) {return value.orElse(null);}
+    default Long mapMaybeLong(Optional<Long> value) {
+        return value.orElse(null);
+    }
 
     default Optional<LocalDateTime> mapToLocalDateTime(Timestamp value) {
         return Optional.ofNullable(value).map(this::mapTimestamp);

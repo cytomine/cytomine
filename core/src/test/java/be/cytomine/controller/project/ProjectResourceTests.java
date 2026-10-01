@@ -38,7 +38,6 @@ import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
-import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.meta.TagDomainAssociation;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.UserAnnotation;

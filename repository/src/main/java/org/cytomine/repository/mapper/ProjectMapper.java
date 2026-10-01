@@ -26,7 +26,7 @@ public interface ProjectMapper {
     @Mapping(target = "countJobAnnotations", ignore = true)
     @Mapping(target = "countReviewedAnnotations", ignore = true)
     @Mapping(target = "name", source = "createProject.name")
-    @Mapping(target = "ontologyId", source = "createProject.ontologyId")
+    @Mapping(target = "ontologyId", source = "createProject.ontology")
     @Mapping(target = "blindMode", source = "createProject.blindMode")
     @Mapping(target = "areImagesDownloadable", source = "createProject.areImagesDownloadable")
     @Mapping(target = "closed", source = "createProject.isClosed")

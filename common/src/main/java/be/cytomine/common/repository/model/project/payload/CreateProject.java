@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotEmpty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record CreateProject(
     @NotEmpty String name,
-    Optional<Long> ontologyId,
+    Optional<Long> ontology,
     boolean blindMode,
     boolean areImagesDownloadable,
     boolean isClosed,

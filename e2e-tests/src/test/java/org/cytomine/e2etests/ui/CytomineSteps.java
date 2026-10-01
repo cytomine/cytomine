@@ -144,7 +144,7 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//td[contains(text(), 'Ontology')]"));
         return wait.until(d -> {
             var elements = d.findElements(By.xpath("//a[contains(@href, '/ontology/')]"));
-            return elements.getFirst().getAttribute("href");
+            return elements.isEmpty() ? null : elements.getFirst().getAttribute("href");
         });
     }
 

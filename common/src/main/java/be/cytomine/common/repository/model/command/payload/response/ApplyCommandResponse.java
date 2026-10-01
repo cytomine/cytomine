@@ -22,16 +22,7 @@ import be.cytomine.common.repository.model.command.DataType;
     @JsonSubTypes.Type(value = UserRoleResponse.class, name = "USER_ROLE"),
 })
 public sealed interface ApplyCommandResponse extends HasLongId, HasLocaleDateTimeCUD
-    permits OntologyResponse,
-    RoleResponse,
-    StorageResponse,
-    TagResponse,
-    TagDomainAssociationResponse,
-    TermRelationResponse,
-    TermResponse,
-    UndoCommandResponse,
-    UploadedFileResponse,
-    UserResponse,
-    UserRoleResponse {
+    permits OntologyResponse, ProjectResponse, RoleResponse, StorageResponse, TagDomainAssociationResponse, TagResponse,
+    TermRelationResponse, TermResponse, UndoCommandResponse, UploadedFileResponse, UserResponse, UserRoleResponse {
     DataType getDataType();
 }

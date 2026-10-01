@@ -67,7 +67,7 @@
     </div>
 
     <create-project-from-metadata-modal
-      :active.sync="createProjectModal"
+      v-model:active="createProjectModal"
       :query="metadataSearch"
       :filters="metadataFilters"
       :ontologies="ontologies"

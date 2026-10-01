@@ -343,7 +343,7 @@ describe('MetadataFilter.vue', () => {
 
     const wrapper = await createWrapper();
 
-    const labels = wrapper.findAll('.facet-filters .label').wrappers.map(label => label.text());
+    const labels = wrapper.findAll('.facet-filters .label').map(label => label.text());
     expect(labels).toContain('Projects');
   });
 });

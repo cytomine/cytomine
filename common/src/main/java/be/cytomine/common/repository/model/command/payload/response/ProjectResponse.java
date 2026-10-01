@@ -5,8 +5,26 @@ import java.util.Optional;
 
 import be.cytomine.common.repository.model.command.DataType;
 
-public record ProjectResponse(String name, long id, LocalDateTime created, Optional<LocalDateTime> updated,
-                              Optional<LocalDateTime> deleted) implements ApplyCommandResponse{
+public record ProjectResponse(
+    long id,
+    String name,
+    Long ontology,
+    String ontologyName,
+    boolean blindMode,
+    boolean areImagesDownloadable,
+    long numberOfImages,
+    long numberOfAnnotations,
+    long numberOfJobAnnotations,
+    long numberOfReviewedAnnotations,
+    boolean isClosed,
+    boolean isReadOnly,
+    boolean isRestricted,
+    boolean hideUsersLayers,
+    boolean hideAdminsLayers,
+    LocalDateTime created,
+    Optional<LocalDateTime> updated,
+    Optional<LocalDateTime> deleted
+) implements ApplyCommandResponse {
     @Override
     public DataType getDataType() {
         return DataType.PROJECT;

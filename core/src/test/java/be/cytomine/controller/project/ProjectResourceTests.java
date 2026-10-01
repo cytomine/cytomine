@@ -1,13 +1,14 @@
 package be.cytomine.controller.project;
 
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,19 +28,20 @@ import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.ProjectHttpContract;
+import be.cytomine.common.repository.model.command.Commands;
+import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
+import be.cytomine.common.repository.model.project.payload.CreateProject;
+import be.cytomine.common.repository.model.project.payload.UpdateProject;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.meta.TagDomainAssociation;
-import be.cytomine.domain.ontology.AnnotationTerm;
-import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.social.PersistentProjectConnection;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.repository.security.AclRepository;
 import be.cytomine.repositorynosql.social.PersistentProjectConnectionRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.MeiliSearchService;
@@ -62,11 +64,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -86,11 +89,6 @@ public class ProjectResourceTests {
     private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     ProjectConnectionService projectConnectionService;
-    @Autowired
-    private BasicInstanceBuilder basicInstanceBuilder;
-
-    @Autowired
-    private EntityManager em;
 
     @Autowired
     private BasicInstanceBuilder builder;
@@ -102,20 +100,19 @@ public class ProjectResourceTests {
     private UserAnnotationService userAnnotationService;
 
     @Autowired
-    private AclRepository aclRepository;
-
-    @Autowired
-    private ProjectRepository projectRepository;
-
-    @Autowired
     private PermissionService permissionService;
 
     @Autowired
     private PersistentProjectConnectionRepository persistentProjectConnectionRepository;
     @Autowired
     private UrlApi urlApi;
+    @Autowired
+    private ObjectMapper objectMapper;
     @MockitoBean
     private OntologyHttpContract ontologyHttpContract;
+
+    @MockitoBean
+    private ProjectHttpContract projectHttpContract;
 
     @MockitoBean
     private MeiliSearchService meiliSearchService;
@@ -502,13 +499,12 @@ public class ProjectResourceTests {
     @Transactional
     public void shouldReturnProjectWithAllExpectedFields() throws Exception {
         Project project = builder.givenAProject();
+        when(projectHttpContract.read(project.getId())).thenReturn(Optional.of(toResponse(project)));
 
         restProjectControllerMockMvc.perform(get("/api/project/{id}.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(project.getId().intValue()))
-            .andExpect(jsonPath("$.class").value("be.cytomine.domain.project.Project"))
             .andExpect(jsonPath("$.created").exists())
-            .andExpect(jsonPath("$.updated").exists())
             .andExpect(jsonPath("$.name").value(project.getName()))
             .andExpect(jsonPath("$.ontology").value(project.getOntology().getId().intValue()))
             .andExpect(jsonPath("$.ontologyName").value(project.getOntology().getName()))
@@ -519,7 +515,6 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.numberOfJobAnnotations").value(0))
             .andExpect(jsonPath("$.numberOfReviewedAnnotations").value(0))
             .andExpect(jsonPath("$.isClosed").value(false))
-            .andExpect(jsonPath("$.blindMode").value(false))
             .andExpect(jsonPath("$.isReadOnly").value(false))
             .andExpect(jsonPath("$.isRestricted").value(false))
             .andExpect(jsonPath("$.hideUsersLayers").value(false))
@@ -529,6 +524,8 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void shouldReturnNotFoundWhenProjectDoesNotExist() throws Exception {
+        when(projectHttpContract.read(0L)).thenReturn(Optional.empty());
+
         restProjectControllerMockMvc.perform(get("/api/project/{id}.json", 0))
             .andExpect(status().isNotFound());
     }
@@ -536,244 +533,129 @@ public class ProjectResourceTests {
     @Test
     @Transactional
     public void addValidProject() throws Exception {
-        String currentUsername = currentUserService.getCurrentUsername();
-        Project project = basicInstanceBuilder.givenANotPersistedProject();
-        project.setOntology(builder.givenAnOntology());
-        project.setName("add_valid_project");
-
-        /* Test project creation */
-        restProjectControllerMockMvc.perform(post("/api/project.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJSON(urlApi)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.projectID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddProjectCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.project.id").exists())
-            .andExpect(jsonPath("$.project.name").value(project.getName()))
-            .andExpect(jsonPath("$.project.ontology").value(project.getOntology().getId()));
-
-        project = projectRepository.findByName("add_valid_project").get();
-        assertThat(aclRepository.listMaskForUsers(project.getId(),
-            aclRepository.getAclClassId(Project.class.getName()), currentUsername))
-            .contains(ADMINISTRATION.getMask());
-    }
-
-    @Test
-    @Transactional
-    public void addValidProjectWithoutOntology() throws Exception {
-        Project project = basicInstanceBuilder.givenANotPersistedProject();
-        project.setOntology(null);
-
-        /* Test project creation */
-        restProjectControllerMockMvc.perform(post("/api/project.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJSON(urlApi)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.projectID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddProjectCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.project.id").exists())
-            .andExpect(jsonPath("$.project.name").value(project.getName()))
-            .andExpect(jsonPath("$.ontology").doesNotExist());
-    }
-
-    @Test
-    @Transactional
-    public void addValidProjectWithUsersAdmins() throws Exception {
-        String currentUsername = currentUserService.getCurrentUsername();
-        UserResponse user = builder.givenUserAclRead();
-        UserResponse admin = builder.givenUserAclWrite();
-
-        Project project = basicInstanceBuilder.givenANotPersistedProject();
-        project.setOntology(builder.givenAnOntology());
-        project.setName("add_valid_project_with_users_admins");
-        restProjectControllerMockMvc.perform(post("/api/project.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi)
-                    .withChange("users", List.of(user.id()))
-                    .withChange("admins", List.of(admin.id()))
-                    .toJsonString()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.projectID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddProjectCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.project.id").exists())
-            .andExpect(jsonPath("$.project.name").value(project.getName()));
-
-        Project projectCreated = projectRepository.findByName("add_valid_project_with_users_admins")
-            .orElseThrow(() -> new ObjectNotFoundException("Project", "xxx"));
-
-        assertThat(permissionService.hasACLPermission(
-            projectCreated,
-            currentUsername,
-            ADMINISTRATION
-        )).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, user.username(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(projectCreated, user.username(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, admin.username(), ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(projectCreated, admin.username(), READ)).isTrue();
-
-        // check ontology access
-        assertThat(permissionService.hasACLPermission(projectCreated.getOntology(), user.username(), READ)).isTrue();
-        assertThat(permissionService.hasACLPermission(
-            projectCreated.getOntology(),
-            admin.username(),
-            READ
-        )).isTrue();
-    }
-
-    @Test
-    @Transactional
-    public void addProjectWithAlreadyExistingName() throws Exception {
-        // expected: 409 / {"success":false,"errors":"Project LROLLUS-TEST already exist!"}
         Project project = builder.givenAProject();
+        UUID commandId = UUID.randomUUID();
+        when(projectHttpContract.create(any())).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(project), commandId, Commands.CREATE_PROJECT, Set.of())));
+
+        String createProjectJson = objectMapper.writeValueAsString(toCreateProject(project));
 
         restProjectControllerMockMvc.perform(post("/api/project.json")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi).withChange("id", null).toJsonString()))
-            .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.errors").value(containsString("already exist")));
+                .content(createProjectJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.command").value("be.cytomine.AddProjectCommand"))
+            .andExpect(jsonPath("$.data.id").value(project.getId()))
+            .andExpect(jsonPath("$.data.name").value(project.getName()))
+            .andExpect(jsonPath("$.data.ontology").value(project.getOntology().getId()));
     }
 
     @Test
     @Transactional
     public void editValidProject() throws Exception {
         Project project = builder.givenAProject();
+        UUID commandId = UUID.randomUUID();
+        when(projectHttpContract.update(eq(project.getId()), any())).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(project), commandId, Commands.UPDATE_PROJECT, Set.of())));
+
+        String updateProjectJson = objectMapper.writeValueAsString(toUpdateProject());
+
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi).withChange("name", "new_name").toJsonString()))
+                .content(updateProjectJson))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.projectID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditProjectCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.project.id").exists())
-            .andExpect(jsonPath("$.project.name").value("new_name"));
+            .andExpect(jsonPath("$.command").value("be.cytomine.EditProjectCommand"))
+            .andExpect(jsonPath("$.data.id").value(project.getId()))
+            .andExpect(jsonPath("$.data.name").value(project.getName()));
     }
 
     @Test
     @Transactional
     public void failWhenEditingProjectDoesNotExists() throws Exception {
-        Project project = builder.givenAProject();
-        em.remove(project);
+        when(projectHttpContract.update(eq(0L), any())).thenReturn(Optional.empty());
+
         restProjectControllerMockMvc.perform(put("/api/project/{id}.json", 0)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJSON(urlApi)))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.errors").exists());
-    }
-
-    @Test
-    @Transactional
-    public void editValidProjectWithUsers() throws Exception {
-        Project project = builder.givenAProject();
-
-        UserResponse previousUser = builder.givenUserAclRead();
-        UserResponse newUser = builder.givenUserAclWrite();
-        builder.addUserToProject(project, previousUser.username(), READ);
-
-        restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi).withChange("users", List.of(newUser.id())).toJsonString()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.projectID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditProjectCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.project.id").exists());
-
-        assertThat(permissionService.hasACLPermission(project, previousUser.username(), READ)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, newUser.username(), READ)).isTrue();
-    }
-
-    @Test
-    @Transactional
-    public void editValidProjectWithAdmins() throws Exception {
-        Project project = builder.givenAProject();
-
-        UserResponse previousUser = builder.givenUserAclRead();
-        UserResponse newUser = builder.givenUserAclWrite();
-        builder.addUserToProject(project, previousUser.username(), READ);
-
-        restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi).withChange("admins", List.of(newUser.id())).toJsonString()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.projectID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.EditProjectCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.project.id").exists());
-
-        assertThat(permissionService.hasACLPermission(project, previousUser.username(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, previousUser.username(), ADMINISTRATION)).isFalse();
-        assertThat(permissionService.hasACLPermission(project, newUser.username(), ADMINISTRATION)).isTrue();
-        assertThat(permissionService.hasACLPermission(project, newUser.username(), READ)).isTrue();
-    }
-
-    @Test
-    @Transactional
-    public void failWhenEditingProjectWithAnnotationTermsAndOntologyChange() throws Exception {
-        AnnotationTerm annotationTerm = builder.givenAnAnnotationTerm();
-        Project project = annotationTerm.getUserAnnotation().getProject();
-
-        Ontology newOntology = builder.givenAnOntology();
-        restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJsonObject(urlApi)
-                    .withChange("ontology", List.of(newOntology.getId())).toJsonString()))
-            .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.errors").exists())
-            .andExpect(jsonPath("$.errorValues").exists())
-            .andExpect(jsonPath("$.errorValues.userAssociatedTermsCount").value(1));
+                .content(objectMapper.writeValueAsString(toUpdateProject())))
+            .andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
     public void deleteProject() throws Exception {
-
         Project project = builder.givenAProject();
-        restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", project.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(project.toJSON(urlApi)))
+        UUID commandId = UUID.randomUUID();
+        when(projectHttpContract.delete(project.getId())).thenReturn(Optional.of(
+            new HttpCommandResponse(true, toResponse(project), commandId, Commands.DELETE_PROJECT, Set.of())));
+
+        restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", project.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
-            .andExpect(jsonPath("$.callback").exists())
-            .andExpect(jsonPath("$.callback.projectID").exists())
-            .andExpect(jsonPath("$.callback.method").value("be.cytomine.DeleteProjectCommand"))
-            .andExpect(jsonPath("$.message").exists())
-            .andExpect(jsonPath("$.command").exists())
-            .andExpect(jsonPath("$.project.id").exists())
-            .andExpect(jsonPath("$.project.name").value(project.getName()));
+            .andExpect(jsonPath("$.command").value("be.cytomine.DeleteProjectCommand"))
+            .andExpect(jsonPath("$.data.id").value(project.getId()))
+            .andExpect(jsonPath("$.data.name").value(project.getName()));
     }
 
     @Test
     @Transactional
     public void failWhenDeleteProjectNotExists() throws Exception {
-        restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", 0)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.errors").exists());
+        when(projectHttpContract.delete(0L)).thenReturn(Optional.empty());
+
+        restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", 0))
+            .andExpect(status().isNotFound());
+    }
+
+    private ProjectResponse toResponse(Project project) {
+        return new ProjectResponse(
+            project.getId(),
+            project.getName(),
+            project.getOntology() != null ? project.getOntology().getId() : null,
+            project.getOntology() != null ? project.getOntology().getName() : null,
+            project.getBlindMode() != null && project.getBlindMode(),
+            project.getAreImagesDownloadable() != null && project.getAreImagesDownloadable(),
+            project.getCountImages(),
+            project.getCountAnnotations(),
+            project.getCountJobAnnotations(),
+            project.getCountReviewedAnnotations(),
+            project.isClosed(),
+            project.getMode() != null && project.getMode().name().equals("READ_ONLY"),
+            project.getMode() != null && project.getMode().name().equals("RESTRICTED"),
+            project.isHideUsersLayers(),
+            project.isHideAdminsLayers(),
+            LocalDateTime.now(),
+            Optional.empty(),
+            Optional.empty()
+        );
+    }
+
+    private CreateProject toCreateProject(Project project) {
+        return new CreateProject(
+            project.getName(),
+            project.getOntology() != null ? project.getOntology().getId() : null,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+        );
+    }
+
+    private UpdateProject toUpdateProject() {
+        return new UpdateProject(
+            Optional.of("new_name"),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty()
+        );
     }
 
     @Test

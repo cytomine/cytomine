@@ -45,5 +45,5 @@ public interface UserHttpContract {
     Optional<UserResponse> search(@PathVariable String username);
 
     @GetExchange("/by-ids")
-    Page<UserResponse> findByIdsIn(@RequestParam Set<Long> ids, Pageable pageable);
+    Page<UserResponse> findByIdsIn(@RequestParam(required = false) Set<Long> ids, Pageable pageable);
 }

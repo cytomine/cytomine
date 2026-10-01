@@ -5,7 +5,9 @@ public sealed interface TaskRunOutput permits
     CollectionOutput,
     DateTimeOutput,
     EnumerationOutput,
+    FileOutput,
     GeometryOutput,
+    ImageOutput,
     IntegerOutput,
     NumberOutput,
     StringOutput {

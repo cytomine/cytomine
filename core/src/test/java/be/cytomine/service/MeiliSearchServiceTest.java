@@ -37,7 +37,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -72,23 +74,48 @@ public class MeiliSearchServiceTest {
     }
 
     @Test
-    public void createIndexIfNotExistsShouldCreateIndexWhenMissing() {
+    public void createIndexIfNotExistsShouldCreateAndConfigureIndexWhenMissing() {
         mockExistingIndexes();
+        Index created = mockConfiguredFilterableIndex();
+        mockUpdateFilterableAttributes(created);
+        when(meiliSearchClient.getIndex(INDEX_ID)).thenReturn(created);
+        when(meiliSearchClient.createIndex(INDEX_ID)).thenReturn(new TaskInfo());
 
         meiliSearchService.createIndexIfNotExists();
 
         verify(meiliSearchClient, times(1)).createIndex(INDEX_ID);
+        verify(meiliSearchClient).waitForTask(anyInt());
+        verify(created).updateFilterableAttributesSettings(argThat(attrs -> attrs.length == 3
+            && Arrays.asList(attrs).containsAll(List.of(
+                "image.abstract_image_id", "image.storage_id", "image.projects"))));
     }
 
     @Test
     public void createIndexIfNotExistsShouldNotCreateIndexWhenAlreadyPresent() {
-        Index existing = mock(Index.class);
+        Index existing = mockConfiguredFilterableIndex(new String[]{
+            "image.abstract_image_id", "image.storage_id", "image.projects"});
         when(existing.getUid()).thenReturn(INDEX_ID);
         mockExistingIndexes(existing);
 
         meiliSearchService.createIndexIfNotExists();
 
         verify(meiliSearchClient, never()).createIndex(INDEX_ID);
+        verify(existing, never()).updateFilterableAttributesSettings(any());
+    }
+
+    @Test
+    public void createIndexIfNotExistsShouldMergeExistingFilterableAttributes() {
+        Index existing = mockConfiguredFilterableIndex(new String[]{
+            "image.abstract_image_id", "image.storage_id"});
+        mockUpdateFilterableAttributes(existing);
+        when(existing.getUid()).thenReturn(INDEX_ID);
+        mockExistingIndexes(existing);
+
+        meiliSearchService.createIndexIfNotExists();
+
+        verify(existing).updateFilterableAttributesSettings(argThat(attrs -> attrs.length == 3
+            && Arrays.asList(attrs).containsAll(List.of(
+                "image.abstract_image_id", "image.storage_id", "image.projects"))));
     }
 
     @Test
@@ -98,6 +125,18 @@ public class MeiliSearchServiceTest {
         assertDoesNotThrow(() -> meiliSearchService.createIndexIfNotExists());
 
         verify(meiliSearchClient, never()).createIndex(INDEX_ID);
+    }
+
+    private Index mockConfiguredFilterableIndex(String... existingFilterableAttributes) {
+        Index index = mock(Index.class);
+        when(index.getFilterableAttributesSettings()).thenReturn(existingFilterableAttributes);
+        return index;
+    }
+
+    private void mockUpdateFilterableAttributes(Index index) {
+        TaskInfo taskInfo = mock(TaskInfo.class);
+        when(taskInfo.getTaskUid()).thenReturn(1);
+        when(index.updateFilterableAttributesSettings(any())).thenReturn(taskInfo);
     }
 
     private Index mockSearchableIndex(List<HashMap<String, Object>> hits) {

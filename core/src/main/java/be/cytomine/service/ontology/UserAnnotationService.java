@@ -36,7 +36,6 @@ import be.cytomine.domain.ontology.SharedAnnotation;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationLight;
 import be.cytomine.dto.annotation.SimplifiedAnnotation;
 import be.cytomine.dto.image.BoundariesCropParameter;
@@ -137,7 +136,7 @@ public class UserAnnotationService extends ModelService {
     public List listIncluded(
         ImageInstance image,
         String geometry,
-        User user,
+        long userId,
         List<Long> terms,
         AnnotationDomain annotation,
         List<String> propertiesToShow
@@ -147,7 +146,7 @@ public class UserAnnotationService extends ModelService {
         UserAnnotationListing userAnnotationListing = new UserAnnotationListing(entityManager);
         userAnnotationListing.setColumnsToPrint(propertiesToShow);
         userAnnotationListing.setImage(image.getId());
-        userAnnotationListing.setUser(user.getId());
+        userAnnotationListing.setUser(userId);
         userAnnotationListing.setTerms(terms);
         userAnnotationListing.setExcludedAnnotation((annotation != null ? annotation.getId() : null));
         userAnnotationListing.setBbox(geometry);

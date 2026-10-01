@@ -878,17 +878,16 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void addShouldPropagateProjectTaggingFailure() {
+    void addShouldNotFailWhenProjectTaggingFails() {
         Project project = builder.givenAProject();
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         ImageInstance imageInstance = builder.givenANotPersistedImageInstance(abstractImage, project);
         when(meiliSearchService.addProjectToImages(any(), any()))
             .thenThrow(new SearchException("meili down", 500, "boom"));
 
-        Assertions.assertThrows(
-            SearchException.class,
-            () -> imageInstanceService.add(imageInstance.toJsonObject(urlApi))
-        );
+        Assertions.assertDoesNotThrow(() -> imageInstanceService.add(imageInstance.toJsonObject(urlApi)));
+
+        verify(meiliSearchService).addProjectToImages(List.of(abstractImage.getId()), project.getName());
     }
 
     @Test
@@ -919,17 +918,16 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void deleteShouldPropagateProjectTaggingFailure() {
+    void deleteShouldNotFailWhenProjectTaggingFails() {
         Project project = builder.givenAProject();
         AbstractImage abstractImage = builder.givenAnAbstractImage();
         ImageInstance imageInstance = builder.givenAnImageInstance(abstractImage, project);
         when(meiliSearchService.removeProjectFromImages(any(), any()))
             .thenThrow(new SearchException("meili down", 500, "boom"));
 
-        Assertions.assertThrows(
-            SearchException.class,
-            () -> imageInstanceService.delete(imageInstance, null, null, false)
-        );
+        Assertions.assertDoesNotThrow(() -> imageInstanceService.delete(imageInstance, null, null, false));
+
+        verify(meiliSearchService).removeProjectFromImages(List.of(abstractImage.getId()), project.getName());
     }
 
     @Test
@@ -974,16 +972,19 @@ public class ImageInstanceServiceTests {
     }
 
     @Test
-    void deleteAllForProjectShouldPropagateProjectTaggingFailure() {
+    void deleteAllForProjectShouldNotFailWhenProjectTaggingFails() {
         Project project = builder.givenAProject();
         AbstractImage abstractImage = builder.givenAnAbstractImage();
-        builder.givenAnImageInstance(abstractImage, project);
+        ImageInstance imageInstance = builder.givenAnImageInstance(abstractImage, project);
         when(meiliSearchService.removeProjectFromImages(any(), any()))
             .thenThrow(new SearchException("meili down", 500, "boom"));
 
-        Assertions.assertThrows(
-            SearchException.class,
-            () -> imageInstanceService.deleteAllForProject(project, null, null)
-        );
+        Assertions.assertDoesNotThrow(() -> imageInstanceService.deleteAllForProject(project, null, null));
+
+        verify(meiliSearchService).removeProjectFromImages(any(), eq(project.getName()));
+
+        entityManager.flush();
+        entityManager.clear();
+        assertThat(entityManager.find(ImageInstance.class, imageInstance.getId())).isNull();
     }
 }

@@ -244,6 +244,7 @@ public class UserResourceTests {
         builder.addUserToProject(project, projectUser.username(), READ);
         builder.givenAProjectRepresentativeUser(
             project, projectRepresentative.username(), projectRepresentative.id());
+        wiremockRepository.stubUsersByIds(projectRepresentative);
 
         restUserControllerMockMvc.perform(
                 get("/api/project/{id}/users/representative.json", project.getId()))
@@ -262,6 +263,7 @@ public class UserResourceTests {
         builder.addUserToProject(project, projectCreator.username(), ADMINISTRATION);
         builder.addUserToProject(project, projectUser.username(), READ);
         builder.givenAProjectRepresentativeUser(project, projectCreator.username(), projectCreator.id());
+        wiremockRepository.stubUsersByIds(projectCreator);
 
         restUserControllerMockMvc.perform(
                 get("/api/project/{id}/users/representative.json", project.getId()))
@@ -348,6 +350,7 @@ public class UserResourceTests {
     @Transactional
     public void getUserWithItsUserKeyId() throws Exception {
         UserResponse currentUser = builder.givenSuperAdmin();
+        wiremockRepository.stubUser(currentUser);
         restUserControllerMockMvc.perform(get("/api/user/{id}/keys.json", builder.givenSuperAdmin().id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.privateKey").value(currentUser.privateKey().orElse(null)));
@@ -359,6 +362,7 @@ public class UserResourceTests {
     public void getKeysFromOtherUserIsForbidden() throws Exception {
         wiremockRepository.stubUser(builder.givenAclUserNoAcl());
         UserResponse user = builder.givenSuperAdmin();
+        wiremockRepository.stubUser(user);
         restUserControllerMockMvc.perform(get("/api/user/{id}/keys.json", user.id()))
             .andExpect(status().isForbidden());
         restUserControllerMockMvc.perform(get("/api/userkey/{publicKey}/keys.json", user.publicKey().orElse(null)))
@@ -653,6 +657,7 @@ public class UserResourceTests {
         Project project = builder.givenAProject();
         UserResponse user1 = builder.givenUserAclRead();
         UserResponse user2 = builder.givenUserAclWrite();
+        wiremockRepository.stubUsersByIds(user1, user2);
         restUserControllerMockMvc.perform(post("/api/project/{project}/user.json", project.getId())
                 .param("users", user1.id() + "," + user2.id())
                 .contentType(MediaType.APPLICATION_JSON))
@@ -669,6 +674,7 @@ public class UserResourceTests {
     public void shouldPartiallyAddUsersToProjectWhenSomeUserIdsAreInvalid() throws Exception {
         Project project = builder.givenAProject();
         UserResponse user1 = builder.givenUserAclRead();
+        wiremockRepository.stubUsersByIds(user1);
         restUserControllerMockMvc.perform(post("/api/project/{project}/user.json", project.getId())
                 .param("users", user1.id() + ",xxxxxx,0") //bad format + bad id
                 .contentType(MediaType.APPLICATION_JSON))
@@ -702,6 +708,7 @@ public class UserResourceTests {
         UserResponse user2 = builder.givenUserAclWrite();
         builder.addUserToProject(project, user1.username(), READ);
         builder.addUserToProject(project, user2.username(), READ);
+        wiremockRepository.stubUsersByIds(user1, user2);
         restUserControllerMockMvc.perform(
                 delete("/api/project/{project}/user.json", project.getId())
                     .param("users", user1.id() + "," + user2.id())
@@ -719,6 +726,8 @@ public class UserResourceTests {
     public void shouldPartiallyRemoveUsersFromProjectWhenSomeUserIdsAreInvalid() throws Exception {
         Project project = builder.givenAProject();
         UserResponse user1 = builder.givenUserAclRead();
+        builder.addUserToProject(project, user1.username(), READ);
+        wiremockRepository.stubUsersByIds(user1);
         restUserControllerMockMvc.perform(
                 delete("/api/project/{project}/user.json", project.getId())
                     .param("users", user1.id() + ",xxxxxx,0") //bad format + bad id

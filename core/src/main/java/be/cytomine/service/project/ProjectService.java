@@ -794,7 +794,11 @@ public class ProjectService extends ModelService {
         project = (Project) commandResponse.getObject();
 
         if (oldName != null && project.getName() != null && !oldName.equals(project.getName())) {
-            meiliSearchService.renameProjectInImages(oldName, project.getName());
+            try {
+                meiliSearchService.renameProjectInImages(oldName, project.getName());
+            } catch (Exception e) {
+                log.warn("Could not rename project '{}' to '{}' in metadata", oldName, project.getName(), e);
+            }
         }
 
         taskService.updateTask(task, 20, "Project " + project.getName() + " edited");

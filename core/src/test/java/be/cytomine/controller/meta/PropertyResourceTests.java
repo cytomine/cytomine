@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @WithMockUser(username = SUPERADMIN)
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
+@MockedUser
 public class PropertyResourceTests {
 
     @Autowired

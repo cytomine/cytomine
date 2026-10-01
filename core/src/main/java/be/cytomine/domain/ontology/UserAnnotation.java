@@ -20,6 +20,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
@@ -38,46 +39,30 @@ public class UserAnnotation extends AnnotationDomain implements Serializable {
     @Column(name = "user_id")
     private Long userId;
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "annotation_term",
-        joinColumns = {@JoinColumn(name = "user_annotation_id")},
-        inverseJoinColumns = {@JoinColumn(name = "term_id")}
-    )
+    @JoinTable(name = "annotation_term", joinColumns = {
+        @JoinColumn(name = "user_annotation_id")}, inverseJoinColumns = {@JoinColumn(name = "term_id")})
     private List<Term> terms = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "annotation_track",
-        joinColumns = {@JoinColumn(name = "annotation_ident")},
-        inverseJoinColumns = {@JoinColumn(name = "track_id")}
-    )
+    @JoinTable(name = "annotation_track", joinColumns = {@JoinColumn(name = "annotation_ident")}, inverseJoinColumns = {
+        @JoinColumn(name = "track_id")})
     private List<Track> tracks = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "annotation_link",
-        joinColumns = {@JoinColumn(name = "annotation_ident")},
-        inverseJoinColumns = {@JoinColumn(name = "group_id")}
-    )
+    @JoinTable(name = "annotation_link", joinColumns = {@JoinColumn(name = "annotation_ident")}, inverseJoinColumns = {
+        @JoinColumn(name = "group_id")})
     private List<AnnotationLink> links = new ArrayList<>();
 
     public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
         JsonObject returnArray = AnnotationDomain.getDataFromDomain(domain);
         UserAnnotation annotation = (UserAnnotation) domain;
         returnArray.put("cropURL", urlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
-        returnArray.put(
-            "smallCropURL",
-            urlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
-        );
+        returnArray.put("smallCropURL",
+            urlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png"));
         returnArray.put("url", urlApi.getUserAnnotationCropWithAnnotationId(annotation.getId(), "png"));
-        returnArray.put(
-            "imageURL",
-            urlApi.getAnnotationURL(
-                annotation.getImage().getProject().getId(),
-                annotation.getImage().getId(),
-                annotation.getId()
-            )
-        );
+        returnArray.put("imageURL",
+            urlApi.getAnnotationURL(annotation.getImage().getProject().getId(), annotation.getImage().getId(),
+                annotation.getId()));
         returnArray.put("reviewed", annotation.hasReviewedAnnotation());
 
         return returnArray;
@@ -161,29 +146,21 @@ public class UserAnnotation extends AnnotationDomain implements Serializable {
         if (json.containsKey("sliceObject")) {
             annotation.slice = (SliceInstance) json.get("sliceObject");
         } else {
-            annotation.slice = (SliceInstance) json.getJSONAttrDomain(
-                entityManager,
-                "slice",
-                new SliceInstance(),
-                true
-            );
+            annotation.slice =
+                (SliceInstance) json.getJSONAttrDomain(entityManager, "slice", new SliceInstance(), true);
         }
 
         if (json.containsKey("imageObject")) {
             annotation.image = (ImageInstance) json.get("imageObject");
         } else {
-            annotation.image = (ImageInstance) json.getJSONAttrDomain(
-                entityManager,
-                "image",
-                new ImageInstance(),
-                true
-            );
+            annotation.image =
+                (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
         }
 
         if (json.containsKey("userObject")) {
-            annotation.userId = ((User) json.get("userObject")).getId();
+            annotation.userId = ((UserResponse) json.get("userObject")).id();
         } else {
-            annotation.userId = ((User) json.getJSONAttrDomain(entityManager, "user", new User(), true)).getId();
+            annotation.userId = (json.getJSONAttrDomain(entityManager, "user", new User(), true)).getId();
         }
 
         annotation.project = image.getProject();

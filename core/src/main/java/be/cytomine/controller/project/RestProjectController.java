@@ -37,7 +37,6 @@ import be.cytomine.service.appengine.TaskRunService;
 import be.cytomine.service.project.ProjectFromSearchService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ProjectSearchExtension;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
@@ -61,7 +60,6 @@ public class RestProjectController extends RestCytomineController {
 
     private final OntologyHttpContract ontologyHttpContract;
 
-    private final UserService userService;
 
     private final TaskRunService taskRunService;
 

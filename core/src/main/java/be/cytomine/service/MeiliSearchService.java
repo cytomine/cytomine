@@ -1,8 +1,10 @@
 package be.cytomine.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,6 +50,11 @@ public class MeiliSearchService {
     private static final String[] ABSTRACT_IMAGE_ID_ATTRIBUTE = {"image.abstract_image_id"};
     private static final String PROJECTS_ATTRIBUTE = "image.projects";
     private static final String[] ALL_ATTRIBUTES = {"*"};
+    private static final String[] REQUIRED_FILTERABLE_ATTRIBUTES = {
+        "image.abstract_image_id",
+        "image.storage_id",
+        "image.projects"
+    };
 
     @Value("${meilisearch.index_id}")
     private String indexId;
@@ -59,15 +66,37 @@ public class MeiliSearchService {
     @PostConstruct
     public void createIndexIfNotExists() {
         try {
+            boolean indexFound = false;
             for (Index index : meiliSearchClient.getIndexes().getResults()) {
                 if (indexId.equals(index.getUid())) {
-                    return;
+                    indexFound = true;
+                    ensureIndexConfigured(index);
+                    break;
                 }
             }
-            meiliSearchClient.createIndex(indexId);
-            log.info("Created MeiliSearch index '{}'", indexId);
+            if (!indexFound) {
+                TaskInfo taskInfo = meiliSearchClient.createIndex(indexId);
+                meiliSearchClient.waitForTask(taskInfo.getTaskUid());
+                log.info("Created MeiliSearch index '{}'", indexId);
+                ensureIndexConfigured(meiliSearchClient.getIndex(indexId));
+            }
         } catch (Exception e) {
-            log.warn("Could not create MeiliSearch index '{}' at startup: {}", indexId, e.getMessage());
+            log.warn("Could not create or configure MeiliSearch index '{}': {}", indexId, e.getMessage());
+        }
+    }
+
+    // Union with existing attributes so PIMS-configured settings are never lost.
+    private void ensureIndexConfigured(Index index) throws MeilisearchException {
+        Set<String> filterableAttributes = new LinkedHashSet<>();
+        String[] existing = index.getFilterableAttributesSettings();
+        if (existing != null) {
+            filterableAttributes.addAll(Arrays.asList(existing));
+        }
+        filterableAttributes.addAll(Arrays.asList(REQUIRED_FILTERABLE_ATTRIBUTES));
+        if (filterableAttributes.size() > (existing == null ? 0 : existing.length)) {
+            TaskInfo taskInfo = index.updateFilterableAttributesSettings(filterableAttributes.toArray(new String[0]));
+            index.waitForTask(taskInfo.getTaskUid());
+            log.info("Configured MeiliSearch filterable attributes for index '{}'", indexId);
         }
     }
 

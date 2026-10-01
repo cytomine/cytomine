@@ -1,10 +1,10 @@
 <template>
 <div>
   <div class="image-selector-wrapper" v-show="imageSelectorEnabled">
-    <b-loading :is-full-page="false" :active="loading" />
+    <b-loading :is-full-page="false" :model-value="loading" />
       <div class="header">
         <div>
-          <b-input class="search-images" :value="searchString" @input="debounceSearchString"
+          <b-input class="search-images" :model-value="searchString" @update:model-value="debounceSearchString"
                    :placeholder="$t('search-placeholder')"
                    type="search" icon="search"
           />
@@ -263,7 +263,7 @@ export default {
   mounted() {
     eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };

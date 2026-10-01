@@ -1,6 +1,6 @@
 <template>
 <multiselect
-  :value="value" @input="$emit('input', $event)"
+  :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)"
   :label="label"
   :track-by="trackBy"
   :group-label="groupLabel"
@@ -35,7 +35,7 @@
           {{label ? option[label] : option}}<template v-if="index < displayedOptions.length - 1">,</template>
         </span>
         <strong v-if="countNotDisplayed > 0">
-          {{ $tc("and-count-others", countNotDisplayed, {count: countNotDisplayed}) }}
+          {{ $t("and-count-others", countNotDisplayed, {count: countNotDisplayed}) }}
         </strong>
       </template>
     </div>
@@ -59,8 +59,9 @@ import Multiselect from 'vue-multiselect';
 export default {
   name: 'cytomine-multiselect',
   components: { Multiselect },
+  emits: ['update:modelValue'],
   props: {
-    value: { type: null },
+    modelValue: { type: null },
     options: { type: null },
     label: { type: String },
     trackBy: { type: String },
@@ -85,13 +86,13 @@ export default {
         return false;
       }
 
-      return this.options.every(opt => this.value.includes(opt));
+      return this.options.every(opt => this.modelValue.includes(opt));
     },
     displayedOptions() {
-      return this.value.slice(0, this.maxNbDisplayed);
+      return this.modelValue.slice(0, this.maxNbDisplayed);
     },
     countNotDisplayed() {
-      return this.value.length - this.maxNbDisplayed;
+      return this.modelValue.length - this.maxNbDisplayed;
     },
     internalCloseOnSelect() {
       return (this.closeOnSelect === null) ? (!this.multiple) : this.closeOnSelect;
@@ -100,7 +101,7 @@ export default {
   methods: {
     selectAll() {
       let newValue = this.allSelected ? [] : this.options;
-      this.$emit('input', newValue);
+      this.$emit('update:modelValue', newValue);
     }
   }
 };
@@ -108,7 +109,7 @@ export default {
 
 <style lang="scss">
 @import 'vue-multiselect/dist/vue-multiselect.min.css';
-@import 'bulma/sass/utilities/initial-variables.sass';
+@import 'bulma/sass/utilities/initial-variables';
 
 .multiselect--active, .multiselect__content-wrapper {
   z-index: 50 !important;

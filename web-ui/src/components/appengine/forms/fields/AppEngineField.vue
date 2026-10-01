@@ -1,5 +1,5 @@
 <template>
-  <component v-model="input" :is="currentField" :parameter="parameter" @input="$emit('input', $event)"/>
+  <component v-model="input" :is="currentField" :parameter="parameter"/>
 </template>
 
 <script>

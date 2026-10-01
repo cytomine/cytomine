@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AnnotationMultiSelect from '@/components/appengine/forms/fields/array/AnnotationMultiSelect';
@@ -21,29 +21,29 @@ vi.mock('@/api', () => ({
 }));
 
 describe('AnnotationMultiSelect.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
 
   const mockImages = [{ imageInstance: { id: 1 } }];
 
   const createWrapper = () => {
     return mount(AnnotationMultiSelect, {
-      localVue,
-      computed: {
-        project: () => ({
-          id: 42,
-        }),
-      },
-      mocks: {
-        $store: {
-          getters: {
-            'currentProject/currentViewer': { images: mockImages },
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          // The `computed` mounting option is gone in Vue Test Utils v2, so the
+          // store the `get()` helper reads from has to be mocked instead.
+          $store: {
+            state: {
+              currentProject: { project: { id: 42 } },
+            },
+            getters: {
+              'currentProject/currentViewer': { images: mockImages },
+            },
           },
         },
-      },
-      stubs: {
-        AnnotationPreview: true,
-      },
+        stubs: {
+          AnnotationPreview: true,
+        }
+      }
     });
   };
 
@@ -60,7 +60,7 @@ describe('AnnotationMultiSelect.vue', () => {
 
     expect(wrapper.vm.loading).toBe(false);
     const components = wrapper.findAllComponents(SelectableAnnotation);
-    expect(components.exists()).toBe(true);
+    expect(components.length).toBeGreaterThan(0);
     expect(components.length).toBe(mockedAnnotations.length);
   });
 

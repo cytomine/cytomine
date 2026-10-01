@@ -1,6 +1,6 @@
 <template>
 <div class="project-image-filters-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
     <h2> {{ $t('error') }} </h2>
     <p> {{ $t('unexpected-error-info-message') }} </p>
@@ -17,17 +17,15 @@
       pagination-size="is-small"
     >
 
-      <template #default="{row: filter}">
-        <b-table-column field="name" :label="$t('name')" sortable>
-          {{filter.name}}
-        </b-table-column>
+      <b-table-column v-slot="{row: filter}" field="name" :label="$t('name')" sortable>
+        {{filter.name}}
+      </b-table-column>
 
-        <b-table-column field="selected" :label="$t('status')" sortable>
-          <button :class="['button', filter.selected ? 'is-success' : 'is-danger']" @click="toggleFilter(filter)">
-            {{$t(filter.selected ? 'enabled' : 'disabled')}}
-          </button>
-        </b-table-column>
-      </template>
+      <b-table-column v-slot="{row: filter}" field="selected" :label="$t('status')" sortable>
+        <button :class="['button', filter.selected ? 'is-success' : 'is-danger']" @click="toggleFilter(filter)">
+          {{$t(filter.selected ? 'enabled' : 'disabled')}}
+        </button>
+      </b-table-column>
 
       <template #empty>
         <div class="content has-text-grey has-text-centered">

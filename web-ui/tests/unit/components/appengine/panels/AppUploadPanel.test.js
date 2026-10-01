@@ -17,17 +17,19 @@ describe('AppUploadPanel.vue', () => {
   const createWrapper = (options = {}) => shallowMount(
     AppUploadPanel,
     {
-      mocks: {
-        $t: (key) => key,
-      },
-      stubs: {
-        FileUploadItem: true,
-        'b-button': true,
-        'b-field': true,
-        'b-icon': true,
-        'b-upload': true,
-      },
       ...options,
+      global: {
+        mocks: {
+          $t: (key) => key,
+        },
+        stubs: {
+          FileUploadItem: true,
+          'b-button': true,
+          'b-field': true,
+          'b-icon': true,
+          'b-upload': true,
+        }
+      }
     },
   );
 

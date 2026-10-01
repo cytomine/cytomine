@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import Model from './model';
 import { Cytomine } from '@/api';
 import { isGeometry } from '@/utils/app';
@@ -71,7 +70,7 @@ export default class Task extends Model {
 
   async fetchOutputs() {
     let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.namespace}/${this.version}/outputs`);
-    Vue.set(this, 'outputs', data);
+    this.outputs = data;
 
     return data;
   }

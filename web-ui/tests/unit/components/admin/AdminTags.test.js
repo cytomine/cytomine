@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import AdminTags from '@/components/admin/AdminTags';
@@ -30,23 +30,23 @@ const createTag = (id, name, creatorName) => ({
 let tags;
 
 const createWrapper = async (options = {}) => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
 
   const wrapper = mount(AdminTags, {
-    localVue,
-    stubs: { 'tag-modal': true },
-    mocks: {
-      $t: (message) => message,
-      $i18n: { locale: 'en' },
-      $notify: vi.fn(),
-      $buefy: {
-        dialog: {
-          confirm: vi.fn((params) => params.onConfirm()),
-        },
-      },
-    },
     ...options,
+    global: {
+      plugins: [Buefy],
+      stubs: { 'tag-modal': true },
+      mocks: {
+        $t: (message) => message,
+        $i18n: { locale: 'en' },
+        $notify: vi.fn(),
+        $buefy: {
+          dialog: {
+            confirm: vi.fn((params) => params.onConfirm()),
+          },
+        },
+      }
+    }
   });
   await flushPromises();
   return wrapper;
@@ -148,36 +148,48 @@ describe('AdminTags.vue', () => {
     expect(wrapper.vm.modal).toBe(true);
   });
 
-  it('should add the new tag to the list', async () => {
+  it('should refetch the tags after a tag is created', async () => {
     const wrapper = await createWrapper();
 
-    const newTag = createTag(4, 'liver', 'admin');
-    wrapper.vm.addTag(newTag);
+    const updatedTags = [...tags, createTag(4, 'liver', 'admin')];
+    Cytomine.instance.api.get.mockResolvedValue({ data: { collection: updatedTags, size: updatedTags.length } });
 
-    expect(wrapper.vm.tags.length).toBe(4);
-    expect(wrapper.vm.tags[3]).toEqual(newTag);
+    wrapper.vm.addTag();
+    await flushPromises();
+
+    expect(Cytomine.instance.api.get).toHaveBeenCalledTimes(2);
+    expect(wrapper.vm.tags).toEqual(updatedTags);
+    expect(wrapper.vm.total).toBe(4);
   });
 
-  it('should replace the edited tag in the list on update', async () => {
+  it('should refetch the tags after a tag is updated', async () => {
     const wrapper = await createWrapper();
 
-    wrapper.vm.startTagEdition(wrapper.vm.tags[0]);
-    wrapper.vm.updateTag({ name: 'renamed' });
+    const updatedTags = [{ ...tags[0], name: 'renamed' }, tags[1], tags[2]];
+    Cytomine.instance.api.get.mockResolvedValue({ data: { collection: updatedTags, size: updatedTags.length } });
 
+    wrapper.vm.startTagEdition(wrapper.vm.tags[0]);
+    wrapper.vm.updateTag();
+    await flushPromises();
+
+    expect(Cytomine.instance.api.get).toHaveBeenCalledTimes(2);
     expect(wrapper.vm.tags[0]).toEqual({ ...tags[0], name: 'renamed' });
   });
 
-  it('should delete the tag and remove it from the list on confirmation', async () => {
+  it('should delete the tag and refetch the list on confirmation', async () => {
     const wrapper = await createWrapper();
     const deletedTag = wrapper.vm.tags[0];
+
+    const remainingTags = [tags[1], tags[2]];
+    Cytomine.instance.api.get.mockResolvedValue({ data: { collection: remainingTags, size: remainingTags.length } });
 
     await wrapper.findAll('tbody tr').at(0).find('button.is-danger').trigger('click');
     await flushPromises();
 
     expect(wrapper.vm.$buefy.dialog.confirm).toHaveBeenCalled();
     expect(Cytomine.instance.api.delete).toHaveBeenCalledWith(`/tag/${deletedTag.id}.json`);
-    expect(wrapper.vm.tags.length).toBe(2);
-    expect(wrapper.vm.tags).not.toContain(deletedTag);
+    expect(Cytomine.instance.api.get).toHaveBeenCalledTimes(2);
+    expect(wrapper.vm.tags).toEqual(remainingTags);
     expect(wrapper.vm.$notify).toHaveBeenCalledWith(
       { type: 'success', text: 'notif-success-tag-delete' },
     );

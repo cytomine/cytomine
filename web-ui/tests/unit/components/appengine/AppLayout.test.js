@@ -1,5 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
-import VueRouter from 'vue-router';
+import { shallowMount } from '@vue/test-utils';
 
 import AppLayout from '@/components/appengine/AppLayout.vue';
 import AppSidebar from '@/components/appengine/AppSidebar.vue';
@@ -29,22 +28,25 @@ const BMessage = {
   props: ['title', 'type'],
 };
 
-const localVue = createLocalVue();
-localVue.use(VueRouter);
 
 describe('AppLayout.vue', () => {
   const createWrapper = (options = {}) => {
     return shallowMount(AppLayout, {
-      localVue,
-      store,
-      components: {
-        AppSidebar,
-        'b-message': BMessage,
-      },
-      mocks: {
-        $t: (key) => key,
-      },
       ...options,
+      global: {
+        plugins: [store],
+        components: {
+          AppSidebar,
+          'b-message': BMessage,
+        },
+        stubs: {
+          // No router is installed, so router-view would not resolve at all.
+          'router-view': true,
+        },
+        mocks: {
+          $t: (key) => key,
+        }
+      }
     });
   };
 
@@ -97,9 +99,9 @@ describe('AppLayout.vue', () => {
       const wrapper = createDisabledWrapper();
 
       const message = wrapper.findComponent(BMessage);
-      expect(message.props('title')).toBe('appengine-not-enabled-title');
+      expect(message.props('title')).toBe('app-engine-not-enabled-title');
       expect(message.props('type')).toBe('is-info');
-      expect(message.text()).toBe('appengine-not-enabled-description');
+      expect(message.text()).toBe('app-engine-not-enabled-description');
     });
   });
 });

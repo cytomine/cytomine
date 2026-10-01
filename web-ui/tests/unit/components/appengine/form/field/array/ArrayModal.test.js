@@ -1,4 +1,4 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ArrayModal from '@/components/appengine/forms/fields/array/ArrayModal';
@@ -22,26 +22,25 @@ vi.mock('@/utils/image-utils', () => ({
 }));
 
 describe('ArrayModal.vue', () => {
-  let localVue;
   let wrapper;
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(ArrayModal, {
-      localVue,
-      mocks: {
-        $t: msg => msg,
-        $notify: vi.fn()
-      },
-      stubs: {
-        AnnotationMultiSelect: true,
-        ImageMultiSelect: true,
-      },
-      propsData: {
+      props: {
         type: { id: 'boolean' },
         active: true,
+      },
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: msg => msg,
+          $notify: vi.fn()
+        },
+        stubs: {
+          AnnotationMultiSelect: true,
+          ImageMultiSelect: true,
+        }
       }
     });
   });

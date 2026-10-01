@@ -80,4 +80,9 @@ public class OntologyController implements OntologyHttpContract {
     public Page<OntologyResponse> getAllForUser(long userId, Pageable pageable) {
         return repository.findAllByUserIdAndDeletedNull(userId, pageable).map(ontologyMapper::mapToOntologyResponse);
     }
+
+    @Override
+    public Page<OntologyResponse> getAllUsersForOntology(long id, Pageable pageable) {
+        return null;
+    }
 }

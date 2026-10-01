@@ -38,7 +38,9 @@ import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
+import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.meta.TagDomainAssociation;
+import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.social.PersistentProjectConnection;
@@ -608,11 +610,12 @@ public class ProjectResourceTests {
     }
 
     private ProjectResponse toResponse(Project project) {
+        Optional<Ontology> maybeOntology = Optional.ofNullable(project.getOntology());
         return new ProjectResponse(
             project.getId(),
             project.getName(),
-            project.getOntology() != null ? project.getOntology().getId() : null,
-            project.getOntology() != null ? project.getOntology().getName() : null,
+            maybeOntology.map(Ontology::getId),
+            maybeOntology.map(Ontology::getName),
             project.getBlindMode() != null && project.getBlindMode(),
             project.getAreImagesDownloadable() != null && project.getAreImagesDownloadable(),
             project.getCountImages(),
@@ -633,7 +636,7 @@ public class ProjectResourceTests {
     private CreateProject toCreateProject(Project project) {
         return new CreateProject(
             project.getName(),
-            project.getOntology() != null ? project.getOntology().getId() : null,
+            Optional.ofNullable(project.getOntology()).map(Ontology::getId),
             false,
             false,
             false,

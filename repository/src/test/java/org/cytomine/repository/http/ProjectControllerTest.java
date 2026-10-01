@@ -27,11 +27,12 @@ import be.cytomine.common.repository.model.project.payload.UpdateProject;
 @Getter
 class ProjectControllerTest implements CRUDCommandTests<CreateProject, ProjectResponse, UpdateProject> {
     String apiURL = ProjectHttpContract.ROOT_PATH;
-    CreateProject createPayload = new CreateProject(UUID.randomUUID().toString(), null, false, false, false, false,
-        false, false, false);
-    UpdateProject updatePayload = new UpdateProject(Optional.of(UUID.randomUUID().toString()), Optional.empty(),
-        Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-        Optional.empty());
+    CreateProject createPayload =
+        new CreateProject(UUID.randomUUID().toString(), Optional.empty(), false, false, false, false, false, false,
+            false);
+    UpdateProject updatePayload =
+        new UpdateProject(Optional.of(UUID.randomUUID().toString()), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
 
     @Autowired
     ApplyCommandResponseMapper applyCommandResponseMapper;
@@ -43,30 +44,16 @@ class ProjectControllerTest implements CRUDCommandTests<CreateProject, ProjectRe
     private ObjectMapper objectMapper;
 
     @Override
-    public ProjectResponse expectedUpdatedResponse(
-        ProjectResponse response,
-        UpdateProject updatePayload,
-        LocalDateTime updatedTime
-    ) {
-        return new ProjectResponse(
-            response.id(),
-            updatePayload.name().orElse(response.name()),
-            updatePayload.ontology().orElse(response.ontology()),
-            response.ontologyName(),
+    public ProjectResponse expectedUpdatedResponse(ProjectResponse response, UpdateProject updatePayload,
+        LocalDateTime updatedTime) {
+        return new ProjectResponse(response.id(), updatePayload.name().orElse(response.name()),
+            updatePayload.ontology().or(response::ontology), response.ontologyName(),
             updatePayload.blindMode().orElse(response.blindMode()),
-            updatePayload.areImagesDownloadable().orElse(response.areImagesDownloadable()),
-            response.numberOfImages(),
-            response.numberOfAnnotations(),
-            response.numberOfJobAnnotations(),
-            response.numberOfReviewedAnnotations(),
-            updatePayload.isClosed().orElse(response.isClosed()),
-            response.isReadOnly(),
-            response.isRestricted(),
+            updatePayload.areImagesDownloadable().orElse(response.areImagesDownloadable()), response.numberOfImages(),
+            response.numberOfAnnotations(), response.numberOfJobAnnotations(), response.numberOfReviewedAnnotations(),
+            updatePayload.isClosed().orElse(response.isClosed()), response.isReadOnly(), response.isRestricted(),
             updatePayload.hideUsersLayers().orElse(response.hideUsersLayers()),
-            updatePayload.hideAdminsLayers().orElse(response.hideAdminsLayers()),
-            response.created(),
-            Optional.of(updatedTime),
-            response.deleted()
-        );
+            updatePayload.hideAdminsLayers().orElse(response.hideAdminsLayers()), response.created(),
+            Optional.of(updatedTime), response.deleted());
     }
 }

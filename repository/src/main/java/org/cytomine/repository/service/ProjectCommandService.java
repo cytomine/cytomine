@@ -64,10 +64,10 @@ public class ProjectCommandService
 
     @Override
     public ProjectResponse mapToResponse(ProjectEntity entity) {
-        String ontologyName = entity.getOntologyId() == null ? null
+        Optional<String> ontologyName = entity.getOntologyId() == null ? null
             : ontologyRepository.findById(entity.getOntologyId())
                 .map(OntologyEntity::getName)
-                .orElse(null);
+               ;
         return projectMapper.mapToProjectResponse(
             entity,
             ontologyName,

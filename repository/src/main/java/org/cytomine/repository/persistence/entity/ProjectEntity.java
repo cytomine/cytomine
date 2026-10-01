@@ -27,9 +27,9 @@ public class ProjectEntity implements HasTimestampCUD {
     @Column
     private Long ontologyId;
     @Column
-    private Boolean blindMode = false;
+    private boolean blindMode = false;
     @Column
-    private Boolean areImagesDownloadable = false;
+    private boolean areImagesDownloadable = false;
     @Column(name = "is_closed")
     private boolean closed = false;
     @Column

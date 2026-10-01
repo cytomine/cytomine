@@ -8,8 +8,8 @@ import be.cytomine.common.repository.model.command.DataType;
 public record ProjectResponse(
     long id,
     String name,
-    Long ontology,
-    String ontologyName,
+    Optional<Long> ontology,
+    Optional<String> ontologyName,
     boolean blindMode,
     boolean areImagesDownloadable,
     long numberOfImages,

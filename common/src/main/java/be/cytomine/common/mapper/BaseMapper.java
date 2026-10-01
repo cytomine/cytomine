@@ -12,7 +12,7 @@ import org.mapstruct.Mapper;
 
 /**
  * It's tempting to add a
- *  `T map(Optional&lt;T&gt; value)`
+ * `T map(Optional&lt;T&gt; value)`
  * here, but then ObjectMapper does a lot of obscure chained calls.
  * Be careful.
  */
@@ -50,6 +50,8 @@ public interface BaseMapper {
     default UUID mapMaybeUUID(Optional<UUID> value) {
         return value.orElse(null);
     }
+
+    default Long map(Optional<Long> value) {return value.orElse(null);}
 
     default Optional<LocalDateTime> mapToLocalDateTime(Timestamp value) {
         return Optional.ofNullable(value).map(this::mapTimestamp);

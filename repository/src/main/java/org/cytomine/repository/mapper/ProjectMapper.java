@@ -1,6 +1,7 @@
 package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 import org.cytomine.repository.persistence.entity.ProjectEntity;
 import org.mapstruct.BeanMapping;
@@ -25,7 +26,7 @@ public interface ProjectMapper {
     @Mapping(target = "countJobAnnotations", ignore = true)
     @Mapping(target = "countReviewedAnnotations", ignore = true)
     @Mapping(target = "name", source = "createProject.name")
-    @Mapping(target = "ontologyId", source = "createProject.ontology")
+    @Mapping(target = "ontologyId", source = "createProject.ontologyId")
     @Mapping(target = "blindMode", source = "createProject.blindMode")
     @Mapping(target = "areImagesDownloadable", source = "createProject.areImagesDownloadable")
     @Mapping(target = "closed", source = "createProject.isClosed")
@@ -65,6 +66,6 @@ public interface ProjectMapper {
     @Mapping(target = "isReadOnly", source = "isReadOnly")
     @Mapping(target = "isRestricted", source = "isRestricted")
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "mode"})
-    ProjectResponse mapToProjectResponse(ProjectEntity entity, String ontologyName, boolean isReadOnly,
+    ProjectResponse mapToProjectResponse(ProjectEntity entity, Optional<String> ontologyName, boolean isReadOnly,
                                          boolean isRestricted);
 }

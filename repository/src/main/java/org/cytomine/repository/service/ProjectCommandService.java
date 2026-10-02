@@ -66,8 +66,7 @@ public class ProjectCommandService
     public ProjectResponse mapToResponse(ProjectEntity entity) {
         Optional<String> ontologyName = entity.getOntologyId() == null ? null
             : ontologyRepository.findById(entity.getOntologyId())
-                .map(OntologyEntity::getName)
-               ;
+            .map(OntologyEntity::getName);
         return projectMapper.mapToProjectResponse(
             entity,
             ontologyName,

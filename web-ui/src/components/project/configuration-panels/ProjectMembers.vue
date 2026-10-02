@@ -107,7 +107,7 @@ import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue'
 import { appendShortTermToken } from '@/utils/token-utils.js';
 
 export default {
-  name: 'projet-members',
+  name: 'project-members',
   components: {
     IconProjectMemberRole,
     CytomineTable,
@@ -134,7 +134,6 @@ export default {
       availableRoles: [],
       selectedRoles: [],
       selectedMembers: [],
-
 
       revision: 0
     };
@@ -261,9 +260,6 @@ export default {
         this.$notify({ type: 'error', text: this.$t('notif-error-change-role', { username: member.fullName }) });
       }
     },
-  },
-  mounted() {
-    appendShortTermToken();
   },
   async created() {
     this.availableRoles = [this.contributorRole, this.managerRole, this.representativeRole];

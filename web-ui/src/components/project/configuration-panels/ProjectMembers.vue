@@ -197,7 +197,18 @@ export default {
     },
     async removeSelectedMembers() {
       try {
-        await this.project.deleteUsers(this.selectedMembers.map(member => member.id));
+        let members = this.selectedMembers;
+        await Promise.all(
+          members
+            .filter(member => member.role === this.representativeRole.value)
+            .map(member => ProjectRepresentative.delete(0, this.project.id, member.id))
+        );
+        await Promise.all(
+          members
+            .filter(member => member.role !== this.contributorRole.value)
+            .map(member => this.project.deleteAdmin(member.id))
+        );
+        await this.project.deleteUsers(members.map(member => member.id));
         await this.refreshMembers();
         this.$notify({ type: 'success', text: this.$t('notif-success-remove-project-members') });
       } catch (error) {

@@ -109,6 +109,10 @@ public class WiremockRepository {
             .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
         );
 
+        SERVER.stubFor(WireMock.delete(urlPathMatching(CBIR_API_BASE_PATH + "/storages/.*"))
+            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
+        );
+
         SERVER.stubFor(WireMock.put(urlPathMatching("/reviewed-annotations/terms/.*"))
             .willReturn(aResponse()
                 .withStatus(HttpStatus.OK.value())

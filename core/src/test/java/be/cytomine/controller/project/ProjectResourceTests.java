@@ -137,7 +137,7 @@ public class ProjectResourceTests {
             .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
         );
 
-        wireMockServer.stubFor(WireMock.delete(urlPathEqualTo(CBIR_API_BASE_PATH + "/storages"))
+        wireMockServer.stubFor(WireMock.delete(urlPathMatching(CBIR_API_BASE_PATH + "/storages/.*"))
             .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
         );
 

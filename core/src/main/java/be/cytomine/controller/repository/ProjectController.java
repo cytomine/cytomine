@@ -12,14 +12,17 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
 import be.cytomine.domain.project.Project;
 import be.cytomine.mapper.ProjectMapper;
+import be.cytomine.service.search.RetrievalService;
 import be.cytomine.utils.JsonObject;
 
 import static java.lang.String.format;
@@ -34,6 +37,7 @@ public class ProjectController {
 
     private final ProjectHttpContract projectHttpContract;
     private final ProjectMapper projectMapper;
+    private final RetrievalService retrievalService;
 
     @GetMapping("/project/{id}.json")
     public JsonObject read(@PathVariable long id) {
@@ -47,7 +51,12 @@ public class ProjectController {
     @PostMapping("/project.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateProject payload) {
         log.debug("POST /project.json - {}", payload);
-        return projectHttpContract.create(payload);
+        Optional<HttpCommandResponse> response = projectHttpContract.create(payload);
+        response.map(HttpCommandResponse::data)
+            .filter(ProjectResponse.class::isInstance)
+            .map(ProjectResponse.class::cast)
+            .ifPresent(project -> retrievalService.createStorage(Long.toString(project.id())));
+        return response;
     }
 
     @PutMapping("/project/{id}.json")
@@ -60,7 +69,17 @@ public class ProjectController {
     @DeleteMapping("/project/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("DELETE /project/{}.json", id);
-        return projectHttpContract.delete(id)
+        HttpCommandResponse response = projectHttpContract.delete(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_PROJECT, id)));
+        deleteStorage(id);
+        return response;
+    }
+
+    private void deleteStorage(long projectId) {
+        try {
+            retrievalService.deleteStorage(Long.toString(projectId));
+        } catch (HttpClientErrorException.NotFound e) {
+            log.warn("No cbir storage to delete for project {}", projectId);
+        }
     }
 }

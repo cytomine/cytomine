@@ -16,9 +16,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
+import be.cytomine.domain.project.Project;
+import be.cytomine.mapper.ProjectMapper;
+import be.cytomine.utils.JsonObject;
 
 import static java.lang.String.format;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -31,11 +33,14 @@ public class ProjectController {
     public static final String UNABLE_TO_FIND_PROJECT = "Unable to find project with id: %s";
 
     private final ProjectHttpContract projectHttpContract;
+    private final ProjectMapper projectMapper;
 
     @GetMapping("/project/{id}.json")
-    public ProjectResponse read(@PathVariable long id) {
+    public JsonObject read(@PathVariable long id) {
         log.debug("GET /project/{}.json", id);
         return projectHttpContract.read(id)
+            .map(projectMapper::map)
+            .map(Project::getDataFromDomain)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_PROJECT, id)));
     }
 

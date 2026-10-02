@@ -14,7 +14,7 @@ import org.mapstruct.Mapper;
  * It's tempting to add a
  * `T map(Optional&lt;T&gt; value)`
  * here, but then ObjectMapper does a lot of obscure chained calls.
- * Be careful
+ * Be careful.
  */
 @Mapper(componentModel = "spring")
 public interface BaseMapper {

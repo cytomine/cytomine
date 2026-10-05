@@ -9,7 +9,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = CollectionOutput.class, name = "ARRAY"),
     @JsonSubTypes.Type(value = DateTimeOutput.class, name = "DATETIME"),
     @JsonSubTypes.Type(value = EnumerationOutput.class, name = "ENUMERATION"),
+    @JsonSubTypes.Type(value = FileOutput.class, name = "FILE"),
     @JsonSubTypes.Type(value = GeometryOutput.class, name = "GEOMETRY"),
+    @JsonSubTypes.Type(value = ImageOutput.class, name = "IMAGE"),
     @JsonSubTypes.Type(value = IntegerOutput.class, name = "INTEGER"),
     @JsonSubTypes.Type(value = NumberOutput.class, name = "NUMBER"),
     @JsonSubTypes.Type(value = StringOutput.class, name = "STRING")

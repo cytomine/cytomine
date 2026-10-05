@@ -5,6 +5,10 @@ public interface Commands {
     String UPDATE_TAG = "be.cytomine.EditTagCommand";
     String DELETE_TAG = "be.cytomine.DeleteTagCommand";
 
+    String CREATE_PROJECT = "be.cytomine.AddProjectCommand";
+    String UPDATE_PROJECT = "be.cytomine.EditProjectCommand";
+    String DELETE_PROJECT = "be.cytomine.DeleteProjectCommand";
+
     String CREATE_TERM = "be.cytomine.AddTermCommand";
     String CREATE_TERM_RELATION = "be.cytomine.AddTermRelationCommand";
     String CREATE_ONTOLOGY = "be.cytomine.AddOntologyCommand";

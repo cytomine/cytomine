@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -203,28 +202,6 @@ public class UserService extends ModelService {
 
     private final UrlApi urlApi;
 
-    public Optional<User> find(UUID sub) {
-        return userRepository.findByReference(String.valueOf(sub));
-    }
-
-    public List<User> find(List<String> ids) {
-        return userRepository.findAllByReferenceIn(ids);
-    }
-
-    public Optional<User> findUser(Long id) {
-        securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userRepository.findById(id);
-    }
-
-    public Optional<UserResponse> findByUsername(String username) {
-        securityACLService.checkGuest(currentUserService.getCurrentUser());
-        return userHttpContract.search(username);
-    }
-
-    public Optional<User> findByUsernameWithAdmin(String username) {
-        return userRepository.findByUsernameLikeIgnoreCase(username);
-    }
-
     public Optional<UserResponse> findByPublicKey(String publicKey) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return userRepository.findByPublicKey(publicKey).map(userMapper::map);
@@ -244,10 +221,6 @@ public class UserService extends ModelService {
                 user));
 
         return authInformation;
-    }
-
-    public List<User> list(List<Long> ids) {
-        return userRepository.findAllByIdIn(ids);
     }
 
     // TODO 2024.2
@@ -612,10 +585,6 @@ public class UserService extends ModelService {
         return userRepository.findAllUsersByStorageId(storage.getId());
     }
 
-    public List<UserResponse> listAll(Project project) {
-        return new ArrayList<>(listUsers(project));
-    }
-
     /**
      * List all layers from a project Each user has its own layer If project has private layer, just get current user
      * layer
@@ -653,7 +622,7 @@ public class UserService extends ModelService {
 
     public List<JsonObject> getAllOnlineUserWithTheirPositions(Project project) {
         //Get all project user online
-        List<Long> usersId = this.getAllFriendsUsersOnline(currentUserService.getCurrentUserOld(), project).stream()
+        List<Long> usersId = this.getAllFriendsUsersOnline(project).stream()
             .map(UserResponse::id).collect(Collectors.toList());
         List<JsonObject> usersWithPosition = userPositionService.findUsersPositions(project);
         usersId.removeAll(usersWithPosition.stream().map(JsonObject::getId).toList());
@@ -763,17 +732,17 @@ public class UserService extends ModelService {
     /**
      * Get all user that share at least a same project as user from argument
      */
-    public List<UserResponse> getAllFriendsUsers(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
-        return userRepository.findAllUsersSharingAccessToSameProject(user.getUsername()).stream().map(userMapper::map)
+    public List<UserResponse> getAllFriendsUsers(UserResponse user) {
+        securityACLService.checkIsSameUser(user.id(), currentUserService.getCurrentUser());
+        return userRepository.findAllUsersSharingAccessToSameProject(user.username()).stream().map(userMapper::map)
             .toList();
     }
 
     /**
      * Get all online user that share at least a same project as user from argument
      */
-    public List<UserResponse> getAllFriendsUsersOnline(User user) {
-        securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
+    public List<UserResponse> getAllFriendsUsersOnline(UserResponse user) {
+        securityACLService.checkIsSameUser(user.id(), currentUserService.getCurrentUser());
         List<UserResponse> friends = getAllFriendsUsers(user);
         return getAllOnlineUsers().stream().distinct().filter(friends::contains).toList();
     }
@@ -781,7 +750,7 @@ public class UserService extends ModelService {
     /**
      * Get all user that share at least a same project as user from argument and
      */
-    public List<UserResponse> getAllFriendsUsersOnline(User user, Project project) {
+    public List<UserResponse> getAllFriendsUsersOnline(Project project) {
         securityACLService.check(project, READ);
         //no need to make insterect because getAllOnlineUsers(project) contains only friends users
         return getAllOnlineUsers(project).stream().map(userMapper::map).toList();

@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.dto.image.ImageParameter;
 import be.cytomine.dto.image.LabelParameter;
@@ -101,15 +101,10 @@ public class RestAbstractImageController extends RestCytomineController {
     }
 
     @GetMapping("/abstractimage/{id}/user.json")
-    public ResponseEntity<String> showUploaderOfImage(@PathVariable Long id) {
+    public UserResponse showUploaderOfImage(@PathVariable Long id) {
         log.debug("REST request to show image uploader");
-        User user = abstractImageService.getImageUploader(id);
-        if (user != null) {
-            return responseSuccess(abstractImageService.getImageUploader(id));
-        } else {
-            return responseNotFound("AbstractImage", "User", id);
-        }
-
+        return abstractImageService.getImageUploader(id).orElseThrow(() -> new ObjectNotFoundException("User not "
+            + "found"));
     }
 
     // TODO:MIGRATION GET params vs POST params!

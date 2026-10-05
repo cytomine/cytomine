@@ -1,6 +1,7 @@
 package be.cytomine.controller.image;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.CompanionFile;
@@ -39,6 +42,8 @@ public class RestCompanionFileController extends RestCytomineController {
     private final ImageServerService imageServerService;
 
     private final AbstractImageRepository abstractImageRepository;
+
+    private final UserHttpContract userHttpContract;
 
     @GetMapping("/abstractimage/{id}/companionfile.json")
     public ResponseEntity<String> listByAbstractImage(
@@ -100,15 +105,13 @@ public class RestCompanionFileController extends RestCytomineController {
 
 
     @GetMapping("/companionfile/{id}/user.json")
-    public ResponseEntity<String> showUploaderOfImage(@PathVariable Long id) {
+    public UserResponse showUploaderOfImage(@PathVariable Long id) {
         log.debug("REST request to show companionfile uploader");
         CompanionFile companionFile = companionFileService.find(id)
             .orElseThrow(() -> new ObjectNotFoundException("CompanionFile", id));
-        if (companionFile.getUploadedFile() != null && companionFile.getUploadedFile().getUser() != null) {
-            return responseSuccess(companionFile.getUploadedFile().getUser());
-        } else {
-            return responseNotFound("CompanionFile", "User", id);
-        }
+        return Optional.ofNullable(companionFile.getUploadedFile()).map(UploadedFile::getUserId)
+            .flatMap(userHttpContract::get).orElseThrow(() -> new ObjectNotFoundException("User not found"));
+
 
     }
 }

@@ -316,17 +316,15 @@ public class CytomineTests {
             }
 
             cytomineSteps.createAnnotationAndSearchAnnotations(wait, driver, nbAnnotations);
-
-            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
     @Test
-    void removeUserFromProject() {
+    void addAndRemoveUserFromProject() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String username = "ImageServer1";
-
             cytomineSteps.addUserToProject(wait, admin.projectUrl(), username);
+            cytomineSteps.changeUserRole(wait, admin.projectUrl(), username);
             cytomineSteps.removeUserFromProject(wait, admin.projectUrl(), username);
 
         });

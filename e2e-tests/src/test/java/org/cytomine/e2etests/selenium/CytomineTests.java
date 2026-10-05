@@ -130,15 +130,12 @@ public class CytomineTests {
             Set<String> projectUrls = projectNames.stream()
                 .map(name -> cytomineSteps.createProject(wait, driver, cytomineUrl, name))
                 .collect(toSet());
-            try {
-                cytomineSteps.listProjects(wait, cytomineUrl, projectNames);
-            } finally {
-                projectUrls.forEach(projectUrl -> cleanup(() -> {
-                    String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-                    cytomineSteps.deleteProject(wait, projectUrl);
-                    cytomineSteps.deleteOntology(wait, ontologyUrl);
-                }));
-            }
+            cytomineSteps.listProjects(wait, cytomineUrl, projectNames);
+            projectUrls.forEach(projectUrl -> {
+                String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+                cytomineSteps.deleteProject(wait, projectUrl);
+                cytomineSteps.deleteOntology(wait, ontologyUrl);
+            });
         });
     }
 
@@ -154,16 +151,13 @@ public class CytomineTests {
 
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-            try {
-                imageNames.forEach(name -> cytomineSteps.addImage(wait, cytomineUrl, name, Optional.of(projectName)));
-                cytomineSteps.listImagesInProject(wait, projectUrl, imageNames);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl)
-                );
-                imageNames.forEach(imageName -> cleanup(() -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)));
-            }
+
+            imageNames.forEach(name -> cytomineSteps.addImage(wait, cytomineUrl, name, Optional.of(projectName)));
+            cytomineSteps.listImagesInProject(wait, projectUrl, imageNames);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            imageNames.forEach(imageName -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName));
         });
     }
 
@@ -183,15 +177,12 @@ public class CytomineTests {
             String projectName = "selenium-" + randomUUID();
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-                );
-            }
+
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -254,37 +245,34 @@ public class CytomineTests {
             String projectName = "selenium-" + randomUUID();
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectUrl);
 
-                annotationTools.drawPointAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectUrl);
 
-                annotationTools.drawLineAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
+            annotationTools.drawPointAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
 
-                annotationTools.drawFreeHandLineAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
+            annotationTools.drawLineAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
 
-                annotationTools.drawRectangleAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
+            annotationTools.drawFreeHandLineAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
 
-                annotationTools.drawCircleAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
+            annotationTools.drawRectangleAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
 
-                annotationTools.drawPolygonAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
+            annotationTools.drawCircleAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
 
-                annotationTools.drawFreeHandPolygonAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-                );
-            }
+            annotationTools.drawPolygonAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
+
+            annotationTools.drawFreeHandPolygonAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -297,21 +285,18 @@ public class CytomineTests {
 
             String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
-            try {
-                cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectURL);
 
-                cytomineSteps.selectTermForAnnotation(wait, termName);
-                annotationTools.drawRectangleAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectURL),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyURL)
-                );
-            }
+            cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectURL);
+
+            cytomineSteps.selectTermForAnnotation(wait, termName);
+            annotationTools.drawRectangleAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
+
+            cytomineSteps.deleteProject(wait, projectURL);
+            cytomineSteps.deleteOntology(wait, ontologyURL);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -324,21 +309,18 @@ public class CytomineTests {
 
             String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
-            try {
-                cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectURL);
-                cytomineSteps.selectTermForAnnotation(wait, termName);
 
-                annotationTools.drawRectangleAnnotationWithMagicWand(wait, driver);
-                cytomineSteps.verifyAnnotationProcessedWithSam(wait);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectURL),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyURL)
-                );
-            }
+            cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectURL);
+            cytomineSteps.selectTermForAnnotation(wait, termName);
+
+            annotationTools.drawRectangleAnnotationWithMagicWand(wait, driver);
+            cytomineSteps.verifyAnnotationProcessedWithSam(wait);
+
+            cytomineSteps.deleteProject(wait, projectURL);
+            cytomineSteps.deleteOntology(wait, ontologyURL);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -381,25 +363,22 @@ public class CytomineTests {
 
             String projectURL = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyURL = cytomineSteps.getOntologyUrlFromProject(wait, projectURL);
-            try {
-                cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectURL);
-                cytomineSteps.selectTermForAnnotation(wait, termName);
 
-                for (int i = 0; i < nbAnnotations; i++) {
-                    annotationTools.drawRandomRectangleAnnotation(wait, driver);
-                    cytomineSteps.verifyAnnotationCreated(wait);
-                }
+            cytomineSteps.addTermToOntology(wait, driver, ontologyURL, termName);
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectURL);
+            cytomineSteps.selectTermForAnnotation(wait, termName);
 
-                cytomineSteps.createAnnotationAndSearchAnnotations(wait, driver, nbAnnotations);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectURL),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyURL)
-                );
+            for (int i = 0; i < nbAnnotations; i++) {
+                annotationTools.drawRandomRectangleAnnotation(wait, driver);
+                cytomineSteps.verifyAnnotationCreated(wait);
             }
+
+            cytomineSteps.createAnnotationAndSearchAnnotations(wait, driver, nbAnnotations);
+
+            cytomineSteps.deleteProject(wait, projectURL);
+            cytomineSteps.deleteOntology(wait, ontologyURL);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -409,14 +388,10 @@ public class CytomineTests {
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, "selenium-" + randomUUID());
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
 
-            try {
-                cytomineSteps.addUserToProject(wait, projectUrl, "ImageServer1");
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl)
-                );
-            }
+            cytomineSteps.addUserToProject(wait, projectUrl, "ImageServer1");
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
         });
     }
 
@@ -426,16 +401,12 @@ public class CytomineTests {
             String username = "ImageServer1";
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, "selenium-" + randomUUID());
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-            try {
-                cytomineSteps.addUserToProject(wait, projectUrl, username);
 
-                cytomineSteps.removeUserFromProject(wait, projectUrl, username);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl)
-                );
-            }
+            cytomineSteps.addUserToProject(wait, projectUrl, username);
+            cytomineSteps.removeUserFromProject(wait, projectUrl, username);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
         });
     }
 
@@ -454,17 +425,13 @@ public class CytomineTests {
                 projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectName));
             }
 
-            try {
-                cytomineSteps.filterProjectByName(wait, cytomineUrl, projectNameToSearch, projectNames);
-            } finally {
-                for (String projectUrl : projectUrls) {
-                    cleanup(() -> {
-                        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-                        cytomineSteps.deleteProject(wait, projectUrl);
-                        cytomineSteps.deleteOntology(wait, ontologyUrl);
-                    });
-                }
-            }
+            cytomineSteps.filterProjectByName(wait, cytomineUrl, projectNameToSearch, projectNames);
+
+            projectUrls.forEach(projectUrl -> {
+                String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+                cytomineSteps.deleteProject(wait, projectUrl);
+                cytomineSteps.deleteOntology(wait, ontologyUrl);
+            });
         });
     }
 
@@ -476,25 +443,22 @@ public class CytomineTests {
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
             String termName = "selenium-term-" + randomUUID();
-            try {
-                cytomineSteps.addTermToOntology(wait, driver, ontologyUrl, termName);
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectUrl);
 
-                annotationTools.drawRectangleAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
-                cytomineSteps.selectTermForAnnotation(wait, termName);
-                annotationTools.drawRectangleAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
-                sleep(1000);
-                cytomineSteps.filterAnnotationsByTerm(wait, projectUrl, termName);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-                );
-            }
+            cytomineSteps.addTermToOntology(wait, driver, ontologyUrl, termName);
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectUrl);
+
+            annotationTools.drawRectangleAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
+            cytomineSteps.selectTermForAnnotation(wait, termName);
+            annotationTools.drawRectangleAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
+            sleep(1000);
+            cytomineSteps.filterAnnotationsByTerm(wait, projectUrl, termName);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -506,22 +470,19 @@ public class CytomineTests {
 
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectUrl);
-                annotationTools.drawRectangleAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
 
-                cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.PDF);
-                cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.CSV);
-                cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.Excel);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-                );
-            }
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectUrl);
+            annotationTools.drawRectangleAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
+
+            cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.PDF);
+            cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.CSV);
+            cytomineSteps.downloadAnnotationReport(wait, projectUrl, projectName, ReportType.Excel);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -533,20 +494,17 @@ public class CytomineTests {
 
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectUrl);
-                annotationTools.drawRectangleAnnotation(wait, driver);
-                cytomineSteps.verifyAnnotationCreated(wait);
 
-                cytomineSteps.exportAnnotations(wait, projectUrl, projectName);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-                );
-            }
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectUrl);
+            annotationTools.drawRectangleAnnotation(wait, driver);
+            cytomineSteps.verifyAnnotationCreated(wait);
+
+            cytomineSteps.exportAnnotations(wait, projectUrl, projectName);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -574,18 +532,15 @@ public class CytomineTests {
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
             String imageName = "selenium-" + randomUUID() + ".png";
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectUrl);
-                sleep(1000);
-                cytomineSteps.checkRecentlyViewedProjects(wait, cytomineUrl, projectName, imageName);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-                );
-            }
+
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectUrl);
+            sleep(1000);
+            cytomineSteps.checkRecentlyViewedProjects(wait, cytomineUrl, projectName, imageName);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -607,19 +562,16 @@ public class CytomineTests {
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
             String imageName = "selenium-" + randomUUID() + ".png";
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectUrl);
-                annotationTools.drawRectangleAnnotation(wait, driver);
 
-                cytomineSteps.reviewAnnotations(wait);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-                );
-            }
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectUrl);
+            annotationTools.drawRectangleAnnotation(wait, driver);
+
+            cytomineSteps.reviewAnnotations(wait);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -630,20 +582,17 @@ public class CytomineTests {
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
             String imageName = "selenium-" + randomUUID() + ".png";
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
 
-                String imageGroupName = "selenium-" + randomUUID();
-                cytomineSteps.createImageGroup(wait, projectUrl, imageGroupName, Set.of(imageName));
-                cytomineSteps.openImageGroupInViewer(wait, projectUrl, imageGroupName);
-                cytomineSteps.deleteImageGroup(wait, projectUrl, imageGroupName);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-                );
-            }
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+
+            String imageGroupName = "selenium-" + randomUUID();
+            cytomineSteps.createImageGroup(wait, projectUrl, imageGroupName, Set.of(imageName));
+            cytomineSteps.openImageGroupInViewer(wait, projectUrl, imageGroupName);
+            cytomineSteps.deleteImageGroup(wait, projectUrl, imageGroupName);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -656,33 +605,29 @@ public class CytomineTests {
 
             String firstImageName = "selenium-" + randomUUID() + ".png";
             String secondImageName = "selenium-" + randomUUID() + ".png";
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, firstImageName, Optional.of(projectName));
-                cytomineSteps.addImage(wait, cytomineUrl, secondImageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, firstImageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, secondImageName, Optional.of(projectName));
 
-                String imageGroupName = "selenium-" + randomUUID();
-                cytomineSteps.createImageGroup(wait, projectUrl, imageGroupName,
-                    Set.of(firstImageName, secondImageName));
-                cytomineSteps.openImageGroupInViewer(wait, projectUrl, imageGroupName);
+            String imageGroupName = "selenium-" + randomUUID();
+            cytomineSteps.createImageGroup(wait, projectUrl, imageGroupName,
+                Set.of(firstImageName, secondImageName));
+            cytomineSteps.openImageGroupInViewer(wait, projectUrl, imageGroupName);
 
-                annotationTools.drawRectangleAnnotationInCell(wait, driver, 1);
-                annotationTools.drawRectangleAnnotationInCell(wait, driver, 2);
+            annotationTools.drawRectangleAnnotationInCell(wait, driver, 1);
+            annotationTools.drawRectangleAnnotationInCell(wait, driver, 2);
 
-                cytomineSteps.linkAnnotationToOtherView(wait);
-                cytomineSteps.verifyLinkedAnnotationInDetails(wait);
+            cytomineSteps.linkAnnotationToOtherView(wait);
+            cytomineSteps.verifyLinkedAnnotationInDetails(wait);
 
-                cytomineSteps.unlinkAnnotationFromView(wait);
-                cytomineSteps.verifyAnnotationUnlinkedInDetails(wait);
+            cytomineSteps.unlinkAnnotationFromView(wait);
+            cytomineSteps.verifyAnnotationUnlinkedInDetails(wait);
 
-                cytomineSteps.deleteImageGroup(wait, projectUrl, imageGroupName);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, firstImageName),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, secondImageName)
-                );
-            }
+            cytomineSteps.deleteImageGroup(wait, projectUrl, imageGroupName);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, firstImageName);
+            cytomineSteps.deleteImage(wait, cytomineUrl, secondImageName);
         });
     }
 
@@ -711,18 +656,15 @@ public class CytomineTests {
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
             String imageName = "selenium-" + randomUUID() + ".png";
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.openImageInViewer(wait, projectUrl);
 
-                annotationTools.screenshotCurrentView(wait);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
-                );
-            }
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectUrl);
+
+            annotationTools.screenshotCurrentView(wait);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
 
@@ -734,20 +676,17 @@ public class CytomineTests {
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
             String imageName = "selenium-" + randomUUID() + ".png";
             String tagName = "selenium-tag-" + randomUUID();
-            try {
-                cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
-                cytomineSteps.createTag(wait, cytomineUrl, tagName);
 
-                cytomineSteps.goToProjectTab(wait, projectUrl, "Images");
-                cytomineSteps.addTagToImage(wait, imageName, tagName);
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
-                    () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName),
-                    () -> cytomineSteps.deleteTag(wait, cytomineUrl, tagName)
-                );
-            }
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.createTag(wait, cytomineUrl, tagName);
+
+            cytomineSteps.goToProjectTab(wait, projectUrl, "Images");
+            cytomineSteps.addTagToImage(wait, imageName, tagName);
+
+            cytomineSteps.deleteProject(wait, projectUrl);
+            cytomineSteps.deleteOntology(wait, ontologyUrl);
+            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
+            cytomineSteps.deleteTag(wait, cytomineUrl, tagName);
         });
     }
 

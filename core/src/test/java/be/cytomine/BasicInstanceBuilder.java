@@ -122,18 +122,6 @@ public class BasicInstanceBuilder {
         return getUser(ADMIN);
     }
 
-    public UserResponse givenAnotherUser() {
-        return getUser(ANOTHER_USER);
-    }
-
-    public UserResponse givenSuperAdminAcl() {
-        return getUser(SUPER_ADMIN_ACL);
-    }
-
-    public UserResponse givenAdminAcl() {
-        return getUser(ADMIN_ACL);
-    }
-
     public UserResponse givenAclUserNoAcl() {
         return getUser(ACL_USER_NO_ACL);
     }
@@ -152,10 +140,6 @@ public class BasicInstanceBuilder {
 
     public UserResponse givenUserAclDelete() {
         return getUser(USER_ACL_DELETE);
-    }
-
-    public UserResponse givenUserAclAdmin() {
-        return getUser(USER_ACL_ADMIN);
     }
 
     public UserResponse givenCreator() {
@@ -206,15 +190,6 @@ public class BasicInstanceBuilder {
         return CurrentUserService.getSecurityCurrentUser().map(currentUser -> currentUser.getUser().username())
             .flatMap(userRepository::findByUsernameLikeIgnoreCase).map(user -> userMapper.map(user))
             .orElseGet(this::givenSuperAdmin);
-    }
-
-    public UserResponse givenANotPersistedUser() {
-        User user = new User();
-        user.setName("firstname lastname");
-        user.setReference(UUID.randomUUID().toString());
-        user.setUsername(randomString());
-        user.generateKeys();
-        return userMapper.map(user);
     }
 
     public ImageFilterProject givenANotPersistedImageFilterProject(ImageFilter imageFilter, Project project) {
@@ -365,10 +340,6 @@ public class BasicInstanceBuilder {
         storage.setName(randomString());
         storage.setUserId(getUserResponseEntity(user).id());
         return storage;
-    }
-
-    public Storage givenANotPersistedStorage() {
-        return givenANotPersistedStorage(givenSuperAdmin());
     }
 
     private String randomString() {
@@ -870,10 +841,6 @@ public class BasicInstanceBuilder {
         return persistAndReturn(givenANotPersistedProjectDefaultLayer(givenAProject(), givenSuperAdmin()));
     }
 
-    public ProjectDefaultLayer givenAProjectDefaultLayer(Project project, UserResponse user) {
-        return persistAndReturn(givenANotPersistedProjectDefaultLayer(project, user));
-    }
-
     public ProjectDefaultLayer givenANotPersistedProjectDefaultLayer() {
         return givenANotPersistedProjectDefaultLayer(givenAProject(), givenSuperAdmin());
     }
@@ -885,30 +852,6 @@ public class BasicInstanceBuilder {
         projectDefaultLayer.setProject(project);
         projectDefaultLayer.setHideByDefault(false);
         return projectDefaultLayer;
-    }
-
-    public SecUserSecRole givenAUserRole() {
-        return persistAndReturn(givenANotPersistedUserRole(getUserEntity(GUEST_ACL),
-            secRoleRepository.findByAuthority(ROLE_USER).get()));
-    }
-
-    public SecUserSecRole givenAUserRole(User user) {
-        return persistAndReturn(givenANotPersistedUserRole(user, secRoleRepository.findByAuthority(ROLE_USER).get()));
-    }
-
-    public SecUserSecRole givenAUserRole(User user, SecRole secRole) {
-        return persistAndReturn(givenANotPersistedUserRole(user, secRole));
-    }
-
-    public SecUserSecRole givenANotPersistedUserRole(User user, String authority) {
-        return givenANotPersistedUserRole(user, secRoleRepository.findByAuthority(authority).get());
-    }
-
-    public SecUserSecRole givenANotPersistedUserRole(User secUser, SecRole secRole) {
-        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
-        secSecUserSecRole.setSecRole(secRole);
-        secSecUserSecRole.setSecUser(secUser);
-        return secSecUserSecRole;
     }
 
     public ImageGroup givenANotPersistedImagegroup() {

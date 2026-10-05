@@ -447,7 +447,7 @@ public class ReviewedAnnotationServiceTests {
 
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
-        image.setReviewUser(builder.getUserEntity(builder.givenAclUserNoAcl().username()));
+        image.setReviewUser(builder.getUserDomain(builder.givenAclUserNoAcl().username()));
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(image.getProject());
         userAnnotation.setImage(image);
         builder.persistAndReturn(userAnnotation);
@@ -553,7 +553,7 @@ public class ReviewedAnnotationServiceTests {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation();
 
         imageInstanceService.startReview(userAnnotation.getImage());
-        userAnnotation.getImage().setReviewUser(builder.getUserEntity(builder.givenAclUserNoAcl().username()));
+        userAnnotation.getImage().setReviewUser(builder.getUserDomain(builder.givenAclUserNoAcl().username()));
 
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
@@ -631,7 +631,7 @@ public class ReviewedAnnotationServiceTests {
         ImageInstance image = builder.givenAnImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                reviewedAnnotationService.reviewLayer(image.getId(), List.of(image.getUser().getId()), null);
+                reviewedAnnotationService.reviewLayer(image.getId(), List.of(image.getUserId()), null);
             }
         );
     }
@@ -640,10 +640,10 @@ public class ReviewedAnnotationServiceTests {
     void reviewAllUserLayersUserIsNotReviewer() {
         ImageInstance image = builder.givenAnImageInstance();
         imageInstanceService.startReview(image);
-        image.setReviewUser(builder.getUserEntity(builder.givenAclUserNoAcl().username()));
+        image.setReviewUser(builder.getUserDomain(builder.givenAclUserNoAcl().username()));
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                reviewedAnnotationService.reviewLayer(image.getId(), List.of(image.getUser().getId()), null);
+                reviewedAnnotationService.reviewLayer(image.getId(), List.of(image.getUserId()), null);
             }
         );
     }

@@ -23,7 +23,6 @@ import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
 import be.cytomine.domain.image.UploadedFile;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.dto.image.ImageParameter;
 import be.cytomine.dto.image.TileParameters;
@@ -118,7 +117,7 @@ public class RestAbstractSliceController extends RestCytomineController {
     @GetMapping("/abstractslice/{id}/user.json")
     public UserResponse showUploaderOfImage(@PathVariable Long id) {
         log.debug("REST request to show image uploader");
-        return  abstractSliceService.findImageUploaded(id).orElseThrow(()-> new ObjectNotFoundException("User not "
+        return  abstractSliceService.findImageUploaded(id).orElseThrow(() -> new ObjectNotFoundException("User not "
             + "found"));
 
     }

@@ -105,7 +105,7 @@ public class ImageConsultationServiceTests {
         UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance = builder.givenASliceInstance().getImage();
         PersistentImageConsultation consultation = givenAPersistentImageConsultation(
-            builder.getUserEntity(user.username()),
+            builder.getUserDomain(user.username()),
             imageInstance,
             new Date()
         );
@@ -114,7 +114,7 @@ public class ImageConsultationServiceTests {
         Date after = new Date();
 
         consultation =
-            givenAPersistentImageConsultation(builder.getUserEntity(user.username()), imageInstance, new Date());
+            givenAPersistentImageConsultation(builder.getUserDomain(user.username()), imageInstance, new Date());
 
         Optional<PersistentImageConsultation>
             connectionOptional
@@ -134,7 +134,7 @@ public class ImageConsultationServiceTests {
         ImageInstance imageInstance = builder.givenASliceInstance(projet).getImage();
 
         PersistentImageConsultation consultation = givenAPersistentImageConsultation(
-            builder.getUserEntity(user.username()),
+            builder.getUserDomain(user.username()),
             imageInstance,
             DateUtils.addSeconds(new Date(), -10)
         );
@@ -144,9 +144,9 @@ public class ImageConsultationServiceTests {
         annotation.setImage(imageInstance);
         builder.persistAndReturn(annotation);
 
-        consultation = givenAPersistentImageConsultation(builder.getUserEntity(user.username()), imageInstance,
+        consultation = givenAPersistentImageConsultation(builder.getUserDomain(user.username()), imageInstance,
             DateUtils.addSeconds(new Date(), 1));
-        consultation = givenAPersistentImageConsultation(builder.getUserEntity(user.username()), imageInstance,
+        consultation = givenAPersistentImageConsultation(builder.getUserDomain(user.username()), imageInstance,
             DateUtils.addSeconds(new Date(), 10));
         Page<PersistentImageConsultation> allByUserAndProject =
             persistentImageConsultationRepository.findAllByProjectAndUser(
@@ -169,13 +169,13 @@ public class ImageConsultationServiceTests {
         UserResponse user = builder.givenSuperAdmin();
         ImageInstance imageInstance = builder.givenASliceInstance().getImage();
 
-        givenAPersistentImageConsultation(builder.getUserEntity(user.username()), imageInstance, new Date());
+        givenAPersistentImageConsultation(builder.getUserDomain(user.username()), imageInstance, new Date());
 
         Page<PersistentImageConsultation>
             results
             = imageConsultationService.listImageConsultationByProjectAndUserNoImageDistinct(
             imageInstance.getProject(),
-            builder.getUserEntity(user.username()).getId(),
+            builder.getUserEntity(user.username()).id(),
             0,
             0
         );
@@ -188,18 +188,18 @@ public class ImageConsultationServiceTests {
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
 
-        givenAPersistentImageConsultation(builder.getUserEntity(user.username()), imageInstance1, new Date());
-        givenAPersistentImageConsultation(builder.getUserEntity(user.username()), imageInstance1, new Date());
+        givenAPersistentImageConsultation(builder.getUserDomain(user.username()), imageInstance1, new Date());
+        givenAPersistentImageConsultation(builder.getUserDomain(user.username()), imageInstance1, new Date());
 
         List<JsonObject> results = imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
-            imageInstance1.getProject(), builder.getUserEntity(user.username()).getId());
+            imageInstance1.getProject(), builder.getUserEntity(user.username()).id());
         assertThat(results).hasSize(1);
         assertThat(results.get(0).get("imageName")).isEqualTo(imageInstance1.getBlindInstanceFilename());
 
-        givenAPersistentImageConsultation(builder.getUserEntity(user.username()), imageInstance2, new Date());
+        givenAPersistentImageConsultation(builder.getUserDomain(user.username()), imageInstance2, new Date());
 
         results = imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
-            imageInstance1.getProject(), builder.getUserEntity(user.username()).getId());
+            imageInstance1.getProject(), builder.getUserEntity(user.username()).id());
         assertThat(results).hasSize(2);
 
     }
@@ -212,13 +212,13 @@ public class ImageConsultationServiceTests {
         ImageInstance imageInstance1 = builder.givenASliceInstance().getImage();
         ImageInstance imageInstance2 = builder.givenASliceInstance(imageInstance1.getProject()).getImage();
 
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -3));
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance2,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance2,
             DateUtils.addDays(new Date(),
                 -2));
-        givenAPersistentImageConsultation(builder.getUserEntity(user2.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user2.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -1));
 
@@ -280,13 +280,13 @@ public class ImageConsultationServiceTests {
         assertThat(results.get(0).get("image")).isNull();
         assertThat(results.get(1).get("image")).isNull();
 
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -3));
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance2,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance2,
             DateUtils.addDays(new Date(),
                 -2));
-        givenAPersistentImageConsultation(builder.getUserEntity(user2.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user2.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -1));
 
@@ -335,13 +335,13 @@ public class ImageConsultationServiceTests {
         );
         assertThat(results).hasSize(0);
 
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -10));
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance2,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance2,
             DateUtils.addDays(new Date(),
                 -5));
-        givenAPersistentImageConsultation(builder.getUserEntity(user2.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user2.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -1));
 
@@ -394,16 +394,16 @@ public class ImageConsultationServiceTests {
         );
         assertThat(results).hasSize(0);
 
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -10));
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -7));
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance2,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance2,
             DateUtils.addDays(new Date(),
                 -5));
-        givenAPersistentImageConsultation(builder.getUserEntity(user2.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user2.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -1));
 
@@ -434,14 +434,14 @@ public class ImageConsultationServiceTests {
         ImageInstance imageInstance2 = builder.givenASliceInstance(projet).getImage();
 
         Date noConnectionBefore = DateUtils.addDays(new Date(), -100);
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -10));
-        givenAPersistentImageConsultation(builder.getUserEntity(user1.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(user1.username()), imageInstance1,
             DateUtils.addDays(new Date(),
                 -10));
         Date twoConnectionBefore = DateUtils.addDays(new Date(), -5);
-        givenAPersistentImageConsultation(builder.getUserEntity(anotherUser.username()), imageInstance1,
+        givenAPersistentImageConsultation(builder.getUserDomain(anotherUser.username()), imageInstance1,
             DateUtils.addDays(new Date(), -1));
         Date threeConnectionBefore = new Date();
 

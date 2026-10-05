@@ -257,7 +257,7 @@ public class AnnotationTermResourceTests {
         AnnotationTerm
             previousAnnotationTermFromOtherUser
             = builder.givenAnAnnotationTerm(previousAnnotationTerm.getUserAnnotation());
-        previousAnnotationTermFromOtherUser.setUser(builder.getUserEntity(builder.givenAclUserNoAcl().username()));
+        previousAnnotationTermFromOtherUser.setUser(builder.getUserDomain(builder.givenAclUserNoAcl().username()));
 
         AnnotationTerm
             annotationTerm
@@ -316,7 +316,7 @@ public class AnnotationTermResourceTests {
     public void addValidAnnotationTermCleanBeforeForAllUser() throws Exception {
 
         AnnotationTerm previousAnnotationTerm = builder.givenAnAnnotationTerm();
-        previousAnnotationTerm.setUser(builder.getUserEntity(builder.givenAclUserNoAcl().username()));
+        previousAnnotationTerm.setUser(builder.getUserDomain(builder.givenAclUserNoAcl().username()));
 
         AnnotationTerm
             annotationTerm

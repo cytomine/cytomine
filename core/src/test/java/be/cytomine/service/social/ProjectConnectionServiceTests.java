@@ -280,7 +280,7 @@ public class ProjectConnectionServiceTests {
         givenALastConnection(user, projet);
 
         Page<PersistentProjectConnection> results =
-            projectConnectionService.getConnectionByUserAndProject(builder.getUserEntity(user.username()).getId(),
+            projectConnectionService.getConnectionByUserAndProject(builder.getUserResponseEntity(user.username()).id(),
                 projet,
                 50, 0);
         assertThat(results).isNotEmpty();
@@ -288,7 +288,7 @@ public class ProjectConnectionServiceTests {
         assertThat(results.getContent().get(0).getExtraProperties()).containsEntry("online", true);
 
         results = projectConnectionService.getConnectionByUserAndProject(
-            builder.getUserEntity(anotherUser.username()).getId(),
+            builder.getUserResponseEntity(anotherUser.username()).id(),
             projet,
             50, 0);
         assertThat(results).isNotEmpty();
@@ -485,7 +485,7 @@ public class ProjectConnectionServiceTests {
         UserResponse user = builder.givenSuperAdmin();
 
         List<JsonObject> results = projectConnectionService.numberOfProjectConnections("day", null, null, projet,
-            Optional.of(builder.getUserEntity(user.username()).getId()));
+            Optional.of(builder.getUserResponseEntity(user.username()).id()));
         assertThat(results).isEmpty();
 
         givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T12:00:00"));
@@ -493,12 +493,12 @@ public class ProjectConnectionServiceTests {
         givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2022-01-01T13:30:00"));
 
         results = projectConnectionService.numberOfProjectConnections("day", null, null, projet,
-            Optional.of(builder.getUserEntity(user.username()).getId()));
+            Optional.of(builder.getUserResponseEntity(user.username()).id()));
         assertThat(results).hasSize(1);
         assertThat(results.get(0).get("frequency")).isEqualTo(3);
 
         results = projectConnectionService.numberOfProjectConnections("hour", null, null, projet,
-            Optional.of(builder.getUserEntity(user.username()).getId()));
+            Optional.of(builder.getUserResponseEntity(user.username()).id()));
         assertThat(results).hasSize(2);
         Optional<JsonObject> entry = results.stream().filter(x -> x.get("frequency").equals(2)).findFirst();
         assertThat(entry).isPresent();
@@ -508,7 +508,7 @@ public class ProjectConnectionServiceTests {
         givenAPersistentConnectionInProject(user, projet, simpleDateFormat.parse("2021-01-20T03:00:00"));
 
         results = projectConnectionService.numberOfProjectConnections("week", null, null, projet,
-            Optional.of(builder.getUserEntity(user.username()).getId()));
+            Optional.of(builder.getUserResponseEntity(user.username()).id()));
         assertThat(results).hasSize(2);
         entry = results.stream().filter(x -> x.get("frequency").equals(3)).findFirst();
         assertThat(entry).isPresent();

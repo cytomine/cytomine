@@ -173,7 +173,7 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column :label="$t('id')" width="20" :visible="currentUser.isDeveloper" sortable field="id">
+            <b-table-column :label="$t('id')" width="20" :visible="currentAccount.isDeveloper" sortable field="id">
               {{image.id}}
             </b-table-column>
 

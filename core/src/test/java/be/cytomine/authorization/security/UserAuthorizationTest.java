@@ -55,10 +55,6 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @WithMockUser(username = GUEST)
     public void everyBodyCanReadUser() {
         User userNoAcl = userRepository.findByUsernameLikeIgnoreCase(USER_NO_ACL).get();
-        assertThat(userService.findUser(userNoAcl.getId())).isPresent();
-        assertThat(userService.find(userNoAcl.getId())).isPresent();
-        assertThat(userService.get(userNoAcl.getId())).isNotNull();
-        assertThat(userService.findByUsername(userNoAcl.getUsername())).isPresent();
         assertThat(userService.findByPublicKey(userNoAcl.getPublicKey())).isPresent();
         assertThat(userService.getAuthenticationRoles(userMapper.map(userNoAcl))).isNotNull();
     }
@@ -116,7 +112,11 @@ public class UserAuthorizationTest extends AbstractAuthorizationTest {
     @Test
     @WithMockUser(username = USER_NO_ACL)
     public void userCanAddUser() {
-        User user = builder.givenANotPersistedUser();
+        User user = new User();
+        user.setName("firstname lastname");
+        user.setReference(UUID.randomUUID().toString());
+        user.setUsername(UUID.randomUUID().toString());
+        user.generateKeys();
         expectOK(() -> userService.add(user.toJsonObject(urlApi).withChange("password", UUID.randomUUID().toString())));
     }
 

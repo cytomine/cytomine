@@ -175,7 +175,7 @@ public class ImageConsultationServiceTests {
             results
             = imageConsultationService.listImageConsultationByProjectAndUserNoImageDistinct(
             imageInstance.getProject(),
-            builder.getUserEntity(user.username()),
+            builder.getUserResponseEntity(user.username()).id(),
             0,
             0
         );
@@ -192,14 +192,14 @@ public class ImageConsultationServiceTests {
         givenAPersistentImageConsultation(builder.getUserEntity(user.username()), imageInstance1, new Date());
 
         List<JsonObject> results = imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
-            imageInstance1.getProject(), builder.getUserEntity(user.username()));
+            imageInstance1.getProject(), builder.getUserResponseEntity(user.username()).id());
         assertThat(results).hasSize(1);
         assertThat(results.get(0).get("imageName")).isEqualTo(imageInstance1.getBlindInstanceFilename());
 
         givenAPersistentImageConsultation(builder.getUserEntity(user.username()), imageInstance2, new Date());
 
         results = imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
-            imageInstance1.getProject(), builder.getUserEntity(user.username()));
+            imageInstance1.getProject(), builder.getUserResponseEntity(user.username()).id());
         assertThat(results).hasSize(2);
 
     }

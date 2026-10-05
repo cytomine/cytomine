@@ -121,16 +121,14 @@ data:
           "annotations": {
             "inputType": "select"
           },
-          "required": {
-            "roles": [
+          "permissions": {
+            "view": [
               "admin",
               "user"
-            ]
-          },
-          "permissions": {
-            "view": [],
+            ],
             "edit": [
-              "admin"
+              "admin",
+              "user"
             ]
           },
           "multivalued": false

@@ -16,15 +16,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.social.ImageConsultationService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.RequestParams;
@@ -41,7 +40,7 @@ public class RestImageConsultationController extends RestCytomineController {
 
     private final ProjectService projectService;
 
-    private final UserService userService;
+    private final UserHttpContract userHttpContract;
 
     private final ReportService reportService;
 
@@ -85,15 +84,15 @@ public class RestImageConsultationController extends RestCytomineController {
     ) {
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-        User user = userService.find(userId).orElseThrow(() -> new ObjectNotFoundException("User", userId));
+        UserResponse user = userHttpContract.get(userId).orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
         if (distinctImages) {
             return responseSuccess(imageConsultationService.listImageConsultationByProjectAndUserWithDistinctImage(
-                project, user
+                project, user.id()
             ));
         } else {
             return responseSuccess(imageConsultationService.listImageConsultationByProjectAndUserNoImageDistinct(
-                project, user, max, offset
+                project, user.id(), max, offset
             ));
         }
     }
@@ -123,11 +122,11 @@ public class RestImageConsultationController extends RestCytomineController {
 
             Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-            User user = userService.findUser(userId)
+            UserResponse user = userHttpContract.get(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
 
             byte[] report = reportService.generateImageConsultationReport(
-                project.getName(), user.getUsername(), results
+                project.getName(), user.username(), results
             );
             responseReportFile(
                 reportService.getImageConsultationReportFileName(

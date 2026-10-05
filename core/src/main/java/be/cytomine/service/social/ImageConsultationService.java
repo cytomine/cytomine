@@ -203,23 +203,23 @@ public class ImageConsultationService {
     }
 
     public Page<PersistentImageConsultation> listImageConsultationByProjectAndUserNoImageDistinct(Project project,
-        User user, Integer max, Integer offset) {
-        securityACLService.checkIsSameUserOrAdminContainer(project, user.getId(), currentUserService.getCurrentUser());
+        long userId, Integer max, Integer offset) {
+        securityACLService.checkIsSameUserOrAdminContainer(project, userId, currentUserService.getCurrentUser());
         if (max != 0) {
             max += offset; // ?
         } else {
             max = Integer.MAX_VALUE;
         }
-        return persistentImageConsultationRepository.findAllByProjectAndUser(project.getId(), user.getId(),
+        return persistentImageConsultationRepository.findAllByProjectAndUser(project.getId(), userId,
             PageRequest.of(0, max, Sort.Direction.DESC, "created"));
     }
 
-    public List<JsonObject> listImageConsultationByProjectAndUserWithDistinctImage(Project project, User user) {
-        securityACLService.checkIsSameUserOrAdminContainer(project, user.getId(), currentUserService.getCurrentUser());
+    public List<JsonObject> listImageConsultationByProjectAndUserWithDistinctImage(Project project, long userId) {
+        securityACLService.checkIsSameUserOrAdminContainer(project, userId, currentUserService.getCurrentUser());
         List<Bson> requests = new ArrayList<>();
         List<JsonObject> data = new ArrayList<>();
 
-        requests.add(match(eq("user", user.getId())));
+        requests.add(match(eq("user", userId)));
         requests.add(match(eq("project", project.getId())));
 
         requests.add(group("$image", Accumulators.max("date", "$created"), Accumulators.first("time", "$time"),

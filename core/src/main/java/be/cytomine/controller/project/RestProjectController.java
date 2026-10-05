@@ -8,11 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,10 +35,7 @@ import be.cytomine.service.appengine.TaskRunService;
 import be.cytomine.service.project.ProjectFromSearchService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ProjectSearchExtension;
-import be.cytomine.service.security.UserService;
-import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
-import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
 @RestController
@@ -53,15 +48,12 @@ public class RestProjectController extends RestCytomineController {
 
     private final ProjectRepository projectRepository;
 
-    private final TaskService taskService;
-
     private final CurrentUserService currentUserService;
 
     private final CurrentRoleService currentRoleService;
 
     private final OntologyHttpContract ontologyHttpContract;
 
-    private final UserService userService;
 
     private final TaskRunService taskRunService;
 
@@ -101,33 +93,6 @@ public class RestProjectController extends RestCytomineController {
         );
     }
 
-    @GetMapping("/project/{id}.json")
-    public ResponseEntity<String> show(@PathVariable Long id) {
-        log.debug("REST request to get project : {}", id);
-        return projectService.find(id)
-            .map(this::responseSuccess)
-            .orElseGet(() -> responseNotFound("Project", id));
-    }
-
-    @PostMapping("/project.json")
-    public ResponseEntity<String> add(@RequestBody JsonObject json, @RequestParam(required = false) Long task) {
-        log.debug("REST request to save Project : " + json);
-        Task existingTask = taskService.get(task);
-        log.info("task {} is found for id = {}", existingTask, task);
-        return add(projectService, json, existingTask);
-    }
-
-    @PutMapping("/project/{id}.json")
-    public ResponseEntity<String> edit(
-        @PathVariable String id,
-        @RequestBody JsonObject json,
-        @RequestParam(required = false) Long task
-    ) {
-        log.debug("REST request to edit Project : " + id);
-        Task existingTask = taskService.get(task);
-        return update(projectService, json, existingTask);
-    }
-
     @PostMapping("/project/from-search")
     public ProjectFromSearchResponse addFromSearch(@RequestBody ProjectFromSearchRequest request) {
         log.debug("REST request to create project from metadata search : " + request);
@@ -137,13 +102,6 @@ public class RestProjectController extends RestCytomineController {
             log.error("add from search error:" + e.msg, e);
             throw new ResponseStatusException(HttpStatus.valueOf(e.code), e.msg);
         }
-    }
-
-    @DeleteMapping("/project/{id}.json")
-    public ResponseEntity<String> delete(@PathVariable String id, @RequestParam(required = false) Long task) {
-        log.debug("REST request to delete Project : " + id);
-        Task existingTask = taskService.get(task);
-        return delete(projectService, JsonObject.of("id", id), existingTask);
     }
 
     /**

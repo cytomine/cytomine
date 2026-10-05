@@ -54,7 +54,7 @@ public class UserCommandService
             payload.name().orElse(entity.getName()), payload.firstname().orElse(entity.getFirstname()),
             payload.lastname().orElse(entity.getLastname()), payload.language().orElse(entityLanguage),
             payload.publicKey().orElse(entity.getPublicKey()), payload.privateKey().orElse(entity.getPrivateKey()),
-            payload.origin().orElse(entity.getOrigin()), now);
+            payload.origin().orElse(entity.getOrigin()), payload.developer().orElse(entity.isDeveloper()), now);
     }
 
     @Override

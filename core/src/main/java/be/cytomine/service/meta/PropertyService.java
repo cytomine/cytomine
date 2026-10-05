@@ -24,7 +24,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.repository.meta.PropertyRepository;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.security.UserRepository;
@@ -212,7 +211,7 @@ public class PropertyService extends ModelService {
     }
 
     public List<Map<String, Object>> listAnnotationCenterPosition(
-        User user,
+        long userId,
         ImageInstance image,
         Geometry boundingbox,
         String key
@@ -227,7 +226,7 @@ public class PropertyService extends ModelService {
                 + image.getId()
                 + "' "
                 + "AND ua.user_id = '"
-                + user.getId()
+                + userId
                 + "' "
                 + (boundingbox != null ? "AND ST_Intersects(ua.location,ST_GeometryFromText('"
                 + boundingbox

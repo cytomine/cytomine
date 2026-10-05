@@ -14,6 +14,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.AbstractImage;
@@ -118,8 +119,8 @@ public class AbstractSliceServiceTests {
     @Test
     void findAbstractSliceImageUploaded() {
         AbstractSlice abstractSlice1 = builder.givenAnAbstractSlice();
-        assertThat(abstractSliceService.findImageUploaded(abstractSlice1.getId()))
-            .isEqualTo(abstractSlice1.getUploadedFile().getUser());
+        assertThat(abstractSliceService.findImageUploaded(abstractSlice1.getId()).map(UserResponse::id))
+            .contains(abstractSlice1.getUploadedFile().getUserId());
     }
 
     @Test

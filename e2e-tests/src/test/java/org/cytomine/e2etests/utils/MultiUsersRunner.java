@@ -62,14 +62,18 @@ public class MultiUsersRunner {
                 cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
                 String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
                 String ontologyUrl = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
-                test.accept(new TestData(role,
-                    username,
-                    password,
-                    projectName,
-                    projectUrl, ontologyName, ontologyUrl
-                ));
-                cytomineSteps.deleteProject(wait, projectUrl);
-                cytomineSteps.logout(wait, cytomineUrl);
+                try {
+                    test.accept(new TestData(role,
+                        username,
+                        password,
+                        projectName,
+                        projectUrl, ontologyName, ontologyUrl
+                    ));
+                } finally {
+                    cytomineSteps.deleteProject(wait, projectUrl);
+                    cytomineSteps.deleteOntology(wait, ontologyUrl);
+                    cytomineSteps.logout(wait, cytomineUrl);
+                }
             } finally {
                 keycloakClient.deleteUser(user.username());
             }

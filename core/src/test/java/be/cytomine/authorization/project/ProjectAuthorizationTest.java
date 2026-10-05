@@ -1357,7 +1357,7 @@ public class ProjectAuthorizationTest extends CRUDAuthorizationTest {
         /*admin data*/
         //Create an annotation (by admin)
         ImageInstance imageAdmin = builder.givenAnImageInstance(project);
-        imageAdmin.setUserId(builder.getUserEntity(admin.username()).id());
+        imageAdmin.setUserId(builder.getUserResponseEntity(admin.username()).id());
         builder.persistAndReturn(imageAdmin);
 
         SliceInstance sliceAdmin = builder.givenASliceInstance(imageAdmin, builder.givenAnAbstractSlice());

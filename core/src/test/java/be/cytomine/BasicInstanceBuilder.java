@@ -180,26 +180,26 @@ public class BasicInstanceBuilder {
     }
 
     public UserResponse getUser(String username) {
-        return getUserEntity(username);
+        return getUserResponseEntity(username);
     }
 
-    public UserResponse getUserEntity(String username) {
+    public UserResponse getUserResponseEntity(String username) {
         return userRepository.findByUsernameLikeIgnoreCase(username)
             .map(userMapper::map)
             .orElseThrow(() -> new ObjectNotFoundException(username + " not in db"));
     }
 
-    private UserResponse getUserEntity(UserResponse user) {
-        return getUserEntity(user.username());
+    private UserResponse getUserResponseEntity(UserResponse user) {
+        return getUserResponseEntity(user.username());
     }
 
-    public User getUserDomain(String username) {
+    public User getUserEntity(String username) {
         return userRepository.findByUsernameLikeIgnoreCase(username)
             .orElseThrow(() -> new ObjectNotFoundException(username + " not in db"));
     }
 
-    private User getUserDomain(UserResponse user) {
-        return getUserDomain(user.username());
+    private User getUserEntity(UserResponse user) {
+        return getUserEntity(user.username());
     }
 
     public UserResponse givenCurrentUser() {
@@ -334,7 +334,7 @@ public class BasicInstanceBuilder {
     public UploadedFile givenANotPersistedUploadedFile(String contentType) {
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setStorage(givenAStorage());
-        uploadedFile.setUserId(getUserEntity(SUPER_ADMIN).id());
+        uploadedFile.setUserId(getUserResponseEntity(SUPER_ADMIN).id());
         uploadedFile.setFilename(randomString());
         uploadedFile.setOriginalFilename(randomString());
         uploadedFile.setExt("tif");
@@ -363,7 +363,7 @@ public class BasicInstanceBuilder {
     public Storage givenANotPersistedStorage(UserResponse user) {
         Storage storage = new Storage();
         storage.setName(randomString());
-        storage.setUserId(getUserEntity(user).id());
+        storage.setUserId(getUserResponseEntity(user).id());
         return storage;
     }
 
@@ -400,7 +400,7 @@ public class BasicInstanceBuilder {
         ImageInstance image = new ImageInstance();
         image.setBaseImage(abstractImage);
         image.setProject(project);
-        image.setUserId(getUserEntity(SUPER_ADMIN).id());
+        image.setUserId(getUserResponseEntity(SUPER_ADMIN).id());
         return image;
     }
 
@@ -494,7 +494,7 @@ public class BasicInstanceBuilder {
         NestedImageInstance nestedImageInstance = new NestedImageInstance();
         nestedImageInstance.setBaseImage(givenAnAbstractImage());
         nestedImageInstance.setProject(parent.getProject());
-        nestedImageInstance.setUserId(getUserEntity(SUPER_ADMIN).id());
+        nestedImageInstance.setUserId(getUserResponseEntity(SUPER_ADMIN).id());
         nestedImageInstance.setParent(parent);
         nestedImageInstance.setX(1);
         nestedImageInstance.setY(2);
@@ -617,7 +617,7 @@ public class BasicInstanceBuilder {
         if (term != null) {
             AnnotationTerm annotationTerm = new AnnotationTerm();
             annotationTerm.setUserAnnotation(annotation);
-            annotationTerm.setUser(getUserDomain(user));
+            annotationTerm.setUser(getUserEntity(user));
             annotationTerm.setTerm(term);
             persistAndReturn(annotationTerm);
             em.refresh(annotation);
@@ -632,7 +632,7 @@ public class BasicInstanceBuilder {
     public AnnotationTerm givenANotPersistedAnnotationTerm(UserAnnotation annotation, Term term) {
         AnnotationTerm annotationTerm = new AnnotationTerm();
         annotationTerm.setTerm(term);
-        annotationTerm.setUser(getUserDomain(this.givenCurrentUser()));
+        annotationTerm.setUser(getUserEntity(this.givenCurrentUser()));
         annotationTerm.setUserAnnotation(annotation);
         return annotationTerm;
     }
@@ -665,7 +665,7 @@ public class BasicInstanceBuilder {
         annotation.setImage(userAnnotation.getImage());
         annotation.setProject(userAnnotation.getImage().getProject());
         annotation.putParentAnnotation(userAnnotation);
-        annotation.setReviewUser(getUserDomain(SUPER_ADMIN));
+        annotation.setReviewUser(getUserEntity(SUPER_ADMIN));
         annotation.setStatus(0);
         return annotation;
     }
@@ -678,7 +678,7 @@ public class BasicInstanceBuilder {
         annotation.getSlice().setProject(project);
         annotation.getImage().setProject(project);
         annotation.setProject(project);
-        annotation.setReviewUser(getUserDomain(SUPER_ADMIN));
+        annotation.setReviewUser(getUserEntity(SUPER_ADMIN));
         annotation.setStatus(0);
         return annotation;
     }
@@ -704,14 +704,14 @@ public class BasicInstanceBuilder {
         annotation.setUserId(user.id());
         annotation.setProject(sliceInstance.getProject());
         annotation.putParentAnnotation(userAnnotation);
-        annotation.setReviewUser(getUserDomain(SUPER_ADMIN));
+        annotation.setReviewUser(getUserEntity(SUPER_ADMIN));
         annotation.setStatus(0);
         persistAndReturn(annotation);
 
         if (term != null) {
             AnnotationTerm annotationTerm = new AnnotationTerm();
             annotationTerm.setUserAnnotation(userAnnotation);
-            annotationTerm.setUser(getUserDomain(user));
+            annotationTerm.setUser(getUserEntity(user));
             annotationTerm.setTerm(term);
             persistAndReturn(annotationTerm);
             annotation.getTerms().add(term);
@@ -727,8 +727,8 @@ public class BasicInstanceBuilder {
         SharedAnnotation sharedAnnotation = new SharedAnnotation();
         sharedAnnotation.setAnnotation(givenAUserAnnotation());
         sharedAnnotation.setComment("Rech. proj. pr proj. priv. Self Dem. Brt. Poss. S'adr. à l'hô. Mart");
-        sharedAnnotation.setSender(getUserDomain(SUPER_ADMIN));
-        sharedAnnotation.setReceivers(List.of(getUserDomain(SUPER_ADMIN)));
+        sharedAnnotation.setSender(getUserEntity(SUPER_ADMIN));
+        sharedAnnotation.setReceivers(List.of(getUserEntity(SUPER_ADMIN)));
         return sharedAnnotation;
     }
 
@@ -785,7 +785,7 @@ public class BasicInstanceBuilder {
         annotationIndex.setSlice(givenASliceInstance());
         annotationIndex.setCountAnnotation(1L);
         annotationIndex.setCountReviewedAnnotation(1L);
-        annotationIndex.setUser(getUserDomain(SUPER_ADMIN));
+        annotationIndex.setUser(getUserEntity(SUPER_ADMIN));
         return annotationIndex;
     }
 
@@ -827,7 +827,7 @@ public class BasicInstanceBuilder {
     public Tag givenANotPersistedTag(String name) {
         Tag tag = new Tag();
         tag.setName(name);
-        tag.setUser(getUserDomain(SUPER_ADMIN));
+        tag.setUser(getUserEntity(SUPER_ADMIN));
         return tag;
     }
 
@@ -881,14 +881,14 @@ public class BasicInstanceBuilder {
     public ProjectDefaultLayer givenANotPersistedProjectDefaultLayer(Project project, UserResponse user) {
         addUserToProject(project, user.username());
         ProjectDefaultLayer projectDefaultLayer = new ProjectDefaultLayer();
-        projectDefaultLayer.setUser(getUserDomain(user));
+        projectDefaultLayer.setUser(getUserEntity(user));
         projectDefaultLayer.setProject(project);
         projectDefaultLayer.setHideByDefault(false);
         return projectDefaultLayer;
     }
 
     public SecUserSecRole givenAUserRole() {
-        return persistAndReturn(givenANotPersistedUserRole(getUserDomain(GUEST_ACL),
+        return persistAndReturn(givenANotPersistedUserRole(getUserEntity(GUEST_ACL),
             secRoleRepository.findByAuthority(ROLE_USER).get()));
     }
 
@@ -1015,7 +1015,7 @@ public class BasicInstanceBuilder {
     public TaskRun givenANotPersistedTaskRun(Project project, UUID taskRunId, ImageInstance image) {
         TaskRun taskRun = new TaskRun();
         taskRun.setProject(project);
-        taskRun.setUser(getUserDomain(SUPER_ADMIN));
+        taskRun.setUser(getUserEntity(SUPER_ADMIN));
         taskRun.setTaskRunId(taskRunId);
         taskRun.setImage(image);
         return taskRun;

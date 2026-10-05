@@ -417,8 +417,8 @@ public class UserServiceTests {
 
     @Test
     void listUsersWithSortUsername() {
-        User user1 = builder.getUserDomain(CREATOR);
-        User user2 = builder.getUserDomain(USER_ACL_CREATE);
+        User user1 = builder.getUserEntity(CREATOR);
+        User user2 = builder.getUserEntity(USER_ACL_CREATE);
 
         Page<Map<String, Object>> list = userService.list(
             new ArrayList<>(List.of(new SearchParameterEntry(
@@ -445,11 +445,11 @@ public class UserServiceTests {
 
     @Test
     void listUsersWithPage() {
-        User user1 = builder.getUserDomain(USER_ACL_ADMIN);
-        User user2 = builder.getUserDomain(USER_ACL_CREATE);
-        User user3 = builder.getUserDomain(USER_ACL_DELETE);
-        User user4 = builder.getUserDomain(USER_ACL_READ);
-        User user5 = builder.getUserDomain(USER_ACL_WRITE);
+        User user1 = builder.getUserEntity(USER_ACL_ADMIN);
+        User user2 = builder.getUserEntity(USER_ACL_CREATE);
+        User user3 = builder.getUserEntity(USER_ACL_DELETE);
+        User user4 = builder.getUserEntity(USER_ACL_READ);
+        User user5 = builder.getUserEntity(USER_ACL_WRITE);
 
         Page<Map<String, Object>> list = userService.list(
             new ArrayList<>(List.of(new SearchParameterEntry(
@@ -527,7 +527,7 @@ public class UserServiceTests {
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.getUserDomain(USER_ACL_READ);
+        User anotherUser = builder.getUserEntity(USER_ACL_READ);
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
@@ -595,7 +595,7 @@ public class UserServiceTests {
         builder.addUserToProject(projectWhereUserIsContributor, "superadmin", WRITE);
         builder.addUserToProject(projectWithTwoUsers, "superadmin", WRITE);
 
-        User anotherUser = builder.getUserDomain(USER_ACL_READ);
+        User anotherUser = builder.getUserEntity(USER_ACL_READ);
         builder.addUserToProject(projectWhereUserIsMissing, anotherUser.getUsername(), WRITE);
         builder.addUserToProject(projectWithTwoUsers, anotherUser.getUsername(), WRITE);
 
@@ -679,9 +679,9 @@ public class UserServiceTests {
 
     @Test
     void listUserExtendedWithLastImageName() {
-        User userWhoHasOpenImage = builder.getUserDomain(USER_ACL_READ);
-        User userWhoHasOpenImageAfter = builder.getUserDomain(USER_ACL_WRITE);
-        User userNeverOpenImage = builder.getUserDomain(USER_ACL_CREATE);
+        User userWhoHasOpenImage = builder.getUserEntity(USER_ACL_READ);
+        User userWhoHasOpenImageAfter = builder.getUserEntity(USER_ACL_WRITE);
+        User userNeverOpenImage = builder.getUserEntity(USER_ACL_CREATE);
 
         Project project = builder.givenAProject();
 
@@ -720,9 +720,9 @@ public class UserServiceTests {
 
     @Test
     void listUserExtendedWithLastConnection() {
-        User userWhoHasOpenProject = builder.getUserDomain(USER_ACL_READ);
-        User userWhoHasOpenProjectAfter = builder.getUserDomain(USER_ACL_WRITE);
-        User userNeverOpenProject = builder.getUserDomain(USER_ACL_CREATE);
+        User userWhoHasOpenProject = builder.getUserEntity(USER_ACL_READ);
+        User userWhoHasOpenProjectAfter = builder.getUserEntity(USER_ACL_WRITE);
+        User userNeverOpenProject = builder.getUserEntity(USER_ACL_CREATE);
 
         Project project = builder.givenAProject();
 
@@ -779,9 +779,9 @@ public class UserServiceTests {
 
     @Test
     void listUserExtendedWithConnectionFrequency() {
-        User userWhoHasOpenOnce = builder.getUserDomain(USER_ACL_READ);
-        User userWhoHasOpenProject11x = builder.getUserDomain(USER_ACL_WRITE);
-        User userNeverOpenProject = builder.getUserDomain(USER_ACL_CREATE);
+        User userWhoHasOpenOnce = builder.getUserEntity(USER_ACL_READ);
+        User userWhoHasOpenProject11x = builder.getUserEntity(USER_ACL_WRITE);
+        User userNeverOpenProject = builder.getUserEntity(USER_ACL_CREATE);
 
         Project project = builder.givenAProject();
 
@@ -892,7 +892,7 @@ public class UserServiceTests {
         Project projectWhereUserIsManager = builder.givenAProject();
         builder.addUserToProject(projectWhereUserIsManager, "superadmin", ADMINISTRATION);
 
-        assertThat(userService.findCreator(projectWhereUserIsManager)).contains(builder.getUserDomain(user.username()));
+        assertThat(userService.findCreator(projectWhereUserIsManager)).contains(builder.getUserEntity(user.username()));
     }
 
     @Test
@@ -900,14 +900,14 @@ public class UserServiceTests {
         Storage storage = builder.givenAStorage(builder.givenSuperAdmin());
 
         assertThat(userService.listUsers(storage)).contains(
-            builder.getUserDomain(builder.givenSuperAdmin().username()));
+            builder.getUserEntity(builder.givenSuperAdmin().username()));
     }
 
     @Test
     void listLayers() {
         UserResponse user = builder.givenUserAclRead();
-        User anotherUserInProject = builder.getUserDomain(USER_ACL_READ);
-        User anotherUserNotInProject = builder.getUserDomain(USER_ACL_WRITE);
+        User anotherUserInProject = builder.getUserEntity(USER_ACL_READ);
+        User anotherUserNotInProject = builder.getUserEntity(USER_ACL_WRITE);
 
         Project project = builder.givenAProject();
 
@@ -925,7 +925,7 @@ public class UserServiceTests {
     @Test
     void listLayersWithProjectWithPrivateAdminLayer() {
         UserResponse user = builder.givenAclUserNoAcl();
-        User adminInProject = builder.getUserDomain(USER_ACL_ADMIN);
+        User adminInProject = builder.getUserEntity(USER_ACL_ADMIN);
 
         Project project = builder.givenAProject();
         project.setHideAdminsLayers(true);
@@ -945,7 +945,7 @@ public class UserServiceTests {
     @Test
     void listLayersWithProjectWithPrivateUserLayer() {
         UserResponse user = builder.givenAclUserNoAcl();
-        User userInProject = builder.getUserDomain(USER_ACL_READ);
+        User userInProject = builder.getUserEntity(USER_ACL_READ);
 
         Project project = builder.givenAProject();
         project.setHideUsersLayers(true);
@@ -965,7 +965,7 @@ public class UserServiceTests {
     @Test
     void listLayersWithProjectWithPrivateUserLayerWithProjectAdminRole() {
         UserResponse user = builder.givenAclUserNoAcl();
-        User userInProject = builder.getUserDomain(USER_ACL_READ);
+        User userInProject = builder.getUserEntity(USER_ACL_READ);
 
         Project project = builder.givenAProject();
         project.setHideUsersLayers(true);
@@ -986,7 +986,7 @@ public class UserServiceTests {
         UserResponse userOffline = builder.givenUserAclRead();
 
         assertThat(userService.getAllOnlineUsers()).isEmpty();
-        givenALastConnection(builder.getUserDomain(userOnline.username()), null, new Date());
+        givenALastConnection(builder.getUserEntity(userOnline.username()), null, new Date());
 
         assertThat(userService.getAllOnlineUsers()).contains(userOnline)
             .doesNotContain(userOffline);
@@ -995,14 +995,14 @@ public class UserServiceTests {
     @Test
     void listOnlineUserForProject() {
         UserResponse userOnline = builder.givenAclUserNoAcl();
-        User userOnlineButOnDifferentProject = builder.getUserDomain(USER_ACL_WRITE);
-        User userOffline = builder.getUserDomain(USER_ACL_READ);
+        User userOnlineButOnDifferentProject = builder.getUserEntity(USER_ACL_WRITE);
+        User userOffline = builder.getUserEntity(USER_ACL_READ);
 
         Project project = builder.givenAProject();
         Project anotherProject = builder.givenAProject();
 
         givenALastConnection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
-        givenALastConnection(builder.getUserDomain(userOnline.username()), project.getId(),
+        givenALastConnection(builder.getUserEntity(userOnline.username()), project.getId(),
             DateUtils.addSeconds(new Date(), -15));
         givenALastConnection(
             userOnlineButOnDifferentProject,
@@ -1012,7 +1012,7 @@ public class UserServiceTests {
 
         assertThat(userService.getAllOnlineUserIds(project)).contains(userOnline.id())
             .doesNotContain(userOnlineButOnDifferentProject.getId(), userOffline.getId());
-        assertThat(userService.getAllOnlineUsers(project)).contains(builder.getUserDomain(userOnline.username()))
+        assertThat(userService.getAllOnlineUsers(project)).contains(builder.getUserEntity(userOnline.username()))
             .doesNotContain(userOnlineButOnDifferentProject, userOffline);
     }
 
@@ -1034,8 +1034,8 @@ public class UserServiceTests {
     @Test
     void listFriendUsersOffline() {
         UserResponse user = builder.givenAclUserNoAcl();
-        User userFriendOnline = builder.getUserDomain(USER_ACL_READ);
-        User userFriendOffline = builder.getUserDomain(USER_ACL_WRITE);
+        User userFriendOnline = builder.getUserEntity(USER_ACL_READ);
+        User userFriendOffline = builder.getUserEntity(USER_ACL_WRITE);
 
         Project project = builder.givenAProject();
 
@@ -1054,8 +1054,8 @@ public class UserServiceTests {
     @Test
     void listFriendUsersOfflineOnAProject() {
         UserResponse user = builder.givenAclUserNoAcl();
-        User userFriendOnline = builder.getUserDomain(USER_ACL_READ);
-        User userFriendOnlineButOnAnotherProject = builder.getUserDomain(USER_ACL_WRITE);
+        User userFriendOnline = builder.getUserEntity(USER_ACL_READ);
+        User userFriendOnlineButOnAnotherProject = builder.getUserEntity(USER_ACL_WRITE);
 
         Project project = builder.givenAProject();
 
@@ -1084,13 +1084,13 @@ public class UserServiceTests {
         builder.addUserToProject(project, userOnline.username());
 
         PersistentProjectConnection lastConnection = givenAPersistentConnectionInProject(
-            builder.getUserDomain(userOnline.username()),
+            builder.getUserEntity(userOnline.username()),
             project,
             DateUtils.addSeconds(new Date(), -15)
         );
 
         PersistentImageConsultation consultation = givenAPersistentImageConsultation(
-            builder.getUserDomain(userOnline.username()),
+            builder.getUserEntity(userOnline.username()),
             builder.givenAnImageInstance(project),
             new Date()
         );
@@ -1107,14 +1107,14 @@ public class UserServiceTests {
     @Test
     void listOnlineUserForProjectWitTheirPosition() {
         UserResponse userOnline = builder.givenAclUserNoAcl();
-        User userOnlineButOnDifferentProject = builder.getUserDomain(USER_ACL_WRITE);
-        User userOffline = builder.getUserDomain(USER_ACL_READ);
+        User userOnlineButOnDifferentProject = builder.getUserEntity(USER_ACL_WRITE);
+        User userOffline = builder.getUserEntity(USER_ACL_READ);
 
         Project project = builder.givenAProject();
         Project anotherProject = builder.givenAProject();
 
         givenALastConnection(userOffline, project.getId(), DateUtils.addDays(new Date(), -15));
-        givenALastConnection(builder.getUserDomain(userOnline.username()), project.getId(),
+        givenALastConnection(builder.getUserEntity(userOnline.username()), project.getId(),
             DateUtils.addSeconds(new Date(), -15));
         givenALastConnection(
             userOnlineButOnDifferentProject,
@@ -1123,7 +1123,7 @@ public class UserServiceTests {
         );
 
         givenAPersistentUserPosition(
-            DateUtils.addSeconds(new Date(), -15), builder.getUserDomain(userOnline.username()),
+            DateUtils.addSeconds(new Date(), -15), builder.getUserEntity(userOnline.username()),
             builder.givenANotPersistedSliceInstance(
                 builder.givenAnImageInstance(project),
                 builder.givenAnAbstractSlice()
@@ -1172,17 +1172,17 @@ public class UserServiceTests {
         builder.addUserToProject(project, userOnline.username());
 
         PersistentProjectConnection firstConnection = givenAPersistentConnectionInProject(
-            builder.getUserDomain(userOnline.username()),
+            builder.getUserEntity(userOnline.username()),
             project,
             DateUtils.addDays(new Date(), -15)
         );
         PersistentProjectConnection lastConnection = givenAPersistentConnectionInProject(
-            builder.getUserDomain(userOnline.username()),
+            builder.getUserEntity(userOnline.username()),
             project,
             DateUtils.addSeconds(new Date(), -15)
         );
 
-        givenAPersistentImageConsultation(builder.getUserDomain(userOnline.username()),
+        givenAPersistentImageConsultation(builder.getUserEntity(userOnline.username()),
             builder.givenAnImageInstance(project),
             new Date());
 

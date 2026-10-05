@@ -438,17 +438,17 @@ public class StatsResourceTests {
     void statsConnectionEvolution() throws Exception {
         Project project = builder.givenAProject();
         givenAPersistentConnectionInProject(
-            builder.getUserDomain(builder.givenSuperAdmin().username()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             project,
             DateUtils.addDays(new Date(), -15)
         );
         givenAPersistentConnectionInProject(
-            builder.getUserDomain(builder.givenSuperAdmin().username()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             project,
             DateUtils.addDays(new Date(), -15)
         );
         givenAPersistentConnectionInProject(
-            builder.getUserDomain(builder.givenSuperAdmin().username()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             project,
             DateUtils.addDays(new Date(), -5)
         );
@@ -468,17 +468,17 @@ public class StatsResourceTests {
         Project project = builder.givenAProject();
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         givenAPersistentImageConsultation(
-            builder.getUserDomain(builder.givenSuperAdmin().username()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             imageInstance,
             DateUtils.addDays(new Date(), -15)
         );
         givenAPersistentImageConsultation(
-            builder.getUserDomain(builder.givenSuperAdmin().username()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             imageInstance,
             DateUtils.addDays(new Date(), -15)
         );
         givenAPersistentImageConsultation(
-            builder.getUserDomain(builder.givenSuperAdmin().username()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             imageInstance,
             DateUtils.addDays(new Date(), -5)
         );
@@ -500,25 +500,25 @@ public class StatsResourceTests {
         givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
-            builder.getUserDomain(builder.givenSuperAdmin().username()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             "select"
         );
         givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
-            builder.getUserDomain(builder.givenSuperAdmin().username()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             "move"
         );
         givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -15),
             annotation,
-            builder.getUserDomain(builder.givenSuperAdmin().username()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             "select"
         );
         givenAPersistentAnnotationAction(
             DateUtils.addDays(new Date(), -5),
             annotation,
-            builder.getUserDomain(builder.givenSuperAdmin().username()),
+            builder.getUserEntity(builder.givenSuperAdmin().username()),
             "select"
         );
 

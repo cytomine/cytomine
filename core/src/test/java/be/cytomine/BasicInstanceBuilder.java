@@ -180,15 +180,16 @@ public class BasicInstanceBuilder {
     }
 
     public UserResponse getUser(String username) {
-        return userMapper.map(getUserEntity(username));
+        return getUserEntity(username);
     }
 
-    public User getUserEntity(String username) {
+    public UserResponse getUserEntity(String username) {
         return userRepository.findByUsernameLikeIgnoreCase(username)
+            .map(userMapper::map)
             .orElseThrow(() -> new ObjectNotFoundException(username + " not in db"));
     }
 
-    private User getUserEntity(UserResponse user) {
+    private UserResponse getUserEntity(UserResponse user) {
         return getUserEntity(user.username());
     }
 
@@ -198,13 +199,13 @@ public class BasicInstanceBuilder {
             .orElseGet(this::givenSuperAdmin);
     }
 
-    public User givenANotPersistedUser() {
+    public UserResponse givenANotPersistedUser() {
         User user = new User();
         user.setName("firstname lastname");
         user.setReference(UUID.randomUUID().toString());
         user.setUsername(randomString());
         user.generateKeys();
-        return user;
+        return userMapper.map(user);
     }
 
     public ImageFilterProject givenANotPersistedImageFilterProject(ImageFilter imageFilter, Project project) {
@@ -324,7 +325,7 @@ public class BasicInstanceBuilder {
     public UploadedFile givenANotPersistedUploadedFile(String contentType) {
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setStorage(givenAStorage());
-        uploadedFile.setUser(getUserEntity(SUPER_ADMIN));
+        uploadedFile.setUserId(getUserEntity(SUPER_ADMIN).id());
         uploadedFile.setFilename(randomString());
         uploadedFile.setOriginalFilename(randomString());
         uploadedFile.setExt("tif");
@@ -345,15 +346,15 @@ public class BasicInstanceBuilder {
     public Storage givenAStorage(UserResponse user) {
         Storage storage = givenANotPersistedStorage(user);
         storage = persistAndReturn(storage);
-        permissionService.addPermission(storage, storage.getUser().getUsername(), ADMINISTRATION,
-            storage.getUser().getUsername());
+        permissionService.addPermission(storage, user.username(), ADMINISTRATION,
+            user.username());
         return storage;
     }
 
     public Storage givenANotPersistedStorage(UserResponse user) {
         Storage storage = new Storage();
         storage.setName(randomString());
-        storage.setUser(getUserEntity(user));
+        storage.setUserId(getUserEntity(user).id());
         return storage;
     }
 

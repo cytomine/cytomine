@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
@@ -115,14 +116,10 @@ public class RestAbstractSliceController extends RestCytomineController {
     }
 
     @GetMapping("/abstractslice/{id}/user.json")
-    public ResponseEntity<String> showUploaderOfImage(@PathVariable Long id) {
+    public UserResponse showUploaderOfImage(@PathVariable Long id) {
         log.debug("REST request to show image uploader");
-        User user = abstractSliceService.findImageUploaded(id);
-        if (user != null) {
-            return responseSuccess(user);
-        } else {
-            return responseNotFound("AbstractSlice", "User", id);
-        }
+        return  abstractSliceService.findImageUploaded(id).orElseThrow(()-> new ObjectNotFoundException("User not "
+            + "found"));
 
     }
 

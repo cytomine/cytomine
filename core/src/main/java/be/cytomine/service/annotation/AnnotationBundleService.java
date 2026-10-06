@@ -12,7 +12,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,39 +91,33 @@ public class AnnotationBundleService {
         String policyAlias = alias("POLICY");
 
         Map<Long, String> annotatorAliasByUser = new LinkedHashMap<>();
-        Set<ImageAnnotation> imageAnnotations = new HashSet<>();
+        Set<ImageAnnotation> imageAnnotations = annotationsByImage.values().stream()
+            .map(entry -> {
+                AnnotationResult representative = entry.getFirst();
 
-        for (Map.Entry<Long, List<AnnotationResult>> entry : annotationsByImage.entrySet()) {
-            List<AnnotationResult> imageAnnotationResults = entry.getValue();
-            AnnotationResult representative = imageAnnotationResults.getFirst();
+                Long userId = asLong(representative.get("user"));
+                String annotatorAlias = annotatorAliasByUser.computeIfAbsent(
+                    userId == null ? -1L : userId,
+                    key -> alias("ANNOTATOR")
+                );
 
-            Long userId = asLong(representative.get("user"));
-            String annotatorAlias = annotatorAliasByUser.computeIfAbsent(
-                userId == null ? -1L : userId,
-                key -> alias("ANNOTATOR")
-            );
+                LocalDateTime created = toLocalDateTime(representative.get("created"));
+                String createdDate = created.format(DateTimeFormatter.BASIC_ISO_DATE);
+                String imageAlias = alias("IMAGE");
 
-            LocalDateTime created = toLocalDateTime(representative.get("created"));
-            String imageAlias = alias("IMAGE");
-            String annotationAlias = alias("ANNOTATION");
-            String filename = imageAlias + "_" + created.format(DateTimeFormatter.BASIC_ISO_DATE) + ".geojson";
+                byte[] geojson = buildFeatureCollection(entry, termNames, createdDate);
 
-            byte[] geojson = buildFeatureCollection(
-                imageAnnotationResults,
-                termNames,
-                created.format(DateTimeFormatter.BASIC_ISO_DATE)
-            );
-
-            imageAnnotations.add(new ImageAnnotation(
-                imageAlias,
-                annotationAlias,
-                annotatorAlias,
-                filename,
-                geojson,
-                sha256(geojson),
-                created.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-            ));
-        }
+                return new ImageAnnotation(
+                    imageAlias,
+                    alias("ANNOTATION"),
+                    annotatorAlias,
+                    imageAlias + "_" + createdDate + ".geojson",
+                    geojson,
+                    sha256(geojson),
+                    created.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                );
+            })
+            .collect(Collectors.toSet());
 
         Map<Long, String> annotatorDescriptions = resolveAnnotatorDescriptions(annotatorAliasByUser.keySet());
 

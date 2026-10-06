@@ -270,26 +270,35 @@ public class CytomineTests {
 
     @Test
     void uploadAndRunAndDeleteTaskRun() {
-        multiUsers.runAsAdmin(wait, driver, admin -> {
-            String imageName = "selenium-" + randomUUID() + ".png";
-            String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
+        String imageName = "selenium-" + randomUUID() + ".png";
+        String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
+        String projectName = "selenium-" + randomUUID();
+        String taskName = "identity with geometry";
+        String taskVersion = "1.0.0";
 
-            String taskName = "identity with geometry";
-            String taskVersion = "1.0.0";
-
-            cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
-            cytomineSteps.openImageInViewer(wait, admin.projectUrl());
+        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
+        cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
+        String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
+        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+        try {
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.openImageInViewer(wait, projectUrl);
             annotationTools.drawRectangleAnnotation(wait, driver);
             cytomineSteps.verifyAnnotationCreated(wait);
 
             cytomineSteps.selectTask(wait, taskName, taskVersion);
             cytomineSteps.selectAnnotationForGeometryInput(wait);
             cytomineSteps.runTask(wait, driver);
-            cytomineSteps.deleteTaskRun(wait, admin.projectUrl(), taskName);
-            cytomineSteps.deleteTask(wait, cytomineUrl, taskName);
-            cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
-        });
+            cytomineSteps.deleteTaskRun(wait, projectUrl, taskName);
+        } finally {
+            cleanup(
+                () -> cytomineSteps.deleteTask(wait, cytomineUrl, taskName),
+                () -> cytomineSteps.deleteProject(wait, projectUrl),
+                () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
+                () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
+            );
+        }
+        cytomineSteps.logout(wait, cytomineUrl);
     }
 
     @Test
@@ -410,12 +419,11 @@ public class CytomineTests {
     @Test
     void exportOntology() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
-            String ontologyName = "selenium-" + randomUUID();
             String termName = "selenium-term-" + randomUUID();
 
             cytomineSteps.addTermToOntology(wait, driver, admin.ontologyUrl(), termName);
 
-            cytomineSteps.exportOntology(wait, admin.ontologyUrl(), ontologyName);
+            cytomineSteps.exportOntology(wait, admin.ontologyUrl(), admin.ontologyName());
 
         });
     }
@@ -509,13 +517,12 @@ public class CytomineTests {
     @Test
     void undoCommand() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
-            String ontologyName = "selenium-" + randomUUID();
             String renamedOntologyName = "selenium-renamed-" + randomUUID();
 
             cytomineSteps.renameOntology(wait, admin.ontologyUrl(), renamedOntologyName);
 
             cytomineSteps.undoCommandFromHistory(wait, cytomineUrl, "Update", renamedOntologyName);
-            cytomineSteps.verifyOntologyName(wait, admin.ontologyUrl(), ontologyName);
+            cytomineSteps.verifyOntologyName(wait, admin.ontologyUrl(), admin.ontologyName());
 
         });
     }

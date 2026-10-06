@@ -58,17 +58,16 @@ public class MultiUsersRunner {
             cytomineSteps.logout(adminWait, cytomineUrl);
             try {
                 String projectName = "selenium-project-" + UUID.randomUUID().toString().substring(0, 8);
-                String ontologyName = "selenium-ontology-" + UUID.randomUUID().toString().substring(0, 8);
                 cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
                 String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
-                String ontologyUrl = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
+                String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
 
                 try {
                     test.accept(new TestData(role,
                         username,
                         password,
                         projectName,
-                        projectUrl, ontologyName, ontologyUrl
+                        projectUrl, projectName, ontologyUrl
                     ));
                 } finally {
                     cytomineSteps.deleteProject(wait, projectUrl);

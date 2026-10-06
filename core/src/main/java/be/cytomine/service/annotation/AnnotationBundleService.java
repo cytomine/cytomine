@@ -200,11 +200,9 @@ public class AnnotationBundleService {
         try {
             Geometry geometry = wktReader.read(location.toString());
             Map<String, Object> geometryJson = JsonObject.toMap(geoJsonWriter.write(geometry));
-            if (geometryJson == null) {
-                return Optional.empty();
-            }
 
-            return Optional.of(new GeoJsonFeature(buildProperties(annotation, termNames), geometryJson));
+            return Optional.ofNullable(geometryJson)
+                .map(json -> new GeoJsonFeature(buildProperties(annotation, termNames), json));
         } catch (ParseException e) {
             log.warn("Unable to parse WKT for annotation {}: {}", annotation.get("id"), e.getMessage());
             return Optional.empty();

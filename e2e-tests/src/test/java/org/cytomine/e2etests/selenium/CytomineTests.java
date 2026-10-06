@@ -136,9 +136,8 @@ public class CytomineTests {
         multiUsers.run(wait, driver, List.of(ROLE_ADMIN, ROLE_USER), admin -> {
             Set<String> imageNames = Set.of("selenium-" + randomUUID() + ".png", "selenium-" + randomUUID() + ".png",
                 "selenium-" + randomUUID() + ".png");
-            String projectName = "selenium-" + randomUUID();
-
-            imageNames.forEach(name -> cytomineSteps.addImage(wait, cytomineUrl, name, Optional.of(projectName)));
+            imageNames.forEach(
+                name -> cytomineSteps.addImage(wait, cytomineUrl, name, Optional.of(admin.projectName())));
             cytomineSteps.listImagesInProject(wait, admin.projectUrl(), imageNames);
 
             imageNames.forEach(imageName -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName));
@@ -149,9 +148,8 @@ public class CytomineTests {
     void addImageToStorageWithProject() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String imageName = "selenium-" + randomUUID() + ".png";
-            String projectName = "selenium-" + randomUUID();
 
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
 
             cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
@@ -205,9 +203,8 @@ public class CytomineTests {
     void addAnnotationWithTools() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String imageName = "selenium-" + randomUUID() + ".png";
-            String projectName = "selenium-" + randomUUID();
 
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
 
             annotationTools.drawPointAnnotation(wait, driver);
@@ -239,11 +236,10 @@ public class CytomineTests {
     void addAnnotationWithTerm() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String imageName = "selenium-" + randomUUID() + ".png";
-            String projectName = "selenium-" + randomUUID();
             String termName = "selenium-term-" + randomUUID();
 
             cytomineSteps.addTermToOntology(wait, driver, admin.ontologyUrl(), termName);
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
 
             cytomineSteps.selectTermForAnnotation(wait, termName);
@@ -258,11 +254,10 @@ public class CytomineTests {
     void addAnnotationWithSam() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String imageName = "selenium-" + randomUUID() + ".png";
-            String projectName = "selenium-" + randomUUID();
             String termName = "selenium-term-" + randomUUID();
 
             cytomineSteps.addTermToOntology(wait, driver, admin.ontologyUrl(), termName);
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
             cytomineSteps.selectTermForAnnotation(wait, termName);
 
@@ -278,12 +273,12 @@ public class CytomineTests {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String imageName = "selenium-" + randomUUID() + ".png";
             String zipName = "com.cytomine.dummy.identity.geometry-1.0.0.zip";
-            String projectName = "selenium-" + randomUUID();
+
             String taskName = "identity with geometry";
             String taskVersion = "1.0.0";
 
             cytomineSteps.uploadTask(wait, cytomineUrl, zipName);
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
             annotationTools.drawRectangleAnnotation(wait, driver);
             cytomineSteps.verifyAnnotationCreated(wait);
@@ -301,12 +296,12 @@ public class CytomineTests {
     void retrieveSimilarAnnotationWithCbir() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String imageName = "selenium-" + randomUUID() + ".png";
-            String projectName = "selenium-" + randomUUID();
+
             String termName = "selenium-term-" + randomUUID();
             int nbAnnotations = 3;
 
             cytomineSteps.addTermToOntology(wait, driver, admin.ontologyUrl(), termName);
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
             cytomineSteps.selectTermForAnnotation(wait, termName);
 
@@ -340,9 +335,9 @@ public class CytomineTests {
 
             projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectNameToSearch));
             for (int i = 0; i < nbProjects; i++) {
-                String projectName = "selenium-" + randomUUID();
-                projectNames.add(projectName);
-                projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectName));
+
+                projectNames.add(admin.projectName());
+                projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, admin.projectName()));
             }
 
             cytomineSteps.filterProjectByName(wait, cytomineUrl, projectNameToSearch, projectNames);
@@ -359,12 +354,11 @@ public class CytomineTests {
     void filterAnnotationsByTermInProject() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String imageName = "selenium-" + randomUUID() + ".png";
-            String projectName = "selenium-" + randomUUID();
 
             String termName = "selenium-term-" + randomUUID();
 
             cytomineSteps.addTermToOntology(wait, driver, admin.ontologyUrl(), termName);
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
 
             annotationTools.drawRectangleAnnotation(wait, driver);
@@ -382,16 +376,15 @@ public class CytomineTests {
     void downloadAnnotationReport() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String imageName = "selenium-" + randomUUID() + ".png";
-            String projectName = "selenium-" + randomUUID();
 
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
             annotationTools.drawRectangleAnnotation(wait, driver);
             cytomineSteps.verifyAnnotationCreated(wait);
 
-            cytomineSteps.downloadAnnotationReport(wait, admin.projectUrl(), projectName, ReportType.PDF);
-            cytomineSteps.downloadAnnotationReport(wait, admin.projectUrl(), projectName, ReportType.CSV);
-            cytomineSteps.downloadAnnotationReport(wait, admin.projectUrl(), projectName, ReportType.Excel);
+            cytomineSteps.downloadAnnotationReport(wait, admin.projectUrl(), admin.projectName(), ReportType.PDF);
+            cytomineSteps.downloadAnnotationReport(wait, admin.projectUrl(), admin.projectName(), ReportType.CSV);
+            cytomineSteps.downloadAnnotationReport(wait, admin.projectUrl(), admin.projectName(), ReportType.Excel);
 
             cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
@@ -401,14 +394,13 @@ public class CytomineTests {
     void exportAnnotations() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String imageName = "selenium-" + randomUUID() + ".png";
-            String projectName = "selenium-" + randomUUID();
 
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
             annotationTools.drawRectangleAnnotation(wait, driver);
             cytomineSteps.verifyAnnotationCreated(wait);
 
-            cytomineSteps.exportAnnotations(wait, admin.projectUrl(), projectName);
+            cytomineSteps.exportAnnotations(wait, admin.projectUrl(), admin.projectName());
 
             cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
@@ -430,12 +422,12 @@ public class CytomineTests {
     @Test
     void seeRecentlyViewedProjectsInDashboard() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
-            String projectName = "selenium-" + randomUUID();
+
             String imageName = "selenium-" + randomUUID() + ".png";
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
             sleep(1000);
-            cytomineSteps.checkRecentlyViewedProjects(wait, cytomineUrl, projectName, imageName);
+            cytomineSteps.checkRecentlyViewedProjects(wait, cytomineUrl, admin.projectName(), imageName);
             cytomineSteps.deleteImage(wait, cytomineUrl, imageName);
         });
     }
@@ -454,11 +446,10 @@ public class CytomineTests {
     @Test
     void reviewAnnotationsInProject() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
-            String projectName = "selenium-" + randomUUID();
 
             String imageName = "selenium-" + randomUUID() + ".png";
 
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
             annotationTools.drawRectangleAnnotation(wait, driver);
 
@@ -471,11 +462,10 @@ public class CytomineTests {
     @Test
     void createAndDeleteImageGroup() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
-            String projectName = "selenium-" + randomUUID();
 
             String imageName = "selenium-" + randomUUID() + ".png";
 
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
 
             String imageGroupName = "selenium-" + randomUUID();
             cytomineSteps.createImageGroup(wait, admin.projectUrl(), imageGroupName, Set.of(imageName));
@@ -489,12 +479,11 @@ public class CytomineTests {
     @Test
     void linkAnnotationsBetweenImages() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
-            String projectName = "selenium-" + randomUUID();
 
             String firstImageName = "selenium-" + randomUUID() + ".png";
             String secondImageName = "selenium-" + randomUUID() + ".png";
-            cytomineSteps.addImage(wait, cytomineUrl, firstImageName, Optional.of(projectName));
-            cytomineSteps.addImage(wait, cytomineUrl, secondImageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, firstImageName, Optional.of(admin.projectName()));
+            cytomineSteps.addImage(wait, cytomineUrl, secondImageName, Optional.of(admin.projectName()));
 
             String imageGroupName = "selenium-" + randomUUID();
             cytomineSteps.createImageGroup(wait, admin.projectUrl(), imageGroupName,
@@ -533,11 +522,10 @@ public class CytomineTests {
     @Test
     void screenshotInImageViewer() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
-            String projectName = "selenium-" + randomUUID();
 
             String imageName = "selenium-" + randomUUID() + ".png";
 
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
 
             annotationTools.screenshotCurrentView(wait);
@@ -549,12 +537,11 @@ public class CytomineTests {
     @Test
     void addTagToImageInProject() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
-            String projectName = "selenium-" + randomUUID();
 
             String imageName = "selenium-" + randomUUID() + ".png";
             String tagName = "selenium-tag-" + randomUUID();
 
-            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(projectName));
+            cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.createTag(wait, cytomineUrl, tagName);
 
             cytomineSteps.goToProjectTab(wait, admin.projectUrl(), "Images");

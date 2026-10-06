@@ -62,6 +62,7 @@ public class MultiUsersRunner {
                 cytomineSteps.login(wait, cytomineUrl, user.username(), user.password());
                 String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, projectName);
                 String ontologyUrl = cytomineSteps.createOntology(wait, driver, cytomineUrl, ontologyName);
+
                 try {
                     test.accept(new TestData(role,
                         username,

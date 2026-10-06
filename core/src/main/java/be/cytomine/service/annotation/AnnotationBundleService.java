@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
@@ -68,6 +70,8 @@ public class AnnotationBundleService {
     private final TermHttpContract termHttpContract;
 
     private final UserHttpContract userHttpContract;
+
+    private final ObjectMapper objectMapper;
 
     public byte[] buildBundle(Project project) {
         Long projectId = project.getId();
@@ -188,7 +192,7 @@ public class AnnotationBundleService {
 
         GeoJsonFeatureCollection featureCollection = new GeoJsonFeatureCollection(name, features);
 
-        return JsonObject.toJsonString(featureCollection).getBytes(StandardCharsets.UTF_8);
+        return toJsonBytes(featureCollection);
     }
 
     private Optional<GeoJsonFeature> toFeature(AnnotationResult annotation, Map<Long, String> termNames) {
@@ -244,7 +248,7 @@ public class AnnotationBundleService {
         List<OntologyEntry> entries = terms.stream()
             .map(term -> new OntologyEntry(term.name(), term.color()))
             .toList();
-        return JsonObject.toJsonString(entries).getBytes(StandardCharsets.UTF_8);
+        return toJsonBytes(entries);
     }
 
     private String buildTaskText() {
@@ -415,6 +419,14 @@ public class AnnotationBundleService {
             archive.write(content);
             archive.closeEntry();
         } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private byte[] toJsonBytes(Object value) {
+        try {
+            return objectMapper.writeValueAsBytes(value);
+        } catch (JsonProcessingException e) {
             throw new UncheckedIOException(e);
         }
     }

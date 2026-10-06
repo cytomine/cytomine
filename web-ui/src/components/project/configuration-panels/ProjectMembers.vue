@@ -107,7 +107,7 @@ import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue'
 import { appendShortTermToken } from '@/utils/token-utils.js';
 
 export default {
-  name: 'projet-members',
+  name: 'project-members',
   components: {
     IconProjectMemberRole,
     CytomineTable,
@@ -134,7 +134,6 @@ export default {
       availableRoles: [],
       selectedRoles: [],
       selectedMembers: [],
-
 
       revision: 0
     };
@@ -198,7 +197,18 @@ export default {
     },
     async removeSelectedMembers() {
       try {
-        await this.project.deleteUsers(this.selectedMembers.map(member => member.id));
+        let members = this.selectedMembers;
+        await Promise.all(
+          members
+            .filter(member => member.role === this.representativeRole.value)
+            .map(member => ProjectRepresentative.delete(0, this.project.id, member.id))
+        );
+        await Promise.all(
+          members
+            .filter(member => member.role !== this.contributorRole.value)
+            .map(member => this.project.deleteAdmin(member.id))
+        );
+        await this.project.deleteUsers(members.map(member => member.id));
         await this.refreshMembers();
         this.$notify({ type: 'success', text: this.$t('notif-success-remove-project-members') });
       } catch (error) {

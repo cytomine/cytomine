@@ -98,7 +98,7 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
-            builder.getUserEntity(builder.givenAclUserNoAcl().username()).getId()
+            builder.getUserResponseEntity(builder.givenAclUserNoAcl().username()).id()
         )).contains(annotationTerm);
     }
 

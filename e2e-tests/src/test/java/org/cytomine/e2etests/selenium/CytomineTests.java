@@ -406,31 +406,14 @@ public class CytomineTests {
     }
 
     @Test
-    void addUserToProject() {
-        multiUsers.runAsAdmin(wait, driver, admin -> {
-            String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, "selenium-" + randomUUID());
-            String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-
-            try {
-                cytomineSteps.addUserToProject(wait, projectUrl, "ImageServer1");
-            } finally {
-                cleanup(
-                    () -> cytomineSteps.deleteProject(wait, projectUrl),
-                    () -> cytomineSteps.deleteOntology(wait, ontologyUrl)
-                );
-            }
-        });
-    }
-
-    @Test
-    void removeUserFromProject() {
+    void addAndRemoveUserFromProject() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String username = "ImageServer1";
             String projectUrl = cytomineSteps.createProject(wait, driver, cytomineUrl, "selenium-" + randomUUID());
             String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
             try {
                 cytomineSteps.addUserToProject(wait, projectUrl, username);
-
+                cytomineSteps.changeUserRole(wait, projectUrl, username);
                 cytomineSteps.removeUserFromProject(wait, projectUrl, username);
             } finally {
                 cleanup(

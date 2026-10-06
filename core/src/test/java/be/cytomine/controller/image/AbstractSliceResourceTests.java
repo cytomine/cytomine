@@ -60,6 +60,8 @@ public class AbstractSliceResourceTests {
     private BasicInstanceBuilder builder;
     @Autowired
     private MockMvc restAbstractSliceControllerMockMvc;
+    @Autowired
+    private WiremockRepository wiremockRepository;
 
     private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
@@ -185,6 +187,7 @@ public class AbstractSliceResourceTests {
     @Transactional
     public void getAbstractSliceUploader() throws Exception {
         AbstractSlice image = builder.givenAnAbstractSlice();
+        wiremockRepository.stubUser(builder.givenSuperAdmin());
 
         restAbstractSliceControllerMockMvc.perform(get("/api/abstractslice/{id}/user.json", image.getId()))
             .andExpect(status().isOk())

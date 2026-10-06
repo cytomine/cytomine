@@ -22,6 +22,7 @@ import be.cytomine.common.config.security.CytomineAuthenticationSupport;
 import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.http.HealthService;
 import be.cytomine.common.repository.http.OntologyHttpContract;
+import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import be.cytomine.common.repository.http.RoleHttpContract;
 import be.cytomine.common.repository.http.StatsHttpContract;
@@ -134,6 +135,11 @@ public class RepositoryClient {
     @Bean
     ReviewedAnnotationHttpContract reviewedAnnotationClient(RestClient repositoryRestClient) {
         return createClient(repositoryRestClient, ReviewedAnnotationHttpContract.class);
+    }
+
+    @Bean
+    ProjectHttpContract projectHttpContract(RestClient repositoryRestClient) {
+        return createClient(repositoryRestClient, ProjectHttpContract.class);
     }
 
     @Bean

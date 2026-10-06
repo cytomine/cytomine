@@ -698,7 +698,7 @@ export default {
           { responseType: 'blob' },
         );
 
-        const defaultFilename = `project-${this.project.id}-annotations.geojson`;
+        const defaultFilename = `project-${this.project.id}-annotations.zip`;
         const filename = getFilename(response.headers?.['content-disposition']) || defaultFilename;
         triggerBlobDownload(response.data, filename);
       } catch (error) {

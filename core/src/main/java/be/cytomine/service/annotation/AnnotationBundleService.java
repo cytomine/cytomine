@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,11 @@ import be.cytomine.common.repository.model.command.payload.response.TermResponse
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.annotation.AnnotationResult;
+import be.cytomine.dto.annotation.GeoJsonFeature;
+import be.cytomine.dto.annotation.GeoJsonFeatureCollection;
+import be.cytomine.dto.annotation.GeoJsonFeatureProperties;
 import be.cytomine.dto.annotation.ImageAnnotation;
+import be.cytomine.dto.annotation.OntologyEntry;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.utils.AnnotationListingBuilder;
@@ -178,20 +181,17 @@ public class AnnotationBundleService {
         Map<Long, String> termNames,
         String name
     ) {
-        List<Map<String, Object>> features = annotations.stream()
+        List<GeoJsonFeature> features = annotations.stream()
             .map(annotation -> toFeature(annotation, termNames))
             .flatMap(Optional::stream)
             .toList();
 
-        Map<String, Object> featureCollection = new LinkedHashMap<>();
-        featureCollection.put("type", "FeatureCollection");
-        featureCollection.put("name", name);
-        featureCollection.put("features", features);
+        GeoJsonFeatureCollection featureCollection = new GeoJsonFeatureCollection(name, features);
 
         return JsonObject.toJsonString(featureCollection).getBytes(StandardCharsets.UTF_8);
     }
 
-    private Optional<Map<String, Object>> toFeature(AnnotationResult annotation, Map<Long, String> termNames) {
+    private Optional<GeoJsonFeature> toFeature(AnnotationResult annotation, Map<Long, String> termNames) {
         Object location = annotation.get("location");
         if (location == null) {
             return Optional.empty();
@@ -204,30 +204,22 @@ public class AnnotationBundleService {
                 return Optional.empty();
             }
 
-            Map<String, Object> feature = new LinkedHashMap<>();
-            feature.put("type", "Feature");
-            feature.put("properties", buildProperties(annotation, termNames));
-            feature.put("geometry", geometryJson);
-            return Optional.of(feature);
+            return Optional.of(new GeoJsonFeature(buildProperties(annotation, termNames), geometryJson));
         } catch (ParseException e) {
             log.warn("Unable to parse WKT for annotation {}: {}", annotation.get("id"), e.getMessage());
             return Optional.empty();
         }
     }
 
-    private Map<String, Object> buildProperties(AnnotationResult annotation, Map<Long, String> termNames) {
-        Map<String, Object> properties = new HashMap<>();
-        properties.put("unit", "pixel");
+    private GeoJsonFeatureProperties buildProperties(AnnotationResult annotation, Map<Long, String> termNames) {
+        String pathClassName = null;
 
         Object terms = annotation.get("term");
         if (terms instanceof List<?> termList && !termList.isEmpty()) {
-            String termName = termNames.get(asLong(termList.getFirst()));
-            if (termName != null) {
-                properties.put("path_class_name", termName);
-            }
+            pathClassName = termNames.get(asLong(termList.getFirst()));
         }
 
-        return properties;
+        return new GeoJsonFeatureProperties("pixel", pathClassName);
     }
 
     private Map<Long, String> resolveAnnotatorDescriptions(Set<Long> userIds) {
@@ -251,12 +243,9 @@ public class AnnotationBundleService {
     }
 
     private byte[] buildOntologyJson(List<TermResponse> terms) {
-        List<Map<String, Object>> entries = terms.stream().map(term -> {
-            Map<String, Object> entry = new LinkedHashMap<>();
-            entry.put("type", term.name());
-            entry.put("color", term.color());
-            return entry;
-        }).collect(Collectors.toList());
+        List<OntologyEntry> entries = terms.stream()
+            .map(term -> new OntologyEntry(term.name(), term.color()))
+            .toList();
         return JsonObject.toJsonString(entries).getBytes(StandardCharsets.UTF_8);
     }
 

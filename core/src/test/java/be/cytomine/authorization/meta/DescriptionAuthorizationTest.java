@@ -157,7 +157,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     public void userCanAddInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
-        imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
+        imageInstance.setUserId(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get().getId());
         expectOK(
             () -> descriptionService.add(builder.givenANotPersistedDescription(imageInstance).toJsonObject(urlApi)));
     }
@@ -199,7 +199,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     public void userCanEditInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
-        imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
+        imageInstance.setUserId(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get().getId());
         Description descriptionForImage = builder.givenADescription(imageInstance);
         expectOK(() -> descriptionService.update(descriptionForImage, descriptionForImage.toJsonObject(urlApi), null));
     }
@@ -231,7 +231,7 @@ public class DescriptionAuthorizationTest extends CRUDAuthorizationTest {
     public void userCanDeleteInRestrictedModeForImageIfOwner() {
         ImageInstance imageInstance = builder.givenAnImageInstance(project);
         imageInstance.getProject().setMode(EditingMode.RESTRICTED);
-        imageInstance.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
+        imageInstance.setUserId(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get().getId());
         expectOK(() -> descriptionService.delete(builder.givenADescription(imageInstance), null, null, true));
     }
 

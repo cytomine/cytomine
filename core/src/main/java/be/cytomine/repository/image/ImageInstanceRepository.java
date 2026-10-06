@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 
 /**
  * Spring Data JPA repository for the abstract image entity.
@@ -67,5 +66,5 @@ public interface ImageInstanceRepository
 
     Long countAllByProject(Project project);
 
-    List<ImageInstance> findAllByUser(User user);
+    List<ImageInstance> findAllByUserId(long userId);
 }

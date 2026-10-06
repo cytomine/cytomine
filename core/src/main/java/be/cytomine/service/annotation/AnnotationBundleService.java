@@ -12,6 +12,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,7 @@ public class AnnotationBundleService {
         String policyAlias = alias("POLICY");
 
         Map<Long, String> annotatorAliasByUser = new LinkedHashMap<>();
-        List<ImageAnnotation> imageAnnotations = new ArrayList<>();
+        Set<ImageAnnotation> imageAnnotations = new HashSet<>();
 
         for (Map.Entry<Long, List<AnnotationResult>> entry : annotationsByImage.entrySet()) {
             List<AnnotationResult> imageAnnotationResults = entry.getValue();
@@ -282,7 +283,7 @@ public class AnnotationBundleService {
             """;
     }
 
-    private String buildAnnotationXml(List<ImageAnnotation> imageAnnotations, String ontologyAlias, String taskAlias) {
+    private String buildAnnotationXml(Set<ImageAnnotation> imageAnnotations, String ontologyAlias, String taskAlias) {
         BigPictureXmlWriter xml = new BigPictureXmlWriter();
         xml.open("ANNOTATION_SET");
         for (ImageAnnotation imageAnnotation : imageAnnotations) {
@@ -315,7 +316,7 @@ public class AnnotationBundleService {
         return xml.build();
     }
 
-    private String buildDatasetXml(Project project, String datasetAlias, List<ImageAnnotation> imageAnnotations) {
+    private String buildDatasetXml(Project project, String datasetAlias, Set<ImageAnnotation> imageAnnotations) {
         BigPictureXmlWriter xml = new BigPictureXmlWriter();
         xml.open("DATASET_SET");
         xml.open("DATASET", "alias", datasetAlias);

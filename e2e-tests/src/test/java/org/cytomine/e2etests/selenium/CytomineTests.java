@@ -321,7 +321,6 @@ public class CytomineTests {
             cytomineSteps.addUserToProject(wait, admin.projectUrl(), username);
             cytomineSteps.changeUserRole(wait, admin.projectUrl(), username);
             cytomineSteps.removeUserFromProject(wait, admin.projectUrl(), username);
-
         });
     }
 

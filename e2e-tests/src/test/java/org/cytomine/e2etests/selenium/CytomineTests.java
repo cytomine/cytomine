@@ -331,21 +331,24 @@ public class CytomineTests {
             String projectNameToSearch = "search-" + randomUUID();
             List<String> projectUrls = new ArrayList<>();
             List<String> projectNames = new ArrayList<>();
-
             projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectNameToSearch));
             for (int i = 0; i < nbProjects; i++) {
-
-                projectNames.add(admin.projectName());
-                projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, admin.projectName()));
+                String projectName = "selenium-" + randomUUID();
+                projectNames.add(projectName);
+                projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectName));
             }
 
-            cytomineSteps.filterProjectByName(wait, cytomineUrl, projectNameToSearch, projectNames);
-
-            projectUrls.forEach(projectUrl -> {
-                String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
-                cytomineSteps.deleteProject(wait, projectUrl);
-                cytomineSteps.deleteOntology(wait, ontologyUrl);
-            });
+            try {
+                cytomineSteps.filterProjectByName(wait, cytomineUrl, projectNameToSearch, projectNames);
+            } finally {
+                for (String projectUrl : projectUrls) {
+                    cleanup(() -> {
+                        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+                        cytomineSteps.deleteProject(wait, projectUrl);
+                        cytomineSteps.deleteOntology(wait, ontologyUrl);
+                    });
+                }
+            }
         });
     }
 
@@ -353,7 +356,6 @@ public class CytomineTests {
     void filterAnnotationsByTermInProject() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
             String imageName = "selenium-" + randomUUID() + ".png";
-
             String termName = "selenium-term-" + randomUUID();
 
             cytomineSteps.addTermToOntology(wait, driver, admin.ontologyUrl(), termName);

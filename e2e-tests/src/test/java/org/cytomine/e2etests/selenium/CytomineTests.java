@@ -187,15 +187,11 @@ public class CytomineTests {
             String parentTermName = "selenium-parent-" + randomUUID();
             String childTermName = "selenium-child-" + randomUUID();
 
-            try {
-                cytomineSteps.addTermToOntology(wait, driver, admin.ontologyUrl(), parentTermName);
-                cytomineSteps.addTermToOntology(wait, driver, admin.ontologyUrl(), childTermName);
-                cytomineSteps.makeTermChildOf(wait, driver, admin.ontologyUrl(), childTermName, parentTermName);
-                cytomineSteps.deleteTermFromOntology(wait, admin.ontologyUrl(), parentTermName);
-                cytomineSteps.verifyTermsAbsentAfterRefresh(wait, admin.ontologyUrl(), parentTermName, childTermName);
-            } finally {
-                cleanup(() -> cytomineSteps.deleteOntology(wait, admin.ontologyUrl()));
-            }
+            cytomineSteps.addTermToOntology(wait, driver, admin.ontologyUrl(), parentTermName);
+            cytomineSteps.addTermToOntology(wait, driver, admin.ontologyUrl(), childTermName);
+            cytomineSteps.makeTermChildOf(wait, driver, admin.ontologyUrl(), childTermName, parentTermName);
+            cytomineSteps.deleteTermFromOntology(wait, admin.ontologyUrl(), parentTermName);
+            cytomineSteps.verifyTermsAbsentAfterRefresh(wait, admin.ontologyUrl(), parentTermName, childTermName);
         });
     }
 

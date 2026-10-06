@@ -183,19 +183,23 @@ def run_import_datasets(
 
         annotation_summary = {}
         image_summary = ImportSummary()
+        parsers = []
         for bucket in buckets:
-            try:
-                parser = BucketParser(bucket)
-                parser.discover()
+            parser = BucketParser(bucket)
+            parser.discover()
+            parsers.append(parser)
+        parsers.sort(key=lambda p: bool(p.dependency))
 
+        for parser in parsers:
+            try:
                 if not parser.parent:
-                    logger.warning(f"No parent dataset found for {bucket}, skipping...")
+                    logger.warning(f"No parent dataset found for {parser.root}, skipping...")
                     continue
 
                 parent_dataset = parser.parent
                 dataset_dir = parser.dataset_dir
                 if dataset_dir is None:
-                    logger.warning(f"Could not resolve dataset directory for {bucket}, skipping...")
+                    logger.warning(f"Could not resolve dataset directory for {parser.root}, skipping...")
                     continue
                 validator = MetadataValidator()
                 if validator.validate(dataset_dir / "METADATA"):
@@ -217,8 +221,7 @@ def run_import_datasets(
                 ontologies = OntologyCollection().fetch()
 
                 for child in parser.children:
-
-                    child_path = dataset_dir / child
+                    child_path = dataset_dir
                     ontology = OntologyImporter(child_path).run()
                     ontologies.append(ontology)
 
@@ -269,7 +272,7 @@ def run_import_datasets(
                     logger.error(f"[{parent_dataset}] Failed to parse XML files or index in MeiliSearch: {e}", exc_info=True)
 
             except Exception as e:
-                logger.error(f"Failed to process bucket {bucket}: {e}", exc_info=True)
+                logger.error(f"Failed to process bucket {parser.root}: {e}", exc_info=True)
                 continue
         return ImportResponse(
             image_summary=image_summary,

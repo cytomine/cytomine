@@ -577,7 +577,7 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
         webDriverUtils.clickButtonByText(wait, "Export annotations");
 
-        String filenameSuffix = "_" + projectName + "_annotations." + ReportType.GEOJSON.getLabel();
+        String filenameSuffix = "_" + projectName + "_annotations.zip";
         Instant end = Instant.now().plus(Duration.ofSeconds(5));
 
         while (Instant.now().isBefore(end)) {

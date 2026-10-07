@@ -336,6 +336,7 @@ public class CytomineTests {
             String projectNameToSearch = "search-" + randomUUID();
             List<String> projectUrls = new ArrayList<>();
             List<String> projectNames = new ArrayList<>();
+
             projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectNameToSearch));
             for (int i = 0; i < nbProjects; i++) {
                 String projectName = "selenium-" + randomUUID();
@@ -427,7 +428,6 @@ public class CytomineTests {
     @Test
     void seeRecentlyViewedProjectsInDashboard() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
-
             String imageName = "selenium-" + randomUUID() + ".png";
             cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());
@@ -439,13 +439,10 @@ public class CytomineTests {
 
     @Test
     void checkProjectAfterPimsImport() {
-        String projectName = "test-project";
-        String imageName = "wsi";
-        cytomineSteps.login(wait, cytomineUrl, adminUsername, adminPassword);
-
-        cytomineSteps.checkPimsImportProject(wait, cytomineUrl, projectName, imageName);
-
-        cytomineSteps.logout(wait, cytomineUrl);
+        multiUsers.runAsAdmin(wait, driver, admin -> {
+            String imageName = "wsi";
+            cytomineSteps.checkPimsImportProject(wait, cytomineUrl, admin.projectName(), imageName);
+        });
     }
 
     @Test

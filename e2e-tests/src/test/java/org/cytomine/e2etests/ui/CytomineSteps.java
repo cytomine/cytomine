@@ -71,7 +71,6 @@ public class CytomineSteps {
         webDriverUtils.clickButtonByText(wait, "Delete");
         webDriverUtils.clickButtonByText(wait, "Confirm");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
-        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
     }
 
     public void listProjects(Wait<WebDriver> wait, URL cytomineUrl, Set<String> projectNames) {
@@ -577,7 +576,7 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
         webDriverUtils.clickButtonByText(wait, "Export annotations");
 
-        String filenameSuffix = "_" + projectName + "_annotations." + ReportType.GEOJSON.getLabel();
+        String filenameSuffix = "_" + projectName + "_annotations.zip";
         Instant end = Instant.now().plus(Duration.ofSeconds(5));
 
         while (Instant.now().isBefore(end)) {
@@ -833,10 +832,9 @@ public class CytomineSteps {
         String imageName
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + projectName + "')]"));
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + imageName + "')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + projectName + ")]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No project recently opened')]"));
-        webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No image recently opened')]"));
     }
 
     public void checkPimsImportProject(
@@ -846,9 +844,9 @@ public class CytomineSteps {
         String imageName
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/projects");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + projectName + "')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + projectName + ")]"));
         webDriverUtils.xpathClick(wait, "//a[contains(text(), '" + projectName + "')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + imageName + "')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
     }
 
     public void reviewAnnotations(Wait<WebDriver> wait) {

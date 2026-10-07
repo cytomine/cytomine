@@ -8,7 +8,6 @@ on:
         required: true
       REGISTRY_TOKEN:
         required: true
-
 permissions: {}
 
 jobs:
@@ -144,7 +143,7 @@ jobs:
             --set images.eclipse_temurin=registry.cytomine.org/docker/library/eclipse-temurin:8u462-b08-jdk-ubi9-minimal \
             --set images.envoy_proxy=registry.cytomine.org/docker/envoyproxy/envoy:v1.33-latest \
             --set images.iam=registry.cytomine.org/docker/keycloak/keycloak:26.3 \
-            --set images.mongodb=registry.cytomine.org/docker/library/mongo:5.0-focal \
+            --set images.mongodb=registry.cytomine.org/docker/library/mongo:9-noble \
             --set images.pims=registry.cytomine.org/cytomine/pims:${{ env.DEPLOYMENT_NAME }} \
             --set images.pims_cache=registry.cytomine.org/docker/library/redis:7 \
             --set images.pims_import=registry.cytomine.org/cytomine/python-client:${{ env.DEPLOYMENT_NAME }} \
@@ -192,7 +191,8 @@ jobs:
 
       - name: Logs pims import job
         if: failure()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs job/pims-import-ci --all-containers=true
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs job/pims-import-ci
+          --all-containers=true
 
       - name: Run helm tests
         run: |
@@ -206,11 +206,13 @@ jobs:
 
       - name: Logs e2e tests results - e2e-tests pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c e2e-tests
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c e2e-tests
 
       - name: Logs e2e tests results - selenium pod
         if: always()
-        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests -c selenium
+        run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
+          -c selenium
 
       - name: Export test results
         if: always()

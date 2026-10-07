@@ -468,6 +468,18 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
     }
 
+    public void changeUserRole(Wait<WebDriver> wait, String projectUrl, String username) {
+        webDriverUtils.goTo(wait, projectUrl);
+        webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
+        String roleIcon = "//td[@data-label='Username' and normalize-space(text())='" + username + "']"
+            + "/following-sibling::td[@data-label='Role']//i[contains(@class,'fa-user-cog')]";
+        webDriverUtils.byClick(wait, By.xpath(roleIcon));
+        webDriverUtils.byIsDisplayed(
+            wait,
+            By.xpath(roleIcon + "[not(contains(@class,'disabled'))]")
+        );
+    }
+
     public void removeUserFromProject(Wait<WebDriver> wait, String projectUrl, String username) {
         webDriverUtils.goTo(wait, projectUrl);
         webDriverUtils.byClick(wait, By.xpath("//label[contains(@class,'b-radio') and contains(text(),'Members')]"));
@@ -565,7 +577,7 @@ public class CytomineSteps {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
         webDriverUtils.clickButtonByText(wait, "Export annotations");
 
-        String filenameSuffix = "_" + projectName + "_annotations." + ReportType.GEOJSON.getLabel();
+        String filenameSuffix = "_" + projectName + "_annotations.zip";
         Instant end = Instant.now().plus(Duration.ofSeconds(5));
 
         while (Instant.now().isBefore(end)) {

@@ -1,5 +1,7 @@
 package be.cytomine.controller.ontology;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -7,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -67,7 +71,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -994,29 +997,75 @@ public class AnnotationDomainResourceTests {
     }
 
     @Test
-    public void shouldReturnGeoJsonContentType() throws Exception {
+    public void shouldReturnZipBundle() throws Exception {
         wiremockRepository.stubTermsByProject(project.getId(), term);
-        restAnnotationDomainControllerMockMvc.perform(get(
+        byte[] bundle = restAnnotationDomainControllerMockMvc.perform(get(
                 "/api/project/{projectId}/annotations/export",
                 project.getId()
             ))
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Disposition", containsString("attachment; filename=")))
-            .andExpect(header().string("Content-Disposition", containsString(".geojson")))
-            .andExpect(content().contentTypeCompatibleWith("application/geo+json"))
-            .andExpect(content().json("{}"));
+            .andExpect(header().string("Content-Disposition", containsString(".zip")))
+            .andExpect(content().contentTypeCompatibleWith("application/zip"))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+
+        Map<String, byte[]> entries = unzip(bundle);
+        org.assertj.core.api.Assertions.assertThat(entries).containsKeys(
+            "dataset/METADATA/annotation.xml",
+            "dataset/METADATA/dataset.xml",
+            "dataset/METADATA/annotator.xml",
+            "dataset/METADATA/ontology.xml",
+            "dataset/METADATA/annotation_task.xml",
+            "dataset/METADATA/policy.xml",
+            "dataset/ANNOTATION_TASKS/task.txt"
+        );
+
+        String annotationXml = new String(entries.get("dataset/METADATA/annotation.xml"), StandardCharsets.UTF_8);
+        AssertionsForClassTypes.assertThat(annotationXml).contains("<ANNOTATION_SET>");
+        AssertionsForClassTypes.assertThat(annotationXml).contains("ANNOTATIONS/IMAGE_");
+        AssertionsForClassTypes.assertThat(annotationXml).contains("checksum_method=\"SHA256\"");
     }
 
     @Test
     public void shouldExportTermNameAsPathClassNameProperty() throws Exception {
         wiremockRepository.stubTermsByProject(project.getId(), term);
-        restAnnotationDomainControllerMockMvc.perform(get(
+        byte[] bundle = restAnnotationDomainControllerMockMvc.perform(get(
                 "/api/project/{projectId}/annotations/export",
                 project.getId()
             ))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.type").value("FeatureCollection"))
-            .andExpect(jsonPath("$.features[*].properties.path_class_name", hasItem(term.getName())));
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+
+        Map<String, byte[]> entries = unzip(bundle);
+        String geojsonEntry = entries.keySet().stream()
+            .filter(name -> name.startsWith("dataset/ANNOTATIONS/") && name.endsWith(".geojson"))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("No GeoJSON file found in the export bundle"));
+
+        Map<String, Object> featureCollection = objectMapper.readValue(entries.get(geojsonEntry), Map.class);
+        AssertionsForClassTypes.assertThat(featureCollection.get("type")).isEqualTo("FeatureCollection");
+
+        List<Map<String, Object>> features = (List<Map<String, Object>>) featureCollection.get("features");
+        List<Object> pathClassNames = features.stream()
+            .map(feature -> ((Map<String, Object>) feature.get("properties")).get("path_class_name"))
+            .toList();
+        org.assertj.core.api.Assertions.assertThat(pathClassNames).contains(term.getName());
+    }
+
+    private static Map<String, byte[]> unzip(byte[] bundle) throws IOException {
+        Map<String, byte[]> entries = new LinkedHashMap<>();
+        try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(bundle))) {
+            ZipEntry entry;
+            while ((entry = zip.getNextEntry()) != null) {
+                entries.put(entry.getName(), zip.readAllBytes());
+                zip.closeEntry();
+            }
+        }
+        return entries;
     }
 
     @Test

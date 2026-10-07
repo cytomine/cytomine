@@ -911,7 +911,7 @@ public class UserService extends ModelService {
 
     public void deleteDependentImageInstance(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
-            for (ImageInstance imageInstance : imageInstanceRepository.findAllByUser((User) user)) {
+            for (ImageInstance imageInstance : imageInstanceRepository.findAllByUserId(user.getId())) {
                 imageInstanceService.delete(imageInstance, transaction, task, false);
             }
         }
@@ -954,12 +954,12 @@ public class UserService extends ModelService {
 
     public void deleteDependentUploadedFile(User user, Transaction transaction, Task task) {
         if (user instanceof User) {
-            uploadedFileRepository.deleteAllByUser((User) user);
+            uploadedFileRepository.deleteAllByUserId(user.getId());
         }
     }
 
     public void deleteDependentStorage(User user, Transaction transaction, Task task) {
-        for (Storage storage : storageRepository.findAllByUser(user)) {
+        for (Storage storage : storageRepository.findAllByUserId(user.getId())) {
             if (uploadedFileRepository.countByStorage(storage) > 0) {
                 throw new ConstraintException(
                     "Storage contains data, cannot delete user. Remove or assign storage to an another user first");
@@ -974,7 +974,7 @@ public class UserService extends ModelService {
     }
 
     public void deleteDependentNestedImageInstance(User user, Transaction transaction, Task task) {
-        nestedImageInstanceRepository.deleteAllByUser((User) user);
+        nestedImageInstanceRepository.deleteAllByUserId(user.getId());
     }
 
     public void deleteDependentProjectDefaultLayer(User user, Transaction transaction, Task task) {

@@ -185,7 +185,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     public void userCanAddInRestrictedModeForImageIfOwner() {
         ImageInstance attachedFileImage = builder.givenAnImageInstance(project);
         attachedFileImage.getProject().setMode(EditingMode.RESTRICTED);
-        attachedFileImage.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
+        attachedFileImage.setUserId(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get().getId());
         expectOK(() -> attachedFileService.create(
             "test",
             "hello".getBytes(),
@@ -230,7 +230,7 @@ public class AttachedFileAuthorizationTest extends CRDAuthorizationTest {
     public void userCanDeleteInRestrictedModeForImageIfOwner() {
         ImageInstance attachedFileImage = builder.givenAnImageInstance(project);
         attachedFileImage.getProject().setMode(EditingMode.RESTRICTED);
-        attachedFileImage.setUser(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get());
+        attachedFileImage.setUserId(userRepository.findByUsernameLikeIgnoreCase(USER_ACL_READ).get().getId());
         AttachedFile attachedFile = builder.givenAnAttachedFile(attachedFileImage);
         expectOK(() -> attachedFileService.delete(attachedFile, null, null, true));
     }

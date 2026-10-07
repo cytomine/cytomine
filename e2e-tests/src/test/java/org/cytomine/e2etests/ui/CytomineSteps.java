@@ -833,8 +833,8 @@ public class CytomineSteps {
         String imageName
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString());
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + projectName + "')]"));
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + imageName + "')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + projectName + ")]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No project recently opened')]"));
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//div[contains(text(), 'No image recently opened')]"));
     }
@@ -846,9 +846,9 @@ public class CytomineSteps {
         String imageName
     ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/projects");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + projectName + "')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + projectName + ")]"));
         webDriverUtils.xpathClick(wait, "//a[contains(text(), '" + projectName + "')]");
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), '" + imageName + "')]"));
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), " + imageName + ")]"));
     }
 
     public void reviewAnnotations(Wait<WebDriver> wait) {

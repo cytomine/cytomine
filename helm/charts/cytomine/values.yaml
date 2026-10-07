@@ -99,7 +99,7 @@ images:
   eclipse_temurin: eclipse-temurin:8u462-b08-jdk-ubi9-minimal
   postgis: postgis/postgis:15-3.5
   postgresql: postgres:15
-  mongodb: mongo:9-focal
+  mongodb: mongo:9-noble
   pims_cache: redis:7
   redis: redis:7
   meilisearch: getmeili/meilisearch:v1.43.0

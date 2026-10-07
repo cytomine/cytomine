@@ -7,7 +7,7 @@ x-version-env: &version-env
 
 services:
   mongo:
-    image: mongo:9-focal
+    image: mongo:9-noble
     restart: unless-stopped
     ports:
       - 27017:27017

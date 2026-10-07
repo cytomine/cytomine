@@ -2,7 +2,6 @@ package be.cytomine.config;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

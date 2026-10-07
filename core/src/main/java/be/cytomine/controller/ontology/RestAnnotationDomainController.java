@@ -54,6 +54,7 @@ import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.UrlApi;
+import be.cytomine.service.annotation.AnnotationBundleService;
 import be.cytomine.service.annotation.AnnotationReportService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.middleware.ImageServerService;
@@ -79,6 +80,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
     private final AnnotationListingService annotationListingService;
 
     private final AnnotationReportService annotationReportService;
+
+    private final AnnotationBundleService annotationBundleService;
 
     private final GenericAnnotationService genericAnnotationService;
 
@@ -132,18 +135,19 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L), params.getJSONAttrLong("max", 0L));
     }
 
-    @GetMapping(value = "/project/{projectId}/annotations/export", produces = "application/geo+json")
-    public ResponseEntity<Map<String, Object>> export(@PathVariable Long projectId) {
+    @GetMapping(value = "/project/{projectId}/annotations/export", produces = "application/zip")
+    public ResponseEntity<byte[]> export(@PathVariable Long projectId) {
         log.info("GET /project/{}/annotations/export", projectId);
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        String filename = reportService.getAnnotationReportFileName(ReportType.GEOJSON.getLabel(), project.getName());
-        Map<String, Object> geoJson = annotationReportService.exportAnnotations(projectId);
+        String filename = reportService.getAnnotationReportFileName("zip", project.getName());
+        byte[] bundle = annotationBundleService.buildBundle(project);
 
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-            .body(geoJson);
+            .contentType(MediaType.parseMediaType("application/zip"))
+            .body(bundle);
     }
 
     @PostMapping("/project/{projectId}/annotation/download")

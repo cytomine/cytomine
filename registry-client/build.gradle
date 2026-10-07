@@ -8,8 +8,7 @@ group 'com.cytomine'
 version '0.0.0'  // do NOT change this, this will be automatically changed by CI
 
 java {
-    sourceCompatibility = '21'
-    targetCompatibility = '21'
+    sourceCompatibility = '25'
 }
 
 checkstyle {

@@ -9,7 +9,4 @@ public record TestData(Role role,
                        String projectUrl,
                        String ontologyName,
                        String ontologyUrl) {
-    public TestData {
-
-    }
 }

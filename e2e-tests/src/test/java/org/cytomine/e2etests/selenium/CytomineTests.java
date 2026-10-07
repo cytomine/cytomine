@@ -428,7 +428,6 @@ public class CytomineTests {
     @Test
     void seeRecentlyViewedProjectsInDashboard() {
         multiUsers.runAsAdmin(wait, driver, admin -> {
-
             String imageName = "selenium-" + randomUUID() + ".png";
             cytomineSteps.addImage(wait, cytomineUrl, imageName, Optional.of(admin.projectName()));
             cytomineSteps.openImageInViewer(wait, admin.projectUrl());

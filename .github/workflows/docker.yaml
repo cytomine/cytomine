@@ -52,8 +52,6 @@ jobs:
           - name: app-engine-tasks-runner
             context: .
             dockerfile_location: app-engine/task-runner
-          - name: documentation
-            context: docs
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1

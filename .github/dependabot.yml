@@ -1,0 +1,53 @@
+---
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directories:
+      - /
+    schedule:
+      interval: weekly
+      day: sunday
+    labels:
+      - dependencies
+  - package-ecosystem: uv
+    directories:
+      - /
+      - /sam
+      - /cbir
+      - /pims
+      - /clients/python
+    schedule:
+      interval: weekly
+      day: sunday
+    labels:
+      - dependencies
+  - package-ecosystem: gradle
+    directories:
+      - /core
+      - /common
+      - /repository
+      - /registry-client
+      - /app-engine
+      - /e2e-tests
+    schedule:
+      interval: weekly
+      day: sunday
+    labels:
+      - dependencies
+  - package-ecosystem: npm
+    directories:
+      - /web-ui
+      - /docs
+    schedule:
+      interval: weekly
+      day: sunday
+    labels:
+      - dependencies
+  - package-ecosystem: nix
+    directories:
+      - /
+    schedule:
+      interval: weekly
+      day: sunday
+    labels:
+      - dependencies

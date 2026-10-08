@@ -32,3 +32,4 @@ iam-db-1 | 2026-05-07 09:03:41.062 UTC [1] DETAIL: The data directory was initia
 The best option is probably to erase your data.
 But you can also dump and restore it.
 Follow this link's instructions: [https://stackoverflow.com/questions/78782410/docker-the-data-directory-was-initialized-by-postgresql-version-14-which-is-no/78782530#78782530](https://stackoverflow.com/questions/78782410/docker-the-data-directory-was-initialized-by-postgresql-version-14-which-is-no/78782530#78782530)
+

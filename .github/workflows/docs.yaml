@@ -27,7 +27,7 @@ jobs:
 
     env:
       IMAGE: cytomine/documentation
-      IMAGE_TAG: ${{ github.event_name == 'pull_request' && github.sha || 'latest' }}
+      IMAGE_TAG: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'latest' }}
 
     steps:
       - name: Checkout the repository
@@ -60,7 +60,9 @@ jobs:
           context: ./docs/
           file: ./docs/Dockerfile
           push: true
-          tags: ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+          tags: |
+            ${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
+            registry.cytomine.org/${{ env.IMAGE }}:${{ env.IMAGE_TAG }}
           cache-from: type=registry,ref=${{ env.IMAGE }}-build-cache
           cache-to: type=registry,ref=${{ env.IMAGE }}-build-cache,mode=min
 

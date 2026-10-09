@@ -48,8 +48,8 @@ jobs:
           context: sam
           file: sam/Dockerfile.weights
           push: true
-          tags:
-            - registry.cytomine.org/cytomine/sam-weights:latest
-            - cytomine/sam-weights:latest
+          tags: |
+            registry.cytomine.org/cytomine/sam-weights:latest
+            cytomine/sam-weights:latest
           allow: network.host
           network: host

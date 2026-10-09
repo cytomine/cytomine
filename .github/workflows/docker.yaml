@@ -42,6 +42,7 @@ jobs:
             target: production
           - name: sam-weights
             dockerfile_location: sam
+            context: sam
             suffix: .weights
           - name: web-ui
           - name: python-client
@@ -90,7 +91,8 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: ${{ matrix.image.context || matrix.image.name }}
-          file: ./${{ matrix.image.dockerfile_location || matrix.image.context || matrix.image.name }}/Dockerfile${{ matrix.image.suffix }}
+          file: ./${{ matrix.image.dockerfile_location || matrix.image.context || matrix.image.name }}/Dockerfile${{
+            matrix.image.suffix }}
           push: true
           tags: |
             registry.cytomine.org/cytomine/${{ matrix.image.name }}:${{ env.DEPLOYMENT_NAME }}
@@ -111,7 +113,8 @@ jobs:
       - name: Run Trivy vulnerability scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: registry.cytomine.org/cytomine/${{ matrix.image.name }}:${{ env.DEPLOYMENT_NAME }}
+          image-ref: registry.cytomine.org/cytomine/${{ matrix.image.name }}:${{ env.DEPLOYMENT_NAME
+            }}
           format: table
           exit-code: '0'
           ignore-unfixed: true

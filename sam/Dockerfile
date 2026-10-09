@@ -1,6 +1,6 @@
 ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG PYTHON_VERSION=3.10
-ARG SAM_WEIGHTS_IMAGE=registry.cytomine.org/cytomine/sam-weights:latest
+ARG SAM_WEIGHTS_IMAGE=registry.cytomine.org/docker/cytomine/sam-weights:latest
 
 FROM ${SAM_WEIGHTS_IMAGE} AS weights
 

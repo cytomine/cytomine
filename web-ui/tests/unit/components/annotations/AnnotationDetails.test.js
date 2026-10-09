@@ -1,6 +1,5 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
-import VueRouter from 'vue-router';
 
 import { AnnotationType } from '@/api';
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
@@ -23,15 +22,6 @@ vi.mock('@/api', () => ({
     fetchAll: vi.fn().mockResolvedValue({ array: [] }),
   },
 }));
-
-const localVue = createLocalVue();
-localVue.use(Buefy);
-localVue.use(VueRouter);
-
-localVue.directive('click-outside', {
-  bind() {},
-  unbind() {},
-});
 
 const mockAdminUser = {
   id: 123,
@@ -93,8 +83,7 @@ describe('AnnotationDetails.vue', () => {
 
   const createWrapper = () => {
     return shallowMount(AnnotationDetails, {
-      localVue,
-      propsData: {
+      props: {
         annotation: mockAnnotation,
         terms: [
           { id: 10, name: 'Cell' },
@@ -128,28 +117,34 @@ describe('AnnotationDetails.vue', () => {
         showChannelInfo: false,
         showComments: false,
       },
-      mocks: {
-        $notify: vi.fn(),
-        $store: mockStore,
-        $t: (key) => key,
-      },
-      stubs: {
-        'attached-files': true,
-        'annotation-links-preview': true,
-        'b-tag': true,
-        'b-field': true,
-        'b-input': true,
-        'channel-name': true,
-        'cytomine-description': true,
-        'cytomine-properties': true,
-        'cytomine-tags': true,
-        'cytomine-term': true,
-        'cytomine-track': true,
-        'image-name': true,
-        'ontology-tree': true,
-        'router-link': true,
-        'track-tree': true,
-      },
+      global: {
+        plugins: [Buefy],
+        directives: {
+          'click-outside': {}
+        },
+        mocks: {
+          $notify: vi.fn(),
+          $store: mockStore,
+          $t: (key) => key,
+        },
+        stubs: {
+          'attached-files': true,
+          'annotation-links-preview': true,
+          'b-tag': true,
+          'b-field': true,
+          'b-input': true,
+          'channel-name': true,
+          'cytomine-description': true,
+          'cytomine-properties': true,
+          'cytomine-tags': true,
+          'cytomine-term': true,
+          'cytomine-track': true,
+          'image-name': true,
+          'ontology-tree': true,
+          'router-link': true,
+          'track-tree': true,
+        }
+      }
     });
   };
 

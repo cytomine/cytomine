@@ -11,12 +11,12 @@ describe('SelectableAnnotation.vue', () => {
 
   beforeEach(() => {
     wrapper = shallowMount(SelectableAnnotation, {
-      propsData: {
+      props: {
         annotation: mockAnnotation,
         images: mockImages,
         users: mockUsers,
         isSelected: false,
-      },
+      }
     });
   });
 
@@ -38,9 +38,9 @@ describe('SelectableAnnotation.vue', () => {
     const annotationPreview = wrapper.findComponent(AnnotationPreview);
 
     expect(annotationPreview.exists()).toBe(true);
-    expect(annotationPreview.props('annot')).toBe(mockAnnotation);
-    expect(annotationPreview.props('images')).toBe(mockImages);
-    expect(annotationPreview.props('users')).toBe(mockUsers);
+    expect(annotationPreview.props('annot')).toEqual(mockAnnotation);
+    expect(annotationPreview.props('images')).toEqual(mockImages);
+    expect(annotationPreview.props('users')).toEqual(mockUsers);
     expect(annotationPreview.props('size')).toBe(85);
   });
 

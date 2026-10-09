@@ -3,7 +3,7 @@
   :title="$t('description')"
   class="description-modal"
   :class="{expanded: expanded}"
-  @close="$parent.close()"
+  @close="$emit('close')"
 >
   <template #controls>
     <button class="button is-small" @click="expanded = !expanded">
@@ -27,7 +27,7 @@
   </template>
 
   <template v-if="edit" #footer>
-    <button class="button" @click="$parent.close()">{{$t('button-cancel')}}</button>
+    <button class="button" @click="$emit('close')">{{$t('button-cancel')}}</button>
     <button v-if="edit" class="button is-link" @click="save()"> {{ $t('button-save') }} </button>
   </template>
 </cytomine-modal-card>
@@ -74,7 +74,7 @@ export default {
           await updatedDesc.delete();
           this.$emit('change', null);
         }
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         this.descriptionContent = this.description.data;
         this.$notify({ type: 'error', text: this.$t('notif-error-update-description') });

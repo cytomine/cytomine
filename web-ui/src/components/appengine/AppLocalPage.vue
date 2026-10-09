@@ -1,6 +1,6 @@
 <template>
   <div class="content-wrapper">
-    <b-loading :is-full-page="false" :active="loading" />
+    <b-loading :is-full-page="false" :model-value="loading" />
 
     <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
       {{ $t('failed-fetch-tasks') }}

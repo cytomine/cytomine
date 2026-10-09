@@ -9,9 +9,11 @@ const mocks = {
 describe('BooleanItem.vue', () => {
   it('should render "yes" when value is true', () => {
     const wrapper = shallowMount(BooleanItem, {
-      mocks: mocks,
-      propsData: {
+      props: {
         value: true
+      },
+      global: {
+        mocks: mocks
       }
     });
 
@@ -24,9 +26,11 @@ describe('BooleanItem.vue', () => {
 
   it('should render "no" when value is false', () => {
     const wrapper = shallowMount(BooleanItem, {
-      mocks: mocks,
-      propsData: {
+      props: {
         value: false
+      },
+      global: {
+        mocks: mocks
       }
     });
 
@@ -39,9 +43,11 @@ describe('BooleanItem.vue', () => {
 
   it('should render "no" when value is undefined', () => {
     const wrapper = shallowMount(BooleanItem, {
-      mocks: mocks,
-      propsData: {
+      props: {
         value: undefined
+      },
+      global: {
+        mocks: mocks
       }
     });
 

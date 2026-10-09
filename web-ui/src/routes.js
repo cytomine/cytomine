@@ -1,4 +1,4 @@
-import VueRouter from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 import Account from '@/components/user/Account.vue';
 import AdminPanel from '@/components/admin/AdminPanel.vue';
@@ -115,10 +115,10 @@ const routes = [
         component: ProjectConfiguration,
       },
       {
-        path: '*',
-        component: PageNotFound,
-      },
-    ],
+        path: ':pathMatch(.*)*',
+        component: PageNotFound
+      }
+    ]
   },
   {
     path: '/activity',
@@ -133,7 +133,7 @@ const routes = [
     component: AppLayout,
     children: [
       {
-        path: '/',
+        path: '',
         component: AppLocalPage,
       },
       {
@@ -155,13 +155,13 @@ const routes = [
     component: UserHistoryPage,
   },
   {
-    path: '*',
+    path: '/:pathMatch(.*)*',
     component: PageNotFound,
-  },
+  }
 ];
 
-const router = new VueRouter({
-  mode: 'history',
+const router = createRouter({
+  history: createWebHistory(),
   routes: routes,
   linkActiveClass: 'is-active',
 });

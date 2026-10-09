@@ -1,10 +1,9 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import FileField from '@/components/appengine/forms/fields/FileField';
 
 describe('FileField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -14,18 +13,18 @@ describe('FileField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(FileField, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-      },
-      propsData: {
+      props: {
         parameter: mockParameter,
-        value: null,
+        modelValue: null,
       },
+      global: {
+        plugins: [Buefy],
+        mocks: {
+          $t: (message) => message,
+        }
+      }
     });
   });
 
@@ -42,7 +41,7 @@ describe('FileField.vue', () => {
 
   it('The component should render clear button when there is a file', async () => {
     const file = { name: 'filename' };
-    await wrapper.setProps({ value: file });
+    await wrapper.setProps({ modelValue: file });
 
     expect(wrapper.find('.field label').text()).toBe(mockParameter.display_name);
     expect(wrapper.find('input[type="file"]').exists()).toBe(true);
@@ -55,16 +54,17 @@ describe('FileField.vue', () => {
 
   it('The id should be rendered when selected', async () => {
     const file = { name: 'filename' };
-    await wrapper.setProps({ value: file });
+    await wrapper.setProps({ modelValue: file });
 
-    expect(wrapper.vm.value).toStrictEqual(file);
+    expect(wrapper.vm.modelValue).toStrictEqual(file);
     expect(wrapper.find('.file-name').text()).toBe(file.name);
   });
 
   it('Changing the value should emit an event', async () => {
-    await wrapper.setData({ input: { id: 42 } });
+    wrapper.vm.input = { id: 42 };
+    await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input.at(0)).toEqual([{ id: 42 }]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'].at(0)).toEqual([{ id: 42 }]);
   });
 });

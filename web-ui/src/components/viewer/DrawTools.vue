@@ -36,7 +36,7 @@
         <b-input v-model="searchStringTerm" :placeholder="$t('search-placeholder')" size="is-small" />
         <ontology-tree
           class="ontology-tree"
-          v-model="termsToAssociate"
+          v-model:selectedNodes="termsToAssociate"
           :ontology="ontology"
           :searchString="searchStringTerm"
         />
@@ -66,7 +66,7 @@
         <b-input v-model="searchStringTrack" :placeholder="$t('search-placeholder')" size="is-small" />
         <track-tree
           class="track-tree"
-          v-model="tracksToAssociate"
+          v-model:selectedNodes="tracksToAssociate"
           :tracks="tracks"
           :searchString="searchStringTrack"
           :allow-new="true"
@@ -784,7 +784,6 @@ export default {
     openPasteWithLinkModal() {
       this.$buefy.modal.open({
         component: PasteAnnotationWithLinkModal,
-        parent: this,
         hasModalCard: true,
         props: {
           index: this.index
@@ -1236,7 +1235,7 @@ export default {
   mounted() {
     eventBus.on('shortkeyEvent', this.shortkeyHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     eventBus.off('shortkeyEvent', this.shortkeyHandler);
   }
 };
@@ -1368,7 +1367,7 @@ $colorActiveIcon: #fff;
       padding: 0.75em 0;
     }
 
-    .sl-vue-tree-sidebar {
+    .tree-sidebar {
       margin-right: 1.5em;
     }
   }

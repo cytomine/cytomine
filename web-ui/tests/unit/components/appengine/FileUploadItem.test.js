@@ -12,18 +12,20 @@ describe('FileUploadItem.vue', () => {
   const createWrapper = (options = {}) => shallowMount(
     FileUploadItem,
     {
-      propsData: {
+      props: {
         file: mockFile,
       },
-      mocks: {
-        $t: (key) => key,
-      },
-      stubs: {
-        'b-button': true,
-        'b-icon': true,
-        'b-progress': true,
-      },
       ...options,
+      global: {
+        mocks: {
+          $t: (key) => key,
+        },
+        stubs: {
+          'b-button': true,
+          'b-icon': true,
+          'b-progress': true,
+        }
+      }
     },
   );
 

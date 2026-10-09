@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-loading class="small" :active="loading" :is-full-page="false" />
+    <b-loading class="small" :model-value="loading" :is-full-page="false" />
 
     <div v-if="!loading" class="annotation-content">
       <selectable-annotation

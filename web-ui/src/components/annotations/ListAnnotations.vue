@@ -8,7 +8,7 @@
   <p>{{ $t('error-load-annotations-filters') }}</p>
 </div>
 <div v-else class="content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <div v-if="!loading">
     <div class="box">
       <h2> {{ $t('display') }} </h2>
@@ -115,7 +115,7 @@
               <ontology-tree-multiselect
                 :ontology="ontology"
                 :additionalNodes="additionalTermNodes"
-                v-model="selectedTermsIds"
+                v-model:selectedNodes="selectedTermsIds"
               />
             </div>
           </div>
@@ -128,7 +128,7 @@
               <track-tree-multiselect
                 :tracks="filteredTracks"
                 :additional-nodes="additionalTrackNodes"
-                v-model="selectedTracksIds"
+                v-model:selectedNodes="selectedTracksIds"
               />
             </div>
           </div>
@@ -843,5 +843,13 @@ export default {
 .button {
   display: block;
   margin: auto;
+}
+
+.buttons {
+  gap: 0.25rem;
+}
+
+.buttons .button {
+  margin: 0;
 }
 </style>

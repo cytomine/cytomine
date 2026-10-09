@@ -1,5 +1,5 @@
 <template>
-  <cytomine-modal-card :title="$t('about-cytomine')" @close="$parent.close()">
+  <cytomine-modal-card :title="$t('about-cytomine')" @close="$emit('close')">
     <template>
       <img class="logo" src="@/assets/logo.svg">
 

@@ -2,6 +2,10 @@ package org.cytomine.keycloak;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakSession;
@@ -15,8 +19,12 @@ import org.keycloak.protocol.oidc.mappers.UserInfoTokenMapper;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.representations.IDToken;
 
-public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper implements OIDCAccessTokenMapper,
-    OIDCIDTokenMapper, UserInfoTokenMapper {
+public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
+    implements OIDCAccessTokenMapper, OIDCIDTokenMapper, UserInfoTokenMapper {
+
+    public static final Map<String, List<String>> customClaims =
+        Map.of("ADMIN", List.of("CAN_SEE_ALL_PROJECTS"), "USER", List.of("CAN_EDIT_PROJECT"), "GUEST",
+            List.of("CAN_EDIT_PROJECT"));
 
     public static final String PROVIDER_ID = "cytomine-protocol-mapper";
 
@@ -53,9 +61,14 @@ public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper implement
     }
 
     @Override
-    protected void setClaim(IDToken token, ProtocolMapperModel mappingModel,
-        UserSessionModel userSession, KeycloakSession keycloakSession,
-        ClientSessionContext clientSessionCtx) {
-        OIDCAttributeMapperHelper.mapClaim(token, mappingModel, "example");
+    protected void setClaim(IDToken token, ProtocolMapperModel mappingModel, UserSessionModel userSession,
+        KeycloakSession keycloakSession, ClientSessionContext clientSessionCtx) {
+        Set<String> appliedCustomClaims = clientSessionCtx.getRolesStream().flatMap(
+                role ->
+                    Optional.ofNullable(role.getName()).stream()
+                        .flatMap(name -> Optional.ofNullable(customClaims.get(name)).stream())
+                        .flatMap(List::stream))
+            .collect(Collectors.toSet());
+        token.getOtherClaims().put("cytomine_claims", appliedCustomClaims);
     }
 }

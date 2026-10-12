@@ -605,6 +605,20 @@
     "authenticationFlowBindingOverrides" : { },
     "fullScopeAllowed" : true,
     "nodeReRegistrationTimeout" : -1,
+    "protocolMappers": [
+      {
+        "id": "59b1fbf4-22be-4399-a7fc-2ca5b849f85b",
+        "name": "cytomine",
+        "protocol": "openid-connect",
+        "protocolMapper": "cytomine-protocol-mapper",
+        "consentRequired": false,
+        "config": {
+          "access.token.claim": "true",
+          "id.token.claim": "true",
+          "userinfo.token.claim": "true"
+        }
+      }
+    ],
     "defaultClientScopes" : [ "web-origins", "acr", "roles", "profile", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {

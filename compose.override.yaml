@@ -13,7 +13,8 @@ services:
   iam:
     image: cytomine/iam:latest
     build:
-      context: ./iam/
+      context: ./
+      dockerfile: ./iam/Dockerfile
 
   app-engine:
     image: cytomine/app-engine:latest

@@ -24,6 +24,8 @@ COPY ./registry-client/build.gradle /app/registry-client/build.gradle
 COPY ./registry-client/src /app/registry-client/src
 COPY ./repository/build.gradle /app/repository/build.gradle
 COPY ./repository/src /app/repository/src
+COPY ./iam/cytomine-protocol-mapper/build.gradle /app/iam/cytomine-protocol-mapper/build.gradle
+COPY ./iam/cytomine-protocol-mapper/src /app/iam/cytomine-protocol-mapper/src
 COPY ./settings.gradle /app/settings.gradle
 
 ARG APP_ENGINE_VERSION

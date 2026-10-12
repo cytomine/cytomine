@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'org.cytomine'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
 description = 'Keycloak custom roles mapper'
 
 java {
@@ -17,10 +17,10 @@ checkstyle {
     toolVersion = '10.21.2'
     configFile = file("${rootProject.projectDir}/checkstyle.xml")
 }
-bootJar {
-    archiveFileName = 'custom-roles-mapper.jar'
-}
 
+bootJar {
+    archiveFileName = 'cytomine-protocol-mapper.jar'
+}
 configurations {
     compileOnly {
         extendsFrom annotationProcessor

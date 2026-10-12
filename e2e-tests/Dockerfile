@@ -17,6 +17,8 @@ COPY ./registry-client/build.gradle /app/registry-client/build.gradle
 COPY ./registry-client/src /app/registry-client/src
 COPY ./repository/build.gradle /app/repository/build.gradle
 COPY ./repository/src /app/repository/src
+COPY ./iam/cytomine-protocol-mapper/build.gradle /app/iam/cytomine-protocol-mapper/build.gradle
+COPY ./iam/cytomine-protocol-mapper/src /app/iam/cytomine-protocol-mapper/src
 COPY ./settings.gradle /app/settings.gradle
 COPY ./app-engine/src/test/resources/artifacts/com.cytomine.dummy.identity.geometry-1.0.0.zip /app/e2e-tests/src/test/resources/com.cytomine.dummy.identity.geometry-1.0.0.zip
 

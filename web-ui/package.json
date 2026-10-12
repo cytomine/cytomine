@@ -63,7 +63,7 @@
     "jsdom": "^29.1.1",
     "onchange": "^7.1.0",
     "randomstring": "^1.1.5",
-    "sass": "^1.86.0",
+    "sass": "^1.105.1",
     "vite": "^6.4.3",
     "vitest": "^4.1.11",
     "vue-eslint-parser": "^10.4.1",

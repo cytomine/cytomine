@@ -43,6 +43,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation project(':common')
+    implementation 'org.keycloak:keycloak-core:24.0.2'
+    implementation 'org.keycloak:keycloak-services:24.0.2'
+    implementation 'org.keycloak:keycloak-server-spi:24.0.2'
+    implementation 'org.keycloak:keycloak-server-spi-private:24.0.2'
 }
 
 test {

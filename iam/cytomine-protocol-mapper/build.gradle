@@ -1,7 +1,5 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.2'
-    id 'io.spring.dependency-management' version '1.1.7'
     id 'checkstyle'
 }
 
@@ -10,7 +8,7 @@ version = '1.0.0'
 description = 'Keycloak custom roles mapper'
 
 java {
-    sourceCompatibility = '21'
+    sourceCompatibility = '17'
 }
 
 checkstyle {
@@ -18,13 +16,8 @@ checkstyle {
     configFile = file("${rootProject.projectDir}/checkstyle.xml")
 }
 
-bootJar {
+jar {
     archiveFileName = 'cytomine-protocol-mapper.jar'
-}
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
 }
 
 repositories {
@@ -32,30 +25,19 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.mapstruct:mapstruct:1.6.3'
-    compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-    testImplementation testFixtures(project(':common'))
+    compileOnly 'org.keycloak:keycloak-core:24.0.2'
+    compileOnly 'org.keycloak:keycloak-services:24.0.2'
+    compileOnly 'org.keycloak:keycloak-server-spi:24.0.2'
+    compileOnly 'org.keycloak:keycloak-server-spi-private:24.0.2'
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation project(':common')
-    implementation 'org.keycloak:keycloak-core:24.0.2'
-    implementation 'org.keycloak:keycloak-services:24.0.2'
-    implementation 'org.keycloak:keycloak-server-spi:24.0.2'
-    implementation 'org.keycloak:keycloak-server-spi-private:24.0.2'
 }
 
 test {
     useJUnitPlatform()
 }
 
-compileJava {
-    options.compilerArgs += [
-            '-Amapstruct.unmappedTargetPolicy=ERROR',
-            '-Amapstruct.unmappedSourcePolicy=ERROR'
-    ]
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
 }

@@ -5,7 +5,6 @@ ARG IMAGE_VERSION
 ARG IMAGE_REVISION
 ARG JAVA_VERSION=21-jre
 ARG GRADLE_VERSION=9.5.1-jdk21-alpine
-ARG PROXY_CACHE=registry.cytomine.org/docker
 
 FROM ${PROXY_CACHE}/gradle:${GRADLE_VERSION} AS jar-builder
 ENV GRADLE_USER_HOME=/opt/gradle/.gradle
@@ -26,8 +25,9 @@ COPY ./repository/src /app/repository/src
 COPY ./iam/cytomine-protocol-mapper/build.gradle /app/iam/cytomine-protocol-mapper/build.gradle
 COPY ./iam/cytomine-protocol-mapper/src /app/iam/cytomine-protocol-mapper/src
 COPY ./settings.gradle /app/settings.gradle
+COPY ./checkstyle.xml /app/checkstyle.xml
 RUN --mount=type=cache,target=/opt/gradle/.gradle,id=gradle-cache,sharing=locked \
-    gradle :iam:cytomine-protocol-mapper:bootJar --no-daemon --build-cache --console=verbose
+    gradle :iam:cytomine-protocol-mapper:jar --no-daemon --build-cache --console=verbose
 
 #######################################################################################
 ## Stage: IAM build
@@ -40,6 +40,8 @@ ENV KC_DB=postgres \
     KC_METRICS_ENABLED=true
 
 WORKDIR /opt/keycloak
+
+COPY --from=jar-builder /app/iam/cytomine-protocol-mapper/build/libs/cytomine-protocol-mapper.jar /opt/keycloak/providers/cytomine-protocol-mapper.jar
 
 RUN /opt/keycloak/bin/kc.sh build
 
@@ -96,7 +98,6 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
 
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 COPY --from=prod-tools-builder /mnt/rootfs /
-COPY --from=jar-builder /app/iam/cytomine-protocol-mapper/build/libs/cytomine-protocol-mapper.jar /opt/keycloak/providers/cytomine-protocol-mapper.jar
 
 RUN mkdir /opt/keycloak/data/import
 COPY ./iam/kc_config.json /opt/keycloak/data/import

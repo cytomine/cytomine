@@ -12,6 +12,8 @@ from cytomine.models import (
     AnnotationTerm,
     ImageInstanceCollection,
     OntologyCollection,
+    Property,
+    PropertyCollection,
     TermCollection,
 )
 
@@ -20,6 +22,8 @@ from pims.schemas.annotation import WktAnnotation
 from pims.schemas.operations import ImportResult, ImportSummary
 
 logger = logging.getLogger("pims.app")
+
+ANNOTATION_CHECKSUM_PREFIX = "pims.annotation.import."
 
 
 class AnnotationImporter:
@@ -55,6 +59,7 @@ class AnnotationImporter:
     def import_annotation(self, alias: str) -> ImportResult:
         file = self.annotations[alias].find(".//FILE")
         annotation_path = self.base_path / file.get("filename")
+        checksum = file.get("checksum")
         image_name = self.annotations[alias].find(".//IMAGE_REF").get("alias")
         image = get_image(image_name, self.images)
         if image is None:
@@ -64,6 +69,10 @@ class AnnotationImporter:
                 success=False,
                 message=f"Image {image_name} does not exist",
             )
+
+        if checksum and self.is_already_imported(image, checksum):
+            logger.info(f"Annotation '{alias}' already imported on image {image_name}, skipping.")
+            return ImportResult(name=alias, success=True, message="Already imported")
 
         ontology_name = self.annotations[alias].find(".//ONTOLOGY_REF").get("alias")
         ontology = get_ontology(ontology_name, self.ontologies)
@@ -85,7 +94,21 @@ class AnnotationImporter:
             if term:
                 AnnotationTerm(id_annotation=annot.id, id_term=term.id).save()
 
+        if checksum:
+            Property(
+                image,
+                key=ANNOTATION_CHECKSUM_PREFIX + checksum,
+                value=checksum,
+            ).save()
+
         return ImportResult(name=alias, success=True)
+
+    @staticmethod
+    def is_already_imported(image, checksum: str) -> bool:
+        """Return True if an annotation file with this checksum was already imported on the image."""
+        key = ANNOTATION_CHECKSUM_PREFIX + checksum
+        properties = PropertyCollection(image).fetch()
+        return bool(properties) and key in properties.as_dict()
 
     def run(self) -> ImportSummary:
         logger.info("[START] Import annotations...")

@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.cytomine.keycloak.config.CytominePermissions;
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakSession;
@@ -28,7 +29,7 @@ import be.cytomine.common.config.security.CytominePermission;
 public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
     implements OIDCAccessTokenMapper, OIDCIDTokenMapper, UserInfoTokenMapper {
 
-    public static final ObjectMapper objectMapper = new ObjectMapper();
+    public static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
     public static final CytominePermissions customClaims;
     public static final String PROVIDER_ID = "cytomine-protocol-mapper";
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
@@ -36,7 +37,7 @@ public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
     static {
         try {
             customClaims = objectMapper.readValue(new File(
-                "./cytomine_permissions.yml"), CytominePermissions.class);
+                "/opt/keycloak/providers/cytomine_permissions.yml"), CytominePermissions.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

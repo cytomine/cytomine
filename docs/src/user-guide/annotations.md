@@ -111,10 +111,10 @@ The geometries themselves are stored as [GeoJSON](https://geojson.org/) files, a
 
 ### Structure of the archive
 
-All the content lives under a single `dataset/` root folder:
+All the content lives under a single root folder named after the project (lowercased, with spaces and special characters replaced by underscores, for example a project named "Breast Cancer 2026" gives `breast_cancer_2026/`). The examples below use `{PROJECT-NAME}/` to stand for that folder:
 
 ```text
-dataset/
+{PROJECT-NAME}/
 ├── METADATA/
 │   ├── annotation.xml        # links each image to its GeoJSON file
 │   ├── dataset.xml           # describes the project as a dataset

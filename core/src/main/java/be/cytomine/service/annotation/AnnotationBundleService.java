@@ -53,7 +53,7 @@ import be.cytomine.utils.JsonObject;
 @Service
 public class AnnotationBundleService {
 
-    private static final String ROOT = "dataset";
+    private static final String DEFAULT_ROOT = "dataset";
 
     private static final String ALIAS_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -128,8 +128,10 @@ public class AnnotationBundleService {
 
         Map<Long, String> annotatorDescriptions = resolveAnnotatorDescriptions(annotatorAliasByUser.keySet());
 
+        String root = sanitize(project.getName(), DEFAULT_ROOT);
+
         String ontologyName = project.getOntology() != null ? project.getOntology().getName() : "ontology";
-        String ontologyFileName = sanitizeFilename(ontologyName) + ".json";
+        String ontologyFileName = sanitize(ontologyName, "ontology") + ".json";
         byte[] ontologyJson = buildOntologyJson(terms);
 
         String taskText = buildTaskText();
@@ -143,16 +145,16 @@ public class AnnotationBundleService {
         String policyXml = buildPolicyXml(policyAlias, datasetAlias);
 
         return zip(archive -> {
-            writeEntry(archive, "METADATA/annotation.xml", annotationXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "METADATA/dataset.xml", datasetXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "METADATA/annotator.xml", annotatorXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "METADATA/ontology.xml", ontologyXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "METADATA/annotation_task.xml", annotationTaskXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "METADATA/policy.xml", policyXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "ONTOLOGIES/" + ontologyFileName, ontologyJson);
-            writeEntry(archive, "ANNOTATION_TASKS/task.txt", taskBytes);
+            writeEntry(archive, root, "METADATA/annotation.xml", annotationXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(archive, root, "METADATA/dataset.xml", datasetXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(archive, root, "METADATA/annotator.xml", annotatorXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(archive, root, "METADATA/ontology.xml", ontologyXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(archive, root, "METADATA/annotation_task.xml", annotationTaskXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(archive, root, "METADATA/policy.xml", policyXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(archive, root, "ONTOLOGIES/" + ontologyFileName, ontologyJson);
+            writeEntry(archive, root, "ANNOTATION_TASKS/task.txt", taskBytes);
             for (ImageAnnotation imageAnnotation : imageAnnotations) {
-                writeEntry(archive, "ANNOTATIONS/" + imageAnnotation.filename(), imageAnnotation.geojson());
+                writeEntry(archive, root, "ANNOTATIONS/" + imageAnnotation.filename(), imageAnnotation.geojson());
             }
         });
     }
@@ -413,9 +415,9 @@ public class AnnotationBundleService {
         return xml.build();
     }
 
-    private void writeEntry(ZipOutputStream archive, String path, byte[] content) {
+    private void writeEntry(ZipOutputStream archive, String root, String path, byte[] content) {
         try {
-            archive.putNextEntry(new ZipEntry(ROOT + "/" + path));
+            archive.putNextEntry(new ZipEntry(root + "/" + path));
             archive.write(content);
             archive.closeEntry();
         } catch (IOException e) {
@@ -449,10 +451,10 @@ public class AnnotationBundleService {
         return builder.toString();
     }
 
-    private static String sanitizeFilename(String name) {
+    private static String sanitize(String name, String fallback) {
         String sanitized = name == null ? "" : name.trim().toLowerCase().replaceAll("[^a-z0-9]+", "_");
         sanitized = sanitized.replaceAll("^_+|_+$", "");
-        return sanitized.isEmpty() ? "ontology" : sanitized;
+        return sanitized.isEmpty() ? fallback : sanitized;
     }
 
     private static Long asLong(Object value) {

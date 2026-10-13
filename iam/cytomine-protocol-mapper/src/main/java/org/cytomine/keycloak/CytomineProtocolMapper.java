@@ -1,12 +1,15 @@
 package org.cytomine.keycloak;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.cytomine.keycloak.config.CytominePermissions;
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.ProtocolMapperModel;
@@ -19,16 +22,25 @@ import org.keycloak.protocol.oidc.mappers.UserInfoTokenMapper;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.representations.IDToken;
 
+import be.cytomine.common.config.security.CytominePermission;
+
+
 public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
     implements OIDCAccessTokenMapper, OIDCIDTokenMapper, UserInfoTokenMapper {
 
-    public static final Map<String, List<String>> customClaims =
-        Map.of("ADMIN", List.of("CAN_SEE_ALL_PROJECTS"), "USER", List.of("CAN_EDIT_PROJECT"), "GUEST",
-            List.of("CAN_EDIT_PROJECT"));
-
+    public static final ObjectMapper objectMapper = new ObjectMapper();
+    public static final CytominePermissions customClaims;
     public static final String PROVIDER_ID = "cytomine-protocol-mapper";
-
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
+
+    static {
+        try {
+            customClaims = objectMapper.readValue(new File(
+                "./cytomine_permissions.yml"), CytominePermissions.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     static {
         OIDCAttributeMapperHelper.addTokenClaimNameConfig(configProperties);
@@ -63,11 +75,11 @@ public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
     @Override
     protected void setClaim(IDToken token, ProtocolMapperModel mappingModel, UserSessionModel userSession,
         KeycloakSession keycloakSession, ClientSessionContext clientSessionCtx) {
-        Set<String> appliedCustomClaims = clientSessionCtx.getRolesStream().flatMap(
+        Set<CytominePermission> appliedCustomClaims = clientSessionCtx.getRolesStream().flatMap(
                 role ->
                     Optional.ofNullable(role.getName()).stream()
-                        .flatMap(name -> Optional.ofNullable(customClaims.get(name)).stream())
-                        .flatMap(List::stream))
+                        .flatMap(name -> Optional.ofNullable(customClaims.roles().get(name)).stream())
+                        .flatMap(Set::stream))
             .collect(Collectors.toSet());
         token.getOtherClaims().put("cytomine_claims", appliedCustomClaims);
     }

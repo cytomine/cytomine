@@ -1,0 +1,20 @@
+# global roles
+# this file is embedded in iam docker image, it needs to be provided to keycloak
+roles:
+  user:
+    - can_create_project
+    - can_see_all_project
+    - project_owner_can_add_members
+    - project_owner_can_delete_members
+    - project_owner_can_delete_project
+  admin:
+    - can_see_all_projects
+    - project_owner_can_add_members
+  guest:
+    - can_see_all_projects
+# project roles can be attributed to a user for a specific project
+project_roles:
+  project_user:
+    - can_create_projects
+  project_guest:
+  project_admin:

@@ -42,6 +42,7 @@ ENV KC_DB=postgres \
 WORKDIR /opt/keycloak
 
 COPY --from=jar-builder /app/iam/cytomine-protocol-mapper/build/libs/cytomine-protocol-mapper.jar /opt/keycloak/providers/cytomine-protocol-mapper.jar
+COPY ./iam/cytomine_permissions.yml /opt/keycloak/providers/cytomine_permissions.yml
 
 RUN /opt/keycloak/bin/kc.sh build
 

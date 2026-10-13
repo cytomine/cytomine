@@ -8,12 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.cytomine.keycloak.config.CytominePermissions;
 import org.keycloak.models.ClientSessionContext;
@@ -28,14 +25,13 @@ import org.keycloak.protocol.oidc.mappers.UserInfoTokenMapper;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.representations.IDToken;
 
-
 import be.cytomine.common.config.security.CytominePermission;
 
 
 public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
     implements OIDCAccessTokenMapper, OIDCIDTokenMapper, UserInfoTokenMapper {
 
-    public static final ObjectMapper objectMapper ;
+    public static final ObjectMapper objectMapper;
     public static final CytominePermissions customClaims;
     public static final String PROVIDER_ID = "cytomine-protocol-mapper";
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();

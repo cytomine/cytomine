@@ -8,8 +8,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.cytomine.keycloak.config.CytominePermissions;
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakSession;
@@ -23,18 +28,25 @@ import org.keycloak.protocol.oidc.mappers.UserInfoTokenMapper;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.representations.IDToken;
 
+
 import be.cytomine.common.config.security.CytominePermission;
 
 
 public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
     implements OIDCAccessTokenMapper, OIDCIDTokenMapper, UserInfoTokenMapper {
 
-    public static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+    public static final ObjectMapper objectMapper ;
     public static final CytominePermissions customClaims;
     public static final String PROVIDER_ID = "cytomine-protocol-mapper";
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
     static {
+        objectMapper = YAMLMapper.builder()
+            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+            .build()
+            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+
+
         try {
             customClaims = objectMapper.readValue(new File(
                 "/opt/keycloak/providers/cytomine_permissions.yml"), CytominePermissions.class);
@@ -79,7 +91,7 @@ public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
         Set<CytominePermission> appliedCustomClaims = clientSessionCtx.getRolesStream().flatMap(
                 role ->
                     Optional.ofNullable(role.getName()).stream()
-                        .flatMap(name -> Optional.ofNullable(customClaims.roles().get(name)).stream())
+                        .flatMap(name -> Optional.ofNullable(customClaims.roles().get(name.toLowerCase())).stream())
                         .flatMap(Set::stream))
             .collect(Collectors.toSet());
         token.getOtherClaims().put("cytomine_claims", appliedCustomClaims);

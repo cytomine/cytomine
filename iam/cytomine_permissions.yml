@@ -3,18 +3,15 @@
 roles:
   user:
     - can_create_project
-    - can_see_all_project
-    - project_owner_can_add_members
-    - project_owner_can_delete_members
-    - project_owner_can_delete_project
+    - can_see_all_projects
   admin:
     - can_see_all_projects
-    - project_owner_can_add_members
+    - can_create_project
   guest:
     - can_see_all_projects
 # project roles can be attributed to a user for a specific project
 project_roles:
   project_user:
-    - can_create_projects
+    - project_owner_can_add_members
   project_guest:
   project_admin:

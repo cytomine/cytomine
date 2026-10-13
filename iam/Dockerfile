@@ -106,4 +106,4 @@ COPY ./iam/kc_config.json /opt/keycloak/data/import
 ENV KC_HTTP_PORT=8100
 
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
-CMD ["start" , "--import-realm", "--optimized"]
+CMD ["start" , "--import-realm", "--optimized", "--verbose"]

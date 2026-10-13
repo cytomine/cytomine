@@ -12,14 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.Task;
@@ -36,7 +35,7 @@ public class RestProjectRepresentativeUserController extends RestCytomineControl
 
     private final ProjectService projectService;
 
-    private final UserService userService;
+    private final UserHttpContract userHttpContract;
 
     @GetMapping("/project/{id}/representative.json")
     public ResponseEntity<String> listByProject(
@@ -86,7 +85,7 @@ public class RestProjectRepresentativeUserController extends RestCytomineControl
         } else {
             Project project = projectService.find(projectId)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
-            User user = userService.findUser(userId)
+            userHttpContract.get(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User", userId));
             projectRepresentativeUser = projectRepresentativeUserService.find(project, userId)
                 .orElseThrow(() -> new ObjectNotFoundException(

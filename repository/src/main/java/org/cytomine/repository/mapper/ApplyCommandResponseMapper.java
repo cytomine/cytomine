@@ -11,6 +11,7 @@ import org.mapstruct.Mapping;
 
 import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
@@ -29,6 +30,7 @@ public interface ApplyCommandResponseMapper {
         Optional<LocalDateTime> deleteTime) {
         return switch (applyCommandResponse) {
             case OntologyResponse or -> setDeleteTimeOR(or, deleteTime);
+            case ProjectResponse pr -> setDeleteTimePR(pr, deleteTime);
             case RoleResponse rr -> setDeleteTimeRR(rr, deleteTime);
             case TermResponse tr -> setDeleteTimeTR(tr, deleteTime);
             case StorageResponse sr -> setDeleteTimeSR(sr, deleteTime);
@@ -54,6 +56,10 @@ public interface ApplyCommandResponseMapper {
     default Set<TermResponse> setDeleteTimes(Set<TermResponse> terms, Optional<LocalDateTime> deleteTime) {
         return terms.stream().map(term -> setDeleteTimeTR(term, deleteTime)).collect(Collectors.toSet());
     }
+
+    @Mapping(target = "deleted", source = "deleteTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
+    ProjectResponse setDeleteTimePR(ProjectResponse pr, Optional<LocalDateTime> deleteTime);
 
     @Mapping(target = "deleted", source = "deleteTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted", "dataType"})
@@ -91,6 +97,7 @@ public interface ApplyCommandResponseMapper {
         Optional<LocalDateTime> updateTime) {
         return switch (applyCommandResponse) {
             case OntologyResponse or -> setUpdateTimeOR(or, updateTime);
+            case ProjectResponse pr -> setUpdateTimePR(pr, updateTime);
             case RoleResponse rr -> setUpdateTimeRR(rr, updateTime);
             case TermResponse tr -> setUpdateTimeTR(tr, updateTime);
             case StorageResponse sr -> setUpdateTimeSR(sr, updateTime);
@@ -116,6 +123,10 @@ public interface ApplyCommandResponseMapper {
     default Set<TermResponse> setUpdateTimes(Set<TermResponse> terms, Optional<LocalDateTime> updateTime) {
         return terms.stream().map(term -> setUpdateTimeTR(term, updateTime)).collect(Collectors.toSet());
     }
+
+    @Mapping(target = "updated", source = "updateTime")
+    @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})
+    ProjectResponse setUpdateTimePR(ProjectResponse pr, Optional<LocalDateTime> updateTime);
 
     @Mapping(target = "updated", source = "updateTime")
     @BeanMapping(ignoreUnmappedSourceProperties = {"updated", "dataType"})

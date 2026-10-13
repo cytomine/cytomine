@@ -65,25 +65,16 @@ import static org.springframework.security.acls.domain.BasePermission.WRITE;
 public class UserPositionService {
 
     static final int USER_UNFOLLOWING_DELAY = 10;
-
-    private final SecurityACLService securityACLService;
-
-    private final MongoClient mongoClient;
-
-    private final MongoTemplate mongoTemplate;
-
-    private final PersistentUserPositionRepository persistentUserPositionRepository;
-
-    private final LastUserPositionRepository lastUserPositionRepository;
-
-    private final SequenceService sequenceService;
-
     // usersTracked key -> "trackedUserId/imageId"
     public static Map<String, List<User>> broadcasters = new ConcurrentHashMap<>();
-
     // usersTracking key -> "followerId/imageId"
     public static Map<String, Boolean> followers = new ConcurrentHashMap<>();
-
+    private final SecurityACLService securityACLService;
+    private final MongoClient mongoClient;
+    private final MongoTemplate mongoTemplate;
+    private final PersistentUserPositionRepository persistentUserPositionRepository;
+    private final LastUserPositionRepository lastUserPositionRepository;
+    private final SequenceService sequenceService;
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
 
@@ -132,8 +123,8 @@ public class UserPositionService {
         return persistedPosition;
     }
 
-    public void addAsFollower(User broadcaster, User follower, ImageInstance imageInstance) {
-        String broadcasterAndImageId = broadcaster.getId().toString() + "/" + imageInstance.getId().toString();
+    public void addAsFollower(long broadcasterId, User follower, ImageInstance imageInstance) {
+        String broadcasterAndImageId = broadcasterId + "/" + imageInstance.getId().toString();
         String followerAndImageId = follower.getId().toString() + "/" + imageInstance.getId().toString();
 
         if (broadcasters.containsKey(broadcasterAndImageId)) {
@@ -156,12 +147,12 @@ public class UserPositionService {
     public Optional<LastUserPosition> lastPositionByUser(
         ImageInstance image,
         SliceInstance slice,
-        User user,
+        long userId,
         boolean broadcast
     ) {
         securityACLService.check(image, READ);
 
-        return getLastUserPosition(image, slice, user, broadcast);
+        return getLastUserPosition(image, slice, userId, broadcast);
     }
 
     /**
@@ -171,20 +162,20 @@ public class UserPositionService {
     public Optional<LastUserPosition> lastPositionByUserBypassACL(
         ImageInstance image,
         SliceInstance slice,
-        User user,
+        long userId,
         boolean broadcast
     ) {
-        return getLastUserPosition(image, slice, user, broadcast);
+        return getLastUserPosition(image, slice, userId, broadcast);
     }
 
     private Optional<LastUserPosition> getLastUserPosition(
         ImageInstance image,
         SliceInstance slice,
-        User user,
+        long userId,
         boolean broadcast
     ) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("user").is(user.getId()));
+        query.addCriteria(Criteria.where("user").is(userId));
         query.addCriteria(Criteria.where("image").is(image.getId()));
         if (slice != null) {
             query.addCriteria(Criteria.where("slice").is(slice.getId()));
@@ -228,7 +219,7 @@ public class UserPositionService {
 
     public List<PersistentUserPosition> list(
         ImageInstance image,
-        User user,
+        Optional<Long> userId,
         SliceInstance slice,
         Long afterThan,
         Long beforeThan,
@@ -241,9 +232,7 @@ public class UserPositionService {
         }
 
         Query query = new Query();
-        if (user != null) {
-            query.addCriteria(Criteria.where("user").is(user.getId()));
-        }
+        userId.ifPresent(aLong -> query.addCriteria(Criteria.where("user").is(aLong)));
         if (image != null) {
             query.addCriteria(Criteria.where("image").is(image.getId()));
         }
@@ -295,7 +284,7 @@ public class UserPositionService {
 
     public List<Map<String, Object>> summarize(
         ImageInstance image,
-        User user,
+        Optional<Long> userId,
         SliceInstance slice,
         Long afterThan,
         Long beforeThan
@@ -310,9 +299,9 @@ public class UserPositionService {
         if (beforeThan != null) {
             request.add(match(lte("created", new Date(beforeThan))));
         }
-        if (user != null) {
-            request.add(match(eq("user", user.getId())));
-        }
+        userId.ifPresent(id ->
+            request.add(match(eq("user", id)))
+        );
         if (slice != null) {
             request.add(match(eq("slice", slice.getId())));
         }

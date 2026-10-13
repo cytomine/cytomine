@@ -184,7 +184,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         List<Project> projectsToAdd =
             permittedUserProjects.stream().filter(p -> !actualUserProjects.contains(p)).toList();
         for (Project project : projectsToAdd) {
-            projectMemberService.addUserToProjectWithAdmin(user, project, false);
+            projectMemberService.addUserToProjectWithAdmin(user.getUsername(), project, false);
         }
 
         List<Project> projectsToRemove =

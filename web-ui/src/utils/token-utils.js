@@ -1,7 +1,7 @@
 import { getKeycloak } from '../keycloak.js';
 
 export function appendShortTermToken(url, shortTermToken) {
-  if (url === null || shortTermToken === null) {
+  if (url == null || shortTermToken == null) {
     return url;
   }
   if (url.indexOf('?') === -1) {

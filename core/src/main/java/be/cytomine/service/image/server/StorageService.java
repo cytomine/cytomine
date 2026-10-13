@@ -37,19 +37,19 @@ public class StorageService extends ModelService {
         log.info("Initialize storage for {}", user.getUsername());
 
         Storage storage = new Storage();
-        storage.setUser(user);
+        storage.setUserId(user.getId());
         storage.setName(user.getUsername() + " storage");
         storage = storageRepository.save(storage);
 
         String username = user.getUsername();
         if (!permissionService.hasACLPermission(storage, username, READ)) {
-            permissionService.addPermission(storage, storage.getUser().getUsername(), READ, username);
+            permissionService.addPermission(storage, username, READ, username);
         }
         if (!permissionService.hasACLPermission(storage, username, WRITE)) {
-            permissionService.addPermission(storage, storage.getUser().getUsername(), WRITE, username);
+            permissionService.addPermission(storage, username, WRITE, username);
         }
         if (!permissionService.hasACLPermission(storage, username, ADMINISTRATION)) {
-            permissionService.addPermission(storage, storage.getUser().getUsername(), ADMINISTRATION, username);
+            permissionService.addPermission(storage, username, ADMINISTRATION, username);
         }
     }
 

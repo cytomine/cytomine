@@ -24,10 +24,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.TermHttpContract;
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.dto.json.JsonInput;
 import be.cytomine.dto.json.JsonMultipleObject;
@@ -41,7 +42,6 @@ import be.cytomine.service.ontology.SharedAnnotationService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.CommandResponse;
 import be.cytomine.utils.JsonObject;
@@ -56,9 +56,10 @@ public class RestUserAnnotationController extends RestCytomineController {
 
     private final ProjectService projectService;
 
-    private final UserService userService;
 
     private final CurrentUserService currentUserService;
+
+    private final UserHttpContract userHttpContract;
 
     private final ReportService reportService;
 
@@ -82,14 +83,14 @@ public class RestUserAnnotationController extends RestCytomineController {
         @RequestParam(value = "project", required = false) Long idProject
     ) {
         log.debug("REST request to count user annotation by user/project");
-        User user = userService.find(idUser)
+        UserResponse user = userHttpContract.get(idUser)
             .orElseThrow(() -> new ObjectNotFoundException("User", idUser));
         Project project = null;
         if (idProject != null) {
             project = projectService.find(idProject)
                 .orElseThrow(() -> new ObjectNotFoundException("Project", idProject));
         }
-        return responseSuccess(JsonObject.of("total", userAnnotationService.count(user.getId(), project)));
+        return responseSuccess(JsonObject.of("total", userAnnotationService.count(user.id(), project)));
     }
 
     @GetMapping("/project/{idProject}/userannotation/count.json")

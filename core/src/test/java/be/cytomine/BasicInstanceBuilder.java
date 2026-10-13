@@ -53,8 +53,6 @@ import be.cytomine.domain.processing.ImageFilterProject;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
-import be.cytomine.domain.security.SecRole;
-import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.mapper.UserMapper;
@@ -122,18 +120,6 @@ public class BasicInstanceBuilder {
         return getUser(ADMIN);
     }
 
-    public UserResponse givenAnotherUser() {
-        return getUser(ANOTHER_USER);
-    }
-
-    public UserResponse givenSuperAdminAcl() {
-        return getUser(SUPER_ADMIN_ACL);
-    }
-
-    public UserResponse givenAdminAcl() {
-        return getUser(ADMIN_ACL);
-    }
-
     public UserResponse givenAclUserNoAcl() {
         return getUser(ACL_USER_NO_ACL);
     }
@@ -152,10 +138,6 @@ public class BasicInstanceBuilder {
 
     public UserResponse givenUserAclDelete() {
         return getUser(USER_ACL_DELETE);
-    }
-
-    public UserResponse givenUserAclAdmin() {
-        return getUser(USER_ACL_ADMIN);
     }
 
     public UserResponse givenCreator() {
@@ -180,7 +162,17 @@ public class BasicInstanceBuilder {
     }
 
     public UserResponse getUser(String username) {
-        return userMapper.map(getUserEntity(username));
+        return getUserResponseEntity(username);
+    }
+
+    public UserResponse getUserResponseEntity(String username) {
+        return userRepository.findByUsernameLikeIgnoreCase(username)
+            .map(userMapper::map)
+            .orElseThrow(() -> new ObjectNotFoundException(username + " not in db"));
+    }
+
+    private UserResponse getUserResponseEntity(UserResponse user) {
+        return getUserResponseEntity(user.username());
     }
 
     public User getUserEntity(String username) {
@@ -196,15 +188,6 @@ public class BasicInstanceBuilder {
         return CurrentUserService.getSecurityCurrentUser().map(currentUser -> currentUser.getUser().username())
             .flatMap(userRepository::findByUsernameLikeIgnoreCase).map(user -> userMapper.map(user))
             .orElseGet(this::givenSuperAdmin);
-    }
-
-    public User givenANotPersistedUser() {
-        User user = new User();
-        user.setName("firstname lastname");
-        user.setReference(UUID.randomUUID().toString());
-        user.setUsername(randomString());
-        user.generateKeys();
-        return user;
     }
 
     public ImageFilterProject givenANotPersistedImageFilterProject(ImageFilter imageFilter, Project project) {
@@ -324,7 +307,7 @@ public class BasicInstanceBuilder {
     public UploadedFile givenANotPersistedUploadedFile(String contentType) {
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setStorage(givenAStorage());
-        uploadedFile.setUser(getUserEntity(SUPER_ADMIN));
+        uploadedFile.setUserId(getUserResponseEntity(SUPER_ADMIN).id());
         uploadedFile.setFilename(randomString());
         uploadedFile.setOriginalFilename(randomString());
         uploadedFile.setExt("tif");
@@ -345,20 +328,16 @@ public class BasicInstanceBuilder {
     public Storage givenAStorage(UserResponse user) {
         Storage storage = givenANotPersistedStorage(user);
         storage = persistAndReturn(storage);
-        permissionService.addPermission(storage, storage.getUser().getUsername(), ADMINISTRATION,
-            storage.getUser().getUsername());
+        permissionService.addPermission(storage, user.username(), ADMINISTRATION,
+            user.username());
         return storage;
     }
 
     public Storage givenANotPersistedStorage(UserResponse user) {
         Storage storage = new Storage();
         storage.setName(randomString());
-        storage.setUser(getUserEntity(user));
+        storage.setUserId(getUserResponseEntity(user).id());
         return storage;
-    }
-
-    public Storage givenANotPersistedStorage() {
-        return givenANotPersistedStorage(givenSuperAdmin());
     }
 
     private String randomString() {
@@ -390,7 +369,7 @@ public class BasicInstanceBuilder {
         ImageInstance image = new ImageInstance();
         image.setBaseImage(abstractImage);
         image.setProject(project);
-        image.setUser(getUserEntity(SUPER_ADMIN));
+        image.setUserId(getUserResponseEntity(SUPER_ADMIN).id());
         return image;
     }
 
@@ -484,7 +463,7 @@ public class BasicInstanceBuilder {
         NestedImageInstance nestedImageInstance = new NestedImageInstance();
         nestedImageInstance.setBaseImage(givenAnAbstractImage());
         nestedImageInstance.setProject(parent.getProject());
-        nestedImageInstance.setUser(getUserEntity(SUPER_ADMIN));
+        nestedImageInstance.setUserId(getUserResponseEntity(SUPER_ADMIN).id());
         nestedImageInstance.setParent(parent);
         nestedImageInstance.setX(1);
         nestedImageInstance.setY(2);
@@ -860,10 +839,6 @@ public class BasicInstanceBuilder {
         return persistAndReturn(givenANotPersistedProjectDefaultLayer(givenAProject(), givenSuperAdmin()));
     }
 
-    public ProjectDefaultLayer givenAProjectDefaultLayer(Project project, UserResponse user) {
-        return persistAndReturn(givenANotPersistedProjectDefaultLayer(project, user));
-    }
-
     public ProjectDefaultLayer givenANotPersistedProjectDefaultLayer() {
         return givenANotPersistedProjectDefaultLayer(givenAProject(), givenSuperAdmin());
     }
@@ -875,30 +850,6 @@ public class BasicInstanceBuilder {
         projectDefaultLayer.setProject(project);
         projectDefaultLayer.setHideByDefault(false);
         return projectDefaultLayer;
-    }
-
-    public SecUserSecRole givenAUserRole() {
-        return persistAndReturn(givenANotPersistedUserRole(getUserEntity(GUEST_ACL),
-            secRoleRepository.findByAuthority(ROLE_USER).get()));
-    }
-
-    public SecUserSecRole givenAUserRole(User user) {
-        return persistAndReturn(givenANotPersistedUserRole(user, secRoleRepository.findByAuthority(ROLE_USER).get()));
-    }
-
-    public SecUserSecRole givenAUserRole(User user, SecRole secRole) {
-        return persistAndReturn(givenANotPersistedUserRole(user, secRole));
-    }
-
-    public SecUserSecRole givenANotPersistedUserRole(User user, String authority) {
-        return givenANotPersistedUserRole(user, secRoleRepository.findByAuthority(authority).get());
-    }
-
-    public SecUserSecRole givenANotPersistedUserRole(User secUser, SecRole secRole) {
-        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
-        secSecUserSecRole.setSecRole(secRole);
-        secSecUserSecRole.setSecUser(secUser);
-        return secSecUserSecRole;
     }
 
     public ImageGroup givenANotPersistedImagegroup() {

@@ -14,6 +14,7 @@ import org.cytomine.repository.mapper.UserRoleMapper;
 import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.persistence.UserRoleRepository;
 import org.cytomine.repository.persistence.entity.UserRoleEntity;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -29,6 +30,11 @@ import be.cytomine.common.repository.model.command.payload.response.ApplyCommand
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.common.repository.model.user.payload.UpdateUser;
+
+import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc
@@ -75,13 +81,32 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
         return Set.of(userRoleMapper.mapToUserRoleResponse(userRoleEntity));
     }
 
+    @Test
+    public void findByIdsInWithNoIdsReturnsEmptyPage() throws Exception {
+        long userId = createUser();
+        mockMvc.perform(get(apiURL + "/by-ids").with(authenticatedAs(getUsername(userId))))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content.length()").value(0));
+    }
+
+    @Test
+    public void findByIdsInWithUnknownIdsReturnsEmptyPage() throws Exception {
+        long userId = createUser();
+        mockMvc.perform(get(apiURL + "/by-ids")
+                .param("ids", "999999998", "999999999")
+                .with(authenticatedAs(getUsername(userId))))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content.length()").value(0));
+    }
+
     @Override
     public UserResponse expectedUpdatedResponse(UserResponse response, UpdateUser updatePayload,
         LocalDateTime updatedTime) {
         return new UserResponse(response.id(), response.username(), updatePayload.email().orElse(response.email()),
             updatePayload.name().or(response::name), updatePayload.lastname().or(response::lastname),
             updatePayload.firstname().or(response::firstname), updatePayload.language().or(response::language),
-            response.isDeveloper(), updatePayload.origin().or(response::origin), Optional.of(updatedTime),
+            updatePayload.developer().orElse(response.isDeveloper()), updatePayload.origin().or(response::origin),
+            Optional.of(updatedTime),
             response.deleted(), response.created(), updatePayload.privateKey().or(response::privateKey),
             updatePayload.publicKey().or(response::publicKey), response.roles());
     }

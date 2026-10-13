@@ -343,7 +343,7 @@ public class ProjectConnectionService {
     }
 
     public Page<PersistentProjectConnection> getConnectionByUserAndProject(
-        User user,
+        long userId,
         Project project,
         Integer limit,
         Integer offset
@@ -354,7 +354,7 @@ public class ProjectConnectionService {
         }
 
         Page<PersistentProjectConnection> results = persistentProjectConnectionRepository.findAllByUserAndProject(
-            user.getId(),
+            userId,
             project.getId(),
             PageRequest.of(offset, limit, Sort.Direction.DESC, "created")
         );
@@ -365,7 +365,7 @@ public class ProjectConnectionService {
 
         if (connections.get(0).getTime() == null) {
             connections.set(0, ((PersistentProjectConnection) (connections.get(0)).clone()));
-            boolean online = !lastConnectionRepository.findByProjectAndUser(project.getId(), user.getId()).isEmpty();
+            boolean online = !lastConnectionRepository.findByProjectAndUser(project.getId(), userId).isEmpty();
             fillProjectConnection(connections.get(0), new Date());
             if (online) {
                 connections.get(0).getExtraProperties().put("online", true);
@@ -593,14 +593,14 @@ public class ProjectConnectionService {
         Long afterThan,
         Long beforeThan,
         Project project,
-        User user
+        Optional<Long> userId
     ) {
-        if (user == null && project == null) {
+        if (userId.isEmpty() && project == null) {
             securityACLService.checkAdmin(currentUserService.getCurrentUser());
         } else if (project != null) {
             securityACLService.check(project, ADMINISTRATION);
-        } else if (user != null) {
-            securityACLService.checkIsSameUser(user, currentUserService.getCurrentUser());
+        } else {
+            userId.ifPresent(aLong -> securityACLService.checkIsSameUser(aLong, currentUserService.getCurrentUser()));
         }
 
         if (beforeThan == null) {
@@ -724,9 +724,7 @@ public class ProjectConnectionService {
         if (project != null) {
             matchs.add(match(eq("project", project.getId())));
         }
-        if (user != null) {
-            matchs.add(match(eq("user", user.getId())));
-        }
+        userId.ifPresent(aLong -> matchs.add(match(eq("user", aLong))));
 
         List<Bson> requests = new ArrayList<>();
         requests.addAll(matchs);

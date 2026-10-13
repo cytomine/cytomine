@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.domain.image.server.Storage;
-import be.cytomine.domain.security.User;
 
 /**
  * Spring Data JPA repository for the user entity.
@@ -68,7 +67,7 @@ public interface UploadedFileRepository
 
     List<UploadedFile> findAllByParent(UploadedFile uploadedFile);
 
-    void deleteAllByUser(User user);
+    void deleteAllByUserId(long userId);
 
     long countByStorage(Storage storage);
 }

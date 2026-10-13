@@ -56,6 +56,8 @@ public class CompanionFileResourceTests {
     private MockMvc restCompanionFileControllerMockMvc;
     @Autowired
     private UrlApi urlApi;
+    @Autowired
+    private WiremockRepository wiremockRepository;
 
     @Test
     @Transactional
@@ -178,6 +180,7 @@ public class CompanionFileResourceTests {
     @Transactional
     public void getCompanionFileUploader() throws Exception {
         CompanionFile companionFile = builder.givenACompanionFile(builder.givenAnAbstractImage());
+        wiremockRepository.stubUser(builder.givenSuperAdmin());
 
         restCompanionFileControllerMockMvc.perform(get("/api/companionfile/{id}/user.json", companionFile.getId()))
             .andExpect(status().isOk())

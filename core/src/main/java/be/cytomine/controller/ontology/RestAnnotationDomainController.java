@@ -36,12 +36,13 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.annotation.AnnotationReportParams;
 import be.cytomine.dto.annotation.SimplifiedAnnotation;
 import be.cytomine.dto.image.CropParameter;
@@ -53,6 +54,7 @@ import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.UrlApi;
+import be.cytomine.service.annotation.AnnotationBundleService;
 import be.cytomine.service.annotation.AnnotationReportService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.middleware.ImageServerService;
@@ -61,7 +63,6 @@ import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.ontology.UserAnnotationService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.ParamsService;
 import be.cytomine.service.utils.SimplifyGeometryService;
 import be.cytomine.utils.AnnotationListingBuilder;
@@ -80,11 +81,14 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
     private final AnnotationReportService annotationReportService;
 
+    private final AnnotationBundleService annotationBundleService;
+
     private final GenericAnnotationService genericAnnotationService;
 
     private final ReportService reportService;
 
-    private final UserService userService;
+
+    private final UserHttpContract userHttpContract;
 
     private final CurrentUserService currentUserService;
 
@@ -131,18 +135,19 @@ public class RestAnnotationDomainController extends RestCytomineController {
         return responseSuccess(annotations, params.getJSONAttrLong("offset", 0L), params.getJSONAttrLong("max", 0L));
     }
 
-    @GetMapping(value = "/project/{projectId}/annotations/export", produces = "application/geo+json")
-    public ResponseEntity<Map<String, Object>> export(@PathVariable Long projectId) {
+    @GetMapping(value = "/project/{projectId}/annotations/export", produces = "application/zip")
+    public ResponseEntity<byte[]> export(@PathVariable Long projectId) {
         log.info("GET /project/{}/annotations/export", projectId);
         Project project = projectService.find(projectId)
             .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
 
-        String filename = reportService.getAnnotationReportFileName(ReportType.GEOJSON.getLabel(), project.getName());
-        Map<String, Object> geoJson = annotationReportService.exportAnnotations(projectId);
+        String filename = reportService.getAnnotationReportFileName("zip", project.getName());
+        byte[] bundle = annotationBundleService.buildBundle(project);
 
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-            .body(geoJson);
+            .contentType(MediaType.parseMediaType("application/zip"))
+            .body(bundle);
     }
 
     @PostMapping("/project/{projectId}/annotation/download")
@@ -271,9 +276,9 @@ public class RestAnnotationDomainController extends RestCytomineController {
 
         //get user
         Long idUser = params.getJSONAttrLong("user");
-        User user = null;
+        UserResponse user = null;
         if (idUser != 0) {
-            user = userService.find(params.getJSONAttrLong("user")).orElse(null);
+            user = userHttpContract.get(idUser).orElse(null);
         }
 
         //get term
@@ -285,7 +290,8 @@ public class RestAnnotationDomainController extends RestCytomineController {
             response = reviewedAnnotationService.listIncluded(image, geometry, terms, annotation, propertiesToShow);
         } else {
             //goto user annotation
-            response = userAnnotationService.listIncluded(image, geometry, user, terms, annotation, propertiesToShow);
+            response = userAnnotationService.listIncluded(
+                image, geometry, user.id(), terms, annotation, propertiesToShow);
         }
         return response;
     }

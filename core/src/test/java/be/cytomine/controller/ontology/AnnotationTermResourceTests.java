@@ -267,12 +267,12 @@ public class AnnotationTermResourceTests {
         assertThat(annotationTermService.find(
             previousAnnotationTerm.getUserAnnotation(),
             previousAnnotationTerm.getTerm().getId(),
-            previousAnnotationTerm.getUser()
+            previousAnnotationTerm.getUser().getId()
         )).isPresent();
         assertThat(annotationTermService.find(
             previousAnnotationTermFromOtherUser.getUserAnnotation(),
             previousAnnotationTermFromOtherUser.getTerm().getId(),
-            previousAnnotationTermFromOtherUser.getUser()
+            previousAnnotationTermFromOtherUser.getUser().getId()
         )).isPresent();
 
         restAnnotationTermControllerMockMvc.perform(post(
@@ -326,7 +326,7 @@ public class AnnotationTermResourceTests {
         assertThat(annotationTermService.find(
             previousAnnotationTerm.getUserAnnotation(),
             previousAnnotationTerm.getTerm().getId(),
-            previousAnnotationTerm.getUser()
+            previousAnnotationTerm.getUser().getId()
         )).isPresent();
 
         restAnnotationTermControllerMockMvc.perform(post(

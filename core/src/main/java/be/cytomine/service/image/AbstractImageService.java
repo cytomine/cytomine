@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
@@ -34,7 +35,6 @@ import be.cytomine.domain.image.UploadedFile;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ConstraintException;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.ObjectNotFoundException;
@@ -97,6 +97,8 @@ public class AbstractImageService extends ModelService {
 
     private final AttachedFileService attachedFileService;
 
+    private final UserHttpContract userHttpContract;
+
     private final UrlApi urlApi;
 
     @Override
@@ -145,12 +147,13 @@ public class AbstractImageService extends ModelService {
     }
 
 
-    public User getImageUploader(Long abstractImageId) {
+    public Optional<UserResponse> getImageUploader(Long abstractImageId) {
         AbstractImage abstractImage = find(abstractImageId).orElseThrow(() -> new ObjectNotFoundException(
             "AbstractImage",
             abstractImageId
         ));
-        return Optional.ofNullable(abstractImage.getUploadedFile()).map(UploadedFile::getUser).orElse(null);
+        return Optional.ofNullable(abstractImage.getUploadedFile()).map(UploadedFile::getUserId)
+            .flatMap(userHttpContract::get);
     }
 
     /**
@@ -220,7 +223,6 @@ public class AbstractImageService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param json New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     public CommandResponse add(JsonObject json) {
@@ -240,7 +242,6 @@ public class AbstractImageService extends ModelService {
      *
      * @param domain      Domain to update
      * @param jsonNewData New domain datas
-     *
      * @return Response structure (new domain data, old domain data..)
      */
     @Override
@@ -340,7 +341,6 @@ public class AbstractImageService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override

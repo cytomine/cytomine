@@ -65,7 +65,7 @@ public class StorageResourceTests {
     private CurrentUserService currentUserService;
 
     private static StorageResponse toResponse(Storage storage) {
-        return new StorageResponse(storage.getId(), storage.getUser().getId(), storage.getName(), LocalDateTime.now(),
+        return new StorageResponse(storage.getId(), storage.getUserId(), storage.getName(), LocalDateTime.now(),
             Optional.empty(), Optional.empty());
     }
 
@@ -98,7 +98,7 @@ public class StorageResourceTests {
 
         mockMvc.perform(get("/api/storage/{id}.json", storage.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(storage.getId().intValue()))
-            .andExpect(jsonPath("$.userId").value(storage.getUser().getId().intValue()))
+            .andExpect(jsonPath("$.userId").value(storage.getUserId().intValue()))
             .andExpect(jsonPath("$.name").value(storage.getName())).andExpect(jsonPath("$.created").exists());
     }
 

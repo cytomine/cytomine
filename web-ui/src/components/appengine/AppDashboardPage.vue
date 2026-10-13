@@ -69,7 +69,7 @@
                       v-if="run.outputs !== null"
                       :parameters="run.outputs"
                       :project-id="run.project"
-                      type="outputs"
+                      type="output"
                     />
                   </div>
                 </div>

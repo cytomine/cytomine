@@ -36,8 +36,8 @@ public class ImageInstance extends CytomineDomain {
     @ManyToOne(fetch = FetchType.LAZY)
     private Project project;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user; //owner
+    @Column(name = "user_id")
+    private Long userId; //owner
 
     private String instanceFilename;
 
@@ -201,7 +201,7 @@ public class ImageInstance extends CytomineDomain {
         imageInstance.created = json.getJSONAttrDate("created");
         imageInstance.updated = json.getJSONAttrDate("updated");
 
-        imageInstance.user = (User) json.getJSONAttrDomain(entityManager, "user", new User(), false);
+        imageInstance.userId =  json.getJSONAttrDomain(entityManager, "user", new User(), false).getId();
         imageInstance.baseImage = (AbstractImage) json.getJSONAttrDomain(
             entityManager,
             "baseImage",
@@ -242,10 +242,6 @@ public class ImageInstance extends CytomineDomain {
 
     private Long getProjectId() {
         return Optional.ofNullable(this.getProject()).map(CytomineDomain::getId).orElse(null);
-    }
-
-    public Long getUserId() {
-        return Optional.ofNullable(this.getUser()).map(CytomineDomain::getId).orElse(null);
     }
 
     public Long getReviewUserId() {

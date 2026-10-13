@@ -106,7 +106,7 @@ public class ProjectRepresentativeUserService extends ModelService {
         return executeCommand(new AddCommand(currentUser.id()), null, jsonObject);
     }
 
-    public CommandResponse add(JsonObject jsonObject, User adminAsCurrent) {
+    public CommandResponse add(JsonObject jsonObject, long adminAsCurrentId) {
         securityACLService.check(jsonObject.getJSONAttrLong("project"), Project.class, WRITE);
         User user = userRepository.findById(jsonObject.getJSONAttrLong("user"))
             .orElseThrow(() -> new ObjectNotFoundException("User", jsonObject.getJSONAttrStr("user")));
@@ -115,7 +115,7 @@ public class ProjectRepresentativeUserService extends ModelService {
 
         securityACLService.checkIsUserInProject(user, project);
 
-        return executeCommand(new AddCommand(adminAsCurrent.getId()), null, jsonObject);
+        return executeCommand(new AddCommand(adminAsCurrentId), null, jsonObject);
     }
 
 

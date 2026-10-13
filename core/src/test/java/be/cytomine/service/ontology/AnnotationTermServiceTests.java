@@ -63,7 +63,7 @@ public class AnnotationTermServiceTests {
         Optional<AnnotationTerm> result = annotationTermService.find(
             annotationTerm.getUserAnnotation(),
             annotationTerm.getTerm().getId(),
-            annotationTerm.getUser()
+            annotationTerm.getUser().getId()
         );
         assertThat(result).isPresent();
         assertThat(annotationTerm).isEqualTo(result.get());
@@ -93,12 +93,12 @@ public class AnnotationTermServiceTests {
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
-            annotationTerm.getUser()
+            annotationTerm.getUser().getId()
         )).doesNotContain(annotationTerm);
 
         assertThat(annotationTermService.listAnnotationTermNotDefinedByUser(
             annotationTerm.getUserAnnotation(),
-            builder.getUserEntity(builder.givenAclUserNoAcl().username())
+            builder.getUserResponseEntity(builder.givenAclUserNoAcl().username()).id()
         )).contains(annotationTerm);
     }
 
@@ -314,7 +314,7 @@ public class AnnotationTermServiceTests {
         assertThat(annotationTermService.find(
             annotationTerm.getUserAnnotation(),
             annotationTerm.getTerm().getId(),
-            annotationTerm.getUser()
+            annotationTerm.getUser().getId()
         )).isEmpty();
 
         commandService.undo();
@@ -322,7 +322,7 @@ public class AnnotationTermServiceTests {
         assertThat(annotationTermService.find(
             annotationTerm.getUserAnnotation(),
             annotationTerm.getTerm().getId(),
-            annotationTerm.getUser()
+            annotationTerm.getUser().getId()
         )).isPresent();
 
         commandService.redo();
@@ -330,7 +330,7 @@ public class AnnotationTermServiceTests {
         assertThat(annotationTermService.find(
             annotationTerm.getUserAnnotation(),
             annotationTerm.getTerm().getId(),
-            annotationTerm.getUser()
+            annotationTerm.getUser().getId()
         )).isEmpty();
     }
 }

@@ -26,7 +26,6 @@ import be.cytomine.domain.ontology.AnnotationTerm;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
@@ -72,12 +71,21 @@ public class AnnotationTermService extends ModelService {
         return AnnotationTerm.class;
     }
 
-    public Optional<AnnotationTerm> find(AnnotationDomain annotation, Long termId, User user) {
+    public Optional<AnnotationTerm> find(AnnotationDomain annotation, Long termId, long userId) {
         securityACLService.check(annotation.container(), READ);
         List<AnnotationTerm> annotationTerms = annotationTermRepository.findAllByUserAnnotationId(annotation.getId());
         return annotationTerms.stream()
             .filter(
-                x -> x.getTerm().getId().equals(termId) && (user == null || x.getUser().getId().equals(user.getId())))
+                x -> x.getTerm().getId().equals(termId) && (x.getUser().getId().equals(userId)))
+            .findFirst();
+    }
+
+    public Optional<AnnotationTerm> find(AnnotationDomain annotation, Long termId) {
+        securityACLService.check(annotation.container(), READ);
+        List<AnnotationTerm> annotationTerms = annotationTermRepository.findAllByUserAnnotationId(annotation.getId());
+        return annotationTerms.stream()
+            .filter(
+                x -> x.getTerm().getId().equals(termId))
             .findFirst();
     }
 
@@ -87,9 +95,9 @@ public class AnnotationTermService extends ModelService {
     }
 
 
-    public List<AnnotationTerm> list(UserAnnotation annotation, User user) {
+    public List<AnnotationTerm> list(UserAnnotation annotation, long userId) {
         securityACLService.check(annotation.container(), READ);
-        return annotationTermRepository.findAllByUserAndUserAnnotation(user, annotation);
+        return annotationTermRepository.findAllByUserIdAndUserAnnotation(userId, annotation);
     }
 
     public List<AnnotationTerm> list(Project project) {
@@ -97,9 +105,10 @@ public class AnnotationTermService extends ModelService {
         return annotationTermRepository.findAllByUserAnnotationProject(project);
     }
 
-    public List<AnnotationTerm> listAnnotationTermNotDefinedByUser(UserAnnotation userAnnotation, User user) {
+    public List<AnnotationTerm> listAnnotationTermNotDefinedByUser(UserAnnotation userAnnotation, long userId) {
         securityACLService.check(userAnnotation.container(), READ);
-        return list(userAnnotation).stream().filter(x -> !x.getUser().equals(user)).collect(Collectors.toList());
+        return list(userAnnotation).stream().filter(x -> !x.getUser().getId().equals(userId))
+            .collect(Collectors.toList());
     }
 
 
@@ -107,7 +116,6 @@ public class AnnotationTermService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param jsonObject New domain data
-     *
      * @return Response structure (created domain data,..)
      */
     @Override
@@ -134,7 +142,6 @@ public class AnnotationTermService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
-     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -267,7 +274,6 @@ public class AnnotationTermService extends ModelService {
      * Retrieve domain thanks to a JSON object
      *
      * @param json JSON with new domain info
-     *
      * @return domain retrieve thanks to json
      */
     @Override

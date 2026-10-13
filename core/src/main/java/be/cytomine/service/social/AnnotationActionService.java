@@ -2,6 +2,7 @@ package be.cytomine.service.social;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.AnnotationAction;
 import be.cytomine.repositorynosql.social.AnnotationActionRepository;
 import be.cytomine.service.database.SequenceService;
@@ -55,13 +55,12 @@ public class AnnotationActionService {
         return annotationActionRepository.insert(annotationAction);
     }
 
-    public List<AnnotationAction> list(SliceInstance sliceInstance, User user, Long afterThan, Long beforeThan) {
+    public List<AnnotationAction> list(SliceInstance sliceInstance, Optional<Long> userId, Long afterThan,
+        Long beforeThan) {
         securityACLService.checkIsAdminContainer(sliceInstance);
         Query query = new Query();
         query.addCriteria(Criteria.where("slice").is(sliceInstance.getId()));
-        if (user != null) {
-            query.addCriteria(Criteria.where("user").is(user.getId()));
-        }
+        userId.ifPresent(id -> query.addCriteria(Criteria.where("user").is(id)));
         if (afterThan != null && beforeThan != null) {
             query.addCriteria(Criteria.where("created").gte(new Date(afterThan)).lte(new Date(beforeThan)));
         } else if (afterThan != null) {
@@ -74,13 +73,12 @@ public class AnnotationActionService {
         return mongoTemplate.find(query, AnnotationAction.class);
     }
 
-    public List<AnnotationAction> list(ImageInstance imageInstance, User user, Long afterThan, Long beforeThan) {
+    public List<AnnotationAction> list(ImageInstance imageInstance, Optional<Long> userId, Long afterThan,
+        Long beforeThan) {
         securityACLService.checkIsAdminContainer(imageInstance);
         Query query = new Query();
         query.addCriteria(Criteria.where("image").is(imageInstance.getId()));
-        if (user != null) {
-            query.addCriteria(Criteria.where("user").is(user.getId()));
-        }
+        userId.ifPresent(id -> query.addCriteria(Criteria.where("user").is(id)));
         if (afterThan != null && beforeThan != null) {
             query.addCriteria(Criteria.where("created").gte(new Date(afterThan)).lte(new Date(beforeThan)));
         } else if (afterThan != null) {

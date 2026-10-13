@@ -145,4 +145,7 @@
 
     <include file="/config/liquibase/changelog/2026-09-09-user-key-defaults.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-10-01-project-id-sequence.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

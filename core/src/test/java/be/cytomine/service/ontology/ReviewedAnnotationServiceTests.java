@@ -631,7 +631,7 @@ public class ReviewedAnnotationServiceTests {
         ImageInstance image = builder.givenAnImageInstance();
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                reviewedAnnotationService.reviewLayer(image.getId(), List.of(image.getUser().getId()), null);
+                reviewedAnnotationService.reviewLayer(image.getId(), List.of(image.getUserId()), null);
             }
         );
     }
@@ -643,7 +643,7 @@ public class ReviewedAnnotationServiceTests {
         image.setReviewUser(builder.getUserEntity(builder.givenAclUserNoAcl().username()));
         Assertions.assertThrows(
             WrongArgumentException.class, () -> {
-                reviewedAnnotationService.reviewLayer(image.getId(), List.of(image.getUser().getId()), null);
+                reviewedAnnotationService.reviewLayer(image.getId(), List.of(image.getUserId()), null);
             }
         );
     }

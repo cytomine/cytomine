@@ -1,6 +1,7 @@
 package be.cytomine.service.social;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
@@ -80,7 +81,7 @@ public class AnnotationActionServiceTests {
     public void listBySlice() {
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
-        assertThat(annotationActionService.list(annotationDomain.getSlice(), null, null, null))
+        assertThat(annotationActionService.list(annotationDomain.getSlice(), Optional.empty(), null, null))
             .hasSize(0);
 
         givenAPersistentAnnotationAction(new Date(), annotationDomain,
@@ -88,27 +89,27 @@ public class AnnotationActionServiceTests {
         givenAPersistentAnnotationAction(new Date(), annotationDomain,
             builder.getUserEntity(builder.givenSuperAdmin().username()), "select");
 
-        assertThat(annotationActionService.list(annotationDomain.getSlice(), null, null, null))
+        assertThat(annotationActionService.list(annotationDomain.getSlice(), Optional.empty(), null, null))
             .hasSize(2);
 
         assertThat(annotationActionService.list(annotationDomain.getSlice(),
-            builder.getUserEntity(builder.givenSuperAdmin().username()), null, null))
+            Optional.of(builder.getUserResponseEntity(builder.givenSuperAdmin().username()).id()), null, null))
             .hasSize(2);
 
         assertThat(annotationActionService.list(annotationDomain.getSlice(),
-            builder.getUserEntity(builder.givenAclUserNoAcl().username()), null, null))
+            Optional.of(builder.getUserResponseEntity(builder.givenAclUserNoAcl().username()).id()), null, null))
             .hasSize(0);
 
         assertThat(annotationActionService.list(
             annotationDomain.getSlice(),
-            builder.getUserEntity(builder.givenSuperAdmin().username()),
+            Optional.of(builder.getUserResponseEntity(builder.givenSuperAdmin().username()).id()),
             null,
             new Date().getTime()
         )).hasSize(2);
 
         assertThat(annotationActionService.list(
             annotationDomain.getSlice(),
-            builder.getUserEntity(builder.givenSuperAdmin().username()),
+            Optional.of(builder.getUserResponseEntity(builder.givenSuperAdmin().username()).id()),
             new Date().getTime(),
             null
         )).hasSize(0);
@@ -118,7 +119,7 @@ public class AnnotationActionServiceTests {
     public void listByImage() {
         AnnotationDomain annotationDomain = builder.givenAUserAnnotation();
 
-        assertThat(annotationActionService.list(annotationDomain.getImage(), null, null, null))
+        assertThat(annotationActionService.list(annotationDomain.getImage(), Optional.empty(), null, null))
             .hasSize(0);
 
         givenAPersistentAnnotationAction(new Date(), annotationDomain,
@@ -128,27 +129,27 @@ public class AnnotationActionServiceTests {
 
         assertThat(annotationActionRepository.count()).isEqualTo(2);
         System.out.println(annotationActionRepository.findAll());
-        assertThat(annotationActionService.list(annotationDomain.getImage(), null, null, null))
+        assertThat(annotationActionService.list(annotationDomain.getImage(), Optional.empty(), null, null))
             .hasSize(2);
 
         assertThat(annotationActionService.list(annotationDomain.getImage(),
-            builder.getUserEntity(builder.givenSuperAdmin().username()), null, null))
+            Optional.of(builder.getUserResponseEntity(builder.givenSuperAdmin().username()).id()), null, null))
             .hasSize(2);
 
         assertThat(annotationActionService.list(annotationDomain.getImage(),
-            builder.getUserEntity(builder.givenAclUserNoAcl().username()), null, null))
+            Optional.of(builder.getUserResponseEntity(builder.givenAclUserNoAcl().username()).id()), null, null))
             .hasSize(0);
 
         assertThat(annotationActionService.list(
             annotationDomain.getImage(),
-            builder.getUserEntity(builder.givenSuperAdmin().username()),
+            Optional.of(builder.getUserResponseEntity(builder.givenSuperAdmin().username()).id()),
             null,
             new Date().getTime()
         )).hasSize(2);
 
         assertThat(annotationActionService.list(
             annotationDomain.getImage(),
-            builder.getUserEntity(builder.givenSuperAdmin().username()),
+            Optional.of(builder.getUserResponseEntity(builder.givenSuperAdmin().username()).id()),
             new Date().getTime(),
             null
         )).hasSize(0);

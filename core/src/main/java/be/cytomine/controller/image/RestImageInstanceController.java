@@ -38,7 +38,6 @@ import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.dto.image.CropParameter;
 import be.cytomine.dto.image.ImageParameter;
 import be.cytomine.dto.image.LabelParameter;
@@ -46,7 +45,6 @@ import be.cytomine.dto.image.WindowParameter;
 import be.cytomine.dto.meilisearch.SearchWindow;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.image.ImageInstanceService;
@@ -57,7 +55,6 @@ import be.cytomine.service.middleware.ImageServerService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ImageSearchExtension;
 import be.cytomine.service.security.SecurityACLService;
-import be.cytomine.service.security.UserService;
 import be.cytomine.utils.JsonObject;
 import be.cytomine.utils.OffsetBasedPageRequest;
 import be.cytomine.utils.PageUtils;
@@ -85,13 +82,10 @@ public class RestImageInstanceController extends RestCytomineController {
 
     private final MeiliSearchService meiliSearchService;
 
-    private final UserService userService;
 
     private final SliceCoordinatesService sliceCoordinatesService;
 
     private final SecurityACLService securityACLService;
-
-    private final CurrentUserService currentUserService;
 
     private final UserHttpContract userHttpContract;
 
@@ -107,11 +101,11 @@ public class RestImageInstanceController extends RestCytomineController {
     @GetMapping("/user/{id}/imageinstance.json")
     public ResponseEntity<String> listByUser(@PathVariable Long id) {
         log.debug("REST request to get image instance by user {}", id);
-        User user = userService.find(id)
+        UserResponse user = userHttpContract.get(id)
             .orElseThrow(() -> new ObjectNotFoundException("User", id));
         RequestParams requestParams = retrievePageableParameters();
         return responseSuccess(imageInstanceService.list(
-            user.getId(),
+            user.id(),
             retrieveSearchParameters(),
             requestParams.getSort(),
             requestParams.getOrder(),

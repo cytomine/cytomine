@@ -531,8 +531,8 @@ public class ImageInstanceService extends ModelService {
             result.put("reviewUser", result.get("reviewUserId"));
             result.put("baseImage", result.get("baseImageId"));
             result.put("project", result.get("projectId"));
-            // TODO: select N + 1 => see projectService
-            //  (eagerOntology to load domain directly without fetching database)
+            result.put("user", result.get("userId"));
+
             JsonObject object = ImageInstance.getDataFromDomain(new ImageInstance().buildDomainFromJson(
                 result,
                 entityManager

@@ -24,9 +24,7 @@ public interface AnnotationTermRepository
 
     Optional<AnnotationTerm> findByUserAnnotationIdAndTermIdAndUserId(Long annotation, Long term, Long user);
 
-    List<AnnotationTerm> findAllByUserAndUserAnnotation(User user, UserAnnotation annotation);
-
-    long countByTermId(Long termId);
+    List<AnnotationTerm> findAllByUserIdAndUserAnnotation(long userId, UserAnnotation annotation);
 
     List<AnnotationTerm> findAllByUserAnnotationProject(Project project);
 

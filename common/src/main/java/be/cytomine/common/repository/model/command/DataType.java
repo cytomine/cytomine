@@ -2,6 +2,7 @@ package be.cytomine.common.repository.model.command;
 
 public enum DataType {
     ONTOLOGY,
+    PROJECT,
     ROLE,
     STORAGE,
     TAG,

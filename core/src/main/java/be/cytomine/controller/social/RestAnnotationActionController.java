@@ -1,6 +1,7 @@
 package be.cytomine.controller.social;
 
 import java.util.Date;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import be.cytomine.common.repository.http.UserHttpContract;
+import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.CurrentUserService;
@@ -46,6 +48,8 @@ public class RestAnnotationActionController extends RestCytomineController {
 
     private final UserService userService;
 
+    private final UserHttpContract userHttpContract;
+
     private final ImageInstanceService imageInstanceService;
 
     private final SliceInstanceService sliceInstanceService;
@@ -71,37 +75,36 @@ public class RestAnnotationActionController extends RestCytomineController {
     @GetMapping("/imageinstance/{image}/annotation_action.json")
     public ResponseEntity<String> listByImage(
         @PathVariable("image") Long imageId,
-        @RequestParam(value = "user", required = false) Long userId,
+        @RequestParam(value = "user", required = false) Optional<Long> userId,
         @RequestParam(value = "afterThan", required = false) Long afterThan,
         @RequestParam(value = "beforeThan", required = false) Long beforeThan
     ) {
         ImageInstance image = imageInstanceService.find(imageId)
             .orElseThrow(() -> new ObjectNotFoundException("ImageInstance", imageId));
 
-        User user = null;
-        if (userId != null) {
-            user = userService.findUser(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        }
-        return responseSuccess(annotationActionService.list(image, user, afterThan, beforeThan));
+        Optional<Long> validatedUserId =
+            userId.map(id -> userHttpContract.get(id).orElseThrow(() -> new ObjectNotFoundException(
+                "User",
+                userId))).map(UserResponse::id);
+
+        return responseSuccess(annotationActionService.list(image, validatedUserId, afterThan, beforeThan));
     }
 
     @GetMapping("/sliceinstance/{slice}/annotation_action.json")
     public ResponseEntity<String> listBySlice(
         @PathVariable("slice") Long sliceId,
-        @RequestParam(value = "user", required = false) Long userId,
+        @RequestParam(value = "user", required = false) Optional<Long> userId,
         @RequestParam(value = "afterThan", required = false) Long afterThan,
         @RequestParam(value = "beforeThan", required = false) Long beforeThan
     ) {
         SliceInstance sliceInstance = sliceInstanceService.find(sliceId)
             .orElseThrow(() -> new ObjectNotFoundException("SliceInstance", sliceId));
 
-        User user = null;
-        if (userId != null) {
-            user = userService.findUser(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
-        }
-        return responseSuccess(annotationActionService.list(sliceInstance, user, afterThan, beforeThan));
+        Optional<Long> validatedUserId =
+            userId.map(id -> userHttpContract.get(id).orElseThrow(() -> new ObjectNotFoundException(
+                "User",
+                userId))).map(UserResponse::id);
+        return responseSuccess(annotationActionService.list(sliceInstance, validatedUserId, afterThan, beforeThan));
     }
 
     @GetMapping("/project/{project}/annotation_action/count.json")

@@ -84,6 +84,9 @@ public class UserPositionResourceTests {
     @Autowired
     private CurrentUserService currentUserService;
 
+    @Autowired
+    private WiremockRepository wiremockRepository;
+
     @BeforeEach
     public void cleanDB() {
         lastUserPositionRepository.deleteAll();
@@ -447,6 +450,7 @@ public class UserPositionResourceTests {
     @Transactional
     public void getLastUserPositionOfNotFollowedUser() throws Exception {
         UserResponse user = builder.givenSuperAdmin();
+        wiremockRepository.stubUser(user);
         SliceInstance sliceInstance = builder.givenASliceInstance();
         ImageInstance imageInstance = sliceInstance.getImage();
         String userAndImageId = String.valueOf(user.id()) + "/" + imageInstance.getId().toString();

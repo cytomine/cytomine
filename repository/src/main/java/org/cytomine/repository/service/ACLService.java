@@ -33,6 +33,18 @@ public class ACLService {
         return isAdmin(userId) || hasPermission(userId, projectId, PROJECT_CLASS, READ_MASK);
     }
 
+    public boolean canWriteProject(long userId, long projectId) {
+        return isAdmin(userId) || hasPermission(userId, projectId, PROJECT_CLASS, WRITE_MASK);
+    }
+
+    public boolean canDeleteProject(long userId, long projectId) {
+        return isAdmin(userId) || hasPermission(userId, projectId, PROJECT_CLASS, DELETE_MASK);
+    }
+
+    public void grantProjectOwnerPermission(long userId, long projectId) {
+        grantOwnerPermission(userId, projectId, PROJECT_CLASS);
+    }
+
     public boolean canDeleteOntology(long userId, long ontologyId) {
         return isAdmin(userId) || hasPermission(userId, ontologyId, ONTOLOGY_CLASS, DELETE_MASK);
     }

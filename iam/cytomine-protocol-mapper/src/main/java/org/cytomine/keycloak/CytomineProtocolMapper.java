@@ -8,9 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.cytomine.keycloak.config.CytominePermissions;
 import org.keycloak.models.ClientSessionContext;
@@ -27,25 +25,23 @@ import org.keycloak.representations.IDToken;
 
 import be.cytomine.common.config.security.CytominePermission;
 
+import static com.fasterxml.jackson.databind.MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS;
+import static com.fasterxml.jackson.databind.PropertyNamingStrategies.SNAKE_CASE;
+
 
 public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
     implements OIDCAccessTokenMapper, OIDCIDTokenMapper, UserInfoTokenMapper {
 
-    public static final ObjectMapper objectMapper;
+    public static final ObjectMapper objectMapper =
+        YAMLMapper.builder().enable(ACCEPT_CASE_INSENSITIVE_ENUMS).build().setPropertyNamingStrategy(SNAKE_CASE);
     public static final CytominePermissions customClaims;
     public static final String PROVIDER_ID = "cytomine-protocol-mapper";
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
     static {
-        objectMapper = YAMLMapper.builder()
-            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-            .build()
-            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-
-
         try {
-            customClaims = objectMapper.readValue(new File(
-                "/opt/keycloak/providers/cytomine_permissions.yml"), CytominePermissions.class);
+            customClaims = objectMapper.readValue(new File("/opt/keycloak/providers/cytomine_permissions.yml"),
+                CytominePermissions.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -85,11 +81,9 @@ public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
     protected void setClaim(IDToken token, ProtocolMapperModel mappingModel, UserSessionModel userSession,
         KeycloakSession keycloakSession, ClientSessionContext clientSessionCtx) {
         Set<CytominePermission> appliedCustomClaims = clientSessionCtx.getRolesStream().flatMap(
-                role ->
-                    Optional.ofNullable(role.getName()).stream()
-                        .flatMap(name -> Optional.ofNullable(customClaims.roles().get(name.toLowerCase())).stream())
-                        .flatMap(Set::stream))
-            .collect(Collectors.toSet());
+            role -> Optional.ofNullable(role.getName()).stream()
+                .flatMap(name -> Optional.ofNullable(customClaims.roles().get(name.toLowerCase())).stream())
+                .flatMap(Set::stream)).collect(Collectors.toSet());
         token.getOtherClaims().put("cytomine_claims", appliedCustomClaims);
     }
 }

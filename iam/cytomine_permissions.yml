@@ -1,3 +1,4 @@
+---
 # global roles
 # this file is embedded in iam docker image, it needs to be provided to keycloak
 roles:

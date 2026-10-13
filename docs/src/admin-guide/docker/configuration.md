@@ -151,3 +151,14 @@ Several factors can slow down the importation:
 - You are using `sdafs`, it is currently slow the first time the data are loaded
 - You have a large amount of files on your filesystem
 :::
+
+### Importing an exported annotation archive
+
+The annotation archive produced by the [Export annotations](/user-guide/annotations.html#exporting-annotations) feature follows the same BigPicture metadata standard, so it can be imported again using the procedure above.
+
+On import, Cytomine reads `METADATA/annotation.xml` to discover the images and their GeoJSON files, recreates the geometries from the `ANNOTATIONS/*.geojson` files, and re-attaches the ontology terms found in the `path_class_name` property of each feature.
+This makes it possible to move annotations between projects or Cytomine instances, or to keep an exported archive as a portable backup that can later be reloaded.
+
+::: tip
+The exported archive only contains the `METADATA` and `ANNOTATIONS` directories (both optional in the structure above), so the annotations are re-attached to images that already exist in the target Cytomine instance.
+:::

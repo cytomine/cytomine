@@ -39,7 +39,7 @@ once steps above are followed a new button appears in the login form to start th
 **Importing** does not create explicit copies or duplication of files, only database entries and symbolic links are created.
 :::
 
-This section outlines the procedure for importing datasets, which are formatted according to the [BP Dataset File Structure Standard](https://bp.nbis.se/datasets/submission/preparation-guide.html).
+This section outlines the procedure for importing datasets, which are formatted according to the [BP Dataset File Structure Standard](https://bp.nbis.se/datasets/submission/direct-upload/prepare-data.html#folder-structure).
 
 ### Prerequisites
 

@@ -35,6 +35,7 @@ jobs:
           - name: iam
             target: production
             context: .
+            dockerfile_location: iam
           - name: pims
             context: .
             dockerfile_location: pims

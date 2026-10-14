@@ -22,7 +22,13 @@ import org.keycloak.sessions.RootAuthenticationSessionModel;
 
 import java.util.Map;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityProviderConfig> {
@@ -39,10 +45,37 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     private static final String CLAIM_LIS = "https://purl.imsglobal.org/spec/lti/claim/lis";
     private static final String CLAIM_CUSTOM = "https://purl.imsglobal.org/spec/lti/claim/custom";
     private static final String CLAIM_EXT = "https://purl.imsglobal.org/spec/lti/claim/ext";
+    // Deep-linking (Content-Item Message) claims live under the lti-dl namespace.
+    private static final String CLAIM_DEEP_LINKING_SETTINGS = "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings";
 
     // Authentication session notes
     static final String NOTE_TARGET_LINK_URI = "LTI_TARGET_LINK_URI";
+    // Pending nonces are stored as a comma-separated set. A single nonce slot is not enough:
+    // overlapping launches (e.g. the LMS popup was re-opened before the previous id_token POST
+    // arrived) share the same root authentication session, and overwriting the note would make a
+    // legitimately late id_token look like a replay.
     static final String NOTE_NONCE = "LTI_NONCE";
+    static final int MAX_PENDING_NONCES = 16;
+
+    // Context-data keys attached to the BrokeredIdentityContext for identity provider mappers.
+    static final String CTX_LTI_CLAIMS = "LTI_CLAIMS";
+    static final String CTX_LTI_ROLES = "LTI_ROLES";
+    static final String CTX_LTI_CONTEXT = "LTI_CONTEXT";
+    static final String CTX_LTI_TARGET_LINK_URI = "LTI_TARGET_LINK_URI";
+    static final String CTX_LTI_CUSTOM = "LTI_CUSTOM";
+    static final String CTX_DEEP_LINKING_SETTINGS = "LTI_DEEP_LINKING_SETTINGS";
+    static final String CTX_DEEP_LINKING_DATA = "LTI_DEEP_LINKING_DATA";
+
+    // Deep-linking return context, stashed in Keycloak's single-use object store so the
+    // Web-UI picker can later hand the selection back to the local /lti/dl-return endpoint.
+    static final String DL_CTX_SINGLE_USE_PREFIX = "lti-dl:";
+    static final long DL_CTX_TTL_MS = 10 * 60 * 1000L; // 10 minutes
+    static final String DL_CTX_RETURN_URL = "returnUrl";
+    static final String DL_CTX_DATA = "data";
+    static final String DL_CTX_ISS = "iss";
+    static final String DL_CTX_CLIENT_ID = "clientId";
+    static final String DL_CTX_DEPLOYMENT_ID = "deploymentId";
+    static final String DL_CTX_SUB = "sub";
 
     // Clock-skew tolerance applied to both directions of the exp/iat window.
     private static final long CLOCK_SKEW_LEEWAY_SECONDS = 60;
@@ -77,7 +110,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             }
 
             String nonce = UUID.randomUUID().toString();
-            authSession.setClientNote(NOTE_NONCE, nonce);
+            appendPendingNonce(authSession, nonce);
 
             String redirectUri = request.getRedirectUri();
             String encodedState = request.getState().getEncoded();
@@ -102,6 +135,47 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         } catch (Exception e) {
             throw new IdentityBrokerException("Could not build LTI launch redirect", e);
         }
+    }
+
+    /**
+     * Records a freshly generated nonce for this launch. Nonces accumulate instead of overwriting so
+     * that overlapping launches sharing one authentication session do not invalidate each other: each
+     * launch appends its own nonce, and whichever id_token POST arrives first with a matching nonce is
+     * accepted. A bounded FIFO set keeps the note from growing without limit.
+     */
+    static void appendPendingNonce(AuthenticationSessionModel authSession, String nonce) {
+        String current = authSession.getClientNote(NOTE_NONCE);
+        Set<String> pending = current == null || current.isBlank()
+            ? new LinkedHashSet<>()
+            : new LinkedHashSet<>(Arrays.asList(current.split(",")));
+        pending.add(nonce);
+        Iterator<String> it = pending.iterator();
+        while (pending.size() > MAX_PENDING_NONCES && it.hasNext()) {
+            it.next();
+            it.remove();
+        }
+        authSession.setClientNote(NOTE_NONCE, String.join(",", pending));
+    }
+
+    /**
+     * Removes one pending nonce matching the launch's id_token. Returns {@code true} only when the
+     * nonce was actually listed, preserving one-shot replay protection per nonce.
+     */
+    static boolean consumePendingNonce(AuthenticationSessionModel authSession, String nonce) {
+        String current = authSession.getClientNote(NOTE_NONCE);
+        if (current == null || current.isBlank()) {
+            return false;
+        }
+        Set<String> pending = new LinkedHashSet<>(Arrays.asList(current.split(",")));
+        if (!pending.remove(nonce)) {
+            return false;
+        }
+        if (pending.isEmpty()) {
+            authSession.removeClientNote(NOTE_NONCE);
+        } else {
+            authSession.setClientNote(NOTE_NONCE, String.join(",", pending));
+        }
+        return true;
     }
 
     @Override
@@ -138,24 +212,28 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             AuthenticationSessionManager asm = new AuthenticationSessionManager(provider.session);
             RootAuthenticationSessionModel rootAuthSession = asm.getCurrentRootAuthenticationSession(realm);
 
-            AuthenticationSessionModel authSession = null;
+            // Collect candidate authentication sessions under the root session. The launch can arrive
+            // for any session that was restarted from the browser's session cookie; overlapping or
+            // re-opened popups can leave several client sessions under the same root session. Prefer
+            // sessions belonging to the Keycloak client driving the LTI flow, and fall back to all
+            // sessions when none carries that client id (e.g. the note was never written because the
+            // session was created before performLogin recorded it).
+            List<AuthenticationSessionModel> candidates = new ArrayList<>();
             if (rootAuthSession != null) {
                 Map<String, AuthenticationSessionModel> sessions = rootAuthSession.getAuthenticationSessions();
-                if (sessions.size() == 1) {
-                    authSession = sessions.values().iterator().next();
-                } else if (!sessions.isEmpty()) {
-                    String keycloakClientId = provider.getConfig().getKeycloakClientId();
-                    for (AuthenticationSessionModel candidate : sessions.values()) {
-                        if (candidate.getClient() != null
-                            && candidate.getClient().getClientId().equals(keycloakClientId)) {
-                            authSession = candidate;
-                            break;
-                        }
+                String keycloakClientId = provider.getConfig().getKeycloakClientId();
+                for (AuthenticationSessionModel candidate : sessions.values()) {
+                    if (candidate.getClient() != null
+                        && candidate.getClient().getClientId().equals(keycloakClientId)) {
+                        candidates.add(candidate);
                     }
+                }
+                if (candidates.isEmpty()) {
+                    candidates.addAll(sessions.values());
                 }
             }
 
-            if (authSession == null) {
+            if (candidates.isEmpty()) {
                 log.warnf("LTI launch callback: no matching authentication session found under root " +
                         "session %s (client=%s) - session may have expired, or the browser did not send " +
                         "Keycloak's session cookie back on this cross-site request from the LMS",
@@ -167,21 +245,116 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                     .build();
             }
 
-            provider.session.getContext().setAuthenticationSession(authSession);
-
             try {
-                BrokeredIdentityContext identity = provider.validateAndExtract(idToken, state, authSession);
+                BrokeredIdentityContext identity = null;
+                AuthenticationSessionModel matchedSession = null;
+                Exception lastFailure = null;
+                for (AuthenticationSessionModel candidate : candidates) {
+                    provider.session.getContext().setAuthenticationSession(candidate);
+                    try {
+                        identity = provider.validateAndExtract(idToken, state, candidate);
+                        matchedSession = candidate;
+                        break;
+                    } catch (Exception e) {
+                        lastFailure = e;
+                        // If this candidate merely failed the nonce check, keep looking: a different
+                        // (usually newer) session under the same root may carry the nonce for this
+                        // particular launch. Any harder error - bad signature, wrong issuer, expired
+                        // token - is fatal and aborts the loop.
+                        String msg = e.getMessage();
+                        boolean nonceOnly = e instanceof IllegalArgumentException
+                            && msg != null
+                            && (msg.contains("nonce") || msg.contains("No nonce recorded"));
+                        if (!nonceOnly) {
+                            throw e;
+                        }
+                    }
+                }
+
+                if (identity == null || matchedSession == null) {
+                    log.warn("LTI launch validation failed", lastFailure);
+                    return callback.error("invalid_lti_launch");
+                }
+
                 identity.setIdpConfig(provider.getConfig());
                 identity.setIdp(provider);
 
                 // CRITICAL FIX: Ensure authenticationSession is attached to BrokeredIdentityContext
-                identity.setAuthenticationSession(authSession);
+                identity.setAuthenticationSession(matchedSession);
+
+                // Deep linking (LtiDeepLinkingRequest): after a successful broker login, send the teacher to the
+                // Cytomine content-selection URL instead of the resource-link target, carrying a short-lived,
+                // single-use context token that records where the DeepLinkingResponse must be posted back.
+                if (identity.getContextData().get(CTX_DEEP_LINKING_SETTINGS) != null) {
+                    return handleDeepLinkingLaunch(identity, matchedSession);
+                }
 
                 return callback.authenticated(identity);
             } catch (Exception e) {
                 log.warn("LTI launch validation failed", e);
                 return callback.error("invalid_lti_launch");
             }
+        }
+
+        @SuppressWarnings("unchecked")
+        private Response handleDeepLinkingLaunch(BrokeredIdentityContext identity,
+                                                 AuthenticationSessionModel authSession) {
+            String selectionUrl = provider.getConfig().getContentSelectionUrl();
+            if (selectionUrl == null || selectionUrl.isBlank()) {
+                log.warnf("LTI deep-linking launch received but this identity provider has no Content " +
+                    "Selection URL configured - rejecting the launch");
+                return Response.status(Response.Status.NOT_IMPLEMENTED)
+                    .entity("LTI deep linking is not enabled for this identity provider (missing " +
+                        "contentSelectionUrl). Contact the administrator.")
+                    .build();
+            }
+
+            Map<String, Object> dlSettings = (Map<String, Object>) identity.getContextData()
+                .get(CTX_DEEP_LINKING_SETTINGS);
+            Object returnUrlRaw = dlSettings.get("deep_link_return_url");
+            if (!(returnUrlRaw instanceof String returnUrl) || returnUrl.isBlank()) {
+                log.warnf("LTI deep-linking launch is missing deep_link_return_url in deep_linking_settings");
+                return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("LTI deep linking launch is missing deep_link_return_url")
+                    .build();
+            }
+
+            Map<?, ?> claims = identity.getContextData().get(CTX_LTI_CLAIMS) instanceof Map<?, ?> c
+                ? c
+                : Map.of();
+            String subject = claims.get("sub") instanceof String s ? s : null;
+            String deploymentId = claims.get(CLAIM_DEPLOYMENT_ID) instanceof String s ? s : null;
+            Object dataRaw = identity.getContextData().get(CTX_DEEP_LINKING_DATA);
+
+            Map<String, String> returnCtx = new LinkedHashMap<>();
+            returnCtx.put(DL_CTX_RETURN_URL, returnUrl);
+            if (dataRaw != null) {
+                returnCtx.put(DL_CTX_DATA, dataRaw.toString());
+            }
+            returnCtx.put(DL_CTX_ISS, provider.getConfig().getPlatformIssuer());
+            returnCtx.put(DL_CTX_CLIENT_ID, provider.getConfig().getToolClientId());
+            if (deploymentId != null) {
+                returnCtx.put(DL_CTX_DEPLOYMENT_ID, deploymentId);
+            }
+            if (subject != null) {
+                returnCtx.put(DL_CTX_SUB, subject);
+            }
+
+            String ctxToken = UUID.randomUUID().toString();
+            try {
+                provider.session.singleUseObjects().put(DL_CTX_SINGLE_USE_PREFIX + ctxToken,
+                    System.currentTimeMillis() + DL_CTX_TTL_MS, returnCtx);
+            } catch (Exception e) {
+                log.warnf("LTI deep linking: could not store return context", e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("LTI deep linking could not be completed - try again.")
+                    .build();
+            }
+
+            String pickerUrl = selectionUrl + (selectionUrl.contains("?") ? "&" : "?") + "ctx=" + ctxToken;
+            authSession.setRedirectUri(pickerUrl);
+            log.infof("LTI deep linking: teacher launch accepted, redirecting to content selection URL %s", pickerUrl);
+            return callback.authenticated(identity);
         }
     }
 
@@ -207,7 +380,8 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         }
 
         String messageType = (String) claims.get(CLAIM_MESSAGE_TYPE);
-        if (!"LtiResourceLinkRequest".equals(messageType)) {
+        boolean deepLinking = "LtiDeepLinkingRequest".equals(messageType);
+        if (!"LtiResourceLinkRequest".equals(messageType) && !deepLinking) {
             throw new IllegalArgumentException("Unsupported LTI message_type: " + messageType);
         }
 
@@ -221,19 +395,44 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             throw new IllegalArgumentException("deployment_id not allowed: " + deploymentId);
         }
 
+        // For deep-linking launches, validate the Content-Item request: the platform must have told us
+        // where to post the DeepLinkingResponse (deep_link_return_url) and should include an opaque
+        // `data` value to echo back unchanged.
+        Map<String, Object> deepLinkingSettings = null;
+        String deepLinkingData = null;
+        if (deepLinking) {
+            deepLinkingSettings = claims.get(CLAIM_DEEP_LINKING_SETTINGS) instanceof Map<?, ?> map
+                ? (Map<String, Object>) map
+                : null;
+            if (deepLinkingSettings == null) {
+                throw new IllegalArgumentException("LtiDeepLinkingRequest missing deep_linking_settings claim");
+            }
+            Object returnUrlRaw = deepLinkingSettings.get("deep_link_return_url");
+            if (!(returnUrlRaw instanceof String returnUrl) || returnUrl.isBlank()) {
+                throw new IllegalArgumentException(
+                    "LtiDeepLinkingRequest missing deep_link_return_url in deep_linking_settings");
+            }
+            if (!returnUrl.startsWith("https://") && !returnUrl.startsWith("http://")) {
+                throw new IllegalArgumentException("deep_link_return_url must be an absolute http(s) URL");
+            }
+            Object dataRaw = deepLinkingSettings.get("data");
+            if (dataRaw instanceof String data) {
+                deepLinkingData = data;
+            }
+        }
+
         if (returnedState == null || returnedState.isBlank()) {
             throw new IllegalArgumentException("Missing state in launch response");
         }
 
-        String expectedNonce = authSession.getClientNote(NOTE_NONCE);
+        String pendingNonces = authSession.getClientNote(NOTE_NONCE);
         Object nonceClaim = claims.get("nonce");
-        if (expectedNonce == null) {
+        if (pendingNonces == null || pendingNonces.isBlank()) {
             throw new IllegalArgumentException("No nonce recorded for this authentication session - was performLogin() skipped?");
         }
-        if (!(nonceClaim instanceof String) || !expectedNonce.equals(nonceClaim)) {
+        if (!(nonceClaim instanceof String) || !consumePendingNonce(authSession, (String) nonceClaim)) {
             throw new IllegalArgumentException("nonce mismatch - possible replay of a previous launch");
         }
-        authSession.removeClientNote(NOTE_NONCE);
 
         long now = Instant.now().getEpochSecond();
 
@@ -360,10 +559,19 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         identity.setLastName(lastName);
 
         // Attach claims for identity provider mappers
-        identity.getContextData().put("LTI_CLAIMS", claims);
-        identity.getContextData().put("LTI_ROLES", claims.get(CLAIM_ROLES));
-        identity.getContextData().put("LTI_CONTEXT", claims.get(CLAIM_CONTEXT));
-        identity.getContextData().put("LTI_TARGET_LINK_URI", claims.get(CLAIM_TARGET_LINK_URI));
+        identity.getContextData().put(CTX_LTI_CLAIMS, claims);
+        identity.getContextData().put(CTX_LTI_ROLES, claims.get(CLAIM_ROLES));
+        identity.getContextData().put(CTX_LTI_CONTEXT, claims.get(CLAIM_CONTEXT));
+        identity.getContextData().put(CTX_LTI_TARGET_LINK_URI, claims.get(CLAIM_TARGET_LINK_URI));
+        identity.getContextData().put(CTX_LTI_CUSTOM, customParams);
+        if (deepLinking) {
+            identity.getContextData().put(CTX_DEEP_LINKING_SETTINGS, deepLinkingSettings);
+            // Only record `data` when the platform actually supplied it: a null value here breaks
+            // Keycloak's SerializedBrokeredIdentityContext.serialize() during the first-broker-login flow.
+            if (deepLinkingData != null) {
+                identity.getContextData().put(CTX_DEEP_LINKING_DATA, deepLinkingData);
+            }
+        }
 
         return identity;
     }

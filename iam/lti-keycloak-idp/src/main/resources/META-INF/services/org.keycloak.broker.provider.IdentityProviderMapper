@@ -1,1 +1,2 @@
 com.cytomine.keycloak.lti.LTIUserRoleMapper
+com.cytomine.keycloak.lti.LTIProjectMembershipMapper

@@ -173,7 +173,7 @@ public class LTIUserRoleMapper extends AbstractIdentityProviderMapper {
     }
 
     private Set<String> extractLaunchRoles(BrokeredIdentityContext context) {
-        Object rolesClaim = context.getContextData().get("LTI_ROLES");
+        Object rolesClaim = context.getContextData().get(LTIIdentityProvider.CTX_LTI_ROLES);
         Set<String> roles = new LinkedHashSet<>();
         if (rolesClaim instanceof Collection<?> collection) {
             collection.stream()

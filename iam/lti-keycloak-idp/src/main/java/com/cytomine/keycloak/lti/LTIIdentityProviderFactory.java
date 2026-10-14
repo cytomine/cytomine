@@ -74,6 +74,14 @@ public class LTIIdentityProviderFactory
                 "Claim used as the stable per-user identifier. Defaults to \"sub\" - leave blank unless you have a reason to override it.",
                 ProviderConfigProperty.STRING_TYPE));
 
+        props.add(property(
+                "contentSelectionUrl", "Content Selection URL",
+                "Cytomine Web-UI picker URL for LTI deep linking (LtiDeepLinkingRequest launches). " +
+                        "Teachers are redirected here (already logged in) to pick content, so the URL must also " +
+                        "be a valid redirect URI on the Keycloak client for this tool. Leave blank to reject " +
+                        "deep-linking launches.",
+                ProviderConfigProperty.STRING_TYPE));
+
         return props;
     }
 

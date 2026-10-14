@@ -68,4 +68,19 @@ public class LTIIdentityProviderConfig extends IdentityProviderModel {
     public void setSubjectClaim(String claim) {
         getConfig().put("subjectClaim", claim);
     }
+
+    /**
+     * The Cytomine Web-UI "content selection" (picker) URL used for LTI 1.3 deep
+     * linking (LtiDeepLinkingRequest launches). Must also be an allowed redirect
+     * URI on the Keycloak client representing the tool, since teachers are sent
+     * there with a completed login. Null means deep-linking launches are rejected.
+     */
+    public String getContentSelectionUrl() {
+        String v = getConfig().get("contentSelectionUrl");
+        return v == null || v.isBlank() ? null : v;
+    }
+
+    public void setContentSelectionUrl(String url) {
+        getConfig().put("contentSelectionUrl", url);
+    }
 }

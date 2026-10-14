@@ -53,6 +53,15 @@ public class Project extends CytomineDomain {
     @Enumerated(EnumType.STRING)
     EditingMode mode = EditingMode.CLASSIC;
 
+    /**
+     * Exchange grant used by the LTI deep-linking flow: when a course item is created the picked project's
+     * token is written into the launch's {@code custom} claim (cytomine_join_token), and students carrying it
+     * are added to the project as contributors on login. Minted/reused and revoked via
+     * {@code PUT/DELETE /api/project/{id}/join-token.json}. Never exposed in project JSON nor settable via
+     * project updates.
+     */
+    private String joinToken;
+
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         Project project = (Project) this;
         project.id = json.getJSONAttrLong("id", null);

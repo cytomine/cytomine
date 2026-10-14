@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.mongodb.client.MongoClient;
@@ -48,6 +49,7 @@ import be.cytomine.dto.NamedCytomineDomain;
 import be.cytomine.dto.ProjectBounds;
 import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.exceptions.ForbiddenException;
+import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.command.CommandHistoryRepository;
 import be.cytomine.repository.command.CommandRepository;
@@ -165,6 +167,43 @@ public class ProjectService extends ModelService {
             securityACLService.check(project, READ);
         }
         return projects;
+    }
+
+    /**
+     * Mint the LTI join token of a project (or return the existing one). The token is what a deep-linking
+     * content item carries in its {@code custom} claim (cytomine_join_token) so students launching the item
+     * get added to the project as contributors. A new token is only minted when the project has none, so the
+     * same token is reused across course runs until explicitly revoked with {@link #revokeJoinToken(Long)}.
+     * Requires ADMINISTRATION on the project.
+     */
+    public JsonObject mintOrReuseJoinToken(Long projectId) {
+        Project project = findProjectForAdministration(projectId);
+        if (project.getJoinToken() == null || project.getJoinToken().isBlank()) {
+            project.setJoinToken(UUID.randomUUID().toString());
+            projectRepository.save(project);
+        }
+        return JsonObject.of("id", project.getId(), "joinToken", project.getJoinToken());
+    }
+
+    /**
+     * Revoke the LTI join token of a project. Existing course items keep working only in the sense that
+     * students already added to the project keep their membership; new students carrying the old token are no
+     * longer granted access. Requires ADMINISTRATION on the project.
+     */
+    public JsonObject revokeJoinToken(Long projectId) {
+        Project project = findProjectForAdministration(projectId);
+        if (project.getJoinToken() != null) {
+            project.setJoinToken(null);
+            projectRepository.save(project);
+        }
+        return JsonObject.of("id", project.getId(), "revoked", true);
+    }
+
+    private Project findProjectForAdministration(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
+        securityACLService.check(project, ADMINISTRATION);
+        return project;
     }
 
     public ProjectBounds computeBounds(Boolean withMembersCount) {

@@ -117,6 +117,37 @@ Any launch role that is not matched falls back to `GUEST`. The mapper grants the
 
 In the LMS, add the tool as an activity (e.g. an `External tool` activity) and open it. The browser is redirected to the login-init endpoint, then to the LMS authorization endpoint, and the LMS posts the signed `id_token` back to the broker callback. Keycloak verifies the signature against the LMS JWKS, validates `iss`, `aud`, `deployment_id`, `nonce`, `exp` and `iat`, creates or links the user, applies the role mapper, and finally redirects the browser to the target link URI (the Cytomine Web-UI).
 
+### G. Deep linking (selecting Cytomine content inside the LMS)
+
+With deep linking enabled, an instructor does not type a URL when adding the tool — the LMS opens a Cytomine **content-selection picker**, and the LMS itself creates the activity from the returned content item. The item carries Cytomine custom parameters (`cytomine_join_token`, `cytomine_project`, `cytomine_image`) that are re-sent, signed, by the LMS on every student launch.
+
+**Links vs. tool activities.** A common misunderstanding: in LTI (both 1.1 and 1.3) only launching an **External tool activity** produces a signed message from the LMS. A plain URL pasted into the course — even the Cytomine URL — is only a normal page request: no signed `id_token`, no identity, and no way to grant access per-request. Deep linking moves the activity creation *into* the LMS through the selection flow, so every student click is a real LTI launch.
+
+The flow in a nutshell:
+
+1. The instructor adds an `External tool` activity and the LMS asks the tool to return a content item (`LtiDeepLinkingRequest`).
+2. Keycloak accepts the launch (it is a normal broker login) and recognizes the deep-linking message type, then redirects the authenticated instructor to the **Content Selection URL** with a short-lived single-use context.
+3. The picker lists the projects the instructor administers. On selection it:
+   - mints (or reuses) the project's join token via `PUT /api/project/{id}/join-token.json`,
+   - posts the selection back to the IAM `dl-return` endpoint (form fields `ctx`, `url`, `title`, `text`, `custom`).
+4. The IAM signs an `LtiDeepLinkingResponse` JWT (with the realm RSA key that the LMS already holds as the tool's public keyset) and posts it back to the LMS, which creates the activity storing the `custom` parameters.
+
+When a student later opens that activity, Keycloak reads `custom.cytomine_join_token`, stores it in the `lti_join_tokens` user attribute, and Cytomine Core adds the student to the matching project(s) as a **contributor** (non-admin). Membership is **additive**: tokens only ever add or confirm access, they never remove a user from a project.
+
+Configuration steps:
+
+1. **Enable deep linking on the LMS side.** In the LTI 1.3 tool type created in step B, turn on content selection. In Moodle this is the `Content selection` checkbox in `Site administration → Plugins → Activity modules → External tool → Manage tools → <your tool> → Edit`. When enabled, Moodle's activity chooser replaces the URL field with `Select content`.
+2. **Set the Content Selection URL.** On the LTI 1.3 identity provider in Keycloak (step C), set **Content Selection URL** to the Cytomine Web-UI picker, `http://127.0.0.1/lti/content-selection` (the Web-UI on port 80 — not the IAM port 8100; the host must match the value used in step B). It must also match the tool client's `Valid redirect URIs` from step A.
+3. **Add the membership mapper (optional).** On the identity provider's `Mappers` tab, add the **`LTI Project Membership`** mapper. Defaults: custom parameter key `cytomine_join_token`, target attribute `lti_join_tokens`. To expose the attribute as a JWT claim, the shipped `cytomine` realm already maps `lti_join_tokens` (multivalued) into the `profile` client scope; if you imported the realm before this feature, re-add that protocol mapper.
+4. **Instructor flow.** In a course, add an `External tool` activity, pick the Cytomine tool, and confirm moodle's `Select content` prompt. In the picker choose a project (and optionally an image inside it) and confirm. The activity is created; open it once as the instructor to smoke-test the target link.
+5. **Student flow.** Students open the activity, authenticate through the same LTI flow (profile page appears on first login), and land directly on the image/project page the instructor selected. They appear in the project as contributors.
+
+**Join-token lifecycle and revocation.**
+
+- The token is minted once per project and reused (`PUT /api/project/{id}/join-token.json` returns the existing token if one is present), so activity links keep working across course runs.
+- `DELETE /api/project/{id}/join-token.json` revokes it: students already added keep their membership; new students carrying the old token are no longer granted access.
+- The token is a high-entropy UUID; possessing it grants contributor access to the project, so treat it like any project-sharing credential. Only project admins/creators can mint or revoke it.
+
 ## Datasets Importation
 
 ::: tip

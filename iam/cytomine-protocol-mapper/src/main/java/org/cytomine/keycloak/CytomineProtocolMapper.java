@@ -80,6 +80,7 @@ public class CytomineProtocolMapper extends AbstractOIDCProtocolMapper
     @Override
     protected void setClaim(IDToken token, ProtocolMapperModel mappingModel, UserSessionModel userSession,
         KeycloakSession keycloakSession, ClientSessionContext clientSessionCtx) {
+        clientSessionCtx.getRolesStream().forEach(System.out::println);
         Set<CytominePermission> appliedCustomClaims = clientSessionCtx.getRolesStream().flatMap(
             role -> Optional.ofNullable(role.getName()).stream()
                 .flatMap(name -> Optional.ofNullable(customClaims.roles().get(name.toLowerCase())).stream())

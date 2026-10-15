@@ -1,4 +1,4 @@
-java-version: "21"
+java-version: "25"
 java-distribution: "temurin"
 gradle-version: "9.5.1"
 node-version: "22.22.3"

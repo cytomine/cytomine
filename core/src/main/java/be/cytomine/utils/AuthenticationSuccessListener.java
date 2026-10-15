@@ -110,6 +110,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         List<String> projects = listTokenAttributes.getOrDefault("projects", List.of());
+        List<String> joinTokens = listTokenAttributes.getOrDefault("lti_join_tokens", List.of());
         UUID sub = UUID.fromString(stringTokenAttributes.get("sub"));
         Optional<User> userByReference = userRepository.findByReference(sub.toString());
         Optional<User> userByUsername = userRepository.findByUsername(jwtAuthenticationToken.getName());
@@ -125,6 +126,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
             self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
             self().updateProjectsMembership(projects, user);
+            self().updateLtiJoinTokenMembership(joinTokens, user);
 
         } else if (userByReference.isEmpty()) {
 
@@ -143,6 +145,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             UserResponse userResponse = userMapper.map(savedUser);
 
             self().updateProjectsMembership(projects, savedUser);
+            self().updateLtiJoinTokenMembership(joinTokens, savedUser);
 
             if (currentRoleService.hasCurrentUserAdminRole(userResponse)) {
                 currentRoleService.activeAdminSession(userResponse, jwtAuthenticationToken);
@@ -152,6 +155,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             User user = userByReference.get();
             self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
             self().updateProjectsMembership(projects, user);
+            self().updateLtiJoinTokenMembership(joinTokens, user);
         }
     }
 
@@ -197,6 +201,31 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
     private boolean isExternal(User user) {
         return user.getUsername().endsWith("@lifescience-ri.eu");
+    }
+
+    /**
+     * Additive LTI project membership: any project whose join token appears in the user's {@code lti_join_tokens}
+     * claim (exposed by Keycloak's profile-scope protocol mapper) is granted to the user as a contributor
+     * (non-admin). Unlike {@link #updateProjectsMembership} this path never removes memberships - a join token
+     * only ever adds or confirms access, so tokens left behind by past course runs are harmless.
+     */
+    @Transactional
+    protected void updateLtiJoinTokenMembership(List<String> joinTokens, User user) {
+        if (joinTokens == null || joinTokens.isEmpty()) {
+            return;
+        }
+
+        List<Project> tokenProjects = projectRepository.findByJoinTokenIn(joinTokens);
+        if (tokenProjects.isEmpty()) {
+            return;
+        }
+
+        List<Project> actualUserProjects = projectRepository.findAllProjectForUser(user.getUsername());
+        for (Project project : tokenProjects) {
+            if (!actualUserProjects.contains(project)) {
+                projectMemberService.addUserToProjectWithAdmin(user.getUsername(), project, false);
+            }
+        }
     }
 
     @Transactional

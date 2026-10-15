@@ -6,6 +6,7 @@ import java.util.Random;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
@@ -167,10 +168,15 @@ public class PermissionService {
     }
 
     public Long getAclClassId(CytomineDomain domain) {
-        Long id = aclRepository.getAclClassId(domain.getClass().getName());
+        // Resolve the real entity class: a domain reached through a lazy association (e.g. ImageInstance.project)
+        // is a Hibernate proxy, and using its generated class name would make the ACL lookup miss the entity ACL.
+        String className = domain instanceof HibernateProxy hibernateProxy
+            ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass().getName()
+            : domain.getClass().getName();
+        Long id = aclRepository.getAclClassId(className);
         if (id == null) {
-            aclRepository.insertAclClassId(domain.getClass().getName());
-            id = aclRepository.getAclClassId(domain.getClass().getName());
+            aclRepository.insertAclClassId(className);
+            id = aclRepository.getAclClassId(className);
         }
         return id;
     }

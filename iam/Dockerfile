@@ -3,6 +3,19 @@ ARG PROXY_CACHE=registry.cytomine.org/docker
 ARG UBI_VERSION=9.3-1610
 ARG IMAGE_VERSION
 ARG IMAGE_REVISION
+ARG MAVEN_IMAGE_TAG=3.9.6-eclipse-temurin-17
+
+#######################################################################################
+## Stage: LTI Keycloak IDP extension build
+FROM ${PROXY_CACHE}/library/maven:${MAVEN_IMAGE_TAG} AS lti-builder
+
+WORKDIR /build
+
+COPY lti-keycloak-idp/pom.xml .
+RUN mvn -B dependency:go-offline
+
+COPY lti-keycloak-idp/src ./src
+RUN mvn -B clean package -DskipTests
 
 #######################################################################################
 ## Stage: IAM build
@@ -15,6 +28,8 @@ ENV KC_DB=postgres \
     KC_METRICS_ENABLED=true
 
 WORKDIR /opt/keycloak
+
+COPY --from=lti-builder /build/target/*.jar /opt/keycloak/providers/
 
 RUN /opt/keycloak/bin/kc.sh build
 

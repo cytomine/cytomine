@@ -24,6 +24,9 @@ public interface ProjectMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "callBack", ignore = true)
     @Mapping(target = "representativeUsers", ignore = true)
+    // The LTI join token is managed exclusively through PUT/DELETE /api/project/{id}/join-token.json;
+    // it must never be read back through project DTOs.
+    @Mapping(target = "joinToken", ignore = true)
     @Mapping(target = "closed", source = "isClosed")
     @Mapping(target = "countImages", source = "numberOfImages")
     @Mapping(target = "countAnnotations", source = "numberOfAnnotations")

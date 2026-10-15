@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'checkstyle'
+}
+
+group = 'org.cytomine'
+version = '1.0.0'
+description = 'Keycloak custom roles mapper'
+
+java {
+    sourceCompatibility = '17'
+}
+
+checkstyle {
+    toolVersion = '10.21.2'
+    configFile = file("${rootProject.projectDir}/checkstyle.xml")
+}
+
+jar {
+    archiveFileName = 'cytomine-protocol-mapper.jar'
+    from(project(':common').sourceSets.main.output)
+    from({ configurations.runtimeClasspath
+        .filter { it.name.startsWith('jackson-dataformat-yaml') }
+        .collect { zipTree(it) } }) {
+        exclude 'module-info.class', 'META-INF/versions/**/module-info.class'
+        exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+        exclude 'META-INF/LICENSE*', 'META-INF/NOTICE*', 'META-INF/DEPENDENCIES'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.keycloak:keycloak-core:24.0.2'
+    compileOnly 'org.keycloak:keycloak-services:24.0.2'
+    compileOnly 'org.keycloak:keycloak-server-spi:24.0.2'
+    compileOnly 'org.keycloak:keycloak-server-spi-private:24.0.2'
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.1'
+    implementation project(':common')
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
+}

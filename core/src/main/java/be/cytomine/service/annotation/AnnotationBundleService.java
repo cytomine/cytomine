@@ -315,6 +315,7 @@ public class AnnotationBundleService {
         for (ImageAnnotation imageAnnotation : imageAnnotations) {
             xml.empty("ANNOTATION_REF", "alias", imageAnnotation.annotationAlias());
         }
+        xml.empty("COMPLEMENTS_DATASET_REF", "alias", project.getName());
         xml.open("ATTRIBUTES");
         xml.nilStringAttribute("tox_study_duration");
         xml.close("ATTRIBUTES");

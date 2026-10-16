@@ -1012,19 +1012,21 @@ public class AnnotationDomainResourceTests {
             .getContentAsByteArray();
 
         Map<String, byte[]> entries = unzip(bundle);
+        String root = entries.keySet().iterator().next().split("/")[0];
         org.assertj.core.api.Assertions.assertThat(entries).containsKeys(
-            "dataset/METADATA/annotation.xml",
-            "dataset/METADATA/dataset.xml",
-            "dataset/METADATA/annotator.xml",
-            "dataset/METADATA/ontology.xml",
-            "dataset/METADATA/annotation_task.xml",
-            "dataset/METADATA/policy.xml",
-            "dataset/ANNOTATION_TASKS/task.txt"
+            root + "/METADATA/annotation.xml",
+            root + "/METADATA/dataset.xml",
+            root + "/METADATA/annotator.xml",
+            root + "/METADATA/ontology.xml",
+            root + "/METADATA/annotation_task.xml",
+            root + "/METADATA/policy.xml",
+            root + "/ANNOTATION_TASKS/task.txt"
         );
 
-        String annotationXml = new String(entries.get("dataset/METADATA/annotation.xml"), StandardCharsets.UTF_8);
+        String annotationXml = new String(entries.get(root + "/METADATA/annotation.xml"), StandardCharsets.UTF_8);
         AssertionsForClassTypes.assertThat(annotationXml).contains("<ANNOTATION_SET>");
-        AssertionsForClassTypes.assertThat(annotationXml).contains("ANNOTATIONS/IMAGE_");
+        AssertionsForClassTypes.assertThat(annotationXml).contains("ANNOTATIONS/");
+        AssertionsForClassTypes.assertThat(annotationXml).contains(".geojson");
         AssertionsForClassTypes.assertThat(annotationXml).contains("checksum_method=\"SHA256\"");
     }
 
@@ -1042,7 +1044,7 @@ public class AnnotationDomainResourceTests {
 
         Map<String, byte[]> entries = unzip(bundle);
         String geojsonEntry = entries.keySet().stream()
-            .filter(name -> name.startsWith("dataset/ANNOTATIONS/") && name.endsWith(".geojson"))
+            .filter(name -> name.contains("/ANNOTATIONS/") && name.endsWith(".geojson"))
             .findFirst()
             .orElseThrow(() -> new AssertionError("No GeoJSON file found in the export bundle"));
 

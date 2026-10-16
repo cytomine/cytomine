@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.util.AffineTransformation;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
@@ -36,6 +37,7 @@ import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.dto.annotation.GeoJsonFeature;
@@ -44,6 +46,7 @@ import be.cytomine.dto.annotation.GeoJsonFeatureProperties;
 import be.cytomine.dto.annotation.ImageAnnotation;
 import be.cytomine.dto.annotation.OntologyEntry;
 import be.cytomine.repository.AnnotationListing;
+import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.JsonObject;
@@ -53,7 +56,7 @@ import be.cytomine.utils.JsonObject;
 @Service
 public class AnnotationBundleService {
 
-    private static final String ROOT = "dataset";
+    private static final String DEFAULT_ROOT = "dataset";
 
     private static final String ALIAS_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -71,6 +74,8 @@ public class AnnotationBundleService {
 
     private final UserHttpContract userHttpContract;
 
+    private final ImageInstanceRepository imageInstanceRepository;
+
     private final ObjectMapper objectMapper;
 
     public byte[] buildBundle(Project project) {
@@ -81,6 +86,11 @@ public class AnnotationBundleService {
             .collect(Collectors.toMap(TermResponse::id, TermResponse::name, (a, b) -> a));
 
         List<AnnotationResult> annotations = fetchAnnotations(projectId);
+
+        Map<Long, Integer> imageHeights = imageInstanceRepository.findAllByProject(project)
+            .stream()
+            .filter(image -> image.getBaseImage() != null && image.getBaseImage().getHeight() != null)
+            .collect(Collectors.toMap(ImageInstance::getId, image -> image.getBaseImage().getHeight(), (a, b) -> a));
 
         // Group annotations by image: one GeoJSON file (and one ANNOTATION entry) per image.
         Map<Long, List<AnnotationResult>> annotationsByImage = new LinkedHashMap<>();
@@ -98,38 +108,40 @@ public class AnnotationBundleService {
         String policyAlias = alias("POLICY");
 
         Map<Long, String> annotatorAliasByUser = new LinkedHashMap<>();
-        Set<ImageAnnotation> imageAnnotations = annotationsByImage.values().stream()
-            .map(entry -> {
-                AnnotationResult representative = entry.getFirst();
+        Set<ImageAnnotation> imageAnnotations = annotationsByImage.entrySet().stream().map(imageEntry -> {
+            List<AnnotationResult> entry = imageEntry.getValue();
+            AnnotationResult representative = entry.getFirst();
 
-                Long userId = asLong(representative.get("user"));
-                String annotatorAlias = annotatorAliasByUser.computeIfAbsent(
-                    userId == null ? -1L : userId,
-                    key -> alias("ANNOTATOR")
-                );
+            Long userId = asLong(representative.get("user"));
+            String annotatorAlias = annotatorAliasByUser.computeIfAbsent(
+                userId == null ? -1L : userId,
+                key -> alias("ANNOTATOR")
+            );
 
-                LocalDateTime created = toLocalDateTime(representative.get("created"));
-                String createdDate = created.format(DateTimeFormatter.BASIC_ISO_DATE);
-                String imageAlias = alias("IMAGE");
+            LocalDateTime created = toLocalDateTime(representative.get("created"));
+            String createdDate = created.format(DateTimeFormatter.BASIC_ISO_DATE);
+            String imageAlias = imageAlias(representative);
 
-                byte[] geojson = buildFeatureCollection(entry, termNames, createdDate);
+            Integer imageHeight = imageHeights.get(imageEntry.getKey());
+            byte[] geojson = buildFeatureCollection(entry, termNames, createdDate, imageHeight);
 
-                return new ImageAnnotation(
-                    imageAlias,
-                    alias("ANNOTATION"),
-                    annotatorAlias,
-                    imageAlias + "_" + createdDate + ".geojson",
-                    geojson,
-                    sha256(geojson),
-                    created.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                );
-            })
-            .collect(Collectors.toSet());
+            return new ImageAnnotation(
+                imageAlias,
+                alias("ANNOTATION"),
+                annotatorAlias,
+                imageAlias + "_" + createdDate + ".geojson",
+                geojson,
+                sha256(geojson),
+                created.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            );
+        }).collect(Collectors.toSet());
 
         Map<Long, String> annotatorDescriptions = resolveAnnotatorDescriptions(annotatorAliasByUser.keySet());
 
+        String root = sanitize(project.getName(), DEFAULT_ROOT);
+
         String ontologyName = project.getOntology() != null ? project.getOntology().getName() : "ontology";
-        String ontologyFileName = sanitizeFilename(ontologyName) + ".json";
+        String ontologyFileName = sanitize(ontologyName, "ontology") + ".json";
         byte[] ontologyJson = buildOntologyJson(terms);
 
         String taskText = buildTaskText();
@@ -143,16 +155,21 @@ public class AnnotationBundleService {
         String policyXml = buildPolicyXml(policyAlias, datasetAlias);
 
         return zip(archive -> {
-            writeEntry(archive, "METADATA/annotation.xml", annotationXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "METADATA/dataset.xml", datasetXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "METADATA/annotator.xml", annotatorXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "METADATA/ontology.xml", ontologyXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "METADATA/annotation_task.xml", annotationTaskXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "METADATA/policy.xml", policyXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, "ONTOLOGIES/" + ontologyFileName, ontologyJson);
-            writeEntry(archive, "ANNOTATION_TASKS/task.txt", taskBytes);
+            writeEntry(archive, root, "METADATA/annotation.xml", annotationXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(archive, root, "METADATA/dataset.xml", datasetXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(archive, root, "METADATA/annotator.xml", annotatorXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(archive, root, "METADATA/ontology.xml", ontologyXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(
+                archive,
+                root,
+                "METADATA/annotation_task.xml",
+                annotationTaskXml.getBytes(StandardCharsets.UTF_8)
+            );
+            writeEntry(archive, root, "METADATA/policy.xml", policyXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(archive, root, "ONTOLOGIES/" + ontologyFileName, ontologyJson);
+            writeEntry(archive, root, "ANNOTATION_TASKS/task.txt", taskBytes);
             for (ImageAnnotation imageAnnotation : imageAnnotations) {
-                writeEntry(archive, "ANNOTATIONS/" + imageAnnotation.filename(), imageAnnotation.geojson());
+                writeEntry(archive, root, "ANNOTATIONS/" + imageAnnotation.filename(), imageAnnotation.geojson());
             }
         });
     }
@@ -183,10 +200,11 @@ public class AnnotationBundleService {
     private byte[] buildFeatureCollection(
         List<AnnotationResult> annotations,
         Map<Long, String> termNames,
-        String name
+        String name,
+        Integer imageHeight
     ) {
         List<GeoJsonFeature> features = annotations.stream()
-            .map(annotation -> toFeature(annotation, termNames))
+            .map(annotation -> toFeature(annotation, termNames, imageHeight))
             .flatMap(Optional::stream)
             .toList();
 
@@ -195,7 +213,11 @@ public class AnnotationBundleService {
         return toJsonBytes(featureCollection);
     }
 
-    private Optional<GeoJsonFeature> toFeature(AnnotationResult annotation, Map<Long, String> termNames) {
+    private Optional<GeoJsonFeature> toFeature(
+        AnnotationResult annotation,
+        Map<Long, String> termNames,
+        Integer imageHeight
+    ) {
         Object location = annotation.get("location");
         if (location == null) {
             return Optional.empty();
@@ -203,6 +225,9 @@ public class AnnotationBundleService {
 
         try {
             Geometry geometry = wktReader.read(location.toString());
+            if (imageHeight != null) {
+                geometry.apply(new AffineTransformation(1, 0, 0, 0, -1, imageHeight));
+            }
             Map<String, Object> geometryJson = JsonObject.toMap(geoJsonWriter.write(geometry));
 
             return Optional.ofNullable(geometryJson)
@@ -245,9 +270,7 @@ public class AnnotationBundleService {
     }
 
     private byte[] buildOntologyJson(List<TermResponse> terms) {
-        List<OntologyEntry> entries = terms.stream()
-            .map(term -> new OntologyEntry(term.name(), term.color()))
-            .toList();
+        List<OntologyEntry> entries = terms.stream().map(term -> new OntologyEntry(term.name(), term.color())).toList();
         return toJsonBytes(entries);
     }
 
@@ -313,6 +336,7 @@ public class AnnotationBundleService {
         for (ImageAnnotation imageAnnotation : imageAnnotations) {
             xml.empty("ANNOTATION_REF", "alias", imageAnnotation.annotationAlias());
         }
+        xml.empty("COMPLEMENTS_DATASET_REF", "alias", project.getName());
         xml.open("ATTRIBUTES");
         xml.nilStringAttribute("tox_study_duration");
         xml.close("ATTRIBUTES");
@@ -413,9 +437,9 @@ public class AnnotationBundleService {
         return xml.build();
     }
 
-    private void writeEntry(ZipOutputStream archive, String path, byte[] content) {
+    private void writeEntry(ZipOutputStream archive, String root, String path, byte[] content) {
         try {
-            archive.putNextEntry(new ZipEntry(ROOT + "/" + path));
+            archive.putNextEntry(new ZipEntry(root + "/" + path));
             archive.write(content);
             archive.closeEntry();
         } catch (IOException e) {
@@ -441,6 +465,17 @@ public class AnnotationBundleService {
         return buffer.toByteArray();
     }
 
+    private static String imageAlias(AnnotationResult annotation) {
+        Object filename = annotation.get("instanceFilename");
+        if (filename == null || filename.toString().isBlank()) {
+            filename = annotation.get("originalFilename");
+        }
+        if (filename != null && !filename.toString().isBlank()) {
+            return filename.toString();
+        }
+        return alias("IMAGE");
+    }
+
     private static String alias(String prefix) {
         StringBuilder builder = new StringBuilder(prefix).append('_');
         for (int i = 0; i < ALIAS_LENGTH; i++) {
@@ -449,10 +484,10 @@ public class AnnotationBundleService {
         return builder.toString();
     }
 
-    private static String sanitizeFilename(String name) {
+    private static String sanitize(String name, String fallback) {
         String sanitized = name == null ? "" : name.trim().toLowerCase().replaceAll("[^a-z0-9]+", "_");
         sanitized = sanitized.replaceAll("^_+|_+$", "");
-        return sanitized.isEmpty() ? "ontology" : sanitized;
+        return sanitized.isEmpty() ? fallback : sanitized;
     }
 
     private static Long asLong(Object value) {

@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.util.AffineTransformation;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
@@ -43,7 +44,9 @@ import be.cytomine.dto.annotation.GeoJsonFeatureCollection;
 import be.cytomine.dto.annotation.GeoJsonFeatureProperties;
 import be.cytomine.dto.annotation.ImageAnnotation;
 import be.cytomine.dto.annotation.OntologyEntry;
+import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.repository.AnnotationListing;
+import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.service.AnnotationListingService;
 import be.cytomine.utils.AnnotationListingBuilder;
 import be.cytomine.utils.JsonObject;
@@ -71,6 +74,8 @@ public class AnnotationBundleService {
 
     private final UserHttpContract userHttpContract;
 
+    private final ImageInstanceRepository imageInstanceRepository;
+
     private final ObjectMapper objectMapper;
 
     public byte[] buildBundle(Project project) {
@@ -81,6 +86,14 @@ public class AnnotationBundleService {
             .collect(Collectors.toMap(TermResponse::id, TermResponse::name, (a, b) -> a));
 
         List<AnnotationResult> annotations = fetchAnnotations(projectId);
+
+        Map<Long, Integer> imageHeights = imageInstanceRepository.findAllByProject(project).stream()
+            .filter(image -> image.getBaseImage() != null && image.getBaseImage().getHeight() != null)
+            .collect(Collectors.toMap(
+                ImageInstance::getId,
+                image -> image.getBaseImage().getHeight(),
+                (a, b) -> a
+            ));
 
         // Group annotations by image: one GeoJSON file (and one ANNOTATION entry) per image.
         Map<Long, List<AnnotationResult>> annotationsByImage = new LinkedHashMap<>();
@@ -98,8 +111,9 @@ public class AnnotationBundleService {
         String policyAlias = alias("POLICY");
 
         Map<Long, String> annotatorAliasByUser = new LinkedHashMap<>();
-        Set<ImageAnnotation> imageAnnotations = annotationsByImage.values().stream()
-            .map(entry -> {
+        Set<ImageAnnotation> imageAnnotations = annotationsByImage.entrySet().stream()
+            .map(imageEntry -> {
+                List<AnnotationResult> entry = imageEntry.getValue();
                 AnnotationResult representative = entry.getFirst();
 
                 Long userId = asLong(representative.get("user"));
@@ -112,7 +126,8 @@ public class AnnotationBundleService {
                 String createdDate = created.format(DateTimeFormatter.BASIC_ISO_DATE);
                 String imageAlias = imageAlias(representative);
 
-                byte[] geojson = buildFeatureCollection(entry, termNames, createdDate);
+                Integer imageHeight = imageHeights.get(imageEntry.getKey());
+                byte[] geojson = buildFeatureCollection(entry, termNames, createdDate, imageHeight);
 
                 return new ImageAnnotation(
                     imageAlias,
@@ -185,10 +200,11 @@ public class AnnotationBundleService {
     private byte[] buildFeatureCollection(
         List<AnnotationResult> annotations,
         Map<Long, String> termNames,
-        String name
+        String name,
+        Integer imageHeight
     ) {
         List<GeoJsonFeature> features = annotations.stream()
-            .map(annotation -> toFeature(annotation, termNames))
+            .map(annotation -> toFeature(annotation, termNames, imageHeight))
             .flatMap(Optional::stream)
             .toList();
 
@@ -197,7 +213,11 @@ public class AnnotationBundleService {
         return toJsonBytes(featureCollection);
     }
 
-    private Optional<GeoJsonFeature> toFeature(AnnotationResult annotation, Map<Long, String> termNames) {
+    private Optional<GeoJsonFeature> toFeature(
+        AnnotationResult annotation,
+        Map<Long, String> termNames,
+        Integer imageHeight
+    ) {
         Object location = annotation.get("location");
         if (location == null) {
             return Optional.empty();
@@ -205,6 +225,9 @@ public class AnnotationBundleService {
 
         try {
             Geometry geometry = wktReader.read(location.toString());
+            if (imageHeight != null) {
+                geometry.apply(new AffineTransformation(1, 0, 0, 0, -1, imageHeight));
+            }
             Map<String, Object> geometryJson = JsonObject.toMap(geoJsonWriter.write(geometry));
 
             return Optional.ofNullable(geometryJson)

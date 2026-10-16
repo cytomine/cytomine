@@ -37,6 +37,7 @@ import be.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.dto.annotation.GeoJsonFeature;
@@ -44,7 +45,6 @@ import be.cytomine.dto.annotation.GeoJsonFeatureCollection;
 import be.cytomine.dto.annotation.GeoJsonFeatureProperties;
 import be.cytomine.dto.annotation.ImageAnnotation;
 import be.cytomine.dto.annotation.OntologyEntry;
-import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.service.AnnotationListingService;
@@ -87,13 +87,10 @@ public class AnnotationBundleService {
 
         List<AnnotationResult> annotations = fetchAnnotations(projectId);
 
-        Map<Long, Integer> imageHeights = imageInstanceRepository.findAllByProject(project).stream()
+        Map<Long, Integer> imageHeights = imageInstanceRepository.findAllByProject(project)
+            .stream()
             .filter(image -> image.getBaseImage() != null && image.getBaseImage().getHeight() != null)
-            .collect(Collectors.toMap(
-                ImageInstance::getId,
-                image -> image.getBaseImage().getHeight(),
-                (a, b) -> a
-            ));
+            .collect(Collectors.toMap(ImageInstance::getId, image -> image.getBaseImage().getHeight(), (a, b) -> a));
 
         // Group annotations by image: one GeoJSON file (and one ANNOTATION entry) per image.
         Map<Long, List<AnnotationResult>> annotationsByImage = new LinkedHashMap<>();
@@ -111,35 +108,33 @@ public class AnnotationBundleService {
         String policyAlias = alias("POLICY");
 
         Map<Long, String> annotatorAliasByUser = new LinkedHashMap<>();
-        Set<ImageAnnotation> imageAnnotations = annotationsByImage.entrySet().stream()
-            .map(imageEntry -> {
-                List<AnnotationResult> entry = imageEntry.getValue();
-                AnnotationResult representative = entry.getFirst();
+        Set<ImageAnnotation> imageAnnotations = annotationsByImage.entrySet().stream().map(imageEntry -> {
+            List<AnnotationResult> entry = imageEntry.getValue();
+            AnnotationResult representative = entry.getFirst();
 
-                Long userId = asLong(representative.get("user"));
-                String annotatorAlias = annotatorAliasByUser.computeIfAbsent(
-                    userId == null ? -1L : userId,
-                    key -> alias("ANNOTATOR")
-                );
+            Long userId = asLong(representative.get("user"));
+            String annotatorAlias = annotatorAliasByUser.computeIfAbsent(
+                userId == null ? -1L : userId,
+                key -> alias("ANNOTATOR")
+            );
 
-                LocalDateTime created = toLocalDateTime(representative.get("created"));
-                String createdDate = created.format(DateTimeFormatter.BASIC_ISO_DATE);
-                String imageAlias = imageAlias(representative);
+            LocalDateTime created = toLocalDateTime(representative.get("created"));
+            String createdDate = created.format(DateTimeFormatter.BASIC_ISO_DATE);
+            String imageAlias = imageAlias(representative);
 
-                Integer imageHeight = imageHeights.get(imageEntry.getKey());
-                byte[] geojson = buildFeatureCollection(entry, termNames, createdDate, imageHeight);
+            Integer imageHeight = imageHeights.get(imageEntry.getKey());
+            byte[] geojson = buildFeatureCollection(entry, termNames, createdDate, imageHeight);
 
-                return new ImageAnnotation(
-                    imageAlias,
-                    alias("ANNOTATION"),
-                    annotatorAlias,
-                    imageAlias + "_" + createdDate + ".geojson",
-                    geojson,
-                    sha256(geojson),
-                    created.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                );
-            })
-            .collect(Collectors.toSet());
+            return new ImageAnnotation(
+                imageAlias,
+                alias("ANNOTATION"),
+                annotatorAlias,
+                imageAlias + "_" + createdDate + ".geojson",
+                geojson,
+                sha256(geojson),
+                created.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            );
+        }).collect(Collectors.toSet());
 
         Map<Long, String> annotatorDescriptions = resolveAnnotatorDescriptions(annotatorAliasByUser.keySet());
 
@@ -164,7 +159,12 @@ public class AnnotationBundleService {
             writeEntry(archive, root, "METADATA/dataset.xml", datasetXml.getBytes(StandardCharsets.UTF_8));
             writeEntry(archive, root, "METADATA/annotator.xml", annotatorXml.getBytes(StandardCharsets.UTF_8));
             writeEntry(archive, root, "METADATA/ontology.xml", ontologyXml.getBytes(StandardCharsets.UTF_8));
-            writeEntry(archive, root, "METADATA/annotation_task.xml", annotationTaskXml.getBytes(StandardCharsets.UTF_8));
+            writeEntry(
+                archive,
+                root,
+                "METADATA/annotation_task.xml",
+                annotationTaskXml.getBytes(StandardCharsets.UTF_8)
+            );
             writeEntry(archive, root, "METADATA/policy.xml", policyXml.getBytes(StandardCharsets.UTF_8));
             writeEntry(archive, root, "ONTOLOGIES/" + ontologyFileName, ontologyJson);
             writeEntry(archive, root, "ANNOTATION_TASKS/task.txt", taskBytes);
@@ -270,9 +270,7 @@ public class AnnotationBundleService {
     }
 
     private byte[] buildOntologyJson(List<TermResponse> terms) {
-        List<OntologyEntry> entries = terms.stream()
-            .map(term -> new OntologyEntry(term.name(), term.color()))
-            .toList();
+        List<OntologyEntry> entries = terms.stream().map(term -> new OntologyEntry(term.name(), term.color())).toList();
         return toJsonBytes(entries);
     }
 

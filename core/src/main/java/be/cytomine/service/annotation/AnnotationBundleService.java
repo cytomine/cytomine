@@ -110,7 +110,7 @@ public class AnnotationBundleService {
 
                 LocalDateTime created = toLocalDateTime(representative.get("created"));
                 String createdDate = created.format(DateTimeFormatter.BASIC_ISO_DATE);
-                String imageAlias = alias("IMAGE");
+                String imageAlias = imageAlias(representative);
 
                 byte[] geojson = buildFeatureCollection(entry, termNames, createdDate);
 
@@ -441,6 +441,17 @@ public class AnnotationBundleService {
             throw new UncheckedIOException(e);
         }
         return buffer.toByteArray();
+    }
+
+    private static String imageAlias(AnnotationResult annotation) {
+        Object filename = annotation.get("instanceFilename");
+        if (filename == null || filename.toString().isBlank()) {
+            filename = annotation.get("originalFilename");
+        }
+        if (filename != null && !filename.toString().isBlank()) {
+            return filename.toString();
+        }
+        return alias("IMAGE");
     }
 
     private static String alias(String prefix) {

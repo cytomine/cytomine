@@ -53,6 +53,7 @@ dependencies {
     testImplementation testFixtures(project(':common'))
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation project(':common')
+    implementation 'org.keycloak:keycloak-admin-client:24.0.2'
 }
 
 test {

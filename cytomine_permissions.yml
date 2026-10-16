@@ -1,0 +1,19 @@
+---
+cytomine:
+  permissions:
+    roles:
+      user:
+        - can_create_project
+        - can_see_all_projects
+      admin:
+        - can_see_all_projects
+        - can_create_project
+      guest:
+        - can_see_all_projects
+
+    # project roles can be attributed to a user for a specific project
+    project_roles:
+      project_user:
+        - project_owner_can_add_members
+      project_guest:
+      project_admin:

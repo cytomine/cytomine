@@ -2,6 +2,7 @@ package org.cytomine.repository.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -15,6 +16,7 @@ import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.authorization.Logic;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
@@ -49,6 +51,7 @@ public class PermissionsService {
 
     void getRealmRepresentation(RealmResource realmResource, CytominePermissions cytominePermissions) {
         RealmRepresentation realmRepresentation = realmResource.toRepresentation();
+
         ClientsResource clients = realmResource.clients();
 
 
@@ -56,8 +59,21 @@ public class PermissionsService {
             ClientResource existingClient = clients.get("cytomine-permissions");
             existingClient.update(getClientRepresentation(clientRepresentation, cytominePermissions));
         }, () -> {
+            cytominePermissions.roles()
+                .forEach((key, value) ->
+                    Optional.ofNullable(realmResource.roles().get(key)).map(ignored -> true).orElseGet(() -> {
+                        realmResource.roles().create(getRoleRepresentation(key));
+                        return true;
+                    }));
             realmResource.clients().create(getClientRepresentation(new ClientRepresentation(), cytominePermissions));
         });
+    }
+
+    RoleRepresentation getRoleRepresentation(String role) {
+        RoleRepresentation roleRepresentation = new RoleRepresentation();
+        roleRepresentation.setId(role);
+        roleRepresentation.setName(role);
+        return roleRepresentation;
     }
 
     ClientRepresentation getClientRepresentation(ClientRepresentation clientRepresentation,
@@ -73,6 +89,8 @@ public class PermissionsService {
     ResourceServerRepresentation getResourceServerRepresentation(CytominePermissions cytominePermissions) {
         ResourceServerRepresentation resourceServerRepresentation = new ResourceServerRepresentation();
         resourceServerRepresentation.setResources(List.of(getResourceRepresentation()));
+
+
         resourceServerRepresentation.setScopes(
             Stream.of(CytominePermission.values()).map(this::getScopeRepresentation).toList());
         resourceServerRepresentation.setPolicies(
@@ -108,6 +126,7 @@ public class PermissionsService {
         ResourceRepresentation resourceRepresentation = new ResourceRepresentation();
         resourceRepresentation.setId("core");
         resourceRepresentation.setName("core");
+
         return resourceRepresentation;
     }
 

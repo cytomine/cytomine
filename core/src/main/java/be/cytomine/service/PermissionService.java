@@ -175,8 +175,8 @@ public class PermissionService {
             : domain.getClass().getName();
         Long id = aclRepository.getAclClassId(className);
         if (id == null) {
-            aclRepository.insertAclClassId(className);
-            id = aclRepository.getAclClassId(className);
+            aclRepository.insertAclClassId(domain.getClass().getName());
+            id = aclRepository.getAclClassId(domain.getClass().getName());
         }
         return id;
     }

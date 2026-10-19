@@ -66,7 +66,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     compileOnly("org.springframework.boot:spring-boot-devtools")
 
-    implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.87'
+    implementation group: 'com.networknt', name: 'json-schema-validator', version: '3.0.8'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.28.0'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '4.1.0'
     implementation 'org.apache.commons:commons-fileupload2-jakarta-servlet6:2.0.0-M4'

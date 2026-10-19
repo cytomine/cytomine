@@ -22,11 +22,11 @@ public class KeyCloakConfiguration {
     @Bean
     Keycloak keycloak() {
         return Keycloak.getInstance(
-                url,
-                realm,
-                user,
-                password,
-                clientId);
+            url,
+            realm,
+            user,
+            password,
+            clientId);
     }
 
 }

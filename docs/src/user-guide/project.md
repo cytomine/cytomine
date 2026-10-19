@@ -56,6 +56,13 @@ One can open the image by clicking on its thumbnail or on the blue _Open_ button
 
 You will find the documentation dedicated to the image viewer on [a dedicated page](./image-viewer.md).
 
+clicking show filters shows metadata filters supported by cytomine to filter `BigPicture` datasets metadata using the following filters and full text search across
+all searchable textual properties in the dataset metadata.
+
+filtering dynamically returns results and counts per filter and also a total count of results. these filters only search images of the project.
+
+![Image details](/images/user-guide/project/project-metadata-filters.png)
+
 ## Annotations
 
 The annotation panel will give a list of all the annotations made in the project with filters on the contributors, the images and the terms.

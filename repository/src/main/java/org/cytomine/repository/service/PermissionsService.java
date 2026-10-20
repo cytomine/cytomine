@@ -53,9 +53,12 @@ public class PermissionsService {
         ClientsResource clients = realmResource.clients();
 
         ClientResource existingClient = clients.findByClientId("cytomine-permissions").stream().findFirst()
-            .map(ignored -> clients.get("cytomine-permissions")).orElseGet(() -> realmResource.clients()
-                .create(getClientRepresentation(new ClientRepresentation(), cytominePermissions))
-                .readEntity(ClientResource.class));
+            .map(ignored -> clients.get("cytomine-permissions")).orElseGet(() -> {
+                    realmResource.clients()
+                        .create(getBaseClientRepresentation(new ClientRepresentation()));
+                    return realmResource.clients().get("cytomine-permissions");
+                }
+            );
 
         cytominePermissions.roles().forEach(
             (key, value) -> wrapException(() -> existingClient.roles().get(key).toRepresentation()).map(ignored -> true)
@@ -77,8 +80,8 @@ public class PermissionsService {
 
     RoleRepresentation getRoleRepresentation(String role) {
         RoleRepresentation roleRepresentation = new RoleRepresentation();
-        roleRepresentation.setId(role);
-        roleRepresentation.setName(role);
+        roleRepresentation.setId(role.toUpperCase());
+        roleRepresentation.setName(role.toUpperCase());
         return roleRepresentation;
     }
 

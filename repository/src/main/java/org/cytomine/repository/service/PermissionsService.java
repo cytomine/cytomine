@@ -66,7 +66,8 @@ public class PermissionsService {
                     existingClient.roles().create(getRoleRepresentation(key));
                     return true;
                 }));
-        existingClient.update(getClientRepresentation(existingClient.toRepresentation(), cytominePermissions));
+        realmResource.clients().get("cytomine-permissions")
+            .update(getClientRepresentation(existingClient.toRepresentation(), cytominePermissions));
     }
 
     <T> Optional<T> wrapException(Supplier<T> call) {
@@ -80,8 +81,9 @@ public class PermissionsService {
 
     RoleRepresentation getRoleRepresentation(String role) {
         RoleRepresentation roleRepresentation = new RoleRepresentation();
-        roleRepresentation.setId(role.toUpperCase());
-        roleRepresentation.setName(role.toUpperCase());
+        roleRepresentation.setId(role);
+        roleRepresentation.setName(role);
+        roleRepresentation.setClientRole(true);
         return roleRepresentation;
     }
 
@@ -112,8 +114,6 @@ public class PermissionsService {
         resourceServerRepresentation.setPolicies(cytominePermissions.roles().entrySet().stream()
             .flatMap(entry -> entry.getValue().stream().map(v1 -> getPolicyRepresentation(entry.getKey(), v1)))
             .toList());
-        cytominePermissions.roles().forEach((roleName, permissions) -> {
-        });
         return resourceServerRepresentation;
     }
 

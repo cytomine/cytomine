@@ -59,7 +59,7 @@ You will find the documentation dedicated to the image viewer on [a dedicated pa
 Clicking on Show filters button shows metadata filters supported by Cytomine to filter `BigPicture` datasets metadata using the following filters and full text search across
 all searchable textual properties in the dataset metadata.
 
-filtering dynamically returns results and counts per filter and also a total count of results. these filters only search images of the project.
+Filtering dynamically returns results and counts per filter and also a total count of results. These filters only search images of the current project.
 
 ![Image details](/images/user-guide/project/project-metadata-filters.png)
 

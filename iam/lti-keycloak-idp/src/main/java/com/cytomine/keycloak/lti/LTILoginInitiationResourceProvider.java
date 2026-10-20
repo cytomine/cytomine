@@ -1,6 +1,8 @@
 package com.cytomine.keycloak.lti;
 import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
@@ -54,6 +56,10 @@ public class LTILoginInitiationResourceProvider implements RealmResourceProvider
         // no-op
     }
 
+    /**
+     * Moodle (and most other platforms) POST the OIDC third-party-initiated login to the
+     * login initiation URL with the LTI parameters urlencoded in the request body.
+     */
     @POST
     @Path("login-init")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -63,6 +69,31 @@ public class LTILoginInitiationResourceProvider implements RealmResourceProvider
                                @FormParam("client_id") String clientId,
                                @FormParam("lti_deployment_id") String deploymentId,
                                @FormParam("lti_message_hint") String messageHint) {
+        return doLoginInit(iss, loginHint, targetLinkUri, clientId, deploymentId, messageHint);
+    }
+
+    /**
+     * Blackboard (and some other platforms) GET the login initiation URL with the LTI
+     * parameters urlencoded in the query string. JAX-RS decodes them automatically, so the
+     * handling is identical to the POST variant.
+     */
+    @GET
+    @Path("login-init")
+    public Response loginInitGet(@QueryParam("iss") String iss,
+                                 @QueryParam("login_hint") String loginHint,
+                                 @QueryParam("target_link_uri") String targetLinkUri,
+                                 @QueryParam("client_id") String clientId,
+                                 @QueryParam("lti_deployment_id") String deploymentId,
+                                 @QueryParam("lti_message_hint") String messageHint) {
+        return doLoginInit(iss, loginHint, targetLinkUri, clientId, deploymentId, messageHint);
+    }
+
+    private Response doLoginInit(String iss,
+                                 String loginHint,
+                                 String targetLinkUri,
+                                 String clientId,
+                                 String deploymentId,
+                                 String messageHint) {
 
         if (iss == null || loginHint == null || targetLinkUri == null) {
             return Response.status(Response.Status.BAD_REQUEST)

@@ -23,7 +23,7 @@ Clicking Show filters button shows metadata filters supported by Cytomine to fil
 all searchable textual properties in the dataset metadata.
 
 Filtering dynamically returns results and counts per filter and also a total count of results. These filters search images across all images in the user storage.
-filters show all possible collective filters across datasets, also the user can create a new project from the result of filtering so basically selecting interesting
+Filters show all possible collective filters across datasets. Also the user can create a new Cytomine project from the result of filtering so basically selecting interesting
 images from different datasets and grouping them together in one project managed by the user.
 
 ![Storage details](/images/user-guide/storage/storage-metadata-filters.png)

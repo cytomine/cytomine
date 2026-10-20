@@ -32,6 +32,9 @@ jobs:
           python-version: 3.x
           check-latest: true
 
+      - name: Install envsubst
+        run: sudo apt-get update && sudo apt-get install -y gettext-base
+
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.9.0
 

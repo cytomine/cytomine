@@ -138,7 +138,7 @@ This step should be done before the `docker compose up -d` command in the Cytomi
 ### Metadata
 
 Cytomine uses a dedicated search engine to index datasets to make them ready for filtering and search later on through UI. No extra config is needed to set this up.
-it works automatically as part of dataset importation, and it's idempotent so that added datasets always leave cytomine in a valid state. currently supported metadata version is
+It works automatically as part of dataset importation, and it's idempotent so that added datasets always leave cytomine in a valid state. Currently supported metadata version is
 v2.0.
 
 ### Usage

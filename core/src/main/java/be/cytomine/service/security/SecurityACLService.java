@@ -110,7 +110,7 @@ public class SecurityACLService {
 
     public void check(CytomineDomain domain, Permission permission, UserResponse currentUser) {
         if (domain != null) {
-            if (!hasPermission(retrieveContainer(domain), permission, currentRoleService.isAdminByNow(currentUser))) {
+            if (!hasPermission(retrieveContainer(domain), permission, currentUser)) {
                 throw new ForbiddenException("You don't have the right to read or modify this resource! "
                     + domain.getClass()
                     + " "
@@ -148,13 +148,18 @@ public class SecurityACLService {
     }
 
     /**
-     * Check if user has permission on the curret domain
+     * Check if user has permission on the current domain
      *
      * @param permission Permission to check (READ,...)
      * @return true if user has this permission on current domain
      */
     public boolean hasPermission(CytomineDomain domain, Permission permission, boolean isAdmin) {
         return permissionService.hasACLPermission(domain, permission) || isAdmin;
+    }
+
+    public boolean hasPermission(CytomineDomain domain, Permission permission, UserResponse currentUser) {
+        return permissionService.hasACLPermission(domain, currentUser.username(), permission)
+            || currentRoleService.isAdminByNow(currentUser);
     }
 
     public boolean hasPermission(CytomineDomain domain, Permission permission) {

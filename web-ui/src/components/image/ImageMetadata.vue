@@ -39,6 +39,7 @@
 import { getWildcardRegexp } from '@/utils/string-utils';
 import { get } from '@/utils/store-helpers';
 import { appendShortTermToken } from '@/utils/token-utils.js';
+import { fetchImageMetadata } from '@/utils/search';
 import { Cytomine } from '@/api';
 
 export default {
@@ -82,6 +83,9 @@ export default {
     },
     uriCytomineImageType() {
       return this.image.class.includes('AbstractImage') ? 'abstractimage' : 'imageinstance';
+    },
+    abstractImageId() {
+      return this.image.class.includes('AbstractImage') ? this.image.id : this.image.baseImage;
     }
   },
   methods: {
@@ -90,19 +94,28 @@ export default {
       this.rotationAngle = (this.rotationAngle + val + 360) % 360;
     },
     async fetchMetadata() {
-      this.metadata = (await Cytomine.instance.api.get(
-        `${this.uriCytomineImageType}/${this.image.id}/metadata.json`
-      )).data.collection.map(md => ({ fullKey: `${md.namespace}.${md.key}`, ...md }));
+      let [imageMetadata, searchMetadata] = await Promise.all([
+        Cytomine.instance.api.get(
+          `${this.uriCytomineImageType}/${this.image.id}/metadata.json`
+        ).then(({ data }) => data.collection.map(
+          md => ({ fullKey: `${md.namespace}.${md.key}`, ...md })
+        )),
+        fetchImageMetadata(this.abstractImageId).then(items => items.map(
+          item => ({ id: `meili-${item.fullKey}`, ...item })
+        ))
+      ]);
+      this.metadata = [...imageMetadata, ...searchMetadata];
       this.metadata.sort((a, b) => a.fullKey.localeCompare(b.fullKey));
     }
   },
-  created() {
+  async created() {
     try {
-      this.fetchMetadata();
-      this.loading = false;
+      await this.fetchMetadata();
     } catch (error) {
       console.log(error);
       this.error = true;
+    } finally {
+      this.loading = false;
     }
   }
 };

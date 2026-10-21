@@ -6,6 +6,7 @@ import java.util.Random;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
@@ -167,10 +168,11 @@ public class PermissionService {
     }
 
     public Long getAclClassId(CytomineDomain domain) {
-        Long id = aclRepository.getAclClassId(domain.getClass().getName());
+        String className = Hibernate.getClass(domain).getName();
+        Long id = aclRepository.getAclClassId(className);
         if (id == null) {
-            aclRepository.insertAclClassId(domain.getClass().getName());
-            id = aclRepository.getAclClassId(domain.getClass().getName());
+            aclRepository.insertAclClassId(className);
+            id = aclRepository.getAclClassId(className);
         }
         return id;
     }

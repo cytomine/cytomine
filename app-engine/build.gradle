@@ -76,8 +76,8 @@ dependencies {
     implementation 'org.locationtech.jts.io:jts-io-common:1.19.0'
 
     // Hibernate
-    implementation 'org.hibernate:hibernate-core:7.1.8.Final'
-    implementation 'org.hibernate:hibernate-spatial:7.1.8.Final'
+    implementation 'org.hibernate:hibernate-core:7.4.13.Final'
+    implementation 'org.hibernate:hibernate-spatial:7.4.13.Final'
 
 
     // Jakarta
@@ -114,7 +114,7 @@ dependencies {
 
     // liquibase
     liquibaseRuntime 'info.picocli:picocli:4.7.5'
-    implementation 'org.liquibase:liquibase-core:4.25.0'
+    implementation 'org.liquibase:liquibase-core:5.0.4'
 
     // Image processing
     implementation 'org.apache.commons:commons-imaging:1.0.0-alpha5'
@@ -122,7 +122,7 @@ dependencies {
 
     testImplementation "org.springframework.boot:spring-boot-testcontainers"
     testImplementation "org.testcontainers:testcontainers-junit-jupiter"
-    testImplementation 'com.google.cloud.tools:jib-core:0.27.3'
+    testImplementation 'com.google.cloud.tools:jib-core:0.28.2'
     testImplementation "org.testcontainers:testcontainers-postgresql"
     testImplementation "org.testcontainers:testcontainers"
     testImplementation "org.testcontainers:testcontainers-k3s"

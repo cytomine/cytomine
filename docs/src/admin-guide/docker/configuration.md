@@ -135,6 +135,12 @@ If no `.env` file was provided, the default location is `./cytomine/data/dataset
 This step should be done before the `docker compose up -d` command in the Cytomine installation guide.
 :::
 
+### Metadata
+
+Cytomine uses a dedicated search engine to index datasets to make them ready for filtering and search later on through UI. No extra config is needed to set this up.
+It works automatically as part of dataset importation, and it's idempotent so that added datasets always leave cytomine in a valid state. Currently supported metadata version is
+v2.0.
+
 ### Usage
 
 Using the Python client in your locally cloned Cytomine directory, you can import the datasets with the following command executed from the root of the repository:

@@ -14,6 +14,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.cytomine.repository.config.CytominePermissions;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.AuthorizationResource;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -23,6 +24,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.representations.idm.authorization.Logic;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
+import org.keycloak.representations.idm.authorization.ResourcePermissionRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
 import org.keycloak.representations.idm.authorization.ScopeRepresentation;
@@ -33,6 +35,7 @@ import tools.jackson.databind.ObjectMapper;
 import be.cytomine.common.config.security.CytominePermission;
 import be.cytomine.common.config.security.CytomineUserRole;
 
+import static org.keycloak.representations.idm.authorization.DecisionStrategy.AFFIRMATIVE;
 import static org.keycloak.representations.idm.authorization.DecisionStrategy.UNANIMOUS;
 
 @Component
@@ -73,7 +76,38 @@ public class PermissionsService {
         existingClient.authorization()
             .importSettings(getResourceServerRepresentation(cytominePermissions));
 
+        cytominePermissions.roles().forEach(
+            (role, scopes) -> upsertResourcePermission(role, scopes, existingClient));
+
         cytominePermissions.users().forEach(user -> assignRolesToExistingUser(user, existingClient));
+    }
+
+    void upsertResourcePermission(String role, Set<CytominePermission> scopes, ClientResource client) {
+        AuthorizationResource authorization = client.authorization();
+
+        ResourcePermissionRepresentation permission =
+            wrapException(() -> authorization.permissions().resource().findByName("core-" + role))
+                .orElseGet(ResourcePermissionRepresentation::new);
+
+        permission.setName("core-" + role);
+        permission.setDecisionStrategy(UNANIMOUS);
+        permission.setLogic(Logic.POSITIVE);
+        permission.addResource("core");
+        scopes.stream().map(CytominePermission::toString).forEach(permission::addScope);
+        permission.addPolicy("role-" + role);
+
+        try {
+            if (permission.getId() == null) {
+                authorization.permissions().resource().create(permission);
+                log.info("Created resource permission core-{}", role);
+            } else {
+                authorization.permissions().resource()
+                    .findById(permission.getId()).update(permission);
+                log.info("Updated resource permission core-{}", role);
+            }
+        } catch (Exception e) {
+            log.error("Failed to upsert resource permission core-{}", role, e);
+        }
     }
 
     void assignRolesToExistingUser(CytomineUserRole user, ClientResource client) {
@@ -131,13 +165,12 @@ public class PermissionsService {
         Set<CytominePermission> scopes = Stream.of(CytominePermission.values())
             .collect(Collectors.toSet());
 
+        resourceServerRepresentation.setDecisionStrategy(AFFIRMATIVE);
         resourceServerRepresentation.setScopes(
             scopes.stream().map(this::getScopeRepresentation).toList());
         resourceServerRepresentation.setResources(List.of(getResourceRepresentation(scopes)));
-        resourceServerRepresentation.setPolicies(cytominePermissions.roles().entrySet().stream()
-            .flatMap(entry -> Stream.of(
-                getRolePolicy(entry.getKey(), entry.getValue()),
-                getPermissionPolicy(entry.getKey(), entry.getValue())))
+        resourceServerRepresentation.setPolicies(cytominePermissions.roles().keySet().stream()
+            .map(this::getRolePolicy)
             .toList());
         return resourceServerRepresentation;
     }
@@ -150,13 +183,11 @@ public class PermissionsService {
     }
 
     @SneakyThrows
-    PolicyRepresentation getRolePolicy(String role, Set<CytominePermission> scopes) {
+    PolicyRepresentation getRolePolicy(String role) {
         PolicyRepresentation policyRepresentation = new PolicyRepresentation();
         policyRepresentation.setId("role-" + role);
         policyRepresentation.setName("role-" + role);
         policyRepresentation.setType("role");
-        policyRepresentation.setScopes(
-            scopes.stream().map(CytominePermission::toString).collect(Collectors.toSet()));
         policyRepresentation.setDecisionStrategy(UNANIMOUS);
         policyRepresentation.setLogic(Logic.POSITIVE);
         policyRepresentation.setConfig(
@@ -164,22 +195,6 @@ public class PermissionsService {
                 List.of(new SimpleRoleRepresentation("cytomine-permissions/" + role, false)))));
         return policyRepresentation;
 
-    }
-
-    @SneakyThrows
-    PolicyRepresentation getPermissionPolicy(String role, Set<CytominePermission> scopes) {
-        PolicyRepresentation policyRepresentation = new PolicyRepresentation();
-        policyRepresentation.setId("core-" + role);
-        policyRepresentation.setName("core-" + role);
-        policyRepresentation.setType("resource");
-        policyRepresentation.setResources(Set.of("core"));
-        policyRepresentation.setScopes(
-            scopes.stream().map(CytominePermission::toString).collect(Collectors.toSet()));
-        policyRepresentation.setDecisionStrategy(UNANIMOUS);
-        policyRepresentation.setLogic(Logic.POSITIVE);
-        policyRepresentation.setConfig(
-            Map.of("applyPolicies", jsonMapper.writeValueAsString(List.of("role-" + role))));
-        return policyRepresentation;
     }
 
     ResourceRepresentation getResourceRepresentation(Set<CytominePermission> scopes) {

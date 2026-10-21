@@ -17,3 +17,9 @@ cytomine:
         - project_owner_can_add_members
       project_guest:
       project_admin:
+
+  users:
+    - name: admin
+      roles:
+        - user
+        - admin

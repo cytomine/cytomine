@@ -38,6 +38,7 @@ import eventBus from '@/utils/event-bus';
 import { Cytomine } from '@/api';
 
 import { getWildcardRegexp } from '@/utils/string-utils';
+import { fetchImageMetadata } from '@/utils/search';
 
 export default {
   name: 'MetadataPanel',
@@ -67,9 +68,17 @@ export default {
   },
   methods: {
     async fetchMetadata() {
-      this.metadata = (await Cytomine.instance.api.get(
-        `imageinstance/${this.image.id}/metadata.json`
-      )).data.collection.map(md => ({ fullKey: `${md.namespace}.${md.key}`, ...md }));
+      let [imageMetadata, searchMetadata] = await Promise.all([
+        Cytomine.instance.api.get(
+          `imageinstance/${this.image.id}/metadata.json`
+        ).then(({ data }) => data.collection.map(
+          md => ({ fullKey: `${md.namespace}.${md.key}`, ...md })
+        )),
+        fetchImageMetadata(this.image.baseImage).then(items => items.map(
+          item => ({ id: `meili-${item.fullKey}`, key: item.fullKey, ...item })
+        ))
+      ]);
+      this.metadata = [...imageMetadata, ...searchMetadata];
       this.metadata.sort((a, b) => a.fullKey.localeCompare(b.fullKey));
     },
     closeMetadata() {

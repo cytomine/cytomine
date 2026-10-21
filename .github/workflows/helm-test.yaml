@@ -32,8 +32,11 @@ jobs:
           python-version: 3.x
           check-latest: true
 
+      - name: Install envsubst
+        run: sudo apt-get update && sudo apt-get install -y gettext-base
+
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.8.0
+        uses: helm/chart-testing-action@v2.9.0
 
       - name: Define deployment name
         run: echo "DEPLOYMENT_NAME=${GITHUB_SHA:0:7}" >> $GITHUB_ENV

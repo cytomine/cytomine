@@ -11,13 +11,16 @@ import java.util.stream.Stream;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.cytomine.repository.config.CytominePermissions;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.representations.idm.authorization.Logic;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
@@ -28,10 +31,12 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.config.security.CytominePermission;
+import be.cytomine.common.config.security.CytomineUserRole;
 
 import static org.keycloak.representations.idm.authorization.DecisionStrategy.UNANIMOUS;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class PermissionsService {
 
@@ -67,6 +72,33 @@ public class PermissionsService {
 
         existingClient.authorization()
             .importSettings(getResourceServerRepresentation(cytominePermissions));
+
+        cytominePermissions.users().forEach(user -> assignRolesToExistingUser(user, existingClient));
+    }
+
+    void assignRolesToExistingUser(CytomineUserRole user, ClientResource client) {
+        UsersResource users = keycloak.realm(realm).users();
+
+        Optional<UserRepresentation> existingUser =
+            wrapException(() -> users.searchByUsername(user.name(), true))
+                .filter(found -> !found.isEmpty())
+                .map(found -> found.get(0));
+
+        if (existingUser.isEmpty()) {
+            log.warn("User {} not found in realm {}, skipping roles assignment", user.name(), realm);
+            return;
+        }
+
+        List<RoleRepresentation> userRoles = user.roles().stream()
+            .map(role -> wrapException(() -> client.roles().get(role).toRepresentation()))
+            .flatMap(Optional::stream)
+            .toList();
+
+        users.get(existingUser.get().getId())
+            .roles()
+            .clientLevel(client.toRepresentation().getId())
+            .add(userRoles);
+        log.info("Assigned client roles {} to user {}", user.roles(), user.name());
     }
 
     <T> Optional<T> wrapException(Supplier<T> call) {

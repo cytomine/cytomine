@@ -18,8 +18,8 @@ cytomine:
       project_guest:
       project_admin:
 
-  users:
-    - name: admin
-      roles:
-        - user
-        - admin
+    users:
+      - name: admin
+        roles:
+          - user
+          - admin

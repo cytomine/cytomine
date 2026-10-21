@@ -19,7 +19,14 @@ The list of uploaded files in your storage gathers:
 
 Files related to an image upload, such as internally required conversions can be shown in a file tree.
 
-![Storage details](/images/user-guide/storage/upload-details-2.png)
+Clicking Show filters button shows metadata filters supported by Cytomine to filter `BigPicture` datasets metadata using the following filters and full text search across
+all searchable textual properties in the dataset metadata.
+
+Filtering dynamically returns results and counts per filter and also a total count of results. These filters search images across all images in the user storage.
+Filters show all possible collective filters across datasets. Also the user can create a new Cytomine project from the result of filtering so basically selecting interesting
+images from different datasets and grouping them together in one project managed by the user.
+
+![Storage details](/images/user-guide/storage/storage-metadata-filters.png)
 
 ## Upload
 

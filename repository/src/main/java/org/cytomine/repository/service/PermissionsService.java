@@ -47,10 +47,7 @@ public class PermissionsService {
     @PostConstruct
     public void writePermissionsToKeycloak() {
         RealmResource realmResource = keycloak.realm(realm);
-        getRealmRepresentation(realmResource, cytominePermissions);
-    }
 
-    void getRealmRepresentation(RealmResource realmResource, CytominePermissions cytominePermissions) {
         ClientsResource clients = realmResource.clients();
 
         ClientResource existingClient = clients.findByClientId("cytomine-permissions").stream().findFirst()
@@ -76,9 +73,8 @@ public class PermissionsService {
                     return true;
                 }));
 
-        realmResource.clients().get("cytomine-permissions")
-            .update(getClientRepresentation(existingClient.toRepresentation(), cytominePermissions));
-        
+        existingClient.authorization()
+            .importSettings(getResourceServerRepresentation(cytominePermissions));
     }
 
     <T> Optional<T> wrapException(Supplier<T> call) {
@@ -106,16 +102,6 @@ public class PermissionsService {
         return clientRepresentation;
     }
 
-    ClientRepresentation getClientRepresentation(ClientRepresentation clientRepresentation,
-        CytominePermissions cytominePermissions) {
-        clientRepresentation.setId("cytomine-permissions");
-        clientRepresentation.setName("cytomine-permissions");
-        clientRepresentation.setAuthorizationServicesEnabled(true);
-        clientRepresentation.setServiceAccountsEnabled(true);
-        clientRepresentation.setAuthorizationSettings(getResourceServerRepresentation(cytominePermissions));
-        return clientRepresentation;
-    }
-
     ResourceServerRepresentation getResourceServerRepresentation(CytominePermissions cytominePermissions) {
         ResourceServerRepresentation resourceServerRepresentation = new ResourceServerRepresentation();
 
@@ -139,8 +125,8 @@ public class PermissionsService {
     @SneakyThrows
     PolicyRepresentation getPolicyRepresentation(String role, CytominePermission policy) {
         PolicyRepresentation policyRepresentation = new PolicyRepresentation();
-        policyRepresentation.setId(policy.toString());
-        policyRepresentation.setName(policy.toString());
+        policyRepresentation.setId(role + "." + policy);
+        policyRepresentation.setName(role + "." + policy);
         policyRepresentation.setType("role");
         policyRepresentation.setScopes(Set.of(policy.toString()));
         policyRepresentation.setDecisionStrategy(UNANIMOUS);

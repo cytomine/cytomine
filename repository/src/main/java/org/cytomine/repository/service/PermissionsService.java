@@ -69,6 +69,7 @@ public class PermissionsService {
     @Value("${keycloak-client.target.admin-user.email:admin@cytomine.org}")
     String adminEmail;
 
+    @Value("${keycloak-client.configure-keycloak}")
     boolean configureKeycloak;
 
     @PostConstruct

@@ -26,14 +26,6 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: iam-client-config
-data:
-  config.json: {{ tpl (.Files.Get "configs/iam/config.json") . | quote }}
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
   name: iam-user-config
 data:
   config.json: |-

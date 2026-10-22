@@ -49,5 +49,12 @@ keycloak-client:
   target:
     realm: cytomine
     client-id: core
+    client-url: ${APP_URL:http://127.0.0.1}
+    admin-user:
+      username: ${CYTOMINE_ADMIN_USER:admin}
+      password: ${CYTOMINE_ADMIN_PASSWORD:password}
+      first-name: Admin
+      last-name: Admin
+      email: ${CYTOMINE_ADMIN_EMAIL:admin@cytomine.org}
   client-id: admin-cli
   url: ${IAM_URL:http://127.0.0.1:8100}/iam

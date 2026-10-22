@@ -34,13 +34,10 @@ FROM ${PROXY_CACHE}/keycloak/keycloak:${KEYCLOAK_VERSION} AS dev-server
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 COPY --from=dev-tools-builder /mnt/rootfs /
 
-RUN mkdir /opt/keycloak/data/import
-COPY kc_config.json /opt/keycloak/data/import
-
 ENV KC_HTTP_RELATIVE_PATH=/iam
 
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
-CMD ["start-dev", "--import-realm", "--http-port=8100"]
+CMD ["start-dev", "--http-port=8100"]
 
 #######################################################################################
 ## Stage: Cytomine IAM external tools build
@@ -72,10 +69,7 @@ LABEL org.opencontainers.image.authors="uliege@cytomine.org" \
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 COPY --from=prod-tools-builder /mnt/rootfs /
 
-RUN mkdir /opt/keycloak/data/import
-COPY kc_config.json /opt/keycloak/data/import
-
 ENV KC_HTTP_PORT=8100
 
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
-CMD ["start" , "--import-realm", "--optimized"]
+CMD ["start" , "--optimized"]

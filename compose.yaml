@@ -313,6 +313,8 @@ services:
       POSTGIS_HOST: postgis
       IAM_URL: http://iam:8100
       IAM_EXTERNAL_URL: http://127.0.0.1:8100
+      KEYCLOAK_ADMIN_PASSWORD: *KEYCLOAK_ADMIN_PASSWORD
+      CYTOMINE_ADMIN_PASSWORD: password
     networks:
       host_network:
         ipv4_address: 172.16.238.18

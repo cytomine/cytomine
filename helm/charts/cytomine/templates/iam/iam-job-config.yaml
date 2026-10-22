@@ -85,16 +85,23 @@ spec:
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
-      - name: create-client
+      - name: wait-for-core-client
         image: "{{ .Values.images.iam }}"
         command: ["/bin/sh", "-c"]
-        args: ["/opt/keycloak/bin/kcadm.sh create clients -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -f /opt/keycloak-conf/config.json -o || true && /opt/keycloak/bin/kcadm.sh get clients -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -q clientId=core --fields=id | tr -d '\n][{} \"' | cut -f2 -d':' > /opt/keycloak-auth/client-core-id && cat /opt/keycloak-auth/client-core-id"]
+        args:
+          - |
+            CORE_CLIENT_ID=""
+            while test -z "$CORE_CLIENT_ID"; do
+              CORE_CLIENT_ID=$(/opt/keycloak/bin/kcadm.sh get clients -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -q clientId=core --fields=id | tr -d '\n][{} \"' | cut -f2 -d':' | cut -f1 -d',')
+              if test -z "$CORE_CLIENT_ID"; then
+                echo "Waiting for the repository service to create the core client..."
+                sleep 5
+              fi
+            done
+            echo "$CORE_CLIENT_ID" > /opt/keycloak-auth/client-core-id && cat /opt/keycloak-auth/client-core-id
         volumeMounts:
         - name: kc-auth
           mountPath: "/opt/keycloak-auth"
-        - name: iam-client-config
-          mountPath: "/opt/keycloak-conf/config.json"
-          subPath: "config.json"
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 
@@ -279,12 +286,6 @@ spec:
       volumes:
       - emptyDir: {}
         name: kc-auth
-      - name: iam-client-config
-        configMap:
-          name: iam-client-config
-          items:
-          - key: "config.json"
-            path: "config.json"
       - name: iam-user-config
         configMap:
           name: iam-user-config

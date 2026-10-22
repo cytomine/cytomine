@@ -1,5 +1,7 @@
 package org.cytomine.repository.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +29,8 @@ import org.keycloak.representations.userprofile.config.UPAttribute;
 import org.keycloak.representations.userprofile.config.UPConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 @Slf4j
@@ -52,93 +55,10 @@ public class PermissionsService {
     private static final String DEFAULT_LOCALE = "en";
     private static final String PROFILE_CLIENT_SCOPE = "profile";
     private static final String PROJECTS_MAPPER = "projects";
-    private static final String USER_PROFILE_SCHEMA = """
-        {
-          "groups": [
-            {
-              "name": "user-metadata",
-              "displayHeader": "User metadata",
-              "displayDescription": "Attributes, which refer to user metadata"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "isDeveloper",
-              "displayName": "developer",
-              "group": "user-metadata",
-              "validations": {
-                "options": {
-                  "options": [
-                    "1",
-                    "0"
-                  ]
-                }
-              },
-              "annotations": {
-                "inputType": "select"
-              },
-              "permissions": {
-                "view": [
-                  "admin",
-                  "user"
-                ],
-                "edit": [
-                  "admin",
-                  "user"
-                ]
-              },
-              "multivalued": false
-            },
-            {
-              "name": "locale",
-              "displayName": "locale",
-              "group": "user-metadata",
-              "validations": {
-                "options": {
-                  "options": [
-                    "nl",
-                    "en",
-                    "es",
-                    "fr"
-                  ]
-                }
-              },
-              "annotations": {
-                "inputType": "select"
-              },
-              "permissions": {
-                "view": [
-                  "admin",
-                  "user"
-                ],
-                "edit": [
-                  "admin",
-                  "user"
-                ]
-              },
-              "multivalued": false
-            },
-            {
-              "name": "projects",
-              "displayName": "projects",
-              "group": "user-metadata",
-              "validations": {},
-              "annotations": {},
-              "permissions": {
-                "view": [],
-                "edit": [
-                  "admin"
-                ]
-              },
-              "multivalued": true
-            }
-          ],
-          "unmanagedAttributePolicy": "ENABLED"
-        }
-        """;
+    private static final String USER_PROFILE_SCHEMA = "/keycloak-profile.json";
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
 
     private final Keycloak keycloak;
-    private final ObjectMapper objectMapper;
 
     @Value("${keycloak-client.target.realm}")
     String realm;
@@ -356,18 +276,24 @@ public class PermissionsService {
     }
 
     private void applyUserProfileSchema(RealmResource realmResource) {
-        UPConfig schema = objectMapper.readValue(USER_PROFILE_SCHEMA, UPConfig.class);
-        UPConfig config = realmResource.users().userProfile().getConfiguration();
-        schema.getGroups().stream()
-            .filter(group -> config.getGroups().stream()
-                .noneMatch(existing -> group.getName().equals(existing.getName())))
-            .forEach(config::addGroup);
-        schema.getAttributes().forEach(config::addOrReplaceAttribute);
-        config.setUnmanagedAttributePolicy(schema.getUnmanagedAttributePolicy());
-        realmResource.users().userProfile().update(config);
-        log.info("Applied user profile attributes {} on Keycloak realm '{}'",
-            schema.getAttributes().stream().map(UPAttribute::getName).toList(), realm);
-
+        try (InputStream stream = getClass().getResourceAsStream(USER_PROFILE_SCHEMA)) {
+            if (stream == null) {
+                throw new IllegalStateException("Missing user profile schema resource " + USER_PROFILE_SCHEMA);
+            }
+            UPConfig schema = JSON_MAPPER.readValue(stream, UPConfig.class);
+            UPConfig config = realmResource.users().userProfile().getConfiguration();
+            schema.getGroups().stream()
+                .filter(group -> config.getGroups().stream()
+                    .noneMatch(existing -> group.getName().equals(existing.getName())))
+                .forEach(config::addGroup);
+            schema.getAttributes().forEach(config::addOrReplaceAttribute);
+            config.setUnmanagedAttributePolicy(schema.getUnmanagedAttributePolicy());
+            realmResource.users().userProfile().update(config);
+            log.info("Applied user profile attributes {} on Keycloak realm '{}'",
+                schema.getAttributes().stream().map(UPAttribute::getName).toList(), realm);
+        } catch (IOException | JacksonException e) {
+            throw new IllegalStateException("Failed to parse user profile schema " + USER_PROFILE_SCHEMA, e);
+        }
     }
 
     private void ensureProjectsMapperIsSet(RealmResource realmResource) {

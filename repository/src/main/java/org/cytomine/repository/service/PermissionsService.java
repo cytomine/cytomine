@@ -41,8 +41,7 @@ public class PermissionsService {
     private static final List<String> OPTIONAL_CLIENT_SCOPES =
         List.of("address", "phone", "offline_access", "microprofile-jwt");
     private static final List<String> WEB_ORIGINS = List.of("*");
-    private static final int MAX_ATTEMPTS = 60;
-    private static final long RETRY_DELAY_SECONDS = 10;
+
 
     private final Keycloak keycloak;
 
@@ -70,12 +69,16 @@ public class PermissionsService {
     @Value("${keycloak-client.target.admin-user.email:admin@cytomine.org}")
     String adminEmail;
 
+    boolean configureKeycloak;
+
     @PostConstruct
     public void applyCytomineConfiguration() {
-        RealmResource realmResource = ensureRealmExists();
-        ClientResource coreClient = ensureCoreClientExists(realmResource);
-        ensureClientRolesAreSet(coreClient);
-        ensureAdminUserIsSet(realmResource, coreClient);
+        if (configureKeycloak) {
+            RealmResource realmResource = ensureRealmExists();
+            ClientResource coreClient = ensureCoreClientExists(realmResource);
+            ensureClientRolesAreSet(coreClient);
+            ensureAdminUserIsSet(realmResource, coreClient);
+        }
     }
 
     private RealmResource ensureRealmExists() {

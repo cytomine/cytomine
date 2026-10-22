@@ -58,3 +58,4 @@ keycloak-client:
       email: ${CYTOMINE_ADMIN_EMAIL:admin@cytomine.org}
   client-id: admin-cli
   url: ${IAM_URL:http://127.0.0.1:8100}/iam
+  configure-keycloak: true

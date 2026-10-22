@@ -154,7 +154,7 @@ keycloak-client:
     client-id: core
   client-id: admin-cli
   url: ${IAM_URL:http://127.0.0.1:8100}/iam
-
+  configure-keycloak: false
 meilisearch:
   host: ${MEILISEARCH_URL:http://localhost:7700}
   api-key: ${MEILISEARCH_KEY:masterKey}

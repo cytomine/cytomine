@@ -1,11 +1,15 @@
 package org.cytomine.repository.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,15 +17,17 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.RealmsResource;
 import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.ClientScopeRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.representations.userprofile.config.UPConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -41,9 +47,17 @@ public class PermissionsService {
     private static final List<String> OPTIONAL_CLIENT_SCOPES =
         List.of("address", "phone", "offline_access", "microprofile-jwt");
     private static final List<String> WEB_ORIGINS = List.of("*");
-
+    private static final String REALM_MANAGEMENT_CLIENT = "realm-management";
+    private static final List<String> REALM_MANAGEMENT_ROLES =
+        List.of("view-users", "manage-users", "query-users");
+    private static final List<String> SUPPORTED_LOCALES = List.of("en", "fr", "es", "nl");
+    private static final String DEFAULT_LOCALE = "en";
+    private static final String USER_PROFILE_SCHEMA = "/keycloak-profile.json";
+    private static final String PROFILE_CLIENT_SCOPE = "profile";
+    private static final String PROJECTS_MAPPER = "projects";
 
     private final Keycloak keycloak;
+    private final ObjectMapper objectMapper;
 
     @Value("${keycloak-client.target.realm}")
     String realm;
@@ -79,18 +93,33 @@ public class PermissionsService {
             ClientResource coreClient = ensureCoreClientExists(realmResource);
             ensureClientRolesAreSet(coreClient);
             ensureAdminUserIsSet(realmResource, coreClient);
+            ensureRealmIsInternationalized(realmResource);
+            ensureAdminHasRealmManagementRoles(realmResource);
+            applyUserProfileSchema(realmResource);
+            ensureProjectsMapperIsSet(realmResource);
         }
     }
 
     private RealmResource ensureRealmExists() {
-        RealmsResource realmsResource = keycloak.realms();
-        if (realmsResource.findAll().stream().noneMatch(r -> realm.equals(r.getRealm()))) {
-            RealmRepresentation realmRepresentation = new RealmRepresentation();
-            realmRepresentation.setRealm(realm);
-            realmsResource.create(realmRepresentation);
-            log.info("Created Keycloak realm '{}'", realm);
+        RealmResource realmResource = keycloak.realms().findAll().stream()
+            .filter(r -> realm.equals(r.getRealm()))
+            .findFirst()
+            .map(r -> keycloak.realm(realm))
+            .orElseGet(() -> {
+                RealmRepresentation realmRepresentation = new RealmRepresentation();
+                realmRepresentation.setRealm(realm);
+                realmRepresentation.setEnabled(true);
+                keycloak.realms().create(realmRepresentation);
+                log.info("Created Keycloak realm '{}'", realm);
+                return keycloak.realm(realm);
+            });
+        RealmRepresentation representation = realmResource.toRepresentation();
+        if (!Boolean.TRUE.equals(representation.isEnabled())) {
+            representation.setEnabled(true);
+            realmResource.update(representation);
+            log.info("Enabled Keycloak realm '{}'", realm);
         }
-        return keycloak.realm(realm);
+        return realmResource;
     }
 
     private ClientResource ensureCoreClientExists(RealmResource realmResource) {
@@ -201,6 +230,85 @@ public class PermissionsService {
                 .orElseThrow(() -> new IllegalStateException("Missing Keycloak client role " + ADMIN_ROLE));
             userResource.roles().clientLevel(coreClientId).add(List.of(adminRole));
             log.info("Assigned Keycloak client role '{}' to user '{}'", ADMIN_ROLE, adminUsername);
+        }
+    }
+
+    private void ensureRealmIsInternationalized(RealmResource realmResource) {
+        RealmRepresentation representation = realmResource.toRepresentation();
+        if (Boolean.TRUE.equals(representation.isInternationalizationEnabled())
+            && SUPPORTED_LOCALES.containsAll(representation.getSupportedLocales())
+            && DEFAULT_LOCALE.equals(representation.getDefaultLocale())) {
+            return;
+        }
+        representation.setInternationalizationEnabled(true);
+        representation.setSupportedLocales(Set.copyOf(SUPPORTED_LOCALES));
+        representation.setDefaultLocale(DEFAULT_LOCALE);
+        realmResource.update(representation);
+        log.info("Enabled internationalization on Keycloak realm '{}'", realm);
+    }
+
+    private void ensureAdminHasRealmManagementRoles(RealmResource realmResource) {
+        UserRepresentation user = realmResource.users().search(adminUsername, Boolean.TRUE).stream()
+            .findFirst().orElse(null);
+        if (user == null) {
+            throw new IllegalStateException("Missing Keycloak admin user " + adminUsername);
+        }
+        ClientRepresentation realmManagement = realmResource.clients().findByClientId(REALM_MANAGEMENT_CLIENT).stream()
+            .findFirst().orElse(null);
+        if (realmManagement == null) {
+            return;
+        }
+        UserResource userResource = realmResource.users().get(user.getId());
+        Set<String> assigned = userResource.roles().clientLevel(realmManagement.getId()).listAll().stream()
+            .map(RoleRepresentation::getName)
+            .collect(Collectors.toSet());
+        List<RoleRepresentation> missing = realmResource.clients().get(realmManagement.getId()).roles().list().stream()
+            .filter(role -> REALM_MANAGEMENT_ROLES.contains(role.getName()))
+            .filter(role -> !assigned.contains(role.getName()))
+            .toList();
+        if (missing.isEmpty()) {
+            return;
+        }
+        userResource.roles().clientLevel(realmManagement.getId()).add(missing);
+        log.info("Assigned realm-management roles {} to user '{}'",
+            missing.stream().map(RoleRepresentation::getName).toList(), adminUsername);
+    }
+
+    private void applyUserProfileSchema(RealmResource realmResource) {
+        try (InputStream stream = getClass().getResourceAsStream(USER_PROFILE_SCHEMA)) {
+            if (stream == null) {
+                throw new IllegalStateException("Missing user profile schema resource " + USER_PROFILE_SCHEMA);
+            }
+            UPConfig config = objectMapper.readValue(stream, UPConfig.class);
+            realmResource.users().userProfile().update(config);
+            log.info("Applied user profile schema on Keycloak realm '{}'", realm);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to apply Keycloak user profile schema", e);
+        }
+    }
+
+    private void ensureProjectsMapperIsSet(RealmResource realmResource) {
+        ClientScopeRepresentation profileScope = realmResource.clientScopes().findAll().stream()
+            .filter(scope -> PROFILE_CLIENT_SCOPE.equals(scope.getName()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Missing Keycloak client scope " + PROFILE_CLIENT_SCOPE));
+        if (realmResource.clientScopes().get(profileScope.getId()).getProtocolMappers().getMappers().stream()
+            .noneMatch(mapper -> PROJECTS_MAPPER.equals(mapper.getName()))) {
+            ProtocolMapperRepresentation mapper = new ProtocolMapperRepresentation();
+            mapper.setName(PROJECTS_MAPPER);
+            mapper.setProtocol("openid-connect");
+            mapper.setProtocolMapper("oidc-usermodel-attribute-mapper");
+            Map<String, String> config = new HashMap<>();
+            config.put("user.attribute", PROJECTS_MAPPER);
+            config.put("claim.name", PROJECTS_MAPPER);
+            config.put("id.token.claim", "true");
+            config.put("access.token.claim", "true");
+            config.put("userinfo.token.claim", "true");
+            config.put("jsonType.label", "String");
+            config.put("multivalued", "true");
+            mapper.setConfig(config);
+            realmResource.clientScopes().get(profileScope.getId()).getProtocolMappers().createMapper(mapper);
+            log.info("Added 'projects' protocol mapper on realm '{}'", realm);
         }
     }
 

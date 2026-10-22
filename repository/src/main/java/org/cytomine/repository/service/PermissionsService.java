@@ -43,6 +43,8 @@ import static org.keycloak.representations.idm.authorization.DecisionStrategy.UN
 @RequiredArgsConstructor
 public class PermissionsService {
 
+    public static final String CLIENT_NAME = "cytomine-permissions";
+    public static final String RESOURCE_NAME = "core";
     private final Keycloak keycloak;
 
     private final CytominePermissions cytominePermissions;
@@ -58,13 +60,12 @@ public class PermissionsService {
 
         ClientsResource clients = realmResource.clients();
 
-        ClientResource existingClient = clients.findByClientId("cytomine-permissions").stream().findFirst()
-            .map(ignored -> clients.get("cytomine-permissions")).orElseGet(() -> {
-                    realmResource.clients()
-                        .create(getBaseClientRepresentation(new ClientRepresentation()));
-                    return realmResource.clients().get("cytomine-permissions");
-                }
-            );
+        ClientResource existingClient =
+            clients.findByClientId(CLIENT_NAME).stream().findFirst().map(ignored -> clients.get(CLIENT_NAME))
+                .orElseGet(() -> {
+                    realmResource.clients().create(getBaseClientRepresentation(new ClientRepresentation()));
+                    return realmResource.clients().get(CLIENT_NAME);
+                });
 
         cytominePermissions.roles().forEach(
             (key, value) -> wrapException(() -> existingClient.roles().get(key).toRepresentation()).map(ignored -> true)
@@ -73,11 +74,9 @@ public class PermissionsService {
                     return true;
                 }));
 
-        existingClient.authorization()
-            .importSettings(getResourceServerRepresentation(cytominePermissions));
+        existingClient.authorization().importSettings(getResourceServerRepresentation(cytominePermissions));
 
-        cytominePermissions.roles().forEach(
-            (role, scopes) -> upsertResourcePermission(role, scopes, existingClient));
+        cytominePermissions.roles().forEach((role, scopes) -> upsertResourcePermission(role, scopes, existingClient));
 
         cytominePermissions.users().forEach(user -> assignRolesToExistingUser(user, existingClient));
     }
@@ -86,13 +85,13 @@ public class PermissionsService {
         AuthorizationResource authorization = client.authorization();
 
         ResourcePermissionRepresentation permission =
-            wrapException(() -> authorization.permissions().resource().findByName("core-" + role))
-                .orElseGet(ResourcePermissionRepresentation::new);
+            wrapException(() -> authorization.permissions().resource().findByName("core-" + role)).orElseGet(
+                ResourcePermissionRepresentation::new);
 
         permission.setName("core-" + role);
         permission.setDecisionStrategy(UNANIMOUS);
         permission.setLogic(Logic.POSITIVE);
-        permission.addResource("core");
+        permission.addResource(RESOURCE_NAME);
         scopes.stream().map(CytominePermission::toString).forEach(permission::addScope);
         permission.addPolicy("role-" + role);
 
@@ -101,8 +100,7 @@ public class PermissionsService {
                 authorization.permissions().resource().create(permission);
                 log.info("Created resource permission core-{}", role);
             } else {
-                authorization.permissions().resource()
-                    .findById(permission.getId()).update(permission);
+                authorization.permissions().resource().findById(permission.getId()).update(permission);
                 log.info("Updated resource permission core-{}", role);
             }
         } catch (Exception e) {
@@ -110,29 +108,19 @@ public class PermissionsService {
         }
     }
 
-    void assignRolesToExistingUser(CytomineUserRole user, ClientResource client) {
+    void assignRolesToExistingUser(CytomineUserRole targetedUser, ClientResource client) {
         UsersResource users = keycloak.realm(realm).users();
 
-        Optional<UserRepresentation> existingUser =
-            wrapException(() -> users.searchByUsername(user.name(), true))
-                .filter(found -> !found.isEmpty())
-                .map(found -> found.get(0));
+        wrapException(() -> keycloak.realm(realm).users().searchByUsername(targetedUser.name(), true)).flatMap(
+            usersResult -> usersResult.stream().findFirst()).ifPresent(u-> {
+            List<RoleRepresentation> userRoles =
+                targetedUser.roles().stream()
+                    .map(role -> wrapException(() -> client.roles().get(role).toRepresentation()))
+                    .flatMap(Optional::stream).toList();
 
-        if (existingUser.isEmpty()) {
-            log.warn("User {} not found in realm {}, skipping roles assignment", user.name(), realm);
-            return;
-        }
-
-        List<RoleRepresentation> userRoles = user.roles().stream()
-            .map(role -> wrapException(() -> client.roles().get(role).toRepresentation()))
-            .flatMap(Optional::stream)
-            .toList();
-
-        users.get(existingUser.get().getId())
-            .roles()
-            .clientLevel(client.toRepresentation().getId())
-            .add(userRoles);
-        log.info("Assigned client roles {} to user {}", user.roles(), user.name());
+            users.get(u.getId()).roles().clientLevel(client.toRepresentation().getId()).add(userRoles);
+            log.info("Assigned client roles {} to user {}", targetedUser.roles(), targetedUser.name());
+        });
     }
 
     <T> Optional<T> wrapException(Supplier<T> call) {
@@ -153,8 +141,8 @@ public class PermissionsService {
     }
 
     ClientRepresentation getBaseClientRepresentation(ClientRepresentation clientRepresentation) {
-        clientRepresentation.setId("cytomine-permissions");
-        clientRepresentation.setName("cytomine-permissions");
+        clientRepresentation.setId(CLIENT_NAME);
+        clientRepresentation.setName(CLIENT_NAME);
         clientRepresentation.setAuthorizationServicesEnabled(true);
         clientRepresentation.setServiceAccountsEnabled(true);
         return clientRepresentation;
@@ -162,16 +150,13 @@ public class PermissionsService {
 
     ResourceServerRepresentation getResourceServerRepresentation(CytominePermissions cytominePermissions) {
         ResourceServerRepresentation resourceServerRepresentation = new ResourceServerRepresentation();
-        Set<CytominePermission> scopes = Stream.of(CytominePermission.values())
-            .collect(Collectors.toSet());
+        Set<CytominePermission> scopes = Stream.of(CytominePermission.values()).collect(Collectors.toSet());
 
         resourceServerRepresentation.setDecisionStrategy(AFFIRMATIVE);
-        resourceServerRepresentation.setScopes(
-            scopes.stream().map(this::getScopeRepresentation).toList());
+        resourceServerRepresentation.setScopes(scopes.stream().map(this::getScopeRepresentation).toList());
         resourceServerRepresentation.setResources(List.of(getResourceRepresentation(scopes)));
-        resourceServerRepresentation.setPolicies(cytominePermissions.roles().keySet().stream()
-            .map(this::getRolePolicy)
-            .toList());
+        resourceServerRepresentation.setPolicies(
+            cytominePermissions.roles().keySet().stream().map(this::getRolePolicy).toList());
         return resourceServerRepresentation;
     }
 
@@ -190,19 +175,17 @@ public class PermissionsService {
         policyRepresentation.setType("role");
         policyRepresentation.setDecisionStrategy(UNANIMOUS);
         policyRepresentation.setLogic(Logic.POSITIVE);
-        policyRepresentation.setConfig(
-            Map.of("roles", jsonMapper.writeValueAsString(
-                List.of(new SimpleRoleRepresentation("cytomine-permissions/" + role, false)))));
+        policyRepresentation.setConfig(Map.of("roles",
+            jsonMapper.writeValueAsString(List.of(new SimpleRoleRepresentation(CLIENT_NAME + "/" + role, false)))));
         return policyRepresentation;
 
     }
 
     ResourceRepresentation getResourceRepresentation(Set<CytominePermission> scopes) {
         ResourceRepresentation resourceRepresentation = new ResourceRepresentation();
-        resourceRepresentation.setId("core");
-        resourceRepresentation.setName("core");
-        resourceRepresentation.setScopes(
-            scopes.stream().map(this::getScopeRepresentation).collect(Collectors.toSet()));
+        resourceRepresentation.setId(RESOURCE_NAME);
+        resourceRepresentation.setName(RESOURCE_NAME);
+        resourceRepresentation.setScopes(scopes.stream().map(this::getScopeRepresentation).collect(Collectors.toSet()));
         return resourceRepresentation;
     }
 

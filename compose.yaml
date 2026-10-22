@@ -153,8 +153,8 @@ services:
       KC_DB_URL_PORT: 5432
       KC_DB_USERNAME: iam
       KC_FEATURES: token-exchange
-      KC_HOSTNAME: 127.0.0.1
-      KC_HOSTNAME_ADMIN: 127.0.0.1
+      KC_HOSTNAME: http://127.0.0.1:8100/iam
+      KC_HOSTNAME_ADMIN: http://127.0.0.1:8100/iam
       KC_HOSTNAME_PORT: 8100
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_BACKCHANNEL: false

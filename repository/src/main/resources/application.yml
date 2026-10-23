@@ -16,6 +16,8 @@ spring:
         format_sql: false
         jdbc:
           batch_size: 50
+  config:
+    import: "optional:file:./cytomine_permissions.yml"
 
   liquibase:
     enabled: true

@@ -39,7 +39,7 @@ once steps above are followed a new button appears in the login form to start th
 **Importing** does not create explicit copies or duplication of files, only database entries and symbolic links are created.
 :::
 
-This section outlines the procedure for importing datasets, which are formatted according to the [BP Dataset File Structure Standard](https://bp.nbis.se/datasets/submission/preparation-guide.html).
+This section outlines the procedure for importing datasets, which are formatted according to the [BP Dataset File Structure Standard](https://bp.nbis.se/datasets/submission/direct-upload/prepare-data.html#folder-structure).
 
 ### Prerequisites
 
@@ -135,6 +135,12 @@ If no `.env` file was provided, the default location is `./cytomine/data/dataset
 This step should be done before the `docker compose up -d` command in the Cytomine installation guide.
 :::
 
+### Metadata
+
+Cytomine uses a dedicated search engine to index datasets to make them ready for filtering and search later on through UI. No extra config is needed to set this up.
+It works automatically as part of dataset importation, and it's idempotent so that added datasets always leave cytomine in a valid state. Currently supported metadata version is
+v2.0.
+
 ### Usage
 
 Using the Python client in your locally cloned Cytomine directory, you can import the datasets with the following command executed from the root of the repository:
@@ -150,4 +156,15 @@ Several factors can slow down the importation:
 
 - You are using `sdafs`, it is currently slow the first time the data are loaded
 - You have a large amount of files on your filesystem
+:::
+
+### Importing an exported annotation archive
+
+The annotation archive produced by the [Export annotations](/user-guide/annotations.html#exporting-annotations) feature follows the same BigPicture metadata standard, so it can be imported again using the procedure above.
+
+On import, Cytomine reads `METADATA/annotation.xml` to discover the images and their GeoJSON files, recreates the geometries from the `ANNOTATIONS/*.geojson` files, and re-attaches the ontology terms found in the `path_class_name` property of each feature.
+This makes it possible to move annotations between projects or Cytomine instances, or to keep an exported archive as a portable backup that can later be reloaded.
+
+::: tip
+The exported archive only contains the `METADATA` and `ANNOTATIONS` directories (both optional in the structure above), so the annotations are re-attached to images that already exist in the target Cytomine instance.
 :::

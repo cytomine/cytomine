@@ -640,7 +640,7 @@ public class CytomineSteps {
         String password,
         String role
     ) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
         webDriverUtils.clickButtonByText(wait, "New user");
         webDriverUtils.byIsDisplayed(wait, By.name("username"));

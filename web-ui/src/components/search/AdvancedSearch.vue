@@ -76,8 +76,8 @@
           <template #default="{row: project}">
             <b-table-column field="currentUserRole" label="" centered width="1" sortable>
               <icon-project-member-role
-                :is-manager="project.currentUserRoles.admin"
-                :is-representative="project.currentUserRoles.representative"
+                :is-manager="project.currentUserRoles?.admin"
+                :is-representative="project.currentUserRoles?.representative"
               />
             </b-table-column>
 
@@ -112,7 +112,7 @@
             </b-table-column>
 
             <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-              {{ formatMomentDate(Number(project.lastActivity), 'll') }}
+              {{ project.lastActivity ? formatMomentDate(Number(project.lastActivity), 'll') : '' }}
             </b-table-column>
 
             <b-table-column label=" " centered width="150">

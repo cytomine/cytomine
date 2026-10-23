@@ -11,6 +11,11 @@ import org.springframework.data.jpa.repository.Query;
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     Optional<ProjectEntity> findByIdAndDeletedNull(long id);
 
+    @Query(
+        value = "SELECT p.* FROM project p WHERE p.deleted IS NULL",
+        countQuery = "SELECT count(p.id) FROM project p WHERE p.deleted IS NULL",
+        nativeQuery = true
+    )
     Page<ProjectEntity> findAllByDeletedNull(Pageable pageable);
 
     @Query(

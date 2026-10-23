@@ -45,6 +45,16 @@ export default class ProjectCollection extends Collection {
     }
   }
 
+  /** @inheritdoc */
+  getParameters() {
+    let params = super.getParameters();
+    if (params.sort) {
+      params.sort = `${params.sort},${params.order || 'asc'}`;
+    }
+    delete params.order;
+    return params;
+  }
+
 
   /**
    * @static Fetch bounds of the attributes of all projects

@@ -1,11 +1,9 @@
 package be.cytomine.controller.repository;
 
-import java.util.Map;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
@@ -43,17 +40,6 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequiredArgsConstructor
 public class ProjectController {
     public static final String UNABLE_TO_FIND_PROJECT = "Unable to find project with id: %s";
-    private static final String DEFAULT_SORT_COLUMN = "created";
-    private static final Map<String, String> SORT_COLUMNS = Map.ofEntries(
-        Map.entry("id", "id"),
-        Map.entry("name", "name"),
-        Map.entry("created", "created"),
-        Map.entry("updated", "updated"),
-        Map.entry("numberOfImages", "count_images"),
-        Map.entry("numberOfAnnotations", "count_annotations"),
-        Map.entry("numberOfJobAnnotations", "count_job_annotations"),
-        Map.entry("numberOfReviewedAnnotations", "count_reviewed_annotations")
-    );
 
     private final ProjectHttpContract projectHttpContract;
     private final ProjectMapper projectMapper;
@@ -63,30 +49,10 @@ public class ProjectController {
     @GetMapping("/project.json")
     public CollectionResponse<ProjectResponse> list(
         @SortDefault(sort = "created", direction = Sort.Direction.DESC)
-        @PageableDefault(size = 2000) Pageable pageable,
-        @RequestParam(required = false) String sort,
-        @RequestParam(required = false) String order
+        @PageableDefault(size = 2000) Pageable pageable
     ) {
         log.debug("GET /project.json");
-        if (sort == null || sort.isBlank()) {
-            return pageMapper.toCollectionResponse(projectHttpContract.list(pageable));
-        }
-
-        String column;
-        Sort.Direction direction;
-        if (SORT_COLUMNS.containsKey(sort)) {
-            column = SORT_COLUMNS.get(sort);
-            direction = "asc".equals(order) ? Sort.Direction.ASC : Sort.Direction.DESC;
-        } else {
-            column = DEFAULT_SORT_COLUMN;
-            direction = Sort.Direction.DESC;
-        }
-        Pageable effective = PageRequest.of(
-            pageable.getPageNumber(),
-            pageable.getPageSize(),
-            Sort.by(direction, column)
-        );
-        return pageMapper.toCollectionResponse(projectHttpContract.list(effective));
+        return pageMapper.toCollectionResponse(projectHttpContract.list(pageable));
     }
 
     @GetMapping("/project/{id}.json")

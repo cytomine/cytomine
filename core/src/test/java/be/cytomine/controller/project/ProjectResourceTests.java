@@ -14,12 +14,14 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -73,6 +75,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
@@ -183,6 +186,30 @@ public class ProjectResourceTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.name=='" + project.getName() + "')]").exists());
+    }
+
+    @Test
+    @Transactional
+    public void listAllProjectsWithPaginationAndSort() throws Exception {
+        Project project = builder.givenAProject();
+        when(projectHttpContract.list(any(Pageable.class)))
+            .thenReturn(new PageImpl<>(List.of(toResponse(project))));
+
+        restProjectControllerMockMvc.perform(get("/api/project.json")
+                .param("page", "1")
+                .param("size", "10")
+                .param("sort", "count_images,desc")
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))));
+
+        ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(projectHttpContract).list(pageableCaptor.capture());
+        Pageable pageable = pageableCaptor.getValue();
+        assertThat(pageable.getPageNumber()).isEqualTo(1);
+        assertThat(pageable.getPageSize()).isEqualTo(10);
+        assertThat(pageable.getSort().getOrderFor("count_images").getDirection())
+            .isEqualTo(Sort.Direction.DESC);
     }
 
     @Test

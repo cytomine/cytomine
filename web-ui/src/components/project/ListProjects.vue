@@ -123,7 +123,7 @@
         :revision="revision"
       >
         <template #default="{row: project}">
-          <b-table-column field="currentUserRole" label="" centered width="1" sortable>
+          <b-table-column field="currentUserRole" label="" centered width="1">
             <icon-project-member-role
               :is-manager="project.currentUserRoles.admin"
               :is-representative="project.currentUserRoles.representative"
@@ -136,7 +136,7 @@
             </router-link>
           </b-table-column>
 
-          <b-table-column field="membersCount" :label="$t('members')" centered sortable width="150">
+          <b-table-column field="membersCount" :label="$t('members')" centered width="150">
             {{ project.membersCount }}
           </b-table-column>
 
@@ -156,7 +156,7 @@
             </router-link>
           </b-table-column>
 
-          <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
+          <b-table-column field="lastActivity" :label="$t('last-activity')" centered width="180">
             {{ formatMomentDate(Number(project.lastActivity), 'll') }}
           </b-table-column>
 

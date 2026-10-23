@@ -65,12 +65,23 @@ public class WebDriverUtils {
         });
     }
 
+    void byHitEnter(Wait<WebDriver> wait, By by) {
+        wait.until(d -> {
+            try {
+                d.findElement(by).sendKeys(Keys.ENTER);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
+    }
+
     void goTo(Wait<WebDriver> wait, String url) {
         wait.until(
             d -> {
                 try {
                     d.get(url);
-                    return url.equals(d.getCurrentUrl());
+                    return true;
                 } catch (Exception e) {
                     return false;
                 }

@@ -3,6 +3,7 @@ package org.cytomine.e2etests.selenium;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -325,6 +326,35 @@ public class CytomineTests {
             cytomineSteps.addUserToProject(wait, admin.projectUrl(), username);
             cytomineSteps.changeUserRole(wait, admin.projectUrl(), username);
             cytomineSteps.removeUserFromProject(wait, admin.projectUrl(), username);
+        });
+    }
+
+    @Test
+    void filterProjectByName() {
+        multiUsers.runAsAdmin(wait, driver, admin -> {
+            int nbProjects = 3;
+            String projectNameToSearch = "search-" + randomUUID();
+            List<String> projectUrls = new ArrayList<>();
+            List<String> projectNames = new ArrayList<>();
+
+            projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectNameToSearch));
+            for (int i = 0; i < nbProjects; i++) {
+                String projectName = "selenium-" + randomUUID();
+                projectNames.add(projectName);
+                projectUrls.add(cytomineSteps.createProject(wait, driver, cytomineUrl, projectName));
+            }
+
+            try {
+                cytomineSteps.filterProjectByName(wait, cytomineUrl, projectNameToSearch, projectNames);
+            } finally {
+                for (String projectUrl : projectUrls) {
+                    cleanup(() -> {
+                        String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
+                        cytomineSteps.deleteProject(wait, projectUrl);
+                        cytomineSteps.deleteOntology(wait, ontologyUrl);
+                    });
+                }
+            }
         });
     }
 

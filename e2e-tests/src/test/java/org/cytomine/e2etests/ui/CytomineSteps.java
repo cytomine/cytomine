@@ -492,6 +492,27 @@ public class CytomineSteps {
         webDriverUtils.waitUntilByEmpty(wait, By.xpath("//*[contains(text(),'" + username + "')]"));
     }
 
+    public void filterProjectByName(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String projectNameToSearch,
+        List<String> projectNames
+    ) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/projects");
+        By searchInput = By.cssSelector("div.search-projects input[type='search']");
+        webDriverUtils.byClick(wait, searchInput);
+        webDriverUtils.bySendKeys(wait, searchInput, projectNameToSearch);
+
+        projectNames.forEach(projectName ->
+            webDriverUtils.waitUntilByEmpty(
+                wait,
+                By.xpath("//a[normalize-space(text())='" + projectName + "']")
+            )
+        );
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//a[normalize-space(text())='" + projectNameToSearch + "']"));
+        webDriverUtils.byClear(wait, searchInput);
+    }
+
     public void filterAnnotationsByTerm(Wait<WebDriver> wait, String projectUrl, String termName) {
         webDriverUtils.goTo(wait, projectUrl.replace("configuration", "annotations"));
 
@@ -619,7 +640,7 @@ public class CytomineSteps {
         String password,
         String role
     ) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString() + "admin?tab=users");
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
         webDriverUtils.clickButtonByText(wait, "New user");
         webDriverUtils.byIsDisplayed(wait, By.name("username"));

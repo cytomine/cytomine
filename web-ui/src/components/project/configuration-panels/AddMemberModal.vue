@@ -1,6 +1,6 @@
 <template>
 <cytomine-modal :active="active" :title="$t('add-members-to-project')" @close="$emit('update:active', false)">
-    <b-loading :is-full-page="false" :active="loading" class="small" />
+    <b-loading :is-full-page="false" :model-value="loading" class="small" />
     <template v-if="!loading">
       <b-field>
         <domain-tag-input v-model="selectedMembers" :domains="notMemberUsers" placeholder="search-user" displayedProperty="fullName" searchedProperty="fullName"/>

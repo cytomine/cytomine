@@ -1,8 +1,8 @@
 <template>
-<v-popover
+<VDropdown
   placement="right"
-  trigger="manual"
-  :open="opened"
+  :triggers="[]"
+  :shown="opened"
   :auto-hide="false"
 > <!-- autoHide leads to erratic behaviour when adding/showing DOM elements => handle display of popover manually -->
 
@@ -23,7 +23,7 @@
     </template>
   </div>
 
-  <template #popover>
+  <template #popper>
     <annotation-details
       v-click-outside.capture="(event) => close(event)"
       :annotation="annot"
@@ -44,7 +44,7 @@
     /> <!-- Display component only if it is the currently displayed annotation
             (prevents fetching unnecessary information) -->
   </template>
-</v-popover>
+</VDropdown>
 </template>
 
 <script>
@@ -141,7 +141,7 @@ export default {
 
       let el = event.target;
       while (el) {
-        if (el.classList.contains('modal') || el.classList.contains('notifications') || el.isSameNode(this.$refs.previewButton)) {
+        if (el.classList.contains('modal') || el.classList.contains('vue-notification-group') || el.isSameNode(this.$refs.previewButton)) {
           // do not close the popover if click was performed in modal or in notification
           // if click performed on previewButton, handled in @click
           return;
@@ -161,7 +161,7 @@ export default {
     await this.fetchThumbnail();
     eventBus.on('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // unsubscribe from all events
     eventBus.off('reloadAnnotationCrop', this.reloadAnnotationCropHandler);
   }

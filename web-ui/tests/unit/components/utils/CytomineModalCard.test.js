@@ -10,9 +10,11 @@ describe('CytomineModalCard.vue', () => {
   it('should render the title correctly', () => {
     const title = 'Test Modal Title';
     const wrapper = shallowMount(CytomineModalCard, {
-      mocks,
-      propsData: {
+      props: {
         title
+      },
+      global: {
+        mocks
       }
     });
 
@@ -22,9 +24,11 @@ describe('CytomineModalCard.vue', () => {
 
   it('should render the footer when "footer" is true', () => {
     const wrapper = shallowMount(CytomineModalCard, {
-      mocks,
-      propsData: {
+      props: {
         footer: true
+      },
+      global: {
+        mocks
       }
     });
 
@@ -34,9 +38,11 @@ describe('CytomineModalCard.vue', () => {
 
   it('should not render the footer when "footer" is false', () => {
     const wrapper = shallowMount(CytomineModalCard, {
-      mocks,
-      propsData: {
+      props: {
         footer: false,
+      },
+      global: {
+        mocks
       }
     });
 
@@ -46,9 +52,11 @@ describe('CytomineModalCard.vue', () => {
 
   it('should render default slot content', () => {
     const wrapper = shallowMount(CytomineModalCard, {
-      mocks,
       slots: {
         default: '<div class="slot-content">Slot Content</div>'
+      },
+      global: {
+        mocks
       }
     });
 
@@ -57,7 +65,7 @@ describe('CytomineModalCard.vue', () => {
 
   it('should render named slot content for footer', () => {
     const wrapper = shallowMount(CytomineModalCard, {
-      propsData: {
+      props: {
         footer: true
       },
       slots: {
@@ -70,9 +78,11 @@ describe('CytomineModalCard.vue', () => {
 
   it('should emit "close" event when the close button is clicked', async () => {
     const wrapper = shallowMount(CytomineModalCard, {
-      mocks,
-      propsData: {
+      props: {
         footer: true
+      },
+      global: {
+        mocks
       }
     });
 

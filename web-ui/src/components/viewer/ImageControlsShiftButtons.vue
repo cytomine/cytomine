@@ -7,12 +7,12 @@
     >
       <i class="fas" :class="{'fa-step-forward': forward, 'fa-step-backward': !forward}"></i>
     </button>
-    <v-popover
+    <VDropdown
         :placement="selectorPlacement"
-        trigger="manual"
-        :open="opened"
+        :triggers="[]"
+        :shown="opened"
         :auto-hide="false"
-        :popover-inner-class="'tooltip-inner popover-inner step-selector'"
+        popper-class="step-selector"
     >
       <button
           class="button is-small item"
@@ -27,22 +27,22 @@
         </div>
       </button>
 
-      <template #popover>
+      <template #popper>
         <div
           v-click-outside="() => stopEdition()"
           ref="stepSelector"
           class="step-selector"
+          @keyup.enter="stopEdition()"
         >
           <b-input :placeholder="$t('step')" size="is-small"
              v-model="editedValue"
              ref="inputStepSelector"
-             @hook:mounted="focus()"
+             @vue:mounted="focus()"
              @blur="stopEdition()"
-             @keyup.enter.native="stopEdition()"
           />
         </div>
       </template>
-    </v-popover>
+    </VDropdown>
   </div>
 </template>
 
@@ -91,7 +91,7 @@ export default {
       return (this.forward) ? 'left' : 'right';
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener('contextmenu', this.onContextmenuOutside, true);
   },
   methods: {

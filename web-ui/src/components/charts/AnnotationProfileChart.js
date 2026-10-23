@@ -1,3 +1,4 @@
+import { h } from 'vue';
 import { Line } from 'vue-chartjs';
 import ChartZoom from 'chartjs-plugin-zoom';
 
@@ -96,15 +97,13 @@ export default {
   async mounted() {
     await this.updateData();
   },
-  render(h) {
+  render() {
     return h('div', { class: this.cssClasses }, [
       h(Line, {
         ref: 'chartRef',
-        props: {
-          data: this.chartData,
-          options: this.chartOptions,
-          plugins: [ChartZoom],
-        },
+        data: this.chartData,
+        options: this.chartOptions,
+        plugins: [ChartZoom],
       }),
     ]);
   },

@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import AppInfoPage from '@/components/appengine/AppInfoPage.vue';
 import Task from '@/utils/appengine/task';
@@ -20,8 +20,6 @@ vi.mock('@/utils/appengine/task', () => ({
   }
 }));
 
-const localVue = createLocalVue();
-
 describe('AppInfoPage.vue', () => {
   const mockTask = {
     name: 'Test App',
@@ -38,24 +36,30 @@ describe('AppInfoPage.vue', () => {
 
   const createWrapper = ({ host } = {}) => {
     return shallowMount(AppInfoPage, {
-      localVue,
-      mocks: {
-        $notify: vi.fn(),
-        $t: (key) => key,
-        $route: { params: { namespace: 'ns', version: '1.0.0' }, query: { host } },
-        $router: { push: vi.fn() },
-      },
-      stubs: {
-        'b-button': {
-          props: ['label', 'iconPack', 'iconLeft'],
-          template: '<button>{{ label }}</button>',
+      global: {
+        mocks: {
+          $notify: vi.fn(),
+          $t: (key) => key,
+          // vue-router 3 cannot be installed on Vue 3, so the route the
+          // component reads in `created` is mocked directly.
+          $route: {
+            params: { namespace: 'mock-namespace', version: '1.0.0' },
+            query: { host },
+          },
+          $router: { push: vi.fn() },
         },
-        'b-collapse': true,
-        'b-dropdown': true,
-        'b-dropdown-item': true,
-        'b-icon': true,
-        'b-loading': true,
-      },
+        stubs: {
+          'b-button': {
+            props: ['label', 'iconPack', 'iconLeft'],
+            template: '<button>{{ label }}</button>',
+          },
+          'b-collapse': true,
+          'b-dropdown': true,
+          'b-dropdown-item': true,
+          'b-icon': true,
+          'b-loading': true,
+        }
+      }
     });
   };
 
@@ -72,7 +76,7 @@ describe('AppInfoPage.vue', () => {
     await flushPromises();
 
     expect(wrapper.vm.loading).toBe(false);
-    expect(wrapper.vm.task).toBe(mockTask);
+    expect(wrapper.vm.task).toEqual(mockTask);
 
     const expectedAuthors = mockTask.authors
       .map(author => `- ${author.firstName} ${author.lastName}`)

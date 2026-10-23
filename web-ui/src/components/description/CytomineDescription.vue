@@ -1,6 +1,6 @@
 <template>
 <div :class="['description-wrapper', loading ? 'loading' : '']">
-  <b-loading :is-full-page="false" :active="loading" class="small" />
+  <b-loading :is-full-page="false" :model-value="loading" class="small" />
   <template v-if="!loading">
     <template v-if="description">
       <div class="ql-snow">
@@ -67,7 +67,6 @@ export default {
       // (http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/)
 
       this.$buefy.modal.open({
-        parent: this,
         component: DescriptionModal,
         props: {
           description: this.description || new Description({ data: '', object: this.object }),

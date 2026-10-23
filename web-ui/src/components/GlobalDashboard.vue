@@ -1,6 +1,6 @@
 <template>
 <div class="content-wrapper">
-  <b-loading :is-full-page="false" :active.sync="loading" />
+  <b-loading :is-full-page="false" v-model="loading" />
 
   <template v-if="!loading">
     <div class="columns">
@@ -12,17 +12,15 @@
           </b-message>
           <b-table v-else :data="recentProjects">
 
-            <template #default="{row: project}">
-              <b-table-column :label="$t('project')" width="100" centered>
-                <router-link class="project-name" :to="`/project/${project.id}`">
-                  {{ project.name }}
-                </router-link>
-              </b-table-column>
+            <b-table-column v-slot="{row: project}" :label="$t('project')" width="100" centered>
+              <router-link class="project-name" :to="`/project/${project.id}`">
+                {{ project.name }}
+              </router-link>
+            </b-table-column>
 
-              <b-table-column :label="$t('images')" width="400">
-                <list-images-preview :project="project" />
-              </b-table-column>
-            </template>
+            <b-table-column v-slot="{row: project}" :label="$t('images')" width="400">
+              <list-images-preview :project="project" />
+            </b-table-column>
 
             <template #empty>
               <div class="content has-text-grey has-text-centered">
@@ -46,48 +44,48 @@
                 <td>{{projects ? projects.length : "?"}}</td>
                 <td>{{$t('projects')}}</td>
                 <td>
-                  <v-popover>
+                  <VDropdown>
                     <i class="fas fa-info-circle"></i>
-                    <template #popover>
+                    <template #popper>
                       <p>{{$t('number-projects-info-message')}}</p>
                     </template>
-                  </v-popover>
+                  </VDropdown>
                 </td>
               </tr>
               <tr>
                 <td>{{nbImages != null ? nbImages : "?"}}</td>
                 <td>{{$t('images')}}</td>
                 <td>
-                  <v-popover>
+                  <VDropdown>
                     <i class="fas fa-info-circle"></i>
-                    <template #popover>
+                    <template #popper>
                       <p>{{$t('number-images-info-message')}}</p>
                     </template>
-                  </v-popover>
+                  </VDropdown>
                 </td>
               </tr>
               <tr>
                 <td>{{nbUserAnnots != null ? nbUserAnnots : "?"}}</td>
                 <td>{{$t('user-annotations')}}</td>
                 <td>
-                  <v-popover>
+                  <VDropdown>
                     <i class="fas fa-info-circle"></i>
-                    <template #popover>
+                    <template #popper>
                       <p>{{$t('number-annotations-info-message')}}</p>
                     </template>
-                  </v-popover>
+                  </VDropdown>
                 </td>
               </tr>
               <tr>
                 <td>{{nbReviewed != null ? nbReviewed : "?"}}</td>
                 <td>{{$t('reviewed-annotations')}}</td>
                 <td>
-                  <v-popover>
+                  <VDropdown>
                     <i class="fas fa-info-circle"></i>
-                    <template #popover>
+                    <template #popper>
                       <p>{{$t('number-reviewed-annotations-info-message')}}</p>
                     </template>
-                  </v-popover>
+                  </VDropdown>
                 </td>
               </tr>
             </tbody>
@@ -214,7 +212,7 @@ export default {
 </script>
 
 <style scoped>
-td {
+:deep(td) {
   vertical-align: middle !important;
 }
 

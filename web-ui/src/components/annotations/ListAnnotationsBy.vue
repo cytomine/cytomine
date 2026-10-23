@@ -1,6 +1,6 @@
 <template>
 <div class="box">
-  <b-loading :is-full-page="false" class="small" :active="loading"  />
+  <b-loading :is-full-page="false" class="small" :model-value="loading"  />
   <div v-if="!isInViewer || (isInViewer && !loading)">
     <h2>
       <template v-if="titlePrefix">{{titlePrefix}} </template>
@@ -15,13 +15,11 @@
       <em class="no-result">{{ $t('no-annotation') }}</em>
     </template>
     <template v-else>
-      <template v-for="(annot, index) in annotations">
+      <template v-for="(annot, index) in annotations" :key="((isInViewer) ? index : '') + title + annot.id">
         <div class="break"
              v-if="regroupPerLine && annotationInGroupDetails[index].first"
-             :key="((isInViewer) ? index : '') + title + annot.id + 'break-in'"
         ></div>
         <annotation-preview
-            :key="((isInViewer) ? index : '') + title + annot.id"
             :class="annotStyles(annot, index)"
             class="annot-preview-block"
             :annot="annot"
@@ -50,7 +48,7 @@
 
       <b-pagination
         :total="nbAnnotations"
-        :current.sync="currentPage"
+        v-model="currentPage"
         size="is-small"
         :per-page="nbPerPage"
       />

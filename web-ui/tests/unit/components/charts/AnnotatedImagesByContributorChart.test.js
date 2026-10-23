@@ -12,11 +12,11 @@ describe('AnnotatedImagesByContributorChart.js', () => {
   };
 
   const createWrapper = () => shallowMount(AnnotatedImagesByContributorChart, {
-    propsData: {
+    props: {
       project: mockProject,
       startDate: 0,
       endDate: 1,
-    },
+    }
   });
 
   it('should fetch contributor stats into labels/data and emit nbElems', async () => {

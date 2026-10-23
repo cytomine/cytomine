@@ -5,8 +5,8 @@
 
       <b-field label="Search from metadata">
         <b-input
-          :value="searchString"
-          @input="debounceSearchString"
+          :model-value="searchString"
+          @update:model-value="debounceSearchString"
           icon="search"
           :placeholder="$t('search-placeholder')"
         />

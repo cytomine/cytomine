@@ -1,5 +1,5 @@
 <template>
-<b-modal :active="active" @close="close()" has-modal-card>
+<b-modal :model-value="active" @close="close()" has-modal-card>
   <cytomine-modal-card :title="title" @close="close()">
     <slot></slot>
     <template #footer>

@@ -1,17 +1,19 @@
 <template>
   <form @submit.prevent="save()">
     <cytomine-modal-card :title="$t(track ? 'update-track' : 'create-track')" class="track-modal">
-      <b-field :label="$t('name')" :type="{'is-danger': errors.has('name')}" :message="errors.first('name')">
-        <b-input v-model="name" name="name" v-validate="'required'" />
-      </b-field>
+      <field :form="form" name="name" :validators="nameRules" v-slot="{field, state}">
+        <b-field :label="$t('name')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+          <b-input name="name" :model-value="state.value" @update:model-value="field.handleChange" />
+        </b-field>
+      </field>
 
-      <sketch-picker v-model="color" :presetColors="presetColors" />
+      <sketch-picker v-model="color" :presetColors="presetColors" :disable-alpha="true" />
 
       <template #footer>
-        <button class="button" type="button" @click="$parent.close()">
+        <button class="button" type="button" @click="$emit('close')">
           {{$t('button-cancel')}}
         </button>
-        <button class="button is-link" :disabled="errors.any()">
+        <button class="button is-link" :disabled="!isValid">
           {{$t('button-save')}}
         </button>
       </template>
@@ -20,8 +22,11 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+import { SketchPicker, tinycolor } from 'vue-color';
+
 import { Track } from '@/api';
-import { Sketch } from 'vue-color';
+import { required, rules, validateForm } from '@/utils/form.js';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
@@ -31,13 +36,20 @@ export default {
     image: Object
   },
   components: {
-    'sketch-picker': Sketch,
-    CytomineModalCard
+    SketchPicker,
+    CytomineModalCard,
+    Field
   },
-  $_veeValidate: { validator: 'new' },
+  setup(props) {
+    const form = useForm({ defaultValues: { name: props.track ? props.track.name : '' } });
+    return {
+      form,
+      isValid: form.useStore(state => state.isValid),
+      nameRules: { onChange: rules(required) }
+    };
+  },
   data() {
     return {
-      name: '',
       color: null
     };
   },
@@ -63,8 +75,7 @@ export default {
       return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
     },
     async save() {
-      let result = await this.$validator.validateAll();
-      if (!result) {
+      if (!await validateForm(this.form)) {
         return;
       }
 
@@ -76,10 +87,14 @@ export default {
     },
     async create() {
       try {
-        let track = await new Track({ name: this.name, color: this.color.hex, image: this.image.id }).save();
+        let track = await new Track({
+          name: this.form.state.values.name,
+          color: tinycolor(this.color).toHexString(),
+          image: this.image.id
+        }).save();
         this.$notify({ type: 'success', text: this.$t('notif-success-track-creation') });
         this.$emit('newTrack', track);
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-track-creation') });
@@ -87,13 +102,13 @@ export default {
     },
     async update() {
       let track = new Track(this.track);
-      track.color = this.color.hex;
-      track.name = this.name;
+      track.color = tinycolor(this.color).toHexString();
+      track.name = this.form.state.values.name;
       try {
         await track.save();
         this.$notify({ type: 'success', text: this.$t('notif-success-track-update') });
         this.$emit('updateTrack', track);
-        this.$parent.close();
+        this.$emit('close');
       } catch (error) {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-track-update') });
@@ -101,42 +116,22 @@ export default {
     }
   },
   created() {
-    this.name = this.track ? this.track.name : '';
-    this.color = { hex: this.track ? this.track.color : this.randomColor() };
+    this.color = this.track ? this.track.color : this.randomColor();
   }
 };
 </script>
 
 <style>
-  .track-modal .vc-sketch {
+  .track-modal .vc-sketch-picker {
     width: auto;
     box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
   }
 
-  .track-modal .vc-sketch-active-color {
+  .track-modal .vc-sketch-picker .active-color {
     box-shadow: inset 0 0 0 1px rgba(10, 10, 10, 0.1);
   }
 
-  .track-modal .vc-sketch-saturation-wrap {
+  .track-modal .vc-sketch-picker .saturation {
     padding-bottom: 15vh;
-  }
-
-  /* hide alpha channel */
-  .track-modal .vc-sketch-field--single:last-child {
-    display: none;
-  }
-  /* --- */
-
-  .track-modal .vc-sketch-sliders {
-    display: flex;
-    align-items: center;
-  }
-
-  .track-modal .vc-sketch-hue-wrap {
-    flex-grow: 1;
-  }
-
-  .track-modal .vc-sketch-alpha-wrap {
-    display: none;
   }
 </style>

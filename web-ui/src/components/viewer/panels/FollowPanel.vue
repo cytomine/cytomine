@@ -121,6 +121,19 @@ export default {
     image() {
       return this.imageWrapper.imageInstance;
     },
+    // The `view` prop used to be the `vl-view` *component*, whose position was
+    // reactive because Vue 2 proxied the ol View it wrapped. It is the raw ol
+    // View now, so the position is read from the store, which `CytomineImage`
+    // keeps in step with the map.
+    viewCenter() {
+      return this.imageWrapper.view.center || [0, 0];
+    },
+    viewZoom() {
+      return this.imageWrapper.view.zoom;
+    },
+    viewRotation() {
+      return this.imageWrapper.view.rotation;
+    },
     activePanel() {
       return this.imageWrapper.activePanel;
     },
@@ -247,16 +260,16 @@ export default {
         this.trackedUser = null;
       }
     },
-    'view.zoom'() {
+    viewZoom() {
       this.viewerPositionChanged = true;
     },
-    'view.rotation'() {
+    viewRotation() {
       this.viewerPositionChanged = true;
     },
-    'view.viewCenter.0'() {
+    'viewCenter.0'() {
       this.viewerPositionChanged = true;
     },
-    'view.viewCenter.1'() {
+    'viewCenter.1'() {
       this.viewerPositionChanged = true;
     }
   },
@@ -313,10 +326,10 @@ export default {
       const shouldRefreshForKeepAlive = Date.now() - this.lastPositionUpdate > constants.WS_POSITION_KEEP_ALIVE_INTERVAL;
       if (this.broadcast && this.wsConnected && (this.viewerPositionChanged || shouldRefreshForKeepAlive)) {
         const position = JSON.stringify({
-          x: this.view.viewCenter[0],
-          y: this.view.viewCenter[1],
-          zoom: this.view.zoom,
-          rotation: this.view.rotation
+          x: this.viewCenter[0],
+          y: this.viewCenter[1],
+          zoom: this.viewZoom,
+          rotation: this.viewRotation
         });
         this.userPostitionWebsock.send(position);
         this.viewerPositionChanged = false;
@@ -376,7 +389,7 @@ export default {
     this.fetchOnline();
     this.track();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     clearTimeout(this.timeoutTracking);
     clearTimeout(this.timeoutOnlineUsers);
     if (this.wsConnected) {

@@ -1,5 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
-import VueI18n from 'vue-i18n';
+import { shallowMount } from '@vue/test-utils';
 
 import CytomineDescriptionModal from '@/components/description/CytomineDescriptionModal';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
@@ -20,21 +19,20 @@ vi.mock('@/components/form/CytomineQuillEditor', () => ({
 }));
 
 describe('CytomineDescriptionModal', () => {
-  const localVue = createLocalVue();
-  localVue.use(VueI18n);
 
   let wrapper;
 
   beforeEach(() => {
     wrapper = shallowMount(CytomineDescriptionModal, {
-      localVue,
-      mocks: {
-        $t: (message) => message,
-        $notify: vi.fn()
-      },
-      propsData: {
+      props: {
         description: { data: 'Test description' },
         edit: false
+      },
+      global: {
+        mocks: {
+          $t: (message) => message,
+          $notify: vi.fn()
+        }
       }
     });
   });

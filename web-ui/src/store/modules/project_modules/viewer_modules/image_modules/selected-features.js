@@ -1,4 +1,4 @@
-import { createGeoJsonFmt } from 'vuelayers/lib/ol-ext/format';
+import { createGeoJsonFmt } from '@/viewer-ol/geojson.js';
 import { annotBelongsToLayer } from '@/utils/annotation-utils';
 
 export default {

@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="selectAnnotation()">
     <cytomine-modal :active="active" :title="$t('select-annotation')" @close="$emit('update:active', false)">
-      <b-loading class="small" :active="loading" :is-full-page="false"/>
+      <b-loading class="small" :model-value="loading" :is-full-page="false"/>
 
       <template v-if="!loading">
         <div class="annotation-content">
@@ -18,7 +18,7 @@
 
         <b-pagination
           :total="nbAnnotations"
-          :current.sync="currentPage"
+          v-model="currentPage"
           :per-page="nbPerPage"
           size="is-small"
         />
@@ -140,7 +140,7 @@ export default {
   async mounted() {
     eventBus.on('addAnnotation', this.addAnnotationHandler);
   },
-  async beforeDestroy() {
+  async beforeUnmount() {
     eventBus.off('addAnnotation', this.addAnnotationHandler);
   },
 };

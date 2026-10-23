@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import DomainTagInput from '@/components/utils/DomainTagInput.vue';
@@ -9,8 +9,6 @@ vi.mock('@/utils/string-utils', () => ({
 }));
 
 describe('DomainTagInput.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
 
   const mocks = {
     $t: message => message
@@ -22,16 +20,18 @@ describe('DomainTagInput.vue', () => {
     { id: 3, name: 'another.com' }
   ];
 
-  const value = [{ id: 1, name: 'example.com' }];
+  const modelValue = [{ id: 1, name: 'example.com' }];
 
   let wrapper;
   beforeEach(() => {
     wrapper = shallowMount(DomainTagInput, {
-      localVue,
-      mocks,
-      propsData: {
-        value,
+      props: {
+        modelValue,
         domains
+      },
+      global: {
+        plugins: [Buefy],
+        mocks
       }
     });
   });
@@ -48,12 +48,12 @@ describe('DomainTagInput.vue', () => {
     expect(wrapper.vm.filteredDomains).toEqual([{ id: 2, name: 'test.com' }]);
   });
 
-  it('should emit input event when a tag is added', async () => {
-    wrapper.vm.$emit('input', [{ id: 2, name: 'test.com' }]);
+  it('should emit update:modelValue event when a tag is added', async () => {
+    wrapper.vm.$emit('update:modelValue', [{ id: 2, name: 'test.com' }]);
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted().input).toBeTruthy();
-    expect(wrapper.emitted().input[0]).toEqual([[{ id: 2, name: 'test.com' }]]);
+    expect(wrapper.emitted()['update:modelValue']).toBeTruthy();
+    expect(wrapper.emitted()['update:modelValue'][0]).toEqual([[{ id: 2, name: 'test.com' }]]);
   });
 
   it('should not allow duplicate domains to be added', async () => {

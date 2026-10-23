@@ -15,7 +15,7 @@
           <span class="comma" v-if="index < displayedSelectedTerms.length - 1">,</span>
         </span>
         <strong v-if="countNotDisplayed > 0">
-          {{ $tc("and-count-others", countNotDisplayed, {count: countNotDisplayed}) }}
+          {{ $t("and-count-others", countNotDisplayed, {count: countNotDisplayed}) }}
         </strong>
       </template>
     </div>
@@ -45,7 +45,7 @@
       :searchString="searchString"
       :multipleSelection="multiple"
       @select="handleSelection()"
-      @setSelectedNodes="nodes => $emit('setSelectedNodes', nodes)"
+      @update:selectedNodes="nodes => $emit('update:selectedNodes', nodes)"
     >
       <template #no-result>
         <ul class="multiselect__content">
@@ -72,10 +72,7 @@ export default {
     OntologyTree,
     CytomineTerm
   },
-  model: {
-    prop: 'selectedNodes',
-    event: 'setSelectedNodes'
-  },
+  emits: ['update:selectedNodes'],
   props: {
     ontology: { type: Object },
     additionalNodes: { type: Array, default: () => [] },
@@ -120,7 +117,7 @@ export default {
   },
   methods: {
     selectAll() {
-      this.$emit('setSelectedNodes', this.allSelected ? [] : this.allTerms.map(term => term.id));
+      this.$emit('update:selectedNodes', this.allSelected ? [] : this.allTerms.map(term => term.id));
     },
 
     handleSelection() {

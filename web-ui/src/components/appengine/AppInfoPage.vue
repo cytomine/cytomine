@@ -1,6 +1,6 @@
 <template>
   <div class="content-wrapper">
-    <b-loading v-if="loading" :is-full-page="false" :active="loading" />
+    <b-loading v-if="loading" :is-full-page="false" :model-value="loading" />
     <div v-else class="panel">
       <div class="panel-heading">
         <b-button

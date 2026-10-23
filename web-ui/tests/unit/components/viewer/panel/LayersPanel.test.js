@@ -84,26 +84,28 @@ describe('LayersPanel.vue', () => {
     };
 
     return shallowMount(LayersPanel, {
-      propsData: {
+      props: {
         index: '0',
       },
-      mocks: {
-        $notify: mockNotify,
-        $store: defaultStore,
-        $t: (key) => key,
-      },
-      stubs: {
-        'b-checkbox': true,
-        'b-field': true,
-        'b-message': {
-          props: ['type', 'hasIcon', 'iconSize', 'size'],
-          template: '<div class="b-message-stub"><slot /></div>',
+      global: {
+        mocks: {
+          $notify: mockNotify,
+          $store: defaultStore,
+          $t: (key) => key,
         },
-        'b-select': {
-          props: ['placeholder', 'value'],
-          template: '<select><option disabled>{{ placeholder }}</option></select>',
-        },
-      },
+        stubs: {
+          'b-checkbox': true,
+          'b-field': true,
+          'b-message': {
+            props: ['type', 'hasIcon', 'iconSize', 'size'],
+            template: '<div class="b-message-stub"><slot /></div>',
+          },
+          'b-select': {
+            props: ['placeholder', 'value'],
+            template: '<select><option disabled>{{ placeholder }}</option></select>',
+          },
+        }
+      }
     });
   };
 

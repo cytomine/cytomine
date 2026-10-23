@@ -48,7 +48,6 @@ export default {
       // (http://meyerweb.com/eric/thoughts/2011/09/12/un-fixing-fixed-elements-with-css-transforms/)
 
       this.$buefy.modal.open({
-        parent: this,
         component: AttachedFileModal,
         props: { object: this.object },
         hasModalCard: true,

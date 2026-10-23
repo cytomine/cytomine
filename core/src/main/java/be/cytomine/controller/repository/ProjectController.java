@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
@@ -47,7 +48,7 @@ public class ProjectController {
     private final PageMapper pageMapper;
 
     @GetMapping("/project.json")
-    public CollectionResponse<ProjectResponse> list(
+    public CollectionResponse<ProjectListRowResponse> list(
         @SortDefault(sort = "created", direction = Sort.Direction.DESC)
         @PageableDefault(size = 2000) Pageable pageable
     ) {

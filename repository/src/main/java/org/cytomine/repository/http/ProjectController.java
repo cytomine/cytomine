@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
@@ -60,10 +61,10 @@ public class ProjectController implements ProjectHttpContract {
     }
 
     @Override
-    public Page<ProjectResponse> list(Pageable pageable) {
+    public Page<ProjectListRowResponse> list(Pageable pageable) {
         long userId = currentUserService.getCurrentUserId();
         if (aclService.isAdmin(userId)) {
-            return repository.findAllByDeletedNull(pageable).map(service::mapToResponse);
+            return repository.findAllByDeletedNull(userId, pageable).map(service::mapToResponse);
         }
         return repository.findAllReadableByUser(userId, pageable).map(service::mapToResponse);
     }

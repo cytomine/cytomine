@@ -24,10 +24,21 @@
         :revision="revision"
       >
         <template #default="{row: project}">
+          <b-table-column field="currentUserRole" label="" centered width="1">
+            <icon-project-member-role
+              :is-manager="project.currentUserRoles?.admin"
+              :is-representative="project.currentUserRoles?.representative"
+            />
+          </b-table-column>
+
           <b-table-column field="name" :label="$t('name')" sortable width="250">
             <router-link :to="`/project/${project.id}`">
               {{ project.name }}
             </router-link>
+          </b-table-column>
+
+          <b-table-column field="members_count" :label="$t('members')" centered sortable width="150">
+            {{ project.membersCount }}
           </b-table-column>
 
           <b-table-column field="count_images" :label="$t('images')" centered sortable width="150">
@@ -44,6 +55,12 @@
             <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
               {{ project.numberOfReviewedAnnotations }}
             </router-link>
+          </b-table-column>
+
+          <b-table-column field="last_activity" :label="$t('last-activity')" centered sortable width="180">
+            <template v-if="project.lastActivity">
+              {{ formatMomentDate(Number(project.lastActivity), 'll') }}
+            </template>
           </b-table-column>
 
           <b-table-column label=" " centered width="150">
@@ -80,8 +97,10 @@
 import CytomineTable from '@/components/utils/CytomineTable.vue';
 import ProjectDetails from './ProjectDetails.vue';
 import AddProjectModal from './AddProjectModal.vue';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 
 import { get, sync } from '@/utils/store-helpers';
+import { formatMomentDate } from '@/utils/date';
 
 import { ProjectCollection, OntologyCollection } from '@/api';
 
@@ -90,7 +109,8 @@ export default {
   components: {
     CytomineTable,
     ProjectDetails,
-    AddProjectModal
+    AddProjectModal,
+    IconProjectMemberRole
   },
   data() {
     return {
@@ -103,6 +123,7 @@ export default {
 
       excludedProperties: [
         'name',
+        'membersCount',
         'numberOfImages',
         'numberOfAnnotations',
         'numberOfReviewedAnnotations',
@@ -125,6 +146,7 @@ export default {
     openedDetails: sync('listProjects/openedDetails')
   },
   methods: {
+    formatMomentDate,
     async fetchOntologies() {
       let ontologies = (await OntologyCollection.fetchAll({ light: true })).array;
       ontologies.sort((a, b) => a.name.localeCompare(b.name));

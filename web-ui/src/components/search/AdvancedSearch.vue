@@ -74,6 +74,13 @@
           @setCollectionSize="nbProjects = $event"
         >
           <template #default="{row: project}">
+            <b-table-column field="currentUserRole" label="" centered width="1">
+              <icon-project-member-role
+                :is-manager="project.currentUserRoles?.admin"
+                :is-representative="project.currentUserRoles?.representative"
+              />
+            </b-table-column>
+
             <b-table-column :label="$t('id')" width="20" :visible="currentAccount.isDeveloper" field="id" sortable>
               {{project.id}}
             </b-table-column>
@@ -82,6 +89,10 @@
               <router-link :to="`/project/${project.id}`">
                 {{ project.name }}
               </router-link>
+            </b-table-column>
+
+            <b-table-column field="members_count" :label="$t('members')" centered sortable width="150">
+              {{ project.membersCount }}
             </b-table-column>
 
             <b-table-column field="count_images" :label="$t('images')" centered sortable width="150">
@@ -98,6 +109,12 @@
               <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
                 {{ project.numberOfReviewedAnnotations }}
               </router-link>
+            </b-table-column>
+
+            <b-table-column field="last_activity" :label="$t('last-activity')" centered sortable width="180">
+              <template v-if="project.lastActivity">
+                {{ formatMomentDate(Number(project.lastActivity), 'll') }}
+              </template>
             </b-table-column>
 
             <b-table-column label=" " centered width="150">
@@ -229,6 +246,8 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
 import { ImageInstanceCollection, ProjectCollection, TagCollection } from '@/api';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 import { appendShortTermToken } from '@/utils/token-utils.js';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
+import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'advanced-search',
@@ -238,7 +257,8 @@ export default {
     CytomineTable,
     ProjectDetails,
     ImageDetails,
-    CytomineMultiselect
+    CytomineMultiselect,
+    IconProjectMemberRole
   },
   data() {
     return {
@@ -254,12 +274,14 @@ export default {
       excludedProperties: [
         'name',
         'imagesPreview',
+        'membersCount',
         'lastActivity',
       ],
     };
   },
   methods: {
     appendShortTermToken,
+    formatMomentDate,
     debounceSearchString: _.debounce(async function (value) {
       this.searchString = value;
     }, 500),

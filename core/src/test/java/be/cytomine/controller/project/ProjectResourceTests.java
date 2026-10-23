@@ -36,7 +36,9 @@ import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectUserRoles;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
@@ -180,12 +182,17 @@ public class ProjectResourceTests {
     public void listAllProjects() throws Exception {
         Project project = builder.givenAProject();
         when(projectHttpContract.list(any(Pageable.class)))
-            .thenReturn(new PageImpl<>(List.of(toResponse(project))));
+            .thenReturn(new PageImpl<>(List.of(toListResponse(project))));
 
         restProjectControllerMockMvc.perform(get("/api/project.json"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.collection[?(@.name=='" + project.getName() + "')]").exists());
+            .andExpect(jsonPath("$.collection[?(@.name=='" + project.getName() + "')]").exists())
+            .andExpect(jsonPath("$.collection[0].numberOfSlides").value(0))
+            .andExpect(jsonPath("$.collection[0].membersCount").value(3))
+            .andExpect(jsonPath("$.collection[0].currentUserRoles.admin").value(true))
+            .andExpect(jsonPath("$.collection[0].currentUserRoles.representative").value(false))
+            .andExpect(jsonPath("$.collection[0].lastActivity").value(1234));
     }
 
     @Test
@@ -193,7 +200,7 @@ public class ProjectResourceTests {
     public void listAllProjectsWithPaginationAndSort() throws Exception {
         Project project = builder.givenAProject();
         when(projectHttpContract.list(any(Pageable.class)))
-            .thenReturn(new PageImpl<>(List.of(toResponse(project))));
+            .thenReturn(new PageImpl<>(List.of(toListResponse(project))));
 
         restProjectControllerMockMvc.perform(get("/api/project.json")
                 .param("page", "1")
@@ -347,6 +354,33 @@ public class ProjectResourceTests {
             LocalDateTime.now(),
             Optional.empty(),
             Optional.empty()
+        );
+    }
+
+    private ProjectListRowResponse toListResponse(Project project) {
+        Optional<Ontology> maybeOntology = Optional.ofNullable(project.getOntology());
+        return new ProjectListRowResponse(
+            project.getId(),
+            project.getName(),
+            maybeOntology.map(Ontology::getId),
+            maybeOntology.map(Ontology::getName),
+            project.getBlindMode() != null && project.getBlindMode(),
+            project.getAreImagesDownloadable() != null && project.getAreImagesDownloadable(),
+            0,
+            project.getCountImages(),
+            project.getCountAnnotations(),
+            project.getCountJobAnnotations(),
+            project.getCountReviewedAnnotations(),
+            project.isClosed(),
+            project.getMode() != null && project.getMode().name().equals("READ_ONLY"),
+            project.getMode() != null && project.getMode().name().equals("RESTRICTED"),
+            project.isHideUsersLayers(),
+            project.isHideAdminsLayers(),
+            LocalDateTime.now(),
+            Optional.empty(),
+            3,
+            new ProjectUserRoles(true, false),
+            Optional.of(1234L)
         );
     }
 

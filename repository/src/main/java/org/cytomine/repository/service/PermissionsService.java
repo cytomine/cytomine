@@ -123,6 +123,7 @@ public class PermissionsService {
             ensureAdminHasRealmManagementRoles(realmResource);
             applyUserProfileSchema(realmResource);
             ensureProjectsMapperIsSet(realmResource);
+            writePermissionsToKeycloak();
         }
     }
 
@@ -345,7 +346,8 @@ public class PermissionsService {
             log.info("Added 'projects' protocol mapper on realm '{}'", realm);
         }
     }
-    @PostConstruct
+
+
     public void writePermissionsToKeycloak() {
         RealmResource realmResource = keycloak.realm(realm);
 

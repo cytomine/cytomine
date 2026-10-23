@@ -3,9 +3,6 @@ package be.cytomine.common.repository.model.command.payload.response;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import be.cytomine.common.repository.model.HasLongId;
-import be.cytomine.common.repository.model.command.DataType;
-
 public record ProjectListRowResponse(
     long id,
     String name,
@@ -28,8 +25,4 @@ public record ProjectListRowResponse(
     long membersCount,
     ProjectUserRoles currentUserRoles,
     Optional<Long> lastActivity
-) implements HasLongId {
-    public DataType getDataType() {
-        return DataType.PROJECT;
-    }
-}
+) {}

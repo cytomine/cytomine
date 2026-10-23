@@ -138,12 +138,13 @@ services:
         ipv4_address: 172.16.238.16
 
   iam:
-    image: cytomine/iam:latest
+    image: keycloak/keycloak:26.8
     restart: unless-stopped
     depends_on:
       - iam-db
     ports:
       - 8100:8100
+    command: ["start-dev", "--http-port=8100"]
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
       KC_DB_PASSWORD: password
@@ -151,8 +152,9 @@ services:
       KC_DB_URL_HOST: iam-db
       KC_DB_URL_PORT: 5432
       KC_DB_USERNAME: iam
-      KC_HOSTNAME: 127.0.0.1
-      KC_HOSTNAME_ADMIN: 127.0.0.1
+      KC_FEATURES: token-exchange
+      KC_HOSTNAME: http://127.0.0.1:8100/iam
+      KC_HOSTNAME_ADMIN: http://127.0.0.1:8100/iam
       KC_HOSTNAME_PORT: 8100
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_BACKCHANNEL: false
@@ -313,6 +315,8 @@ services:
       POSTGIS_HOST: postgis
       IAM_URL: http://iam:8100
       IAM_EXTERNAL_URL: http://127.0.0.1:8100
+      KEYCLOAK_ADMIN_PASSWORD: *KEYCLOAK_ADMIN_PASSWORD
+      CYTOMINE_ADMIN_PASSWORD: password
     networks:
       host_network:
         ipv4_address: 172.16.238.18

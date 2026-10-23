@@ -41,21 +41,23 @@ import org.keycloak.representations.userprofile.config.UPAttribute;
 import org.keycloak.representations.userprofile.config.UPConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import be.cytomine.common.config.security.CytominePermission;
 import be.cytomine.common.config.security.CytomineUserRole;
 
 import static org.keycloak.representations.idm.authorization.DecisionStrategy.AFFIRMATIVE;
 import static org.keycloak.representations.idm.authorization.DecisionStrategy.UNANIMOUS;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class PermissionsService {
 
+    public static final String CLIENT_NAME = "cytomine-permissions";
+    public static final String RESOURCE_NAME = "core";
     private static final String NAME = "Cytomine Core";
     private static final String DESCRIPTION = "This is the default client for cytomine.";
     private static final List<String> ROLES = List.of("USER", "GUEST", "ADMIN");
@@ -76,9 +78,6 @@ public class PermissionsService {
     private static final String PROJECTS_MAPPER = "projects";
     private static final String USER_PROFILE_SCHEMA = "/keycloak-profile.json";
     private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
-
-    public static final String CLIENT_NAME = "cytomine-permissions";
-    public static final String RESOURCE_NAME = "core";
     private final Keycloak keycloak;
 
     private final CytominePermissions cytominePermissions;
@@ -403,17 +402,15 @@ public class PermissionsService {
 
     void assignRolesToExistingUser(CytomineUserRole targetedUser, ClientResource client) {
         UsersResource users = keycloak.realm(realm).users();
-
-        wrapException(() -> keycloak.realm(realm).users().searchByUsername(targetedUser.name(), true)).flatMap(
-            usersResult -> usersResult.stream().findFirst()).ifPresent(u-> {
-            List<RoleRepresentation> userRoles =
-                targetedUser.roles().stream()
+        wrapException(() -> keycloak.realm(realm).users().searchByUsername(targetedUser.name(), true))
+            .flatMap(usersResult -> usersResult.stream().findFirst())
+            .ifPresent(u -> {
+                List<RoleRepresentation> userRoles = targetedUser.roles().stream()
                     .map(role -> wrapException(() -> client.roles().get(role).toRepresentation()))
                     .flatMap(Optional::stream).toList();
-
-            users.get(u.getId()).roles().clientLevel(client.toRepresentation().getId()).add(userRoles);
-            log.info("Assigned client roles {} to user {}", targetedUser.roles(), targetedUser.name());
-        });
+                users.get(u.getId()).roles().clientLevel(client.toRepresentation().getId()).add(userRoles);
+                log.info("Assigned client roles {} to user {}", targetedUser.roles(), targetedUser.name());
+            });
     }
 
     <T> Optional<T> wrapException(Supplier<T> call) {
@@ -473,13 +470,15 @@ public class PermissionsService {
         return policyRepresentation;
 
     }
+
     ResourceRepresentation getResourceRepresentation(Set<CytominePermission> scopes) {
         ResourceRepresentation resourceRepresentation = new ResourceRepresentation();
         resourceRepresentation.setId(RESOURCE_NAME);
         resourceRepresentation.setName(RESOURCE_NAME);
         resourceRepresentation.setScopes(scopes.stream().map(this::getScopeRepresentation).collect(Collectors.toSet()));
         return resourceRepresentation;
-}
+    }
+
     private UserRepresentation newAdminUserRepresentation(UserRepresentation representation) {
         representation.setUsername(adminUsername);
         representation.setEnabled(true);

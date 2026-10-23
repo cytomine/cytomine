@@ -8,6 +8,8 @@ import org.cytomine.repository.persistence.ProjectRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.CurrentUserService;
 import org.cytomine.repository.service.ProjectCommandService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
@@ -55,5 +58,14 @@ public class ProjectController implements ProjectHttpContract {
     @Override
     public Optional<HttpCommandResponse> delete(@PathVariable long id) {
         return service.delete(currentUserService.getCurrentUserId(), id, LocalDateTime.now().truncatedTo(MICROS));
+    }
+
+    @Override
+    public Page<ProjectListRowResponse> list(Pageable pageable) {
+        long userId = currentUserService.getCurrentUserId();
+        if (aclService.isAdmin(userId)) {
+            return repository.findAllByDeletedNull(userId, pageable).map(service::mapToResponse);
+        }
+        return repository.findAllReadableByUser(userId, pageable).map(service::mapToResponse);
     }
 }

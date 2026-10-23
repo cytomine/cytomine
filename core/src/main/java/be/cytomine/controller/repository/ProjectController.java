@@ -4,6 +4,10 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +21,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
+import be.cytomine.controller.utils.CollectionResponse;
+import be.cytomine.controller.utils.PageMapper;
 import be.cytomine.domain.project.Project;
 import be.cytomine.mapper.ProjectMapper;
 import be.cytomine.service.search.RetrievalService;
@@ -38,6 +45,16 @@ public class ProjectController {
     private final ProjectHttpContract projectHttpContract;
     private final ProjectMapper projectMapper;
     private final RetrievalService retrievalService;
+    private final PageMapper pageMapper;
+
+    @GetMapping("/project.json")
+    public CollectionResponse<ProjectListRowResponse> list(
+        @SortDefault(sort = "created", direction = Sort.Direction.DESC)
+        @PageableDefault(size = 2000) Pageable pageable
+    ) {
+        log.debug("GET /project.json");
+        return pageMapper.toCollectionResponse(projectHttpContract.list(pageable));
+    }
 
     @GetMapping("/project/{id}.json")
     public JsonObject read(@PathVariable long id) {

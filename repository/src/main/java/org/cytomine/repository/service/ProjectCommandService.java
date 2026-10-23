@@ -9,13 +9,16 @@ import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.ProjectMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.OntologyRepository;
+import org.cytomine.repository.persistence.ProjectListRow;
 import org.cytomine.repository.persistence.ProjectRepository;
 import org.cytomine.repository.persistence.entity.OntologyEntity;
 import org.cytomine.repository.persistence.entity.ProjectEntity;
 import org.springframework.stereotype.Component;
 
 import be.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectUserRoles;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.CreateProjectCommand;
 import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
@@ -64,14 +67,38 @@ public class ProjectCommandService
 
     @Override
     public ProjectResponse mapToResponse(ProjectEntity entity) {
-        Optional<String> ontologyName = entity.getOntologyId() == null ? null
-            : ontologyRepository.findById(entity.getOntologyId())
-            .map(OntologyEntity::getName);
         return projectMapper.mapToProjectResponse(
             entity,
-            ontologyName,
+            Optional.ofNullable(entity.getOntologyId()).flatMap(ontologyRepository::findById)
+                .map(OntologyEntity::getName),
             MODE_READ_ONLY.equals(entity.getMode()),
             MODE_RESTRICTED.equals(entity.getMode())
+        );
+    }
+
+    public ProjectListRowResponse mapToResponse(ProjectListRow row) {
+        return new ProjectListRowResponse(
+            row.id(),
+            row.name(),
+            Optional.ofNullable(row.ontology()),
+            Optional.ofNullable(row.ontologyName()),
+            row.blindMode(),
+            row.areImagesDownloadable(),
+            row.numberOfSlides(),
+            row.numberOfImages(),
+            row.numberOfAnnotations(),
+            row.numberOfJobAnnotations(),
+            row.numberOfReviewedAnnotations(),
+            row.isClosed(),
+            row.isReadOnly(),
+            row.isRestricted(),
+            row.hideUsersLayers(),
+            row.hideAdminsLayers(),
+            row.created(),
+            Optional.ofNullable(row.updated()),
+            row.membersCount(),
+            new ProjectUserRoles(row.isAdmin(), row.isRepresentative()),
+            Optional.ofNullable(row.lastActivity())
         );
     }
 

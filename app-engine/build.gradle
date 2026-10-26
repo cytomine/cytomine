@@ -113,7 +113,7 @@ dependencies {
     implementation project(':registry-client')
 
     // liquibase
-    liquibaseRuntime 'info.picocli:picocli:4.7.5'
+    liquibaseRuntime 'info.picocli:picocli:4.7.7'
     implementation 'org.liquibase:liquibase-core:5.0.4'
 
     // Image processing

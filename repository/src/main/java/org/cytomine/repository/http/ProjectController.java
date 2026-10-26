@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.ProjectHttpContract;
@@ -66,7 +67,8 @@ public class ProjectController implements ProjectHttpContract {
     }
 
     @Override
-    public ProjectListFilteredResponse listFiltered(Pageable pageable, ProjectListAvailableFiltersPayload filters) {
+    public ProjectListFilteredResponse listFiltered(@RequestParam Pageable pageable,
+        @RequestBody ProjectListAvailableFiltersPayload filters) {
         long userId = currentUserService.getCurrentUserId();
         return new ProjectListFilteredResponse(
             repository.findAllReadableByUser(userId, pageable, filters.ontologyNames(), filters.roleNames(),

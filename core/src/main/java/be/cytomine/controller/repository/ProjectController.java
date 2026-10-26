@@ -49,17 +49,6 @@ public class ProjectController {
     private final RetrievalService retrievalService;
     private final PageMapper pageMapper;
 
-    @GetMapping("/project.json")
-    public FilteredCollectionResponse<ProjectListRowResponse, ProjectListAvailableFiltersPayload> list(
-        @SortDefault(sort = "created", direction = Sort.Direction.DESC)
-        @PageableDefault(size = 2000) Pageable pageable
-    ) {
-        log.debug("GET /project.json");
-        ProjectListFilteredResponse filteredList = projectHttpContract.list(pageable);
-        return pageMapper.toFilteredCollectionResponse(filteredList.content(),
-            filteredList.availableFilters());
-    }
-
     @PostMapping("/project.json")
     public FilteredCollectionResponse<ProjectListRowResponse, ProjectListAvailableFiltersPayload> list(
         @SortDefault(sort = "created", direction = Sort.Direction.DESC)

@@ -87,18 +87,14 @@ class OpenslideVipsParser(VipsParser):
 
 class OpenslideVipsReader(VipsReader):
     def read_thumb(
-        self, out_width, out_height, precomputed=False,
-        c: int | list[int] | None = None, **other
+        self,
+        out_width: int,
+        out_height: int,
+        precomputed: bool = False,
+        c: int | list[int] | None = None,
+        **other,
     ):
-        if precomputed:
-            imd = self.format.full_imd
-            if imd.associated_thumb.exists:
-                im = VIPSImage.openslideload(
-                    str(self.format.path), associated='thumbnail'
-                ).flatten()
-                return self._extract_channels(im, c)
-
-        return super().read_thumb(out_width, out_height, **other)
+        return super().read_thumb(out_width, out_height, c=c, **other)
 
     def read_window(
         self, region, out_width, out_height,

@@ -86,16 +86,6 @@ class OpenslideVipsParser(VipsParser):
 
 
 class OpenslideVipsReader(VipsReader):
-    def read_thumb(
-        self,
-        out_width: int,
-        out_height: int,
-        precomputed: bool = False,
-        c: int | list[int] | None = None,
-        **other,
-    ):
-        return super().read_thumb(out_width, out_height, c=c, **other)
-
     def read_window(
         self, region, out_width, out_height,
         c: int | list[int] | None = None, **other

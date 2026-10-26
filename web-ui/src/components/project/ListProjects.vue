@@ -13,6 +13,104 @@
       </button>
     </p>
     <div class="panel-block">
+      <div class="search-block">
+        <b-input
+          class="search-projects"
+          v-model="searchString"
+          :placeholder="$t('search-placeholder')"
+          type="search" icon="search"
+        />
+        <button class="button" @click="toggleFilterDisplay()">
+          <span class="icon">
+            <i class="fas fa-filter"></i>
+          </span>
+          <span>
+            {{filtersOpened ? $t('button-hide-filters') : $t('button-show-filters')}}
+          </span>
+          <span v-if="nbActiveFilters" class="nb-active-filters">
+            {{nbActiveFilters}}
+          </span>
+        </button>
+      </div>
+
+      <b-collapse :open="filtersOpened">
+        <div class="filters">
+          <div class="columns">
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('ontology')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedOntologies" :options="availableOntologies"
+                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all-ontologies')" />
+              </div>
+            </div>
+
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('my-role')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple :searchable="false" />
+              </div>
+            </div>
+
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('tags')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-multiselect v-model="selectedTags" :options="availableTags"
+                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+              </div>
+            </div>
+          </div>
+
+          <div class="columns">
+              <div class="column filter">
+                <div class="filter-label">
+                  {{$t('members')}}
+                </div>
+                <div class="filter-body">
+                  <cytomine-slider v-model="boundsMembers" :max="maxNbMembers" />
+                </div>
+              </div>
+
+              <div class="column filter">
+                <div class="filter-label">
+                  {{$t('images')}}
+                </div>
+                <div class="filter-body">
+                  <cytomine-slider v-model="boundsImages" :max="maxNbImages" />
+                </div>
+              </div>
+
+              <div class="column"></div>
+          </div>
+
+          <div class="columns">
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('user-annotations')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsUserAnnotations" :max="maxNbUserAnnotations" />
+              </div>
+            </div>
+
+            <div class="column filter">
+              <div class="filter-label">
+                {{$t('reviewed-annotations')}}
+              </div>
+              <div class="filter-body">
+                <cytomine-slider v-model="boundsReviewedAnnotations" :max="maxNbReviewedAnnotations" />
+              </div>
+            </div>
+            <div class="column"></div>
+          </div>
+        </div>
+      </b-collapse>
+
       <cytomine-table
         :collection="projectCollection"
         class="table-projects"
@@ -86,6 +184,13 @@
           </div>
         </template>
       </cytomine-table>
+
+      <div class="legend">
+          <h2>{{$t('legend')}}</h2>
+          <p><icon-project-member-role /> : {{$t('contributor-icon-label')}}</p>
+          <p><icon-project-member-role :is-manager="true" /> : {{$t('manager-icon-label')}}</p>
+          <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('representative-icon-label')}}</p>
+      </div>
     </div>
   </div>
 
@@ -195,9 +300,30 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
+
+.search-block {
+  display: flex;
+}
+
+.legend {
+  margin-top: 0.8rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  padding: 1rem 1.5em;
+  background: #f8f8f8;
+}
+
+.legend p:not(:last-child) {
+  margin-bottom: 0.4em;
+}
 </style>
 
 <style>
+.search-projects {
+  max-width: 25em;
+  margin-right: 1em;
+}
+
 .table-projects {
   margin-top: 1rem;
 }

@@ -40,9 +40,6 @@ public interface ProjectHttpContract {
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id);
 
-    @GetExchange("/list-all")
-    ProjectListFilteredResponse list(Pageable pageable);
-
     @PostExchange("/list-all")
     ProjectListFilteredResponse listFiltered(Pageable pageable, ProjectListAvailableFiltersPayload filters);
 }

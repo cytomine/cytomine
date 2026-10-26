@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import be.cytomine.common.repository.model.list.filtered.BoundedFilter;
 import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
@@ -32,6 +33,14 @@ public class ProjectController implements ProjectHttpContract {
     private final CurrentUserService currentUserService;
     private final ProjectCommandService service;
     private final ProjectRepository repository;
+
+    private static Long min(Optional<BoundedFilter> bounds) {
+        return bounds.flatMap(BoundedFilter::min).orElse(null);
+    }
+
+    private static Long max(Optional<BoundedFilter> bounds) {
+        return bounds.flatMap(BoundedFilter::max).orElse(null);
+    }
 
     @Override
     public Optional<HttpCommandResponse> create(@RequestBody CreateProject payload) {
@@ -57,30 +66,16 @@ public class ProjectController implements ProjectHttpContract {
     }
 
     @Override
-    public ProjectListFilteredResponse list(Pageable pageable) {
-        long userId = currentUserService.getCurrentUserId();
-        ProjectListAvailableFiltersPayload emptyFilters = ProjectListAvailableFiltersPayload.empty();
-        if (aclService.isAdmin(userId)) {
-            return new ProjectListFilteredResponse(
-                repository.findAllByDeletedNull(userId, pageable, emptyFilters).map(service::mapToResponse),
-                service.mapFilters(repository.getAvailableFilters()));
-        }
-        return new ProjectListFilteredResponse(
-            repository.findAllReadableByUser(userId, pageable, emptyFilters).map(service::mapToResponse),
-            service.mapFilters(repository.getAvailableFilters()));
-    }
-
-    @Override
     public ProjectListFilteredResponse listFiltered(Pageable pageable, ProjectListAvailableFiltersPayload filters) {
         long userId = currentUserService.getCurrentUserId();
-        if (aclService.isAdmin(userId)) {
-            return new ProjectListFilteredResponse(
-                repository.findAllByDeletedNullFiltered(userId, pageable, filters.ontologyNames(), filters.roleNames(),
-                        filters.tagLabels())
-                    .map(service::mapToResponse), service.mapFilters(repository.getAvailableFilters()));
-        }
         return new ProjectListFilteredResponse(
-            repository.findAllReadableByUser(userId, pageable, filters).map(service::mapToResponse),
-            service.mapFilters(repository.getAvailableFilters()));
+            repository
+                .findAllReadableByUser(userId, pageable, filters.ontologyNames(), filters.roleNames(),
+                    filters.tagLabels(),
+                    min(filters.memberCount()), max(filters.memberCount()),
+                    min(filters.imageCount()), max(filters.imageCount()),
+                    min(filters.manualAnnotationCount()), max(filters.manualAnnotationCount()),
+                    min(filters.reviewedAnnotationCount()), max(filters.reviewedAnnotationCount()))
+                .map(service::mapToResponse), service.mapFilters(repository.getAvailableFilters()));
     }
 }

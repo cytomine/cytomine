@@ -104,7 +104,7 @@ public class ProjectCommandService
         );
     }
 
-     public ProjectListAvailableFiltersPayload mapFilters(ProjectListAvailableFilters projectListAvailableFilters){
+    public ProjectListAvailableFiltersPayload mapFilters(ProjectListAvailableFilters projectListAvailableFilters) {
         return projectMapper.mapFilters(projectListAvailableFilters);
     }
 

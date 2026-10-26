@@ -69,6 +69,6 @@ public class ProjectController implements ProjectHttpContract {
         }
         return new ProjectListFilteredResponse(
             repository.findAllReadableByUser(userId, pageable).map(service::mapToResponse),
-            service.mapFilters(repository.getAvailableFilters(userId)));
+            service.mapFilters(repository.getAvailableFilters()));
     }
 }

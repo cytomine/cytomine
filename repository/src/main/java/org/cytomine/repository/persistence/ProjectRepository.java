@@ -66,15 +66,15 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
 
     String FILTERED_CONDITIONS = """
         AND (:ontologyNames IS NULL OR o.name IN (:ontologyNames))
-        AND (:roleNames IS NULL OR CASE WHEN """ + IS_ADMIN_EXISTS + """
-             THEN 'admin' ELSE 'contributor' END IN (:roleNames))
+        AND (:roleNames IS NULL OR CASE WHEN (""" + IS_ADMIN_EXISTS + """
+             ) THEN 'admin' ELSE 'contributor' END IN (:roleNames))
         AND (:tagLabels IS NULL OR EXISTS (SELECT 1
-                                             FROM tag_domain_association tda
-                                             JOIN tag t ON t.id = tda.tag_id AND t.deleted IS NULL
-                                            WHERE tda.domain_id = p.id
-                                              AND tda.domain_class_name = 'be.cytomine.domain.project.Project'
-                                              AND tda.deleted IS NULL
-                                              AND t.name IN (:tagLabels)))
+                                              FROM tag_domain_association tda
+                                              JOIN tag t ON t.id = tda.tag_id AND t.deleted IS NULL
+                                             WHERE tda.domain_id = p.id
+                                               AND tda.domain_class_name = 'be.cytomine.domain.project.Project'
+                                               AND tda.deleted IS NULL
+                                               AND t.name IN (:tagLabels)))
         AND (:minMemberCount IS NULL OR """ + MEMBERS_COUNT_SUBQUERY + """
               >= :minMemberCount)
         AND (:maxMemberCount IS NULL OR """ + MEMBERS_COUNT_SUBQUERY + """

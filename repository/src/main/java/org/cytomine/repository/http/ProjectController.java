@@ -57,7 +57,24 @@ public class ProjectController implements ProjectHttpContract {
     }
 
     @Override
-    public ProjectListFilteredResponse list(Pageable pageable, ProjectListAvailableFiltersPayload filters) {
+    public ProjectListFilteredResponse list(Pageable pageable) {
+        long userId = currentUserService.getCurrentUserId();
+        ProjectListAvailableFiltersPayload emptyFilters =
+            ProjectListAvailableFiltersPayload.empty();
+        if (aclService.isAdmin(userId)) {
+            return new ProjectListFilteredResponse(
+                repository.findAllByDeletedNull(pageable,
+                    emptyFilters
+                ).map(service::mapToResponse),
+                service.mapFilters(repository.getAvailableFilters()));
+        }
+        return new ProjectListFilteredResponse(
+            repository.findAllReadableByUser(userId, pageable, emptyFilters).map(service::mapToResponse),
+            service.mapFilters(repository.getAvailableFilters()));
+    }
+
+    @Override
+    public ProjectListFilteredResponse listFiltered(Pageable pageable, ProjectListAvailableFiltersPayload filters) {
         long userId = currentUserService.getCurrentUserId();
         if (aclService.isAdmin(userId)) {
             return new ProjectListFilteredResponse(

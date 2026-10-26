@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.common.PostGisTestConfiguration;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.data.domain.Sort.Direction.ASC;
@@ -42,20 +43,19 @@ class ProjectRepositoryTest {
             return ids.get(0);
         }
         return jdbcTemplate.queryForObject(
-            "INSERT INTO acl_class (id, class) VALUES (nextval('hibernate_sequence'), ?) RETURNING id",
-            Long.class, PROJECT_CLASS);
+            "INSERT INTO acl_class (id, class) VALUES (nextval('hibernate_sequence'), ?) RETURNING id", Long.class,
+            PROJECT_CLASS);
     }
 
     Long insertProject(String name, long countImages, long countAnnotations, String mode, LocalDateTime created,
-                       Timestamp updated) {
+        Timestamp updated) {
         return jdbcTemplate.queryForObject("""
             INSERT INTO project (version, are_images_downloadable, blind_mode, count_annotations, count_images,
                                  count_job_annotations, count_reviewed_annotations, is_closed, mode, name,
                                  hide_users_layers, hide_admins_layers, created, updated)
             VALUES (0, false, false, ?, ?, 0, 0, false, ?, ?, false, false, ?, ?)
             RETURNING id
-            """,
-            Long.class, countAnnotations, countImages, mode, name, Timestamp.valueOf(created), updated);
+            """, Long.class, countAnnotations, countImages, mode, name, Timestamp.valueOf(created), updated);
     }
 
     /**
@@ -63,8 +63,7 @@ class ProjectRepositoryTest {
      * A granting mask of 16 makes the user admin of the project.
      */
     Long insertProjectWithMembership(String name, long countImages, long countAnnotations, String mode,
-                                     LocalDateTime created, Timestamp updated, String username, boolean adminMask,
-                                     boolean representative) {
+        LocalDateTime created, Timestamp updated, String username, boolean adminMask, boolean representative) {
         Long projectId = insertProject(name, countImages, countAnnotations, mode, created, updated);
         Long aclClassId = aclClassId();
         Long aoiId = jdbcTemplate.queryForObject("""
@@ -72,10 +71,11 @@ class ProjectRepositoryTest {
             VALUES (nextval('hibernate_sequence'), ?, false, ?)
             RETURNING id
             """, Long.class, aclClassId, projectId);
-        Long aclSidId = jdbcTemplate.queryForObject(
-            "SELECT id FROM acl_sid WHERE sid = ? AND principal = true", Long.class, username);
-        Long memberUserId = jdbcTemplate.queryForObject(
-            "SELECT id FROM sec_user WHERE username = ?", Long.class, username);
+        Long aclSidId =
+            jdbcTemplate.queryForObject("SELECT id FROM acl_sid WHERE sid = ? AND principal = true", Long.class,
+                username);
+        Long memberUserId =
+            jdbcTemplate.queryForObject("SELECT id FROM sec_user WHERE username = ?", Long.class, username);
         jdbcTemplate.execute("""
             INSERT INTO acl_entry (id, ace_order, acl_object_identity, audit_failure, audit_success, granting, mask,
                                    sid)
@@ -119,11 +119,12 @@ class ProjectRepositoryTest {
     @Test
     void mapsRowWithoutSort() {
         Long userId = insertUser("test-user1");
-        Long id = insertProject("test1", 4, 3, "READ_ONLY",
-            LocalDateTime.now(), Timestamp.valueOf(LocalDateTime.now()));
+        Long id =
+            insertProject("test1", 4, 3, "READ_ONLY", LocalDateTime.now(), Timestamp.valueOf(LocalDateTime.now()));
         insertCommandHistory(id, userId);
 
-        Page<ProjectListRow> page = projectRepository.findAllByDeletedNull(1L, PageRequest.of(0, 10));
+        Page<ProjectListRow> page =
+            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10), ProjectListAvailableFiltersPayload.empty());
 
         assertThat(page.getContent()).hasSize(1);
         ProjectListRow row = page.getContent().get(0);
@@ -155,7 +156,8 @@ class ProjectRepositoryTest {
     void mapsRowWithNullables() {
         insertProject("test2", 0, 0, "CLASSIC", LocalDateTime.now(), null);
 
-        Page<ProjectListRow> page = projectRepository.findAllByDeletedNull(1L, PageRequest.of(0, 10));
+        Page<ProjectListRow> page =
+            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10), ProjectListAvailableFiltersPayload.empty());
 
         assertThat(page.getContent()).hasSize(1);
         ProjectListRow row = page.getContent().get(0);
@@ -172,10 +174,11 @@ class ProjectRepositoryTest {
         insertProjectWithMembership("test3", 1, 2, "CLASSIC", LocalDateTime.now(), null, "test-admin", true, true);
         insertProjectWithMembership("test4", 1, 2, "CLASSIC", LocalDateTime.now(), null, "test-another", false, false);
 
-        Page<ProjectListRow> page = projectRepository.findAllByDeletedNull(adminId, PageRequest.of(0, 10));
+        Page<ProjectListRow> page =
+            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10), ProjectListAvailableFiltersPayload.empty());
 
-        Map<String, ProjectListRow> rows = page.getContent().stream()
-            .collect(Collectors.toMap(ProjectListRow::name, r -> r));
+        Map<String, ProjectListRow> rows =
+            page.getContent().stream().collect(Collectors.toMap(ProjectListRow::name, r -> r));
         assertThat(rows).containsKeys("test3", "test4");
         assertThat(rows.get("test3").membersCount()).isEqualTo(1);
         assertThat(rows.get("test3").isAdmin()).isTrue();
@@ -195,25 +198,29 @@ class ProjectRepositoryTest {
         Long testAId = jdbcTemplate.queryForObject("SELECT id FROM project WHERE name = 'test-a'", Long.class);
         insertCommandHistory(testAId, userId);
 
-        Page<ProjectListRow> descImages = projectRepository.findAllByDeletedNull(1L,
-            PageRequest.of(0, 10, Sort.by(DESC, "count_images")));
+        Page<ProjectListRow> descImages =
+            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10, Sort.by(DESC, "count_images")),
+                ProjectListAvailableFiltersPayload.empty());
         assertThat(descImages.getContent()).extracting(ProjectListRow::name).containsExactly("test-b", "test-a");
 
-        Page<ProjectListRow> ascAnnotations = projectRepository.findAllByDeletedNull(1L,
-            PageRequest.of(0, 10, Sort.by(ASC, "count_annotations")));
+        Page<ProjectListRow> ascAnnotations =
+            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10, Sort.by(ASC, "count_annotations")),
+                ProjectListAvailableFiltersPayload.empty());
         assertThat(ascAnnotations.getContent()).extracting(ProjectListRow::name).containsExactly("test-b", "test-a");
 
-        Page<ProjectListRow> ascCreated = projectRepository.findAllByDeletedNull(1L,
-            PageRequest.of(0, 10, Sort.by(ASC, "created")));
+        Page<ProjectListRow> ascCreated =
+            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10, Sort.by(ASC, "created")),
+                ProjectListAvailableFiltersPayload.empty());
         assertThat(ascCreated.getContent()).extracting(ProjectListRow::name).containsExactly("test-a", "test-b");
 
-        Page<ProjectListRow> ascMembers = projectRepository.findAllByDeletedNull(1L,
-            PageRequest.of(0, 10, Sort.by(ASC, "members_count")));
-        assertThat(ascMembers.getContent()).extracting(ProjectListRow::name)
-            .containsExactly("test-b", "test-a");
+        Page<ProjectListRow> ascMembers =
+            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10, Sort.by(ASC, "members_count")),
+                ProjectListAvailableFiltersPayload.empty());
+        assertThat(ascMembers.getContent()).extracting(ProjectListRow::name).containsExactly("test-b", "test-a");
 
-        Page<ProjectListRow> descActivity = projectRepository.findAllByDeletedNull(1L,
-            PageRequest.of(0, 10, Sort.by(DESC, "last_activity")));
+        Page<ProjectListRow> descActivity =
+            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10, Sort.by(DESC, "last_activity")),
+                ProjectListAvailableFiltersPayload.empty());
         assertThat(descActivity.getContent().get(0).lastActivity()).isNull();
         assertThat(descActivity.getContent().get(1).name()).isEqualTo("test-a");
         assertThat(descActivity.getContent().get(1).lastActivity()).isGreaterThan(1_000_000_000_000L);

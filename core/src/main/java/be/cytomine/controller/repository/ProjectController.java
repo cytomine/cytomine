@@ -60,6 +60,18 @@ public class ProjectController {
             filteredList.availableFilters());
     }
 
+    @PostMapping("/project.json")
+    public FilteredCollectionResponse<ProjectListRowResponse, ProjectListAvailableFiltersPayload> list(
+        @SortDefault(sort = "created", direction = Sort.Direction.DESC)
+        @PageableDefault(size = 2000) Pageable pageable,
+        @RequestBody ProjectListAvailableFiltersPayload projectFilters
+    ) {
+        log.debug("Post /project.json");
+        ProjectListFilteredResponse filteredList = projectHttpContract.listFiltered(pageable, projectFilters);
+        return pageMapper.toFilteredCollectionResponse(filteredList.content(),
+            filteredList.availableFilters());
+    }
+
     @GetMapping("/project/{id}.json")
     public JsonObject read(@PathVariable long id) {
         log.debug("GET /project/{}.json", id);

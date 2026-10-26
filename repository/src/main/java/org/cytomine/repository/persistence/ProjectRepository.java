@@ -22,7 +22,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
             JOIN acl_sid asid ON asid.id = ae.sid
             JOIN sec_user su ON su.username = asid.sid
         """;
-    String READABLE_PROJECT_WHERE = "WHERE p.deleted IS NULL AND su.id = :userId";
+
     String PROJECT_ROW_PROJECTION = """
         SELECT p.id,
                p.name,

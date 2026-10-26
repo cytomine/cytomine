@@ -104,7 +104,7 @@ dependencies {
     implementation group: 'io.cucumber', name: 'cucumber-spring', version: '6.10.4'
     testImplementation 'io.cucumber:cucumber-java:6.10.4'
     testImplementation 'io.cucumber:cucumber-junit:6.10.4'
-    testImplementation 'org.assertj:assertj-core:3.4.1'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
     testImplementation 'org.junit.vintage:junit-vintage-engine'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation "org.junit.jupiter:junit-jupiter"

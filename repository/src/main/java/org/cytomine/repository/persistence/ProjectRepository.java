@@ -42,6 +42,28 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
                     AND ae.mask >= 16
                )""";
 
+    String READABLE_EXISTS = """
+        EXISTS (SELECT 1
+                  FROM acl_entry ae
+                  JOIN acl_object_identity aoi ON aoi.id = ae.acl_object_identity
+                  JOIN acl_sid asid ON asid.id = ae.sid
+                  JOIN sec_user su ON su.username = asid.sid
+                 WHERE aoi.object_id_identity = p.id
+                   AND aoi.object_id_class =
+                        (SELECT ac.id FROM acl_class ac
+                          WHERE ac.class = 'be.cytomine.domain.project.Project')
+                   AND su.id = :userId
+                   AND ae.mask >= 1
+               )""";
+
+    String PLATFORM_ADMIN_EXISTS = """
+        EXISTS (SELECT 1
+                  FROM sec_user_sec_role usr
+                  JOIN sec_role sr ON sr.id = usr.sec_role_id
+                 WHERE usr.sec_user_id = :userId
+                   AND sr.authority IN ('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')
+               )""";
+
     String FILTERED_CONDITIONS = """
         AND (:ontologyNames IS NULL OR o.name IN (:ontologyNames))
         AND (:roleNames IS NULL OR CASE WHEN """ + IS_ADMIN_EXISTS + """
@@ -67,6 +89,9 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
 
     String FILTERED_WHERE = """
         WHERE p.deleted IS NULL
+        AND (""" + PLATFORM_ADMIN_EXISTS + """
+        OR\s""" + READABLE_EXISTS + """
+        )
         """ + FILTERED_CONDITIONS;
 
     String ACL_MEMBER_JOIN = """
@@ -214,22 +239,11 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     @Query(value = ProjectRepository.PROJECT_ROW_PROJECTION + """
         FROM project p
         LEFT JOIN ontology o ON o.id = p.ontology_id
-        JOIN acl_object_identity aoi ON aoi.object_id_identity = p.id
-        JOIN acl_class ac ON ac.id = aoi.object_id_class AND ac.class = 'be.cytomine.domain.project.Project'
-        JOIN acl_entry ae ON ae.acl_object_identity = aoi.id
-        JOIN acl_sid sid ON sid.id = ae.sid
-        JOIN sec_user su ON su.username = sid.sid
-        WHERE p.deleted IS NULL AND su.id = :userId
-        """ + FILTERED_CONDITIONS,
+        """ + FILTERED_WHERE,
         countQuery = """
-        SELECT count(DISTINCT p.id) FROM project p
-        JOIN acl_object_identity aoi ON aoi.object_id_identity = p.id
-        JOIN acl_class ac ON ac.id = aoi.object_id_class AND ac.class = 'be.cytomine.domain.project.Project'
-        JOIN acl_entry ae ON ae.acl_object_identity = aoi.id
-        JOIN acl_sid sid ON sid.id = ae.sid
-        JOIN sec_user su ON su.username = sid.sid
-        WHERE p.deleted IS NULL AND su.id = :userId
-            """ + FILTERED_CONDITIONS, nativeQuery = true)
+            SELECT count(p.id) FROM project p
+            LEFT JOIN ontology o ON o.id = p.ontology_id
+            """ + FILTERED_WHERE, nativeQuery = true)
     Page<ProjectListRow> findAllReadableByUser(long userId, Pageable pageable, Set<String> ontologyNames,
         Set<String> roleNames, Set<String> tagLabels, Long minMemberCount, Long maxMemberCount, Long minImageCount,
         Long maxImageCount, Long minManualAnnotationCount, Long maxManualAnnotationCount,

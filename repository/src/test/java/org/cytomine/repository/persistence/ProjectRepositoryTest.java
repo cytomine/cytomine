@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.cytomine.repository.RepositoryApp;
@@ -13,12 +14,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.data.domain.Sort.Direction.ASC;
@@ -103,6 +104,22 @@ class ProjectRepositoryTest {
         return userId;
     }
 
+    Long insertAdminUser(String username) {
+        Long userId = insertUser(username);
+        jdbcTemplate.update(
+            "INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_SUPER_ADMIN', NOW() "
+                + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_SUPER_ADMIN')");
+        jdbcTemplate.update(
+            "INSERT INTO sec_user_sec_role (version, sec_user_id, created, sec_role_id) SELECT 0, ?, NOW(), "
+                + "(SELECT id FROM sec_role WHERE authority = 'ROLE_SUPER_ADMIN')", userId);
+        return userId;
+    }
+
+    private Page<ProjectListRow> findAllUnfiltered(long userId, Pageable pageable) {
+        return projectRepository.findAllReadableByUser(userId, pageable, Set.of(), Set.of(), Set.of(),
+            null, null, null, null, null, null, null, null);
+    }
+
     void insertCommandHistory(Long projectId, Long userId) {
         Long commandId = jdbcTemplate.queryForObject("""
             INSERT INTO command (id, version, action_message, data, print_message, refuse_undo,
@@ -118,14 +135,12 @@ class ProjectRepositoryTest {
 
     @Test
     void mapsRowWithoutSort() {
-        Long userId = insertUser("test-user1");
+        Long userId = insertAdminUser("test-user1");
         Long id =
             insertProject("test1", 4, 3, "READ_ONLY", LocalDateTime.now(), Timestamp.valueOf(LocalDateTime.now()));
         insertCommandHistory(id, userId);
 
-        Page<ProjectListRow> page =
-            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10),
-                ProjectListAvailableFiltersPayload.empty());
+        Page<ProjectListRow> page = findAllUnfiltered(userId, PageRequest.of(0, 10));
 
         assertThat(page.getContent()).hasSize(1);
         ProjectListRow row = page.getContent().get(0);
@@ -159,22 +174,14 @@ class ProjectRepositoryTest {
         Long id =
             insertProject("test1", 4, 3, "READ_ONLY", LocalDateTime.now(), Timestamp.valueOf(LocalDateTime.now()));
         insertCommandHistory(id, userId);
-
-//        Page<ProjectListRow> page =
-//            projectRepository.findAllByDeletedNullFiltered(userId, PageRequest.of(0, 10),
-//                Set.of("not existing"));
-//
-//        assertThat(page.getContent()).hasSize(1);
-
     }
 
     @Test
     void mapsRowWithNullables() {
+        Long userId = insertAdminUser("test-admin-sup");
         insertProject("test2", 0, 0, "CLASSIC", LocalDateTime.now(), null);
 
-        Page<ProjectListRow> page =
-            projectRepository.findAllByDeletedNull(-1L, PageRequest.of(0, 10),
-                ProjectListAvailableFiltersPayload.empty());
+        Page<ProjectListRow> page = findAllUnfiltered(userId, PageRequest.of(0, 10));
 
         assertThat(page.getContent()).hasSize(1);
         ProjectListRow row = page.getContent().get(0);
@@ -186,14 +193,12 @@ class ProjectRepositoryTest {
 
     @Test
     void computesMembershipFields() {
-        Long userId = insertUser("test-admin");
+        Long userId = insertAdminUser("test-admin");
         Long anotherId = insertUser("test-another");
         insertProjectWithMembership("test3", 1, 2, "CLASSIC", LocalDateTime.now(), null, "test-admin", true, true);
         insertProjectWithMembership("test4", 1, 2, "CLASSIC", LocalDateTime.now(), null, "test-another", false, false);
 
-        Page<ProjectListRow> page =
-            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10),
-                ProjectListAvailableFiltersPayload.empty());
+        Page<ProjectListRow> page = findAllUnfiltered(userId, PageRequest.of(0, 10));
 
         Map<String, ProjectListRow> rows =
             page.getContent().stream().collect(Collectors.toMap(ProjectListRow::name, r -> r));
@@ -208,7 +213,7 @@ class ProjectRepositoryTest {
 
     @Test
     void sortsOnRawColumnsAndAliases() {
-        Long userId = insertUser("test-user2");
+        Long userId = insertAdminUser("test-user2");
         insertProjectWithMembership("test-a", 4, 3, "CLASSIC", LocalDateTime.now().minusHours(1), null, "test-user2",
             true, true);
         insertProject("test-b", 9, 1, "CLASSIC", LocalDateTime.now(), null);
@@ -217,28 +222,22 @@ class ProjectRepositoryTest {
         insertCommandHistory(testAId, userId);
 
         Page<ProjectListRow> descImages =
-            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10, Sort.by(DESC, "count_images")),
-                ProjectListAvailableFiltersPayload.empty());
+            findAllUnfiltered(userId, PageRequest.of(0, 10, Sort.by(DESC, "count_images")));
         assertThat(descImages.getContent()).extracting(ProjectListRow::name).containsExactly("test-b", "test-a");
 
         Page<ProjectListRow> ascAnnotations =
-            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10, Sort.by(ASC, "count_annotations")),
-                ProjectListAvailableFiltersPayload.empty());
+            findAllUnfiltered(userId, PageRequest.of(0, 10, Sort.by(ASC, "count_annotations")));
         assertThat(ascAnnotations.getContent()).extracting(ProjectListRow::name).containsExactly("test-b", "test-a");
 
-        Page<ProjectListRow> ascCreated =
-            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10, Sort.by(ASC, "created")),
-                ProjectListAvailableFiltersPayload.empty());
+        Page<ProjectListRow> ascCreated = findAllUnfiltered(userId, PageRequest.of(0, 10, Sort.by(ASC, "created")));
         assertThat(ascCreated.getContent()).extracting(ProjectListRow::name).containsExactly("test-a", "test-b");
 
         Page<ProjectListRow> ascMembers =
-            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10, Sort.by(ASC, "members_count")),
-                ProjectListAvailableFiltersPayload.empty());
+            findAllUnfiltered(userId, PageRequest.of(0, 10, Sort.by(ASC, "members_count")));
         assertThat(ascMembers.getContent()).extracting(ProjectListRow::name).containsExactly("test-b", "test-a");
 
         Page<ProjectListRow> descActivity =
-            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10, Sort.by(DESC, "last_activity")),
-                ProjectListAvailableFiltersPayload.empty());
+            findAllUnfiltered(userId, PageRequest.of(0, 10, Sort.by(DESC, "last_activity")));
         assertThat(descActivity.getContent().get(0).lastActivity()).isNull();
         assertThat(descActivity.getContent().get(1).name()).isEqualTo("test-a");
         assertThat(descActivity.getContent().get(1).lastActivity()).isGreaterThan(1_000_000_000_000L);

@@ -69,8 +69,7 @@ public class ProjectController implements ProjectHttpContract {
     public ProjectListFilteredResponse listFiltered(Pageable pageable, ProjectListAvailableFiltersPayload filters) {
         long userId = currentUserService.getCurrentUserId();
         return new ProjectListFilteredResponse(
-            repository
-                .findAllReadableByUser(userId, pageable, filters.ontologyNames(), filters.roleNames(),
+            repository.findAllReadableByUser(userId, pageable, filters.ontologyNames(), filters.roleNames(),
                     filters.tagLabels(),
                     min(filters.memberCount()), max(filters.memberCount()),
                     min(filters.imageCount()), max(filters.imageCount()),

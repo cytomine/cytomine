@@ -23,7 +23,7 @@ import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
-import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
@@ -50,7 +50,7 @@ public class ProjectController {
     private final PageMapper pageMapper;
 
     @GetMapping("/project.json")
-    public FilteredCollectionResponse<ProjectListRowResponse, ProjectListAvailableFiltersResponse> list(
+    public FilteredCollectionResponse<ProjectListRowResponse, ProjectListAvailableFiltersPayload> list(
         @SortDefault(sort = "created", direction = Sort.Direction.DESC)
         @PageableDefault(size = 2000) Pageable pageable
     ) {

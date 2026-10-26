@@ -6,6 +6,6 @@ import be.cytomine.common.repository.model.command.payload.response.ProjectListR
 
 public record ProjectListFilteredResponse(
     Page<ProjectListRowResponse> content,
-    ProjectListAvailableFiltersResponse availableFilters
+    ProjectListAvailableFiltersPayload availableFilters
 ) {
 }

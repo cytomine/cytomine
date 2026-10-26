@@ -26,7 +26,7 @@ import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
 import be.cytomine.common.repository.model.command.request.DeleteProjectCommand;
 import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateProjectCommand;
-import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
 
@@ -104,7 +104,7 @@ public class ProjectCommandService
         );
     }
 
-    public ProjectListAvailableFiltersResponse mapFilters(ProjectListAvailableFilters projectListAvailableFilters){
+     public ProjectListAvailableFiltersPayload mapFilters(ProjectListAvailableFilters projectListAvailableFilters){
         return projectMapper.mapFilters(projectListAvailableFilters);
     }
 

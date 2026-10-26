@@ -40,7 +40,7 @@ import be.cytomine.common.repository.model.command.payload.response.ProjectListR
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectUserRoles;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
@@ -170,7 +170,7 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         when(projectHttpContract.list(any(Pageable.class))).thenReturn(
             new ProjectListFilteredResponse(new PageImpl<>(List.of(toListResponse(project))),
-                new ProjectListAvailableFiltersResponse(Set.of(), Set.of(), Set.of(), Optional.empty(),
+                new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(),
                     Optional.empty(), Optional.empty(), Optional.empty())));
 
         restProjectControllerMockMvc.perform(get("/api/project.json")).andExpect(status().isOk())
@@ -189,7 +189,7 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         when(projectHttpContract.list(any(Pageable.class))).thenReturn(
             new ProjectListFilteredResponse(new PageImpl<>(List.of(toListResponse(project))),
-                new ProjectListAvailableFiltersResponse(Set.of(), Set.of(), Set.of(), Optional.empty(),
+                new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(),
                     Optional.empty(), Optional.empty(), Optional.empty())));
 
         restProjectControllerMockMvc.perform(

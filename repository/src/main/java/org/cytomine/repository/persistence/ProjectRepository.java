@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import be.cytomine.common.repository.model.list.filtered.BoundedFilter;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     String PROJECT_CLASS = "'be.cytomine.domain.project.Project'";
@@ -191,7 +192,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
             """,
         nativeQuery = true
     )
-    Page<ProjectListRow> findAllByDeletedNull(long userId, Pageable pageable);
+    Page<ProjectListRow> findAllByDeletedNull(Pageable pageable, ProjectListAvailableFiltersPayload filters);
 
     @Query(
         value = ProjectRepository.PROJECT_ROW_PROJECTION + """
@@ -215,6 +216,6 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
             """,
         nativeQuery = true
     )
-    Page<ProjectListRow> findAllReadableByUser(long userId, Pageable pageable);
+    Page<ProjectListRow> findAllReadableByUser(long userId, Pageable pageable, ProjectListAvailableFiltersPayload filters);
 
 }

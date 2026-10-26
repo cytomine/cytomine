@@ -3,7 +3,6 @@ package be.cytomine.common.repository.http;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,8 +13,8 @@ import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
 
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
@@ -42,5 +41,5 @@ public interface ProjectHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id);
 
     @GetExchange("/list-all")
-    ProjectListFilteredResponse list(Pageable pageable);
+    ProjectListFilteredResponse list(Pageable pageable, ProjectListAvailableFiltersPayload filters);
 }

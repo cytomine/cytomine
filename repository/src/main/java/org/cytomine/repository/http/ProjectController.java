@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
@@ -41,15 +42,11 @@ public class ProjectController implements ProjectHttpContract {
     public Optional<ProjectResponse> read(@PathVariable long id) {
         long userId = currentUserService.getCurrentUserId();
         return repository.findByIdAndDeletedNull(id)
-            .filter(project -> aclService.canReadProject(userId, project.getId()))
-            .map(service::mapToResponse);
+            .filter(project -> aclService.canReadProject(userId, project.getId())).map(service::mapToResponse);
     }
 
     @Override
-    public Optional<HttpCommandResponse> update(
-        @PathVariable long id,
-        @RequestBody UpdateProject payload
-    ) {
+    public Optional<HttpCommandResponse> update(@PathVariable long id, @RequestBody UpdateProject payload) {
         return service.update(currentUserService.getCurrentUserId(), id, payload,
             LocalDateTime.now().truncatedTo(MICROS));
     }
@@ -60,15 +57,15 @@ public class ProjectController implements ProjectHttpContract {
     }
 
     @Override
-    public ProjectListFilteredResponse list(Pageable pageable) {
+    public ProjectListFilteredResponse list(Pageable pageable, ProjectListAvailableFiltersPayload filters) {
         long userId = currentUserService.getCurrentUserId();
         if (aclService.isAdmin(userId)) {
             return new ProjectListFilteredResponse(
-                repository.findAllByDeletedNull(userId, pageable).map(service::mapToResponse),
+                repository.findAllByDeletedNull(pageable, filters).map(service::mapToResponse),
                 service.mapFilters(repository.getAvailableFilters()));
         }
         return new ProjectListFilteredResponse(
-            repository.findAllReadableByUser(userId, pageable).map(service::mapToResponse),
+            repository.findAllReadableByUser(userId, pageable, filters).map(service::mapToResponse),
             service.mapFilters(repository.getAvailableFilters()));
     }
 }

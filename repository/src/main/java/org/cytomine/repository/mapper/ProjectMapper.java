@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.mapper.BaseMapper;
 import be.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
-import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
@@ -69,7 +69,8 @@ public interface ProjectMapper {
     @Mapping(target = "isRestricted", source = "isRestricted")
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "mode"})
     ProjectResponse mapToProjectResponse(ProjectEntity entity, Optional<String> ontologyName, boolean isReadOnly,
-                                         boolean isRestricted);
+        boolean isRestricted);
 
-     ProjectListAvailableFiltersResponse mapFilters(ProjectListAvailableFilters projectListAvailableFilters);
+    ProjectListAvailableFiltersPayload mapFilters(ProjectListAvailableFilters projectListAvailableFilters);
+
 }

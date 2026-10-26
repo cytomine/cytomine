@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.cytomine.repository.RepositoryApp;
@@ -124,7 +125,8 @@ class ProjectRepositoryTest {
         insertCommandHistory(id, userId);
 
         Page<ProjectListRow> page =
-            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10), ProjectListAvailableFiltersPayload.empty());
+            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10),
+                ProjectListAvailableFiltersPayload.empty());
 
         assertThat(page.getContent()).hasSize(1);
         ProjectListRow row = page.getContent().get(0);
@@ -153,11 +155,27 @@ class ProjectRepositoryTest {
     }
 
     @Test
+    void filteredRows() {
+        Long userId = insertUser("test-user1");
+        Long id =
+            insertProject("test1", 4, 3, "READ_ONLY", LocalDateTime.now(), Timestamp.valueOf(LocalDateTime.now()));
+        insertCommandHistory(id, userId);
+
+        Page<ProjectListRow> page =
+            projectRepository.findAllByDeletedNullFiltered(userId, PageRequest.of(0, 10),
+                Set.of("not existing"));
+
+        assertThat(page.getContent()).hasSize(1);
+
+    }
+
+    @Test
     void mapsRowWithNullables() {
         insertProject("test2", 0, 0, "CLASSIC", LocalDateTime.now(), null);
 
         Page<ProjectListRow> page =
-            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10), ProjectListAvailableFiltersPayload.empty());
+            projectRepository.findAllByDeletedNull(-1L, PageRequest.of(0, 10),
+                ProjectListAvailableFiltersPayload.empty());
 
         assertThat(page.getContent()).hasSize(1);
         ProjectListRow row = page.getContent().get(0);
@@ -169,13 +187,14 @@ class ProjectRepositoryTest {
 
     @Test
     void computesMembershipFields() {
-        Long adminId = insertUser("test-admin");
+        Long userId = insertUser("test-admin");
         Long anotherId = insertUser("test-another");
         insertProjectWithMembership("test3", 1, 2, "CLASSIC", LocalDateTime.now(), null, "test-admin", true, true);
         insertProjectWithMembership("test4", 1, 2, "CLASSIC", LocalDateTime.now(), null, "test-another", false, false);
 
         Page<ProjectListRow> page =
-            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10), ProjectListAvailableFiltersPayload.empty());
+            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10),
+                ProjectListAvailableFiltersPayload.empty());
 
         Map<String, ProjectListRow> rows =
             page.getContent().stream().collect(Collectors.toMap(ProjectListRow::name, r -> r));
@@ -199,27 +218,27 @@ class ProjectRepositoryTest {
         insertCommandHistory(testAId, userId);
 
         Page<ProjectListRow> descImages =
-            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10, Sort.by(DESC, "count_images")),
+            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10, Sort.by(DESC, "count_images")),
                 ProjectListAvailableFiltersPayload.empty());
         assertThat(descImages.getContent()).extracting(ProjectListRow::name).containsExactly("test-b", "test-a");
 
         Page<ProjectListRow> ascAnnotations =
-            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10, Sort.by(ASC, "count_annotations")),
+            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10, Sort.by(ASC, "count_annotations")),
                 ProjectListAvailableFiltersPayload.empty());
         assertThat(ascAnnotations.getContent()).extracting(ProjectListRow::name).containsExactly("test-b", "test-a");
 
         Page<ProjectListRow> ascCreated =
-            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10, Sort.by(ASC, "created")),
+            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10, Sort.by(ASC, "created")),
                 ProjectListAvailableFiltersPayload.empty());
         assertThat(ascCreated.getContent()).extracting(ProjectListRow::name).containsExactly("test-a", "test-b");
 
         Page<ProjectListRow> ascMembers =
-            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10, Sort.by(ASC, "members_count")),
+            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10, Sort.by(ASC, "members_count")),
                 ProjectListAvailableFiltersPayload.empty());
         assertThat(ascMembers.getContent()).extracting(ProjectListRow::name).containsExactly("test-b", "test-a");
 
         Page<ProjectListRow> descActivity =
-            projectRepository.findAllByDeletedNull(PageRequest.of(0, 10, Sort.by(DESC, "last_activity")),
+            projectRepository.findAllByDeletedNull(userId, PageRequest.of(0, 10, Sort.by(DESC, "last_activity")),
                 ProjectListAvailableFiltersPayload.empty());
         assertThat(descActivity.getContent().get(0).lastActivity()).isNull();
         assertThat(descActivity.getContent().get(1).name()).isEqualTo("test-a");

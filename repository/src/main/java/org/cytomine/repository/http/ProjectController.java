@@ -59,13 +59,10 @@ public class ProjectController implements ProjectHttpContract {
     @Override
     public ProjectListFilteredResponse list(Pageable pageable) {
         long userId = currentUserService.getCurrentUserId();
-        ProjectListAvailableFiltersPayload emptyFilters =
-            ProjectListAvailableFiltersPayload.empty();
+        ProjectListAvailableFiltersPayload emptyFilters = ProjectListAvailableFiltersPayload.empty();
         if (aclService.isAdmin(userId)) {
             return new ProjectListFilteredResponse(
-                repository.findAllByDeletedNull(pageable,
-                    emptyFilters
-                ).map(service::mapToResponse),
+                repository.findAllByDeletedNull(userId, pageable, emptyFilters).map(service::mapToResponse),
                 service.mapFilters(repository.getAvailableFilters()));
         }
         return new ProjectListFilteredResponse(
@@ -78,8 +75,9 @@ public class ProjectController implements ProjectHttpContract {
         long userId = currentUserService.getCurrentUserId();
         if (aclService.isAdmin(userId)) {
             return new ProjectListFilteredResponse(
-                repository.findAllByDeletedNull(pageable, filters).map(service::mapToResponse),
-                service.mapFilters(repository.getAvailableFilters()));
+                repository.findAllByDeletedNullFiltered(userId, pageable, filters.ontologyNames(), filters.roleNames(),
+                        filters.tagLabels())
+                    .map(service::mapToResponse), service.mapFilters(repository.getAvailableFilters()));
         }
         return new ProjectListFilteredResponse(
             repository.findAllReadableByUser(userId, pageable, filters).map(service::mapToResponse),

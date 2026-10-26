@@ -9,6 +9,7 @@ import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.ProjectMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.OntologyRepository;
+import org.cytomine.repository.persistence.ProjectListAvailableFilters;
 import org.cytomine.repository.persistence.ProjectListRow;
 import org.cytomine.repository.persistence.ProjectRepository;
 import org.cytomine.repository.persistence.entity.OntologyEntity;
@@ -25,6 +26,7 @@ import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
 import be.cytomine.common.repository.model.command.request.DeleteProjectCommand;
 import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
 import be.cytomine.common.repository.model.command.request.UpdateProjectCommand;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
 
@@ -100,6 +102,10 @@ public class ProjectCommandService
             new ProjectUserRoles(row.isAdmin(), row.isRepresentative()),
             Optional.ofNullable(row.lastActivity())
         );
+    }
+
+    public ProjectListAvailableFiltersResponse mapFilters(ProjectListAvailableFilters projectListAvailableFilters){
+        return projectMapper.mapFilters(projectListAvailableFilters);
     }
 
     @Override

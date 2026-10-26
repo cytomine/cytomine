@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     Optional<ProjectEntity> findByIdAndDeletedNull(long id);
 
+ProjectListAvailableFilters getAvailableFilters();
+
     String PROJECT_ROW_PROJECTION = """
         SELECT p.id,
                p.name,
@@ -102,4 +104,6 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
         nativeQuery = true
     )
     Page<ProjectListRow> findAllReadableByUser(long userId, Pageable pageable);
+
+    ProjectListAvailableFilters getAvailableFilters(long userId);
 }

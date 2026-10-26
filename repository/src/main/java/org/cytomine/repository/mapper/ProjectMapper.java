@@ -3,6 +3,7 @@ package org.cytomine.repository.mapper;
 import java.sql.Timestamp;
 import java.util.Optional;
 
+import org.cytomine.repository.persistence.ProjectListAvailableFilters;
 import org.cytomine.repository.persistence.entity.ProjectEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -11,6 +12,7 @@ import org.mapstruct.Mapping;
 import be.cytomine.common.mapper.BaseMapper;
 import be.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
@@ -68,4 +70,6 @@ public interface ProjectMapper {
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "mode"})
     ProjectResponse mapToProjectResponse(ProjectEntity entity, Optional<String> ontologyName, boolean isReadOnly,
                                          boolean isRestricted);
+
+     ProjectListAvailableFiltersResponse mapFilters(ProjectListAvailableFilters projectListAvailableFilters);
 }

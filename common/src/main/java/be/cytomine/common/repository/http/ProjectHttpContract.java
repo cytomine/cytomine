@@ -16,6 +16,7 @@ import org.springframework.web.service.annotation.PutExchange;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
 
@@ -41,5 +42,5 @@ public interface ProjectHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id);
 
     @GetExchange("/list-all")
-    Page<ProjectListRowResponse> list(Pageable pageable);
+    ProjectListFilteredResponse list(Pageable pageable);
 }

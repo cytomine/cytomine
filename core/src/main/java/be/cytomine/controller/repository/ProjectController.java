@@ -23,9 +23,11 @@ import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
-import be.cytomine.controller.utils.CollectionResponse;
+import be.cytomine.controller.utils.FilteredCollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
 import be.cytomine.domain.project.Project;
 import be.cytomine.mapper.ProjectMapper;
@@ -48,12 +50,14 @@ public class ProjectController {
     private final PageMapper pageMapper;
 
     @GetMapping("/project.json")
-    public CollectionResponse<ProjectListRowResponse> list(
+    public FilteredCollectionResponse<ProjectListRowResponse, ProjectListAvailableFiltersResponse> list(
         @SortDefault(sort = "created", direction = Sort.Direction.DESC)
         @PageableDefault(size = 2000) Pageable pageable
     ) {
         log.debug("GET /project.json");
-        return pageMapper.toCollectionResponse(projectHttpContract.list(pageable));
+        ProjectListFilteredResponse filteredList = projectHttpContract.list(pageable);
+        return pageMapper.toFilteredCollectionResponse(filteredList.content(),
+            filteredList.availableFilters());
     }
 
     @GetMapping("/project/{id}.json")

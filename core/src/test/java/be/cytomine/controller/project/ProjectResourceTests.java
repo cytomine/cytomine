@@ -40,6 +40,8 @@ import be.cytomine.common.repository.model.command.payload.response.ProjectListR
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectUserRoles;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
 import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
@@ -131,28 +133,21 @@ public class ProjectResourceTests {
     private static void setupStub() {
         /* Simulate call to PIMS */
         wireMockServer.stubFor(WireMock.post(urlPathMatching(IMS_API_BASE_PATH + "/image/.*/annotation/drawing"))
-            .withRequestBody(WireMock.matching(".*"))
-            .willReturn(aResponse()
-                .withStatus(HttpStatus.OK.value())
-                .withBody(UUID.randomUUID().toString().getBytes())
-            )
-        );
+            .withRequestBody(WireMock.matching(".*")).willReturn(
+                aResponse().withStatus(HttpStatus.OK.value()).withBody(UUID.randomUUID().toString().getBytes())));
 
         /* Simulate call to CBIR server */
-        wireMockServer.stubFor(WireMock.post(urlPathEqualTo(CBIR_API_BASE_PATH + "/storages"))
-            .withRequestBody(matching(".*"))
-            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
-        );
+        wireMockServer.stubFor(
+            WireMock.post(urlPathEqualTo(CBIR_API_BASE_PATH + "/storages")).withRequestBody(matching(".*"))
+                .willReturn(aResponse().withBody(UUID.randomUUID().toString())));
 
         wireMockServer.stubFor(WireMock.delete(urlPathMatching(CBIR_API_BASE_PATH + "/storages/.*"))
-            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
-        );
+            .willReturn(aResponse().withBody(UUID.randomUUID().toString())));
 
-        wireMockServer.stubFor(WireMock.post(urlPathEqualTo(CBIR_API_BASE_PATH + "/images"))
-            .withQueryParam("storage", matching(".*"))
-            .withQueryParam("index", equalTo("annotation"))
-            .willReturn(aResponse().withBody(UUID.randomUUID().toString()))
-        );
+        wireMockServer.stubFor(
+            WireMock.post(urlPathEqualTo(CBIR_API_BASE_PATH + "/images")).withQueryParam("storage", matching(".*"))
+                .withQueryParam("index", equalTo("annotation"))
+                .willReturn(aResponse().withBody(UUID.randomUUID().toString())));
     }
 
     @BeforeAll
@@ -161,15 +156,7 @@ public class ProjectResourceTests {
     }
 
     PersistentProjectConnection givenAPersistentConnectionInProject(long userId, Project project, Date created) {
-        return projectConnectionService.add(
-            userId,
-            project,
-            "xxx",
-            "linux",
-            "chrome",
-            "123",
-            created
-        );
+        return projectConnectionService.add(userId, project, "xxx", "linux", "chrome", "123", created);
     }
 
     @BeforeEach
@@ -181,11 +168,12 @@ public class ProjectResourceTests {
     @Transactional
     public void listAllProjects() throws Exception {
         Project project = builder.givenAProject();
-        when(projectHttpContract.list(any(Pageable.class)))
-            .thenReturn(new PageImpl<>(List.of(toListResponse(project))));
+        when(projectHttpContract.list(any(Pageable.class))).thenReturn(
+            new ProjectListFilteredResponse(new PageImpl<>(List.of(toListResponse(project))),
+                new ProjectListAvailableFiltersResponse(Set.of(), Set.of(), Set.of(), Optional.empty(),
+                    Optional.empty(), Optional.empty(), Optional.empty())));
 
-        restProjectControllerMockMvc.perform(get("/api/project.json"))
-            .andExpect(status().isOk())
+        restProjectControllerMockMvc.perform(get("/api/project.json")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.name=='" + project.getName() + "')]").exists())
             .andExpect(jsonPath("$.collection[0].numberOfSlides").value(0))
@@ -199,24 +187,21 @@ public class ProjectResourceTests {
     @Transactional
     public void listAllProjectsWithPaginationAndSort() throws Exception {
         Project project = builder.givenAProject();
-        when(projectHttpContract.list(any(Pageable.class)))
-            .thenReturn(new PageImpl<>(List.of(toListResponse(project))));
+        when(projectHttpContract.list(any(Pageable.class))).thenReturn(
+            new ProjectListFilteredResponse(new PageImpl<>(List.of(toListResponse(project))),
+                new ProjectListAvailableFiltersResponse(Set.of(), Set.of(), Set.of(), Optional.empty(),
+                    Optional.empty(), Optional.empty(), Optional.empty())));
 
-        restProjectControllerMockMvc.perform(get("/api/project.json")
-                .param("page", "1")
-                .param("size", "10")
-                .param("sort", "count_images,desc")
-            )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))));
+        restProjectControllerMockMvc.perform(
+                get("/api/project.json").param("page", "1").param("size", "10").param("sort", "count_images,desc"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.collection", hasSize(greaterThan(0))));
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
         verify(projectHttpContract).list(pageableCaptor.capture());
         Pageable pageable = pageableCaptor.getValue();
         assertThat(pageable.getPageNumber()).isEqualTo(1);
         assertThat(pageable.getPageSize()).isEqualTo(10);
-        assertThat(pageable.getSort().getOrderFor("count_images").getDirection())
-            .isEqualTo(Sort.Direction.DESC);
+        assertThat(pageable.getSort().getOrderFor("count_images").getDirection()).isEqualTo(Sort.Direction.DESC);
     }
 
     @Test
@@ -225,25 +210,19 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         when(projectHttpContract.read(project.getId())).thenReturn(Optional.of(toResponse(project)));
 
-        restProjectControllerMockMvc.perform(get("/api/project/{id}.json", project.getId()))
-            .andExpect(status().isOk())
+        restProjectControllerMockMvc.perform(get("/api/project/{id}.json", project.getId())).andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(project.getId().intValue()))
             .andExpect(jsonPath("$.class").value("be.cytomine.domain.project.Project"))
-            .andExpect(jsonPath("$.created").exists())
-            .andExpect(jsonPath("$.name").value(project.getName()))
+            .andExpect(jsonPath("$.created").exists()).andExpect(jsonPath("$.name").value(project.getName()))
             .andExpect(jsonPath("$.ontology").value(project.getOntology().getId().intValue()))
             .andExpect(jsonPath("$.ontologyName").value(project.getOntology().getName()))
-            .andExpect(jsonPath("$.blindMode").value(false))
-            .andExpect(jsonPath("$.areImagesDownloadable").value(false))
-            .andExpect(jsonPath("$.numberOfSlides").value(0))
-            .andExpect(jsonPath("$.numberOfImages").value(0))
+            .andExpect(jsonPath("$.blindMode").value(false)).andExpect(jsonPath("$.areImagesDownloadable").value(false))
+            .andExpect(jsonPath("$.numberOfSlides").value(0)).andExpect(jsonPath("$.numberOfImages").value(0))
             .andExpect(jsonPath("$.numberOfAnnotations").value(0))
             .andExpect(jsonPath("$.numberOfJobAnnotations").value(0))
             .andExpect(jsonPath("$.numberOfReviewedAnnotations").value(0))
-            .andExpect(jsonPath("$.isClosed").value(false))
-            .andExpect(jsonPath("$.isReadOnly").value(false))
-            .andExpect(jsonPath("$.isRestricted").value(false))
-            .andExpect(jsonPath("$.hideUsersLayers").value(false))
+            .andExpect(jsonPath("$.isClosed").value(false)).andExpect(jsonPath("$.isReadOnly").value(false))
+            .andExpect(jsonPath("$.isRestricted").value(false)).andExpect(jsonPath("$.hideUsersLayers").value(false))
             .andExpect(jsonPath("$.hideAdminsLayers").value(false));
     }
 
@@ -252,8 +231,7 @@ public class ProjectResourceTests {
     public void shouldReturnNotFoundWhenProjectDoesNotExist() throws Exception {
         when(projectHttpContract.read(0L)).thenReturn(Optional.empty());
 
-        restProjectControllerMockMvc.perform(get("/api/project/{id}.json", 0))
-            .andExpect(status().isNotFound());
+        restProjectControllerMockMvc.perform(get("/api/project/{id}.json", 0)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -266,11 +244,9 @@ public class ProjectResourceTests {
 
         String createProjectJson = objectMapper.writeValueAsString(toCreateProject(project));
 
-        restProjectControllerMockMvc.perform(post("/api/project.json")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createProjectJson))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
+        restProjectControllerMockMvc.perform(
+                post("/api/project.json").contentType(MediaType.APPLICATION_JSON).content(createProjectJson))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value("be.cytomine.AddProjectCommand"))
             .andExpect(jsonPath("$.data.id").value(project.getId()))
             .andExpect(jsonPath("$.data.name").value(project.getName()))
@@ -287,10 +263,9 @@ public class ProjectResourceTests {
 
         String updateProjectJson = objectMapper.writeValueAsString(toUpdateProject());
 
-        restProjectControllerMockMvc.perform(put("/api/project/{id}.json", project.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updateProjectJson))
-            .andExpect(status().isOk())
+        restProjectControllerMockMvc.perform(
+                put("/api/project/{id}.json", project.getId()).contentType(MediaType.APPLICATION_JSON)
+                    .content(updateProjectJson)).andExpect(status().isOk())
             .andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value("be.cytomine.EditProjectCommand"))
             .andExpect(jsonPath("$.data.id").value(project.getId()))
@@ -302,10 +277,8 @@ public class ProjectResourceTests {
     public void failWhenEditingProjectDoesNotExists() throws Exception {
         when(projectHttpContract.update(eq(0L), any())).thenReturn(Optional.empty());
 
-        restProjectControllerMockMvc.perform(put("/api/project/{id}.json", 0)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(toUpdateProject())))
-            .andExpect(status().isNotFound());
+        restProjectControllerMockMvc.perform(put("/api/project/{id}.json", 0).contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(toUpdateProject()))).andExpect(status().isNotFound());
     }
 
     @Test
@@ -317,8 +290,7 @@ public class ProjectResourceTests {
             new HttpCommandResponse(true, toResponse(project), commandId, Commands.DELETE_PROJECT, Set.of())));
 
         restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", project.getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.printMessage").value(true))
             .andExpect(jsonPath("$.command").value("be.cytomine.DeleteProjectCommand"))
             .andExpect(jsonPath("$.data.id").value(project.getId()))
             .andExpect(jsonPath("$.data.name").value(project.getName()));
@@ -329,87 +301,41 @@ public class ProjectResourceTests {
     public void failWhenDeleteProjectNotExists() throws Exception {
         when(projectHttpContract.delete(0L)).thenReturn(Optional.empty());
 
-        restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", 0))
-            .andExpect(status().isNotFound());
+        restProjectControllerMockMvc.perform(delete("/api/project/{id}.json", 0)).andExpect(status().isNotFound());
     }
 
     private ProjectResponse toResponse(Project project) {
         Optional<Ontology> maybeOntology = Optional.ofNullable(project.getOntology());
-        return new ProjectResponse(
-            project.getId(),
-            project.getName(),
-            maybeOntology.map(Ontology::getId),
-            maybeOntology.map(Ontology::getName),
-            project.getBlindMode() != null && project.getBlindMode(),
-            project.getAreImagesDownloadable() != null && project.getAreImagesDownloadable(),
-            project.getCountImages(),
-            project.getCountAnnotations(),
-            project.getCountJobAnnotations(),
-            project.getCountReviewedAnnotations(),
-            project.isClosed(),
-            project.getMode() != null && project.getMode().name().equals("READ_ONLY"),
-            project.getMode() != null && project.getMode().name().equals("RESTRICTED"),
-            project.isHideUsersLayers(),
-            project.isHideAdminsLayers(),
-            LocalDateTime.now(),
-            Optional.empty(),
-            Optional.empty()
-        );
+        return new ProjectResponse(project.getId(), project.getName(), maybeOntology.map(Ontology::getId),
+            maybeOntology.map(Ontology::getName), project.getBlindMode() != null && project.getBlindMode(),
+            project.getAreImagesDownloadable() != null && project.getAreImagesDownloadable(), project.getCountImages(),
+            project.getCountAnnotations(), project.getCountJobAnnotations(), project.getCountReviewedAnnotations(),
+            project.isClosed(), project.getMode() != null && project.getMode().name().equals("READ_ONLY"),
+            project.getMode() != null && project.getMode().name().equals("RESTRICTED"), project.isHideUsersLayers(),
+            project.isHideAdminsLayers(), LocalDateTime.now(), Optional.empty(), Optional.empty());
     }
 
     private ProjectListRowResponse toListResponse(Project project) {
         Optional<Ontology> maybeOntology = Optional.ofNullable(project.getOntology());
-        return new ProjectListRowResponse(
-            project.getId(),
-            project.getName(),
-            maybeOntology.map(Ontology::getId),
-            maybeOntology.map(Ontology::getName),
-            project.getBlindMode() != null && project.getBlindMode(),
-            project.getAreImagesDownloadable() != null && project.getAreImagesDownloadable(),
-            0,
-            project.getCountImages(),
-            project.getCountAnnotations(),
-            project.getCountJobAnnotations(),
-            project.getCountReviewedAnnotations(),
-            project.isClosed(),
+        return new ProjectListRowResponse(project.getId(), project.getName(), maybeOntology.map(Ontology::getId),
+            maybeOntology.map(Ontology::getName), project.getBlindMode() != null && project.getBlindMode(),
+            project.getAreImagesDownloadable() != null && project.getAreImagesDownloadable(), 0,
+            project.getCountImages(), project.getCountAnnotations(), project.getCountJobAnnotations(),
+            project.getCountReviewedAnnotations(), project.isClosed(),
             project.getMode() != null && project.getMode().name().equals("READ_ONLY"),
-            project.getMode() != null && project.getMode().name().equals("RESTRICTED"),
-            project.isHideUsersLayers(),
-            project.isHideAdminsLayers(),
-            LocalDateTime.now(),
-            Optional.empty(),
-            3,
-            new ProjectUserRoles(true, false),
-            Optional.of(1234L)
-        );
+            project.getMode() != null && project.getMode().name().equals("RESTRICTED"), project.isHideUsersLayers(),
+            project.isHideAdminsLayers(), LocalDateTime.now(), Optional.empty(), 3, new ProjectUserRoles(true, false),
+            Optional.of(1234L));
     }
 
     private CreateProject toCreateProject(Project project) {
-        return new CreateProject(
-            project.getName(),
-            Optional.ofNullable(project.getOntology()).map(Ontology::getId),
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+        return new CreateProject(project.getName(), Optional.ofNullable(project.getOntology()).map(Ontology::getId),
+            false, false, false, false, false, false, false);
     }
 
     private UpdateProject toUpdateProject() {
-        return new UpdateProject(
-            Optional.of("new_name"),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty()
-        );
+        return new UpdateProject(Optional.of("new_name"), Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     @Test
@@ -421,8 +347,7 @@ public class ProjectResourceTests {
         userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
 
         restProjectControllerMockMvc.perform(get("/api/project/{id}/last/{max}.json", project.getId(), 10))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(1))));
+            .andExpect(status().isOk()).andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(1))));
     }
 
     @Test
@@ -433,8 +358,7 @@ public class ProjectResourceTests {
         Project projectNotOpened = builder.givenAProject();
         builder.addUserToProject(projectNotOpened, currentUserService.getCurrentUsername());
 
-        restProjectControllerMockMvc.perform(get("/api/project/method/lastopened.json"))
-            .andExpect(status().isOk())
+        restProjectControllerMockMvc.perform(get("/api/project/method/lastopened.json")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(2))));
         // last opened list unopened project (hum...) if user has not open any project
     }
@@ -451,16 +375,14 @@ public class ProjectResourceTests {
         givenAPersistentConnectionInProject(currentUserService.getCurrentUser().id(), project, new Date());
         assertThat(persistentProjectConnectionRepository.count()).isEqualTo(1);
 
-        restProjectControllerMockMvc.perform(get("/api/project/method/lastopened.json"))
-            .andExpect(status().isOk())
+        restProjectControllerMockMvc.perform(get("/api/project/method/lastopened.json")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThanOrEqualTo(2))))
             .andExpect(jsonPath("$.collection[0].date").exists())
             .andExpect(jsonPath("$.collection[0].id").value(project.getId()))
             .andExpect(jsonPath("$.collection[0].opened").value("true"))
-            .andExpect(jsonPath("$.collection[?(@.id==" + projectNotOpened.getId() + ")].date").exists())
-            .andExpect(jsonPath("$.collection[?(@.id=="
-                + projectNotOpened.getId()
-                + ")].id").value(projectNotOpened.getId().intValue()))
+            .andExpect(jsonPath("$.collection[?(@.id==" + projectNotOpened.getId() + ")].date").exists()).andExpect(
+                jsonPath("$.collection[?(@.id==" + projectNotOpened.getId() + ")].id").value(
+                    projectNotOpened.getId().intValue()))
             .andExpect(jsonPath("$.collection[?(@.id==" + projectNotOpened.getId() + ")].opened").value(false));
     }
 
@@ -474,8 +396,7 @@ public class ProjectResourceTests {
         when(ontologyHttpContract.getLight(ontologyId)).thenReturn(
             Optional.of(new OntologyLight(ontologyId, "ontology")));
         restProjectControllerMockMvc.perform(get("/api/ontology/{id}/project.json", ontologyId))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.collection[0].id").value(project.getId()));
+            .andExpect(status().isOk()).andExpect(jsonPath("$.collection[0].id").value(project.getId()));
 
     }
 
@@ -498,16 +419,14 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, currentUserService.getCurrentUsername());
         restProjectControllerMockMvc.perform(
-                get("/api/user/{id}/project.json", currentUserService.getCurrentUser().id()))
-            .andExpect(status().isOk())
+                get("/api/user/{id}/project.json", currentUserService.getCurrentUser().id())).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[0].id").value(project.getId()));
     }
 
     @Test
     @Transactional
     public void listByUserThatDoesNotExist() throws Exception {
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project.json", 0L))
-            .andExpect(status().isNotFound());
+        restProjectControllerMockMvc.perform(get("/api/user/{id}/project.json", 0L)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -515,10 +434,8 @@ public class ProjectResourceTests {
     public void listByUserLight() throws Exception {
         Project project = builder.givenAProject();
         builder.addUserToProject(project, currentUserService.getCurrentUsername());
-        restProjectControllerMockMvc.perform(get(
-                "/api/user/{id}/project/light.json",
-                currentUserService.getCurrentUser().id()
-            ))
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project/light.json", currentUserService.getCurrentUser().id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
     }
@@ -532,18 +449,18 @@ public class ProjectResourceTests {
         permissionService.addPermission(project, USER_ACL_READ, READ);
         permissionService.addPermission(project, USER_ACL_ADMIN, ADMINISTRATION);
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", SUPER_ADMIN_ACL_ID)
-                .param("creator", "true"))
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project/light.json", SUPER_ADMIN_ACL_ID).param("creator", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_READ_ID)
-                .param("creator", "true"))
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project/light.json", USER_ACL_READ_ID).param("creator", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").doesNotExist());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_ADMIN_ID)
-                .param("creator", "true"))
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project/light.json", USER_ACL_ADMIN_ID).param("creator", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").doesNotExist());
     }
@@ -557,18 +474,18 @@ public class ProjectResourceTests {
         permissionService.addPermission(project, USER_ACL_READ, READ);
         permissionService.addPermission(project, USER_ACL_ADMIN, ADMINISTRATION);
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", SUPER_ADMIN_ACL_ID)
-                .param("admin", "true"))
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project/light.json", SUPER_ADMIN_ACL_ID).param("admin", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_READ_ID)
-                .param("admin", "true"))
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project/light.json", USER_ACL_READ_ID).param("admin", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").doesNotExist());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_ADMIN_ID)
-                .param("admin", "true"))
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project/light.json", USER_ACL_ADMIN_ID).param("admin", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
@@ -583,18 +500,17 @@ public class ProjectResourceTests {
         permissionService.addPermission(project, USER_ACL_READ, READ);
         permissionService.addPermission(project, USER_ACL_ADMIN, ADMINISTRATION);
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", SUPER_ADMIN_ACL_ID)
-                .param("user", "true"))
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project/light.json", SUPER_ADMIN_ACL_ID).param("user", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_READ_ID)
-                .param("user", "true"))
-            .andExpect(status().isOk())
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project/light.json", USER_ACL_READ_ID).param("user", "true")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
-        restProjectControllerMockMvc.perform(get("/api/user/{id}/project/light.json", USER_ACL_ADMIN_ID)
-                .param("user", "true"))
+        restProjectControllerMockMvc.perform(
+                get("/api/user/{id}/project/light.json", USER_ACL_ADMIN_ID).param("user", "true"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
     }
@@ -626,25 +542,20 @@ public class ProjectResourceTests {
 
         Date stop = DateUtils.addSeconds(new Date(), 5);
 
-        restProjectControllerMockMvc.perform(get("/api/bounds/project.json")
-                .param("withMembersCount", "true"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.created.min").exists())
+        restProjectControllerMockMvc.perform(get("/api/bounds/project.json").param("withMembersCount", "true"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.created.min").exists())
             .andExpect(jsonPath("$.created.max").value(lessThanOrEqualTo(stop.getTime())))
             .andExpect(jsonPath("$.updated.min").exists())
             .andExpect(jsonPath("$.updated.max").value(lessThanOrEqualTo(stop.getTime())))
-            .andExpect(jsonPath("$.mode.min").hasJsonPath())
-            .andExpect(jsonPath("$.mode.max").hasJsonPath())
-            .andExpect(jsonPath("$.name.min").value("0001"))
-            .andExpect(jsonPath("$.name.max").value("zzzzz"))
+            .andExpect(jsonPath("$.mode.min").hasJsonPath()).andExpect(jsonPath("$.mode.max").hasJsonPath())
+            .andExpect(jsonPath("$.name.min").value("0001")).andExpect(jsonPath("$.name.max").value("zzzzz"))
             .andExpect(jsonPath("$.numberOfAnnotations.min").value(0))
             .andExpect(jsonPath("$.numberOfAnnotations.max").value(20))
             .andExpect(jsonPath("$.numberOfJobAnnotations.min").value(0))
             .andExpect(jsonPath("$.numberOfJobAnnotations.max").value(30))
             .andExpect(jsonPath("$.numberOfReviewedAnnotations.min").value(0))
             .andExpect(jsonPath("$.numberOfReviewedAnnotations.max").value(40))
-            .andExpect(jsonPath("$.numberOfImages.min").value(0))
-            .andExpect(jsonPath("$.numberOfImages.max").value(10))
+            .andExpect(jsonPath("$.numberOfImages.min").value(0)).andExpect(jsonPath("$.numberOfImages.max").value(10))
             .andExpect(jsonPath("$.members.min").value(lessThanOrEqualTo(1)))
             .andExpect(jsonPath("$.members.max").value(2));
     }
@@ -659,15 +570,13 @@ public class ProjectResourceTests {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
         userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
 
-        restProjectControllerMockMvc.perform(get("/api/commandhistory.json")
-                .param("fullData", "true"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[?(@.project==" + project.getId() + ")]").exists());
+        restProjectControllerMockMvc.perform(get("/api/commandhistory.json").param("fullData", "true"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$[?(@.project==" + project.getId() + ")]").exists());
 
-        restProjectControllerMockMvc.perform(get("/api/project/{id}/commandhistory.json", project.getId())
-                .param("user", String.valueOf(currentUserId)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[?(@.project==" + project.getId() + ")]").exists());
+        restProjectControllerMockMvc.perform(
+                get("/api/project/{id}/commandhistory.json", project.getId()).param("user",
+                    String.valueOf(currentUserId)))
+            .andExpect(status().isOk()).andExpect(jsonPath("$[?(@.project==" + project.getId() + ")]").exists());
     }
 
     @Test
@@ -682,22 +591,21 @@ public class ProjectResourceTests {
         UserAnnotation userAnnotation = builder.givenANotPersistedUserAnnotation(project);
         userAnnotationService.add(userAnnotation.toJsonObject(urlApi));
 
-        restProjectControllerMockMvc.perform(get("/api/project/{id}/commandhistory.json", project.getId())
-                .param("startDate", start.getTime() + "")
-                .param("endDate", stop.getTime() + ""))
-            .andExpect(status().isOk())
+        restProjectControllerMockMvc.perform(
+                get("/api/project/{id}/commandhistory.json", project.getId()).param("startDate", start.getTime() + "")
+                    .param("endDate", stop.getTime() + "")).andExpect(status().isOk())
             .andExpect(jsonPath("$[?(@.project==" + project.getId() + ")]").exists());
 
-        restProjectControllerMockMvc.perform(get("/api/project/{id}/commandhistory.json", project.getId())
-                .param("startDate", DateUtils.addSeconds(start, -5).getTime() + "")
-                .param("endDate", DateUtils.addSeconds(start, -3).getTime() + ""))
-            .andExpect(status().isOk())
+        restProjectControllerMockMvc.perform(
+                get("/api/project/{id}/commandhistory.json", project.getId()).param("startDate",
+                        DateUtils.addSeconds(start, -5).getTime() + "")
+                    .param("endDate", DateUtils.addSeconds(start, -3).getTime() + "")).andExpect(status().isOk())
             .andExpect(jsonPath("$[?(@.project==" + project.getId() + ")]").doesNotExist());
 
-        restProjectControllerMockMvc.perform(get("/api/project/{id}/commandhistory.json", project.getId())
-                .param("startDate", DateUtils.addSeconds(start, 3).getTime() + "")
-                .param("endDate", DateUtils.addSeconds(start, 5).getTime() + ""))
-            .andExpect(status().isOk())
+        restProjectControllerMockMvc.perform(
+                get("/api/project/{id}/commandhistory.json", project.getId()).param("startDate",
+                        DateUtils.addSeconds(start, 3).getTime() + "")
+                    .param("endDate", DateUtils.addSeconds(start, 5).getTime() + "")).andExpect(status().isOk())
             .andExpect(jsonPath("$[?(@.project==" + project.getId() + ")]").doesNotExist());
     }
 }

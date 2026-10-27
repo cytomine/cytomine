@@ -196,6 +196,29 @@ public class AnnotationTermResourceTests {
 
     @Test
     @Transactional
+    public void addValidAnnotationTermWithoutUser() throws Exception {
+        AnnotationTerm
+            annotationTerm
+            = builder.givenANotPersistedAnnotationTerm(builder.givenAUserAnnotation());
+        JsonObject jsonObject = annotationTerm.toJsonObject(urlApi);
+        jsonObject.remove("user");
+        restAnnotationTermControllerMockMvc.perform(post(
+                "/api/annotation/{idAnnotation}/term/{idTerm}.json",
+                annotationTerm.getUserAnnotation().getId(),
+                annotationTerm.getTerm().getId()
+            )
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonObject.toJsonString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.printMessage").value(true))
+            .andExpect(jsonPath("$.callback.method").value("be.cytomine.AddAnnotationTermCommand"))
+            .andExpect(jsonPath("$.annotationterm.id").exists())
+            .andExpect(jsonPath("$.annotationterm.term").exists())
+            .andExpect(jsonPath("$.annotationterm.user").value(annotationTerm.getUser().getId().intValue()));
+    }
+
+    @Test
+    @Transactional
     public void addAnnotationTermWithTermFromBadOntology() throws Exception {
         AnnotationTerm
             annotationTerm

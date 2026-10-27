@@ -322,7 +322,14 @@ export default {
       return this.$route.query.tags;
     },
     projectCollection() {
-      return new ProjectCollection();
+      let collection = new ProjectCollection();
+      if (this.searchString) {
+        collection.filters = { name: this.searchString };
+      }
+      if (this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
+        collection.filters = { ...(collection.filters ?? {}), tagLabels: this.selectedTags.map(tag => tag.name) };
+      }
+      return collection;
     },
     imageCollection() {
       let collection = new ImageInstanceCollection({

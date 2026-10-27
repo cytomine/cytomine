@@ -116,7 +116,7 @@ class ProjectRepositoryTest {
     }
 
     private Page<ProjectListRow> findAllUnfiltered(long userId, Pageable pageable) {
-        return projectRepository.findAllReadableByUser(userId, pageable, Set.of(), Set.of(), Set.of(),
+        return projectRepository.findAllReadableByUser(userId, pageable, Set.of(), Set.of(), Set.of(), null,
             null, null, null, null, null, null, null, null);
     }
 
@@ -170,10 +170,18 @@ class ProjectRepositoryTest {
 
     @Test
     void filteredRows() {
-        Long userId = insertUser("test-user1");
-        Long id =
-            insertProject("test1", 4, 3, "READ_ONLY", LocalDateTime.now(), Timestamp.valueOf(LocalDateTime.now()));
-        insertCommandHistory(id, userId);
+        Long userId = insertAdminUser("test-user1");
+        insertProjectWithMembership("searchable-project", 4, 3, "READ_ONLY", LocalDateTime.now(), null, "test-user1",
+            true, false);
+        insertProject("other-project", 1, 0, "CLASSIC", LocalDateTime.now(), null);
+
+        Page<ProjectListRow> page = projectRepository.findAllReadableByUser(userId, PageRequest.of(0, 10), null, null,
+            null, "SEARCHABLE", null, null, null, null, null, null, null, null);
+        assertThat(page.getContent()).extracting(ProjectListRow::name).containsExactly("searchable-project");
+
+        Page<ProjectListRow> adminRoleRows = projectRepository.findAllReadableByUser(userId, PageRequest.of(0, 10),
+            null, Set.of("admin"), null, null, null, null, null, null, null, null, null, null);
+        assertThat(adminRoleRows.getContent()).extracting(ProjectListRow::name).containsExactly("searchable-project");
     }
 
     @Test

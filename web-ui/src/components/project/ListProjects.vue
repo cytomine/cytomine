@@ -42,7 +42,7 @@
               </div>
               <div class="filter-body">
                 <cytomine-multiselect v-model="selectedOntologies" :options="availableOntologies"
-                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all-ontologies')" />
+                  label="name" track-by="name" :multiple="true" :allPlaceholder="$t('all-ontologies')" />
               </div>
             </div>
 
@@ -51,7 +51,8 @@
                 {{$t('my-role')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple :searchable="false" />
+                <cytomine-multiselect v-model="selectedRoles" :options="availableRoles"
+                  label="name" track-by="name" :multiple="true" :searchable="false" />
               </div>
             </div>
 
@@ -61,7 +62,7 @@
               </div>
               <div class="filter-body">
                 <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+                  label="name" track-by="name" :multiple="true" :allPlaceholder="$t('all')" />
               </div>
             </div>
           </div>
@@ -200,11 +201,13 @@
 
 <script>
 import CytomineTable from '@/components/utils/CytomineTable.vue';
+import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
+import CytomineSlider from '@/components/form/CytomineSlider.vue';
 import ProjectDetails from './ProjectDetails.vue';
 import AddProjectModal from './AddProjectModal.vue';
 import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 
-import { get, sync } from '@/utils/store-helpers';
+import { get, sync, syncBoundsFilter, syncMultiselectFilter } from '@/utils/store-helpers';
 import { formatMomentDate } from '@/utils/date';
 
 import { ProjectCollection, OntologyCollection } from '@/api';
@@ -213,6 +216,8 @@ export default {
   name: 'list-projects',
   components: {
     CytomineTable,
+    CytomineMultiselect,
+    CytomineSlider,
     ProjectDetails,
     AddProjectModal,
     IconProjectMemberRole
@@ -225,6 +230,12 @@ export default {
       ontologies: [],
 
       creationModal: false,
+
+      availableFilters: {},
+      maxNbMembers: 10,
+      maxNbImages: 10,
+      maxNbUserAnnotations: 100,
+      maxNbReviewedAnnotations: 100,
 
       excludedProperties: [
         'name',
@@ -241,8 +252,71 @@ export default {
   computed: {
     currentUser: get('currentUser/user'),
 
+    searchString: sync('listProjects/searchString', { debounce: 500 }),
+    filtersOpened: sync('listProjects/filtersOpened'),
+    nbActiveFilters() {
+      return this.$store.getters['listProjects/nbActiveFilters'];
+    },
+
+    availableRoles() {
+      return (this.availableFilters.roleNames ?? []).map(role => ({
+        name: role === 'admin' ? this.$t('manager') : this.$t('contributor'),
+        value: role
+      })).sort((a, b) => a.name.localeCompare(b.name));
+    },
+    availableOntologies() {
+      return (this.availableFilters.ontologyNames ?? []).map(name => ({ name }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    },
+    availableTags() {
+      return (this.availableFilters.tagLabels ?? []).map(name => ({ name }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    },
+
+    selectedOntologies: syncMultiselectFilter('listProjects', 'selectedOntologies', 'availableOntologies'),
+    selectedRoles: syncMultiselectFilter('listProjects', 'selectedRoles', 'availableRoles'),
+    selectedTags: syncMultiselectFilter('listProjects', 'selectedTags', 'availableTags'),
+
+    boundsMembers: syncBoundsFilter('listProjects', 'boundsMembers', 'maxNbMembers'),
+    boundsImages: syncBoundsFilter('listProjects', 'boundsImages', 'maxNbImages'),
+    boundsUserAnnotations: syncBoundsFilter('listProjects', 'boundsUserAnnotations', 'maxNbUserAnnotations'),
+    boundsReviewedAnnotations: syncBoundsFilter('listProjects', 'boundsReviewedAnnotations', 'maxNbReviewedAnnotations'),
+
     projectCollection() {
-      return new ProjectCollection();
+      let collection = new ProjectCollection();
+      let filters = {};
+      if (this.selectedOntologies.length > 0 && this.selectedOntologies.length < this.availableOntologies.length) {
+        filters.ontologyNames = this.selectedOntologies.map(ontology => ontology.name);
+      }
+      if (this.selectedRoles.length > 0 && this.selectedRoles.length < this.availableRoles.length) {
+        filters.roleNames = this.selectedRoles.map(role => role.value);
+      }
+      if (this.searchString) {
+        filters.name = this.searchString;
+      }
+      if (this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
+        filters.tagLabels = this.selectedTags.map(tag => tag.name);
+      }
+      [
+        { key: 'memberCount', bounds: this.boundsMembers, max: this.maxNbMembers },
+        { key: 'imageCount', bounds: this.boundsImages, max: this.maxNbImages },
+        { key: 'manualAnnotationCount', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations },
+        { key: 'reviewedAnnotationCount', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations }
+      ].forEach(({ key, bounds, max }) => {
+        if (bounds[0] > 0 || bounds[1] < max) {
+          filters[key] = {};
+          if (bounds[0] > 0) {
+            filters[key].min = bounds[0];
+          }
+          if (bounds[1] !== max) {
+            filters[key].max = bounds[1];
+          }
+        }
+      });
+      if (Object.keys(filters).length > 0) {
+        collection.filters = filters;
+      }
+      return collection;
     },
     currentPage: sync('listProjects/currentPage'),
     perPage: sync('listProjects/perPage'),
@@ -250,12 +324,28 @@ export default {
     sortOrder: sync('listProjects/sortOrder'),
     openedDetails: sync('listProjects/openedDetails')
   },
+  watch: {
+    revision() {
+      this.fetchOntologies();
+      this.fetchAvailableFilters();
+    }
+  },
   methods: {
     formatMomentDate,
+    toggleFilterDisplay() {
+      this.filtersOpened = !this.filtersOpened;
+    },
     async fetchOntologies() {
       let ontologies = (await OntologyCollection.fetchAll({ light: true })).array;
       ontologies.sort((a, b) => a.name.localeCompare(b.name));
       this.ontologies = ontologies;
+    },
+    async fetchAvailableFilters() {
+      this.availableFilters = (await ProjectCollection.fetchAvailableFilters()) ?? {};
+      this.maxNbMembers = Math.max(10, this.availableFilters.memberCount?.max ?? 0);
+      this.maxNbImages = Math.max(10, this.availableFilters.imageCount?.max ?? 0);
+      this.maxNbUserAnnotations = Math.max(100, this.availableFilters.manualAnnotationCount?.max ?? 0);
+      this.maxNbReviewedAnnotations = Math.max(100, this.availableFilters.reviewedAnnotationCount?.max ?? 0);
     },
     updateProject() {
       this.revision++;
@@ -279,7 +369,10 @@ export default {
   },
   async created() {
     try {
-      await this.fetchOntologies();
+      await Promise.all([
+        this.fetchOntologies(),
+        this.fetchAvailableFilters()
+      ]);
     } catch (error) {
       console.log(error);
       this.error = true;

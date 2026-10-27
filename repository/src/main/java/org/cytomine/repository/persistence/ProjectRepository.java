@@ -65,6 +65,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
                )""";
 
     String FILTERED_CONDITIONS = """
+        AND (:name IS NULL OR p.name ILIKE CONCAT('%', :name, '%'))
         AND (:ontologyNames IS NULL OR o.name IN (:ontologyNames))
         AND (:roleNames IS NULL OR CASE WHEN (""" + IS_ADMIN_EXISTS + """
              ) THEN 'admin' ELSE 'contributor' END IN (:roleNames))
@@ -245,7 +246,8 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
             LEFT JOIN ontology o ON o.id = p.ontology_id
             """ + FILTERED_WHERE, nativeQuery = true)
     Page<ProjectListRow> findAllReadableByUser(long userId, Pageable pageable, Set<String> ontologyNames,
-        Set<String> roleNames, Set<String> tagLabels, Long minMemberCount, Long maxMemberCount, Long minImageCount,
+        Set<String> roleNames, Set<String> tagLabels, String name, Long minMemberCount, Long maxMemberCount,
+        Long minImageCount,
         Long maxImageCount, Long minManualAnnotationCount, Long maxManualAnnotationCount,
         Long minReviewedAnnotationCount, Long maxReviewedAnnotationCount);
 

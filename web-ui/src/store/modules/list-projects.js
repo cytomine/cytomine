@@ -4,7 +4,20 @@ function getDefaultState() {
     perPage: 10,
     sortField: 'created',
     sortOrder: 'desc',
-    openedDetails: []
+      openedDetails: [],
+
+      searchString: '',
+
+      filtersOpened: false,
+      filters: {
+          selectedOntologies: null,
+          selectedRoles: null,
+          selectedTags: null,
+          boundsMembers: null,
+          boundsImages: null,
+          boundsUserAnnotations: null,
+          boundsReviewedAnnotations: null
+      }
   };
 }
 
@@ -36,6 +49,28 @@ export default {
 
     setOpenedDetails(state, value) {
       state.openedDetails = value;
+    },
+
+      setSearchString(state, searchString) {
+          state.searchString = searchString;
+      },
+
+      setFiltersOpened(state, value) {
+          state.filtersOpened = value;
+      },
+
+      setFilter(state, {filterName, propValue}) {
+          state.filters[filterName] = propValue;
+      }
+  },
+
+    getters: {
+        nbActiveFilters: state => {
+            return Object.values(state.filters).filter(val => val).length; // count the number of not null values
+        },
+
+        nbEmptyFilters: state => {
+            return Object.values(state.filters).filter(val => val && val.length === 0).length;
     }
   }
 };

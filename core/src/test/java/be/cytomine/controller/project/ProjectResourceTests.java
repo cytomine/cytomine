@@ -171,7 +171,7 @@ public class ProjectResourceTests {
         when(projectHttpContract.listFiltered(any(Pageable.class), any())).thenReturn(
             new ProjectListFilteredResponse(new PageImpl<>(List.of(toListResponse(project))),
                 new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(),
-                    Optional.empty(), Optional.empty(), Optional.empty())));
+                    Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty())));
 
         restProjectControllerMockMvc.perform(post("/api/projects/search")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -190,7 +190,7 @@ public class ProjectResourceTests {
         when(projectHttpContract.listFiltered(any(Pageable.class), any())).thenReturn(
             new ProjectListFilteredResponse(new PageImpl<>(List.of(toListResponse(project))),
                 new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(),
-                    Optional.empty(), Optional.empty(), Optional.empty())));
+                    Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty())));
 
         restProjectControllerMockMvc.perform(
                 post("/api/projects/search").param("page", "1").param("size", "10").param("sort", "count_images,desc"))

@@ -6,6 +6,7 @@ import java.util.Set;
 public record ProjectListAvailableFiltersPayload(Set<String> ontologyNames,
                                                  Set<String> roleNames,
                                                  Set<String> tagLabels,
+                                                 Optional<String> name,
                                                  Optional<BoundedFilter> memberCount,
                                                  Optional<BoundedFilter> imageCount,
                                                  Optional<BoundedFilter> manualAnnotationCount,
@@ -23,7 +24,7 @@ public record ProjectListAvailableFiltersPayload(Set<String> ontologyNames,
     }
 
     public static ProjectListAvailableFiltersPayload empty() {
-        return new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(),
+        return new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(), Optional.empty(),
             Optional.empty(), Optional.empty(), Optional.empty());
     }
 }

@@ -161,7 +161,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
 
     default ProjectListAvailableFilters getAvailableFilters() {
         return new ProjectListAvailableFilters(Set.copyOf(findOntologyNames()), Set.copyOf(findRoleNames()),
-            Set.copyOf(findTagNames()), findMemberCountBounds(), findImageCountBounds(),
+            Set.copyOf(findTagNames()), Optional.empty(), findMemberCountBounds(), findImageCountBounds(),
             findManualAnnotationCountBounds(), findReviewedAnnotationCountBounds());
     }
 

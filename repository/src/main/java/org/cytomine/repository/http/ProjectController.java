@@ -68,15 +68,21 @@ public class ProjectController implements ProjectHttpContract {
 
     @Override
     public ProjectListFilteredResponse listFiltered(@RequestParam Pageable pageable,
-        @RequestBody ProjectListAvailableFiltersPayload filters) {
+        @RequestBody Optional<ProjectListAvailableFiltersPayload> filters) {
         long userId = currentUserService.getCurrentUserId();
-        return new ProjectListFilteredResponse(
-            repository.findAllReadableByUser(userId, pageable, filters.ontologyNames(), filters.roleNames(),
-                    filters.tagLabels(),
-                    min(filters.memberCount()), max(filters.memberCount()),
-                    min(filters.imageCount()), max(filters.imageCount()),
-                    min(filters.manualAnnotationCount()), max(filters.manualAnnotationCount()),
-                    min(filters.reviewedAnnotationCount()), max(filters.reviewedAnnotationCount()))
-                .map(service::mapToResponse), service.mapFilters(repository.getAvailableFilters()));
+
+        return filters.map(existingFilters -> new ProjectListFilteredResponse(
+            repository.findAllReadableByUser(userId, pageable, existingFilters.ontologyNames(),
+                existingFilters.roleNames(), existingFilters.tagLabels(), min(existingFilters.memberCount()),
+                max(existingFilters.memberCount()), min(existingFilters.imageCount()),
+                max(existingFilters.imageCount()), min(existingFilters.manualAnnotationCount()),
+                max(existingFilters.manualAnnotationCount()), min(existingFilters.reviewedAnnotationCount()),
+                max(existingFilters.reviewedAnnotationCount())).map(service::mapToResponse),
+            service.mapFilters(repository.getAvailableFilters()))).orElseGet(() -> new ProjectListFilteredResponse(
+            repository.findAllReadableByUser(userId, pageable, null, null, null, null, null, null, null, null, null,
+                null, null).map(service::mapToResponse), service.mapFilters(repository.getAvailableFilters()))
+
+        );
+
     }
 }

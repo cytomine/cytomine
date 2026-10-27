@@ -21,7 +21,7 @@ import be.cytomine.common.repository.model.project.payload.UpdateProject;
 
 @HttpExchange(ProjectHttpContract.ROOT_PATH)
 public interface ProjectHttpContract {
-    String ROOT_PATH = "/project";
+    String ROOT_PATH = "/projects";
 
     @PostExchange
     Optional<HttpCommandResponse> create(
@@ -40,6 +40,6 @@ public interface ProjectHttpContract {
     @DeleteExchange("/{id}")
     Optional<HttpCommandResponse> delete(@PathVariable long id);
 
-    @PostExchange("/list-all")
-    ProjectListFilteredResponse listFiltered(Pageable pageable, ProjectListAvailableFiltersPayload filters);
+    @PostExchange("search")
+    ProjectListFilteredResponse listFiltered(Pageable pageable, Optional<ProjectListAvailableFiltersPayload> filters);
 }

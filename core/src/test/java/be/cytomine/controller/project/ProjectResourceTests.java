@@ -173,7 +173,7 @@ public class ProjectResourceTests {
                 new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(),
                     Optional.empty(), Optional.empty(), Optional.empty())));
 
-        restProjectControllerMockMvc.perform(get("/api/project.json")).andExpect(status().isOk())
+        restProjectControllerMockMvc.perform(post("/api/projects/search")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
             .andExpect(jsonPath("$.collection[?(@.name=='" + project.getName() + "')]").exists())
             .andExpect(jsonPath("$.collection[0].numberOfSlides").value(0))
@@ -193,7 +193,7 @@ public class ProjectResourceTests {
                     Optional.empty(), Optional.empty(), Optional.empty())));
 
         restProjectControllerMockMvc.perform(
-                get("/api/project.json").param("page", "1").param("size", "10").param("sort", "count_images,desc"))
+                post("/api/projects/search").param("page", "1").param("size", "10").param("sort", "count_images,desc"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.collection", hasSize(greaterThan(0))));
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);

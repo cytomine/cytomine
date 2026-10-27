@@ -49,13 +49,13 @@ public class ProjectController {
     private final RetrievalService retrievalService;
     private final PageMapper pageMapper;
 
-    @PostMapping("/projects")
+    @PostMapping("/projects/search")
     public FilteredCollectionResponse<ProjectListRowResponse, ProjectListAvailableFiltersPayload> list(
         @SortDefault(sort = "created", direction = Sort.Direction.DESC)
         @PageableDefault(size = 2000) Pageable pageable,
-        @RequestBody ProjectListAvailableFiltersPayload projectFilters
+        @RequestBody Optional<ProjectListAvailableFiltersPayload> projectFilters
     ) {
-        log.debug("Post /project.json");
+        log.debug("Post /projects/search");
         ProjectListFilteredResponse filteredList = projectHttpContract.listFiltered(pageable, projectFilters);
         return pageMapper.toFilteredCollectionResponse(filteredList.content(), filteredList.availableFilters());
     }

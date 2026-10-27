@@ -57,8 +57,7 @@ public class ProjectController {
     ) {
         log.debug("Post /project.json");
         ProjectListFilteredResponse filteredList = projectHttpContract.listFiltered(pageable, projectFilters);
-        return pageMapper.toFilteredCollectionResponse(filteredList.content(),
-            filteredList.availableFilters());
+        return pageMapper.toFilteredCollectionResponse(filteredList.content(), filteredList.availableFilters());
     }
 
     @GetMapping("/project/{id}.json")

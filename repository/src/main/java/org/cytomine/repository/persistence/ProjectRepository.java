@@ -65,7 +65,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
                )""";
 
     String FILTERED_CONDITIONS = """
-        AND (:name IS NULL OR p.name ILIKE CONCAT('%', :name, '%'))
+        AND p.name ILIKE CONCAT('%', CAST(:name AS text), '%')
         AND (:ontologyNames IS NULL OR o.name IN (:ontologyNames))
         AND (:roleNames IS NULL OR CASE WHEN (""" + IS_ADMIN_EXISTS + """
              ) THEN 'admin' ELSE 'contributor' END IN (:roleNames))

@@ -4,13 +4,13 @@ import Project from '../models/project.js';
 
 export default class ProjectCollection extends Collection {
 
-    /**
+  /**
      * @returns {Object} The filters available server-side, as returned in the filters field of the last search performed
      *                   with this collection (null if no search was performed yet)
      */
-    get availableFilters() {
-        return this._availableFilters ?? null;
-    }
+  get availableFilters() {
+    return this._availableFilters ?? null;
+  }
 
   /** @inheritdoc */
   static get model() {
@@ -62,8 +62,8 @@ export default class ProjectCollection extends Collection {
    * @returns {Object} The available filters, as provided in the filters field of the projects search response
    */
   static async fetchAvailableFilters() {
-      let {data} = await Cytomine.instance.api.post('projects/search', null, {params: {size: 1}});
-      return data.filters;
+    let { data } = await Cytomine.instance.api.post('projects/search', null, { params: { size: 1 } });
+    return data.filters;
   }
 
   /** @inheritdoc */
@@ -72,25 +72,25 @@ export default class ProjectCollection extends Collection {
     this.admin = null; // used iff filter on user ; if true, only returns the projects in which user is admin
     this.withLastActivity = null;
     this.withMembersCount = null;
-      this.filters = null;
-      this._availableFilters = null;
+    this.filters = null;
+    this._availableFilters = null;
   }
 
-    /** @inheritdoc */
-    async _doFetch() {
-        if (this._filter.key) {
-            return super._doFetch();
-        }
-        let params = {};
-        if (this.max > 0) {
-            params.page = this._curPage;
-            params.size = this.max;
-        }
-        if (this.sort) {
-            params.sort = `${this.sort},${this.order || 'asc'}`;
-        }
-        let {data} = await Cytomine.instance.api.post('projects/search', this.filters ?? undefined, {params});
-        this._availableFilters = data.filters;
+  /** @inheritdoc */
+  async _doFetch() {
+    if (this._filter.key) {
+      return super._doFetch();
+    }
+    let params = {};
+    if (this.max > 0) {
+      params.page = this._curPage;
+      params.size = this.max;
+    }
+    if (this.sort) {
+      params.sort = `${this.sort},${this.order || 'asc'}`;
+    }
+    let { data } = await Cytomine.instance.api.post('projects/search', this.filters ?? undefined, { params });
+    this._availableFilters = data.filters;
     return data;
   }
 

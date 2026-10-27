@@ -175,13 +175,25 @@ class ProjectRepositoryTest {
             true, false);
         insertProject("other-project", 1, 0, "CLASSIC", LocalDateTime.now(), null);
 
-        Page<ProjectListRow> page = projectRepository.findAllReadableByUser(userId, PageRequest.of(0, 10), null, null,
-            null, "SEARCHABLE", null, null, null, null, null, null, null, null);
+        Page<ProjectListRow> page = projectRepository.findAllReadableByUser(userId, PageRequest.of(0, 10), Set.of(),
+            Set.of(), Set.of(), "SEARCHABLE", null, null, null, null, null, null, null, null);
         assertThat(page.getContent()).extracting(ProjectListRow::name).containsExactly("searchable-project");
 
         Page<ProjectListRow> adminRoleRows = projectRepository.findAllReadableByUser(userId, PageRequest.of(0, 10),
-            null, Set.of("admin"), null, null, null, null, null, null, null, null, null, null);
+            Set.of(), Set.of("admin"), Set.of(), null, null, null, null, null, null, null, null, null);
         assertThat(adminRoleRows.getContent()).extracting(ProjectListRow::name).containsExactly("searchable-project");
+    }
+
+    @Test
+    void nullNameIsIgnoredByFilters() {
+        Long userId = insertAdminUser("test-user1");
+        insertProjectWithMembership("searchable-project", 4, 3, "READ_ONLY", LocalDateTime.now(), null, "test-user1",
+            true, false);
+        insertProject("other-project", 1, 0, "CLASSIC", LocalDateTime.now(), null);
+
+        Page<ProjectListRow> page = projectRepository.findAllReadableByUser(userId, PageRequest.of(0, 10), Set.of(),
+            Set.of(), Set.of(), null, null, null, null, null, null, null, null, null);
+        assertThat(page.getContent()).hasSize(2);
     }
 
     @Test

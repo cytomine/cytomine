@@ -70,8 +70,9 @@ public class ProjectController implements ProjectHttpContract {
     public ProjectListFilteredResponse listFiltered(@RequestParam Pageable pageable,
         @RequestBody Optional<ProjectListAvailableFiltersPayload> filters) {
         long userId = currentUserService.getCurrentUserId();
+        ProjectListAvailableFiltersPayload existingFilters = filters.orElseGet(ProjectListAvailableFiltersPayload::empty);
 
-        return filters.map(existingFilters -> new ProjectListFilteredResponse(
+        return new ProjectListFilteredResponse(
             repository.findAllReadableByUser(userId, pageable, existingFilters.ontologyNames(),
                 existingFilters.roleNames(), existingFilters.tagLabels(), existingFilters.name().orElse(null),
                 min(existingFilters.memberCount()),
@@ -79,11 +80,6 @@ public class ProjectController implements ProjectHttpContract {
                 max(existingFilters.imageCount()), min(existingFilters.manualAnnotationCount()),
                 max(existingFilters.manualAnnotationCount()), min(existingFilters.reviewedAnnotationCount()),
                 max(existingFilters.reviewedAnnotationCount())).map(service::mapToResponse),
-            service.mapFilters(repository.getAvailableFilters()))).orElseGet(() -> new ProjectListFilteredResponse(
-            repository.findAllReadableByUser(userId, pageable, null, null, null, null, null, null, null, null, null,
-                null, null, null).map(service::mapToResponse), service.mapFilters(repository.getAvailableFilters()))
-
-        );
-
+            service.mapFilters(repository.getAvailableFilters()));
     }
 }

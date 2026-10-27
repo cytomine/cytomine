@@ -168,7 +168,7 @@ public class ProjectResourceTests {
     @Transactional
     public void listAllProjects() throws Exception {
         Project project = builder.givenAProject();
-        when(projectHttpContract.list(any(Pageable.class))).thenReturn(
+        when(projectHttpContract.listFiltered(any(Pageable.class), any())).thenReturn(
             new ProjectListFilteredResponse(new PageImpl<>(List.of(toListResponse(project))),
                 new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(),
                     Optional.empty(), Optional.empty(), Optional.empty())));
@@ -187,7 +187,7 @@ public class ProjectResourceTests {
     @Transactional
     public void listAllProjectsWithPaginationAndSort() throws Exception {
         Project project = builder.givenAProject();
-        when(projectHttpContract.list(any(Pageable.class))).thenReturn(
+        when(projectHttpContract.listFiltered(any(Pageable.class), any())).thenReturn(
             new ProjectListFilteredResponse(new PageImpl<>(List.of(toListResponse(project))),
                 new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(),
                     Optional.empty(), Optional.empty(), Optional.empty())));
@@ -197,7 +197,7 @@ public class ProjectResourceTests {
             .andExpect(status().isOk()).andExpect(jsonPath("$.collection", hasSize(greaterThan(0))));
 
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
-        verify(projectHttpContract).list(pageableCaptor.capture());
+        verify(projectHttpContract).listFiltered(pageableCaptor.capture(), any());
         Pageable pageable = pageableCaptor.getValue();
         assertThat(pageable.getPageNumber()).isEqualTo(1);
         assertThat(pageable.getPageSize()).isEqualTo(10);
@@ -506,7 +506,8 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
         restProjectControllerMockMvc.perform(
-                get("/api/user/{id}/project/light.json", USER_ACL_READ_ID).param("user", "true")).andExpect(status().isOk())
+                get("/api/user/{id}/project/light.json", USER_ACL_READ_ID).param("user", "true"))
+            .andExpect(status().isOk())
             .andExpect(jsonPath("$.collection[?(@.id=='" + project.getId() + "')]").exists());
 
         restProjectControllerMockMvc.perform(

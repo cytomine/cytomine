@@ -49,7 +49,7 @@ public class ProjectController {
     private final RetrievalService retrievalService;
     private final PageMapper pageMapper;
 
-    @PostMapping("/project.json")
+    @PostMapping("/projects")
     public FilteredCollectionResponse<ProjectListRowResponse, ProjectListAvailableFiltersPayload> list(
         @SortDefault(sort = "created", direction = Sort.Direction.DESC)
         @PageableDefault(size = 2000) Pageable pageable,

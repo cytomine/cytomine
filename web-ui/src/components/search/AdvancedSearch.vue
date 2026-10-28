@@ -76,8 +76,8 @@
           <template #default="{row: project}">
             <b-table-column field="currentUserRole" label="" centered width="1">
               <icon-project-member-role
-                :is-manager="project.currentUserRoles?.admin"
-                :is-representative="project.currentUserRoles?.representative"
+                :is-manager="project.currentUserRoles?.includes('admin')"
+                :is-representative="project.currentUserRoles?.includes('representative')"
               />
             </b-table-column>
 

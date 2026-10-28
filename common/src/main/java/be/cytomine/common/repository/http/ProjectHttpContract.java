@@ -14,7 +14,6 @@ import org.springframework.web.service.annotation.PutExchange;
 
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
-import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFiltersPayload;
 import be.cytomine.common.repository.model.project.payload.CreateProject;

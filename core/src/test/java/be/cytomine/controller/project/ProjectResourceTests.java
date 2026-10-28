@@ -323,7 +323,7 @@ public class ProjectResourceTests {
             project.getCountReviewedAnnotations(), project.isClosed(),
             project.getMode() != null && project.getMode().name().equals("READ_ONLY"),
             project.getMode() != null && project.getMode().name().equals("RESTRICTED"), project.isHideUsersLayers(),
-            project.isHideAdminsLayers(), LocalDateTime.now(), Optional.empty(), 3, Set.of("admin","representative"),
+            project.isHideAdminsLayers(), LocalDateTime.now(), Optional.empty(), 3, Set.of("admin", "representative"),
             Optional.of(1234L));
     }
 

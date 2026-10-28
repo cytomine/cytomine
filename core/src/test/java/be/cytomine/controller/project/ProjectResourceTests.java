@@ -72,6 +72,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -177,8 +178,7 @@ public class ProjectResourceTests {
             .andExpect(jsonPath("$.collection[?(@.name=='" + project.getName() + "')]").exists())
             .andExpect(jsonPath("$.collection[0].numberOfSlides").value(0))
             .andExpect(jsonPath("$.collection[0].membersCount").value(3))
-            .andExpect(jsonPath("$.collection[0].currentUserRoles.admin").value(true))
-            .andExpect(jsonPath("$.collection[0].currentUserRoles.representative").value(false))
+            .andExpect(jsonPath("$.collection[0].currentUserRoles", containsInAnyOrder("admin", "representative")))
             .andExpect(jsonPath("$.collection[0].lastActivity").value(1234));
     }
 

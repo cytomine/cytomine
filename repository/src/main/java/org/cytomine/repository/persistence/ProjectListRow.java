@@ -1,7 +1,6 @@
 package org.cytomine.repository.persistence;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record ProjectListRow(
     long id,

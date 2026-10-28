@@ -1,7 +1,6 @@
 package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -78,5 +77,6 @@ public interface ProjectMapper {
     ProjectListAvailableFiltersPayload mapFilters(ProjectListAvailableFilters projectListAvailableFilters);
 
 
+    @Mapping(target = "currentUserRoles", source = "currentUserRoles")
     ProjectListRowResponse mapToResponse(ProjectListRow row, Set<String> currentUserRoles);
 }

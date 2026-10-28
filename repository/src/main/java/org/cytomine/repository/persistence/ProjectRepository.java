@@ -1,11 +1,11 @@
 package org.cytomine.repository.persistence;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import org.cytomine.repository.persistence.entity.ProjectEntity;
+import org.cytomine.repository.persistence.projection.ProjectRoleProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -132,27 +132,8 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
                     AND aoi.object_id_class =
                         (SELECT ac.id FROM acl_class ac
                           WHERE ac.class = 'be.cytomine.domain.project.Project')
-               ) AS members_count,
-               EXISTS (SELECT 1
-                         FROM acl_entry ae
-                         JOIN acl_object_identity aoi ON aoi.id = ae.acl_object_identity
-                         JOIN acl_sid asid ON asid.id = ae.sid
-                         JOIN sec_user su ON su.username = asid.sid
-                         WHERE aoi.object_id_identity = p.id
-                           AND aoi.object_id_class =
-                               (SELECT ac.id FROM acl_class ac
-                                 WHERE ac.class = 'be.cytomine.domain.project.Project')
-                           AND su.id = :userId
-                          AND ae.granting = true
-                          AND ae.mask >= 16
-                      ) AS is_admin,
-               EXISTS (SELECT 1
-                         FROM project_representative_user pru
-                        WHERE pru.project_id = p.id
-                          AND pru.user_id = :userId
-                          AND pru.deleted IS NULL
-                      ) AS is_representative,
-               (SELECT (extract(epoch from max(ch.created)) * 1000)::bigint
+                ) AS members_count,
+                (SELECT (extract(epoch from max(ch.created)) * 1000)::bigint
                   FROM command_history ch
                  WHERE ch.project_id = p.id
                    AND ch.deleted IS NULL
@@ -252,6 +233,27 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
         Long maxImageCount, Long minManualAnnotationCount, Long maxManualAnnotationCount,
         Long minReviewedAnnotationCount, Long maxReviewedAnnotationCount);
 
-    List<Map.Entry<Long, String>> findRolesForProjectIds(Set<Long>projectIds);
+    @Query(value = """
+        SELECT p.id AS project_id, 'admin' AS role
+          FROM project p
+          JOIN acl_object_identity aoi ON aoi.object_id_identity = p.id
+           AND aoi.object_id_class = (SELECT ac.id FROM acl_class ac
+                                       WHERE ac.class = 'be.cytomine.domain.project.Project')
+          JOIN acl_entry ae ON ae.acl_object_identity = aoi.id
+          JOIN acl_sid asid ON asid.id = ae.sid
+          JOIN sec_user su ON su.username = asid.sid
+         WHERE su.id = :userId
+           AND ae.granting = true
+           AND ae.mask >= 16
+           AND p.id IN (:projectIds)
+        UNION ALL
+        SELECT p.id AS project_id, 'representative' AS role
+          FROM project p
+          JOIN project_representative_user pru ON pru.project_id = p.id
+         WHERE pru.user_id = :userId
+           AND pru.deleted IS NULL
+           AND p.id IN (:projectIds)
+        """, nativeQuery = true)
+    List<ProjectRoleProjection> findRolesForProjectIds(long userId, Set<Long> projectIds);
 
 }

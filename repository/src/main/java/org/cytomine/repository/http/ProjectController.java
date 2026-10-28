@@ -9,10 +9,12 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.cytomine.repository.persistence.ProjectListRow;
 import org.cytomine.repository.persistence.ProjectRepository;
+import org.cytomine.repository.persistence.projection.ProjectRoleProjection;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.CurrentUserService;
 import org.cytomine.repository.service.ProjectCommandService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.list.filtered.OptionallyBoundedFilter;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
@@ -84,12 +87,17 @@ public class ProjectController implements ProjectHttpContract {
                 max(existingFilters.imageCount()), min(existingFilters.manualAnnotationCount()),
                 max(existingFilters.manualAnnotationCount()), min(existingFilters.reviewedAnnotationCount()),
                 max(existingFilters.reviewedAnnotationCount()));
-        Map<Long, Set<String>> rolesPerProject =
-            repository.findRolesForProjectIds(rows.stream().map(ProjectListRow::id).collect(Collectors.toSet()));
+        Set<Long> projectIds = rows.stream().map(ProjectListRow::id).collect(Collectors.toSet());
+        Map<Long, Set<String>> rolesPerProject = projectIds.isEmpty() ? Map.of()
+            : repository.findRolesForProjectIds(userId, projectIds).stream()
+                .collect(Collectors.groupingBy(ProjectRoleProjection::getProjectId,
+                    Collectors.mapping(ProjectRoleProjection::getRole, Collectors.toSet())));
 
-        return new ProjectListFilteredResponse(
-            rows.stream().map(r -> service.mapToResponse(r, rolesPerProject.get(r.id()))).collect(Collectors.toSet())
-            ,
-            service.mapFilters(repository.getAvailableFilters()));
+        Page<ProjectListRowResponse> responses =
+            new PageImpl<>(rows.stream()
+                .map(r -> service.mapToResponse(r, rolesPerProject.getOrDefault(r.id(), Set.of()))).toList(),
+                pageable, rows.getTotalElements());
+
+        return new ProjectListFilteredResponse(responses, service.mapFilters(repository.getAvailableFilters()));
     }
 }

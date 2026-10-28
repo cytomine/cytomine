@@ -78,8 +78,8 @@ public class ProjectCommandService
         );
     }
 
-    public ProjectListRowResponse mapToResponse(ProjectListRow row, Set<String>currentUserRoles) {
-        return projectMapper.mapToResponse(row,currentUserRoles);
+    public ProjectListRowResponse mapToResponse(ProjectListRow row, Set<String> currentUserRoles) {
+        return projectMapper.mapToResponse(row, currentUserRoles);
     }
 
     public ProjectListAvailableFiltersPayload mapFilters(ProjectListAvailableFilters projectListAvailableFilters) {

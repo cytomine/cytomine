@@ -23,6 +23,5 @@ public record ProjectListRow(
     LocalDateTime created,
     LocalDateTime updated,
     long membersCount,
-    List<String> currentUserRoles,
     Long lastActivity
 ) {}

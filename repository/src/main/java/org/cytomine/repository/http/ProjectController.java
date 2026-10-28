@@ -1,13 +1,18 @@
 package org.cytomine.repository.http;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.repository.persistence.ProjectListRow;
 import org.cytomine.repository.persistence.ProjectRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.CurrentUserService;
 import org.cytomine.repository.service.ProjectCommandService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,14 +76,20 @@ public class ProjectController implements ProjectHttpContract {
         long userId = currentUserService.getCurrentUserId();
         ProjectListFiltersPayload existingFilters = filters.orElseGet(ProjectListFiltersPayload::empty);
 
-        return new ProjectListFilteredResponse(
+        Page<ProjectListRow> rows =
             repository.findAllReadableByUser(userId, pageable, existingFilters.ontologyNames(),
                 existingFilters.roleNames(), existingFilters.tagLabels(), existingFilters.name().orElse(null),
                 min(existingFilters.memberCount()),
                 max(existingFilters.memberCount()), min(existingFilters.imageCount()),
                 max(existingFilters.imageCount()), min(existingFilters.manualAnnotationCount()),
                 max(existingFilters.manualAnnotationCount()), min(existingFilters.reviewedAnnotationCount()),
-                max(existingFilters.reviewedAnnotationCount())).map(service::mapToResponse),
+                max(existingFilters.reviewedAnnotationCount()));
+        Map<Long, Set<String>> rolesPerProject =
+            repository.findRolesForProjectIds(rows.stream().map(ProjectListRow::id).collect(Collectors.toSet()));
+
+        return new ProjectListFilteredResponse(
+            rows.stream().map(r -> service.mapToResponse(r, rolesPerProject.get(r.id()))).collect(Collectors.toSet())
+            ,
             service.mapFilters(repository.getAvailableFilters()));
     }
 }

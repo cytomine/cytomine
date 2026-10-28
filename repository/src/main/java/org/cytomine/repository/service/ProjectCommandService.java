@@ -2,6 +2,7 @@ package org.cytomine.repository.service;
 
 import java.sql.Timestamp;
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -77,8 +78,8 @@ public class ProjectCommandService
         );
     }
 
-    public ProjectListRowResponse mapToResponse(ProjectListRow row) {
-        return projectMapper.mapToResponse(row);
+    public ProjectListRowResponse mapToResponse(ProjectListRow row, Set<String>currentUserRoles) {
+        return projectMapper.mapToResponse(row,currentUserRoles);
     }
 
     public ProjectListAvailableFiltersPayload mapFilters(ProjectListAvailableFilters projectListAvailableFilters) {

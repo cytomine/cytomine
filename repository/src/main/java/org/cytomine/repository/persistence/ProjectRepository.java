@@ -1,6 +1,7 @@
 package org.cytomine.repository.persistence;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -250,5 +251,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
         Long minImageCount,
         Long maxImageCount, Long minManualAnnotationCount, Long maxManualAnnotationCount,
         Long minReviewedAnnotationCount, Long maxReviewedAnnotationCount);
+
+    List<Map.Entry<Long, String>> findRolesForProjectIds(Set<Long>projectIds);
 
 }

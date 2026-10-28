@@ -1,6 +1,7 @@
 package org.cytomine.repository.persistence;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ProjectListRow(
     long id,
@@ -22,7 +23,6 @@ public record ProjectListRow(
     LocalDateTime created,
     LocalDateTime updated,
     long membersCount,
-    boolean isAdmin,
-    boolean isRepresentative,
+    List<String> currentUserRoles,
     Long lastActivity
 ) {}

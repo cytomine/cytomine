@@ -67,7 +67,7 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
     public Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
         TermEntity subEntity = termRepository.save(
             new TermEntity(null, 0, currentId, UUID.randomUUID().toString(), UUID.randomUUID().toString(),
-                baseMapper.map(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)), null, null, "", Set.of()));
+                baseMapper.mapLocalDateTimeToTimestamp(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)), null, null, "", Set.of()));
         subEntities = Set.of(termMapper.mapToTermResponse(subEntity));
         return subEntities;
     }

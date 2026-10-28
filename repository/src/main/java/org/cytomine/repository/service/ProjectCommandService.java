@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import be.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
 import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
-import be.cytomine.common.repository.model.command.payload.response.ProjectUserRoles;
 import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
 import be.cytomine.common.repository.model.command.request.CreateProjectCommand;
 import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
@@ -79,29 +78,7 @@ public class ProjectCommandService
     }
 
     public ProjectListRowResponse mapToResponse(ProjectListRow row) {
-        return new ProjectListRowResponse(
-            row.id(),
-            row.name(),
-            Optional.ofNullable(row.ontology()),
-            Optional.ofNullable(row.ontologyName()),
-            row.blindMode(),
-            row.areImagesDownloadable(),
-            row.numberOfSlides(),
-            row.numberOfImages(),
-            row.numberOfAnnotations(),
-            row.numberOfJobAnnotations(),
-            row.numberOfReviewedAnnotations(),
-            row.isClosed(),
-            row.isReadOnly(),
-            row.isRestricted(),
-            row.hideUsersLayers(),
-            row.hideAdminsLayers(),
-            row.created(),
-            Optional.ofNullable(row.updated()),
-            row.membersCount(),
-            new ProjectUserRoles(row.isAdmin(), row.isRepresentative()),
-            Optional.ofNullable(row.lastActivity())
-        );
+        return projectMapper.mapToResponse(row);
     }
 
     public ProjectListAvailableFiltersPayload mapFilters(ProjectListAvailableFilters projectListAvailableFilters) {

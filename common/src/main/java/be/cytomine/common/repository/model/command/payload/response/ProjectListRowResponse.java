@@ -2,6 +2,7 @@ package be.cytomine.common.repository.model.command.payload.response;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 public record ProjectListRowResponse(
     long id,
@@ -23,6 +24,6 @@ public record ProjectListRowResponse(
     LocalDateTime created,
     Optional<LocalDateTime> updated,
     long membersCount,
-    ProjectUserRoles currentUserRoles,
+    Set<String> currentUserRoles,
     Optional<Long> lastActivity
 ) {}

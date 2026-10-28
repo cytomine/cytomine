@@ -38,7 +38,6 @@ import be.cytomine.common.repository.model.command.Commands;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
-import be.cytomine.common.repository.model.command.payload.response.ProjectUserRoles;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
@@ -324,7 +323,7 @@ public class ProjectResourceTests {
             project.getCountReviewedAnnotations(), project.isClosed(),
             project.getMode() != null && project.getMode().name().equals("READ_ONLY"),
             project.getMode() != null && project.getMode().name().equals("RESTRICTED"), project.isHideUsersLayers(),
-            project.isHideAdminsLayers(), LocalDateTime.now(), Optional.empty(), 3, new ProjectUserRoles(true, false),
+            project.isHideAdminsLayers(), LocalDateTime.now(), Optional.empty(), 3, Set.of("admin","representative"),
             Optional.of(1234L));
     }
 

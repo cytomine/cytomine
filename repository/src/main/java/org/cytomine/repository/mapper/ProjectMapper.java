@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.Optional;
 
 import org.cytomine.repository.persistence.ProjectListAvailableFilters;
+import org.cytomine.repository.persistence.ProjectListRow;
 import org.cytomine.repository.persistence.entity.ProjectEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -11,6 +12,7 @@ import org.mapstruct.Mapping;
 
 import be.cytomine.common.mapper.BaseMapper;
 import be.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
+import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
@@ -73,4 +75,6 @@ public interface ProjectMapper {
 
     ProjectListAvailableFiltersPayload mapFilters(ProjectListAvailableFilters projectListAvailableFilters);
 
+
+    ProjectListRowResponse mapToResponse(ProjectListRow row);
 }

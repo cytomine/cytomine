@@ -163,8 +163,7 @@ class ProjectRepositoryTest {
         assertThat(row.created()).isNotNull();
         assertThat(row.updated()).isNotNull();
         assertThat(row.membersCount()).isZero();
-        assertThat(row.isAdmin()).isFalse();
-        assertThat(row.isRepresentative()).isFalse();
+        assertThat(row.currentUserRoles()).isEmpty();
         assertThat(row.lastActivity()).isGreaterThan(1_000_000_000_000L);
     }
 
@@ -208,7 +207,7 @@ class ProjectRepositoryTest {
         assertThat(row.updated()).isNull();
         assertThat(row.lastActivity()).isNull();
         assertThat(row.isReadOnly()).isFalse();
-        assertThat(row.isRepresentative()).isFalse();
+        assertThat(row.currentUserRoles()).isEmpty();
     }
 
     @Test
@@ -224,11 +223,7 @@ class ProjectRepositoryTest {
             page.getContent().stream().collect(Collectors.toMap(ProjectListRow::name, r -> r));
         assertThat(rows).containsKeys("test3", "test4");
         assertThat(rows.get("test3").membersCount()).isEqualTo(1);
-        assertThat(rows.get("test3").isAdmin()).isTrue();
-        assertThat(rows.get("test3").isRepresentative()).isTrue();
         assertThat(rows.get("test4").membersCount()).isEqualTo(1);
-        assertThat(rows.get("test4").isAdmin()).isFalse();
-        assertThat(rows.get("test4").isRepresentative()).isFalse();
     }
 
     @Test

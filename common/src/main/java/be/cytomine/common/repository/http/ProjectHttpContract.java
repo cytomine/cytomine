@@ -16,6 +16,7 @@ import be.cytomine.common.repository.model.command.payload.response.HttpCommandR
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListFiltersPayload;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
 
@@ -41,5 +42,6 @@ public interface ProjectHttpContract {
     Optional<HttpCommandResponse> delete(@PathVariable long id);
 
     @PostExchange("search")
-    ProjectListFilteredResponse listFiltered(Pageable pageable, Optional<ProjectListAvailableFiltersPayload> filters);
+    ProjectListFilteredResponse listFiltered(Pageable pageable,
+        @RequestBody Optional<ProjectListFiltersPayload> filters);
 }

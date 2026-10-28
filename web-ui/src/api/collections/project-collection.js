@@ -62,7 +62,7 @@ export default class ProjectCollection extends Collection {
    * @returns {Object} The available filters, as provided in the filters field of the projects search response
    */
   static async fetchAvailableFilters() {
-    let { data } = await Cytomine.instance.api.post('projects/search', null, { params: { size: 1 } });
+    let { data } = await Cytomine.instance.api.post('projects/search', null, { params: { size: 1 }, headers: { 'Content-Type': 'application/json' } });
     return data.filters;
   }
 
@@ -89,7 +89,7 @@ export default class ProjectCollection extends Collection {
     if (this.sort) {
       params.sort = `${this.sort},${this.order || 'asc'}`;
     }
-    let { data } = await Cytomine.instance.api.post('projects/search', this.filters ?? undefined, { params });
+    let { data } = await Cytomine.instance.api.post('projects/search', this.filters ?? undefined, { params, headers: { 'Content-Type': 'application/json' } });
     this._availableFilters = data.filters;
     return data;
   }

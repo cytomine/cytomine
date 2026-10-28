@@ -25,6 +25,7 @@ import be.cytomine.common.repository.model.command.payload.response.ProjectListR
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListFiltersPayload;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
 import be.cytomine.controller.utils.FilteredCollectionResponse;
@@ -53,7 +54,7 @@ public class ProjectController {
     public FilteredCollectionResponse<ProjectListRowResponse, ProjectListAvailableFiltersPayload> list(
         @SortDefault(sort = "created", direction = Sort.Direction.DESC)
         @PageableDefault(size = 2000) Pageable pageable,
-        @RequestBody Optional<ProjectListAvailableFiltersPayload> projectFilters
+        @RequestBody Optional<ProjectListFiltersPayload> projectFilters
     ) {
         log.debug("Post /projects/search");
         ProjectListFilteredResponse filteredList = projectHttpContract.listFiltered(pageable, projectFilters);

@@ -96,9 +96,9 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
         """ + FILTERED_CONDITIONS;
 
     String ACL_MEMBER_JOIN = """
-            JOIN acl_entry ae
-            JOIN acl_object_identity aoi ON aoi.id = ae.acl_object_identity
-            JOIN acl_class ac ON ac.id = aoi.object_id_class AND ac.class = 'be.cytomine.domain.project.Project'
+            JOIN acl_object_identity aoi ON aoi.object_id_identity = p.id
+            JOIN acl_class ac ON ac.id = aoi.object_id_class AND ac.class =""" + PROJECT_CLASS + """
+            JOIN acl_entry ae ON ae.acl_object_identity = aoi.id
             JOIN acl_sid asid ON asid.id = ae.sid
             JOIN sec_user su ON su.username = asid.sid
         """;

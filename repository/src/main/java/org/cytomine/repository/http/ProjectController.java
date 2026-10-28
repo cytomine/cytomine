@@ -12,15 +12,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
-import be.cytomine.common.repository.model.list.filtered.BoundedFilter;
-import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
+import be.cytomine.common.repository.model.list.filtered.OptionallyBoundedFilter;
 import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListFiltersPayload;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
 
@@ -35,12 +34,12 @@ public class ProjectController implements ProjectHttpContract {
     private final ProjectCommandService service;
     private final ProjectRepository repository;
 
-    private static Long min(Optional<BoundedFilter> bounds) {
-        return bounds.flatMap(BoundedFilter::min).orElse(null);
+    private Long min(Optional<OptionallyBoundedFilter> bounds) {
+        return bounds.flatMap(OptionallyBoundedFilter::min).orElse(null);
     }
 
-    private static Long max(Optional<BoundedFilter> bounds) {
-        return bounds.flatMap(BoundedFilter::max).orElse(null);
+    private Long max(Optional<OptionallyBoundedFilter> bounds) {
+        return bounds.flatMap(OptionallyBoundedFilter::max).orElse(null);
     }
 
     @Override
@@ -67,10 +66,10 @@ public class ProjectController implements ProjectHttpContract {
     }
 
     @Override
-    public ProjectListFilteredResponse listFiltered(@RequestParam Pageable pageable,
-        @RequestBody Optional<ProjectListAvailableFiltersPayload> filters) {
+    public ProjectListFilteredResponse listFiltered(Pageable pageable,
+        @RequestBody Optional<ProjectListFiltersPayload> filters) {
         long userId = currentUserService.getCurrentUserId();
-        ProjectListAvailableFiltersPayload existingFilters = filters.orElseGet(ProjectListAvailableFiltersPayload::empty);
+        ProjectListFiltersPayload existingFilters = filters.orElseGet(ProjectListFiltersPayload::empty);
 
         return new ProjectListFilteredResponse(
             repository.findAllReadableByUser(userId, pageable, existingFilters.ontologyNames(),

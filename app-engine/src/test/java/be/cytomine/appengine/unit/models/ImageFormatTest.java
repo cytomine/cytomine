@@ -142,7 +142,11 @@ public class ImageFormatTest {
         Assertions.assertTrue(format.validate(withoutExtension), "Validation should only rely on the file content.");
         Dimension dimension = format.getDimensions(withoutExtension);
         Assertions.assertEquals(EXPECTED_WIDTH, dimension.getWidth(), "Width should be " + EXPECTED_WIDTH + " pixels.");
-        Assertions.assertEquals(EXPECTED_HEIGHT, dimension.getHeight(), "Height should be " + EXPECTED_HEIGHT + " pixels.");
+        Assertions.assertEquals(
+            EXPECTED_HEIGHT,
+            dimension.getHeight(),
+            "Height should be " + EXPECTED_HEIGHT + " pixels."
+        );
     }
 
     @Test

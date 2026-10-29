@@ -8,9 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -19,38 +17,30 @@ import org.springframework.stereotype.Component;
 import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.common.repository.model.user.payload.CreateUser;
-import be.cytomine.domain.project.Project;
-import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.mapper.UserMapper;
-import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.project.ProjectMemberService;
+import be.cytomine.service.security.UserService;
 
 import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
 import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
 import static be.cytomine.common.repository.model.Role.ROLE_USER;
 
+/**
+ * Synchronizes the Cytomine user record with the JWT identity on every authentication success. All
+ * database access is delegated to the domain services ({@link UserService}, {@link ProjectMemberService}):
+ * this listener only parses the token attributes and orchestrates the synchronization steps.
+ */
 @RequiredArgsConstructor
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
-    private final ApplicationContext applicationContext;
-
     private final CurrentRoleService currentRoleService;
 
-    private final SecUserSecRoleRepository secSecUserSecRoleRepository;
-
-    private final SecRoleRepository secRoleRepository;
+    private final UserService userService;
 
     private final UserHttpContract userHttpContract;
-
-    private final UserRepository userRepository;
-
-    private final ProjectRepository projectRepository;
 
     private final ProjectMemberService projectMemberService;
 
@@ -75,10 +65,6 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             return ROLE_USER.toString();
         }
         return ROLE_GUEST.toString();
-    }
-
-    private AuthenticationSuccessListener self() {
-        return applicationContext.getBean(AuthenticationSuccessListener.class);
     }
 
     @Override
@@ -112,8 +98,9 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         List<String> projects = listTokenAttributes.getOrDefault("projects", List.of());
         List<String> joinTokens = listTokenAttributes.getOrDefault("lti_join_tokens", List.of());
         UUID sub = UUID.fromString(stringTokenAttributes.get("sub"));
-        Optional<User> userByReference = userRepository.findByReference(sub.toString());
-        Optional<User> userByUsername = userRepository.findByUsername(jwtAuthenticationToken.getName());
+        Optional<User> userByReference = userService.findUserByReference(sub.toString());
+        Optional<User> userByUsername = userService.findUserByUsername(jwtAuthenticationToken.getName());
+
         if (userByUsername.isPresent() && userByReference.isEmpty()) {
             User user = userByUsername.get();
             user.setReference(sub.toString());
@@ -122,11 +109,12 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             user.setLastname(
                 stringTokenAttributes.get("family_name") != null ? stringTokenAttributes.get("family_name") : "");
             user.setEmail(stringTokenAttributes.get("email") != null ? stringTokenAttributes.get("email") : "");
-            userRepository.save(user);
+            userService.save(user);
 
-            self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
-            self().updateProjectsMembership(projects, user);
-            self().updateLtiJoinTokenMembership(joinTokens, user);
+            userService.syncCumulativeRole(user, rolesFromAuthentication);
+            synchronizeAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
+            projectMemberService.syncProjectMembership(user, projects);
+            projectMemberService.syncJoinTokenMembership(user, joinTokens);
 
         } else if (userByReference.isEmpty()) {
 
@@ -140,12 +128,12 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                 Optional.of(sub.toString()));
             userHttpContract.selfRegister(createUser);
 
-            User savedUser = userRepository.findByReference(sub.toString())
+            User savedUser = userService.findUserByReference(sub.toString())
                 .orElseThrow(() -> new IllegalStateException("User not found after self-registration: " + sub));
             UserResponse userResponse = userMapper.map(savedUser);
 
-            self().updateProjectsMembership(projects, savedUser);
-            self().updateLtiJoinTokenMembership(joinTokens, savedUser);
+            projectMemberService.syncProjectMembership(savedUser, projects);
+            projectMemberService.syncJoinTokenMembership(savedUser, joinTokens);
 
             if (currentRoleService.hasCurrentUserAdminRole(userResponse)) {
                 currentRoleService.activeAdminSession(userResponse, jwtAuthenticationToken);
@@ -153,94 +141,21 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
 
         } else {
             User user = userByReference.get();
-            self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
-            self().updateProjectsMembership(projects, user);
-            self().updateLtiJoinTokenMembership(joinTokens, user);
+            userService.syncCumulativeRole(user, rolesFromAuthentication);
+            synchronizeAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
+            projectMemberService.syncProjectMembership(user, projects);
+            projectMemberService.syncJoinTokenMembership(user, joinTokens);
         }
     }
 
-    @Transactional
-    protected void updateRolesAndAdminSession(JwtAuthenticationToken jwtAuthenticationToken, User user,
+    private void synchronizeAdminSession(JwtAuthenticationToken jwtAuthenticationToken, User user,
         Set<String> rolesFromAuthentication) {
-
-        secSecUserSecRoleRepository.deleteAllByIdInBatch(
-            secSecUserSecRoleRepository.findAllBySecUser(user).stream().map(SecUserSecRole::getId).toList());
-        secSecUserSecRoleRepository.flush();
-        // Guest > User > Admin
-        self().setCumulativeRole(rolesFromAuthentication, user);
-        UserResponse userResponse = userMapper.map(user);
         if (rolesFromAuthentication.contains(ROLE_ADMIN.toString())) {
+            UserResponse userResponse = userMapper.map(user);
             if (currentRoleService.hasCurrentUserAdminRole(userResponse)) {
                 currentRoleService.activeAdminSession(userResponse, jwtAuthenticationToken);
             }
         }
-    }
-
-    @Transactional
-    protected void updateProjectsMembership(List<String> projects, User user) {
-        if (!isExternal(user)) {
-            return; // do nothing if user is local
-        }
-
-        List<Project> permittedUserProjects = projectRepository.findByNameIn(projects);
-        List<Project> actualUserProjects = projectRepository.findAllProjectForUser(user.getUsername());
-
-        List<Project> projectsToAdd =
-            permittedUserProjects.stream().filter(p -> !actualUserProjects.contains(p)).toList();
-        for (Project project : projectsToAdd) {
-            projectMemberService.addUserToProjectWithAdmin(user.getUsername(), project, false);
-        }
-
-        List<Project> projectsToRemove =
-            actualUserProjects.stream().filter(p -> !permittedUserProjects.contains(p)).toList();
-
-        for (Project project : projectsToRemove) {
-            projectMemberService.deleteUserFromProjectWithAdmin(user, project, false);
-        }
-    }
-
-    private boolean isExternal(User user) {
-        return user.getUsername().endsWith("@lifescience-ri.eu");
-    }
-
-    /**
-     * Additive LTI project membership: any project whose join token appears in the user's {@code lti_join_tokens}
-     * claim (exposed by Keycloak's profile-scope protocol mapper) is granted to the user as a contributor
-     * (non-admin). Unlike {@link #updateProjectsMembership} this path never removes memberships - a join token
-     * only ever adds or confirms access, so tokens left behind by past course runs are harmless.
-     */
-    @Transactional
-    protected void updateLtiJoinTokenMembership(List<String> joinTokens, User user) {
-        if (joinTokens == null || joinTokens.isEmpty()) {
-            return;
-        }
-
-        List<Project> tokenProjects = projectRepository.findByJoinTokenIn(joinTokens);
-        if (tokenProjects.isEmpty()) {
-            return;
-        }
-
-        List<Project> actualUserProjects = projectRepository.findAllProjectForUser(user.getUsername());
-        for (Project project : tokenProjects) {
-            if (!actualUserProjects.contains(project)) {
-                projectMemberService.addUserToProjectWithAdmin(user.getUsername(), project, false);
-            }
-        }
-    }
-
-    @Transactional
-    protected void setCumulativeRole(Set<String> rolesFromAuthentication, User user) {
-
-        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
-        if (rolesFromAuthentication.contains(ROLE_ADMIN.toString())) {
-            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_ADMIN.toString()));
-        } else if (rolesFromAuthentication.contains(ROLE_USER.toString())) {
-            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_USER.toString()));
-        } else {
-            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_GUEST.toString()));
-        }
-        secSecUserSecRole.setSecUser(user);
-        secSecUserSecRoleRepository.save(secSecUserSecRole);
     }
 
     @Override

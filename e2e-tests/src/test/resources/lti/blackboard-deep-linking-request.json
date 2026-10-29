@@ -1,0 +1,37 @@
+{
+  "loginInit": {
+    "method": "GET",
+    "alias": "lti-blackboard",
+    "iss": "https://blackboard.test",
+    "client_id": "bb-tool-client",
+    "target_link_uri": "{{simulator}}/picker",
+    "login_hint": "bb-teacher-9",
+    "lti_deployment_id": "bb-deployment-1"
+  },
+  "claims": {
+    "iss": "https://blackboard.test",
+    "aud": "bb-tool-client",
+    "sub": "bb-user-2",
+    "given_name": "Bob",
+    "family_name": "Teacher",
+    "name": "Bob Teacher",
+    "email": "bob.teacher@blackboard.test",
+    "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiDeepLinkingRequest",
+    "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
+    "https://purl.imsglobal.org/spec/lti/claim/deployment_id": "bb-deployment-1",
+    "https://purl.imsglobal.org/spec/lti/claim/target_link_uri": "{{simulator}}/picker",
+    "https://purl.imsglobal.org/spec/lti/claim/roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"],
+    "https://purl.imsglobal.org/spec/lti/claim/context": {
+      "id": "course.externalId:bio-101",
+      "label": "bio-101",
+      "title": "Bio 101"
+    },
+    "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings": {
+      "deep_link_return_url": "{{simulator}}/deep-link-return",
+      "accept_types": ["ltiResourceLink"],
+      "accept_presentation_document_targets": ["iframe", "window"],
+      "accept_multiple": true,
+      "data": "bb-opaque-placement-data"
+    }
+  }
+}

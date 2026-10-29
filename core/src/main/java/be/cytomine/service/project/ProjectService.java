@@ -69,6 +69,7 @@ import be.cytomine.service.ontology.AnnotationTermService;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.service.search.ProjectSearchExtension;
 import be.cytomine.service.search.RetrievalService;
+import be.cytomine.service.security.IamProjectMembershipService;
 import be.cytomine.service.security.SecurityACLService;
 import be.cytomine.service.security.UserService;
 import be.cytomine.service.utils.TaskService;
@@ -145,6 +146,8 @@ public class ProjectService extends ModelService {
     private final MeiliSearchService meiliSearchService;
 
     private final UrlApi urlApi;
+
+    private final IamProjectMembershipService iamProjectMembershipService;
 
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
@@ -799,6 +802,18 @@ public class ProjectService extends ModelService {
             } catch (Exception e) {
                 log.warn("Could not rename project '{}' to '{}' in metadata", oldName, project.getName(), e);
             }
+            // the project name is how membership is provisioned in IAM for external users: keep the references
+            // of the current external members aligned on the new name, otherwise their membership would be
+            // repealed at their next request by AuthenticationSuccessListener
+            String newName = project.getName();
+            try {
+                userService.listUsers(project).stream()
+                    .filter(member -> iamProjectMembershipService.isExternal(member.username()))
+                    .forEach(member -> iamProjectMembershipService.renameProject(
+                        member.username(), oldName, newName));
+            } catch (Exception e) {
+                log.warn("Could not rename project '{}' to '{}' in IAM", oldName, newName, e);
+            }
         }
 
         taskService.updateTask(task, 20, "Project " + project.getName() + " edited");
@@ -1024,6 +1039,19 @@ public class ProjectService extends ModelService {
             );
         }
 
+        // the project name is how membership is provisioned in IAM for external users: if the creator is one of
+        // them, provision the new project in IAM, otherwise its creation on their behalf would be repealed at
+        // their next request by AuthenticationSuccessListener
+        String creatorUsername = currentUserService.getCurrentUsername();
+        if (iamProjectMembershipService.isExternal(creatorUsername)) {
+            try {
+                iamProjectMembershipService.addProject(creatorUsername, ((Project) domain).getName());
+            } catch (Exception e) {
+                log.warn("Could not add project {} to the IAM projects of user {}",
+                    ((Project) domain).getName(), creatorUsername, e);
+            }
+        }
+
         if (projectRepresentativeUserService.find((Project) domain, currentUserService.getCurrentUser().id())
             .isEmpty()) {
             log.info("add creator "
@@ -1054,6 +1082,16 @@ public class ProjectService extends ModelService {
         redoStackItemRepository.deleteAllByCommandProject(project);
         commandRepository.deleteAllByProject(project);
         retrievalService.deleteStorage(project.getId().toString());
+        // the project name is how membership is provisioned in IAM for external users: drop the references of
+        // the deleted project from their IAM projects attribute
+        try {
+            userService.listUsers(project).stream()
+                .filter(member -> iamProjectMembershipService.isExternal(member.username()))
+                .forEach(member -> iamProjectMembershipService.removeProject(member.username(), project.getName()));
+        } catch (Exception e) {
+            log.warn("Could not remove project {} from the IAM projects of its external members", project.getName(),
+                e);
+        }
     }
 
     public List<Object> getStringParamsI18n(CytomineDomain domain) {

@@ -33,6 +33,18 @@ The following config assigns the role `admin` to all external users and this is 
 
 once steps above are followed a new button appears in the login form to start the authentication process for users coming from other organizations.
 
+### C. LS-AAI users and project membership
+
+Identified LS-AAI users (usernames ending with `@lifescience-ri.eu`) have their project memberships provisioned from
+the IAM: the `projects` multivalued user attribute in Keycloak lists the names of the projects(s) they can access.
+
+- The attribute is applied to the database at every authenticated request, and it accepts project names only.
+- Adding or removing such a user from a project through the Cytomine members tab updates the attribute in IAM, and
+  their account must exist in IAM for the addition to succeed.
+- Renaming or deleting a project also keeps the attribute aligned for their members.
+
+Local users are not concerned: their project memberships stay managed from the project configuration tabs only.
+
 ## Datasets Importation
 
 ::: tip

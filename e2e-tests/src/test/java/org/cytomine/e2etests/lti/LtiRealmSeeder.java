@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ProcessingException;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -88,6 +89,10 @@ final class LtiRealmSeeder {
                 "IAM admin credentials seem to be wrong for " + LtiSettings.IAM_BASE_URL, e);
         } catch (NotFoundException freshEnvironment) {
             // realm does not exist yet - nothing to clean up
+        } catch (ProcessingException unreachable) {
+            // JUnit runs this cleanup even when the IAM reachability gate already aborted the
+            // tests (e.g. the helm kind pod has no IAM on localhost:8100); the transport-level
+            // failure means no realm was ever seeded - nothing to clean up.
         }
     }
 

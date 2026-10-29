@@ -217,6 +217,60 @@ public class ProjectMemberService {
         }
     }
 
+    private static boolean isExternal(User user) {
+        return user.getUsername().endsWith("@lifescience-ri.eu");
+    }
+
+    /**
+     * Aligns the memberships of an external user with the project names carried by their authentication
+     * token: projects named in the token but not yet joined are joined as plain contributors, memberships
+     * in projects no longer named in the token are removed. Local users are left untouched.
+     */
+    public void syncProjectMembership(User user, List<String> projectNames) {
+        if (!isExternal(user)) {
+            return; // do nothing if user is local
+        }
+
+        List<Project> permittedUserProjects = projectRepository.findByNameIn(projectNames);
+        List<Project> actualUserProjects = projectRepository.findAllProjectForUser(user.getUsername());
+
+        List<Project> projectsToAdd =
+            permittedUserProjects.stream().filter(p -> !actualUserProjects.contains(p)).toList();
+        for (Project project : projectsToAdd) {
+            addUserToProjectWithAdmin(user.getUsername(), project, false);
+        }
+
+        List<Project> projectsToRemove =
+            actualUserProjects.stream().filter(p -> !permittedUserProjects.contains(p)).toList();
+        for (Project project : projectsToRemove) {
+            deleteUserFromProjectWithAdmin(user, project, false);
+        }
+    }
+
+    /**
+     * Additive LTI project membership: any project whose join token appears in the user's {@code lti_join_tokens}
+     * claim (exposed by Keycloak's profile-scope protocol mapper) is granted to the user as a contributor
+     * (non-admin). Unlike {@link #syncProjectMembership} this path never removes memberships - a join token
+     * only ever adds or confirms access, so tokens left behind by past course runs are harmless.
+     */
+    public void syncJoinTokenMembership(User user, List<String> joinTokens) {
+        if (joinTokens == null || joinTokens.isEmpty()) {
+            return;
+        }
+
+        List<Project> tokenProjects = projectRepository.findByJoinTokenIn(joinTokens);
+        if (tokenProjects.isEmpty()) {
+            return;
+        }
+
+        List<Project> actualUserProjects = projectRepository.findAllProjectForUser(user.getUsername());
+        for (Project project : tokenProjects) {
+            if (!actualUserProjects.contains(project)) {
+                addUserToProjectWithAdmin(user.getUsername(), project, false);
+            }
+        }
+    }
+
     private void removeOntologyRightIfNecessary(Project project, long userId, String username, boolean admin) {
         // we remove the right ONLY if user has no other project with this ontology
         UserResponse user = userHttpContract.get(userId).orElseThrow();

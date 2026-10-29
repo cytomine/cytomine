@@ -80,7 +80,7 @@ services:
     environment:
       <<: *version-env
       CORE_URL: http://127.0.0.1:8080/api
-      IAM_URL: http://127.0.0.1:8100/iam/realms/cytomine
+      IAM_URL: http://localhost:8100/iam/realms/cytomine
       PIMS_URL: http://127.0.0.1:5001/ims
       APPENGINE_URL: http://127.0.0.1:8082
       CBIR_URL: http://127.0.0.1:6000
@@ -153,8 +153,8 @@ services:
       KC_DB_URL_PORT: 5432
       KC_DB_USERNAME: iam
       KC_FEATURES: token-exchange
-      KC_HOSTNAME: http://127.0.0.1:8100/iam
-      KC_HOSTNAME_ADMIN: http://127.0.0.1:8100/iam
+      KC_HOSTNAME: http://localhost:8100/iam
+      KC_HOSTNAME_ADMIN: http://localhost:8100/iam
       KC_HOSTNAME_PORT: 8100
       KC_HOSTNAME_STRICT: false
       KC_HOSTNAME_STRICT_BACKCHANNEL: false
@@ -170,9 +170,19 @@ services:
       KC_SMTP_USER: user
       KEYCLOAK_ADMIN: &KEYCLOAK_ADMIN admin
       KEYCLOAK_ADMIN_PASSWORD: &KEYCLOAK_ADMIN_PASSWORD masterpassword
+      KC_LOG_LEVEL: "INFO,org.keycloak.services.managers.AuthenticationSessionManager:DEBUG,org.keycloak.services.resources.IdentityBrokerService:DEBUG"
+      # Instruct Keycloak's outgoing HTTP SPI to permit unproxied internal/loopback connections
+      KC_SPI_CONNECTIONS_HTTP_CLIENT_DEFAULT_NO_PROXY: "localhost,127.0.0.1,host.docker.internal,172.16.238.1,172.16.238.0/24"
+      KC_SPI_CONNECTIONS_HTTP_CLIENT_DEFAULT_DISABLE_TRUST_MANAGER: "true"
+    volumes:
+      # LTI 1.3 identity provider SPI; build with: mvn -q package -f iam/lti-keycloak-idp
+      - ./iam/lti-keycloak-idp/target/lti-identity-provider.jar:/opt/keycloak/providers/lti-identity-provider.jar:ro
     networks:
       host_network:
         ipv4_address: 172.16.238.9
+    extra_hosts:
+      - "host.docker.internal:172.16.238.1"
+      - "localhost:172.16.238.1"
 
   app-engine-db:
     image: *postgres-image
@@ -239,7 +249,7 @@ services:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       IAM_URL: http://iam:8100
-      IAM_EXTERNAL_URL: http://127.0.0.1:8100
+      IAM_EXTERNAL_URL: http://localhost:8100
       SERVER_URL: http://127.0.0.1:8080
       PIMS_URL: http://pims:5000
       CBIR_URL: http://cbir:6000
@@ -314,7 +324,7 @@ services:
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       POSTGIS_HOST: postgis
       IAM_URL: http://iam:8100
-      IAM_EXTERNAL_URL: http://127.0.0.1:8100
+      IAM_EXTERNAL_URL: http://localhost:8100
       KEYCLOAK_ADMIN_PASSWORD: *KEYCLOAK_ADMIN_PASSWORD
       CYTOMINE_ADMIN_PASSWORD: password
     networks:

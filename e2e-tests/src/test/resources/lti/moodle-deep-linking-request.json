@@ -1,0 +1,43 @@
+{
+  "loginInit": {
+    "method": "POST",
+    "alias": "lti-moodle",
+    "iss": "http://moodle.local",
+    "client_id": "moodle-tool-client",
+    "target_link_uri": "{{simulator}}/picker?course_id=course-1",
+    "login_hint": "teacher-1",
+    "lti_deployment_id": "moodle-deployment-1",
+    "lti_message_hint": "LtiDeepLinkingMessage"
+  },
+  "claims": {
+    "iss": "http://moodle.local",
+    "aud": "moodle-tool-client",
+    "sub": "teacher-1",
+    "given_name": "Anne",
+    "family_name": "Instructor",
+    "name": "Anne Instructor",
+    "email": "anne.instructor@moodle.local",
+    "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiDeepLinkingRequest",
+    "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
+    "https://purl.imsglobal.org/spec/lti/claim/deployment_id": "moodle-deployment-1",
+    "https://purl.imsglobal.org/spec/lti/claim/target_link_uri": "{{simulator}}/picker",
+    "https://purl.imsglobal.org/spec/lti/claim/roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"],
+    "https://purl.imsglobal.org/spec/lti/claim/context": {
+      "id": "course-1",
+      "label": "bio-101",
+      "title": "Bio 101"
+    },
+    "https://purl.imsglobal.org/spec/lti/claim/custom": {
+      "quiz_id": "q-7",
+      "cytomine_join_token": "join-token-moodle-project-42"
+    },
+    "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings": {
+      "deep_link_return_url": "{{simulator}}/deep-link-return",
+      "accept_types": ["ltiResourceLink"],
+      "accept_presentation_document_targets": ["frame", "iframe", "window"],
+      "accept_multiple": true,
+      "auto_create": true,
+      "data": "moodle-correlation-data-42"
+    }
+  }
+}

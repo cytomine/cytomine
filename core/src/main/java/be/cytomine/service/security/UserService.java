@@ -105,6 +105,9 @@ import be.cytomine.utils.SQLUtils;
 import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
+import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static be.cytomine.common.repository.model.Role.ROLE_USER;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 
@@ -205,6 +208,42 @@ public class UserService extends ModelService {
     public Optional<UserResponse> findByPublicKey(String publicKey) {
         securityACLService.checkGuest(currentUserService.getCurrentUser());
         return userRepository.findByPublicKey(publicKey).map(userMapper::map);
+    }
+
+    /** User whose {@code reference} stores the identity provider subject ({@code sub}) claim. */
+    public Optional<User> findUserByReference(String reference) {
+        return userRepository.findByReference(reference);
+    }
+
+    /** User with the exact username, empty when no such user exists. */
+    public Optional<User> findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    /** Plain persistence of already-staged user attributes, without command history. */
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    /**
+     * Replaces every role currently granted to the user by the single cumulative role matching the source
+     * authentication authorities (ADMIN beats USER beats GUEST). Used for token-authenticated users whose
+     * managed roles are owned by the identity provider, not by Cytomine.
+     */
+    public void syncCumulativeRole(User user, Set<String> rolesFromAuthentication) {
+        secSecUserSecRoleRepository.deleteAllByIdInBatch(
+            secSecUserSecRoleRepository.findAllBySecUser(user).stream().map(SecUserSecRole::getId).toList());
+        secSecUserSecRoleRepository.flush();
+        SecUserSecRole cumulativeRole = new SecUserSecRole();
+        if (rolesFromAuthentication.contains(ROLE_ADMIN.toString())) {
+            cumulativeRole.setSecRole(secRoleRepository.getByAuthority(ROLE_ADMIN.toString()));
+        } else if (rolesFromAuthentication.contains(ROLE_USER.toString())) {
+            cumulativeRole.setSecRole(secRoleRepository.getByAuthority(ROLE_USER.toString()));
+        } else {
+            cumulativeRole.setSecRole(secRoleRepository.getByAuthority(ROLE_GUEST.toString()));
+        }
+        cumulativeRole.setSecUser(user);
+        secSecUserSecRoleRepository.save(cumulativeRole);
     }
 
     public AuthInformation getAuthenticationRoles(UserResponse user) {

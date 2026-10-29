@@ -24,12 +24,14 @@ import java.util.Map;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityProviderConfig> {
 
@@ -76,6 +78,8 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     static final String DL_CTX_CLIENT_ID = "clientId";
     static final String DL_CTX_DEPLOYMENT_ID = "deploymentId";
     static final String DL_CTX_SUB = "sub";
+    // Comma-separated copy of deep_linking_settings.accept_presentation_document_targets (e.g. "iframe,window").
+    static final String DL_CTX_PRESENTATION_TARGETS = "presentationTargets";
 
     // Clock-skew tolerance applied to both directions of the exp/iat window.
     private static final long CLOCK_SKEW_LEEWAY_SECONDS = 60;
@@ -338,6 +342,14 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             }
             if (subject != null) {
                 returnCtx.put(DL_CTX_SUB, subject);
+            }
+            // Remember which presentation targets the platform accepts, so the content item we return only asks
+            // for a new window when the platform supports it.
+            if (dlSettings.get("accept_presentation_document_targets") instanceof Collection<?> targets
+                && !targets.isEmpty()) {
+                returnCtx.put(DL_CTX_PRESENTATION_TARGETS, targets.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(",")));
             }
 
             String ctxToken = UUID.randomUUID().toString();

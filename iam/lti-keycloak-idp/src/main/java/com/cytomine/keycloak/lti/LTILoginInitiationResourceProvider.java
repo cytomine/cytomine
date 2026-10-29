@@ -22,6 +22,7 @@ import org.keycloak.util.JsonSerialization;
 
 import java.security.PrivateKey;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +38,11 @@ public class LTILoginInitiationResourceProvider implements RealmResourceProvider
     private static final String CLAIM_VERSION = "https://purl.imsglobal.org/spec/lti/claim/version";
     private static final String CLAIM_DEPLOYMENT_ID = "https://purl.imsglobal.org/spec/lti/claim/deployment_id";
     private static final String CLAIM_CONTENT_ITEMS = "https://purl.imsglobal.org/spec/lti-dl/claim/content_items";
-    private static final String CLAIM_DEEP_LINKING_SETTINGS =
-        "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings";
+    private static final String CLAIM_DL_DATA = "https://purl.imsglobal.org/spec/lti-dl/claim/data";
+    // Window name used for the content item's "window" presentation: each link opens in a new browser tab.
+    // The Cytomine viewer needs the full page, and running outside the LMS iframe avoids third-party cookie
+    // restrictions on the Keycloak/Cytomine session.
+    private static final String NEW_WINDOW_TARGET = "_blank";
 
     private final KeycloakSession session;
 
@@ -218,14 +222,11 @@ public class LTILoginInitiationResourceProvider implements RealmResourceProvider
             contentItem.put("text", text);
         }
         contentItem.put("url", url);
+        if (platformAcceptsWindow(returnCtx)) {
+            contentItem.put("window", Map.of("targetName", NEW_WINDOW_TARGET));
+        }
         if (!custom.isEmpty()) {
             contentItem.put("custom", custom);
-        }
-
-        // Echo the platform's opaque `data` value back so Moodle can correlate the response with the request.
-        Map<String, Object> deepLinkingSettings = new LinkedHashMap<>();
-        if (returnCtx.get(LTIIdentityProvider.DL_CTX_DATA) != null) {
-            deepLinkingSettings.put("data", returnCtx.get(LTIIdentityProvider.DL_CTX_DATA));
         }
 
         long now = Instant.now().getEpochSecond();
@@ -240,7 +241,13 @@ public class LTILoginInitiationResourceProvider implements RealmResourceProvider
         payload.put(CLAIM_MESSAGE_TYPE, "LtiDeepLinkingResponse");
         payload.put(CLAIM_VERSION, "1.3.0");
         payload.put(CLAIM_CONTENT_ITEMS, List.of(contentItem));
-        payload.put(CLAIM_DEEP_LINKING_SETTINGS, deepLinkingSettings);
+        // LTI Deep Linking 2.0: the `data` value received in the request's deep_linking_settings must be echoed
+        // back unchanged as the top-level https://purl.imsglobal.org/spec/lti-dl/claim/data claim (required when
+        // present in the request). Blackboard uses it to find the course, insertion point and placement.
+        String dlData = returnCtx.get(LTIIdentityProvider.DL_CTX_DATA);
+        if (dlData != null) {
+            payload.put(CLAIM_DL_DATA, dlData);
+        }
 
         try {
             return new JWSBuilder().kid(signingKey.getKid())
@@ -249,6 +256,18 @@ public class LTILoginInitiationResourceProvider implements RealmResourceProvider
         } catch (Exception e) {
             throw new IllegalStateException("Failed to sign the LtiDeepLinkingResponse JWT", e);
         }
+    }
+
+    /**
+     * True when the platform listed "window" in deep_linking_settings.accept_presentation_document_targets, or
+     * did not send that list at all (it is required by the spec, so an absent list is treated permissively).
+     */
+    private static boolean platformAcceptsWindow(Map<String, String> returnCtx) {
+        String targets = returnCtx.get(LTIIdentityProvider.DL_CTX_PRESENTATION_TARGETS);
+        if (targets == null || targets.isBlank()) {
+            return true;
+        }
+        return Arrays.stream(targets.split(",")).map(String::trim).anyMatch("window"::equals);
     }
 
     @SuppressWarnings("unchecked")

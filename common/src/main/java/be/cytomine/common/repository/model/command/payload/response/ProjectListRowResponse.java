@@ -14,7 +14,6 @@ public record ProjectListRowResponse(
     long numberOfSlides,
     long numberOfImages,
     long numberOfAnnotations,
-    long numberOfJobAnnotations,
     long numberOfReviewedAnnotations,
     boolean isClosed,
     boolean isReadOnly,

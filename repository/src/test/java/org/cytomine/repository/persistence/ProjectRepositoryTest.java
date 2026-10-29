@@ -152,7 +152,7 @@ class ProjectRepositoryTest {
 
         Page<ProjectListRow> page = findAllUnfiltered(userId, PageRequest.of(0, 10));
 
-        assertEquals(List.of(new ProjectListRow(id, "test1", null, null, false, false, 0, 4, 3, 0, 0, false, true,
+        assertEquals(List.of(new ProjectListRow(id, "test1", null, null, false, false, 0, 4, 3, 0, false, true,
             false, false, false, created, updated.toLocalDateTime(), 0, lastActivity(id))), page.getContent());
     }
 
@@ -165,7 +165,7 @@ class ProjectRepositoryTest {
         LocalDateTime createdOther = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         insertProject("other-project", 1, 0, "CLASSIC", createdOther, null);
         ProjectListRow searchableRow = new ProjectListRow(searchableId, "searchable-project", null, null, false,
-            false, 0, 4, 3, 0, 0, false, true, false, false, false, createdSearchable, null, 1, null);
+            false, 0, 4, 3, 0, false, true, false, false, false, createdSearchable, null, 1, null);
 
         Page<ProjectListRow> page = projectRepository.findAllReadableByUser(userId, PageRequest.of(0, 10), Set.of(),
             Set.of(), Set.of(), "SEARCHABLE", null, null, null, null, null, null, null, null);
@@ -188,9 +188,9 @@ class ProjectRepositoryTest {
         Page<ProjectListRow> page = projectRepository.findAllReadableByUser(userId, PageRequest.of(0, 10), Set.of(),
             Set.of(), Set.of(), null, null, null, null, null, null, null, null, null);
         assertEquals(List.of(
-            new ProjectListRow(searchableId, "searchable-project", null, null, false, false, 0, 4, 3, 0, 0, false,
+            new ProjectListRow(searchableId, "searchable-project", null, null, false, false, 0, 4, 3, 0, false,
                 true, false, false, false, createdSearchable, null, 1, null),
-            new ProjectListRow(otherId, "other-project", null, null, false, false, 0, 1, 0, 0, 0, false, false,
+            new ProjectListRow(otherId, "other-project", null, null, false, false, 0, 1, 0, 0, false, false,
                 false, false, false, createdOther, null, 0, null)), page.getContent());
     }
 
@@ -202,14 +202,13 @@ class ProjectRepositoryTest {
 
         Page<ProjectListRow> page = findAllUnfiltered(userId, PageRequest.of(0, 10));
 
-        assertEquals(List.of(new ProjectListRow(id, "test2", null, null, false, false, 0, 0, 0, 0, 0, false, false,
+        assertEquals(List.of(new ProjectListRow(id, "test2", null, null, false, false, 0, 0, 0, 0, false, false,
             false, false, false, created, null, 0, null)), page.getContent());
     }
 
     @Test
     void computesMembershipFields() {
         Long userId = insertAdminUser("test-admin");
-        Long anotherId = insertUser("test-another");
         LocalDateTime created3 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Long test3Id =
             insertProjectWithMembership("test3", 1, 2, "CLASSIC", created3, null, "test-admin", true, true);
@@ -220,9 +219,9 @@ class ProjectRepositoryTest {
         Page<ProjectListRow> page = findAllUnfiltered(userId, PageRequest.of(0, 10));
 
         assertEquals(List.of(
-            new ProjectListRow(test3Id, "test3", null, null, false, false, 0, 1, 2, 0, 0, false, false, false, false,
+            new ProjectListRow(test3Id, "test3", null, null, false, false, 0, 1, 2, 0, false, false, false, false,
                 false, created3, null, 1, null),
-            new ProjectListRow(test4Id, "test4", null, null, false, false, 0, 1, 2, 0, 0, false, false, false, false,
+            new ProjectListRow(test4Id, "test4", null, null, false, false, 0, 1, 2, 0, false, false, false, false,
                 false, created4, null, 1, null)), page.getContent());
     }
 
@@ -236,9 +235,9 @@ class ProjectRepositoryTest {
         Long testBId = insertProject("test-b", 9, 1, "CLASSIC", createdB, null);
         insertCommandHistory(testAId, userId, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
 
-        ProjectListRow rowA = new ProjectListRow(testAId, "test-a", null, null, false, false, 0, 4, 3, 0, 0, false,
+        ProjectListRow rowA = new ProjectListRow(testAId, "test-a", null, null, false, false, 0, 4, 3, 0, false,
             false, false, false, false, createdA, null, 1, lastActivity(testAId));
-        ProjectListRow rowB = new ProjectListRow(testBId, "test-b", null, null, false, false, 0, 9, 1, 0, 0, false,
+        ProjectListRow rowB = new ProjectListRow(testBId, "test-b", null, null, false, false, 0, 9, 1, 0, false,
             false, false, false, false, createdB, null, 0, null);
 
         Page<ProjectListRow> descImages =

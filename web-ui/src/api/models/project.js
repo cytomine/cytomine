@@ -2,7 +2,7 @@ import Cytomine from '../cytomine.js';
 import Model from './model.js';
 import User from './user.js';
 import UserCollection from '../collections/user-collection.js';
-import { AnnotationType } from './annotation.js';
+import {AnnotationType} from './annotation.js';
 
 /** Enum providing the project member roles handled in Cytomine */
 export const ProjectMemberRole = Object.freeze({
@@ -28,7 +28,6 @@ export default class Project extends Model {
     this.numberOfSlides = null;
     this.numberOfImages = null;
     this.numberOfAnnotations = null;
-    this.numberOfJobAnnotations = null;
     this.numberOfReviewedAnnotations = null;
 
     this.retrievalDisable = null;

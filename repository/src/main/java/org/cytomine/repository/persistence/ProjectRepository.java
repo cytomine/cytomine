@@ -114,7 +114,6 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
                0::bigint,
                p.count_images,
                p.count_annotations,
-               p.count_job_annotations,
                p.count_reviewed_annotations,
                p.is_closed,
                (p.mode = 'READ_ONLY'),

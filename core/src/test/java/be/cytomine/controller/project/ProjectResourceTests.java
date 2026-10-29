@@ -170,8 +170,8 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         when(projectHttpContract.listFiltered(any(Pageable.class), any())).thenReturn(
             new ProjectListFilteredResponse(new PageImpl<>(List.of(toListResponse(project))),
-                new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(),
-                    Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty())));
+                new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(), Optional.empty(),
+                    Optional.empty(), Optional.empty(), Optional.empty())));
 
         restProjectControllerMockMvc.perform(post("/api/projects/search")).andExpect(status().isOk())
             .andExpect(jsonPath("$.collection", hasSize(greaterThan(0))))
@@ -188,8 +188,8 @@ public class ProjectResourceTests {
         Project project = builder.givenAProject();
         when(projectHttpContract.listFiltered(any(Pageable.class), any())).thenReturn(
             new ProjectListFilteredResponse(new PageImpl<>(List.of(toListResponse(project))),
-                new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(),
-                    Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty())));
+                new ProjectListAvailableFiltersPayload(Set.of(), Set.of(), Set.of(), Optional.empty(), Optional.empty(),
+                    Optional.empty(), Optional.empty(), Optional.empty())));
 
         restProjectControllerMockMvc.perform(
                 post("/api/projects/search").param("page", "1").param("size", "10").param("sort", "count_images,desc"))
@@ -319,9 +319,8 @@ public class ProjectResourceTests {
         return new ProjectListRowResponse(project.getId(), project.getName(), maybeOntology.map(Ontology::getId),
             maybeOntology.map(Ontology::getName), project.getBlindMode() != null && project.getBlindMode(),
             project.getAreImagesDownloadable() != null && project.getAreImagesDownloadable(), 0,
-            project.getCountImages(), project.getCountAnnotations(), project.getCountJobAnnotations(),
-            project.getCountReviewedAnnotations(), project.isClosed(),
-            project.getMode() != null && project.getMode().name().equals("READ_ONLY"),
+            project.getCountImages(), project.getCountAnnotations(), project.getCountReviewedAnnotations(),
+            project.isClosed(), project.getMode() != null && project.getMode().name().equals("READ_ONLY"),
             project.getMode() != null && project.getMode().name().equals("RESTRICTED"), project.isHideUsersLayers(),
             project.isHideAdminsLayers(), LocalDateTime.now(), Optional.empty(), 3, Set.of("admin", "representative"),
             Optional.of(1234L));
@@ -525,7 +524,6 @@ public class ProjectResourceTests {
     @Test
     @jakarta.transaction.Transactional
     public void getProjectBounds() throws Exception {
-        Date start = DateUtils.addSeconds(new Date(), -5);
         Project project = builder.givenAProject();
         project.setName("0001");
         project.setCountImages(10);

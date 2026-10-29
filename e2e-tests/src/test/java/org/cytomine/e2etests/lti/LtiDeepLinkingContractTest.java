@@ -8,6 +8,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 import com.nimbusds.jose.crypto.RSASSAVerifier;
@@ -46,6 +47,9 @@ class LtiDeepLinkingContractTest {
     private static final String CLAIM_MESSAGE_TYPE = LTI_NAMESPACE + "message_type";
     private static final String CLAIM_VERSION = LTI_NAMESPACE + "version";
     private static final String CLAIM_DEPLOYMENT_ID = LTI_NAMESPACE + "deployment_id";
+    private static final String CLAIM_ROLES = LTI_NAMESPACE + "roles";
+    private static final String CLAIM_CUSTOM = LTI_NAMESPACE + "custom";
+    private static final String LTI_ROLES_URI_PREFIX = "http://purl.imsglobal.org/vocab/lis/v2/membership#";
     private static final String CLAIM_DEEP_LINKING_SETTINGS = DL_NAMESPACE + "deep_linking_settings";
     private static final String CLAIM_CONTENT_ITEMS = DL_NAMESPACE + "content_items";
     private static final String CLAIM_DATA = DL_NAMESPACE + "data";
@@ -57,6 +61,7 @@ class LtiDeepLinkingContractTest {
     private static final Map<String, Object> ITEM_CUSTOM_MAP = Map.of("cytomine_project_id", "42");
 
     private static final LtiPlatformSimulator PLATFORM = new LtiPlatformSimulator();
+    private static final LtiRealmSeeder SEEDER = new LtiRealmSeeder();
 
     /**
      * Flow clients carry the browser cookies of one LMS session, so every test gets a fresh
@@ -70,13 +75,13 @@ class LtiDeepLinkingContractTest {
     static void startEnvironment() {
         Assumptions.assumeTrue(iamIsReachable(), "IAM service is not reachable - skipping LTI contract tests");
         PLATFORM.start();
-        new LtiRealmSeeder().seed();
+        SEEDER.seed();
     }
 
     @AfterAll
     static void stopEnvironment() {
         PLATFORM.stop();
-        new LtiRealmSeeder().dropRealm();
+        SEEDER.dropRealm();
     }
 
     @Test
@@ -88,6 +93,7 @@ class LtiDeepLinkingContractTest {
         assertEquals("moodle-correlation-data-42", response.get(CLAIM_DATA));
         assertEquals("moodle-deployment-1", response.get(CLAIM_DEPLOYMENT_ID));
         assertEquals("teacher-1", response.get("sub"));
+        assertProvisionedUser("anne.instructor@moodle.local", "USER", "join-token-moodle-project-42");
     }
 
     @Test
@@ -99,6 +105,7 @@ class LtiDeepLinkingContractTest {
         assertEquals("bb-opaque-placement-data", response.get(CLAIM_DATA));
         assertEquals("bb-deployment-1", response.get(CLAIM_DEPLOYMENT_ID));
         assertEquals("bb-user-2", response.get("sub"));
+        assertProvisionedUser("bob.teacher@blackboard.test", "USER", "join-token-bb-project-7");
     }
 
     @Test
@@ -145,6 +152,63 @@ class LtiDeepLinkingContractTest {
         flowBrowser.submitSelection(picker.ctxToken(), ITEM_URL, ITEM_TITLE, ITEM_TEXT, ITEM_CUSTOM);
         assertEquals(400, flowBrowser.replaySelection(picker.ctxToken()),
             "an already-consumed context token must be rejected");
+    }
+
+    @Test
+    void learnerLaunchGrantsOnlyTheGuestCoreRole() {
+        UnaryOperator<Map<String, Object>> variant = claims -> {
+            claims.put("sub", "student-2");
+            claims.put("email", "student2@moodle.local");
+            claims.put("name", "Stella Student");
+            claims.put(CLAIM_ROLES, List.of(LTI_ROLES_URI_PREFIX + "Student"));
+            claims.put(CLAIM_CUSTOM, Map.of("cytomine_join_token", "join-token-student-9"));
+            return claims;
+        };
+        Map<String, Object> response = selectAndVerifyConsistentResponse(LtiFixture.load("moodle"), variant);
+        assertSelection(response, true);
+        assertProvisionedUser("student2@moodle.local", "GUEST", "join-token-student-9");
+    }
+
+    @Test
+    void repeatedLaunchesMergeFurtherMembershipTokensIntoTheUserAttribute() {
+        UnaryOperator<Map<String, Object>> firstLaunch = claims -> {
+            claims.put("sub", "student-3");
+            claims.put("email", "student3@moodle.local");
+            claims.put("name", "Sam Student");
+            claims.put(CLAIM_ROLES, List.of(LTI_ROLES_URI_PREFIX + "Learner"));
+            claims.put(CLAIM_CUSTOM, Map.of("cytomine_join_token", "join-token-course-a"));
+            return claims;
+        };
+        selectAndVerifyConsistentResponse(LtiFixture.load("moodle"), firstLaunch);
+
+        UnaryOperator<Map<String, Object>> secondLaunch = claims -> {
+            claims.put("sub", "student-3");
+            claims.put("email", "student3@moodle.local");
+            claims.put(CLAIM_ROLES, List.of(LTI_ROLES_URI_PREFIX + "Learner"));
+            claims.put(CLAIM_CUSTOM, Map.of("cytomine_join_token", "join-token-course-b"));
+            return claims;
+        };
+        selectAndVerifyConsistentResponse(LtiFixture.load("moodle"), secondLaunch);
+
+        List<String> tokens = SEEDER.attribute("student3@moodle.local", LtiRealmSeeder.JOIN_TOKEN_ATTRIBUTE);
+        assertEquals(List.of("join-token-course-a", "join-token-course-b"), tokens,
+            "membership tokens from repeated launches must merge, never replace");
+        assertEquals(Set.of("GUEST"), SEEDER.coreRoleNames("student3@moodle.local"));
+    }
+
+    /**
+     * Asserts the effects of the two seeded identity provider mappers on the Keycloak user that the
+     * first-broker-login flow provisioned: the {@code LTI Core Roles} mapper grants exactly the mapped
+     * client role on the Cytomine "core" client, and the {@code LTI Project Membership} mapper merged
+     * the launch's {@code cytomine_join_token} custom parameter into the {@code lti_join_tokens} attribute.
+     */
+    private static void assertProvisionedUser(String username, String expectedCoreRole, String expectedToken) {
+        assertTrue(SEEDER.userExists(username),
+            "the broker first-login flow must provision the Keycloak user " + username);
+        assertEquals(Set.of(expectedCoreRole), SEEDER.coreRoleNames(username),
+            "the LTI Core Roles mapper must grant exactly the expected core client role");
+        assertEquals(List.of(expectedToken), SEEDER.attribute(username, LtiRealmSeeder.JOIN_TOKEN_ATTRIBUTE),
+            "the LTI Project Membership mapper must merge the launch join token");
     }
 
     private static Map<String, Object> selectAndVerifyConsistentResponse(LtiFixture fixture,

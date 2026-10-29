@@ -2,24 +2,37 @@ package org.cytomine.e2etests.lti;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.representations.idm.ClientMappingsRepresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
+import org.keycloak.representations.idm.IdentityProviderMapperRepresentation;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
+import org.keycloak.representations.idm.MappingsRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 
 /**
- * Creates (and removes) the dedicated {@link LtiSettings#REALM} Keycloak realm with the tool client
- * and the LTI 1.3 identity providers matching the fixtures, once per test class run. Only the IAM
- * master admin API is used; the rest of the Cytomine stack is not touched.
+ * Creates (and removes) the dedicated {@link LtiSettings#REALM} Keycloak realm with the tool client,
+ * the Cytomine-managed "core" client with its ADMIN/USER/GUEST client roles, and one LTI 1.3 identity
+ * provider per platform fixture - each carrying the {@code LTI Core Roles} mapper and the
+ * {@code LTI Project Membership} mapper exactly as documented in the admin guide.
+ *
+ * <p>Only the IAM master admin API is used; the rest of the Cytomine stack is not touched.</p>
  */
 final class LtiRealmSeeder {
 
     static final String TOOL_CLIENT_ID = "lti-tool";
+    static final String CORE_CLIENT_ID = "core";
+    static final List<String> MANAGED_ROLES = List.of("ADMIN", "USER", "GUEST");
+    static final String JOIN_TOKEN_ATTRIBUTE = "lti_join_tokens";
 
     private final Keycloak admin;
 
@@ -42,6 +55,7 @@ final class LtiRealmSeeder {
         realm.setSslRequired("NONE");
         admin.realms().create(realm);
         createToolClient(LtiSettings.SIMULATOR_PORT);
+        createCoreClientWithManagedRoles();
         seedIdentityProvider(LtiFixture.load("moodle"));
         seedIdentityProvider(LtiFixture.load("blackboard"));
     }
@@ -67,6 +81,26 @@ final class LtiRealmSeeder {
         admin.realms().realm(LtiSettings.REALM).clients().create(client);
     }
 
+    /**
+     * The Cytomine "core" client owns the ADMIN/USER/GUEST client roles the LTI Core Roles mapper
+     * assigns. Without this client (with its roles) the mapper skips role assignment with a warning.
+     */
+    private void createCoreClientWithManagedRoles() {
+        ClientRepresentation core = new ClientRepresentation();
+        core.setClientId(CORE_CLIENT_ID);
+        core.setEnabled(true);
+        admin.realms().realm(LtiSettings.REALM).clients().create(core);
+        for (String roleName : MANAGED_ROLES) {
+            RoleRepresentation role = new RoleRepresentation();
+            role.setName(roleName);
+            admin.realms().realm(LtiSettings.REALM).clients().get(coreClientId()).roles().create(role);
+        }
+    }
+
+    private String coreClientId() {
+        return admin.realms().realm(LtiSettings.REALM).clients().findByClientId(CORE_CLIENT_ID).get(0).getId();
+    }
+
     private void seedIdentityProvider(LtiFixture fixture) {
         IdentityProviderRepresentation identityProvider = new IdentityProviderRepresentation();
         identityProvider.setAlias(fixture.alias());
@@ -82,5 +116,68 @@ final class LtiRealmSeeder {
             Map.entry("platformJwksUrl", LtiSettings.simulatorBase() + "/jwks"),
             Map.entry("contentSelectionUrl", LtiSettings.simulatorBase() + "/picker")));
         admin.realms().realm(LtiSettings.REALM).identityProviders().create(identityProvider);
+        addCoreRolesMapper(fixture.alias());
+        addProjectMembershipMapper(fixture.alias());
+    }
+
+    private void addCoreRolesMapper(String alias) {
+        IdentityProviderMapperRepresentation mapper = new IdentityProviderMapperRepresentation();
+        mapper.setName("lti-core-roles");
+        mapper.setIdentityProviderAlias(alias);
+        mapper.setIdentityProviderMapper("lti-core-role-mapper");
+        mapper.setConfig(Map.ofEntries(
+            Map.entry("adminRoleUris", ""),
+            Map.entry("userRoleUris", "Instructor,TeachingAssistant"),
+            Map.entry("guestRoleUris", "Student,Learner")));
+        admin.realms().realm(LtiSettings.REALM).identityProviders().get(alias).addMapper(mapper);
+    }
+
+    private void addProjectMembershipMapper(String alias) {
+        IdentityProviderMapperRepresentation mapper = new IdentityProviderMapperRepresentation();
+        mapper.setName("lti-project-membership");
+        mapper.setIdentityProviderAlias(alias);
+        mapper.setIdentityProviderMapper("lti-project-membership-mapper");
+        mapper.setConfig(Map.ofEntries(
+            Map.entry("customTokenKey", "cytomine_join_token"),
+            Map.entry("targetAttribute", JOIN_TOKEN_ATTRIBUTE)));
+        admin.realms().realm(LtiSettings.REALM).identityProviders().get(alias).addMapper(mapper);
+    }
+
+    boolean userExists(String username) {
+        return provisionedUser(username) != null;
+    }
+
+    /** Names of the client roles the provisioned user holds on the Cytomine "core" client. */
+    Set<String> coreRoleNames(String username) {
+        UserRepresentation user = provisionedUser(username);
+        if (user == null) {
+            return Set.of();
+        }
+        MappingsRepresentation mappings =
+            admin.realms().realm(LtiSettings.REALM).users().get(user.getId()).roles().getAll();
+        if (mappings.getClientMappings() == null || mappings.getClientMappings().get(CORE_CLIENT_ID) == null) {
+            return Set.of();
+        }
+        ClientMappingsRepresentation coreMappings = mappings.getClientMappings().get(CORE_CLIENT_ID);
+        return coreMappings.getMappings().stream()
+            .map(RoleRepresentation::getName)
+            .collect(Collectors.toSet());
+    }
+
+    /** Values of a (possibly multivalued) user attribute, empty when the user or attribute is absent. */
+    List<String> attribute(String username, String attributeName) {
+        UserRepresentation user = provisionedUser(username);
+        if (user == null || user.getAttributes() == null) {
+            return List.of();
+        }
+        List<String> values = user.getAttributes().get(attributeName);
+        return values == null ? List.of() : values;
+    }
+
+    private UserRepresentation provisionedUser(String username) {
+        return admin.realms().realm(LtiSettings.REALM).users().search(username, 0, 5).stream()
+            .filter(user -> username.equals(user.getUsername()))
+            .findFirst()
+            .orElse(null);
     }
 }

@@ -21,6 +21,9 @@
     "https://purl.imsglobal.org/spec/lti/claim/deployment_id": "bb-deployment-1",
     "https://purl.imsglobal.org/spec/lti/claim/target_link_uri": "{{simulator}}/picker",
     "https://purl.imsglobal.org/spec/lti/claim/roles": ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"],
+    "https://purl.imsglobal.org/spec/lti/claim/custom": {
+      "cytomine_join_token": "join-token-bb-project-7"
+    },
     "https://purl.imsglobal.org/spec/lti/claim/context": {
       "id": "course.externalId:bio-101",
       "label": "bio-101",

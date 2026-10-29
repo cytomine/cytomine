@@ -28,7 +28,8 @@
       "title": "Bio 101"
     },
     "https://purl.imsglobal.org/spec/lti/claim/custom": {
-      "quiz_id": "q-7"
+      "quiz_id": "q-7",
+      "cytomine_join_token": "join-token-moodle-project-42"
     },
     "https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings": {
       "deep_link_return_url": "{{simulator}}/deep-link-return",

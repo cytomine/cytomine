@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -127,5 +129,34 @@ public class ImageFormatTest {
         }
         File image = images.get(formatKey);
         Assertions.assertTrue(format.validate(image), "Validation should return true.");
+    }
+
+    @Test
+    public void testValidateWithoutFileExtension(@TempDir Path tempDir) throws IOException {
+        // task run inputs are streamed to storage under the parameter name, without extension
+        File withoutExtension = tempDir.resolve("a_fixed_image").toFile();
+        Files.copy(Path.of("src/test/resources/artifacts/images/image.tif"), withoutExtension.toPath());
+
+        TiffFormat format = new TiffFormat();
+
+        Assertions.assertTrue(format.validate(withoutExtension), "Validation should only rely on the file content.");
+        Dimension dimension = format.getDimensions(withoutExtension);
+        Assertions.assertEquals(EXPECTED_WIDTH, dimension.getWidth(), "Width should be " + EXPECTED_WIDTH + " pixels.");
+        Assertions.assertEquals(EXPECTED_HEIGHT, dimension.getHeight(), "Height should be " + EXPECTED_HEIGHT + " pixels.");
+    }
+
+    @Test
+    public void testValidateTiffWithoutSamplesPerPixel(@TempDir Path tempDir) throws IOException {
+        // streamed under the parameter name, without extension, like task run inputs
+        File withoutExtension = tempDir.resolve("a_fixed_image").toFile();
+        Files.copy(
+            Path.of("src/test/resources/artifacts/images/image-no-samples-per-pixel.tif"),
+            withoutExtension.toPath()
+        );
+
+        TiffFormat format = new TiffFormat();
+
+        // must not throw a NullPointerException when the SamplesPerPixel field is absent
+        Assertions.assertFalse(format.validate(withoutExtension), "Validation should return false.");
     }
 }

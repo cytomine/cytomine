@@ -1,4 +1,4 @@
-package be.cytomine.config;
+package be.cytomine.common.keycloak;
 
 import org.keycloak.admin.client.Keycloak;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,11 +22,11 @@ public class KeyCloakConfiguration {
     @Bean
     Keycloak keycloak() {
         return Keycloak.getInstance(
-                url,
-                realm,
-                user,
-                password,
-                clientId);
+            url,
+            realm,
+            user,
+            password,
+            clientId);
     }
 
 }

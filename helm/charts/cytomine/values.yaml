@@ -103,7 +103,7 @@ images:
   pims_cache: redis:7
   redis: redis:7
   meilisearch: getmeili/meilisearch:v1.43.0
-  iam: keycloak/keycloak:26.3
+  iam: keycloak/keycloak:26.8
   e2e_tests: cytomine/e2e-tests:latest
   selenium: selenium/standalone-firefox
   pullPolicy: Always

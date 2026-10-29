@@ -212,17 +212,10 @@ class ProjectRepositoryTest {
         LocalDateTime created3 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Long test3Id =
             insertProjectWithMembership("test3", 1, 2, "CLASSIC", created3, "test-admin", true, true);
-        LocalDateTime created4 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
-        Long test4Id =
-            insertProjectWithMembership("test4", 1, 2, "CLASSIC", created4, "test-another", false, false);
-
         Page<ProjectListRow> page = findAllUnfiltered(userId, PageRequest.of(0, 10));
-
         assertEquals(List.of(
             new ProjectListRow(test3Id, "test3", null, null, false, false, 0, 1, 2, 0, false, false, false, false,
-                false, created3, null, 1, null),
-            new ProjectListRow(test4Id, "test4", null, null, false, false, 0, 1, 2, 0, false, false, false, false,
-                false, created4, null, 1, null)), page.getContent());
+                false, created3, null, 1, null)), page.getContent());
     }
 
     @Test

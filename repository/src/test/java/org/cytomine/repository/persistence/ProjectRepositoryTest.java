@@ -63,8 +63,8 @@ class ProjectRepositoryTest {
      * A granting mask of 16 makes the user admin of the project.
      */
     Long insertProjectWithMembership(String name, long countImages, long countAnnotations, String mode,
-        LocalDateTime created, Timestamp updated, String username, boolean adminMask, boolean representative) {
-        Long projectId = insertProject(name, countImages, countAnnotations, mode, created, updated);
+        LocalDateTime created, String username, boolean adminMask, boolean representative) {
+        Long projectId = insertProject(name, countImages, countAnnotations, mode, created, null);
         Long aclClassId = aclClassId();
         Long aoiId = jdbcTemplate.queryForObject("""
             INSERT INTO acl_object_identity (id, object_id_class, entries_inheriting, object_id_identity)
@@ -161,7 +161,7 @@ class ProjectRepositoryTest {
         Long userId = insertAdminUser("test-user1");
         LocalDateTime createdSearchable = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Long searchableId = insertProjectWithMembership("searchable-project", 4, 3, "READ_ONLY", createdSearchable,
-            null, "test-user1", true, false);
+            "test-user1", true, false);
         LocalDateTime createdOther = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         insertProject("other-project", 1, 0, "CLASSIC", createdOther, null);
         ProjectListRow searchableRow = new ProjectListRow(searchableId, "searchable-project", null, null, false,
@@ -181,7 +181,7 @@ class ProjectRepositoryTest {
         Long userId = insertAdminUser("test-user1");
         LocalDateTime createdSearchable = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Long searchableId = insertProjectWithMembership("searchable-project", 4, 3, "READ_ONLY", createdSearchable,
-            null, "test-user1", true, false);
+            "test-user1", true, false);
         LocalDateTime createdOther = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Long otherId = insertProject("other-project", 1, 0, "CLASSIC", createdOther, null);
 
@@ -211,10 +211,10 @@ class ProjectRepositoryTest {
         Long userId = insertAdminUser("test-admin");
         LocalDateTime created3 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Long test3Id =
-            insertProjectWithMembership("test3", 1, 2, "CLASSIC", created3, null, "test-admin", true, true);
+            insertProjectWithMembership("test3", 1, 2, "CLASSIC", created3, "test-admin", true, true);
         LocalDateTime created4 = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Long test4Id =
-            insertProjectWithMembership("test4", 1, 2, "CLASSIC", created4, null, "test-another", false, false);
+            insertProjectWithMembership("test4", 1, 2, "CLASSIC", created4, "test-another", false, false);
 
         Page<ProjectListRow> page = findAllUnfiltered(userId, PageRequest.of(0, 10));
 
@@ -230,7 +230,7 @@ class ProjectRepositoryTest {
         Long userId = insertAdminUser("test-user2");
         LocalDateTime createdA = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS).minusHours(1);
         Long testAId =
-            insertProjectWithMembership("test-a", 4, 3, "CLASSIC", createdA, null, "test-user2", true, true);
+            insertProjectWithMembership("test-a", 4, 3, "CLASSIC", createdA, "test-user2", true, true);
         LocalDateTime createdB = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
         Long testBId = insertProject("test-b", 9, 1, "CLASSIC", createdB, null);
         insertCommandHistory(testAId, userId, LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));

@@ -1,20 +1,20 @@
-import Cytomine from "../cytomine.js";
-import Model from "./model.js";
-import User from "./user.js";
-import UserCollection from "../collections/user-collection.js";
-import { AnnotationType } from "./annotation.js";
+import Cytomine from '../cytomine.js';
+import Model from './model.js';
+import User from './user.js';
+import UserCollection from '../collections/user-collection.js';
+import {AnnotationType} from './annotation.js';
 
 /** Enum providing the project member roles handled in Cytomine */
 export const ProjectMemberRole = Object.freeze({
-  CONTRIBUTOR: "contributor",
-  MANAGER: "manager",
-  REPRESENTATIVE: "representative",
+  CONTRIBUTOR: 'contributor',
+  MANAGER: 'manager',
+  REPRESENTATIVE: 'representative'
 });
 
 export default class Project extends Model {
   /** @inheritdoc */
   static get callbackIdentifier() {
-    return "project";
+    return 'project';
   }
 
   /** @inheritdoc */
@@ -55,13 +55,11 @@ export default class Project extends Model {
    */
   async fetchCreator() {
     if (this.isNew()) {
-      throw new Error("Cannot get creator of a project with no ID.");
+      throw new Error('Cannot get creator of a project with no ID.');
     }
 
     if (!this._creator) {
-      let { data } = await Cytomine.instance.api.get(
-        `${this.callbackIdentifier}/${this.id}/creator.json`
-      );
+      let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/creator.json`);
       this._creator = new User(data.collection[0]);
     }
 
@@ -77,7 +75,7 @@ export default class Project extends Model {
    */
   async fetchUsers(online) {
     if (this.isNew()) {
-      throw new Error("Cannot fetch users of a project with no ID.");
+      throw new Error('Cannot fetch users of a project with no ID.');
     }
 
     let params = {};
@@ -85,12 +83,9 @@ export default class Project extends Model {
       params.online = online;
     }
 
-    let { data } = await Cytomine.instance.api.get(
-      `${this.callbackIdentifier}/${this.id}/user.json`,
-      { params }
-    );
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/user.json`, { params });
     let collection = new UserCollection();
-    data.collection.forEach((item) => collection.push(new User(item)));
+    data.collection.forEach(item => collection.push(new User(item)));
     return collection;
   }
 
@@ -101,12 +96,10 @@ export default class Project extends Model {
    */
   async fetchConnectedUsers() {
     if (this.isNew()) {
-      throw new Error("Cannot fetch connected users of a project with no ID.");
+      throw new Error('Cannot fetch connected users of a project with no ID.');
     }
 
-    let { data } = await Cytomine.instance.api.get(
-      `${this.callbackIdentifier}/${this.id}/online/user.json`
-    );
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/online/user.json`);
     return data.collection;
   }
 
@@ -117,14 +110,12 @@ export default class Project extends Model {
    */
   async fetchAdministrators() {
     if (this.isNew()) {
-      throw new Error("Cannot fetch administrators of a project with no ID.");
+      throw new Error('Cannot fetch administrators of a project with no ID.');
     }
 
-    let { data } = await Cytomine.instance.api.get(
-      `${this.callbackIdentifier}/${this.id}/admin.json`
-    );
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/admin.json`);
     let collection = new UserCollection();
-    data.collection.forEach((item) => collection.push(new User(item)));
+    data.collection.forEach(item => collection.push(new User(item)));
     return collection;
   }
 
@@ -137,14 +128,12 @@ export default class Project extends Model {
    */
   async fetchRepresentatives() {
     if (this.isNew()) {
-      throw new Error("Cannot fetch representatives of a project with no ID.");
+      throw new Error('Cannot fetch representatives of a project with no ID.');
     }
 
-    let { data } = await Cytomine.instance.api.get(
-      `${this.callbackIdentifier}/${this.id}/users/representative.json`
-    );
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/users/representative.json`);
     let collection = new UserCollection();
-    data.collection.forEach((item) => collection.push(new User(item)));
+    data.collection.forEach(item => collection.push(new User(item)));
     return collection;
   }
 
@@ -158,7 +147,7 @@ export default class Project extends Model {
    */
   async fetchUserLayers(image) {
     if (this.isNew()) {
-      throw new Error("Cannot fetch user layers of a project with no ID.");
+      throw new Error('Cannot fetch user layers of a project with no ID.');
     }
 
     let params = {};
@@ -166,12 +155,9 @@ export default class Project extends Model {
       params.image = image;
     }
 
-    let { data } = await Cytomine.instance.api.get(
-      `${this.callbackIdentifier}/${this.id}/userlayer.json`,
-      { params }
-    );
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/userlayer.json`, { params });
     let collection = new UserCollection();
-    data.collection.forEach((item) => collection.push(new User(item)));
+    data.collection.forEach(item => collection.push(new User(item)));
     return collection;
   }
 
@@ -182,11 +168,9 @@ export default class Project extends Model {
    */
   async addUser(idUser) {
     if (this.isNew()) {
-      throw new Error("Cannot add a user to a project with no ID.");
+      throw new Error('Cannot add a user to a project with no ID.');
     }
-    let { data } = await Cytomine.instance.api.post(
-      `${this.callbackIdentifier}/${this.id}/user/${idUser}.json`
-    );
+    let { data } = await Cytomine.instance.api.post(`${this.callbackIdentifier}/${this.id}/user/${idUser}.json`);
     Cytomine.instance.lastCommand = data.command;
   }
 
@@ -197,13 +181,9 @@ export default class Project extends Model {
    */
   async addUsers(idUsers) {
     if (this.isNew()) {
-      throw new Error("Cannot add a user to a project with no ID.");
+      throw new Error('Cannot add a user to a project with no ID.');
     }
-    let { data } = await Cytomine.instance.api.post(
-      `${this.callbackIdentifier}/${this.id}/user.json?users=${idUsers.join(
-        ","
-      )}`
-    );
+    let { data } = await Cytomine.instance.api.post(`${this.callbackIdentifier}/${this.id}/user.json?users=${idUsers.join(',')}`);
     Cytomine.instance.lastCommand = data.command;
   }
 
@@ -214,11 +194,9 @@ export default class Project extends Model {
    */
   async deleteUser(idUser) {
     if (this.isNew()) {
-      throw new Error("Cannot delete a user from a project with no ID.");
+      throw new Error('Cannot delete a user from a project with no ID.');
     }
-    let { data } = await Cytomine.instance.api.delete(
-      `${this.callbackIdentifier}/${this.id}/user/${idUser}.json`
-    );
+    let { data } = await Cytomine.instance.api.delete(`${this.callbackIdentifier}/${this.id}/user/${idUser}.json`);
     Cytomine.instance.lastCommand = data.command;
   }
 
@@ -229,13 +207,9 @@ export default class Project extends Model {
    */
   async deleteUsers(idUsers) {
     if (this.isNew()) {
-      throw new Error("Cannot delete a user from a project with no ID.");
+      throw new Error('Cannot delete a user from a project with no ID.');
     }
-    let { data } = await Cytomine.instance.api.delete(
-      `${this.callbackIdentifier}/${this.id}/user.json?users=${idUsers.join(
-        ","
-      )}`
-    );
+    let { data } = await Cytomine.instance.api.delete(`${this.callbackIdentifier}/${this.id}/user.json?users=${idUsers.join(',')}`);
     Cytomine.instance.lastCommand = data.command;
   }
 
@@ -246,11 +220,9 @@ export default class Project extends Model {
    */
   async addAdmin(idUser) {
     if (this.isNew()) {
-      throw new Error("Cannot add an admin to a project with no ID.");
+      throw new Error('Cannot add an admin to a project with no ID.');
     }
-    let { data } = await Cytomine.instance.api.post(
-      `${this.callbackIdentifier}/${this.id}/user/${idUser}/admin.json`
-    );
+    let { data } = await Cytomine.instance.api.post(`${this.callbackIdentifier}/${this.id}/user/${idUser}/admin.json`);
     Cytomine.instance.lastCommand = data.command;
   }
 
@@ -261,11 +233,9 @@ export default class Project extends Model {
    */
   async deleteAdmin(idUser) {
     if (this.isNew()) {
-      throw new Error("Cannot delete an admin from a project with no ID.");
+      throw new Error('Cannot delete an admin from a project with no ID.');
     }
-    let { data } = await Cytomine.instance.api.delete(
-      `${this.callbackIdentifier}/${this.id}/user/${idUser}/admin.json`
-    );
+    let { data } = await Cytomine.instance.api.delete(`${this.callbackIdentifier}/${this.id}/user/${idUser}/admin.json`);
     Cytomine.instance.lastCommand = data.command;
   }
 
@@ -278,14 +248,12 @@ export default class Project extends Model {
    */
   async fetchUsersActivity() {
     if (this.isNew()) {
-      throw new Error("Cannot fetch users activity on a project with no ID.");
+      throw new Error('Cannot fetch users activity on a project with no ID.');
     }
 
-    let { data } = await Cytomine.instance.api.get(
-      `${this.callbackIdentifier}/${this.id}/usersActivity.json`
-    );
+    let { data } = await Cytomine.instance.api.get(`${this.callbackIdentifier}/${this.id}/usersActivity.json`);
     let collection = new UserCollection();
-    data.collection.forEach((item) => collection.push(new User(item)));
+    data.collection.forEach(item => collection.push(new User(item)));
     return collection;
   }
 
@@ -296,12 +264,10 @@ export default class Project extends Model {
    */
   async fetchUIConfig() {
     if (this.isNew()) {
-      throw new Error("Cannot fetch UI configuration of a project with no ID.");
+      throw new Error('Cannot fetch UI configuration of a project with no ID.');
     }
 
-    let { data } = await Cytomine.instance.api.get(
-      `custom-ui/project/${this.id}.json`
-    );
+    let { data } = await Cytomine.instance.api.get(`custom-ui/project/${this.id}.json`);
     return data;
   }
 
@@ -313,13 +279,10 @@ export default class Project extends Model {
    */
   async saveUIConfig(config) {
     if (this.isNew()) {
-      throw new Error("Cannot save UI configuration of a project with no ID.");
+      throw new Error('Cannot save UI configuration of a project with no ID.');
     }
 
-    let { data } = await Cytomine.instance.api.post(
-      `custom-ui/project/${this.id}.json`,
-      config
-    );
+    let { data } = await Cytomine.instance.api.post(`custom-ui/project/${this.id}.json`, config);
     return data;
   }
 
@@ -336,26 +299,11 @@ export default class Project extends Model {
    *                              The list of actions (properites data, serviceName, className and action will only be
    *                              provided if fullData is set to true)
    */
-  async fetchCommandHistory({
-    max,
-    offset,
-    user,
-    fullData,
-    startDate,
-    endDate,
-  } = {}) {
+  async fetchCommandHistory({ max, offset, user, fullData, startDate, endDate } = {}) {
     if (this.isNew()) {
-      throw new Error("Cannot fetch command history of a project with no ID.");
+      throw new Error('Cannot fetch command history of a project with no ID.');
     }
-    return this.constructor.fetchCommandHistory({
-      project: this.id,
-      max,
-      offset,
-      user,
-      fullData,
-      startDate,
-      endDate,
-    });
+    return this.constructor.fetchCommandHistory({ project: this.id, max, offset, user, fullData, startDate, endDate });
   }
 
   /**
@@ -372,18 +320,8 @@ export default class Project extends Model {
    *                              The list of actions (properites data, serviceName, className and action will only be
    *                              provided if fullData is set to true)
    */
-  static async fetchCommandHistory({
-    project,
-    max,
-    offset,
-    user,
-    fullData,
-    startDate,
-    endDate,
-  } = {}) {
-    let uri = !project
-      ? "commandhistory.json"
-      : `project/${project}/commandhistory.json`;
+  static async fetchCommandHistory({ project, max, offset, user, fullData, startDate, endDate } = {}) {
+    let uri = !project ? 'commandhistory.json' : `project/${project}/commandhistory.json`;
     let { data } = await Cytomine.instance.api.get(uri, {
       params: {
         max,
@@ -391,8 +329,8 @@ export default class Project extends Model {
         user,
         fullData,
         startDate,
-        endDate,
-      },
+        endDate
+      }
     });
 
     return data;
@@ -407,9 +345,7 @@ export default class Project extends Model {
    */
   async fetchNbConnections({ startDate, endDate }) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch the number of connections in a project with no ID."
-      );
+      throw new Error('Cannot fetch the number of connections in a project with no ID.');
     }
     let { data } = await Cytomine.instance.api.get(
       `project/${this.id}/userconnection/count.json`,
@@ -427,16 +363,9 @@ export default class Project extends Model {
    * @param {boolean} [accumulate]    Whether or not the count should be accumulated across periods
    * @returns {Array<{date, endDate, size}>} The number of connections for each period
    */
-  async fetchConnectionsEvolution({
-    startDate,
-    endDate,
-    daysRange,
-    accumulate,
-  } = {}) {
+  async fetchConnectionsEvolution({ startDate, endDate, daysRange, accumulate } = {}) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch the evolution of connections in a project with no ID."
-      );
+      throw new Error('Cannot fetch the evolution of connections in a project with no ID.');
     }
     let { data } = await Cytomine.instance.api.get(
       `project/${this.id}/stats/connectionsevolution.json`,
@@ -454,9 +383,7 @@ export default class Project extends Model {
    */
   async fetchNbImageConsultations({ startDate, endDate }) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch the number of image consultations in a project with no ID."
-      );
+      throw new Error('Cannot fetch the number of image consultations in a project with no ID.');
     }
     let { data } = await Cytomine.instance.api.get(
       `project/${this.id}/imageconsultation/count.json`,
@@ -474,16 +401,9 @@ export default class Project extends Model {
    * @param {boolean} [accumulate]    Whether or not the count should be accumulated across periods
    * @returns {Array<{date, endDate, size}>} The number of image consultations for each period
    */
-  async fetchImageConsultationsEvolution({
-    startDate,
-    endDate,
-    daysRange,
-    accumulate,
-  } = {}) {
+  async fetchImageConsultationsEvolution({ startDate, endDate, daysRange, accumulate } = {}) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch the evolution of image consultations in a project with no ID."
-      );
+      throw new Error('Cannot fetch the evolution of image consultations in a project with no ID.');
     }
     let { data } = await Cytomine.instance.api.get(
       `project/${this.id}/stats/imageconsultationsevolution.json`,
@@ -502,9 +422,7 @@ export default class Project extends Model {
    */
   async fetchNbAnnotationActions({ startDate, endDate, type }) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch the number of annotation actions in a project with no ID."
-      );
+      throw new Error('Cannot fetch the number of annotation actions in a project with no ID.');
     }
     let { data } = await Cytomine.instance.api.get(
       `project/${this.id}/annotation_action/count.json`,
@@ -523,17 +441,9 @@ export default class Project extends Model {
    * @param {string}  [type]        The type of annotation action to take into account
    * @returns {Array<{date, endDate, size}>} The number of annotation actions for each period
    */
-  async fetchAnnotationActionsEvolution({
-    startDate,
-    endDate,
-    daysRange,
-    accumulate,
-    type,
-  } = {}) {
+  async fetchAnnotationActionsEvolution({ startDate, endDate, daysRange, accumulate, type } = {}) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch the evolution of annotation actions in a project with no ID."
-      );
+      throw new Error('Cannot fetch the evolution of annotation actions in a project with no ID.');
     }
     let { data } = await Cytomine.instance.api.get(
       `project/${this.id}/stats/annotationactionsevolution.json`,
@@ -552,23 +462,21 @@ export default class Project extends Model {
    */
   async fetchNbAnnotations({ startDate, endDate, annotationType } = {}) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch the number of annotations in a project with no ID."
-      );
+      throw new Error('Cannot fetch the number of annotations in a project with no ID.');
     }
 
     let uri = null;
     switch (annotationType) {
       case AnnotationType.USER:
-        uri = "userannotation";
+        uri = 'userannotation';
         break;
       case AnnotationType.REVIEWED:
-        uri = "reviewedannotation";
+        uri = 'reviewedannotation';
         break;
     }
 
     if (!uri) {
-      throw new Error("This annotation type is not handled.");
+      throw new Error('This annotation type is not handled.');
     }
 
     let { data } = await Cytomine.instance.api.get(
@@ -589,47 +497,28 @@ export default class Project extends Model {
    * @param {string}  annotationType The annotation type to count (see AnnotationType for allowed values)
    * @returns {Array<{date, endDate, size}>} The number of annotations for each period
    */
-  async fetchAnnotationsEvolution({
-    startDate,
-    endDate,
-    annotationType,
-    daysRange,
-    accumulate,
-    reverseOrder,
-    term,
-  } = {}) {
+  async fetchAnnotationsEvolution({ startDate, endDate, annotationType, daysRange, accumulate, reverseOrder, term } = {}) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch the evolution of annotations in a project with no ID."
-      );
+      throw new Error('Cannot fetch the evolution of annotations in a project with no ID.');
     }
 
     let uri = null;
     switch (annotationType) {
       case AnnotationType.USER:
-        uri = "annotationevolution";
+        uri = 'annotationevolution';
         break;
       case AnnotationType.REVIEWED:
-        uri = "reviewedannotationevolution";
+        uri = 'reviewedannotationevolution';
         break;
     }
 
     if (!uri) {
-      throw new Error("This annotation type is not handled.");
+      throw new Error('This annotation type is not handled.');
     }
 
     let { data } = await Cytomine.instance.api.get(
       `project/${this.id}/stats/${uri}.json`,
-      {
-        params: {
-          startDate,
-          endDate,
-          daysRange,
-          accumulate,
-          reverseOrder,
-          term,
-        },
-      }
+      { params: { startDate, endDate, daysRange, accumulate, reverseOrder, term } }
     );
     return data.collection;
   }
@@ -644,14 +533,11 @@ export default class Project extends Model {
    */
   async fetchStatsTerms({ startDate, endDate, leafsOnly } = {}) {
     if (this.isNew()) {
-      throw new Error("Cannot fetch terms statistics in a project with no ID.");
+      throw new Error('Cannot fetch terms statistics in a project with no ID.');
     }
 
     let params = { startDate, endDate, leafsOnly };
-    let { data } = await Cytomine.instance.api.get(
-      `project/${this.id}/stats/term.json`,
-      { params }
-    );
+    let { data } = await Cytomine.instance.api.get(`project/${this.id}/stats/term.json`, { params });
     return data.collection;
   }
 
@@ -664,16 +550,11 @@ export default class Project extends Model {
    */
   async fetchStatsAnnotatedImagesByTerm({ startDate, endDate } = {}) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch annotated images statistics in a project with no ID."
-      );
+      throw new Error('Cannot fetch annotated images statistics in a project with no ID.');
     }
 
     let params = { startDate, endDate };
-    let { data } = await Cytomine.instance.api.get(
-      `project/${this.id}/stats/termslide.json`,
-      { params }
-    );
+    let { data } = await Cytomine.instance.api.get(`project/${this.id}/stats/termslide.json`, { params });
     return data.collection;
   }
 
@@ -686,16 +567,11 @@ export default class Project extends Model {
    */
   async fetchStatsAnnotationCreators({ startDate, endDate } = {}) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch annotation creators statistics in a project with no ID."
-      );
+      throw new Error('Cannot fetch annotation creators statistics in a project with no ID.');
     }
 
     let params = { startDate, endDate };
-    let { data } = await Cytomine.instance.api.get(
-      `project/${this.id}/stats/user.json`,
-      { params }
-    );
+    let { data } = await Cytomine.instance.api.get(`project/${this.id}/stats/user.json`, { params });
     return data.collection;
   }
 
@@ -708,16 +584,11 @@ export default class Project extends Model {
    */
   async fetchStatsAnnotatedImagesByCreator({ startDate, endDate } = {}) {
     if (this.isNew()) {
-      throw new Error(
-        "Cannot fetch annotated images statistics in a project with no ID."
-      );
+      throw new Error('Cannot fetch annotated images statistics in a project with no ID.');
     }
 
     let params = { startDate, endDate };
-    let { data } = await Cytomine.instance.api.get(
-      `project/${this.id}/stats/userslide.json`,
-      { params }
-    );
+    let { data } = await Cytomine.instance.api.get(`project/${this.id}/stats/userslide.json`, { params });
     return data.collection;
   }
 }

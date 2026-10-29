@@ -10,6 +10,7 @@ import jakarta.ws.rs.NotFoundException;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.UserProfileResource;
 import org.keycloak.representations.idm.ClientMappingsRepresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.IdentityProviderMapperRepresentation;
@@ -18,6 +19,7 @@ import org.keycloak.representations.idm.MappingsRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.representations.userprofile.config.UPConfig;
 
 /**
  * Creates (and removes) the dedicated {@link LtiSettings#REALM} Keycloak realm with the tool client,
@@ -54,10 +56,28 @@ final class LtiRealmSeeder {
         realm.setEnabled(true);
         realm.setSslRequired("NONE");
         admin.realms().create(realm);
+        allowAdminManagedAttributes();
         createToolClient(LtiSettings.SIMULATOR_PORT);
         createCoreClientWithManagedRoles();
         seedIdentityProvider(LtiFixture.load("moodle"));
         seedIdentityProvider(LtiFixture.load("blackboard"));
+    }
+
+    /**
+     * Keycloak 26 always enables the user profile and defaults {@code unmanagedAttributePolicy}
+     * to {@code DISABLED} for new realms, which silently discards every write of an attribute
+     * that is not declared in the profile and hides it from admin REST reads (verified directly
+     * on the {@code user_attribute} table). The {@code lti_join_tokens} attribute written by the
+     * {@code LTI Project Membership} mapper must persist exactly as written and be observable
+     * by this seeder's introspection, so the policy is set to {@code ADMIN_EDIT}: admins (the
+     * broker login flow) may write undeclared attributes.
+     */
+    private void allowAdminManagedAttributes() {
+        UserProfileResource profile =
+            admin.realms().realm(LtiSettings.REALM).users().userProfile();
+        UPConfig config = profile.getConfiguration();
+        config.setUnmanagedAttributePolicy(UPConfig.UnmanagedAttributePolicy.ADMIN_EDIT);
+        profile.update(config);
     }
 
     void dropRealm() {

@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,10 +35,44 @@ final class LtiFlowClient {
 
     LtiFlowClient() {
         this.client = HttpClient.newBuilder()
-            .cookieHandler(new CookieManager())
+            .cookieHandler(new BrowserLikeCookieManager())
             .connectTimeout(Duration.ofSeconds(5))
             .followRedirects(HttpClient.Redirect.NEVER)
             .build();
+    }
+
+    /**
+     * Cookie handling that matches what a real browser does with the local test server. Since
+     * Keycloak 26.8 marks its login cookies ({@code AUTH_SESSION_ID}, {@code KC_RESTART},
+     * {@code KC_AUTH_SESSION_HASH}) as {@code Secure} unconditionally, and the JDK
+     * {@link CookieManager} refuses to send {@code Secure} cookies over plain {@code http}
+     * (Keycloak 26.8 has no option to opt out), launch flows stop on the broker login step
+     * with "Restart login cookie not found". Browsers do send {@code Secure} cookies to
+     * loopback hosts ({@code localhost}, {@code 127.0.0.1}, {@code ::1}) because they treat
+     * those as secure contexts even over {@code http}; this manager emulates exactly that
+     * exception and keeps the strict {@code Secure} rule for every other host.
+     */
+    private static final class BrowserLikeCookieManager extends CookieManager {
+
+        @Override
+        public Map<String, List<String>> get(URI uri, Map<String, List<String>> requestHeaders)
+            throws IOException {
+            if ("http".equalsIgnoreCase(uri.getScheme()) && isLoopback(uri.getHost())) {
+                return super.get(rewrittenAsHttps(uri), requestHeaders);
+            }
+            return super.get(uri, requestHeaders);
+        }
+
+        private static boolean isLoopback(String host) {
+            return "localhost".equalsIgnoreCase(host)
+                || (host != null && host.startsWith("127."))
+                || "::1".equals(host);
+        }
+
+        private static URI rewrittenAsHttps(URI uri) {
+            return URI.create("https://" + uri.getRawAuthority() + uri.getRawPath()
+                + (uri.getRawQuery() == null ? "" : "?" + uri.getRawQuery()));
+        }
     }
 
     /**

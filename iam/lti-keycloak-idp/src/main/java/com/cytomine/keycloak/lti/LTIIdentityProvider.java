@@ -17,6 +17,8 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.util.JsonSerialization;
 import org.keycloak.models.FederatedIdentityModel;
+import org.keycloak.models.UserModel;
+import org.keycloak.models.UserSessionModel;
 import org.keycloak.services.managers.AuthenticationSessionManager;
 import org.keycloak.sessions.RootAuthenticationSessionModel;
 
@@ -92,6 +94,17 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     @Override
     public Response retrieveToken(KeycloakSession session, FederatedIdentityModel identity) {
         return Response.ok(identity.getToken()).build();
+    }
+
+    /**
+     * Keycloak 26.8 identity-brokering API v2 ({@code UserAuthenticationIdentityProvider}): the token
+     * retrieval endpoint now also carries the user session and user the call is performed for. The
+     * stored launch token is user-independent, so this simply delegates to the v1 retrieval.
+     */
+    @Override
+    public Response retrieveToken(KeycloakSession session, FederatedIdentityModel identity,
+                                  UserSessionModel userSession, UserModel user) {
+        return retrieveToken(session, identity);
     }
 
     @Override
@@ -207,10 +220,10 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                                              @FormParam("error") String error) {
             if (error != null) {
                 log.warnf("LTI platform returned error on launch: %s", error);
-                return callback.error("lti_platform_error");
+                return callback.error(provider.getConfig(), "lti_platform_error");
             }
             if (idToken == null) {
-                return callback.error("missing_id_token");
+                return callback.error(provider.getConfig(), "missing_id_token");
             }
 
             AuthenticationSessionManager asm = new AuthenticationSessionManager(provider.session);
@@ -277,10 +290,9 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
 
                 if (identity == null || matchedSession == null) {
                     log.warn("LTI launch validation failed", lastFailure);
-                    return callback.error("invalid_lti_launch");
+                    return callback.error(provider.getConfig(), "invalid_lti_launch");
                 }
 
-                identity.setIdpConfig(provider.getConfig());
                 identity.setIdp(provider);
 
                 // CRITICAL FIX: Ensure authenticationSession is attached to BrokeredIdentityContext
@@ -296,7 +308,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
                 return callback.authenticated(identity);
             } catch (Exception e) {
                 log.warn("LTI launch validation failed", e);
-                return callback.error("invalid_lti_launch");
+                return callback.error(provider.getConfig(), "invalid_lti_launch");
             }
         }
 
@@ -561,8 +573,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         }
 
         // Initialize BrokeredIdentityContext and set user profile properties
-        BrokeredIdentityContext identity = new BrokeredIdentityContext(subject);
-        identity.setIdpConfig(getConfig());
+        BrokeredIdentityContext identity = new BrokeredIdentityContext(subject, getConfig());
         identity.setAuthenticationSession(authSession);
 
         identity.setUsername(username);

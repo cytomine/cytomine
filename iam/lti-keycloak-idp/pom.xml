@@ -27,7 +27,7 @@
             between major versions, so this scaffold should be compiled and
             smoke-tested against your target version before deploying.
         -->
-        <keycloak.version>24.0.2</keycloak.version>
+        <keycloak.version>26.8.1</keycloak.version>
     </properties>
 
     <dependencies>

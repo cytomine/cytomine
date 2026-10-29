@@ -91,15 +91,4 @@ public class UploadTaskApiExceptionHandler {
         AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_BUNDLE_FORMAT);
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
-
-    @ExceptionHandler({ NullPointerException.class })
-    public final ResponseEntity<AppEngineError> handleNullpointerException(Exception e) {
-        // TODO temp handler remove later
-        e.printStackTrace();
-        String message = "missing properties in descriptor.yml";
-        log.info("Bundle/Archive processing failure [{}]", message);
-
-        AppEngineError error = ErrorBuilder.build(ErrorCode.INTERNAL_INVALID_BUNDLE_FORMAT);
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

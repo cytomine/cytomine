@@ -118,13 +118,15 @@ describe('ProjectMembers.vue', () => {
     expect(projectMock.deleteUsers).toHaveBeenCalledWith([1, 2, 3]);
   });
 
-  it('should notify an error and skip refresh when deletion fails', async () => {
+  it('should notify an error and refresh when deletion fails', async () => {
+    // bulk deletion reports partial failures with HTTP 206: some members may already have been removed,
+    // so the member list is refreshed even after the failure to reflect the actual state
     projectMock.deleteUsers.mockRejectedValueOnce(new Error('boom'));
     const wrapper = createWrapper([{ id: 1, fullName: 'Contributor', role: CONTRIBUTOR }]);
 
     await wrapper.vm.removeSelectedMembers();
 
-    expect(dispatch).not.toHaveBeenCalled();
+    expect(dispatch).toHaveBeenCalledWith('currentProject/fetchProjectMembers');
     expect(notify).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'error' })
     );

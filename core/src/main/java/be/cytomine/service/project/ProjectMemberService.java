@@ -22,6 +22,7 @@ import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;
 import be.cytomine.service.UrlApi;
+import be.cytomine.service.security.IamProjectMembershipService;
 import be.cytomine.service.security.SecurityACLService;
 
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
@@ -47,10 +48,18 @@ public class ProjectMemberService {
     private final UserHttpContract userHttpContract;
     private final UrlApi urlApi;
 
+    private final IamProjectMembershipService iamProjectMembershipService;
+
     public void addUserToProject(String username, Project project, boolean admin) {
         securityACLService.check(project, ADMINISTRATION);
         log.info("service.addUserToProject");
         if (project != null) {
+            // for externally provisioned users, the IAM projects attribute is the source of truth reconciled
+            // on every request by AuthenticationSuccessListener: update it first, otherwise the membership
+            // added here would be deleted as soon as the user makes any request
+            if (iamProjectMembershipService.isExternal(username)) {
+                iamProjectMembershipService.addProject(username, project.getName());
+            }
             log.info("addUserToProject project=" + project + " user=" + username + " ADMIN=" + admin);
             synchronized (this.getClass()) {
                 if (admin) {
@@ -106,6 +115,12 @@ public class ProjectMemberService {
             securityACLService.check(project, ADMINISTRATION);
         }
         if (project != null) {
+            // for externally provisioned users, the IAM projects attribute is the source of truth reconciled
+            // on every request by AuthenticationSuccessListener: remove the project from it first, otherwise
+            // the membership removed here would be restored as soon as the user makes any request
+            if (iamProjectMembershipService.isExternal(username)) {
+                iamProjectMembershipService.removeProject(username, project.getName());
+            }
             log.info("deleteUserFromProject project=" + project.getId() + " username=" + username + " ADMIN="
                 + admin);
 
@@ -130,7 +145,7 @@ public class ProjectMemberService {
             }
             // if no representative, add current user as a representative
             boolean hasLostAccessToProject = (!permissionService.hasACLPermission(project, username, READ)
-                && !permissionService.hasACLPermission(project, username, READ));
+                && !permissionService.hasACLPermission(project, username, ADMINISTRATION));
             boolean isLastRepresentative = projectRepresentativeUserService.listByProject(project).size() == 1
                 && projectRepresentativeUserService.listByProject(project).get(0).getUserId().equals(userId);
             if (hasLostAccessToProject && isLastRepresentative) {
@@ -186,8 +201,9 @@ public class ProjectMemberService {
             }
 
             // if no representative, add current user as a representative
-            boolean hasLostAccessToProject = (!permissionService.hasACLPermission(project, user.getUsername(), READ)
-                && !permissionService.hasACLPermission(project, user.getUsername(), READ));
+            boolean hasLostAccessToProject =
+                (!permissionService.hasACLPermission(project, user.getUsername(), READ)
+                    && !permissionService.hasACLPermission(project, user.getUsername(), ADMINISTRATION));
             boolean isLastRepresentative = projectRepresentativeUserService.listByProjectWithAdmin(project).size() == 1
                 && projectRepresentativeUserService.listByProjectWithAdmin(project).get(0).getUserId()
                 .equals(user.getId());

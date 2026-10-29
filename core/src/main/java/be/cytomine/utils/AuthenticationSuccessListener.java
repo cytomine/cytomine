@@ -29,6 +29,7 @@ import be.cytomine.repository.security.SecUserSecRoleRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.project.ProjectMemberService;
+import be.cytomine.service.security.IamProjectMembershipService;
 
 import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
 import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
@@ -55,6 +56,8 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     private final ProjectMemberService projectMemberService;
 
     private final UserMapper userMapper;
+
+    private final IamProjectMembershipService iamProjectMembershipService;
 
     private static Set<String> extractRolesFromAuthentication(JwtAuthenticationToken jwtAuthenticationToken) {
         Set<String> rolesFromAuthentication = new HashSet<>();
@@ -99,17 +102,6 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                     (String) entry.getValue()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        Map<String, List<String>> listTokenAttributes = jwtAuthenticationToken.getTokenAttributes()
-            .entrySet()
-            .stream()
-            .filter(entry -> entry.getValue() instanceof List)
-            .map(entry ->
-                Map.entry(entry.getKey(),
-                    ((List<?>) entry.getValue()).stream().filter(a -> a instanceof String).map(a -> (String) a)
-                        .toList()))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        List<String> projects = listTokenAttributes.getOrDefault("projects", List.of());
         UUID sub = UUID.fromString(stringTokenAttributes.get("sub"));
         Optional<User> userByReference = userRepository.findByReference(sub.toString());
         Optional<User> userByUsername = userRepository.findByUsername(jwtAuthenticationToken.getName());
@@ -124,7 +116,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             userRepository.save(user);
 
             self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
-            self().updateProjectsMembership(projects, user);
+            self().updateProjectsMembership(user);
 
         } else if (userByReference.isEmpty()) {
 
@@ -142,7 +134,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                 .orElseThrow(() -> new IllegalStateException("User not found after self-registration: " + sub));
             UserResponse userResponse = userMapper.map(savedUser);
 
-            self().updateProjectsMembership(projects, savedUser);
+            self().updateProjectsMembership(savedUser);
 
             if (currentRoleService.hasCurrentUserAdminRole(userResponse)) {
                 currentRoleService.activeAdminSession(userResponse, jwtAuthenticationToken);
@@ -151,7 +143,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         } else {
             User user = userByReference.get();
             self().updateRolesAndAdminSession(jwtAuthenticationToken, user, rolesFromAuthentication);
-            self().updateProjectsMembership(projects, user);
+            self().updateProjectsMembership(user);
         }
     }
 
@@ -172,13 +164,21 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         }
     }
 
+    /**
+     * Reconcile the project membership of the user in core with the one provisioned in IAM (the "projects"
+     * attribute of the user in Keycloak). <br>
+     * The IAM state is read live instead of using the "projects" claim of the request token: the token keeps
+     * the claim value it was issued with, which can be outdated by the time the request is processed (e.g.
+     * right after a member was added/removed through core).
+     */
     @Transactional
-    protected void updateProjectsMembership(List<String> projects, User user) {
-        if (!isExternal(user)) {
+    protected void updateProjectsMembership(User user) {
+        if (!iamProjectMembershipService.isExternal(user.getUsername())) {
             return; // do nothing if user is local
         }
 
-        List<Project> permittedUserProjects = projectRepository.findByNameIn(projects);
+        List<Project> permittedUserProjects = projectRepository.findByNameIn(
+            iamProjectMembershipService.findProjects(user.getUsername()));
         List<Project> actualUserProjects = projectRepository.findAllProjectForUser(user.getUsername());
 
         List<Project> projectsToAdd =
@@ -193,10 +193,6 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         for (Project project : projectsToRemove) {
             projectMemberService.deleteUserFromProjectWithAdmin(user, project, false);
         }
-    }
-
-    private boolean isExternal(User user) {
-        return user.getUsername().endsWith("@lifescience-ri.eu");
     }
 
     @Transactional

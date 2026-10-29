@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Project members added or removed through the project configuration members tab are now kept in sync with
+  the IAM "projects" attribute of externally provisioned users (LS-AAI). Previously, their membership was
+  removed as soon as they made their next request, because the reconciliation with IAM relied on the
+  outdated "projects" claim embedded in the access token instead of the current IAM state
+- Project members additions and removals that partially succeed are now explicitly reported (HTTP 206
+  details surfaced in the UI instead of being treated as a full success)
+- Failed project member operations now return a proper HTTP status code derived from the error
+- Fix project representative handover trigger when an administrator loses consistent access to a project
+
 ## [5.2.0] - 2025-06-20
 
 ### Changed

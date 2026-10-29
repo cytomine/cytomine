@@ -123,8 +123,10 @@ public class AnnotationTermService extends ModelService {
         UserResponse currentUser = currentUserService.getCurrentUser();
         //Check if user has a role that allows to associate terms with annotations
         securityACLService.checkGuest(currentUser);
-        UserResponse creator = userHttpContract.get(jsonObject.getJSONAttrLong("user", -1L))
-            .orElse(currentUser);
+        Long providedUserId = jsonObject.getJSONAttrLong("user", -1L);
+        UserResponse creator = providedUserId > 0
+            ? userHttpContract.get(providedUserId).orElse(currentUser)
+            : currentUser;
         jsonObject.put("user", creator.id());
 
         UserAnnotation ua = userAnnotationRepository.findById(

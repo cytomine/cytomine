@@ -101,10 +101,10 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 
     // Cucumber dependencies
-    implementation group: 'io.cucumber', name: 'cucumber-spring', version: '6.10.4'
-    testImplementation 'io.cucumber:cucumber-java:6.10.4'
-    testImplementation 'io.cucumber:cucumber-junit:6.10.4'
-    testImplementation 'org.assertj:assertj-core:3.4.1'
+    implementation group: 'io.cucumber', name: 'cucumber-spring', version: '8.0.4'
+    testImplementation 'io.cucumber:cucumber-java:8.0.4'
+    testImplementation 'io.cucumber:cucumber-junit:8.0.4'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
     testImplementation 'org.junit.vintage:junit-vintage-engine'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation "org.junit.jupiter:junit-jupiter"
@@ -113,11 +113,11 @@ dependencies {
     implementation project(':registry-client')
 
     // liquibase
-    liquibaseRuntime 'info.picocli:picocli:4.7.5'
-    implementation 'org.liquibase:liquibase-core:4.25.0'
+    liquibaseRuntime 'info.picocli:picocli:4.7.7'
+    implementation 'org.liquibase:liquibase-core:5.0.4'
 
     // Image processing
-    implementation 'org.apache.commons:commons-imaging:1.0.0-alpha5'
+    implementation 'org.apache.commons:commons-imaging:1.0.0-alpha6'
     implementation 'org.dcm4che:dcm4che-core:5.31.0'
 
     testImplementation "org.springframework.boot:spring-boot-testcontainers"

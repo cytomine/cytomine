@@ -237,6 +237,25 @@ iam:
   lsaaiClientSecretSecretName:
   # the URL of the LSAAI instance
   lsaaiEndpoint:
+  # LTI 1.3 platform provisioning (requires a Keycloak that ships the `lti-identity-provider`
+  # SPI - e.g. provide your own `images.iam` image including the JAR in /opt/keycloak/providers;
+  # see https://www.keycloak.org/server/providers). When disabled (default), no LTI IdP is created.
+  lti:
+    enabled: false
+    # keycloak client id of the protected tool (admin guide step B)
+    toolClientId: lti-tool
+    # redirect URIs of the tool client as a JSON array, e.g. ["https://<web-ui-host>/lti/*"]
+    # (where users land after the broker flow, plus the Web-UI deep-linking picker URL)
+    toolRedirectUris: []
+    # list of LTI 1.3 platforms to register as identity providers on the `cytomine` realm, e.g.:
+    # - alias: lti-moodle            # must match the redirect URI configured on the platform
+    #   issuer: https://moodle.example.org          # platform audience/issuer (`iss` claim)
+    #   deploymentId: my-deployment-1               # accepted platform `lti_deployment_id` values (comma-separated)
+    #   toolClientId: lti-tool                      # keycloak client id of the protected tool (admin guide step B)
+    #   authorizationEndpoint: https://moodle.example.org/mod/lti/auth.php
+    #   jwksUrl: https://moodle.example.org/mod/lti/certs.php
+    #   contentSelectionUrl: https://<web-ui-host>/lti/content-selection
+    platforms: []
 
 # Content-based image retrieval
 cbir:

@@ -98,6 +98,48 @@ spec:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
 {{ end }}
 
+{{ if and .Values.iam.lti.enabled (gt (len .Values.iam.lti.platforms) 0) }}
+      # LTI 1.3 provisioning (admin guide step B): the public client the LMS platforms launch into.
+      # Requires a Keycloak image that ships the `lti-identity-provider` SPI (see values.yaml iam.lti).
+      - name: add-lti-tool-client
+        image: "{{ .Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            /opt/keycloak/bin/kcadm.sh create clients -r cytomine --server {{ include "cytomine.iamInternalUrl" . }} --config /opt/keycloak-auth/kcadm.config -s clientId={{ .Values.iam.lti.toolClientId }} -s publicClient=true -s standardFlowEnabled=true -s 'redirectUris={{ .Values.iam.lti.toolRedirectUris | toJson }}' || true
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+{{ range .Values.iam.lti.platforms }}
+      # LTI 1.3 provisioning (admin guide step C) for platform "{{ .alias }}": relies on the realm and
+      # the Cytomine `core` client (role mapper target) being provisioned beforehand.
+      - name: add-provider-lti-{{ .alias }}-instance
+        image: "{{ $.Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args: ["/opt/keycloak/bin/kcadm.sh create identity-provider/instances -r cytomine --server {{ include "cytomine.iamInternalUrl" $ }} --config /opt/keycloak-auth/kcadm.config -s providerId=lti-1p3 -s alias={{ .alias }} -s enabled=true -s displayName='LTI 1.3 - {{ .alias }}' -s config.platformIssuer='{{ .issuer }}' -s config.toolClientId={{ $.Values.iam.lti.toolClientId }} -s config.keycloakClientId={{ $.Values.iam.lti.toolClientId }} -s config.allowedDeploymentIds='{{ .deploymentId }}' -s config.platformAuthorizationEndpoint='{{ .authorizationEndpoint }}' -s config.platformJwksUrl='{{ .jwksUrl }}' -s config.contentSelectionUrl='{{ .contentSelectionUrl }}' || true"]
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" $ | nindent 10 }}
+
+      - name: add-provider-lti-{{ .alias }}-mappers
+        image: "{{ $.Values.images.iam }}"
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            /opt/keycloak/bin/kcadm.sh create identity-provider/instances/{{ .alias }}/mappers -r cytomine --server {{ include "cytomine.iamInternalUrl" $ }} --config /opt/keycloak-auth/kcadm.config -s identityProviderAlias={{ .alias }} -s identityProviderMapper=lti-core-role-mapper -s name=lti-core-roles || true
+            /opt/keycloak/bin/kcadm.sh create identity-provider/instances/{{ .alias }}/mappers -r cytomine --server {{ include "cytomine.iamInternalUrl" $ }} --config /opt/keycloak-auth/kcadm.config -s identityProviderAlias={{ .alias }} -s identityProviderMapper=lti-project-membership-mapper -s name=lti-project-membership || true
+        volumeMounts:
+        - name: kc-auth
+          mountPath: "/opt/keycloak-auth"
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" $ | nindent 10 }}
+{{ end }}
+{{ end }}
+
       containers:
       - name: check-job-done
         image: "{{ .Values.images.iam }}"

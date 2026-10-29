@@ -38,9 +38,14 @@ export default class Project extends Model {
     this.isClosed = null;
     this.isReadOnly = null;
     this.isRestricted = null;
+    this.areImagesDownloadable = null;
 
     this.hideUsersLayers = null;
     this.hideAdminsLayers = null;
+
+    this.membersCount = null;
+    this.currentUserRoles = null;
+    this.lastActivity = null;
   }
 
   /**

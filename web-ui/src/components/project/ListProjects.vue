@@ -42,7 +42,7 @@
               </div>
               <div class="filter-body">
                 <cytomine-multiselect v-model="selectedOntologies" :options="availableOntologies"
-                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all-ontologies')" />
+                  label="name" track-by="name" :multiple="true" :allPlaceholder="$t('all-ontologies')" />
               </div>
             </div>
 
@@ -51,7 +51,8 @@
                 {{$t('my-role')}}
               </div>
               <div class="filter-body">
-                <cytomine-multiselect v-model="selectedRoles" :options="availableRoles" multiple :searchable="false" />
+                <cytomine-multiselect v-model="selectedRoles" :options="availableRoles"
+                  label="name" track-by="name" :multiple="true" :searchable="false" />
               </div>
             </div>
 
@@ -61,7 +62,7 @@
               </div>
               <div class="filter-body">
                 <cytomine-multiselect v-model="selectedTags" :options="availableTags"
-                  label="name" track-by="id" :multiple="true" :allPlaceholder="$t('all')" />
+                  label="name" track-by="name" :multiple="true" :allPlaceholder="$t('all')" />
               </div>
             </div>
           </div>
@@ -113,7 +114,6 @@
 
       <cytomine-table
         :collection="projectCollection"
-        :is-empty="nbEmptyFilters > 0"
         class="table-projects"
         :currentPage.sync="currentPage"
         :perPage.sync="perPage"
@@ -123,10 +123,10 @@
         :revision="revision"
       >
         <template #default="{row: project}">
-          <b-table-column field="currentUserRole" label="" centered width="1" sortable>
+          <b-table-column field="currentUserRole" label="" centered width="1">
             <icon-project-member-role
-              :is-manager="project.currentUserRoles.admin"
-              :is-representative="project.currentUserRoles.representative"
+              :is-manager="project.currentUserRoles?.includes('admin')"
+              :is-representative="project.currentUserRoles?.includes('representative')"
             />
           </b-table-column>
 
@@ -136,28 +136,30 @@
             </router-link>
           </b-table-column>
 
-          <b-table-column field="membersCount" :label="$t('members')" centered sortable width="150">
+          <b-table-column field="members_count" :label="$t('members')" centered sortable width="150">
             {{ project.membersCount }}
           </b-table-column>
 
-          <b-table-column field="numberOfImages" :label="$t('images')" centered sortable width="150">
+          <b-table-column field="count_images" :label="$t('images')" centered sortable width="150">
             <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
           </b-table-column>
 
-          <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
+          <b-table-column field="count_annotations" :label="$t('user-annotations')" centered sortable width="150">
             <router-link :to="`/project/${project.id}/annotations?type=user`">
               {{ project.numberOfAnnotations }}
             </router-link>
           </b-table-column>
 
-          <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
+          <b-table-column field="count_reviewed_annotations" :label="$t('reviewed-annotations')" centered sortable width="150">
             <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
               {{ project.numberOfReviewedAnnotations }}
             </router-link>
           </b-table-column>
 
-          <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-            {{ formatMomentDate(Number(project.lastActivity), 'll') }}
+          <b-table-column field="last_activity" :label="$t('last-activity')" centered sortable width="180">
+            <template v-if="project.lastActivity">
+              {{ formatMomentDate(Number(project.lastActivity), 'll') }}
+            </template>
           </b-table-column>
 
           <b-table-column label=" " centered width="150">
@@ -203,35 +205,37 @@ import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
 import CytomineSlider from '@/components/form/CytomineSlider.vue';
 import ProjectDetails from './ProjectDetails.vue';
 import AddProjectModal from './AddProjectModal.vue';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 
 import { get, sync, syncBoundsFilter, syncMultiselectFilter } from '@/utils/store-helpers';
-
-import { ProjectCollection, OntologyCollection, TagCollection } from '@/api';
-import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 import { formatMomentDate } from '@/utils/date';
+
+import { ProjectCollection, OntologyCollection } from '@/api';
+
 export default {
   name: 'list-projects',
   components: {
-    IconProjectMemberRole,
     CytomineTable,
+    CytomineMultiselect,
+    CytomineSlider,
     ProjectDetails,
     AddProjectModal,
-    CytomineMultiselect,
-    CytomineSlider
+    IconProjectMemberRole
   },
   data() {
     return {
       loading: true,
       error: false,
 
-      projects: [],
       ontologies: [],
-      availableTags:[],
-
-      contributorLabel: this.$t('contributor'),
-      managerLabel: this.$t('manager'),
 
       creationModal: false,
+
+      availableFilters: {},
+      maxNbMembers: 10,
+      maxNbImages: 10,
+      maxNbUserAnnotations: 100,
+      maxNbReviewedAnnotations: 100,
 
       excludedProperties: [
         'name',
@@ -241,10 +245,6 @@ export default {
         'numberOfReviewedAnnotations',
         'lastActivity'
       ],
-      maxNbMembers: 10,
-      maxNbImages: 10,
-      maxNbUserAnnotations: 100,
-      maxNbReviewedAnnotations: 100,
 
       revision: 0
     };
@@ -254,84 +254,67 @@ export default {
 
     searchString: sync('listProjects/searchString', { debounce: 500 }),
     filtersOpened: sync('listProjects/filtersOpened'),
+    nbActiveFilters() {
+      return this.$store.getters['listProjects/nbActiveFilters'];
+    },
 
     availableRoles() {
-      return [this.contributorLabel, this.managerLabel];
+      return (this.availableFilters.roleNames ?? []).map(role => ({
+        name: role === 'admin' ? this.$t('manager') : this.$t('contributor'),
+        value: role
+      })).sort((a, b) => a.name.localeCompare(b.name));
     },
     availableOntologies() {
-      return [{ id: 'null', name: this.$t('no-ontology') }, ...this.ontologies];
+      return (this.availableFilters.ontologyNames ?? []).map(name => ({ name }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    },
+    availableTags() {
+      return (this.availableFilters.tagLabels ?? []).map(name => ({ name }))
+        .sort((a, b) => a.name.localeCompare(b.name));
     },
 
-    querySearchTags() {
-      return this.$route.query.tags;
-    },
     selectedOntologies: syncMultiselectFilter('listProjects', 'selectedOntologies', 'availableOntologies'),
     selectedRoles: syncMultiselectFilter('listProjects', 'selectedRoles', 'availableRoles'),
     selectedTags: syncMultiselectFilter('listProjects', 'selectedTags', 'availableTags'),
+
     boundsMembers: syncBoundsFilter('listProjects', 'boundsMembers', 'maxNbMembers'),
     boundsImages: syncBoundsFilter('listProjects', 'boundsImages', 'maxNbImages'),
     boundsUserAnnotations: syncBoundsFilter('listProjects', 'boundsUserAnnotations', 'maxNbUserAnnotations'),
     boundsReviewedAnnotations: syncBoundsFilter('listProjects', 'boundsReviewedAnnotations', 'maxNbReviewedAnnotations'),
 
-    nbActiveFilters() {
-      return this.$store.getters['listProjects/nbActiveFilters'];
-    },
-    nbEmptyFilters() {
-      return this.$store.getters['listProjects/nbEmptyFilters'];
-    },
-
-    selectedOntologiesIds() {
-      return this.selectedOntologies.map(ontology => ontology.id);
-    },
-
-    boundsFilters() {
-      return [
-        { prop: 'numberOfImages', bounds: this.boundsImages, max: this.maxNbImages },
-        { prop: 'membersCount', bounds: this.boundsMembers, max: this.maxNbMembers },
-        { prop: 'numberOfAnnotations', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations },
-        { prop: 'numberOfReviewedAnnotations', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations },
-      ];
-    },
-
     projectCollection() {
-      let collection = new ProjectCollection({
-        withMembersCount: true,
-        withLastActivity: true,
-        withCurrentUserRoles: true
-      });
-      if (this.selectedOntologiesIds.length > 0 && this.selectedOntologiesIds.length < this.availableOntologies.length) {
-        collection['ontology'] = {
-          in: this.selectedOntologiesIds.join()
-        };
+      let collection = new ProjectCollection();
+      let filters = {};
+      if (this.selectedOntologies.length > 0 && this.selectedOntologies.length < this.availableOntologies.length) {
+        filters.ontologyNames = this.selectedOntologies.map(ontology => ontology.name);
       }
-      if (this.selectedRoles.length > 0) {
-        collection['currentUserRole'] = {
-          in: this.selectedRoles.join().toLowerCase()
-        };
+      if (this.selectedRoles.length > 0 && this.selectedRoles.length < this.availableRoles.length) {
+        filters.roleNames = this.selectedRoles.map(role => role.value);
       }
       if (this.searchString) {
-        collection['name'] = {
-          ilike: encodeURIComponent(this.searchString)
-        };
+        filters.name = this.searchString;
       }
       if (this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
-        collection['tag'] = {
-          in: this.selectedTags.map(t => t.id).join()
-        };
+        filters.tagLabels = this.selectedTags.map(tag => tag.name);
       }
-      for (let { prop, bounds, max } of this.boundsFilters) {
-        collection[prop] = {};
-        if (bounds[1] !== max) {
-          // if max bounds is the max possible value, do not set the filter in the request
-          // so that if an event (ex: algo creates an annotation) happens between the bounds request and the query request
-          // the image will not be skipped from the result
-          collection[prop] = {
-            lte: bounds[1]
-          };
+      [
+        { key: 'memberCount', bounds: this.boundsMembers, max: this.maxNbMembers },
+        { key: 'imageCount', bounds: this.boundsImages, max: this.maxNbImages },
+        { key: 'manualAnnotationCount', bounds: this.boundsUserAnnotations, max: this.maxNbUserAnnotations },
+        { key: 'reviewedAnnotationCount', bounds: this.boundsReviewedAnnotations, max: this.maxNbReviewedAnnotations }
+      ].forEach(({ key, bounds, max }) => {
+        if (bounds[0] > 0 || bounds[1] < max) {
+          filters[key] = {};
+          if (bounds[0] > 0) {
+            filters[key].min = bounds[0];
+          }
+          if (bounds[1] !== max) {
+            filters[key].max = bounds[1];
+          }
         }
-        if (bounds[0] > 0) {
-          collection[prop]['gte'] = bounds[0];
-        }
+      });
+      if (Object.keys(filters).length > 0) {
+        collection.filters = filters;
       }
       return collection;
     },
@@ -344,38 +327,25 @@ export default {
   watch: {
     revision() {
       this.fetchOntologies();
-      this.fetchMaxFilters();
-    },
-    querySearchTags(values) {
-      if (values) {
-        this.selectedTags = [];
-        let queriedTags = this.availableTags.filter(tag => values.split(',').includes(tag.name));
-        if (queriedTags) {
-          this.selectedTags = queriedTags;
-        }
-      }
+      this.fetchAvailableFilters();
     }
   },
   methods: {
     formatMomentDate,
+    toggleFilterDisplay() {
+      this.filtersOpened = !this.filtersOpened;
+    },
     async fetchOntologies() {
       let ontologies = (await OntologyCollection.fetchAll({ light: true })).array;
       ontologies.sort((a, b) => a.name.localeCompare(b.name));
       this.ontologies = ontologies;
     },
-    async fetchMaxFilters() {
-      let stats = await ProjectCollection.fetchBounds({ withMembersCount:true });
-
-      this.maxNbMembers = Math.max(10, stats.members.max);
-      this.maxNbImages = Math.max(10, stats.numberOfImages.max);
-      this.maxNbUserAnnotations = Math.max(100, stats.numberOfAnnotations.max);
-      this.maxNbReviewedAnnotations = Math.max(100, stats.numberOfReviewedAnnotations.max);
-    },
-    async fetchTags() {
-      this.availableTags = [{ id: 'null', name: this.$t('no-tag') }, ...(await TagCollection.fetchAll()).array];
-    },
-    toggleFilterDisplay() {
-      this.filtersOpened = !this.filtersOpened;
+    async fetchAvailableFilters() {
+      this.availableFilters = (await ProjectCollection.fetchAvailableFilters()) ?? {};
+      this.maxNbMembers = Math.max(10, this.availableFilters.memberCount?.max ?? 0);
+      this.maxNbImages = Math.max(10, this.availableFilters.imageCount?.max ?? 0);
+      this.maxNbUserAnnotations = Math.max(100, this.availableFilters.manualAnnotationCount?.max ?? 0);
+      this.maxNbReviewedAnnotations = Math.max(100, this.availableFilters.reviewedAnnotationCount?.max ?? 0);
     },
     updateProject() {
       this.revision++;
@@ -401,18 +371,11 @@ export default {
     try {
       await Promise.all([
         this.fetchOntologies(),
-        this.fetchMaxFilters(),
-        this.fetchTags()
+        this.fetchAvailableFilters()
       ]);
     } catch (error) {
       console.log(error);
       this.error = true;
-    }
-    if (this.$route.query.tags) {
-      let queriedTags = this.availableTags.filter(tag => this.$route.query.tags.split(',').includes(tag.name));
-      if (queriedTags) {
-        this.selectedTags = queriedTags;
-      }
     }
 
     this.loading = false;

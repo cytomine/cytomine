@@ -74,10 +74,10 @@
           @setCollectionSize="nbProjects = $event"
         >
           <template #default="{row: project}">
-            <b-table-column field="currentUserRole" label="" centered width="1" sortable>
+            <b-table-column field="currentUserRole" label="" centered width="1">
               <icon-project-member-role
-                :is-manager="project.currentUserRoles.admin"
-                :is-representative="project.currentUserRoles.representative"
+                :is-manager="project.currentUserRoles?.includes('admin')"
+                :is-representative="project.currentUserRoles?.includes('representative')"
               />
             </b-table-column>
 
@@ -91,28 +91,30 @@
               </router-link>
             </b-table-column>
 
-            <b-table-column field="membersCount" :label="$t('members')" centered sortable width="150">
+            <b-table-column field="members_count" :label="$t('members')" centered sortable width="150">
               {{ project.membersCount }}
             </b-table-column>
 
-            <b-table-column field="numberOfImages" :label="$t('images')" centered sortable width="150">
+            <b-table-column field="count_images" :label="$t('images')" centered sortable width="150">
               <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfAnnotations" :label="$t('user-annotations')" centered sortable width="150">
+            <b-table-column field="count_annotations" :label="$t('user-annotations')" centered sortable width="150">
               <router-link :to="`/project/${project.id}/annotations?type=user`">
                 {{ project.numberOfAnnotations }}
               </router-link>
             </b-table-column>
 
-            <b-table-column field="numberOfReviewedAnnotations" :label="$t('reviewed-annotations')" centered sortable width="150">
+            <b-table-column field="count_reviewed_annotations" :label="$t('reviewed-annotations')" centered sortable width="150">
               <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
                 {{ project.numberOfReviewedAnnotations }}
               </router-link>
             </b-table-column>
 
-            <b-table-column field="lastActivity" :label="$t('last-activity')" centered sortable width="180">
-              {{ formatMomentDate(Number(project.lastActivity), 'll') }}
+            <b-table-column field="last_activity" :label="$t('last-activity')" centered sortable width="180">
+              <template v-if="project.lastActivity">
+                {{ formatMomentDate(Number(project.lastActivity), 'll') }}
+              </template>
             </b-table-column>
 
             <b-table-column label=" " centered width="150">
@@ -137,13 +139,6 @@
             </div>
           </template>
         </cytomine-table>
-
-        <div class="legend">
-            <h2>{{$t('legend')}}</h2>
-          <p><icon-project-member-role /> : {{$t('contributor-icon-label')}}</p>
-          <p><icon-project-member-role :is-manager="true" /> : {{$t('manager-icon-label')}}</p>
-          <p><icon-project-member-role :is-manager="true" :is-representative="true" /> : {{$t('representative-icon-label')}}</p>
-        </div>
       </div>
 
 
@@ -249,21 +244,21 @@ import ProjectDetails from '@/components/project/ProjectDetails.vue';
 import ImageDetails from '@/components/image/ImageDetails.vue';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect.vue';
 import { ImageInstanceCollection, ProjectCollection, TagCollection } from '@/api';
-import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 import ImageThumbnail from '@/components/image/ImageThumbnail.vue';
 import { appendShortTermToken } from '@/utils/token-utils.js';
+import IconProjectMemberRole from '@/components/icons/IconProjectMemberRole.vue';
 import { formatMomentDate } from '@/utils/date';
 
 export default {
   name: 'advanced-search',
   components: {
     ImageThumbnail,
-    IconProjectMemberRole,
     ImageName,
     CytomineTable,
     ProjectDetails,
     ImageDetails,
-    CytomineMultiselect
+    CytomineMultiselect,
+    IconProjectMemberRole
   },
   data() {
     return {
@@ -279,6 +274,7 @@ export default {
       excludedProperties: [
         'name',
         'imagesPreview',
+        'membersCount',
         'lastActivity',
       ],
     };
@@ -326,21 +322,12 @@ export default {
       return this.$route.query.tags;
     },
     projectCollection() {
-      let collection = new ProjectCollection({
-        withMembersCount: true,
-        withLastActivity: true,
-        withCurrentUserRoles: true
-      });
+      let collection = new ProjectCollection();
       if (this.searchString) {
-        collection['name'] = {
-          ilike: encodeURIComponent(this.searchString)
-        };
+        collection.filters = { name: this.searchString };
       }
-
       if (this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {
-        collection['tag'] = {
-          in: this.selectedTags.map(t => t.id).join()
-        };
+        collection.filters = { ...(collection.filters ?? {}), tagLabels: this.selectedTags.map(tag => tag.name) };
       }
       return collection;
     },
@@ -409,18 +396,6 @@ export default {
   display: flex;
   background: #fff;
   padding: 0.5em 0.75em;
-}
-
-.legend {
-  margin-top: 0.8rem;
-  margin-bottom: 1rem;
-  border-radius: 10px;
-  padding: 1rem 1.5em;
-  background: #f8f8f8;
-}
-
-.legend p:not(:last-child) {
-  margin-bottom: 0.4em;
 }
 
 :deep(.image-thumbnail) {

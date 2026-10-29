@@ -1,0 +1,28 @@
+package be.cytomine.common.repository.model.command.payload.response;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Set;
+
+public record ProjectListRowResponse(
+    long id,
+    String name,
+    Optional<Long> ontology,
+    Optional<String> ontologyName,
+    boolean blindMode,
+    boolean areImagesDownloadable,
+    long numberOfSlides,
+    long numberOfImages,
+    long numberOfAnnotations,
+    long numberOfReviewedAnnotations,
+    boolean isClosed,
+    boolean isReadOnly,
+    boolean isRestricted,
+    boolean hideUsersLayers,
+    boolean hideAdminsLayers,
+    LocalDateTime created,
+    Optional<LocalDateTime> updated,
+    long membersCount,
+    Set<String> currentUserRoles,
+    Optional<Long> lastActivity
+) {}

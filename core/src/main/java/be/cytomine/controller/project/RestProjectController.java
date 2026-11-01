@@ -29,14 +29,12 @@ import be.cytomine.dto.project.ProjectFromSearchResponse;
 import be.cytomine.exceptions.CytomineException;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.appengine.TaskRunService;
 import be.cytomine.service.project.ProjectFromSearchService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.search.ProjectSearchExtension;
 import be.cytomine.utils.JsonObject;
-import be.cytomine.utils.filters.SearchParameterEntry;
 
 @RestController
 @RequestMapping("/api")
@@ -50,8 +48,6 @@ public class RestProjectController extends RestCytomineController {
 
     private final CurrentUserService currentUserService;
 
-    private final CurrentRoleService currentRoleService;
-
     private final OntologyHttpContract ontologyHttpContract;
 
 
@@ -60,38 +56,6 @@ public class RestProjectController extends RestCytomineController {
     private final UserHttpContract userHttpContract;
 
     private final ProjectFromSearchService projectFromSearchService;
-
-    /**
-     * List all ontology visible for the current user For each ontology, print the terms tree
-     */
-    @GetMapping("/project.json")
-    public ResponseEntity<String> list(
-        @RequestParam(defaultValue = "false", required = false) Boolean withMembersCount,
-        @RequestParam(defaultValue = "false", required = false) Boolean withLastActivity,
-        @RequestParam(defaultValue = "false", required = false) Boolean withDescription,
-        @RequestParam(defaultValue = "false", required = false) Boolean withCurrentUserRoles,
-        @RequestParam(defaultValue = "created", required = false) String sort,
-        @RequestParam(defaultValue = "desc", required = false) String order,
-        @RequestParam(defaultValue = "0", required = false) Long offset,
-        @RequestParam(defaultValue = "0", required = false) Long max
-    ) {
-        log.debug("REST request to list projects");
-        UserResponse user = currentUserService.getCurrentUser();
-
-        if (user.username().equals("admin") && currentRoleService.isAdminByNow(user)) {
-            user = null;
-        }
-
-        ProjectSearchExtension projectSearchExtension = new ProjectSearchExtension();
-        projectSearchExtension.setWithMembersCount(withMembersCount);
-        projectSearchExtension.setWithLastActivity(withLastActivity);
-        projectSearchExtension.setWithDescription(withDescription);
-        projectSearchExtension.setWithCurrentUserRoles(withCurrentUserRoles);
-        List<SearchParameterEntry> searchParameterEntryList = super.retrieveSearchParameters();
-        return responseSuccess(
-            projectService.list(user, projectSearchExtension, searchParameterEntryList, sort, order, max, offset)
-        );
-    }
 
     @PostMapping("/project/from-search")
     public ProjectFromSearchResponse addFromSearch(@RequestBody ProjectFromSearchRequest request) {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import lombok.extern.slf4j.Slf4j;
 import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.openqa.selenium.WebDriver;
@@ -21,6 +22,7 @@ import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
 import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
 import static be.cytomine.common.repository.model.Role.ROLE_USER;
 
+@Slf4j
 @Component
 public class MultiUsersRunner {
 
@@ -70,12 +72,24 @@ public class MultiUsersRunner {
                         projectUrl, projectName, ontologyUrl
                     ));
                 } finally {
-                    cytomineSteps.deleteProject(wait, projectUrl);
-                    cytomineSteps.deleteOntology(wait, ontologyUrl);
-                    cytomineSteps.logout(wait, cytomineUrl);
+                    // best-effort cleanup: a flaky cleanup step (e.g. a transient empty ontology list right
+                    // after the project deletion) must neither fail the run nor mask a failure of the test
+                    cleanup(() -> cytomineSteps.deleteProject(wait, projectUrl),
+                        () -> cytomineSteps.deleteOntology(wait, driver, ontologyUrl),
+                        () -> cytomineSteps.logout(wait, cytomineUrl));
                 }
             } finally {
                 keycloakClient.deleteUser(user.username());
+            }
+        }
+    }
+
+    private void cleanup(Runnable... actions) {
+        for (Runnable action : actions) {
+            try {
+                action.run();
+            } catch (Exception e) {
+                log.warn("Cleanup step failed: {}", e.getMessage(), e);
             }
         }
     }

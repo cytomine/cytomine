@@ -56,8 +56,6 @@ import static org.keycloak.representations.idm.authorization.DecisionStrategy.UN
 @RequiredArgsConstructor
 public class PermissionsService {
 
-    public static final String CLIENT_NAME = "cytomine-permissions";
-    public static final String RESOURCE_NAME = "core";
     private static final String NAME = "Cytomine Core";
     private static final String DESCRIPTION = "This is the default client for cytomine.";
     private static final List<String> ROLES = List.of("USER", "GUEST", "ADMIN");
@@ -68,7 +66,6 @@ public class PermissionsService {
         List.of("web-origins", "acr", "roles", "profile", "basic", "email");
     private static final List<String> OPTIONAL_CLIENT_SCOPES =
         List.of("address", "phone", "offline_access", "microprofile-jwt");
-    private static final List<String> WEB_ORIGINS = List.of("*");
     private static final String REALM_MANAGEMENT_CLIENT = "realm-management";
     private static final List<String> REALM_MANAGEMENT_ROLES =
         List.of("view-users", "manage-users", "query-users");
@@ -78,15 +75,15 @@ public class PermissionsService {
     private static final String PROJECTS_MAPPER = "projects";
     private static final String USER_PROFILE_SCHEMA = "/keycloak-profile.json";
     private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
+
+    private final List<String> webOrigins = List.of("*");
     private final Keycloak keycloak;
-
     private final CytominePermissions cytominePermissions;
-
     private final ObjectMapper jsonMapper;
-
+    @Value("${keycloak-client.target.resource-id}")
+    String resourceId;
     @Value("${keycloak-client.target.realm}")
     String realm;
-
     @Value("${keycloak-client.target.client-id}")
     String clientId;
 
@@ -174,7 +171,7 @@ public class PermissionsService {
         representation.setAlwaysDisplayInConsole(false);
         representation.setClientAuthenticatorType("client-secret");
         representation.setRedirectUris(List.of(clientUrl + "/*"));
-        representation.setWebOrigins(WEB_ORIGINS);
+        representation.setWebOrigins(webOrigins);
         representation.setNotBefore(0);
         representation.setBearerOnly(false);
         representation.setConsentRequired(false);
@@ -191,6 +188,8 @@ public class PermissionsService {
         representation.setNodeReRegistrationTimeout(-1);
         representation.setDefaultClientScopes(DEFAULT_CLIENT_SCOPES);
         representation.setOptionalClientScopes(OPTIONAL_CLIENT_SCOPES);
+        representation.setAuthorizationServicesEnabled(true);
+        representation.setServiceAccountsEnabled(true);
         return representation;
     }
 
@@ -346,17 +345,16 @@ public class PermissionsService {
         }
     }
 
-
     public void writePermissionsToKeycloak() {
         RealmResource realmResource = keycloak.realm(realm);
 
         ClientsResource clients = realmResource.clients();
 
         ClientResource existingClient =
-            clients.findByClientId(CLIENT_NAME).stream().findFirst().map(ignored -> clients.get(CLIENT_NAME))
+            clients.findByClientId(clientId).stream().findFirst().map(ignored -> clients.get(clientId))
                 .orElseGet(() -> {
                     realmResource.clients().create(getBaseClientRepresentation(new ClientRepresentation()));
-                    return realmResource.clients().get(CLIENT_NAME);
+                    return realmResource.clients().get(clientId);
                 });
 
         cytominePermissions.roles().forEach(
@@ -383,7 +381,7 @@ public class PermissionsService {
         permission.setName("core-" + role);
         permission.setDecisionStrategy(UNANIMOUS);
         permission.setLogic(Logic.POSITIVE);
-        permission.addResource(RESOURCE_NAME);
+        permission.addResource(resourceId);
         scopes.stream().map(CytominePermission::toString).forEach(permission::addScope);
         permission.addPolicy("role-" + role);
 
@@ -431,8 +429,8 @@ public class PermissionsService {
     }
 
     ClientRepresentation getBaseClientRepresentation(ClientRepresentation clientRepresentation) {
-        clientRepresentation.setId(CLIENT_NAME);
-        clientRepresentation.setName(CLIENT_NAME);
+        clientRepresentation.setId(clientId);
+        clientRepresentation.setName(clientId);
         clientRepresentation.setAuthorizationServicesEnabled(true);
         clientRepresentation.setServiceAccountsEnabled(true);
         return clientRepresentation;
@@ -466,15 +464,15 @@ public class PermissionsService {
         policyRepresentation.setDecisionStrategy(UNANIMOUS);
         policyRepresentation.setLogic(Logic.POSITIVE);
         policyRepresentation.setConfig(Map.of("roles",
-            jsonMapper.writeValueAsString(List.of(new SimpleRoleRepresentation(CLIENT_NAME + "/" + role, false)))));
+            jsonMapper.writeValueAsString(List.of(new SimpleRoleRepresentation(clientId + "/" + role, false)))));
         return policyRepresentation;
 
     }
 
     ResourceRepresentation getResourceRepresentation(Set<CytominePermission> scopes) {
         ResourceRepresentation resourceRepresentation = new ResourceRepresentation();
-        resourceRepresentation.setId(RESOURCE_NAME);
-        resourceRepresentation.setName(RESOURCE_NAME);
+        resourceRepresentation.setId(resourceId);
+        resourceRepresentation.setName(resourceId);
         resourceRepresentation.setScopes(scopes.stream().map(this::getScopeRepresentation).collect(Collectors.toSet()));
         return resourceRepresentation;
     }

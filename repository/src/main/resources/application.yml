@@ -50,7 +50,8 @@ keycloak-client:
     realm: master
   target:
     realm: cytomine
-    client-id: core
+    client-id: core-v1
+    resource-id: core-v1
     client-url: ${APP_URL:http://127.0.0.1}
     admin-user:
       username: ${CYTOMINE_ADMIN_USER:admin}

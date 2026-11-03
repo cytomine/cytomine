@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import ProjectMembers from '@/components/project/configuration-panels/ProjectMembers.vue';
@@ -15,7 +15,6 @@ vi.mock('@/api', () => ({
 }));
 
 describe('ProjectMembers.vue', () => {
-  let localVue;
   let projectMock;
   let dispatch;
   let notify;
@@ -25,26 +24,27 @@ describe('ProjectMembers.vue', () => {
   const REPRESENTATIVE = 'representative';
 
   const createWrapper = (selectedMembers = [], options = {}) => shallowMount(ProjectMembers, {
-    localVue,
     data: () => ({ selectedMembers, loading: false }),
-    computed: {
-      project: () => projectMock,
-      currentUser: () => ({ id: 999 }),
-      shortTermToken: () => 'token'
-    },
-    mocks: {
-      $t: (message) => message,
-      $tc: (message) => message,
-      $notify: notify,
-      $store: { dispatch }
+    global: {
+      plugins: [Buefy],
+      renderStubDefaultSlot: false,
+      mocks: {
+        $t: (message) => message,
+        $tc: (message) => message,
+        $notify: notify,
+        $store: {
+          dispatch,
+          state: {
+            currentUser: { user: { id: 999 }, shortTermToken: 'token' },
+            currentProject: { project: projectMock }
+          }
+        }
+      }
     },
     ...options
   });
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
-
     projectMock = {
       id: 10,
       deleteUsers: vi.fn().mockResolvedValue(),

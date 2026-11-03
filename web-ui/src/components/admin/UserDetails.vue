@@ -1,6 +1,6 @@
 <template>
 <div class="details-wrapper">
-  <b-loading :active="loading" :is-full-page="false" class="small" />
+  <b-loading :model-value="loading" :is-full-page="false" class="small" />
   <table v-if="!loading" class="table">
     <tbody>
       <tr v-if="currentAccount.isDeveloper">
@@ -13,7 +13,7 @@
           {{projects ? projects.length : '?'}}
         </td>
         <td>
-          <b-collapse v-if="projects && projects.length" :open="false">
+          <b-collapse v-if="projects && projects.length" :model-value="false">
             <template #trigger="{open}">
               <button class="button is-small">
                 {{$t(open ? 'button-hide' : 'button-show')}}
@@ -35,7 +35,7 @@
           {{managedProjects ? managedProjects.length : '?'}}
         </td>
         <td>
-          <b-collapse v-if="managedProjects && managedProjects.length" :open="false">
+          <b-collapse v-if="managedProjects && managedProjects.length" :model-value="false">
             <template #trigger="{open}">
               <button class="button is-small">
                 {{$t(open ? 'button-hide' : 'button-show')}}

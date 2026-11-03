@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <b-collapse :open="filtersOpened">
+      <b-collapse :model-value="filtersOpened">
         <div class="filters columns">
           <div class="column filter">
             <div class="filter-label">
@@ -58,45 +58,43 @@
         :per-page="perPage"
         pagination-size="is-small"
       >
-        <template #default="{row: member}">
-          <b-table-column field="username" :label="$t('username')" sortable width="100">
-            <username :user="member" :online="onlineIds ? onlineIds.includes(member.id) : null" :displayFullName="false" />
-          </b-table-column>
+        <b-table-column v-slot="{row: member}" field="username" :label="$t('username')" sortable width="100">
+          <username :user="member" :online="onlineIds ? onlineIds.includes(member.id) : null" :displayFullName="false" />
+        </b-table-column>
 
-          <b-table-column field="name" :label="$t('name')" sortable width="150">
-            {{ member.name }}
-          </b-table-column>
+        <b-table-column v-slot="{row: member}" field="name" :label="$t('name')" sortable width="150">
+          {{ member.name }}
+        </b-table-column>
 
-          <b-table-column field="role" :label="$t('role')" centered sortable width="20">
-            <icon-project-member-role :is-manager="member.role === managerRole" />
-          </b-table-column>
+        <b-table-column v-slot="{row: member}" field="role" :label="$t('role')" centered sortable width="20">
+          <icon-project-member-role :is-manager="member.role === managerRole" />
+        </b-table-column>
 
-          <b-table-column field="lastImageName" :label="$t('last-image')" sortable width="100">
-            <template v-if="member.lastImageId">
-              <router-link :to="`/project/${project.id}/image/${member.lastImageId}`">
-                {{member.lastImageName}}
-              </router-link>
-            </template>
-            <em v-else class="has-text-grey">{{$t('no-record')}}</em>
-          </b-table-column>
-
-          <b-table-column field="lastConnection" :label="$t('last-connection')" sortable width="100">
-            <template v-if="member.lastConnection">
-              {{formatMomentDate(Number(member.lastConnection), 'll LT')}}
-            </template>
-            <em v-else class="has-text-grey">{{$t('no-record')}}</em>
-          </b-table-column>
-
-          <b-table-column field="frequency" :label="$t('number-connections')" sortable width="100">
-            {{member.frequency}}
-          </b-table-column>
-
-          <b-table-column label="" centered width="50">
-            <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link">
-              {{$t('button-details')}}
+        <b-table-column v-slot="{row: member}" field="lastImageName" :label="$t('last-image')" sortable width="100">
+          <template v-if="member.lastImageId">
+            <router-link :to="`/project/${project.id}/image/${member.lastImageId}`">
+              {{member.lastImageName}}
             </router-link>
-          </b-table-column>
-        </template>
+          </template>
+          <em v-else class="has-text-grey">{{$t('no-record')}}</em>
+        </b-table-column>
+
+        <b-table-column v-slot="{row: member}" field="lastConnection" :label="$t('last-connection')" sortable width="100">
+          <template v-if="member.lastConnection">
+            {{formatMomentDate(Number(member.lastConnection), 'll LT')}}
+          </template>
+          <em v-else class="has-text-grey">{{$t('no-record')}}</em>
+        </b-table-column>
+
+        <b-table-column v-slot="{row: member}" field="frequency" :label="$t('number-connections')" sortable width="100">
+          {{member.frequency}}
+        </b-table-column>
+
+        <b-table-column v-slot="{row: member}" label="" centered width="50">
+          <router-link :to="`/project/${project.id}/activity/user/${member.id}`" class="button is-small is-link">
+            {{$t('button-details')}}
+          </router-link>
+        </b-table-column>
 
         <template #empty>
           <div class="content has-text-grey has-text-centered">

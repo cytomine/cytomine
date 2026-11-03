@@ -3,8 +3,8 @@ import { shallowMount } from '@vue/test-utils';
 import HistogramChart from '@/components/charts/HistogramChart.js';
 
 describe('HistogramChart.js', () => {
-  const createWrapper = (propsData = {}) => shallowMount(HistogramChart, {
-    propsData: {
+  const createWrapper = (props = {}) => shallowMount(HistogramChart, {
+    props: {
       logScale: false,
       color: '#fff',
       histogram: [1, 2, 3, 4, 5],
@@ -16,8 +16,8 @@ describe('HistogramChart.js', () => {
       currentBounds: { min: 0, max: 255 },
       gamma: 1,
       inverted: false,
-      ...propsData,
-    },
+      ...props,
+    }
   });
 
   it('should draw the response line above the histogram fill', () => {

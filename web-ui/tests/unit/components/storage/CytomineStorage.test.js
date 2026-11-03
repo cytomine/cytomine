@@ -26,22 +26,31 @@ vi.mock('@/api', () => ({
 
 describe('CytomineStorage.vue', () => {
   const createWrapper = ({ data = {} } = {}) => shallowMount(CytomineStorage, {
-    mocks: {
-      $t: (key) => key,
-    },
-    stubs: {
-      'list-uploaded-files': true,
-      'cytomine-multiselect': true,
-      'b-message': true,
-      'b-upload': true,
-    },
-    computed: {
-      currentUser: () => ({ id: 42 }),
-      currentAccount: () => ({ isDeveloper: false }),
-    },
     data() {
       return { ...data };
     },
+    global: {
+      mocks: {
+        $t: (key) => key,
+        // The `computed` mounting option is gone in Vue Test Utils v2, so the
+        // store the `get()` helpers read from has to be mocked instead.
+        $store: {
+          state: {
+            currentUser: {
+              user: { id: 42 },
+              account: { isDeveloper: false },
+              shortTermToken: 'token',
+            },
+          },
+        },
+      },
+      stubs: {
+        'list-uploaded-files': true,
+        'cytomine-multiselect': true,
+        'b-message': true,
+        'b-upload': true,
+      }
+    }
   });
 
   beforeEach(() => {
@@ -70,7 +79,7 @@ describe('CytomineStorage.vue', () => {
     wrapper.vm.filesChange([alreadyAdded, newFile]);
 
     expect(wrapper.vm.dropFiles).toHaveLength(1);
-    expect(wrapper.vm.dropFiles[0].file).toBe(newFile);
+    expect(wrapper.vm.dropFiles[0].file).toEqual(newFile);
   });
 
   it('should only cancel files that are not yet uploaded', () => {

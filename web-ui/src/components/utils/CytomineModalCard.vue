@@ -22,7 +22,13 @@ export default {
   name: 'cytomine-modal-card',
   props: {
     title: String,
-    footer: { type: Boolean, default: true }
-  }
+    footer: { type: Boolean, default: true },
+  },
 };
 </script>
+
+<style scoped>
+.modal-card-foot {
+  gap: 0.5em;
+}
+</style>

@@ -17,16 +17,27 @@ describe('TaskInputForm.vue', () => {
   };
 
   const createWrapper = (overrides = {}) => {
-    return shallowMount(TaskInputForm, {
-      propsData: {
+    let wrapper;
+
+    wrapper = shallowMount(TaskInputForm, {
+      props: {
         inputs: {},
         task: mockTask,
-        ...overrides.propsData,
+        // The component is controlled: it emits the input map it wants and the
+        // parent is expected to feed it back. Without that round-trip its
+        // template reads `inputs[name].value` for entries that do not exist,
+        // and Vue 3 tears the instance down when a render throws.
+        onInput: value => wrapper.setProps({ inputs: value }),
+        ...overrides.props,
       },
-      stubs: {
-        'AppEngineField': true,
-      },
+      global: {
+        stubs: {
+          'AppEngineField': true,
+        }
+      }
     });
+
+    return wrapper;
   };
 
   it('should sort task inputs when fetched on created', async () => {
@@ -41,7 +52,7 @@ describe('TaskInputForm.vue', () => {
     ];
     Task.fetchTaskInputs.mockResolvedValue(expectedInputs);
     const wrapper = createWrapper({
-      propsData: {
+      props: {
         task: expectedTask,
       }
     });
@@ -92,7 +103,7 @@ describe('TaskInputForm.vue', () => {
 
   it('should call resetForm when inputs prop becomes empty', async () => {
     const wrapper = createWrapper({
-      propsData: {
+      props: {
         inputs: { some: 'value' },
       },
     });
@@ -121,7 +132,7 @@ describe('TaskInputForm.vue', () => {
 
   it('should emit updated input value on change', async () => {
     const wrapper = createWrapper({
-      propsData: {
+      props: {
         inputs: {
           test: { value: 'old' },
         },

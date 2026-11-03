@@ -1,10 +1,9 @@
-import { createLocalVue, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import Buefy from 'buefy';
 
 import EnumerationField from '@/components/appengine/forms/fields/EnumerationField';
 
 describe('EnumerationField.vue', () => {
-  let localVue;
   let wrapper;
 
   const mockParameter = {
@@ -16,15 +15,15 @@ describe('EnumerationField.vue', () => {
   };
 
   beforeEach(() => {
-    localVue = createLocalVue();
-    localVue.use(Buefy);
 
     wrapper = mount(EnumerationField, {
-      localVue,
-      propsData: {
+      props: {
         parameter: mockParameter,
-        value: mockParameter.default,
+        modelValue: mockParameter.default,
       },
+      global: {
+        plugins: [Buefy]
+      }
     });
   });
 
@@ -63,7 +62,7 @@ describe('EnumerationField.vue', () => {
   it('Changing the value should emit an event', async () => {
     await wrapper.find('select').setValue('B');
 
-    const emitted = wrapper.emitted().input;
+    const emitted = wrapper.emitted()['update:modelValue'];
     expect(emitted).toBeTruthy();
     expect(emitted.at(0)).toEqual(['B']);
     expect(mockParameter.type.values).toContain(emitted.at(0).at(0));
@@ -72,7 +71,7 @@ describe('EnumerationField.vue', () => {
   it('Changing to an unknown value should fail', async () => {
     await wrapper.find('select').setValue('Unknown');
 
-    const emitted = wrapper.emitted().input;
+    const emitted = wrapper.emitted()['update:modelValue'];
     expect(emitted).toBeTruthy();
     expect(emitted.at(0)).toEqual([undefined]);
     expect(mockParameter.type.values).not.toContain(emitted.at(0).at(0));

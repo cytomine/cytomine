@@ -4,7 +4,7 @@
   <p> {{ $t('unexpected-error-info-message') }} </p>
 </b-message>
 <table v-else class="table">
-  <b-loading :is-full-page="false" :active="loading" class="small" />
+  <b-loading :is-full-page="false" :model-value="loading" class="small" />
   <tbody v-if="!loading">
     <tr v-if="isPropDisplayed('id') && currentAccount.isDeveloper">
       <td class="prop-label">{{$t('id')}}</td>

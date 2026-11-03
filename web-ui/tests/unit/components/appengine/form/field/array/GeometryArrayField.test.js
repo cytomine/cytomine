@@ -11,14 +11,14 @@ describe('GeometryArrayField.vue', () => {
     expect(wrapper.findComponent(AnnotationMultiSelect).exists()).toBe(true);
   });
 
-  it('should wrap the emitted ids in {ids, type: annotation} and re-emit as input', async () => {
+  it('should wrap the emitted ids in {ids, type: annotation} and re-emit as update:modelValue', async () => {
     const wrapper = createWrapper();
     const ids = [1, 2, 3];
 
     wrapper.findComponent(AnnotationMultiSelect).vm.$emit('input', ids);
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.emitted('input')).toBeTruthy();
-    expect(wrapper.emitted('input')[0]).toEqual([{ ids, type: 'annotation' }]);
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+    expect(wrapper.emitted('update:modelValue')[0]).toEqual([{ ids, type: 'annotation' }]);
   });
 });

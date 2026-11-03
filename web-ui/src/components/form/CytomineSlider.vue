@@ -54,9 +54,9 @@
 <script>
 export default {
   name: 'cytomine-slider',
-  emits: ['input'],
+  emits: ['update:modelValue'],
   props: {
-    value: { type: null },
+    modelValue: { type: null },
     min: { type: Number, default: 0 },
     max: { type: Number, default: 100 },
     interval: { type: Number },
@@ -78,7 +78,7 @@ export default {
   },
   computed: {
     isArray() {
-      return Array.isArray(this.value);
+      return Array.isArray(this.modelValue);
     },
     step() {
       return this.interval || 1;
@@ -90,7 +90,7 @@ export default {
       return this.range / 2;
     },
     valueArray() {
-      const value = (this.internalValue === null) ? this.value : this.internalValue;
+      const value = (this.internalValue === null) ? this.modelValue : this.internalValue;
       const values = Array.isArray(value) ? value : [value];
       return values.map((v, i) => (typeof v === 'number' && !isNaN(v)) ? v : (i === 0 ? this.min : this.max));
     },
@@ -106,14 +106,14 @@ export default {
     tooltipPlacement() {
       if (this.isArray) {
         if (this.smartTooltipPosition) {
-          const n = this.value.length + 1;
-          const values = (Array.isArray(this.internalValue)) ? this.internalValue : this.value;
+          const n = this.modelValue.length + 1;
+          const values = (Array.isArray(this.internalValue)) ? this.internalValue : this.modelValue;
           return values.map((v, i) => (v >= this.range * (i + 1) / n) ? 'left' : 'right');
         }
-        return this.value.map((_, i) => (i === 0) ? 'left' : 'right');
+        return this.modelValue.map((_, i) => (i === 0) ? 'left' : 'right');
       }
 
-      const value = (this.internalValue === null) ? this.value : this.internalValue;
+      const value = (this.internalValue === null) ? this.modelValue : this.internalValue;
       if (value >= this.middle) {
         return ['left'];
       }
@@ -136,8 +136,8 @@ export default {
     }
   },
   watch: {
-    value() {
-      this.internalValue = this.clone(this.value);
+    modelValue() {
+      this.internalValue = this.clone(this.modelValue);
     }
   },
   methods: {
@@ -184,7 +184,7 @@ export default {
       this.internalValue = values;
     },
     commit() {
-      this.$emit('input', this.clone(this.internalValue));
+      this.$emit('update:modelValue', this.clone(this.internalValue));
     },
     onRailDown(event) {
       if (this.indexEdited !== null) {
@@ -241,7 +241,7 @@ export default {
     },
     startEdition(index) {
       if (this.indexEdited !== index) {
-        this.editedValue = this.isArray ? this.value[index] : this.value;
+        this.editedValue = this.isArray ? this.modelValue[index] : this.modelValue;
         this.indexEdited = index;
       }
     },
@@ -258,14 +258,14 @@ export default {
         parsedValue = Math.max(parsedValue, this.min);
 
         if (this.isArray) {
-          let newVal = this.value.slice();
+          let newVal = this.modelValue.slice();
           newVal[index] = parsedValue;
           if (newVal[0] > newVal[1]) { // reorder bounds if needed
             newVal.reverse();
           }
-          this.$emit('input', newVal);
+          this.$emit('update:modelValue', newVal);
         } else {
-          this.$emit('input', parsedValue);
+          this.$emit('update:modelValue', parsedValue);
         }
       }
     },
@@ -279,7 +279,7 @@ export default {
     }
   },
   created() {
-    this.internalValue = this.clone(this.value);
+    this.internalValue = this.clone(this.modelValue);
   },
   beforeUnmount() {
     window.removeEventListener('pointermove', this.onDrag);

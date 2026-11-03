@@ -119,7 +119,7 @@ public class PermissionsService {
             ensureAdminHasRealmManagementRoles(realmResource);
             applyUserProfileSchema(realmResource);
             ensureProjectsMapperIsSet(realmResource);
-            writePermissionsToKeycloak();
+            writePermissionsToKeycloak(coreClient);
         }
     }
 
@@ -180,8 +180,7 @@ public class PermissionsService {
         representation.setStandardFlowEnabled(true);
         representation.setImplicitFlowEnabled(false);
         representation.setDirectAccessGrantsEnabled(true);
-        representation.setServiceAccountsEnabled(false);
-        representation.setPublicClient(true);
+        representation.setServiceAccountsEnabled(true);
         representation.setFrontchannelLogout(true);
         representation.setProtocol("openid-connect");
         representation.setAttributes(clientAttributes());
@@ -347,17 +346,7 @@ public class PermissionsService {
         }
     }
 
-    public void writePermissionsToKeycloak() {
-        RealmResource realmResource = keycloak.realm(realm);
-
-        ClientsResource clients = realmResource.clients();
-
-        ClientResource existingClient =
-            clients.findByClientId(clientId).stream().findFirst().map(ignored -> clients.get(clientId))
-                .orElseGet(() -> {
-                    realmResource.clients().create(getBaseClientRepresentation(new ClientRepresentation()));
-                    return realmResource.clients().get(clientId);
-                });
+    public void writePermissionsToKeycloak(ClientResource existingClient) {
 
         cytominePermissions.roles().forEach(
             (key, value) -> wrapException(() -> existingClient.roles().get(key).toRepresentation()).map(ignored -> true)

@@ -50,6 +50,7 @@ keycloak-client:
     realm: master
   target:
     realm: cytomine
+    # Change also in keycloak.js if update is needed.
     client-id: core-v1
     resource-id: core-v1
     client-url: ${APP_URL:http://127.0.0.1}

@@ -81,6 +81,7 @@ services:
       <<: *version-env
       CORE_URL: http://127.0.0.1:8080/api
       IAM_URL: http://127.0.0.1:8100/iam/realms/cytomine
+      CORE_CLIENT_NAME: core-v1
       PIMS_URL: http://127.0.0.1:5001/ims
       APPENGINE_URL: http://127.0.0.1:8082
       CBIR_URL: http://127.0.0.1:6000

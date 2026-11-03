@@ -1,5 +1,11 @@
 function getDefaultState() {
   return {
+    currentPage: 1,
+    perPage: 10,
+    sortField: 'created',
+    sortOrder: 'desc',
+    openedDetails: [],
+
     searchString: '',
 
     filtersOpened: false,
@@ -11,13 +17,7 @@ function getDefaultState() {
       boundsImages: null,
       boundsUserAnnotations: null,
       boundsReviewedAnnotations: null
-    },
-
-    currentPage: 1,
-    perPage: 10,
-    sortField: 'lastActivity',
-    sortOrder: 'desc',
-    openedDetails: []
+    }
   };
 }
 
@@ -29,18 +29,6 @@ export default {
   mutations: {
     resetState(state) {
       Object.assign(state, getDefaultState());
-    },
-
-    setSearchString(state, searchString) {
-      state.searchString = searchString;
-    },
-
-    setFiltersOpened(state, value) {
-      state.filtersOpened = value;
-    },
-
-    setFilter(state, { filterName, propValue }) {
-      state.filters[filterName] = propValue;
     },
 
     setCurrentPage(state, page) {
@@ -61,6 +49,18 @@ export default {
 
     setOpenedDetails(state, value) {
       state.openedDetails = value;
+    },
+
+    setSearchString(state, searchString) {
+      state.searchString = searchString;
+    },
+
+    setFiltersOpened(state, value) {
+      state.filtersOpened = value;
+    },
+
+    setFilter(state, { filterName, propValue }) {
+      state.filters[filterName] = propValue;
     }
   },
 

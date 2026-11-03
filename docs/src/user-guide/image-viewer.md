@@ -38,6 +38,12 @@ On the right, you have a panel related to the current image. The related topics 
 - _Annotations Properties_: If the displayed annotations have properties, you will be able to select one to display it on the image;
 - _Broadcast_: If a user is connected and has allowed his position to be broadcast, you will be able to follow him on the image.
 
+### Image metadata
+
+The _Information_ panel gives you access to the image metadata, providing detailed information about the image such as its acquisition parameters and technical properties.
+
+![Image metadata](/images/user-guide/image-viewer/viewer-image-metadata.png)
+
 ### Rotation
 
 At the top left of the viewer, the **+** and **-** zoom buttons and the rotation tool are displayed.

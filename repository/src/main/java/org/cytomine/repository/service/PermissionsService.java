@@ -166,6 +166,8 @@ public class PermissionsService {
         representation.setRootUrl(clientUrl);
         representation.setAdminUrl(clientUrl);
         representation.setBaseUrl(clientUrl);
+        representation.setBearerOnly(false);
+        representation.setPublicClient(false);
         representation.setSurrogateAuthRequired(false);
         representation.setEnabled(true);
         representation.setAlwaysDisplayInConsole(false);

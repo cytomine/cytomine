@@ -27,17 +27,13 @@ import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.security.IamProjectMembershipService;
 import be.cytomine.utils.AuthenticationSuccessListener;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-/**
- * Unit tests of the reconciliation of the project membership of a user with the projects provisioned in IAM,
- * performed by {@link AuthenticationSuccessListener} on every authenticated request.
- */
+/** Unit tests of the project-membership reconciliation with IAM in {@link AuthenticationSuccessListener}. */
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationSuccessListenerTest {
 
@@ -95,11 +91,8 @@ public class AuthenticationSuccessListenerTest {
 
         listener.onApplicationEvent(authenticationEventOf(INTERNAL_USERNAME));
 
-        verify(iamProjectMembershipService, never()).findProjects(anyString());
-        verify(projectMemberService, never()).addUserToProjectWithAdmin(anyString(), any(Project.class),
-            anyBoolean());
-        verify(projectMemberService, never()).deleteUserFromProjectWithAdmin(any(User.class), any(Project.class),
-            anyBoolean());
+        verify(iamProjectMembershipService, never()).findProjects(INTERNAL_USERNAME);
+        verifyNoInteractions(projectMemberService);
     }
 
     @DisplayName("The membership of an external user matching IAM provisioning is left untouched")
@@ -115,10 +108,7 @@ public class AuthenticationSuccessListenerTest {
 
         listener.onApplicationEvent(authenticationEventOf(EXTERNAL_USERNAME));
 
-        verify(projectMemberService, never()).addUserToProjectWithAdmin(anyString(), any(Project.class),
-            anyBoolean());
-        verify(projectMemberService, never()).deleteUserFromProjectWithAdmin(any(User.class), any(Project.class),
-            anyBoolean());
+        verifyNoInteractions(projectMemberService);
     }
 
     @DisplayName("The membership of an external user not present in IAM provisioning is removed")
@@ -137,8 +127,7 @@ public class AuthenticationSuccessListenerTest {
         listener.onApplicationEvent(authenticationEventOf(EXTERNAL_USERNAME));
 
         verify(projectMemberService).deleteUserFromProjectWithAdmin(user, betaProject, false);
-        verify(projectMemberService, never()).addUserToProjectWithAdmin(anyString(), any(Project.class),
-            anyBoolean());
+        verifyNoMoreInteractions(projectMemberService);
     }
 
     @DisplayName("The IAM provisioning of an external user without membership in core is granted")
@@ -157,8 +146,7 @@ public class AuthenticationSuccessListenerTest {
         listener.onApplicationEvent(authenticationEventOf(EXTERNAL_USERNAME));
 
         verify(projectMemberService).addUserToProjectWithAdmin(EXTERNAL_USERNAME, betaProject, false);
-        verify(projectMemberService, never()).deleteUserFromProjectWithAdmin(any(User.class), any(Project.class),
-            anyBoolean());
+        verifyNoMoreInteractions(projectMemberService);
     }
 
     private User internalUser() {

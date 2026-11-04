@@ -40,7 +40,7 @@ application:
 jwt:
   auth:
     converter:
-      resource-id: core
+      resource-id: core-v1
       principle-attribute: preferred_username
 
 keycloak-client:

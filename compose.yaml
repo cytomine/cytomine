@@ -75,6 +75,7 @@ services:
       - core
       - iam
       - pims
+      - repository
     volumes:
       - /etc/localtime:/etc/localtime
     environment:

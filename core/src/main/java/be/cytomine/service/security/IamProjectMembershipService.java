@@ -19,8 +19,8 @@ import be.cytomine.exceptions.UserManagementException;
 
 /**
  * Keeps the IAM (Keycloak) "projects" attribute of externally provisioned users in sync with the project
- * memberships managed in core. Externally provisioned users are the ones whose username ends with
- * {@value #EXTERNAL_USERNAME_SUFFIX} (LS-AAI identity).
+ * memberships managed in core. Externally provisioned users are the ones whose username ends with one of the
+ * {@code cytomine.iam.external-username-suffixes} (the LS-AAI identity by default).
  * <p>
  * The IAM "projects" attribute is the source of truth for the membership of these users: it is reconciled in
  * core by AuthenticationSuccessListener on every authenticated request. This service must therefore be applied
@@ -37,13 +37,16 @@ public class IamProjectMembershipService {
     @Value("${keycloak-client.target.realm}")
     private String realm;
 
-    static final String EXTERNAL_USERNAME_SUFFIX = "@lifescience-ri.eu";
+    @Value("#{'${cytomine.iam.external-username-suffixes:@lifescience-ri.eu}'.split(',')}")
+    private List<String> externalUsernameSuffixes;
 
     /**
-     * @return true if the user with the given username is externally provisioned through LS-AAI
+     * @return true if the user with the given username is externally provisioned, i.e. its username ends with one
+     * of the configured {@code cytomine.iam.external-username-suffixes}
      */
     public boolean isExternal(String username) {
-        return username != null && username.endsWith(EXTERNAL_USERNAME_SUFFIX);
+        return username != null && externalUsernameSuffixes.stream()
+            .anyMatch(suffix -> username.endsWith(suffix.trim()));
     }
 
     /**

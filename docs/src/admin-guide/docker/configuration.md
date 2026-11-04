@@ -35,7 +35,8 @@ once steps above are followed a new button appears in the login form to start th
 
 ### C. LS-AAI users and project membership
 
-Identified LS-AAI users (usernames ending with `@lifescience-ri.eu`) have their project memberships provisioned from
+Identified LS-AAI users (usernames ending with one of the `cytomine.iam.external-username-suffixes`,
+`@lifescience-ri.eu` by default) have their project memberships provisioned from
 the IAM: the `projects` multivalued user attribute in Keycloak lists the names of the projects(s) they can access.
 
 - The attribute is applied to the database at every authenticated request, and it accepts project names only.

@@ -58,6 +58,8 @@ public class PermissionsService {
 
     private static final String NAME = "Cytomine Core";
     private static final String DESCRIPTION = "This is the default client for cytomine.";
+    private static final String BACKEND_NAME = "Cytomine Core API";
+    private static final String BACKEND_DESCRIPTION = "Resource server client for Cytomine Core with fine-grained authorization.";
     private static final List<String> ROLES = List.of("USER", "GUEST", "ADMIN");
     private static final String ADMIN_ROLE = "ADMIN";
     private static final String IS_DEVELOPER_ATTRIBUTE = "isDeveloper";
@@ -86,6 +88,8 @@ public class PermissionsService {
     String realm;
     @Value("${keycloak-client.target.client-id}")
     String clientId;
+    @Value("${keycloak-client.target.backend-client-id}")
+    String backendClientId;
 
     @Value("${keycloak-client.target.client-url:http://127.0.0.1}")
     String clientUrl;
@@ -112,14 +116,15 @@ public class PermissionsService {
     public void applyCytomineConfiguration() {
         if (configureKeycloak) {
             RealmResource realmResource = ensureRealmExists();
-            ClientResource coreClient = ensureCoreClientExists(realmResource);
-            ensureClientRolesAreSet(coreClient);
-            ensureAdminUserIsSet(realmResource, coreClient);
+            ClientResource frontendClient = ensureFrontendClientExists(realmResource);
+            ensureClientRolesAreSet(frontendClient);
+            ensureAdminUserIsSet(realmResource, frontendClient);
             ensureRealmIsInternationalized(realmResource);
             ensureAdminHasRealmManagementRoles(realmResource);
             applyUserProfileSchema(realmResource);
             ensureProjectsMapperIsSet(realmResource);
-            writePermissionsToKeycloak(coreClient);
+            ClientResource backendClient = ensureBackendClientExists(realmResource);
+            writePermissionsToKeycloak(backendClient);
         }
     }
 
@@ -145,20 +150,20 @@ public class PermissionsService {
         return realmResource;
     }
 
-    private ClientResource ensureCoreClientExists(RealmResource realmResource) {
+    private ClientResource ensureFrontendClientExists(RealmResource realmResource) {
         ClientsResource clients = realmResource.clients();
         if (clients.findByClientId(clientId).isEmpty()) {
-            clients.create(getNewClientRepresentation());
+            clients.create(getFrontendClientRepresentation());
             log.info("Created Keycloak client '{}'", clientId);
         }
         ClientResource clientResource = clients.findByClientId(clientId).stream().findFirst()
             .map(representation -> clients.get(representation.getId()))
             .orElseThrow(() -> new IllegalStateException("Failed to retrieve Keycloak client " + clientId));
-        clientResource.update(getNewClientRepresentation());
+        clientResource.update(getFrontendClientRepresentation());
         return clientResource;
     }
 
-    private ClientRepresentation getNewClientRepresentation() {
+    private ClientRepresentation getFrontendClientRepresentation() {
         ClientRepresentation representation = new ClientRepresentation();
         representation.setClientId(clientId);
         representation.setName(NAME);
@@ -166,12 +171,10 @@ public class PermissionsService {
         representation.setRootUrl(clientUrl);
         representation.setAdminUrl(clientUrl);
         representation.setBaseUrl(clientUrl);
-        representation.setBearerOnly(false);
-        representation.setPublicClient(false);
+        representation.setPublicClient(true);
         representation.setSurrogateAuthRequired(false);
         representation.setEnabled(true);
         representation.setAlwaysDisplayInConsole(false);
-        representation.setClientAuthenticatorType("client-secret");
         representation.setRedirectUris(List.of(clientUrl + "/*"));
         representation.setWebOrigins(webOrigins);
         representation.setNotBefore(0);
@@ -180,6 +183,45 @@ public class PermissionsService {
         representation.setStandardFlowEnabled(true);
         representation.setImplicitFlowEnabled(false);
         representation.setDirectAccessGrantsEnabled(true);
+        representation.setFrontchannelLogout(true);
+        representation.setProtocol("openid-connect");
+        representation.setAttributes(clientAttributes());
+        representation.setAuthenticationFlowBindingOverrides(Map.of());
+        representation.setFullScopeAllowed(true);
+        representation.setNodeReRegistrationTimeout(-1);
+        representation.setDefaultClientScopes(DEFAULT_CLIENT_SCOPES);
+        representation.setOptionalClientScopes(OPTIONAL_CLIENT_SCOPES);
+        return representation;
+    }
+
+    private ClientResource ensureBackendClientExists(RealmResource realmResource) {
+        ClientsResource clients = realmResource.clients();
+        if (clients.findByClientId(backendClientId).isEmpty()) {
+            clients.create(getBackendClientRepresentation());
+            log.info("Created Keycloak client '{}'", backendClientId);
+        }
+        ClientResource clientResource = clients.findByClientId(backendClientId).stream().findFirst()
+            .map(representation -> clients.get(representation.getId()))
+            .orElseThrow(() -> new IllegalStateException("Failed to retrieve Keycloak client " + backendClientId));
+        return clientResource;
+    }
+
+    private ClientRepresentation getBackendClientRepresentation() {
+        ClientRepresentation representation = new ClientRepresentation();
+        representation.setClientId(backendClientId);
+        representation.setName(BACKEND_NAME);
+        representation.setDescription(BACKEND_DESCRIPTION);
+        representation.setPublicClient(false);
+        representation.setSurrogateAuthRequired(false);
+        representation.setEnabled(true);
+        representation.setAlwaysDisplayInConsole(false);
+        representation.setClientAuthenticatorType("client-secret");
+        representation.setWebOrigins(webOrigins);
+        representation.setNotBefore(0);
+        representation.setConsentRequired(false);
+        representation.setStandardFlowEnabled(false);
+        representation.setImplicitFlowEnabled(false);
+        representation.setDirectAccessGrantsEnabled(false);
         representation.setServiceAccountsEnabled(true);
         representation.setFrontchannelLogout(true);
         representation.setProtocol("openid-connect");
@@ -190,7 +232,6 @@ public class PermissionsService {
         representation.setDefaultClientScopes(DEFAULT_CLIENT_SCOPES);
         representation.setOptionalClientScopes(OPTIONAL_CLIENT_SCOPES);
         representation.setAuthorizationServicesEnabled(true);
-        representation.setServiceAccountsEnabled(true);
         return representation;
     }
 
@@ -204,6 +245,7 @@ public class PermissionsService {
         attributes.put("display.on.consent.screen", "false");
         attributes.put("oauth2.device.authorization.grant.enabled", "false");
         attributes.put("backchannel.logout.revoke.offline.tokens", "false");
+        attributes.put("pkce.code.challenge.method", "S256");
         return attributes;
     }
 
@@ -366,10 +408,10 @@ public class PermissionsService {
         AuthorizationResource authorization = client.authorization();
 
         ResourcePermissionRepresentation permission =
-            wrapException(() -> authorization.permissions().resource().findByName("core-" + role)).orElseGet(
-                ResourcePermissionRepresentation::new);
+            wrapException(() -> authorization.permissions().resource().findByName(backendClientId + "-" + role))
+                .orElseGet(ResourcePermissionRepresentation::new);
 
-        permission.setName("core-" + role);
+        permission.setName(backendClientId + "-" + role);
         permission.setDecisionStrategy(UNANIMOUS);
         permission.setLogic(Logic.POSITIVE);
         permission.addResource(resourceId);
@@ -379,13 +421,13 @@ public class PermissionsService {
         try {
             if (permission.getId() == null) {
                 authorization.permissions().resource().create(permission);
-                log.info("Created resource permission core-{}", role);
+                log.info("Created resource permission {}-{}", backendClientId, role);
             } else {
                 authorization.permissions().resource().findById(permission.getId()).update(permission);
-                log.info("Updated resource permission core-{}", role);
+                log.info("Updated resource permission {}-{}", backendClientId, role);
             }
         } catch (Exception e) {
-            log.error("Failed to upsert resource permission core-{}", role, e);
+            log.error("Failed to upsert resource permission {}-{}", backendClientId, role, e);
         }
     }
 

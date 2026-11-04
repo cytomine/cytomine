@@ -40,7 +40,7 @@ application:
 jwt:
   auth:
     converter:
-      resource-id: core-v1
+      resource-id: frontend
       principle-attribute: preferred_username
 
 keycloak-client:
@@ -51,8 +51,10 @@ keycloak-client:
   target:
     realm: cytomine
     # Change also in keycloak.js if update is needed.
-    client-id: core-v1
-    resource-id: core-v1
+    client-id: frontend
+    # backend resource-server client: confidential, authorization services (scopes)
+    backend-client-id: backend
+    resource-id: backend
     client-url: ${APP_URL:http://127.0.0.1}
     admin-user:
       username: ${CYTOMINE_ADMIN_USER:admin}

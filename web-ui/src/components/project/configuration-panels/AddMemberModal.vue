@@ -65,7 +65,6 @@ export default {
         this.$notify({ type: 'success', text: this.$t('notif-success-add-project-members') });
       } catch (error) {
         console.log(error);
-        // some users may have been added despite the failure: refresh the member list
         this.$emit('addMembers');
         this.$notify({ type: 'error', text: error?.response?.data?.errors?.message || error.message || this.$t('notif-error-add-project-members') });
       }

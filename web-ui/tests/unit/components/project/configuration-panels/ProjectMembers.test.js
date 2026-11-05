@@ -119,8 +119,6 @@ describe('ProjectMembers.vue', () => {
   });
 
   it('should notify an error and refresh when deletion fails', async () => {
-    // bulk deletion reports partial failures with HTTP 206: some members may already have been removed,
-    // so the member list is refreshed even after the failure to reflect the actual state
     projectMock.deleteUsers.mockRejectedValueOnce(new Error('boom'));
     const wrapper = createWrapper([{ id: 1, fullName: 'Contributor', role: CONTRIBUTOR }]);
 

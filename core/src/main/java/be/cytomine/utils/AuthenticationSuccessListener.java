@@ -164,13 +164,6 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         }
     }
 
-    /**
-     * Reconcile the project membership of the user in core with the one provisioned in IAM (the "projects"
-     * attribute of the user in Keycloak). <br>
-     * The IAM state is read live instead of using the "projects" claim of the request token: the token keeps
-     * the claim value it was issued with, which can be outdated by the time the request is processed (e.g.
-     * right after a member was added/removed through core).
-     */
     @Transactional
     protected void updateProjectsMembership(User user) {
         if (!iamProjectMembershipService.isExternal(user.getUsername())) {

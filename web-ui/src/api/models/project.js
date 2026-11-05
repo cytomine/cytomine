@@ -180,7 +180,6 @@ export default class Project extends Model {
     }
     let response = await Cytomine.instance.api.post(`${this.callbackIdentifier}/${this.id}/user.json?users=${idUsers.join(',')}`);
     if (response.status !== 200) {
-      // some users could not be added to the project (the backend returns HTTP 206 with the details)
       throw new Error(response.data?.data?.message || 'Cannot add users to the project.');
     }
     Cytomine.instance.lastCommand = response.data.command;
@@ -210,7 +209,6 @@ export default class Project extends Model {
     }
     let response = await Cytomine.instance.api.delete(`${this.callbackIdentifier}/${this.id}/user.json?users=${idUsers.join(',')}`);
     if (response.status !== 200) {
-      // some users could not be removed from the project (the backend returns HTTP 206 with the details)
       throw new Error(response.data?.data?.message || 'Cannot remove users from the project.');
     }
     Cytomine.instance.lastCommand = response.data.command;

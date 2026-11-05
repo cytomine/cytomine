@@ -72,8 +72,6 @@ public class MultiUsersRunner {
                         projectUrl, projectName, ontologyUrl
                     ));
                 } finally {
-                    // best-effort cleanup: a flaky cleanup step (e.g. a transient empty ontology list right
-                    // after the project deletion) must neither fail the run nor mask a failure of the test
                     cleanup(() -> cytomineSteps.deleteProject(wait, projectUrl),
                         () -> cytomineSteps.deleteOntology(wait, driver, ontologyUrl),
                         () -> cytomineSteps.logout(wait, cytomineUrl));

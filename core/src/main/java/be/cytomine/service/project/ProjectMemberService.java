@@ -54,9 +54,6 @@ public class ProjectMemberService {
         securityACLService.check(project, ADMINISTRATION);
         log.info("service.addUserToProject");
         if (project != null) {
-            // for externally provisioned users, the IAM projects attribute is the source of truth reconciled
-            // on every request by AuthenticationSuccessListener: update it first, otherwise the membership
-            // added here would be deleted as soon as the user makes any request
             if (iamProjectMembershipService.isExternal(username)) {
                 iamProjectMembershipService.addProject(username, project.getName());
             }
@@ -115,9 +112,6 @@ public class ProjectMemberService {
             securityACLService.check(project, ADMINISTRATION);
         }
         if (project != null) {
-            // for externally provisioned users, the IAM projects attribute is the source of truth reconciled
-            // on every request by AuthenticationSuccessListener: remove the project from it first, otherwise
-            // the membership removed here would be restored as soon as the user makes any request
             if (iamProjectMembershipService.isExternal(username)) {
                 iamProjectMembershipService.removeProject(username, project.getName());
             }

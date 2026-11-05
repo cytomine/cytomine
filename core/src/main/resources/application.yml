@@ -157,7 +157,6 @@ keycloak-client:
   configure-keycloak: false
 cytomine:
   iam:
-    # comma-separated username suffixes of the users whose project membership is provisioned from IAM
     external-username-suffixes: "@lifescience-ri.eu"
 meilisearch:
   host: ${MEILISEARCH_URL:http://localhost:7700}

@@ -33,7 +33,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-/** Unit tests of the project-membership reconciliation with IAM in {@link AuthenticationSuccessListener}. */
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationSuccessListenerTest {
 
@@ -77,8 +76,6 @@ public class AuthenticationSuccessListenerTest {
         listener = new AuthenticationSuccessListener(applicationContext, currentRoleService,
             secSecUserSecRoleRepository, secRoleRepository, null, userRepository, projectRepository,
             projectMemberService, userMapper, iamProjectMembershipService);
-        // the listener calls itself through the application context so that transactional methods run
-        // through their Spring proxy
         org.mockito.Mockito.doReturn(listener)
             .when(applicationContext).getBean(AuthenticationSuccessListener.class);
     }

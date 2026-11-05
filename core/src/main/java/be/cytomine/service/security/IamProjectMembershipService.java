@@ -17,16 +17,6 @@ import org.springframework.stereotype.Service;
 
 import be.cytomine.exceptions.UserManagementException;
 
-/**
- * Keeps the IAM (Keycloak) "projects" attribute of externally provisioned users in sync with the project
- * memberships managed in core. Externally provisioned users are the ones whose username ends with one of the
- * {@code cytomine.iam.external-username-suffixes} (the LS-AAI identity by default).
- * <p>
- * The IAM "projects" attribute is the source of truth for the membership of these users: it is reconciled in
- * core by AuthenticationSuccessListener on every authenticated request. This service must therefore be applied
- * BEFORE (or on removal: also before) any membership change in core, so that the reconciliation does not wipe
- * the change that was just made through the core API.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,21 +30,11 @@ public class IamProjectMembershipService {
     @Value("#{'${cytomine.iam.external-username-suffixes:@lifescience-ri.eu}'.split(',')}")
     private List<String> externalUsernameSuffixes;
 
-    /**
-     * @return true if the user with the given username is externally provisioned, i.e. its username ends with one
-     * of the configured {@code cytomine.iam.external-username-suffixes}
-     */
     public boolean isExternal(String username) {
         return username != null && externalUsernameSuffixes.stream()
             .anyMatch(suffix -> username.endsWith(suffix.trim()));
     }
 
-    /**
-     * Fetch the project names a user currently has access to in IAM.
-     *
-     * @return the project names listed in the IAM "projects" attribute of the user. Empty if the user or the
-     * attribute does not exist.
-     */
     public List<String> findProjects(String username) {
         Optional<UserRepresentation> user = findUser(username);
         if (user.isEmpty()) {
@@ -63,13 +43,6 @@ public class IamProjectMembershipService {
         return currentProjects(user.get());
     }
 
-    /**
-     * Add a project to the IAM "projects" attribute of a user, so that its membership survives the
-     * reconciliation performed by AuthenticationSuccessListener.
-     *
-     * @throws UserManagementException if the user does not exist in IAM: the addition could not be materialized
-     * in IAM and would be repealed at the next reconciliation
-     */
     public void addProject(String username, String projectName) {
         UserRepresentation user = findUser(username)
             .orElseThrow(() -> new UserManagementException(
@@ -83,10 +56,6 @@ public class IamProjectMembershipService {
         }
     }
 
-    /**
-     * Remove a project from the IAM "projects" attribute of a user. Does nothing if the user does not have this
-     * project in IAM or does not exist anymore in IAM (its account was deleted).
-     */
     public void removeProject(String username, String projectName) {
         Optional<UserRepresentation> user = findUser(username);
         if (user.isEmpty()) {
@@ -103,11 +72,6 @@ public class IamProjectMembershipService {
         }
     }
 
-    /**
-     * Replace the old project name by the new one in the IAM "projects" attribute of a user, after a project
-     * has been renamed. Does nothing if the user does not have the old project in IAM or does not exist anymore
-     * in IAM.
-     */
     public void renameProject(String username, String oldName, String newName) {
         Optional<UserRepresentation> user = findUser(username);
         if (user.isEmpty()) {

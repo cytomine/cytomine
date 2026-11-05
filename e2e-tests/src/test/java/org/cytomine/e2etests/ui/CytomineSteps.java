@@ -112,13 +112,6 @@ public class CytomineSteps {
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
     }
 
-    /**
-     * Open the ontology configuration page, which lists the ontologies and shows the details (and the delete
-     * button) of the target one. <br>
-     * Right after the deletion of the project that uses it, the ontology may transiently be missing from the
-     * list: the section then renders with no ontology at all and there is no delete button to click. Navigating
-     * again re-triggers the ontology fetch, which correctly lists it.
-     */
     private void goToOntologyReloadingIfMissing(Wait<WebDriver> wait, WebDriver driver, String ontologyURL) {
         webDriverUtils.goTo(wait, ontologyURL);
         By listedOntology = By.cssSelector("a.panel-block");
@@ -127,7 +120,6 @@ public class CytomineSteps {
         try {
             shortWait.until(d -> !d.findElements(listedOntology).isEmpty());
         } catch (TimeoutException e) {
-            // the ontology is not listed (empty section) or the section is still rendering: navigate again
             listed = false;
         }
         if (!listed) {

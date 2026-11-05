@@ -802,9 +802,6 @@ public class ProjectService extends ModelService {
             } catch (Exception e) {
                 log.warn("Could not rename project '{}' to '{}' in metadata", oldName, project.getName(), e);
             }
-            // the project name is how membership is provisioned in IAM for external users: keep the references
-            // of the current external members aligned on the new name, otherwise their membership would be
-            // repealed at their next request by AuthenticationSuccessListener
             String newName = project.getName();
             try {
                 userService.listUsers(project).stream()
@@ -1039,9 +1036,6 @@ public class ProjectService extends ModelService {
             );
         }
 
-        // the project name is how membership is provisioned in IAM for external users: if the creator is one of
-        // them, provision the new project in IAM, otherwise its creation on their behalf would be repealed at
-        // their next request by AuthenticationSuccessListener
         String creatorUsername = currentUserService.getCurrentUsername();
         if (iamProjectMembershipService.isExternal(creatorUsername)) {
             try {
@@ -1082,8 +1076,6 @@ public class ProjectService extends ModelService {
         redoStackItemRepository.deleteAllByCommandProject(project);
         commandRepository.deleteAllByProject(project);
         retrievalService.deleteStorage(project.getId().toString());
-        // the project name is how membership is provisioned in IAM for external users: drop the references of
-        // the deleted project from their IAM projects attribute
         try {
             userService.listUsers(project).stream()
                 .filter(member -> iamProjectMembershipService.isExternal(member.username()))

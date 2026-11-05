@@ -27,12 +27,14 @@ public class IamProjectMembershipService {
     @Value("${keycloak-client.target.realm}")
     private String realm;
 
-    @Value("#{'${cytomine.iam.external-username-suffixes:@lifescience-ri.eu}'.split(',')}")
+    @Value("#{'${cytomine.iam.external-username-suffixes:}'.split(',')}")
     private List<String> externalUsernameSuffixes;
 
     public boolean isExternal(String username) {
         return username != null && externalUsernameSuffixes.stream()
-            .anyMatch(suffix -> username.endsWith(suffix.trim()));
+            .map(String::trim)
+            .filter(suffix -> !suffix.isBlank())
+            .anyMatch(username::endsWith);
     }
 
     public List<String> findProjects(String username) {

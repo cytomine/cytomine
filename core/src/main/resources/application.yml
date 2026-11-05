@@ -155,9 +155,6 @@ keycloak-client:
   client-id: admin-cli
   url: ${IAM_URL:http://127.0.0.1:8100}/iam
   configure-keycloak: false
-cytomine:
-  iam:
-    external-username-suffixes: "@lifescience-ri.eu"
 meilisearch:
   host: ${MEILISEARCH_URL:http://localhost:7700}
   api-key: ${MEILISEARCH_KEY:masterKey}

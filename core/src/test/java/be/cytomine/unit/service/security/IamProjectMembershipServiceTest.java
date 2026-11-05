@@ -47,4 +47,13 @@ public class IamProjectMembershipServiceTest {
         assertFalse(iamProjectMembershipService.isExternal("flora@lifescience-ri.eu"));
         assertFalse(iamProjectMembershipService.isExternal("flora"));
     }
+
+    @Test
+    public void isExternalShouldNotMatchAnythingWhenNoSuffixIsConfigured() {
+        ReflectionTestUtils.setField(iamProjectMembershipService, "externalUsernameSuffixes", List.of(""));
+
+        assertFalse(iamProjectMembershipService.isExternal("flora@lifescience-ri.eu"));
+        assertFalse(iamProjectMembershipService.isExternal("flora"));
+        assertFalse(iamProjectMembershipService.isExternal(null));
+    }
 }

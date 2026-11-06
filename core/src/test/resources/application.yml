@@ -8,7 +8,7 @@ spring:
       client:
         registration:
           keycloak:
-            client-id: core
+            client-id: backend
             authorization-grant-type: authorization_code
             redirect-uri: ${IAM_URL}/iam/realms/cytomine
             scope:
@@ -349,7 +349,7 @@ application:
 jwt:
   auth:
     converter:
-      resource-id: core
+      resource-id: frontend
       principle-attribute: preferred_username
 
 # admin of the master realm not cytomine realm
@@ -360,7 +360,7 @@ keycloak-client:
     realm: master
   target:
     realm: cytomine
-    client-id: core
+    client-id: backend
   client-id: admin-cli
   url: ${IAM_URL:http://iam:8100}/iam
   configure-keycloak: false

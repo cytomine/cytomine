@@ -5,13 +5,19 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.repository.config.CytominePermissions;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.AuthorizationResource;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -25,12 +31,25 @@ import org.keycloak.representations.idm.ProtocolMapperRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.representations.idm.authorization.Logic;
+import org.keycloak.representations.idm.authorization.PolicyRepresentation;
+import org.keycloak.representations.idm.authorization.ResourcePermissionRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceRepresentation;
+import org.keycloak.representations.idm.authorization.ResourceServerRepresentation;
+import org.keycloak.representations.idm.authorization.ScopeRepresentation;
 import org.keycloak.representations.userprofile.config.UPAttribute;
 import org.keycloak.representations.userprofile.config.UPConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
+
+import be.cytomine.common.config.security.CytominePermission;
+import be.cytomine.common.config.security.CytomineUserRole;
+
+import static org.keycloak.representations.idm.authorization.DecisionStrategy.AFFIRMATIVE;
+import static org.keycloak.representations.idm.authorization.DecisionStrategy.UNANIMOUS;
 
 @Component
 @Slf4j
@@ -39,6 +58,8 @@ public class PermissionsService {
 
     private static final String NAME = "Cytomine Core";
     private static final String DESCRIPTION = "This is the default client for cytomine.";
+    private static final String BACKEND_NAME = "Cytomine Core API";
+    private static final String BACKEND_DESCRIPTION = "Resource server client for Cytomine Core with fine-grained authorization.";
     private static final List<String> ROLES = List.of("USER", "GUEST", "ADMIN");
     private static final String ADMIN_ROLE = "ADMIN";
     private static final String IS_DEVELOPER_ATTRIBUTE = "isDeveloper";
@@ -47,7 +68,6 @@ public class PermissionsService {
         List.of("web-origins", "acr", "roles", "profile", "basic", "email");
     private static final List<String> OPTIONAL_CLIENT_SCOPES =
         List.of("address", "phone", "offline_access", "microprofile-jwt");
-    private static final List<String> WEB_ORIGINS = List.of("*");
     private static final String REALM_MANAGEMENT_CLIENT = "realm-management";
     private static final List<String> REALM_MANAGEMENT_ROLES =
         List.of("view-users", "manage-users", "query-users");
@@ -58,13 +78,18 @@ public class PermissionsService {
     private static final String USER_PROFILE_SCHEMA = "/keycloak-profile.json";
     private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
 
+    private final List<String> webOrigins = List.of("*");
     private final Keycloak keycloak;
-
+    private final CytominePermissions cytominePermissions;
+    private final ObjectMapper jsonMapper;
+    @Value("${keycloak-client.target.resource-id}")
+    String resourceId;
     @Value("${keycloak-client.target.realm}")
     String realm;
-
     @Value("${keycloak-client.target.client-id}")
     String clientId;
+    @Value("${keycloak-client.target.backend-client-id}")
+    String backendClientId;
 
     @Value("${keycloak-client.target.client-url:http://127.0.0.1}")
     String clientUrl;
@@ -91,13 +116,15 @@ public class PermissionsService {
     public void applyCytomineConfiguration() {
         if (configureKeycloak) {
             RealmResource realmResource = ensureRealmExists();
-            ClientResource coreClient = ensureCoreClientExists(realmResource);
-            ensureClientRolesAreSet(coreClient);
-            ensureAdminUserIsSet(realmResource, coreClient);
+            ClientResource frontendClient = ensureFrontendClientExists(realmResource);
+            ensureClientRolesAreSet(frontendClient);
+            ensureAdminUserIsSet(realmResource, frontendClient);
             ensureRealmIsInternationalized(realmResource);
             ensureAdminHasRealmManagementRoles(realmResource);
             applyUserProfileSchema(realmResource);
             ensureProjectsMapperIsSet(realmResource);
+            ClientResource backendClient = ensureBackendClientExists(realmResource);
+            writePermissionsToKeycloak(backendClient);
         }
     }
 
@@ -123,20 +150,20 @@ public class PermissionsService {
         return realmResource;
     }
 
-    private ClientResource ensureCoreClientExists(RealmResource realmResource) {
+    private ClientResource ensureFrontendClientExists(RealmResource realmResource) {
         ClientsResource clients = realmResource.clients();
         if (clients.findByClientId(clientId).isEmpty()) {
-            clients.create(getNewClientRepresentation());
+            clients.create(getFrontendClientRepresentation());
             log.info("Created Keycloak client '{}'", clientId);
         }
         ClientResource clientResource = clients.findByClientId(clientId).stream().findFirst()
             .map(representation -> clients.get(representation.getId()))
             .orElseThrow(() -> new IllegalStateException("Failed to retrieve Keycloak client " + clientId));
-        clientResource.update(getNewClientRepresentation());
+        clientResource.update(getFrontendClientRepresentation());
         return clientResource;
     }
 
-    private ClientRepresentation getNewClientRepresentation() {
+    private ClientRepresentation getFrontendClientRepresentation() {
         ClientRepresentation representation = new ClientRepresentation();
         representation.setClientId(clientId);
         representation.setName(NAME);
@@ -144,20 +171,18 @@ public class PermissionsService {
         representation.setRootUrl(clientUrl);
         representation.setAdminUrl(clientUrl);
         representation.setBaseUrl(clientUrl);
+        representation.setPublicClient(true);
         representation.setSurrogateAuthRequired(false);
         representation.setEnabled(true);
         representation.setAlwaysDisplayInConsole(false);
-        representation.setClientAuthenticatorType("client-secret");
         representation.setRedirectUris(List.of(clientUrl + "/*"));
-        representation.setWebOrigins(WEB_ORIGINS);
+        representation.setWebOrigins(webOrigins);
         representation.setNotBefore(0);
         representation.setBearerOnly(false);
         representation.setConsentRequired(false);
         representation.setStandardFlowEnabled(true);
         representation.setImplicitFlowEnabled(false);
         representation.setDirectAccessGrantsEnabled(true);
-        representation.setServiceAccountsEnabled(false);
-        representation.setPublicClient(true);
         representation.setFrontchannelLogout(true);
         representation.setProtocol("openid-connect");
         representation.setAttributes(clientAttributes());
@@ -166,6 +191,47 @@ public class PermissionsService {
         representation.setNodeReRegistrationTimeout(-1);
         representation.setDefaultClientScopes(DEFAULT_CLIENT_SCOPES);
         representation.setOptionalClientScopes(OPTIONAL_CLIENT_SCOPES);
+        return representation;
+    }
+
+    private ClientResource ensureBackendClientExists(RealmResource realmResource) {
+        ClientsResource clients = realmResource.clients();
+        if (clients.findByClientId(backendClientId).isEmpty()) {
+            clients.create(getBackendClientRepresentation());
+            log.info("Created Keycloak client '{}'", backendClientId);
+        }
+        ClientResource clientResource = clients.findByClientId(backendClientId).stream().findFirst()
+            .map(representation -> clients.get(representation.getId()))
+            .orElseThrow(() -> new IllegalStateException("Failed to retrieve Keycloak client " + backendClientId));
+        return clientResource;
+    }
+
+    private ClientRepresentation getBackendClientRepresentation() {
+        ClientRepresentation representation = new ClientRepresentation();
+        representation.setClientId(backendClientId);
+        representation.setName(BACKEND_NAME);
+        representation.setDescription(BACKEND_DESCRIPTION);
+        representation.setPublicClient(false);
+        representation.setSurrogateAuthRequired(false);
+        representation.setEnabled(true);
+        representation.setAlwaysDisplayInConsole(false);
+        representation.setClientAuthenticatorType("client-secret");
+        representation.setWebOrigins(webOrigins);
+        representation.setNotBefore(0);
+        representation.setConsentRequired(false);
+        representation.setStandardFlowEnabled(false);
+        representation.setImplicitFlowEnabled(false);
+        representation.setDirectAccessGrantsEnabled(false);
+        representation.setServiceAccountsEnabled(true);
+        representation.setFrontchannelLogout(true);
+        representation.setProtocol("openid-connect");
+        representation.setAttributes(clientAttributes());
+        representation.setAuthenticationFlowBindingOverrides(Map.of());
+        representation.setFullScopeAllowed(true);
+        representation.setNodeReRegistrationTimeout(-1);
+        representation.setDefaultClientScopes(DEFAULT_CLIENT_SCOPES);
+        representation.setOptionalClientScopes(OPTIONAL_CLIENT_SCOPES);
+        representation.setAuthorizationServicesEnabled(true);
         return representation;
     }
 
@@ -179,6 +245,7 @@ public class PermissionsService {
         attributes.put("display.on.consent.screen", "false");
         attributes.put("oauth2.device.authorization.grant.enabled", "false");
         attributes.put("backchannel.logout.revoke.offline.tokens", "false");
+        attributes.put("pkce.code.challenge.method", "S256");
         return attributes;
     }
 
@@ -319,6 +386,128 @@ public class PermissionsService {
             realmResource.clientScopes().get(profileScope.getId()).getProtocolMappers().createMapper(mapper);
             log.info("Added 'projects' protocol mapper on realm '{}'", realm);
         }
+    }
+
+    public void writePermissionsToKeycloak(ClientResource existingClient) {
+
+        cytominePermissions.roles().forEach(
+            (key, value) -> wrapException(() -> existingClient.roles().get(key).toRepresentation()).map(ignored -> true)
+                .orElseGet(() -> {
+                    existingClient.roles().create(getRoleRepresentation(key));
+                    return true;
+                }));
+
+        existingClient.authorization().importSettings(getResourceServerRepresentation(cytominePermissions));
+
+        cytominePermissions.roles().forEach((role, scopes) -> upsertResourcePermission(role, scopes, existingClient));
+
+        cytominePermissions.users().forEach(user -> assignRolesToExistingUser(user, existingClient));
+    }
+
+    void upsertResourcePermission(String role, Set<CytominePermission> scopes, ClientResource client) {
+        AuthorizationResource authorization = client.authorization();
+
+        ResourcePermissionRepresentation permission =
+            wrapException(() -> authorization.permissions().resource().findByName(backendClientId + "-" + role))
+                .orElseGet(ResourcePermissionRepresentation::new);
+
+        permission.setName(backendClientId + "-" + role);
+        permission.setDecisionStrategy(UNANIMOUS);
+        permission.setLogic(Logic.POSITIVE);
+        permission.addResource(resourceId);
+        scopes.stream().map(CytominePermission::toString).forEach(permission::addScope);
+        permission.addPolicy("role-" + role);
+
+        try {
+            if (permission.getId() == null) {
+                authorization.permissions().resource().create(permission);
+                log.info("Created resource permission {}-{}", backendClientId, role);
+            } else {
+                authorization.permissions().resource().findById(permission.getId()).update(permission);
+                log.info("Updated resource permission {}-{}", backendClientId, role);
+            }
+        } catch (Exception e) {
+            log.error("Failed to upsert resource permission {}-{}", backendClientId, role, e);
+        }
+    }
+
+    void assignRolesToExistingUser(CytomineUserRole targetedUser, ClientResource client) {
+        UsersResource users = keycloak.realm(realm).users();
+        wrapException(() -> keycloak.realm(realm).users().searchByUsername(targetedUser.name(), true))
+            .flatMap(usersResult -> usersResult.stream().findFirst())
+            .ifPresent(u -> {
+                List<RoleRepresentation> userRoles = targetedUser.roles().stream()
+                    .map(role -> wrapException(() -> client.roles().get(role).toRepresentation()))
+                    .flatMap(Optional::stream).toList();
+                users.get(u.getId()).roles().clientLevel(client.toRepresentation().getId()).add(userRoles);
+                log.info("Assigned client roles {} to user {}", targetedUser.roles(), targetedUser.name());
+            });
+    }
+
+    <T> Optional<T> wrapException(Supplier<T> call) {
+        try {
+            T result = call.get();
+            return Optional.of(result);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    RoleRepresentation getRoleRepresentation(String role) {
+        RoleRepresentation roleRepresentation = new RoleRepresentation();
+        roleRepresentation.setId(role);
+        roleRepresentation.setName(role);
+        roleRepresentation.setClientRole(true);
+        return roleRepresentation;
+    }
+
+    ClientRepresentation getBaseClientRepresentation(ClientRepresentation clientRepresentation) {
+        clientRepresentation.setId(clientId);
+        clientRepresentation.setName(clientId);
+        clientRepresentation.setAuthorizationServicesEnabled(true);
+        clientRepresentation.setServiceAccountsEnabled(true);
+        return clientRepresentation;
+    }
+
+    ResourceServerRepresentation getResourceServerRepresentation(CytominePermissions cytominePermissions) {
+        ResourceServerRepresentation resourceServerRepresentation = new ResourceServerRepresentation();
+        Set<CytominePermission> scopes = Stream.of(CytominePermission.values()).collect(Collectors.toSet());
+
+        resourceServerRepresentation.setDecisionStrategy(AFFIRMATIVE);
+        resourceServerRepresentation.setScopes(scopes.stream().map(this::getScopeRepresentation).toList());
+        resourceServerRepresentation.setResources(List.of(getResourceRepresentation(scopes)));
+        resourceServerRepresentation.setPolicies(
+            cytominePermissions.roles().keySet().stream().map(this::getRolePolicy).toList());
+        return resourceServerRepresentation;
+    }
+
+    ScopeRepresentation getScopeRepresentation(CytominePermission scope) {
+        ScopeRepresentation scopeRepresentation = new ScopeRepresentation();
+        scopeRepresentation.setId(scope.toString());
+        scopeRepresentation.setName(scope.toString());
+        return scopeRepresentation;
+    }
+
+    @SneakyThrows
+    PolicyRepresentation getRolePolicy(String role) {
+        PolicyRepresentation policyRepresentation = new PolicyRepresentation();
+        policyRepresentation.setId("role-" + role);
+        policyRepresentation.setName("role-" + role);
+        policyRepresentation.setType("role");
+        policyRepresentation.setDecisionStrategy(UNANIMOUS);
+        policyRepresentation.setLogic(Logic.POSITIVE);
+        policyRepresentation.setConfig(Map.of("roles",
+            jsonMapper.writeValueAsString(List.of(new SimpleRoleRepresentation(clientId + "/" + role, false)))));
+        return policyRepresentation;
+
+    }
+
+    ResourceRepresentation getResourceRepresentation(Set<CytominePermission> scopes) {
+        ResourceRepresentation resourceRepresentation = new ResourceRepresentation();
+        resourceRepresentation.setId(resourceId);
+        resourceRepresentation.setName(resourceId);
+        resourceRepresentation.setScopes(scopes.stream().map(this::getScopeRepresentation).collect(Collectors.toSet()));
+        return resourceRepresentation;
     }
 
     private UserRepresentation newAdminUserRepresentation(UserRepresentation representation) {

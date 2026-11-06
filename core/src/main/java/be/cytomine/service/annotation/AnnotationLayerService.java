@@ -65,14 +65,13 @@ public class AnnotationLayerService {
         Optional<TaskRun> lastTaskRun = taskRunRepository
             .findFirstByProjectIdOrderByCreatedDesc(imageInstance.getProject().getId());
 
-        if (lastTaskRun.isPresent()) {
-            Optional<TaskRunLayer> lastExecutedRunLayer = taskRunLayerRepository.findByTaskRun(lastTaskRun.get());
-
-            lastExecutedRunLayer
-                .map(TaskRunLayer::getAnnotationLayer)
-                .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
-                .ifPresent(annotationLayerSet::add);
-        }
+        // A task run owns one layer per geometry output, hence several layers may match the last task run.
+        lastTaskRun.ifPresent(taskRun -> taskRunLayerRepository.findAllByTaskRunAndImage(taskRun, imageInstance)
+            .forEach(layer -> {
+                AnnotationLayer annotationLayer = layer.getAnnotationLayer();
+                annotationLayerSet.add(
+                    new AnnotationLayerResponse(annotationLayer.getId(), annotationLayer.getName()));
+            }));
 
         return annotationLayerSet;
     }

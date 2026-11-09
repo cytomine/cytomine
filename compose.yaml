@@ -75,6 +75,7 @@ services:
       - core
       - iam
       - pims
+      - repository
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
@@ -309,6 +310,9 @@ services:
       - iam
     ports:
       - 8081:8081
+    volumes:
+      - ${PWD}/cytomine_permissions.yml:/app/cytomine_permissions.yml:ro
+      - /etc/localtime:/etc/localtime
     environment:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb

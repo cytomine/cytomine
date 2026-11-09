@@ -47,6 +47,11 @@ jobs:
           - name: repository
             context: .
             dockerfile_location: repository
+            target: production
+          - name: resource-server
+            context: .
+            dockerfile_location: resource-server
+            target: production
           - name: app-engine-tasks-runner
             context: .
             dockerfile_location: app-engine/task-runner

@@ -1,3 +1,6 @@
+server:
+  port: 8083
+
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
@@ -15,3 +18,21 @@ spring:
           batch_size: 50
   config:
     import: "optional:file:./cytomine_permissions.yml"
+
+  liquibase:
+    enabled: true
+    change-log: classpath:config/liquibase/master.xml
+    contexts: prod
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${IAM_EXTERNAL_URL}/iam/realms/cytomine
+          jws-algorithms: RS256
+          jwk-set-uri: ${IAM_URL}/iam/realms/cytomine/protocol/openid-connect/certs
+jwt:
+  auth:
+    converter:
+      resource-id: core
+      principle-attribute: preferred_username

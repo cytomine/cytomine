@@ -1,4 +1,4 @@
-package be.cytomine.common.config.security;
+package be.cytomine.common.resourceserver.model;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;

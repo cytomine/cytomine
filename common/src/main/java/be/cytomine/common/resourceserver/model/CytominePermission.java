@@ -1,4 +1,4 @@
-package be.cytomine.common.config.security;
+package be.cytomine.common.resourceserver.model;
 
 public enum CytominePermission {
     CAN_CREATE_PROJECT,

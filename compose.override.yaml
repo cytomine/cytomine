@@ -37,3 +37,9 @@ services:
     build:
       context: ./
       dockerfile: ./repository/Dockerfile
+
+  resource-server:
+    image: cytomine/resource-server:latest
+    build:
+      context: ./
+      dockerfile: ./resource-server/Dockerfile

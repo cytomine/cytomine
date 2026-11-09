@@ -17,7 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import be.cytomine.common.config.security.CytomineAuthenticationSupport;
+import be.cytomine.common.resourceserver.model.CytomineAuthenticationSupport;
 import be.cytomine.domain.security.User;
 import be.cytomine.exceptions.AuthenticationException;
 import be.cytomine.exceptions.ForbiddenException;

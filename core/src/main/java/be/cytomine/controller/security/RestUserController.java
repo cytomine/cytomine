@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.config.security.CytomineAuthenticationSupport;
+import be.cytomine.common.resourceserver.model.CytomineAuthenticationSupport;
 import be.cytomine.common.repository.http.OntologyHttpContract;
 import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.KeysResponse;

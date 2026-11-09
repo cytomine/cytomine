@@ -311,7 +311,6 @@ services:
     ports:
       - 8081:8081
     volumes:
-      - ${PWD}/cytomine_permissions.yml:/app/cytomine_permissions.yml:ro
       - /etc/localtime:/etc/localtime
     environment:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
@@ -324,6 +323,24 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.18
+
+  resource-server:
+    image: cytomine/resource-server:latest
+    restart: unless-stopped
+    depends_on:
+      - iam
+    ports:
+      - 8083:8083
+    volumes:
+      - ${PWD}/cytomine_permissions.yml:/app/cytomine_permissions.yml:ro
+      - /etc/localtime:/etc/localtime
+    environment:
+      POSTGIS_HOST: postgis
+      IAM_URL: http://iam:8100
+      IAM_EXTERNAL_URL: http://127.0.0.1:8100
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.20
 
   meilisearch:
     image: getmeili/meilisearch:v1.43.0

@@ -18,6 +18,8 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import be.cytomine.common.config.security.IncomingAuthorizationContext;
+import be.cytomine.common.repositoryclient.PageableHttpServiceArgumentResolver;
 import be.cytomine.common.resourceserver.model.CytomineAuthenticationSupport;
 import be.cytomine.common.repository.http.CommandHttpContract;
 import be.cytomine.common.repository.http.HealthService;
@@ -35,7 +37,7 @@ import be.cytomine.common.repository.http.UploadedFileHttpContract;
 import be.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.common.repository.http.UserRoleHttpContract;
 import be.cytomine.common.repository.utils.SpringPage;
-import be.cytomine.config.security.IncomingAuthorizationContext;
+
 
 @Configuration
 public class RepositoryClient {

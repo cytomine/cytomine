@@ -1,7 +1,0 @@
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://127.0.0.1:8100/iam/realms/cytomine
-          jwk-set-uri: http://127.0.0.1:8100/iam/realms/cytomine/protocol/openid-connect/certs

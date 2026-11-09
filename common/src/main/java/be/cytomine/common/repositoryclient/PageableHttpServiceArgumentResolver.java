@@ -1,4 +1,4 @@
-package be.cytomine.controller.repository;
+package be.cytomine.common.repositoryclient;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Pageable;

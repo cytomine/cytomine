@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import be.cytomine.common.config.security.IncomingAuthorizationContext;
+
 public class IncomingAuthorizationFilter extends OncePerRequestFilter {
 
     @Override

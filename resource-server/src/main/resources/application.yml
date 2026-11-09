@@ -36,3 +36,5 @@ jwt:
     converter:
       resource-id: core
       principle-attribute: preferred_username
+application:
+  repositoryURL: ${REPOSITORY_URL}

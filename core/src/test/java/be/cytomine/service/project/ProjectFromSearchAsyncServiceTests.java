@@ -12,7 +12,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import be.cytomine.config.security.IncomingAuthorizationContext;
+
+import be.cytomine.common.config.security.IncomingAuthorizationContext;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
@@ -63,13 +64,13 @@ public class ProjectFromSearchAsyncServiceTests {
         );
     }
 
-    private Task task(long id) {
+    private Task task() {
         return mock(Task.class);
     }
 
-    private Project project(long id) {
+    private Project project() {
         Project project = mock(Project.class);
-        lenient().when(project.getId()).thenReturn(id);
+        lenient().when(project.getId()).thenReturn(7L);
         return project;
     }
 
@@ -81,17 +82,17 @@ public class ProjectFromSearchAsyncServiceTests {
         return imageInstance;
     }
 
-    private JsonObject createAddCommand(long abstractImageId, long projectId) {
+    private JsonObject createAddCommand(long abstractImageId) {
         JsonObject json = new JsonObject();
         json.put("baseImage", abstractImageId);
-        json.put("project", projectId);
+        json.put("project", 7L);
         return json;
     }
 
     @Test
     void shouldCreateInstancesForMatchingImagesAndTagOnce() {
-        Task task = task(1L);
-        Project project = project(7L);
+        Task task = task();
+        Project project = project();
         when(project.getName()).thenReturn("MyProject");
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
@@ -109,8 +110,8 @@ public class ProjectFromSearchAsyncServiceTests {
         asyncService().run(1L, 7L, "query", List.of("tag=value"), null);
 
         verify(taskService).updateTask(task, 5, "Searching images");
-        verify(imageInstanceService).add(createAddCommand(10L, 7L));
-        verify(imageInstanceService).add(createAddCommand(11L, 7L));
+        verify(imageInstanceService).add(createAddCommand(10L));
+        verify(imageInstanceService).add(createAddCommand(11L));
         verify(meiliSearchService).addProjectToImages(List.of(10L, 11L), "MyProject");
         verify(taskService).updateTask(eq(task), eq(95), org.mockito.ArgumentMatchers.contains("skipped 0"));
         verify(taskService).finishTask(task);
@@ -122,8 +123,8 @@ public class ProjectFromSearchAsyncServiceTests {
 
     @Test
     void shouldSkipAbstractImagesAlreadyInProject() {
-        Task task = task(1L);
-        Project project = project(7L);
+        Task task = task();
+        Project project = project();
         when(project.getName()).thenReturn("MyProject");
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
@@ -141,16 +142,16 @@ public class ProjectFromSearchAsyncServiceTests {
 
         asyncService().run(1L, 7L, "", List.of(), null);
 
-        verify(imageInstanceService).add(createAddCommand(11L, 7L));
-        verify(imageInstanceService, never()).add(createAddCommand(10L, 7L));
+        verify(imageInstanceService).add(createAddCommand(11L));
+        verify(imageInstanceService, never()).add(createAddCommand(10L));
         verify(meiliSearchService).addProjectToImages(List.of(11L), "MyProject");
         verify(taskService).updateTask(eq(task), eq(95), org.mockito.ArgumentMatchers.contains("skipped 1"));
     }
 
     @Test
     void shouldRestoreTagModeAndReportErrorWhenSearchFails() {
-        Task task = task(1L);
-        Project project = project(7L);
+        Task task = task();
+        Project project = project();
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
 
@@ -167,8 +168,8 @@ public class ProjectFromSearchAsyncServiceTests {
 
     @Test
     void shouldTagEarlierChunksWhenALaterImageFailsToCreate() {
-        Task task = task(1L);
-        Project project = project(7L);
+        Task task = task();
+        Project project = project();
         when(project.getName()).thenReturn("MyProject");
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
@@ -199,8 +200,8 @@ public class ProjectFromSearchAsyncServiceTests {
 
     @Test
     void shouldReportWarningWhenMetadataTaggingFails() {
-        Task task = task(1L);
-        Project project = project(7L);
+        Task task = task();
+        Project project = project();
         when(project.getName()).thenReturn("MyProject");
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));
@@ -237,8 +238,8 @@ public class ProjectFromSearchAsyncServiceTests {
 
     @Test
     void shouldForwardIncomingAuthorizationHeadersWhileRunning() {
-        Task task = task(1L);
-        Project project = project(7L);
+        Task task = task();
+        Project project = project();
         when(project.getName()).thenReturn("MyProject");
         when(taskService.get(1L)).thenReturn(task);
         when(projectRepository.findById(7L)).thenReturn(Optional.of(project));

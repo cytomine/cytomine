@@ -4,12 +4,12 @@ import Project from '../models/project.js';
 
 export default class ProjectCollection extends Collection {
 
-  /** @inheritdoc */
-  _initProperties() {
-    this.light = null; // used iff filter on user ; if true, only id and name properties will be filled
-    this.admin = null; // used iff filter on user ; if true, only returns the projects in which user is admin
-    this.withLastActivity = null;
-    this.withMembersCount = null;
+  /**
+     * @returns {Object} The filters available server-side, as returned in the filters field of the last search performed
+     *                   with this collection (null if no search was performed yet)
+     */
+  get availableFilters() {
+    return this._availableFilters ?? null;
   }
 
   /** @inheritdoc */
@@ -45,16 +45,52 @@ export default class ProjectCollection extends Collection {
     }
   }
 
+  /** @inheritdoc */
+  getParameters() {
+    let params = super.getParameters();
+    if (params.sort) {
+      params.sort = `${params.sort},${params.order || 'asc'}`;
+    }
+    delete params.order;
+    return params;
+  }
 
   /**
-   * @static Fetch bounds of the attributes of all projects
+   * @static Fetch the filters available for the projects search endpoint (values currently present server-side and
+   * bounds of the countable attributes)
    *
-   * @returns {{numberOfAnnotations: {min: Long, max: Long}, numberOfReviewedAnnotations: {min: Long, max: Long}, numberOfImages: {min: Long, max: Long}, members: {min: Long, max: Long}}}
-   *          The max, min or list of all the projects properties. members is returned iif withMembersCount parameter is set to true
+   * @returns {Object} The available filters, as provided in the filters field of the projects search response
    */
-  static async fetchBounds({ withMembersCount = true } = {}) {
-    let suffix = withMembersCount ? '?withMembersCount=true' : '';
-    let { data } = await Cytomine.instance.api.get('bounds/project.json' + suffix);
+  static async fetchAvailableFilters() {
+    let { data } = await Cytomine.instance.api.post('projects/search', null, { params: { size: 1 }, headers: { 'Content-Type': 'application/json' } });
+    return data.filters;
+  }
+
+  /** @inheritdoc */
+  _initProperties() {
+    this.light = null; // used iff filter on user ; if true, only id and name properties will be filled
+    this.admin = null; // used iff filter on user ; if true, only returns the projects in which user is admin
+    this.withLastActivity = null;
+    this.withMembersCount = null;
+    this.filters = null;
+    this._availableFilters = null;
+  }
+
+  /** @inheritdoc */
+  async _doFetch() {
+    if (this._filter.key) {
+      return super._doFetch();
+    }
+    let params = {};
+    if (this.max > 0) {
+      params.page = this._curPage;
+      params.size = this.max;
+    }
+    if (this.sort) {
+      params.sort = `${this.sort},${this.order || 'asc'}`;
+    }
+    let { data } = await Cytomine.instance.api.post('projects/search', this.filters ?? undefined, { params, headers: { 'Content-Type': 'application/json' } });
+    this._availableFilters = data.filters;
     return data;
   }
 

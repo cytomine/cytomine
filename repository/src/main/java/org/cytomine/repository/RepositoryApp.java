@@ -10,13 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.util.StringUtils;
 
-@SpringBootApplication(scanBasePackages = {
-    "org.cytomine.repository", "be.cytomine.common.mapper", "be.cytomine.common.config.security"
-})
+@SpringBootApplication(scanBasePackages = {"org.cytomine.repository", "be.cytomine.common.mapper",
+    "be.cytomine.common.config.security", "be.cytomine.common.keycloak"})
 @Import({ObjectMapperFactory.class})
+@ConfigurationPropertiesScan
 @Slf4j
 public class RepositoryApp {
 

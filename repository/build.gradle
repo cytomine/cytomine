@@ -37,6 +37,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
     implementation 'org.hibernate.orm:hibernate-core'
+    implementation 'com.github.jsqlparser:jsqlparser:5.3'
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     compileOnly 'org.projectlombok:lombok'
@@ -53,6 +54,8 @@ dependencies {
     testImplementation testFixtures(project(':common'))
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation project(':common')
+    implementation 'org.keycloak:keycloak-admin-client:26.0.12'
+    implementation 'org.keycloak:keycloak-client-common-synced:26.0.12'
 }
 
 test {

@@ -4,6 +4,10 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +21,15 @@ import org.springframework.web.server.ResponseStatusException;
 
 import be.cytomine.common.repository.http.ProjectHttpContract;
 import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
+import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
+import be.cytomine.common.repository.model.list.filtered.ProjectListFiltersPayload;
 import be.cytomine.common.repository.model.project.payload.CreateProject;
 import be.cytomine.common.repository.model.project.payload.UpdateProject;
+import be.cytomine.controller.utils.FilteredCollectionResponse;
+import be.cytomine.controller.utils.PageMapper;
 import be.cytomine.domain.project.Project;
 import be.cytomine.mapper.ProjectMapper;
 import be.cytomine.service.search.RetrievalService;
@@ -38,6 +48,18 @@ public class ProjectController {
     private final ProjectHttpContract projectHttpContract;
     private final ProjectMapper projectMapper;
     private final RetrievalService retrievalService;
+    private final PageMapper pageMapper;
+
+    @PostMapping("/projects/search")
+    public FilteredCollectionResponse<ProjectListRowResponse, ProjectListAvailableFiltersPayload> list(
+        @SortDefault(sort = "created", direction = Sort.Direction.DESC)
+        @PageableDefault(size = 2000) Pageable pageable,
+        @RequestBody Optional<ProjectListFiltersPayload> projectFilters
+    ) {
+        log.debug("Post /projects/search");
+        ProjectListFilteredResponse filteredList = projectHttpContract.listFiltered(pageable, projectFilters);
+        return pageMapper.toFilteredCollectionResponse(filteredList.content(), filteredList.availableFilters());
+    }
 
     @GetMapping("/project/{id}.json")
     public JsonObject read(@PathVariable long id) {

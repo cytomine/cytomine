@@ -312,7 +312,7 @@ public class RestUserController extends RestCytomineController {
             }
         }
         if (!errors.isEmpty()) {
-            errorMessage += "Cannot add theses users to the project ${project.id} : " + errors + ". ";
+            errorMessage += "Cannot add these users to the project " + project.getId() + " : " + errors + ". ";
         }
         if (!wrongIds.isEmpty()) {
             errorMessage += String.join(",", wrongIds) + " are not well formatted ids";
@@ -324,6 +324,7 @@ public class RestUserController extends RestCytomineController {
 
         if (!errors.isEmpty() || !wrongIds.isEmpty()) {
             response.put("data", JsonObject.of("message", errorMessage));
+            response.put("status", 206);
             return JsonResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response.toJsonString());
         } else {
             response.put("data", JsonObject.of("message", "OK"));
@@ -385,7 +386,7 @@ public class RestUserController extends RestCytomineController {
             }
         }
         if (!errors.isEmpty()) {
-            errorMessage += "Cannot add theses users to the project ${project.id} : " + errors + ". ";
+            errorMessage += "Cannot remove these users from the project " + project.getId() + " : " + errors + ". ";
         }
         if (!wrongIds.isEmpty()) {
             errorMessage += String.join(",", wrongIds) + " are not well formatted ids";
@@ -397,6 +398,7 @@ public class RestUserController extends RestCytomineController {
 
         if (!errors.isEmpty() || !wrongIds.isEmpty()) {
             response.put("data", JsonObject.of("message", errorMessage));
+            response.put("status", 206);
             return JsonResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response.toJsonString());
         } else {
             response.put("data", JsonObject.of("message", "OK"));

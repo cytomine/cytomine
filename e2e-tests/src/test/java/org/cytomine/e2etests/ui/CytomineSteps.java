@@ -12,8 +12,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.cytomine.e2etests.utils.ReportType;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Component;
 import static java.lang.String.format;
 import static org.cytomine.e2etests.configuration.SeleniumDriver.DOWNLOAD_PATH;
 
+@Slf4j
 @Component
 public class CytomineSteps {
 
@@ -102,11 +105,27 @@ public class CytomineSteps {
         return driver.getCurrentUrl();
     }
 
-    public void deleteOntology(Wait<WebDriver> wait, String ontologyURL) {
-        webDriverUtils.goTo(wait, ontologyURL);
+    public void deleteOntology(Wait<WebDriver> wait, WebDriver driver, String ontologyURL) {
+        goToOntologyReloadingIfMissing(wait, driver, ontologyURL);
         webDriverUtils.clickButtonByText(wait, "Delete");
         webDriverUtils.clickButtonByText(wait, "Confirm");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'successfully deleted')]"));
+    }
+
+    private void goToOntologyReloadingIfMissing(Wait<WebDriver> wait, WebDriver driver, String ontologyURL) {
+        webDriverUtils.goTo(wait, ontologyURL);
+        By listedOntology = By.cssSelector("a.panel-block");
+        Wait<WebDriver> shortWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        boolean listed = true;
+        try {
+            shortWait.until(d -> !d.findElements(listedOntology).isEmpty());
+        } catch (TimeoutException e) {
+            listed = false;
+        }
+        if (!listed) {
+            log.warn("Ontology is not listed at {}: reloading the page before the deletion", ontologyURL);
+            webDriverUtils.goTo(wait, ontologyURL);
+        }
     }
 
     public void renameOntology(Wait<WebDriver> wait, String ontologyUrl, String newName) {

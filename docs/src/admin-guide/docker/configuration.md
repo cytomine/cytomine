@@ -33,6 +33,27 @@ The following config assigns the role `admin` to all external users and this is 
 
 once steps above are followed a new button appears in the login form to start the authentication process for users coming from other organizations.
 
+### C. LS-AAI users and project membership
+
+Identified LS-AAI users (usernames ending with one of the `CYTOMINE_IAM_EXTERNALUSERNAME_SUFFIXES` 
+values, empty by default) have their project memberships provisioned from
+the IAM: the `projects` multivalued user attribute in Keycloak lists the names of the projects(s) they can access.
+
+By default no suffix is configured, so no user is considered external and all project memberships
+are managed from the Cytomine interface. Deployments using IAM-provisioned memberships (e.g.
+`@lifescience-ri.eu`) must enable it:
+
+- In Docker Compose, set the `CYTOMINE_IAM_EXTERNALUSERNAME_SUFFIXES` environment variable
+  (comma-separated for several suffixes), e.g. in an override file or `.env`.
+- In Helm, set `core.external_username_suffixes` in the deployment values.
+
+- The attribute is applied to the database at every authenticated request, and it accepts project names only.
+- Adding or removing such a user from a project through the Cytomine members tab updates the attribute in IAM, and
+  their account must exist in IAM for the addition to succeed.
+- Renaming or deleting a project also keeps the attribute aligned for their members.
+
+Local users are not concerned: their project memberships stay managed from the project configuration tabs only.
+
 ## Configure LTI 1.3 Identity Broker
 
 Cytomine's IAM service embeds a custom Keycloak Identity Provider (SPI) that lets a Learning Management System (LMS) launch a Keycloak-protected tool through **LTI 1.3**. In this setup the LMS is the LTI **Platform** and Keycloak is the LTI **Tool**. After the launch, Keycloak verifies the signed `id_token`, provisions or links the user, and assigns a Cytomine core role. The provider is compatible with any LMS that supports LTI 1.3, e.g. Moodle, Blackboard Learn, Canvas, Sakai or Brightspace (D2L).

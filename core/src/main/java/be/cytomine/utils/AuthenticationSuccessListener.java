@@ -22,6 +22,7 @@ import be.cytomine.mapper.UserMapper;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.security.UserService;
+import be.cytomine.service.security.IamProjectMembershipService;
 
 import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
 import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
@@ -45,6 +46,8 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     private final ProjectMemberService projectMemberService;
 
     private final UserMapper userMapper;
+
+    private final IamProjectMembershipService iamProjectMembershipService;
 
     private static Set<String> extractRolesFromAuthentication(JwtAuthenticationToken jwtAuthenticationToken) {
         Set<String> rolesFromAuthentication = new HashSet<>();
@@ -156,6 +159,45 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                 currentRoleService.activeAdminSession(userResponse, jwtAuthenticationToken);
             }
         }
+    }
+
+    @Transactional
+    protected void updateProjectsMembership(User user) {
+        if (!iamProjectMembershipService.isExternal(user.getUsername())) {
+            return; // do nothing if user is local
+        }
+
+        List<Project> permittedUserProjects = projectRepository.findByNameIn(
+            iamProjectMembershipService.findProjects(user.getUsername()));
+        List<Project> actualUserProjects = projectRepository.findAllProjectForUser(user.getUsername());
+
+        List<Project> projectsToAdd =
+            permittedUserProjects.stream().filter(p -> !actualUserProjects.contains(p)).toList();
+        for (Project project : projectsToAdd) {
+            projectMemberService.addUserToProjectWithAdmin(user.getUsername(), project, false);
+        }
+
+        List<Project> projectsToRemove =
+            actualUserProjects.stream().filter(p -> !permittedUserProjects.contains(p)).toList();
+
+        for (Project project : projectsToRemove) {
+            projectMemberService.deleteUserFromProjectWithAdmin(user, project, false);
+        }
+    }
+
+    @Transactional
+    protected void setCumulativeRole(Set<String> rolesFromAuthentication, User user) {
+
+        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
+        if (rolesFromAuthentication.contains(ROLE_ADMIN.toString())) {
+            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_ADMIN.toString()));
+        } else if (rolesFromAuthentication.contains(ROLE_USER.toString())) {
+            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_USER.toString()));
+        } else {
+            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_GUEST.toString()));
+        }
+        secSecUserSecRole.setSecUser(user);
+        secSecUserSecRoleRepository.save(secSecUserSecRole);
     }
 
     @Override

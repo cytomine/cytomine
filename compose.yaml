@@ -255,6 +255,7 @@ services:
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       IAM_URL: http://iam:8100
       IAM_EXTERNAL_URL: http://localhost:8100
+      CYTOMINE_IAM_EXTERNALUSERNAME_SUFFIXES: ${CYTOMINE_IAM_EXTERNALUSERNAME_SUFFIXES:-}
       SERVER_URL: http://127.0.0.1:8080
       PIMS_URL: http://pims:5000
       CBIR_URL: http://cbir:6000

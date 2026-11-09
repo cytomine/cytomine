@@ -23,39 +23,39 @@ public interface BaseMapper {
         return Optional.ofNullable(t);
     }
 
-    default Timestamp map(LocalDateTime value) {
+    default Timestamp mapLocalDateTimeToTimestamp(LocalDateTime value) {
         if (value == null) {
             return null;
         }
         return Timestamp.valueOf(value);
     }
 
-    default Optional<LocalDateTime> map(Date maybeDate) {
+    default Optional<LocalDateTime> mapDateToMaybeLocalDateTime(Date maybeDate) {
         return Optional.ofNullable(maybeDate)
             .map(date -> LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
     }
 
-    default Date mapMaybeDate(Optional<LocalDateTime> maybeDate) {
+    default Date mapMaybeDateToDate(Optional<LocalDateTime> maybeDate) {
         return maybeDate.map(d -> Date.from(d.atZone(ZoneId.systemDefault()).toInstant())).orElse(null);
     }
 
-    default LocalDateTime mapTimestamp(Timestamp value) {
+    default LocalDateTime mapTimestampToLocalDateTime(Timestamp value) {
         return value.toInstant().atZone(ZoneOffset.systemDefault()).toLocalDateTime();
     }
 
-    default String mapMaybeString(Optional<String> value) {
+    default String mapMaybeStringToString(Optional<String> value) {
         return value.orElse(null);
     }
 
-    default UUID mapMaybeUUID(Optional<UUID> value) {
+    default UUID mapMaybeUUIDToUUID(Optional<UUID> value) {
         return value.orElse(null);
     }
 
-    default Long mapMaybeLong(Optional<Long> value) {
+    default Long mapMaybeLongToLong(Optional<Long> value) {
         return value.orElse(null);
     }
 
-    default Optional<LocalDateTime> mapToLocalDateTime(Timestamp value) {
-        return Optional.ofNullable(value).map(this::mapTimestamp);
+    default Optional<LocalDateTime> mapTimestampToMaybeLocalDateTime(Timestamp value) {
+        return Optional.ofNullable(value).map(this::mapTimestampToLocalDateTime);
     }
 }

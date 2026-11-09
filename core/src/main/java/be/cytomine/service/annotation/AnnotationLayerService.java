@@ -2,17 +2,15 @@ package be.cytomine.service.annotation;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.annotation.AnnotationLayer;
-import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.dto.annotation.AnnotationLayerResponse;
@@ -51,29 +49,6 @@ public class AnnotationLayerService {
         return annotationLayerRepository.findById(id);
     }
 
-    public Set<AnnotationLayerResponse> findByTaskRunLayer(Long imageId) {
-        List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
-
-        Set<AnnotationLayerResponse> annotationLayerSet = taskRunLayers
-            .stream()
-            .map(TaskRunLayer::getAnnotationLayer)
-            .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
-
-        ImageInstance imageInstance = imageInstanceService.get(imageId);
-
-        Optional<TaskRun> lastTaskRun = taskRunRepository
-            .findFirstByProjectIdOrderByCreatedDesc(imageInstance.getProject().getId());
-
-        // A task run owns one layer per geometry output, hence several layers may match the last task run.
-        lastTaskRun.ifPresent(taskRun -> taskRunLayerRepository.findAllByTaskRunAndImage(taskRun, imageInstance)
-            .forEach(layer -> {
-                AnnotationLayer annotationLayer = layer.getAnnotationLayer();
-                annotationLayerSet.add(
-                    new AnnotationLayerResponse(annotationLayer.getId(), annotationLayer.getName()));
-            }));
-
-        return annotationLayerSet;
     public Set<AnnotationLayerResponse> findByTaskRunLayer(Long imageId) {
         Stream<AnnotationLayer> taskRunLayers =
             taskRunLayerRepository.findAllByImageId(imageId).stream().map(TaskRunLayer::getAnnotationLayer);

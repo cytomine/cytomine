@@ -38,11 +38,7 @@ public class IamProjectMembershipService {
     }
 
     public List<String> findProjects(String username) {
-        Optional<UserRepresentation> user = findUser(username);
-        if (user.isEmpty()) {
-            return List.of();
-        }
-        return currentProjects(user.get());
+        return findUser(username).map(u -> currentProjects(u)).orElseGet(List::of);
     }
 
     public void addProject(String username, String projectName) {

@@ -126,7 +126,7 @@ public class CytomineTests {
             projectUrls.forEach(projectUrl -> {
                 String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
                 cytomineSteps.deleteProject(wait, projectUrl);
-                cytomineSteps.deleteOntology(wait, driver, ontologyUrl);
+                cytomineSteps.deleteOntology(wait, ontologyUrl);
             });
         });
     }
@@ -290,7 +290,7 @@ public class CytomineTests {
             cleanup(
                 () -> cytomineSteps.deleteTask(wait, cytomineUrl, taskName),
                 () -> cytomineSteps.deleteProject(wait, projectUrl),
-                () -> cytomineSteps.deleteOntology(wait, driver, ontologyUrl),
+                () -> cytomineSteps.deleteOntology(wait,  ontologyUrl),
                 () -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName)
             );
         }
@@ -351,7 +351,7 @@ public class CytomineTests {
                     cleanup(() -> {
                         String ontologyUrl = cytomineSteps.getOntologyUrlFromProject(wait, projectUrl);
                         cytomineSteps.deleteProject(wait, projectUrl);
-                        cytomineSteps.deleteOntology(wait, driver, ontologyUrl);
+                        cytomineSteps.deleteOntology(wait,  ontologyUrl);
                     });
                 }
             }

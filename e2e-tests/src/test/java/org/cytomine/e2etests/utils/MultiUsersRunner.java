@@ -73,7 +73,7 @@ public class MultiUsersRunner {
                     ));
                 } finally {
                     cleanup(() -> cytomineSteps.deleteProject(wait, projectUrl),
-                        () -> cytomineSteps.deleteOntology(wait, driver, ontologyUrl),
+                        () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
                         () -> cytomineSteps.logout(wait, cytomineUrl));
                 }
             } finally {

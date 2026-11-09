@@ -173,6 +173,10 @@ core:
   deploy: true
   port: 8080
   server_id: 69308206-ed7c-454b-90b3-5639377ccd2f
+  # Comma-separated suffixes identifying external (LS-AAI) users whose project
+  # memberships are provisioned from IAM, e.g. "@lifescience-ri.eu".
+  # Empty by default: no user is considered external unless a deployment sets it.
+  external_username_suffixes: ""
   resources:
     requests:
       memory: 2Gi

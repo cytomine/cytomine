@@ -130,7 +130,19 @@ public class LTILoginInitiationResourceProvider implements RealmResourceProvider
 
         String toolRedirectUri = targetLinkUri;
 
-        String packedHint = LTILaunchHint.encode(loginHint, messageHint, targetLinkUri, deploymentId);
+        // The authorization endpoint limits login_hint to 255 characters and silently drops longer
+        // values, so the raw launch data is stored in the single-use object store and only a
+        // short-lived opaque key travels in the login_hint param. performLogin consumes the entry.
+        String hintKey = LTIIdentityProvider.LTI_HINT_SINGLE_USE_PREFIX + UUID.randomUUID();
+        try {
+            session.singleUseObjects().put(hintKey, LTIIdentityProvider.LTI_HINT_TTL_SECONDS,
+                    LTILaunchHint.data(loginHint, messageHint, targetLinkUri, deploymentId));
+        } catch (Exception e) {
+            log.warnf("LTI login-init: could not store the launch hint", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("LTI login initiation could not be completed - try again.")
+                    .build();
+        }
 
         UriBuilder authUrl = UriBuilder.fromUri(session.getContext().getUri().getBaseUri())
                 .path("realms").path(realm.getName())
@@ -145,7 +157,7 @@ public class LTILoginInitiationResourceProvider implements RealmResourceProvider
                 // the IdP (and therefore our broker callback - where deep-linking launches are detected
                 // and turned into a content-selection redirect) is skipped entirely.
                 .queryParam("prompt", "login")
-                .queryParam("login_hint", packedHint);
+                .queryParam("login_hint", hintKey);
 
         return Response.seeOther(authUrl.build()).build();
     }

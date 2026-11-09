@@ -82,6 +82,18 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <!-- Stage the provider jar into target/providers/: compose.yaml bind-mounts
+                         this directory onto /opt/keycloak/providers. Mounting the directory (instead
+                         of a single file) means the jar is available as soon as it is built, without
+                         first removing a container-created empty directory at a file path. -->
+                    <outputDirectory>${project.build.directory}/providers</outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

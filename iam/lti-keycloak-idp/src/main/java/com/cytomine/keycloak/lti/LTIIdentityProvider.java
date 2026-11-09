@@ -72,8 +72,9 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
 
     // Deep-linking return context, stashed in Keycloak's single-use object store so the
     // Web-UI picker can later hand the selection back to the local /lti/dl-return endpoint.
+    // NOTE: the single-use store lifespan is expressed in SECONDS, not milliseconds.
     static final String DL_CTX_SINGLE_USE_PREFIX = "lti-dl:";
-    static final long DL_CTX_TTL_MS = 10 * 60 * 1000L; // 10 minutes
+    static final long DL_CTX_TTL_SECONDS = 10 * 60L; // 10 minutes
     static final String DL_CTX_RETURN_URL = "returnUrl";
     static final String DL_CTX_DATA = "data";
     static final String DL_CTX_ISS = "iss";
@@ -82,6 +83,13 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
     static final String DL_CTX_SUB = "sub";
     // Comma-separated copy of deep_linking_settings.accept_presentation_document_targets (e.g. "iframe,window").
     static final String DL_CTX_PRESENTATION_TARGETS = "presentationTargets";
+
+    // Launch hints captured by /lti/login-init, stashed in Keycloak's single-use object store and
+    // consumed by performLogin(). Since Keycloak 26 the authorization endpoint limits login_hint to
+    // 255 characters and silently drops longer values, so the raw launch data must not travel in
+    // the URL: login-init passes only this short-lived opaque key under login_hint.
+    static final String LTI_HINT_SINGLE_USE_PREFIX = "lti-launch:";
+    static final long LTI_HINT_TTL_SECONDS = 10 * 60L; // 10 minutes
 
     // Clock-skew tolerance applied to both directions of the exp/iat window.
     private static final long CLOCK_SKEW_LEEWAY_SECONDS = 60;
@@ -112,13 +120,16 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
         try {
             AuthenticationSessionModel authSession = request.getAuthenticationSession();
 
-            // Retrieve encoded launch hints passed via login_hint param
-            String packed = authSession.getClientNote(org.keycloak.protocol.oidc.OIDCLoginProtocol.LOGIN_HINT_PARAM);
-            if (packed == null) {
+            // Retrieve the launch hints passed via the login_hint param. Since Keycloak 26 the
+            // authorization endpoint limits login_hint to 255 characters (silently dropping longer
+            // values), so /lti/login-init passes only an opaque single-use key and the actual launch
+            // data lives in Keycloak's single-use object store.
+            String hintParam = authSession.getClientNote(org.keycloak.protocol.oidc.OIDCLoginProtocol.LOGIN_HINT_PARAM);
+            if (hintParam == null) {
                 throw new IdentityBrokerException(
                     "Missing LTI launch hint - this IdP must be entered via the /lti/login-init endpoint, not directly.");
             }
-            Map<String, String> hint = LTILaunchHint.decode(packed);
+            Map<String, String> hint = resolveLaunchHint(hintParam);
             String loginHint = hint.get("login_hint");
             String messageHint = hint.get("lti_message_hint");
             String targetLinkUri = hint.get("target_link_uri");
@@ -149,9 +160,30 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             }
 
             return Response.seeOther(uriBuilder.build()).build();
+        } catch (IdentityBrokerException e) {
+            // Rethrow unchanged so the actionable message (expired/missing hint, ...) reaches the user.
+            throw e;
         } catch (Exception e) {
             throw new IdentityBrokerException("Could not build LTI launch redirect", e);
         }
+    }
+
+    /**
+     * Resolves the launch hint carried by the {@code login_hint} authentication-session note. Fresh
+     * launches carry only an opaque key into the single-use object store, which is removed on read so
+     * each hint can be consumed exactly once. The legacy base64-packed format is still accepted for
+     * authentication sessions that outlived an extension update (e.g. a refresh mid-flow).
+     */
+    private Map<String, String> resolveLaunchHint(String hintParam) {
+        if (hintParam.startsWith(LTI_HINT_SINGLE_USE_PREFIX)) {
+            Map<String, String> stored = session.singleUseObjects().remove(hintParam);
+            if (stored == null) {
+                throw new IdentityBrokerException(
+                    "The LTI launch hint has expired or was already used - start the launch again from your LMS.");
+            }
+            return stored;
+        }
+        return LTILaunchHint.decode(hintParam);
     }
 
     /**
@@ -367,7 +399,7 @@ public class LTIIdentityProvider extends AbstractIdentityProvider<LTIIdentityPro
             String ctxToken = UUID.randomUUID().toString();
             try {
                 provider.session.singleUseObjects().put(DL_CTX_SINGLE_USE_PREFIX + ctxToken,
-                    System.currentTimeMillis() + DL_CTX_TTL_MS, returnCtx);
+                    DL_CTX_TTL_SECONDS, returnCtx);
             } catch (Exception e) {
                 log.warnf("LTI deep linking: could not store return context", e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

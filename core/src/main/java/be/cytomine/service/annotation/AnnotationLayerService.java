@@ -74,5 +74,19 @@ public class AnnotationLayerService {
             }));
 
         return annotationLayerSet;
+    public Set<AnnotationLayerResponse> findByTaskRunLayer(Long imageId) {
+        Stream<AnnotationLayer> taskRunLayers =
+            taskRunLayerRepository.findAllByImageId(imageId).stream().map(TaskRunLayer::getAnnotationLayer);
+
+        ImageInstance imageInstance = imageInstanceService.get(imageId);
+        Stream<AnnotationLayer> lastTaskRunLayers =
+            taskRunRepository.findFirstByProjectIdOrderByCreatedDesc(imageInstance.getProject().getId()).stream()
+                .flatMap(
+                    existingTaskRun -> taskRunLayerRepository.findAllByTaskRunAndImage(existingTaskRun, imageInstance)
+                        .stream()).map(TaskRunLayer::getAnnotationLayer);
+
+        return Stream.concat(taskRunLayers, lastTaskRunLayers)
+            .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
+            .collect(Collectors.toSet());
     }
 }

@@ -109,6 +109,20 @@ class LtiDeepLinkingContractTest {
     }
 
     @Test
+    void oversizedPlatformHintsAreStillAcceptedForLaunch() {
+        // Since Keycloak 26 the authorization endpoint caps login_hint at 255 characters and silently
+        // drops longer values. Real platforms vastly exceed it (Blackboard sends ~200 characters of
+        // login_hint and ~600 of lti_message_hint), so the SPI must never carry the raw hints in the
+        // URL: /lti/login-init stores them server-side and passes only an opaque, single-use key.
+        LtiFixture oversizedBlackboard = LtiFixture.load("blackboard").withLoginInitOverrides(Map.of(
+            "login_hint", "bb-".repeat(70),
+            "lti_message_hint", "hint-".repeat(120)));
+        Map<String, Object> response = selectAndVerifyConsistentResponse(oversizedBlackboard, null);
+        assertPlatformEcho(response, oversizedBlackboard);
+        assertSelection(response, true);
+    }
+
+    @Test
     void platformThatRejectsWindowTargetsGetsNoWindowProperty() {
         UnaryOperator<Map<String, Object>> variant = claims -> {
             LtiFixture.setPresentationTargets(claims, List.of("iframe", "embed"));

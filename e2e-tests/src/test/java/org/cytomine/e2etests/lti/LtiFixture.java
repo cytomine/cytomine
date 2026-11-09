@@ -53,6 +53,16 @@ final class LtiFixture {
     }
 
     /**
+     * Returns a copy of this fixture with the given login-initiation parameters replaced
+     * (e.g. oversized {@code login_hint} / {@code lti_message_hint} variants of a platform).
+     */
+    LtiFixture withLoginInitOverrides(Map<String, String> overrides) {
+        Map<String, String> params = new LinkedHashMap<>(loginInitParameters);
+        params.putAll(overrides);
+        return new LtiFixture(params, requestClaims);
+    }
+
+    /**
      * Deep-copies the request claims so each test can apply its own variant without touching the
      * shared fixture (e.g. removing {@code data} or the presentation-target list).
      */

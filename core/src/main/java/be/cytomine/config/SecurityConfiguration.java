@@ -11,7 +11,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import be.cytomine.common.config.security.CommonSecurityConfiguration;
-import be.cytomine.common.config.security.JwtAuthConverter;
 import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.UserRepository;
@@ -22,7 +21,6 @@ import be.cytomine.repository.security.UserRepository;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    private final JwtAuthConverter customJwtAuthConverter;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final CommonSecurityConfiguration commonSecurityConfiguration;

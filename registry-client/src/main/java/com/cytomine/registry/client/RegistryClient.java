@@ -106,7 +106,7 @@ public class RegistryClient {
                 context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, reference)));
             }
             String digest = REGISTRY_OPERATE.digest(context, reference)
-                .orElseThrow(() -> new RuntimeException("digest not found"));
+                    .orElseThrow(() -> new RuntimeException("digest not found"));
             reference.setDigest(digest);
         }
 
@@ -125,7 +125,7 @@ public class RegistryClient {
         if (srcIsDocker && dstIsDocker) {
             if (Configurer.authenticated()) {
                 context.setToken(AUTHENTICATOR.getToken(new Pair<>(Scope.PULL, srcReference),
-                    new Pair<>(Scope.PULL_PUSH, dstReference)));
+                        new Pair<>(Scope.PULL_PUSH, dstReference)));
             }
             REGISTRY_OPERATE.load(context, srcReference);
         } else {

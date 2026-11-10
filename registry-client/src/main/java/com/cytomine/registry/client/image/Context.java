@@ -46,13 +46,13 @@ public class Context {
         manifest.setConfig(new ManifestHttp.BlobDTO(ImageMediaType.CONFIG, getConfig().getSize(),
             getConfig().getDigest()));
         manifest.setLayers(
-            getLayers().stream()
-                .map(blob -> new ManifestHttp.BlobDTO(
-                    ImageMediaType.LAYER,
-                    blob.getSize(),
-                    blob.getDigest()
-                ))
-                .collect(Collectors.toList())
+                getLayers().stream()
+                        .map(blob -> new ManifestHttp.BlobDTO(
+                                ImageMediaType.LAYER,
+                                blob.getSize(),
+                                blob.getDigest()
+                        ))
+                        .collect(Collectors.toList())
         );
         return manifest;
     }

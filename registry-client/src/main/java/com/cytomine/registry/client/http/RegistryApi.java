@@ -155,7 +155,7 @@ public class RegistryApi {
     }
 
     public Optional<String> mountBlob(Reference dstReference, String digest, String srcName,
-        String token) throws IOException {
+                                      String token) throws IOException {
         Map<String, String> headers = new HashMap<>();
         Optional.ofNullable(token).ifPresent(t -> headers.put(HttpHeaders.AUTHORIZATION, t));
         String mountUrl = String.format(BLOB_UPLOAD, dstReference.getEndpoint(),
@@ -176,7 +176,7 @@ public class RegistryApi {
     }
 
     public void uploadBlob(String url, String digest, InputStream inputStream, Long length,
-        String token) throws IOException {
+                           String token) throws IOException {
         Map<String, String> headers = new HashMap<>();
         Optional.ofNullable(token).ifPresent(t -> headers.put(HttpHeaders.AUTHORIZATION, t));
         String appendQuery = new URL(url).getQuery() == null ? "?" : "&";
@@ -216,7 +216,7 @@ public class RegistryApi {
     }
 
     public void uploadManifest(Reference reference, ManifestHttp content,
-        ImageMediaType contentType, String token) throws IOException {
+                               ImageMediaType contentType, String token) throws IOException {
         Map<String, String> headers = new HashMap<>();
         Optional.ofNullable(token).ifPresent(t -> headers.put(HttpHeaders.AUTHORIZATION, t));
         RequestBody body = RequestBody.create(JsonUtil.toJson(content),

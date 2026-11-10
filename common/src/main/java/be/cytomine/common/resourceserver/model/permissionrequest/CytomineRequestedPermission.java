@@ -14,6 +14,7 @@ import be.cytomine.common.resourceserver.model.permission.PermissionType;
 })
 public sealed interface CytomineRequestedPermission
     permits CytomineInstanceRequestedPermission, CytomineProjectRequestedPermission {
+
     PermissionType permissionType();
     CytominePermission permission();
 

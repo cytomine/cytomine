@@ -12,12 +12,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import be.cytomine.common.repository.http.OntologyHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
-import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import org.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.project.ProjectFromSearchRequest;
 import be.cytomine.dto.project.ProjectFromSearchResponse;

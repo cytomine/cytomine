@@ -11,12 +11,12 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.mapper.BaseMapper;
-import be.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
-import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
-import be.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
-import be.cytomine.common.repository.model.project.payload.CreateProject;
+import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
+import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import org.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
+import org.cytomine.common.repository.model.project.payload.CreateProject;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface ProjectMapper {

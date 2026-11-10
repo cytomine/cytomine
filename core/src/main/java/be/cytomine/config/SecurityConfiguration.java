@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import be.cytomine.common.config.security.CommonSecurityConfiguration;
+import org.cytomine.common.security.CommonSecurityConfiguration;
 import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.UserRepository;

@@ -25,7 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;

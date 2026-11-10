@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
-import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
-import be.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTagDomainAssociation;
+import org.cytomine.common.repository.http.TagDomainAssociationHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
+import org.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
+import org.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTagDomainAssociation;
 
-import static be.cytomine.common.repository.http.TagDomainAssociationHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.TagDomainAssociationHttpContract.ROOT_PATH;
 
 @RequiredArgsConstructor
 @RestController

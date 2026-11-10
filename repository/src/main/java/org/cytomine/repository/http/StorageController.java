@@ -14,13 +14,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.StorageHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
-import be.cytomine.common.repository.model.storage.payload.CreateStorage;
-import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
+import org.cytomine.common.repository.http.StorageHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import org.cytomine.common.repository.model.storage.payload.CreateStorage;
+import org.cytomine.common.repository.model.storage.payload.UpdateStorage;
 
-import static be.cytomine.common.repository.http.StorageHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.StorageHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
 
 @RestController

@@ -19,7 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import be.cytomine.common.resourceserver.model.CytomineAuthenticationSupport;
+import org.cytomine.common.resourceserver.model.CytomineAuthenticationSupport;
 
 public class ApiKeyFilter extends OncePerRequestFilter {
 

@@ -1,0 +1,16 @@
+package org.cytomine.common.resourceserver.http;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.service.annotation.HttpExchange;
+
+import org.cytomine.common.resourceserver.model.AuthorizationRequest;
+import org.cytomine.common.resourceserver.model.AuthorizationResponse;
+
+@HttpExchange(PermissionsHttpContract.ROOT_PATH)
+public interface PermissionsHttpContract {
+    String ROOT_PATH = "/authorize";
+
+    @PostMapping
+    AuthorizationResponse authorize(@RequestBody AuthorizationRequest authorizationRequest);
+}

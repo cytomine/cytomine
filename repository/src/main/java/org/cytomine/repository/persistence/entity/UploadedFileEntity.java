@@ -18,9 +18,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
-import be.cytomine.common.repository.model.HasTimestampCUD;
-import be.cytomine.common.repository.utils.LTreeType;
-import be.cytomine.common.repository.utils.LongArrayToBytesConverter;
+import org.cytomine.common.repository.model.HasTimestampCUD;
+import org.cytomine.common.repository.utils.LTreeType;
+import org.cytomine.common.repository.utils.LongArrayToBytesConverter;
 
 @Entity(name = "uploaded_file")
 @Data

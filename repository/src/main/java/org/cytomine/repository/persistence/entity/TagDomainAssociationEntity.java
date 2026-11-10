@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import be.cytomine.common.repository.model.HasTimestampCUD;
+import org.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "tag_domain_association")
 @Data

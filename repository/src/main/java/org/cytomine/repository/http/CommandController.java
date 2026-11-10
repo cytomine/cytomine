@@ -14,11 +14,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.CommandHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.http.CommandHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
-import static be.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
 
 @RequiredArgsConstructor

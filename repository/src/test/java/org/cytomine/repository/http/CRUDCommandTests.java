@@ -18,9 +18,9 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;

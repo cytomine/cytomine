@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import be.cytomine.common.repository.http.TagHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TagResponse;
-import be.cytomine.common.repository.model.tag.payload.CreateTag;
-import be.cytomine.common.repository.model.tag.payload.UpdateTag;
+import org.cytomine.common.repository.http.TagHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TagResponse;
+import org.cytomine.common.repository.model.tag.payload.CreateTag;
+import org.cytomine.common.repository.model.tag.payload.UpdateTag;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
 

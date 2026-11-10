@@ -2,16 +2,17 @@ package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
 
+import org.cytomine.common.mapper.BaseMapper;
 import org.cytomine.repository.persistence.entity.UserRoleEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.repository.model.command.payload.request.UserRoleCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
-import be.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
+import org.cytomine.common.repository.model.command.payload.request.UserRoleCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
+import org.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
 
-@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface UserRoleMapper {
     @Mapping(target = "deleted", source = "now")
     @BeanMapping(ignoreUnmappedSourceProperties = {"deleted"})

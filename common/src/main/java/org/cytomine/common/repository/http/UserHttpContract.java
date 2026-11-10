@@ -1,0 +1,49 @@
+package org.cytomine.common.repository.http;
+
+import java.util.Optional;
+import java.util.Set;
+
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.service.annotation.DeleteExchange;
+import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.annotation.HttpExchange;
+import org.springframework.web.service.annotation.PostExchange;
+import org.springframework.web.service.annotation.PutExchange;
+
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.user.payload.CreateUser;
+import org.cytomine.common.repository.model.user.payload.UpdateUser;
+
+@HttpExchange(UserHttpContract.ROOT_PATH)
+public interface UserHttpContract {
+
+    String ROOT_PATH = "/users";
+
+    @GetExchange("/{id}")
+    Optional<UserResponse> get(@PathVariable long id);
+
+    @PostExchange
+    Optional<HttpCommandResponse> create(@Valid @RequestBody CreateUser createUser);
+
+    @PostExchange("/self-register")
+    Optional<HttpCommandResponse> selfRegister(@Valid @RequestBody CreateUser createUser);
+
+    @PutExchange("/{id}")
+    Optional<HttpCommandResponse> update(@PathVariable long id,
+        @RequestBody UpdateUser updateUser);
+
+    @DeleteExchange("/{id}")
+    Optional<HttpCommandResponse> delete(@PathVariable long id);
+
+    @GetExchange("/search/{username}")
+    Optional<UserResponse> search(@PathVariable String username);
+
+    @GetExchange("/by-ids")
+    Page<UserResponse> findByIdsIn(@RequestParam(required = false) Set<Long> ids, Pageable pageable);
+}

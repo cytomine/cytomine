@@ -15,7 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
-import be.cytomine.common.repository.model.HasTimestampCUD;
+import org.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "ontology")
 @Data

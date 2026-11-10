@@ -27,12 +27,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
-import be.cytomine.common.repository.http.OntologyHttpContract;
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.http.UserRoleHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
-import be.cytomine.common.repository.utils.SpringPageCrawler;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.http.UserRoleHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.ontology.payload.OntologyLight;
+import org.cytomine.common.repository.utils.SpringPageCrawler;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;

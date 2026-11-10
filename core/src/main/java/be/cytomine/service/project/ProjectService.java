@@ -30,7 +30,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;

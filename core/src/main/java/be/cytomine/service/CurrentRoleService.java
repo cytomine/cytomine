@@ -15,8 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.utils.WeakConcurrentHashMap;
 

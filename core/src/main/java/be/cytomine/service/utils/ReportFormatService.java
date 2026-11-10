@@ -9,8 +9,8 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.http.TermHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.dto.image.Point;
 import be.cytomine.service.report.ReportColumn;
 import be.cytomine.utils.DateUtils;

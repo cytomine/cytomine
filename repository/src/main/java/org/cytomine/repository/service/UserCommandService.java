@@ -18,18 +18,18 @@ import org.cytomine.repository.persistence.entity.RoleEntity;
 import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.command.payload.request.UserCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
-import be.cytomine.common.repository.model.command.request.CreateUserCommand;
-import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
-import be.cytomine.common.repository.model.command.request.DeleteUserCommand;
-import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
-import be.cytomine.common.repository.model.command.request.UpdateUserCommand;
-import be.cytomine.common.repository.model.storage.payload.CreateStorage;
-import be.cytomine.common.repository.model.user.payload.CreateUser;
-import be.cytomine.common.repository.model.user.payload.UpdateUser;
+import org.cytomine.common.repository.model.command.payload.request.UserCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
+import org.cytomine.common.repository.model.command.request.CreateUserCommand;
+import org.cytomine.common.repository.model.command.request.DeleteCommandRequest;
+import org.cytomine.common.repository.model.command.request.DeleteUserCommand;
+import org.cytomine.common.repository.model.command.request.UpdateCommandRequest;
+import org.cytomine.common.repository.model.command.request.UpdateUserCommand;
+import org.cytomine.common.repository.model.storage.payload.CreateStorage;
+import org.cytomine.common.repository.model.user.payload.CreateUser;
+import org.cytomine.common.repository.model.user.payload.UpdateUser;
 
 import static java.lang.String.format;
 

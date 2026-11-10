@@ -6,11 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.config.security.IncomingAuthorizationContext;
-import be.cytomine.common.repository.http.OntologyHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import org.cytomine.common.security.IncomingAuthorizationContext;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
 
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.project.ProjectFromSearchRequest;

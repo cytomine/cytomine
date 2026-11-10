@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectRepresentativeUserService;

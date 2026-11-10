@@ -5,7 +5,7 @@ import org.springframework.core.Ordered;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 
-import be.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.http.UserHttpContract;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.UserRepository;
 

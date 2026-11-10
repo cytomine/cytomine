@@ -3,10 +3,10 @@ package org.cytomine.resourceserver.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.resourceserver.model.permission.CytomineInstancePermission;
-import be.cytomine.common.resourceserver.model.permission.CytominePermission;
-import be.cytomine.common.resourceserver.model.permission.CytomineProjectPermission;
-import be.cytomine.common.resourceserver.model.permissionconfig.CytominePermissionConfig;
+import org.cytomine.common.resourceserver.model.permission.CytomineInstancePermission;
+import org.cytomine.common.resourceserver.model.permission.CytominePermission;
+import org.cytomine.common.resourceserver.model.permission.CytomineProjectPermission;
+import org.cytomine.common.resourceserver.model.permissionconfig.CytominePermissionConfig;
 
 @RequiredArgsConstructor
 @Component

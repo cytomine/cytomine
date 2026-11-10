@@ -44,7 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.CropOffset;
 import be.cytomine.domain.appengine.TaskRun;

@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Version;
 import lombok.Data;
 
-import be.cytomine.common.repository.model.HasTimestampCUD;
+import org.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "tag")
 @Data

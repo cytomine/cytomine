@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 
-import be.cytomine.common.repository.model.HasTimestampCUD;
+import org.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "storage")
 @Data

@@ -11,7 +11,7 @@ import org.locationtech.jts.io.WKTReader;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;

@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import be.cytomine.common.resourceserver.model.permissionconfig.CytominePermissionConfig;
+import org.cytomine.common.resourceserver.model.permissionconfig.CytominePermissionConfig;
 
 
 @ConfigurationProperties(prefix = "cytomine.permissions")

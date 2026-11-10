@@ -1,0 +1,36 @@
+package org.cytomine.common.repository.http;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.annotation.HttpExchange;
+
+import org.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
+import org.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
+import org.cytomine.common.repository.model.stat.payload.StatTerm;
+
+@HttpExchange(StatsHttpContract.ROOT_PATH)
+public interface StatsHttpContract {
+    String ROOT_PATH = "/stats";
+
+    @GetExchange("/project/{projectId}")
+    Page<StatTerm> findTermsByProject(@PathVariable long projectId,
+        @RequestParam(required = false) Optional<LocalDateTime> startDate,
+        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        Pageable pageable);
+
+    @GetExchange("/per-user/project/{projectId}")
+    Page<FlatStatUserTerm> findUserTermsByProject(@PathVariable long projectId,
+        Pageable pageable);
+
+    @GetExchange("/per-term-and-image/project/{projectId}")
+    Page<StatPerTermAndImage> findPerTermAndImageByProject(@PathVariable long projectId,
+        @RequestParam(required = false) Optional<LocalDateTime> startDate,
+        @RequestParam(required = false) Optional<LocalDateTime> endDate,
+        Pageable pageable);
+}

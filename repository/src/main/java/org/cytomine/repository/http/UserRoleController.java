@@ -14,14 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.UserRoleHttpContract;
-import be.cytomine.common.repository.model.Role;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
-import be.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
-import be.cytomine.common.repository.model.userrole.payload.role.payload.UpdateUserRole;
+import org.cytomine.common.repository.http.UserRoleHttpContract;
+import org.cytomine.common.repository.model.Role;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
+import org.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
+import org.cytomine.common.repository.model.userrole.payload.role.payload.UpdateUserRole;
 
-import static be.cytomine.common.repository.http.UserRoleHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.UserRoleHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
 
 @RequiredArgsConstructor

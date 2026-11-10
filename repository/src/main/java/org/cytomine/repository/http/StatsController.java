@@ -11,12 +11,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.StatsHttpContract;
-import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
-import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
-import be.cytomine.common.repository.model.stat.payload.StatTerm;
+import org.cytomine.common.repository.http.StatsHttpContract;
+import org.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
+import org.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
+import org.cytomine.common.repository.model.stat.payload.StatTerm;
 
-import static be.cytomine.common.repository.http.StatsHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.StatsHttpContract.ROOT_PATH;
 
 @RestController
 @RequestMapping(ROOT_PATH)

@@ -24,9 +24,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import be.cytomine.common.resourceserver.model.CytomineAuthenticationSupport;
-import be.cytomine.common.repository.http.StorageHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import org.cytomine.common.resourceserver.model.CytomineAuthenticationSupport;
+import org.cytomine.common.repository.http.StorageHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
 import be.cytomine.exceptions.ObjectNotFoundException;

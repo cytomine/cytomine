@@ -16,10 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
-import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
-import be.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTagDomainAssociation;
+import org.cytomine.common.repository.http.TagDomainAssociationHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
+import org.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
+import org.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTagDomainAssociation;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc

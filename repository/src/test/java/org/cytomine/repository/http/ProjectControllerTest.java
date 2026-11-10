@@ -16,10 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.ProjectHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
-import be.cytomine.common.repository.model.project.payload.CreateProject;
-import be.cytomine.common.repository.model.project.payload.UpdateProject;
+import org.cytomine.common.repository.http.ProjectHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import org.cytomine.common.repository.model.project.payload.CreateProject;
+import org.cytomine.common.repository.model.project.payload.UpdateProject;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc

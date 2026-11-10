@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import org.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 
-import static be.cytomine.common.repository.http.ReviewedAnnotationHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.ReviewedAnnotationHttpContract.ROOT_PATH;
 
 @RequiredArgsConstructor
 @RestController

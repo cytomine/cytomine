@@ -19,10 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.TermRelationHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
-import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
-import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
+import org.cytomine.common.repository.http.TermRelationHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import org.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
+import org.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc

@@ -28,8 +28,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import be.cytomine.common.repository.http.StorageHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import org.cytomine.common.repository.http.StorageHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.dto.meilisearch.SearchWindow;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

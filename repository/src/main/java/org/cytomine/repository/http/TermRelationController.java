@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.TermRelationHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
-import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
-import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
+import org.cytomine.common.repository.http.TermRelationHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import org.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
+import org.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
-import static be.cytomine.common.repository.http.TermRelationHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.TermRelationHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
 import static java.util.stream.Collectors.toSet;
 

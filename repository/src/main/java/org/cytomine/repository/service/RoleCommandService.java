@@ -13,16 +13,16 @@ import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.persistence.entity.RoleEntity;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.command.payload.request.RoleCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
-import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
-import be.cytomine.common.repository.model.command.request.CreateRoleCommand;
-import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
-import be.cytomine.common.repository.model.command.request.DeleteRoleCommand;
-import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
-import be.cytomine.common.repository.model.command.request.UpdateRoleCommand;
-import be.cytomine.common.repository.model.role.payload.CreateRole;
-import be.cytomine.common.repository.model.role.payload.UpdateRole;
+import org.cytomine.common.repository.model.command.payload.request.RoleCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
+import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
+import org.cytomine.common.repository.model.command.request.CreateRoleCommand;
+import org.cytomine.common.repository.model.command.request.DeleteCommandRequest;
+import org.cytomine.common.repository.model.command.request.DeleteRoleCommand;
+import org.cytomine.common.repository.model.command.request.UpdateCommandRequest;
+import org.cytomine.common.repository.model.command.request.UpdateRoleCommand;
+import org.cytomine.common.repository.model.role.payload.CreateRole;
+import org.cytomine.common.repository.model.role.payload.UpdateRole;
 
 @Component
 @RequiredArgsConstructor

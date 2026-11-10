@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
+import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.project.Project;

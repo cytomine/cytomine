@@ -2,7 +2,7 @@ package be.cytomine.security.current;
 
 import lombok.Data;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 
 @Data
 public class FullCurrentUser implements CurrentUser {

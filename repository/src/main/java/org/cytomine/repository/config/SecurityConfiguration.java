@@ -13,8 +13,8 @@ import org.springframework.security.oauth2.server.resource.web.authentication.Be
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import be.cytomine.common.config.security.JwtAuthConverter;
-import be.cytomine.common.config.security.TokenFromParameterFilter;
+import org.cytomine.common.security.JwtAuthConverter;
+import org.cytomine.common.security.TokenFromParameterFilter;
 
 @Configuration
 @EnableWebSecurity

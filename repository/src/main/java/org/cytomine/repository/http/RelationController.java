@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.RelationHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.RelationResponse;
+import org.cytomine.common.repository.http.RelationHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.RelationResponse;
 
-import static be.cytomine.common.repository.http.RelationHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.RelationHttpContract.ROOT_PATH;
 
 @RequiredArgsConstructor
 @RestController

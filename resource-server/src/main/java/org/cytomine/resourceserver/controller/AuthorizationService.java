@@ -11,12 +11,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.resourceserver.http.PermissionsHttpContract;
-import be.cytomine.common.resourceserver.model.AuthorizationRequest;
-import be.cytomine.common.resourceserver.model.AuthorizationResponse;
-import be.cytomine.common.resourceserver.model.CytomineDeniedPermission;
-import be.cytomine.common.resourceserver.model.CytomineGrantedPermission;
-import be.cytomine.common.resourceserver.model.permission.CytominePermission;
+import org.cytomine.common.resourceserver.http.PermissionsHttpContract;
+import org.cytomine.common.resourceserver.model.AuthorizationRequest;
+import org.cytomine.common.resourceserver.model.AuthorizationResponse;
+import org.cytomine.common.resourceserver.model.CytomineDeniedPermission;
+import org.cytomine.common.resourceserver.model.CytomineGrantedPermission;
+import org.cytomine.common.resourceserver.model.permission.CytominePermission;
 
 
 @RequiredArgsConstructor

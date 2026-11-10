@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.Role;
+import org.cytomine.common.repository.model.Role;
 
 import static java.util.stream.Collectors.toSet;
 

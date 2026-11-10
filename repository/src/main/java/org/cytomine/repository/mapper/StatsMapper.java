@@ -6,9 +6,9 @@ import org.cytomine.repository.persistence.projection.StatUserTermProjection;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
-import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
-import be.cytomine.common.repository.model.stat.payload.StatTerm;
+import org.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
+import org.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
+import org.cytomine.common.repository.model.stat.payload.StatTerm;
 
 @Mapper(componentModel = "spring")
 public interface StatsMapper {

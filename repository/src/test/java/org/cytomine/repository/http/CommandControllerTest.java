@@ -16,12 +16,12 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.CommandHttpContract;
-import be.cytomine.common.repository.http.OntologyHttpContract;
-import be.cytomine.common.repository.model.command.CommandType;
-import be.cytomine.common.repository.model.command.payload.response.CommandV2Response;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import org.cytomine.common.repository.http.CommandHttpContract;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.model.command.CommandType;
+import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;

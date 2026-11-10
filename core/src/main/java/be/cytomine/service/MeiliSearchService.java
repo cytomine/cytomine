@@ -32,8 +32,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.repository.http.StorageHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import org.cytomine.common.repository.http.StorageHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchFacetsResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchImageResponse;
 import be.cytomine.dto.meilisearch.SearchWindow;

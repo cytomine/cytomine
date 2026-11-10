@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 
-import be.cytomine.common.config.security.IncomingAuthorizationContext;
+import org.cytomine.common.security.IncomingAuthorizationContext;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;

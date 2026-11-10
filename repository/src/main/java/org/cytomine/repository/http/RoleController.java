@@ -14,13 +14,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.RoleHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
-import be.cytomine.common.repository.model.role.payload.CreateRole;
-import be.cytomine.common.repository.model.role.payload.UpdateRole;
+import org.cytomine.common.repository.http.RoleHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
+import org.cytomine.common.repository.model.role.payload.CreateRole;
+import org.cytomine.common.repository.model.role.payload.UpdateRole;
 
-import static be.cytomine.common.repository.http.RoleHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.RoleHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
 
 @RequiredArgsConstructor

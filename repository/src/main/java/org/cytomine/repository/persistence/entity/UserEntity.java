@@ -19,8 +19,8 @@ import jakarta.persistence.Version;
 import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 
-import be.cytomine.common.repository.model.HasTimestampCUD;
-import be.cytomine.common.repository.utils.Language;
+import org.cytomine.common.repository.model.HasTimestampCUD;
+import org.cytomine.common.repository.utils.Language;
 
 @Entity(name = "sec_user")
 @Data

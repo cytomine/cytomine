@@ -16,16 +16,16 @@ import org.cytomine.repository.persistence.entity.TermEntity;
 import org.cytomine.repository.persistence.entity.TermRelationEntity;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
-import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
-import be.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
-import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
-import be.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
-import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
-import be.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
-import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
-import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
+import org.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
+import org.cytomine.common.repository.model.command.request.CreateTermRelationCommand;
+import org.cytomine.common.repository.model.command.request.DeleteCommandRequest;
+import org.cytomine.common.repository.model.command.request.DeleteTermRelationCommand;
+import org.cytomine.common.repository.model.command.request.UpdateCommandRequest;
+import org.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
+import org.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
+import org.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 @Component
 @RequiredArgsConstructor

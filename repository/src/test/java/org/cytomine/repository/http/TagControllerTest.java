@@ -22,11 +22,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.TagHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TagResponse;
-import be.cytomine.common.repository.model.tag.payload.CreateTag;
-import be.cytomine.common.repository.model.tag.payload.UpdateTag;
+import org.cytomine.common.repository.http.TagHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TagResponse;
+import org.cytomine.common.repository.model.tag.payload.CreateTag;
+import org.cytomine.common.repository.model.tag.payload.UpdateTag;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc

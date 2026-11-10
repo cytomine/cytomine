@@ -23,8 +23,8 @@ import org.springframework.test.context.DynamicPropertyRegistrar;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import be.cytomine.TermMapper;
-import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunProvisionedResponse;

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import be.cytomine.domain.security.SecRole;
 
-import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
-import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
-import static be.cytomine.common.repository.model.Role.ROLE_SUPER_ADMIN;
-import static be.cytomine.common.repository.model.Role.ROLE_USER;
+import static org.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static org.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static org.cytomine.common.repository.model.Role.ROLE_SUPER_ADMIN;
+import static org.cytomine.common.repository.model.Role.ROLE_USER;
 
 /**
  * Spring Data JPA repository for the user entity.

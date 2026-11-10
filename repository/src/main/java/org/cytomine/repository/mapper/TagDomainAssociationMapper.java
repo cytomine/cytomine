@@ -2,16 +2,17 @@ package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
 
+import org.cytomine.common.mapper.BaseMapper;
 import org.cytomine.repository.persistence.entity.TagDomainAssociationEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.repository.model.command.payload.request.TagDomainAssociationCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
-import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
+import org.cytomine.common.repository.model.command.payload.request.TagDomainAssociationCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
+import org.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
 
-@Mapper(componentModel = "spring", uses = be.cytomine.common.mapper.BaseMapper.class)
+@Mapper(componentModel = "spring", uses = BaseMapper.class)
 public interface TagDomainAssociationMapper {
 
     @Mapping(target = "tagName", ignore = true)

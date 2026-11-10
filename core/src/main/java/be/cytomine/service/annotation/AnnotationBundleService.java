@@ -33,10 +33,10 @@ import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.http.TermHttpContract;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.annotation.AnnotationResult;

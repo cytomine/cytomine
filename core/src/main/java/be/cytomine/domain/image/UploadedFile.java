@@ -14,8 +14,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
 
-import be.cytomine.common.repository.utils.LTreeType;
-import be.cytomine.common.repository.utils.LongArrayToBytesConverter;
+import org.cytomine.common.repository.utils.LTreeType;
+import org.cytomine.common.repository.utils.LongArrayToBytesConverter;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.server.Storage;
 import be.cytomine.domain.security.User;

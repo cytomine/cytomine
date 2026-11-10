@@ -10,8 +10,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import be.cytomine.common.mapper.BaseMapper;
-import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;

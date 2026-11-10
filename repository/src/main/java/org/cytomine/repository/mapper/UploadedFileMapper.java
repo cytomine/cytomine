@@ -6,17 +6,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.cytomine.common.mapper.BaseMapper;
 import org.cytomine.repository.persistence.entity.UploadedFileEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import be.cytomine.common.repository.model.command.payload.request.UploadedFileCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
-import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
+import org.cytomine.common.repository.model.command.payload.request.UploadedFileCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
+import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
 
-@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface UploadedFileMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version", "LTree"})

@@ -16,10 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.StorageHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
-import be.cytomine.common.repository.model.storage.payload.CreateStorage;
-import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
+import org.cytomine.common.repository.http.StorageHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import org.cytomine.common.repository.model.storage.payload.CreateStorage;
+import org.cytomine.common.repository.model.storage.payload.UpdateStorage;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc

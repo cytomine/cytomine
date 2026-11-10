@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.TagHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TagResponse;
-import be.cytomine.common.repository.model.tag.payload.CreateTag;
-import be.cytomine.common.repository.model.tag.payload.UpdateTag;
+import org.cytomine.common.repository.http.TagHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TagResponse;
+import org.cytomine.common.repository.model.tag.payload.CreateTag;
+import org.cytomine.common.repository.model.tag.payload.UpdateTag;
 
 @RequiredArgsConstructor
 @RestController

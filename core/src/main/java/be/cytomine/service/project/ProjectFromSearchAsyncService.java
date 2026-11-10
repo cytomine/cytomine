@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.config.security.IncomingAuthorizationContext;
+import org.cytomine.common.security.IncomingAuthorizationContext;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repository.image.ImageInstanceRepository;

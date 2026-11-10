@@ -15,13 +15,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.UploadedFileHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
-import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
-import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
+import org.cytomine.common.repository.http.UploadedFileHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
+import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
+import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 
-import static be.cytomine.common.repository.http.UploadedFileHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.UploadedFileHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
 
 @RestController

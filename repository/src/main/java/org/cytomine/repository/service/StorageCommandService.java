@@ -13,16 +13,16 @@ import org.cytomine.repository.persistence.StorageRepository;
 import org.cytomine.repository.persistence.entity.StorageEntity;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.command.payload.request.StorageCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
-import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
-import be.cytomine.common.repository.model.command.request.CreateStorageCommand;
-import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
-import be.cytomine.common.repository.model.command.request.DeleteStorageCommand;
-import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
-import be.cytomine.common.repository.model.command.request.UpdateStorageCommand;
-import be.cytomine.common.repository.model.storage.payload.CreateStorage;
-import be.cytomine.common.repository.model.storage.payload.UpdateStorage;
+import org.cytomine.common.repository.model.command.payload.request.StorageCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
+import org.cytomine.common.repository.model.command.request.CreateStorageCommand;
+import org.cytomine.common.repository.model.command.request.DeleteCommandRequest;
+import org.cytomine.common.repository.model.command.request.DeleteStorageCommand;
+import org.cytomine.common.repository.model.command.request.UpdateCommandRequest;
+import org.cytomine.common.repository.model.command.request.UpdateStorageCommand;
+import org.cytomine.common.repository.model.storage.payload.CreateStorage;
+import org.cytomine.common.repository.model.storage.payload.UpdateStorage;
 
 @Component
 @RequiredArgsConstructor

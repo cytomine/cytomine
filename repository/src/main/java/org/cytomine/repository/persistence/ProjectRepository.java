@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import be.cytomine.common.repository.model.list.filtered.BoundedFilter;
+import org.cytomine.common.repository.model.list.filtered.BoundedFilter;
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     String PROJECT_CLASS = "'be.cytomine.domain.project.Project'";

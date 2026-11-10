@@ -24,12 +24,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.model.Role;
-import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.user.payload.CreateUser;
-import be.cytomine.common.repository.model.user.payload.UpdateUser;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.Role;
+import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.user.payload.CreateUser;
+import org.cytomine.common.repository.model.user.payload.UpdateUser;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

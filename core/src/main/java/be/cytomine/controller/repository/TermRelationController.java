@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import be.cytomine.common.repository.http.TermRelationHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
-import be.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
-import be.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
+import org.cytomine.common.repository.http.TermRelationHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import org.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
+import org.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 import be.cytomine.domain.ontology.RelationTerm;
 
 import static java.lang.String.format;

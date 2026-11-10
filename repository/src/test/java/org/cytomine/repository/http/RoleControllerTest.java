@@ -16,10 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.RoleHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
-import be.cytomine.common.repository.model.role.payload.CreateRole;
-import be.cytomine.common.repository.model.role.payload.UpdateRole;
+import org.cytomine.common.repository.http.RoleHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
+import org.cytomine.common.repository.model.role.payload.CreateRole;
+import org.cytomine.common.repository.model.role.payload.UpdateRole;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc

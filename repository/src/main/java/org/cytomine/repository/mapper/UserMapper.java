@@ -3,18 +3,19 @@ package org.cytomine.repository.mapper;
 import java.sql.Timestamp;
 import java.util.Set;
 
+import org.cytomine.common.mapper.BaseMapper;
 import org.cytomine.repository.persistence.entity.RoleEntity;
 import org.cytomine.repository.persistence.entity.UserEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.repository.model.command.payload.request.UserCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.user.payload.CreateUser;
-import be.cytomine.common.repository.utils.Language;
+import org.cytomine.common.repository.model.command.payload.request.UserCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.user.payload.CreateUser;
+import org.cytomine.common.repository.utils.Language;
 
-@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class, RoleMapper.class})
+@Mapper(componentModel = "spring", uses = {BaseMapper.class, RoleMapper.class})
 public interface UserMapper {
 
     default Language mapToLanguage(String language) {

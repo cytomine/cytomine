@@ -22,13 +22,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.mapper.BaseMapper;
-import be.cytomine.common.repository.http.OntologyHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
-import be.cytomine.common.repository.model.ontology.payload.CreateOntology;
-import be.cytomine.common.repository.model.ontology.payload.UpdateOntology;
+import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import org.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc

@@ -20,17 +20,17 @@ import org.cytomine.repository.persistence.entity.TagEntity;
 import org.cytomine.repository.persistence.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.command.payload.request.TagCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TagResponse;
-import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
-import be.cytomine.common.repository.model.command.request.CreateTagCommand;
-import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
-import be.cytomine.common.repository.model.command.request.DeleteTagCommand;
-import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
-import be.cytomine.common.repository.model.command.request.UpdateTagCommand;
-import be.cytomine.common.repository.model.tag.payload.CreateTag;
-import be.cytomine.common.repository.model.tag.payload.UpdateTag;
+import org.cytomine.common.repository.model.command.payload.request.TagCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TagResponse;
+import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
+import org.cytomine.common.repository.model.command.request.CreateTagCommand;
+import org.cytomine.common.repository.model.command.request.DeleteCommandRequest;
+import org.cytomine.common.repository.model.command.request.DeleteTagCommand;
+import org.cytomine.common.repository.model.command.request.UpdateCommandRequest;
+import org.cytomine.common.repository.model.command.request.UpdateTagCommand;
+import org.cytomine.common.repository.model.tag.payload.CreateTag;
+import org.cytomine.common.repository.model.tag.payload.UpdateTag;
 
 @Component
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package be.cytomine.config.security;
+package be.cytomine.common.config.security;
 
 import java.io.IOException;
 
@@ -7,8 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import be.cytomine.common.config.security.IncomingAuthorizationContext;
 
 public class IncomingAuthorizationFilter extends OncePerRequestFilter {
 

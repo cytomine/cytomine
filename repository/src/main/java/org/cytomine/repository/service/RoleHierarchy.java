@@ -3,9 +3,8 @@ package org.cytomine.repository.service;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.cytomine.common.repository.model.Role;
 import org.springframework.stereotype.Component;
-
-import be.cytomine.common.repository.model.Role;
 
 import static java.util.stream.Collectors.toSet;
 

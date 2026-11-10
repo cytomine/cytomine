@@ -10,15 +10,15 @@ import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.user.payload.CreateUser;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
@@ -31,9 +31,9 @@ import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.security.IamProjectMembershipService;
 
-import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
-import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
-import static be.cytomine.common.repository.model.Role.ROLE_USER;
+import static org.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static org.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static org.cytomine.common.repository.model.Role.ROLE_USER;
 
 @RequiredArgsConstructor
 @Component

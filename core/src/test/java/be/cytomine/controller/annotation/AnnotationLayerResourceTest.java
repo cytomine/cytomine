@@ -2,6 +2,7 @@ package be.cytomine.controller.annotation;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.cytomine.common.PostGisTestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,7 +12,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.annotation.Annotation;

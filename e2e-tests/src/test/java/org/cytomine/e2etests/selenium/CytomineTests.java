@@ -29,10 +29,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
-import static be.cytomine.common.repository.model.Role.ROLE_USER;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toSet;
+import static org.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static org.cytomine.common.repository.model.Role.ROLE_USER;
 
 @Import({AnnotationTools.class, CytomineSteps.class, KeycloakClient.class, MultiUsersRunner.class, SeleniumDriver.class,
     WebDriverUtils.class})

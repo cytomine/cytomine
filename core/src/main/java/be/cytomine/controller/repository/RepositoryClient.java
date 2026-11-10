@@ -4,6 +4,23 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.cytomine.common.config.security.CytomineAuthenticationSupport;
+import org.cytomine.common.repository.http.CommandHttpContract;
+import org.cytomine.common.repository.http.HealthService;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.http.ProjectHttpContract;
+import org.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import org.cytomine.common.repository.http.RoleHttpContract;
+import org.cytomine.common.repository.http.StatsHttpContract;
+import org.cytomine.common.repository.http.StorageHttpContract;
+import org.cytomine.common.repository.http.TagDomainAssociationHttpContract;
+import org.cytomine.common.repository.http.TagHttpContract;
+import org.cytomine.common.repository.http.TermHttpContract;
+import org.cytomine.common.repository.http.TermRelationHttpContract;
+import org.cytomine.common.repository.http.UploadedFileHttpContract;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.http.UserRoleHttpContract;
+import org.cytomine.common.repository.utils.SpringPage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,23 +35,6 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
-import be.cytomine.common.config.security.CytomineAuthenticationSupport;
-import be.cytomine.common.repository.http.CommandHttpContract;
-import be.cytomine.common.repository.http.HealthService;
-import be.cytomine.common.repository.http.OntologyHttpContract;
-import be.cytomine.common.repository.http.ProjectHttpContract;
-import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
-import be.cytomine.common.repository.http.RoleHttpContract;
-import be.cytomine.common.repository.http.StatsHttpContract;
-import be.cytomine.common.repository.http.StorageHttpContract;
-import be.cytomine.common.repository.http.TagDomainAssociationHttpContract;
-import be.cytomine.common.repository.http.TagHttpContract;
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.http.TermRelationHttpContract;
-import be.cytomine.common.repository.http.UploadedFileHttpContract;
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.http.UserRoleHttpContract;
-import be.cytomine.common.repository.utils.SpringPage;
 import be.cytomine.config.security.IncomingAuthorizationContext;
 
 @Configuration

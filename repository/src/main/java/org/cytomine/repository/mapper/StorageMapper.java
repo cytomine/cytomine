@@ -2,16 +2,16 @@ package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
 
+import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.model.command.payload.request.StorageCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import org.cytomine.common.repository.model.storage.payload.CreateStorage;
 import org.cytomine.repository.persistence.entity.StorageEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.repository.model.command.payload.request.StorageCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
-import be.cytomine.common.repository.model.storage.payload.CreateStorage;
-
-@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface StorageMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = {"version"})

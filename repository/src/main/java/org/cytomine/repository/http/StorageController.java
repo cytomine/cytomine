@@ -4,6 +4,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.StorageHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import org.cytomine.common.repository.model.storage.payload.CreateStorage;
+import org.cytomine.common.repository.model.storage.payload.UpdateStorage;
 import org.cytomine.repository.mapper.StorageMapper;
 import org.cytomine.repository.persistence.StorageRepository;
 import org.cytomine.repository.service.ACLService;
@@ -14,14 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.cytomine.common.repository.http.StorageHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
-import org.cytomine.common.repository.model.storage.payload.CreateStorage;
-import org.cytomine.common.repository.model.storage.payload.UpdateStorage;
-
-import static org.cytomine.common.repository.http.StorageHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
+import static org.cytomine.common.repository.http.StorageHttpContract.ROOT_PATH;
 
 @RestController
 @RequestMapping(ROOT_PATH)

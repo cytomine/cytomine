@@ -23,60 +23,23 @@ import be.cytomine.utils.JsonObject;
 @Setter
 public class Project extends CytomineDomain {
 
+    @Enumerated(EnumType.STRING)
+    EditingMode mode = EditingMode.CLASSIC;
     private String name;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ontology_id", nullable = true)
     private Ontology ontology;
-
     @OneToMany(mappedBy = "project")
     private Set<ProjectRepresentativeUser> representativeUsers;
-
     private Boolean blindMode = false;
-
     private Boolean areImagesDownloadable = false;
-
     private long countAnnotations;
-
     private long countJobAnnotations;
-
     private long countImages;
-
     private long countReviewedAnnotations;
-
     private boolean isClosed = false;
-
     private boolean hideUsersLayers = false;
-
     private boolean hideAdminsLayers = false;
-
-    @Enumerated(EnumType.STRING)
-    EditingMode mode = EditingMode.CLASSIC;
-
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        Project project = (Project) this;
-        project.id = json.getJSONAttrLong("id", null);
-        project.name = json.getJSONAttrStr("name");
-        project.ontology = (Ontology) json.getJSONAttrDomain(entityManager, "ontology", new Ontology(), false);
-        project.blindMode = json.getJSONAttrBoolean("blindMode", false);
-        project.areImagesDownloadable = json.getJSONAttrBoolean("areImagesDownloadable", false);
-        project.isClosed = json.getJSONAttrBoolean("isClosed", false);
-        project.mode = EditingMode.CLASSIC;
-        if (json.getJSONAttrBoolean("isRestricted", false)) {
-            project.mode = EditingMode.RESTRICTED;
-        }
-        if (json.getJSONAttrBoolean("isReadOnly", false)) {
-            project.mode = EditingMode.READ_ONLY;
-        }
-
-        project.hideUsersLayers = json.getJSONAttrBoolean("hideUsersLayers", false);
-        project.hideAdminsLayers = json.getJSONAttrBoolean("hideAdminsLayers", false);
-
-
-        project.created = json.getJSONAttrDate("created");
-        project.updated = json.getJSONAttrDate("updated");
-        return project;
-    }
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
@@ -110,6 +73,31 @@ public class Project extends CytomineDomain {
         returnArray.put("hideAdminsLayers", project.hideAdminsLayers);
 
         return returnArray;
+    }
+
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        Project project = (Project) this;
+        project.id = json.getJSONAttrLong("id", null);
+        project.name = json.getJSONAttrStr("name");
+        project.ontology = (Ontology) json.getJSONAttrDomain(entityManager, "ontology", new Ontology(), false);
+        project.blindMode = json.getJSONAttrBoolean("blindMode", false);
+        project.areImagesDownloadable = json.getJSONAttrBoolean("areImagesDownloadable", false);
+        project.isClosed = json.getJSONAttrBoolean("isClosed", false);
+        project.mode = EditingMode.CLASSIC;
+        if (json.getJSONAttrBoolean("isRestricted", false)) {
+            project.mode = EditingMode.RESTRICTED;
+        }
+        if (json.getJSONAttrBoolean("isReadOnly", false)) {
+            project.mode = EditingMode.READ_ONLY;
+        }
+
+        project.hideUsersLayers = json.getJSONAttrBoolean("hideUsersLayers", false);
+        project.hideAdminsLayers = json.getJSONAttrBoolean("hideAdminsLayers", false);
+
+
+        project.created = json.getJSONAttrDate("created");
+        project.updated = json.getJSONAttrDate("updated");
+        return project;
     }
 
     @Override

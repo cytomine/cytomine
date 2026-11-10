@@ -15,7 +15,6 @@ import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import org.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "term")

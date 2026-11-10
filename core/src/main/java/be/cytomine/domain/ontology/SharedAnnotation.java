@@ -56,6 +56,25 @@ public class SharedAnnotation extends CytomineDomain implements Serializable {
     )
     private List<User> receivers = new ArrayList<>();
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        SharedAnnotation sharedAnnotation = (SharedAnnotation) domain;
+        returnArray.put("annotationIdent", sharedAnnotation.getAnnotationIdent());
+        returnArray.put("annotationClassName", sharedAnnotation.getAnnotationClassName());
+
+        returnArray.put("comment", sharedAnnotation.getComment());
+        returnArray.put("sender", (sharedAnnotation.getSender() != null ? sharedAnnotation.getSender().getId() : null));
+        returnArray.put(
+            "senderName",
+            (sharedAnnotation.getSender() != null ? sharedAnnotation.getSender().toString() : null)
+        );
+
+        returnArray.put(
+            "receivers",
+            sharedAnnotation.receivers.stream().map(CytomineDomain::getId).collect(Collectors.toList())
+        );
+        return returnArray;
+    }
 
     public String toString() {
         return "Annotation " + annotationIdent + " shared by " + sender;
@@ -65,7 +84,6 @@ public class SharedAnnotation extends CytomineDomain implements Serializable {
         annotationClassName = annotation.getClass().getName();
         annotationIdent = annotation.getId();
     }
-
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         SharedAnnotation sharedAnnotation = this;
@@ -99,26 +117,6 @@ public class SharedAnnotation extends CytomineDomain implements Serializable {
 
     public Long userDomainCreator() {
         return sender.getId();
-    }
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        SharedAnnotation sharedAnnotation = (SharedAnnotation) domain;
-        returnArray.put("annotationIdent", sharedAnnotation.getAnnotationIdent());
-        returnArray.put("annotationClassName", sharedAnnotation.getAnnotationClassName());
-
-        returnArray.put("comment", sharedAnnotation.getComment());
-        returnArray.put("sender", (sharedAnnotation.getSender() != null ? sharedAnnotation.getSender().getId() : null));
-        returnArray.put(
-            "senderName",
-            (sharedAnnotation.getSender() != null ? sharedAnnotation.getSender().toString() : null)
-        );
-
-        returnArray.put(
-            "receivers",
-            sharedAnnotation.receivers.stream().map(CytomineDomain::getId).collect(Collectors.toList())
-        );
-        return returnArray;
     }
 
     @Override

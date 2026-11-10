@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.locationtech.jts.io.ParseException;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.AbstractSlice;
@@ -117,7 +117,7 @@ public class RestAbstractSliceController extends RestCytomineController {
     @GetMapping("/abstractslice/{id}/user.json")
     public UserResponse showUploaderOfImage(@PathVariable Long id) {
         log.debug("REST request to show image uploader");
-        return  abstractSliceService.findImageUploaded(id).orElseThrow(() -> new ObjectNotFoundException("User not "
+        return abstractSliceService.findImageUploaded(id).orElseThrow(() -> new ObjectNotFoundException("User not "
             + "found"));
 
     }

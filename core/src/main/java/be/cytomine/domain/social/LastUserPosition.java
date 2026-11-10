@@ -31,37 +31,24 @@ public class LastUserPosition extends CytomineSocialDomain {
     protected Date updated;
 
     protected Long user;
-
-    private Long image;
-
-    private Long slice;
-
-    private Long project;
-
-    private String imageName;
-
     /**
      * User screen area
      */
     @ElementCollection
     List<List<Double>> location;
-
     /**
      * User zoom on image
      */
     int zoom;
-
     Double rotation;
-
     /**
      * Whether or not the user has decided to broadcast its position
      */
     boolean broadcast;
-
-
-    public Long computeDateInMillis() {
-        return created != null ? created.getTime() - new Date(0).getTime() : null;
-    }
+    private Long image;
+    private Long slice;
+    private Long project;
+    private String imageName;
 
     public static JsonObject getDataFromDomain(CytomineSocialDomain domain) {
         JsonObject returnArray = new JsonObject();
@@ -94,6 +81,10 @@ public class LastUserPosition extends CytomineSocialDomain {
 
     public static double getY(List<List<Double>> location) {
         return getJtsPolygon(location).getCentroid().getY();
+    }
+
+    public Long computeDateInMillis() {
+        return created != null ? created.getTime() - new Date(0).getTime() : null;
     }
 
     @Override

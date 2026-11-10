@@ -12,15 +12,6 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.mapper.UserRoleMapper;
-import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.persistence.RoleRepository;
-import org.cytomine.repository.persistence.UserRoleRepository;
-import org.cytomine.repository.persistence.entity.RoleEntity;
-import org.cytomine.repository.persistence.entity.UserRoleEntity;
-import org.springframework.stereotype.Component;
-
 import org.cytomine.common.repository.model.Role;
 import org.cytomine.common.repository.model.command.payload.request.UserRoleCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
@@ -33,6 +24,14 @@ import org.cytomine.common.repository.model.command.request.UpdateCommandRequest
 import org.cytomine.common.repository.model.command.request.UpdateUserRoleCommand;
 import org.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
 import org.cytomine.common.repository.model.userrole.payload.role.payload.UpdateUserRole;
+import org.cytomine.repository.mapper.CommandMapper;
+import org.cytomine.repository.mapper.UserRoleMapper;
+import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.RoleRepository;
+import org.cytomine.repository.persistence.UserRoleRepository;
+import org.cytomine.repository.persistence.entity.RoleEntity;
+import org.cytomine.repository.persistence.entity.UserRoleEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

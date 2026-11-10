@@ -67,6 +67,35 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
     )
     private List<Term> terms = new ArrayList<>();
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
+        JsonObject returnArray = AnnotationDomain.getDataFromDomain(domain);
+        ReviewedAnnotation annotation = (ReviewedAnnotation) domain;
+
+        returnArray.put("parentIdent", annotation.parentIdent);
+        returnArray.put("parentClassName", annotation.getParentClassName());
+        returnArray.put("status", annotation.getStatus());
+        returnArray.put("reviewUser", annotation.getReviewUser().getId());
+        returnArray.put("terms", annotation.termsId());
+        returnArray.put("term", annotation.termsId());
+
+        returnArray.put("cropURL", urlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put(
+            "smallCropURL",
+            urlApi.getReviewedAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
+        );
+        returnArray.put("url", urlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
+        returnArray.put(
+            "imageURL",
+            urlApi.getAnnotationURL(
+                annotation.getImage().getProject().getId(),
+                annotation.getImage().getId(),
+                annotation.getId()
+            )
+        );
+        returnArray.put("reviewed", true);
+
+        return returnArray;
+    }
 
     @PrePersist
     public void beforeCreate() {
@@ -78,7 +107,6 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         super.beforeUpdate();
     }
 
-
     /**
      * Set link to the annotation that has been reviewed
      *
@@ -89,12 +117,10 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
         parentIdent = annotation.getId();
     }
 
-
     @Override
     public List<Term> terms() {
         return terms;
     }
-
 
     /**
      * Get all annotation terms id
@@ -196,38 +222,6 @@ public class ReviewedAnnotation extends AnnotationDomain implements Serializable
     public JsonObject toJsonObject(UrlApi urlApi) {
         return getDataFromDomain(this, urlApi);
     }
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
-        JsonObject returnArray = AnnotationDomain.getDataFromDomain(domain);
-        ReviewedAnnotation annotation = (ReviewedAnnotation) domain;
-
-        returnArray.put("parentIdent", annotation.parentIdent);
-        returnArray.put("parentClassName", annotation.getParentClassName());
-        returnArray.put("status", annotation.getStatus());
-        returnArray.put("reviewUser", annotation.getReviewUser().getId());
-        returnArray.put("terms", annotation.termsId());
-        returnArray.put("term", annotation.termsId());
-
-        returnArray.put("cropURL", urlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
-        returnArray.put(
-            "smallCropURL",
-            urlApi.getReviewedAnnotationCropWithAnnotationIdWithMaxSize(annotation.getId(), 256, "png")
-        );
-        returnArray.put("url", urlApi.getReviewedAnnotationCropWithAnnotationId(annotation.getId(), "png"));
-        returnArray.put(
-            "imageURL",
-            urlApi.getAnnotationURL(
-                annotation.getImage().getProject().getId(),
-                annotation.getImage().getId(),
-                annotation.getId()
-            )
-        );
-        returnArray.put("reviewed", true);
-
-        return returnArray;
-    }
-
-
 
     /**
      * Return domain user (annotation user, image user...) By default, a domain has no user. You need to override

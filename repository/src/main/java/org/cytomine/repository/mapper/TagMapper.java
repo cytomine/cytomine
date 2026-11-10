@@ -3,14 +3,13 @@ package org.cytomine.repository.mapper;
 import java.sql.Timestamp;
 
 import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.model.command.payload.request.TagCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.TagResponse;
+import org.cytomine.common.repository.model.tag.payload.CreateTag;
 import org.cytomine.repository.persistence.entity.TagEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import org.cytomine.common.repository.model.command.payload.request.TagCommandPayload;
-import org.cytomine.common.repository.model.command.payload.response.TagResponse;
-import org.cytomine.common.repository.model.tag.payload.CreateTag;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface TagMapper {

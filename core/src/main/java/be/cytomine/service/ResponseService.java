@@ -33,7 +33,6 @@ public class ResponseService {
      * @param commandType              Command type: add, edit or delete
      * @param additionalCallbackParams (optional): call back to append in response for client (e.g. image id as
      *                                 callback, to refresh image view in web UI client)
-     *
      * @return Response stucture
      */
     public CommandResponse createResponseMessage(

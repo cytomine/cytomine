@@ -25,7 +25,7 @@ public interface UserAnnotationRepository
 
     Long countByProject(Project project);
 
-    Long countByUserIdAndProject(long  userId, Project project);
+    Long countByUserIdAndProject(long userId, Project project);
 
     Long countByUserId(long userId);
 
@@ -55,7 +55,7 @@ public interface UserAnnotationRepository
             annotationLights.add(new AnnotationLight(
                     (Long) tuple.get("id"),
                     (Long) tuple.get("container"),
-                urlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize((Long) tuple.get("id"), 256, "png")
+                    urlApi.getUserAnnotationCropWithAnnotationIdWithMaxSize((Long) tuple.get("id"), 256, "png")
                 )
             );
         }

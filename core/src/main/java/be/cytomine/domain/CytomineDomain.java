@@ -53,6 +53,17 @@ public abstract class CytomineDomain {
 
     }
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject jsonObject = new JsonObject();
+        if (domain != null) {
+            jsonObject.put("class", domain.getClass());
+            jsonObject.put("id", domain.getId());
+            jsonObject.put("created", DateUtils.getTimeToString(domain.created));
+            jsonObject.put("updated", DateUtils.getTimeToString(domain.updated));
+        }
+        return jsonObject;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -68,18 +79,6 @@ public abstract class CytomineDomain {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject jsonObject = new JsonObject();
-        if (domain != null) {
-            jsonObject.put("class", domain.getClass());
-            jsonObject.put("id", domain.getId());
-            jsonObject.put("created", DateUtils.getTimeToString(domain.created));
-            jsonObject.put("updated", DateUtils.getTimeToString(domain.updated));
-        }
-        return jsonObject;
     }
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {

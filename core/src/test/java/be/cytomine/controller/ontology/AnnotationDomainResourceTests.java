@@ -21,6 +21,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -41,8 +43,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.TestUtils;
-import org.cytomine.common.PostGisTestConfiguration;
-import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -139,6 +139,18 @@ public class AnnotationDomainResourceTests {
         for (String property : unexpectedProperties) {
             assertThat(firstResult).doesNotContainKey(property);
         }
+    }
+
+    private static Map<String, byte[]> unzip(byte[] bundle) throws IOException {
+        Map<String, byte[]> entries = new LinkedHashMap<>();
+        try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(bundle))) {
+            ZipEntry entry;
+            while ((entry = zip.getNextEntry()) != null) {
+                entries.put(entry.getName(), zip.readAllBytes());
+                zip.closeEntry();
+            }
+        }
+        return entries;
     }
 
     void createAnnotationSet() throws ParseException {
@@ -1056,18 +1068,6 @@ public class AnnotationDomainResourceTests {
             .map(feature -> ((Map<String, Object>) feature.get("properties")).get("path_class_name"))
             .toList();
         org.assertj.core.api.Assertions.assertThat(pathClassNames).contains(term.getName());
-    }
-
-    private static Map<String, byte[]> unzip(byte[] bundle) throws IOException {
-        Map<String, byte[]> entries = new LinkedHashMap<>();
-        try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(bundle))) {
-            ZipEntry entry;
-            while ((entry = zip.getNextEntry()) != null) {
-                entries.put(entry.getName(), zip.readAllBytes());
-                zip.closeEntry();
-            }
-        }
-        return entries;
     }
 
     @Test

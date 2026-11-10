@@ -4,19 +4,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-import org.cytomine.resourceserver.config.CytominePermissions;
-import org.cytomine.resourceserver.config.PermissionsConfigService;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import org.cytomine.common.resourceserver.http.PermissionsHttpContract;
 import org.cytomine.common.resourceserver.model.AuthorizationRequest;
 import org.cytomine.common.resourceserver.model.AuthorizationResponse;
 import org.cytomine.common.resourceserver.model.CytomineDeniedPermission;
 import org.cytomine.common.resourceserver.model.CytomineGrantedPermission;
 import org.cytomine.common.resourceserver.model.permission.CytominePermission;
+import org.cytomine.resourceserver.config.CytominePermissions;
+import org.cytomine.resourceserver.config.PermissionsConfigService;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RequiredArgsConstructor

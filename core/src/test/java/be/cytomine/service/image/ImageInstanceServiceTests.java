@@ -15,6 +15,8 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,8 +32,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import org.cytomine.common.PostGisTestConfiguration;
-import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -90,6 +90,7 @@ import static org.mockito.Mockito.when;
 @MockedUser
 public class ImageInstanceServiceTests {
 
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     ImageInstanceService imageInstanceService;
     @Autowired
@@ -106,16 +107,14 @@ public class ImageInstanceServiceTests {
     PersistentUserPositionRepository persistentUserPositionRepository;
     @Autowired
     ImageConsultationService imageConsultationService;
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     CurrentUserService currentUserService;
     @Autowired
     PersistentImageConsultationRepository persistentImageConsultationRepository;
-    @Autowired
-    private UrlApi urlApi;
-
     @MockitoBean
     MeiliSearchService meiliSearchService;
+    @Autowired
+    private UrlApi urlApi;
 
     private static void setupStub() {
         /* Simulate call to CBIR */

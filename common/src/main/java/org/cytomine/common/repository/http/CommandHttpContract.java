@@ -3,15 +3,14 @@ package org.cytomine.common.repository.http;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
-
-import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 
 @HttpExchange(CommandHttpContract.ROOT_PATH)
 public interface CommandHttpContract {

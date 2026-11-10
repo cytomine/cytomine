@@ -3,18 +3,17 @@ package org.cytomine.repository.mapper;
 import java.sql.Timestamp;
 
 import org.cytomine.common.mapper.BaseMapper;
-import org.cytomine.repository.persistence.entity.OntologyEntity;
-import org.cytomine.repository.persistence.entity.RelationEntity;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import org.cytomine.common.repository.model.command.payload.request.OntologyCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import org.cytomine.common.repository.model.command.payload.response.RelationResponse;
 import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import org.cytomine.common.repository.model.ontology.payload.OntologyLight;
 import org.cytomine.common.repository.model.ontology.payload.OntologyUser;
+import org.cytomine.repository.persistence.entity.OntologyEntity;
+import org.cytomine.repository.persistence.entity.RelationEntity;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {TermMapper.class, BaseMapper.class})
 public interface OntologyMapper {

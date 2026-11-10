@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import org.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "sec_role")

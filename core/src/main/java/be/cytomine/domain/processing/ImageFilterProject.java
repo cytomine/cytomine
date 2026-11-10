@@ -32,31 +32,6 @@ public class ImageFilterProject extends CytomineDomain {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        ImageFilterProject processingServer = (ImageFilterProject) this;
-
-        try {
-            processingServer.id = json.getJSONAttrLong("id", null);
-            processingServer.imageFilter = (ImageFilter) json.getJSONAttrDomain(
-                entityManager,
-                "imageFilter",
-                new ImageFilter(),
-                false
-            );
-            processingServer.project = (Project) json.getJSONAttrDomain(entityManager, "project", new Project(), false);
-        } catch (Exception e) {
-            processingServer.imageFilter = (ImageFilter) json.getJSONObject("imageFilter")
-                .getJSONAttrDomain(entityManager, "id", new ImageFilter(), false);
-            processingServer.project = (Project) json.getJSONObject("project")
-                .getJSONAttrDomain(entityManager, "id", new Project(), false);
-        }
-
-        processingServer.created = json.getJSONAttrDate("created");
-        processingServer.updated = json.getJSONAttrDate("updated");
-        return processingServer;
-    }
-
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         ImageFilterProject processingServer = (ImageFilterProject) domain;
@@ -88,6 +63,30 @@ public class ImageFilterProject extends CytomineDomain {
         );
 
         return returnArray;
+    }
+
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        ImageFilterProject processingServer = (ImageFilterProject) this;
+
+        try {
+            processingServer.id = json.getJSONAttrLong("id", null);
+            processingServer.imageFilter = (ImageFilter) json.getJSONAttrDomain(
+                entityManager,
+                "imageFilter",
+                new ImageFilter(),
+                false
+            );
+            processingServer.project = (Project) json.getJSONAttrDomain(entityManager, "project", new Project(), false);
+        } catch (Exception e) {
+            processingServer.imageFilter = (ImageFilter) json.getJSONObject("imageFilter")
+                .getJSONAttrDomain(entityManager, "id", new ImageFilter(), false);
+            processingServer.project = (Project) json.getJSONObject("project")
+                .getJSONAttrDomain(entityManager, "id", new Project(), false);
+        }
+
+        processingServer.created = json.getJSONAttrDate("created");
+        processingServer.updated = json.getJSONAttrDate("updated");
+        return processingServer;
     }
 
     @Override

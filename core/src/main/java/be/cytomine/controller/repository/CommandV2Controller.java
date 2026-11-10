@@ -5,6 +5,9 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.http.CommandHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
@@ -14,9 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.cytomine.common.repository.http.CommandHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
 

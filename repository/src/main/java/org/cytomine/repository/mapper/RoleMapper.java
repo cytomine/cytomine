@@ -3,14 +3,13 @@ package org.cytomine.repository.mapper;
 import java.sql.Timestamp;
 
 import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.model.command.payload.request.RoleCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
+import org.cytomine.common.repository.model.role.payload.CreateRole;
 import org.cytomine.repository.persistence.entity.RoleEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import org.cytomine.common.repository.model.command.payload.request.RoleCommandPayload;
-import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
-import org.cytomine.common.repository.model.role.payload.CreateRole;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface RoleMapper {

@@ -17,10 +17,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Version;
 import lombok.Data;
-import org.hibernate.annotations.DynamicInsert;
-
 import org.cytomine.common.repository.model.HasTimestampCUD;
 import org.cytomine.common.repository.utils.Language;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity(name = "sec_user")
 @Data

@@ -201,7 +201,7 @@ public class ImageInstance extends CytomineDomain {
         imageInstance.created = json.getJSONAttrDate("created");
         imageInstance.updated = json.getJSONAttrDate("updated");
 
-        imageInstance.userId =  json.getJSONAttrDomain(entityManager, "user", new User(), false).getId();
+        imageInstance.userId = json.getJSONAttrDomain(entityManager, "user", new User(), false).getId();
         imageInstance.baseImage = (AbstractImage) json.getJSONAttrDomain(
             entityManager,
             "baseImage",

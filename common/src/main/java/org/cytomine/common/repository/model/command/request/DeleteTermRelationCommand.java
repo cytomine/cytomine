@@ -17,7 +17,7 @@ public record DeleteTermRelationCommand(TermRelationCommandPayload before,
     @Override
     public String getActionMessage() {
         return format("Term relation %s (term1: %s, term2: %s) deleted in ontology %s", before.id(), before.term1Id(),
-                before.term2Id(), before.ontologyId());
+            before.term2Id(), before.ontologyId());
     }
 
     @Override

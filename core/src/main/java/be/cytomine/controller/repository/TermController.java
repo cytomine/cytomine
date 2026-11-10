@@ -4,6 +4,11 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.http.TermHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.term.payload.CreateTerm;
+import org.cytomine.common.repository.model.term.payload.UpdateTerm;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import org.cytomine.common.repository.http.TermHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.TermResponse;
-import org.cytomine.common.repository.model.term.payload.CreateTerm;
-import org.cytomine.common.repository.model.term.payload.UpdateTerm;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
 

@@ -58,14 +58,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class SliceInstanceResourceTests {
 
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private UrlApi urlApi;
     @Autowired
     private BasicInstanceBuilder builder;
     @Autowired
     private MockMvc restSliceInstanceControllerMockMvc;
-
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     @Test
     @Transactional

@@ -4,6 +4,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import jakarta.validation.Valid;
+import org.cytomine.common.repository.model.Role;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
+import org.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
+import org.cytomine.common.repository.model.userrole.payload.role.payload.UpdateUserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,12 +18,6 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
-
-import org.cytomine.common.repository.model.Role;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
-import org.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
-import org.cytomine.common.repository.model.userrole.payload.role.payload.UpdateUserRole;
 
 @HttpExchange(UserRoleHttpContract.ROOT_PATH)
 public interface UserRoleHttpContract {

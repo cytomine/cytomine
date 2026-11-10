@@ -36,6 +36,25 @@ public class AbstractSlice extends CytomineDomain {
 
     private String zName;
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        AbstractSlice abstractSlice = (AbstractSlice) domain;
+        returnArray.put("uploadedFile", abstractSlice.getUploadedFileId());
+        returnArray.put("path", abstractSlice.getPath());
+        returnArray.put("image", abstractSlice.getImageId());
+        returnArray.put("channel", abstractSlice.getChannel());
+        returnArray.put("zStack", abstractSlice.getZStack());
+        returnArray.put("time", abstractSlice.getTime());
+        returnArray.put("rank", abstractSlice.getRank());
+
+        returnArray.put("channelName", abstractSlice.getChannelName());
+        returnArray.put("channelColor", abstractSlice.getChannelColor());
+
+        returnArray.put("zName", abstractSlice.getZName());
+
+        return returnArray;
+    }
+
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         AbstractSlice abstractSlice = this;
         abstractSlice.id = json.getJSONAttrLong("id", null);
@@ -59,25 +78,6 @@ public class AbstractSlice extends CytomineDomain {
         abstractSlice.zName = json.getJSONAttrStr("zName", false);
 
         return abstractSlice;
-    }
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        AbstractSlice abstractSlice = (AbstractSlice) domain;
-        returnArray.put("uploadedFile", abstractSlice.getUploadedFileId());
-        returnArray.put("path", abstractSlice.getPath());
-        returnArray.put("image", abstractSlice.getImageId());
-        returnArray.put("channel", abstractSlice.getChannel());
-        returnArray.put("zStack", abstractSlice.getZStack());
-        returnArray.put("time", abstractSlice.getTime());
-        returnArray.put("rank", abstractSlice.getRank());
-
-        returnArray.put("channelName", abstractSlice.getChannelName());
-        returnArray.put("channelColor", abstractSlice.getChannelColor());
-
-        returnArray.put("zName", abstractSlice.getZName());
-
-        return returnArray;
     }
 
     public Long getUploadedFileId() {

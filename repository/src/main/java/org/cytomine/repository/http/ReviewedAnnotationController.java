@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 import org.cytomine.repository.persistence.ReviewedAnnotationLinkRepository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.ReviewedAnnotationLinkEntity;
@@ -14,8 +15,6 @@ import org.cytomine.repository.service.CurrentUserService;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import org.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
 
 import static org.cytomine.common.repository.http.ReviewedAnnotationHttpContract.ROOT_PATH;
 

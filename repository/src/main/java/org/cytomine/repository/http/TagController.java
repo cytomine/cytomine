@@ -5,6 +5,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.TagHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TagResponse;
+import org.cytomine.common.repository.model.tag.payload.CreateTag;
+import org.cytomine.common.repository.model.tag.payload.UpdateTag;
 import org.cytomine.repository.persistence.TagRepository;
 import org.cytomine.repository.service.ACLService;
 import org.cytomine.repository.service.CurrentUserService;
@@ -15,12 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import org.cytomine.common.repository.http.TagHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.TagResponse;
-import org.cytomine.common.repository.model.tag.payload.CreateTag;
-import org.cytomine.common.repository.model.tag.payload.UpdateTag;
 
 @RequiredArgsConstructor
 @RestController

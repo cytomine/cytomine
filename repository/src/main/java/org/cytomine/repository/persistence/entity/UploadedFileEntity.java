@@ -16,11 +16,10 @@ import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
-
 import org.cytomine.common.repository.model.HasTimestampCUD;
 import org.cytomine.common.repository.utils.LTreeType;
 import org.cytomine.common.repository.utils.LongArrayToBytesConverter;
+import org.hibernate.annotations.Type;
 
 @Entity(name = "uploaded_file")
 @Data

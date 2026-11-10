@@ -7,6 +7,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import org.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.mapper.OntologyMapper;
@@ -20,15 +28,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
-
-import org.cytomine.common.PostGisTestConfiguration;
-import org.cytomine.common.mapper.BaseMapper;
-import org.cytomine.common.repository.http.OntologyHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
-import org.cytomine.common.repository.model.command.payload.response.TermResponse;
-import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
-import org.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 @SpringBootTest(classes = RepositoryApp.class)
 @AutoConfigureMockMvc

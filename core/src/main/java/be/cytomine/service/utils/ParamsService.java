@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.cytomine.common.repository.http.TermHttpContract;
 import org.springframework.stereotype.Service;
 
-import org.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.project.Project;
 import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.AnnotationListing;

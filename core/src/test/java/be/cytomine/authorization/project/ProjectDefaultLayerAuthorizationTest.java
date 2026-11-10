@@ -2,6 +2,7 @@ package be.cytomine.authorization.project;
 
 import java.util.Optional;
 
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRDAuthorizationTest;
-import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.project.ProjectDefaultLayerService;

@@ -29,24 +29,6 @@ public class SliceInstance extends CytomineDomain implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Project project;
 
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        SliceInstance sliceInstance = this;
-        sliceInstance.id = json.getJSONAttrLong("id", null);
-        sliceInstance.created = json.getJSONAttrDate("created");
-        sliceInstance.updated = json.getJSONAttrDate("updated");
-
-        sliceInstance.project = (Project) json.getJSONAttrDomain(entityManager, "project", new Project(), true);
-        sliceInstance.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
-        sliceInstance.baseSlice = (AbstractSlice) json.getJSONAttrDomain(
-            entityManager,
-            "baseSlice",
-            new AbstractSlice(),
-            true
-        );
-
-        return sliceInstance;
-    }
-
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         SliceInstance sliceInstance = (SliceInstance) domain;
@@ -91,6 +73,23 @@ public class SliceInstance extends CytomineDomain implements Serializable {
         return returnArray;
     }
 
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        SliceInstance sliceInstance = this;
+        sliceInstance.id = json.getJSONAttrLong("id", null);
+        sliceInstance.created = json.getJSONAttrDate("created");
+        sliceInstance.updated = json.getJSONAttrDate("updated");
+
+        sliceInstance.project = (Project) json.getJSONAttrDomain(entityManager, "project", new Project(), true);
+        sliceInstance.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
+        sliceInstance.baseSlice = (AbstractSlice) json.getJSONAttrDomain(
+            entityManager,
+            "baseSlice",
+            new AbstractSlice(),
+            true
+        );
+
+        return sliceInstance;
+    }
 
     public String getPath() {
         return Optional.ofNullable(this.baseSlice).map(AbstractSlice::getPath).orElse(null);

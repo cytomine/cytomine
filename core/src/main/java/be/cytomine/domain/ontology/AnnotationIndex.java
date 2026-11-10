@@ -19,25 +19,19 @@ import be.cytomine.utils.JsonObject;
 @Setter
 public class AnnotationIndex {
 
+    @Version
+    protected Integer version = 0;
     @Id
     @GeneratedValue(generator = "myGenerator")
     Long id;
-
+    Long countAnnotation;
+    Long countReviewedAnnotation;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "slice_id", nullable = true)
     private SliceInstance slice;
-
-    @Version
-    protected Integer version = 0;
-
-    Long countAnnotation;
-
-    Long countReviewedAnnotation;
 
     public static JsonObject getDataFromDomain(AnnotationIndex index) {
         JsonObject returnArray = new JsonObject();

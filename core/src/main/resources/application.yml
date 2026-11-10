@@ -48,7 +48,7 @@ spring:
       auto-commit: false
 
   jpa:
-#    database-platform: be.cytomine.config.CustomPostgreSQLDialect
+    #    database-platform: be.cytomine.config.CustomPostgreSQLDialect
     show-sql: false
     properties:
       hibernate:

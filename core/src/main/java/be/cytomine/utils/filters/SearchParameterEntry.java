@@ -11,6 +11,12 @@ import lombok.ToString;
 @ToString
 public class SearchParameterEntry {
 
+    Object value;
+    SearchOperation operation;
+    String property;
+    String sql;
+    Map<String, Object> sqlParameter;
+
     public SearchParameterEntry() {
 
     }
@@ -20,15 +26,5 @@ public class SearchParameterEntry {
         this.operation = operation;
         this.property = property;
     }
-
-    Object value;
-
-    SearchOperation operation;
-
-    String property;
-
-    String sql;
-
-    Map<String, Object> sqlParameter;
 
 }

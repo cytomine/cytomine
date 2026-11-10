@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
+import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
+import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,11 +18,6 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
-
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
-import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
-import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 
 @HttpExchange(UploadedFileHttpContract.ROOT_PATH)
 public interface UploadedFileHttpContract {

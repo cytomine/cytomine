@@ -5,10 +5,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
@@ -22,6 +18,9 @@ import org.cytomine.common.repository.model.command.payload.response.UndoCommand
 import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ApplyCommandResponseMapper {

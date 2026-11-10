@@ -6,17 +6,6 @@ import java.util.Set;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.mapper.ProjectMapper;
-import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.persistence.OntologyRepository;
-import org.cytomine.repository.persistence.ProjectListAvailableFilters;
-import org.cytomine.repository.persistence.ProjectListRow;
-import org.cytomine.repository.persistence.ProjectRepository;
-import org.cytomine.repository.persistence.entity.OntologyEntity;
-import org.cytomine.repository.persistence.entity.ProjectEntity;
-import org.springframework.stereotype.Component;
-
 import org.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
@@ -29,6 +18,16 @@ import org.cytomine.common.repository.model.command.request.UpdateProjectCommand
 import org.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import org.cytomine.common.repository.model.project.payload.CreateProject;
 import org.cytomine.common.repository.model.project.payload.UpdateProject;
+import org.cytomine.repository.mapper.CommandMapper;
+import org.cytomine.repository.mapper.ProjectMapper;
+import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.OntologyRepository;
+import org.cytomine.repository.persistence.ProjectListAvailableFilters;
+import org.cytomine.repository.persistence.ProjectListRow;
+import org.cytomine.repository.persistence.ProjectRepository;
+import org.cytomine.repository.persistence.entity.OntologyEntity;
+import org.cytomine.repository.persistence.entity.ProjectEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

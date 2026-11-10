@@ -6,16 +6,6 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.mapper.TermRelationMapper;
-import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.persistence.RelationRepository;
-import org.cytomine.repository.persistence.TermRelationRepository;
-import org.cytomine.repository.persistence.TermRepository;
-import org.cytomine.repository.persistence.entity.TermEntity;
-import org.cytomine.repository.persistence.entity.TermRelationEntity;
-import org.springframework.stereotype.Component;
-
 import org.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
@@ -26,6 +16,15 @@ import org.cytomine.common.repository.model.command.request.UpdateCommandRequest
 import org.cytomine.common.repository.model.command.request.UpdateTermRelationCommand;
 import org.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 import org.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
+import org.cytomine.repository.mapper.CommandMapper;
+import org.cytomine.repository.mapper.TermRelationMapper;
+import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.RelationRepository;
+import org.cytomine.repository.persistence.TermRelationRepository;
+import org.cytomine.repository.persistence.TermRepository;
+import org.cytomine.repository.persistence.entity.TermEntity;
+import org.cytomine.repository.persistence.entity.TermRelationEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

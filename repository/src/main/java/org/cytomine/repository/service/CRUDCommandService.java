@@ -6,10 +6,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.persistence.entity.CommandV2Entity;
-
 import org.cytomine.common.repository.model.HasAclId;
 import org.cytomine.common.repository.model.HasLongId;
 import org.cytomine.common.repository.model.HasTimestampCUD;
@@ -22,6 +18,9 @@ import org.cytomine.common.repository.model.command.request.UndoCreateCommand;
 import org.cytomine.common.repository.model.command.request.UndoDeleteCommand;
 import org.cytomine.common.repository.model.command.request.UndoUpdateCommand;
 import org.cytomine.common.repository.model.command.request.UpdateCommandRequest;
+import org.cytomine.repository.mapper.CommandMapper;
+import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.entity.CommandV2Entity;
 
 public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E extends HasTimestampCUD,
     R extends ApplyCommandResponse> {

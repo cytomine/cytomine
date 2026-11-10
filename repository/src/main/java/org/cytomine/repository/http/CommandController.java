@@ -5,6 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.CommandHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.service.ApplyCommandService;
@@ -14,12 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.cytomine.common.repository.http.CommandHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-
-import static org.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
+import static org.cytomine.common.repository.http.CommandHttpContract.ROOT_PATH;
 
 @RequiredArgsConstructor
 @RestController

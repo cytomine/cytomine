@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.http.TermHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.cytomine.common.repository.http.TermHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
@@ -55,9 +55,9 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/project/{project}/stats/term.json")
     public ResponseEntity<String> statTerm(@PathVariable("project") Long projectId,
-                                           @RequestParam(value = "startDate", required = false) Long startDateLong,
-                                           @RequestParam(value = "endDate", required = false) Long endDateLong,
-                                           @RequestParam(required = false, defaultValue = "true") Boolean leafOnly) {
+        @RequestParam(value = "startDate", required = false) Long startDateLong,
+        @RequestParam(value = "endDate", required = false) Long endDateLong,
+        @RequestParam(required = false, defaultValue = "true") Boolean leafOnly) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
@@ -67,8 +67,8 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/project/{project}/stats/user.json")
     public ResponseEntity<String> statUser(@PathVariable("project") Long projectId,
-                                           @RequestParam(value = "startDate", required = false) Long startDateLong,
-                                           @RequestParam(value = "endDate", required = false) Long endDateLong) {
+        @RequestParam(value = "startDate", required = false) Long startDateLong,
+        @RequestParam(value = "endDate", required = false) Long endDateLong) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
@@ -95,10 +95,10 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/project/{project}/stats/termimage.json")
     public ResponseEntity<String> statPerTermAndImage(@PathVariable("project") Long projectId,
-                                                      @RequestParam(value = "startDate", required = false)
-                                                      Long startDateLong,
-                                                      @RequestParam(value = "endDate", required = false)
-                                                      Long endDateLong) {
+        @RequestParam(value = "startDate", required = false)
+        Long startDateLong,
+        @RequestParam(value = "endDate", required = false)
+        Long endDateLong) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
@@ -108,8 +108,8 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/project/{project}/stats/userslide.json")
     public ResponseEntity<String> statUserSlide(@PathVariable("project") Long projectId,
-                                                @RequestParam(value = "startDate", required = false) Long startDateLong,
-                                                @RequestParam(value = "endDate", required = false) Long endDateLong) {
+        @RequestParam(value = "startDate", required = false) Long startDateLong,
+        @RequestParam(value = "endDate", required = false) Long endDateLong) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;

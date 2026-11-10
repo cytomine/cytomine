@@ -63,7 +63,6 @@ public class RestTrackController extends RestCytomineController {
      * Add a new track
      *
      * @param json JSON with Track data
-     *
      * @return Response map with .code = http response code and .data.track = new created Track
      */
     @PostMapping("/track.json")
@@ -77,7 +76,6 @@ public class RestTrackController extends RestCytomineController {
      *
      * @param id   Track id
      * @param json JSON with the new Track data
-     *
      * @return Response map with .code = http response code and .data.newTrack = new created Track and  .data.oldTrack =
      * old track value
      */
@@ -91,7 +89,6 @@ public class RestTrackController extends RestCytomineController {
      * Delete a track
      *
      * @param id Track id
-     *
      * @return Response map with .code = http response code and .data.track = deleted track value
      */
     @DeleteMapping("/track/{id}.json")

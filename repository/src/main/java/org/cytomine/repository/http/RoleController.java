@@ -5,6 +5,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.RoleHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
+import org.cytomine.common.repository.model.role.payload.CreateRole;
+import org.cytomine.common.repository.model.role.payload.UpdateRole;
 import org.cytomine.repository.mapper.RoleMapper;
 import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.service.CurrentUserService;
@@ -14,14 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.cytomine.common.repository.http.RoleHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
-import org.cytomine.common.repository.model.role.payload.CreateRole;
-import org.cytomine.common.repository.model.role.payload.UpdateRole;
-
-import static org.cytomine.common.repository.http.RoleHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
+import static org.cytomine.common.repository.http.RoleHttpContract.ROOT_PATH;
 
 @RequiredArgsConstructor
 @RestController

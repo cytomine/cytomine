@@ -38,6 +38,14 @@ public class RelationTerm extends CytomineDomain implements Serializable {
     @JoinColumn(name = "term2_id", nullable = false)
     private Term term2;
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        RelationTerm relationTerm = (RelationTerm) domain;
+        returnArray.put("relation", (relationTerm != null ? relationTerm.getRelationId() : null));
+        returnArray.put("term1", (relationTerm != null ? relationTerm.getTerm1Id() : null));
+        returnArray.put("term2", (relationTerm != null ? relationTerm.getTerm2Id() : null));
+        return returnArray;
+    }
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         RelationTerm relationTerm = this;
@@ -48,16 +56,6 @@ public class RelationTerm extends CytomineDomain implements Serializable {
         relationTerm.created = json.getJSONAttrDate("created");
         relationTerm.updated = json.getJSONAttrDate("updated");
         return relationTerm;
-    }
-
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        RelationTerm relationTerm = (RelationTerm) domain;
-        returnArray.put("relation", (relationTerm != null ? relationTerm.getRelationId() : null));
-        returnArray.put("term1", (relationTerm != null ? relationTerm.getTerm1Id() : null));
-        returnArray.put("term2", (relationTerm != null ? relationTerm.getTerm2Id() : null));
-        return returnArray;
     }
 
     private Long getRelationId() {

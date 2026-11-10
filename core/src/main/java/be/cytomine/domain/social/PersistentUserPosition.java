@@ -44,39 +44,25 @@ public class PersistentUserPosition extends CytomineSocialDomain {
     protected Date updated;
 
     protected Long user;
-
-    private Long image;
-
-    private Long slice;
-
-    private Long project;
-
-    private String session;
-
     /**
      * User screen area
      */
     @ElementCollection
     List<List<Double>> location;
-
     /**
      * User zoom on image
      */
     int zoom;
-
     Double rotation;
-
     /**
      * Whether or not the user has decided to broadcast its position
      */
     boolean broadcast;
-
-
+    private Long image;
+    private Long slice;
+    private Long project;
+    private String session;
     private String imageName;
-
-    public Long computeDateInMillis() {
-        return created != null ? created.getTime() - new Date(0).getTime() : null;
-    }
 
     public static JsonObject getDataFromDomain(PersistentUserPosition domain) {
         JsonObject returnArray = new JsonObject();
@@ -120,6 +106,10 @@ public class PersistentUserPosition extends CytomineSocialDomain {
             coordinates.add(coordinates.get(0));
         }
         return new GeometryFactory().createPolygon(coordinates.toArray(Coordinate[]::new));
+    }
+
+    public Long computeDateInMillis() {
+        return created != null ? created.getTime() - new Date(0).getTime() : null;
     }
 
     @Override

@@ -22,8 +22,6 @@ import be.cytomine.domain.project.Project;
 public interface AbstractImageRepository
     extends JpaRepository<AbstractImage, Long>, JpaSpecificationExecutor<AbstractImage> {
 
-    record AbstractImageIds(Long uploadedFileId, Long abstractImageId) {}
-
     @Override
     @EntityGraph(attributePaths = {"uploadedFile"})
     Page<AbstractImage> findAll(@Nullable Specification<AbstractImage> spec, Pageable pageable);
@@ -47,4 +45,6 @@ public interface AbstractImageRepository
 
     @Query("SELECT ai.uploadedFile.id FROM AbstractImage ai WHERE ai.id IN :abstractImageIds")
     Set<Long> findUploadedFileIdsByAbstractImageIds(Set<Long> abstractImageIds);
+
+    record AbstractImageIds(Long uploadedFileId, Long abstractImageId) {}
 }

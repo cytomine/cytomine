@@ -6,13 +6,6 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.mapper.RoleMapper;
-import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.persistence.RoleRepository;
-import org.cytomine.repository.persistence.entity.RoleEntity;
-import org.springframework.stereotype.Component;
-
 import org.cytomine.common.repository.model.command.payload.request.RoleCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
@@ -23,6 +16,12 @@ import org.cytomine.common.repository.model.command.request.UpdateCommandRequest
 import org.cytomine.common.repository.model.command.request.UpdateRoleCommand;
 import org.cytomine.common.repository.model.role.payload.CreateRole;
 import org.cytomine.common.repository.model.role.payload.UpdateRole;
+import org.cytomine.repository.mapper.CommandMapper;
+import org.cytomine.repository.mapper.RoleMapper;
+import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.RoleRepository;
+import org.cytomine.repository.persistence.entity.RoleEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

@@ -117,14 +117,14 @@ public class FileManager {
         layers.forEach(layer ->
             layer.setName(layer.getDigest().replace(Constants.SHA256_PREFIX, "") + FileConstant.EXTENSION_TAR_GZ));
         return new Context(
-                Reference.parse(
-                        indexFile.getManifests()
-                                .get(0)
-                                .getAnnotations()
-                                .getImageRefName()
-                ),
-                config,
-                layers
+            Reference.parse(
+                indexFile.getManifests()
+                    .get(0)
+                    .getAnnotations()
+                    .getImageRefName()
+            ),
+            config,
+            layers
         );
     }
 

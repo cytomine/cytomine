@@ -85,7 +85,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AbstractImageResourceTests {
 
     private static final String KEY_ID = "some random string";
-
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
+    private static final WireMockServer jwkMockServer = new WireMockServer(8888);
     private static RSAKey rsaKey;
     @Autowired
     private BasicInstanceBuilder builder;
@@ -93,11 +94,6 @@ public class AbstractImageResourceTests {
     private MockMvc restAbstractImageControllerMockMvc;
     @Autowired
     private ApplicationProperties applicationProperties;
-
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
-
-    private static final WireMockServer jwkMockServer = new WireMockServer(8888);
-
     @Autowired
     private UrlApi urlApi;
 

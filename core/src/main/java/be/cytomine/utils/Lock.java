@@ -13,11 +13,10 @@ import be.cytomine.exceptions.ServerException;
 @Slf4j
 public class Lock {
 
+    private static Lock lock = null;
     private Map<Long, ReentrantLock> projectLocks = new ConcurrentHashMap<>();
     private Map<String, ReentrantLock> wsSessionsLock = new ConcurrentHashMap<>();
-
     private Map<Long, ReentrantLock> customUILocks = new ConcurrentHashMap<>();
-    private static Lock lock = null;
 
     private Lock() {
     }

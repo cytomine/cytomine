@@ -3,6 +3,8 @@ package be.cytomine.authorization.security;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.AbstractAuthorizationTest;
-import org.cytomine.common.repository.http.OntologyHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.mapper.UserMapper;

@@ -69,9 +69,9 @@ public class Authenticator {
             .map(p -> String.format(SCOPE, p.getSecond().getName(), p.getFirst().getScope()))
             .collect(Collectors.toList());
         String token = Optional.ofNullable(dockerToken.get(String.join("", scopes)))
-                .map(Pair::getSecond)
-                .map(DockerAuthResp::getToken)
-                .orElse(null);
+            .map(Pair::getSecond)
+            .map(DockerAuthResp::getToken)
+            .orElse(null);
         if (token == null) {
             Map<String, String> headers = new HashMap<>(2);
             if (dockerCredential != null) {

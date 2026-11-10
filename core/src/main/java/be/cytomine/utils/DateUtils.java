@@ -11,9 +11,9 @@ import be.cytomine.domain.CytomineDomain;
 
 public class DateUtils {
 
+    public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
     public static SimpleDateFormat MONGO_DB_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     public static SimpleDateFormat REPORT_FILENAME_FORMAT = new SimpleDateFormat("yyyyMMdd_hhmmss");
-    public static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
 
     public static String getTimeToString(Date date) {
         if (date == null) {

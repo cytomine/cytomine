@@ -17,26 +17,13 @@ import be.cytomine.utils.JsonObject;
 @Setter
 public class ImageFilter extends CytomineDomain {
 
+    @NotBlank
+    String method;
+    Boolean available = true;
     @NotNull
     @NotBlank
     @Column(nullable = false, unique = true)
     private String name;
-
-    @NotBlank
-    String method;
-
-    Boolean available = true;
-
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        ImageFilter processingServer = (ImageFilter) this;
-        processingServer.id = json.getJSONAttrLong("id", null);
-        processingServer.name = json.getJSONAttrStr("name", true);
-        processingServer.method = json.getJSONAttrStr("method", null);
-        processingServer.available = json.getJSONAttrBoolean("available", true);
-        processingServer.created = json.getJSONAttrDate("created");
-        processingServer.updated = json.getJSONAttrDate("updated");
-        return processingServer;
-    }
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
@@ -48,6 +35,16 @@ public class ImageFilter extends CytomineDomain {
         return returnArray;
     }
 
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        ImageFilter processingServer = (ImageFilter) this;
+        processingServer.id = json.getJSONAttrLong("id", null);
+        processingServer.name = json.getJSONAttrStr("name", true);
+        processingServer.method = json.getJSONAttrStr("method", null);
+        processingServer.available = json.getJSONAttrBoolean("available", true);
+        processingServer.created = json.getJSONAttrDate("created");
+        processingServer.updated = json.getJSONAttrDate("updated");
+        return processingServer;
+    }
 
     public String getBaseUrl() {
         return "/filters/" + method + "&url="; // For backwards compatibility

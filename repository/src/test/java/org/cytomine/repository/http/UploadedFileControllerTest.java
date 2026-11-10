@@ -9,6 +9,12 @@ import java.util.UUID;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.http.UploadedFileHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
+import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
+import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.junit.jupiter.api.Test;
@@ -20,13 +26,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-
-import org.cytomine.common.PostGisTestConfiguration;
-import org.cytomine.common.repository.http.UploadedFileHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
-import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
-import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;

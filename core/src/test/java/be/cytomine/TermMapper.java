@@ -6,10 +6,10 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import org.cytomine.common.repository.model.command.payload.response.TermResponse;
 import be.cytomine.domain.ontology.Term;
 
 @Mapper(componentModel = "spring")

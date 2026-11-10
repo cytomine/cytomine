@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
 import lombok.Data;
-
 import org.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "configuration")

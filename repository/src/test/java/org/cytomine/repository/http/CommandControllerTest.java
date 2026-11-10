@@ -4,6 +4,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lombok.SneakyThrows;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.http.CommandHttpContract;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.model.command.CommandType;
+import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import org.cytomine.repository.RepositoryApp;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +21,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
-
-import org.cytomine.common.PostGisTestConfiguration;
-import org.cytomine.common.repository.http.CommandHttpContract;
-import org.cytomine.common.repository.http.OntologyHttpContract;
-import org.cytomine.common.repository.model.command.CommandType;
-import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,16 +35,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 public class CommandControllerTest {
+    private final String apiUrl = CommandHttpContract.ROOT_PATH;
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
-
-    private final String apiUrl = CommandHttpContract.ROOT_PATH;
 
     private long createUser() {
         String username = UUID.randomUUID().toString();

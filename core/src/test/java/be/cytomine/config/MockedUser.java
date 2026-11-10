@@ -7,10 +7,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.cytomine.common.repository.http.UserHttpContract;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-
-import org.cytomine.common.repository.http.UserHttpContract;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

@@ -8,14 +8,6 @@ import java.util.UUID;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.mapper.OntologyMapper;
-import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.persistence.OntologyRepository;
-import org.cytomine.repository.persistence.UserRepository;
-import org.cytomine.repository.persistence.entity.OntologyEntity;
-import org.springframework.stereotype.Component;
-
 import org.cytomine.common.repository.model.command.payload.request.OntologyCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
@@ -27,6 +19,13 @@ import org.cytomine.common.repository.model.command.request.UpdateCommandRequest
 import org.cytomine.common.repository.model.command.request.UpdateOntologyCommand;
 import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
 import org.cytomine.common.repository.model.ontology.payload.UpdateOntology;
+import org.cytomine.repository.mapper.CommandMapper;
+import org.cytomine.repository.mapper.OntologyMapper;
+import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.OntologyRepository;
+import org.cytomine.repository.persistence.UserRepository;
+import org.cytomine.repository.persistence.entity.OntologyEntity;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component

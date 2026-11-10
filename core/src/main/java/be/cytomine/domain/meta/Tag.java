@@ -20,22 +20,12 @@ import be.cytomine.utils.JsonObject;
 @Setter
 public class Tag extends CytomineDomain {
 
-    @NotNull
-    @NotBlank
-    private String name;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     protected User user;
-
-
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        Tag tag = (Tag) this;
-        tag.setId(json.getJSONAttrLong("id", null));
-        tag.setName(json.getJSONAttrStr("name", true));
-        tag.setUser((User) json.getJSONAttrDomain(entityManager, "user", new User(), true));
-        return tag;
-    }
+    @NotNull
+    @NotBlank
+    private String name;
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
@@ -44,6 +34,14 @@ public class Tag extends CytomineDomain {
         returnArray.put("user", tag.getUser().getId());
         returnArray.put("creatorName", tag.getUser().getUsername());
         return returnArray;
+    }
+
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        Tag tag = (Tag) this;
+        tag.setId(json.getJSONAttrLong("id", null));
+        tag.setName(json.getJSONAttrStr("name", true));
+        tag.setUser((User) json.getJSONAttrDomain(entityManager, "user", new User(), true));
+        return tag;
     }
 
     @Override

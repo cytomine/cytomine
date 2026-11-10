@@ -3,16 +3,15 @@ package org.cytomine.common.repository.http;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
+import org.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
+import org.cytomine.common.repository.model.stat.payload.StatTerm;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
-
-import org.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
-import org.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
-import org.cytomine.common.repository.model.stat.payload.StatTerm;
 
 @HttpExchange(StatsHttpContract.ROOT_PATH)
 public interface StatsHttpContract {

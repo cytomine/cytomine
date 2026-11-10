@@ -33,6 +33,20 @@ public class CompanionFile extends CytomineDomain {
 
     private Integer progress = 0;
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        CompanionFile companionFile = (CompanionFile) domain;
+        returnArray.put("uploadedFile", companionFile.getUploadedFileId());
+        returnArray.put("path", companionFile.getPath());
+        returnArray.put("image", companionFile.getImageId());
+        returnArray.put("originalFilename", companionFile.getOriginalFilename());
+
+        returnArray.put("filename", companionFile.getFilename());
+        returnArray.put("type", companionFile.getType());
+        returnArray.put("progress", companionFile.getProgress());
+        returnArray.put("status", companionFile.getUploadedFileStatus());
+        return returnArray;
+    }
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         CompanionFile companionFile = this;
@@ -56,22 +70,6 @@ public class CompanionFile extends CytomineDomain {
         companionFile.progress = json.getJSONAttrInteger("progress", 0);
 
         return companionFile;
-    }
-
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        CompanionFile companionFile = (CompanionFile) domain;
-        returnArray.put("uploadedFile", companionFile.getUploadedFileId());
-        returnArray.put("path", companionFile.getPath());
-        returnArray.put("image", companionFile.getImageId());
-        returnArray.put("originalFilename", companionFile.getOriginalFilename());
-
-        returnArray.put("filename", companionFile.getFilename());
-        returnArray.put("type", companionFile.getType());
-        returnArray.put("progress", companionFile.getProgress());
-        returnArray.put("status", companionFile.getUploadedFileStatus());
-        return returnArray;
     }
 
     public Long getImageId() {

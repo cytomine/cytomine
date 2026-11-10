@@ -10,16 +10,6 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.cytomine.repository.mapper.CommandMapper;
-import org.cytomine.repository.mapper.TagMapper;
-import org.cytomine.repository.persistence.CommandV2Repository;
-import org.cytomine.repository.persistence.TagDomainAssociationRepository;
-import org.cytomine.repository.persistence.TagRepository;
-import org.cytomine.repository.persistence.UserRepository;
-import org.cytomine.repository.persistence.entity.TagEntity;
-import org.cytomine.repository.persistence.entity.UserEntity;
-import org.springframework.stereotype.Component;
-
 import org.cytomine.common.repository.model.command.payload.request.TagCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.TagResponse;
@@ -31,14 +21,21 @@ import org.cytomine.common.repository.model.command.request.UpdateCommandRequest
 import org.cytomine.common.repository.model.command.request.UpdateTagCommand;
 import org.cytomine.common.repository.model.tag.payload.CreateTag;
 import org.cytomine.common.repository.model.tag.payload.UpdateTag;
+import org.cytomine.repository.mapper.CommandMapper;
+import org.cytomine.repository.mapper.TagMapper;
+import org.cytomine.repository.persistence.CommandV2Repository;
+import org.cytomine.repository.persistence.TagDomainAssociationRepository;
+import org.cytomine.repository.persistence.TagRepository;
+import org.cytomine.repository.persistence.UserRepository;
+import org.cytomine.repository.persistence.entity.TagEntity;
+import org.cytomine.repository.persistence.entity.UserEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 @Getter
 public class TagCommandService
     implements CRUDCommandService<CreateTag, UpdateTag, TagCommandPayload, TagEntity, TagResponse> {
-    @Setter
-    private ApplyCommandService applyCommandService;
     private final ACLService aclService;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
@@ -47,6 +44,8 @@ public class TagCommandService
     private final TagDomainAssociationCommandService tagDomainAssociationCommandService;
     private final TagDomainAssociationRepository tagDomainAssociationRepository;
     private final UserRepository userRepository;
+    @Setter
+    private ApplyCommandService applyCommandService;
 
     @Override
     public TagEntity updateEntityWithEntity(TagEntity entity, UpdateTag payload, Timestamp now) {

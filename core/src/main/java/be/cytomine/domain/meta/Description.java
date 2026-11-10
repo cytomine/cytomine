@@ -27,6 +27,14 @@ public class Description extends CytomineDomain {
     @NotNull
     private Long domainIdent;
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        Description description = (Description) domain;
+        returnArray.put("domainIdent", description.getDomainIdent());
+        returnArray.put("domainClassName", description.getDomainClassName());
+        returnArray.put("data", description.getData());
+        return returnArray;
+    }
 
     public void setDomain(CytomineDomain domain) {
         domainClassName = domain.getClass().getName();
@@ -47,15 +55,6 @@ public class Description extends CytomineDomain {
         description.created = json.getJSONAttrDate("created");
         description.updated = json.getJSONAttrDate("updated");
         return description;
-    }
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        Description description = (Description) domain;
-        returnArray.put("domainIdent", description.getDomainIdent());
-        returnArray.put("domainClassName", description.getDomainClassName());
-        returnArray.put("data", description.getData());
-        return returnArray;
     }
 
     @Override

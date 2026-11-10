@@ -47,6 +47,35 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
 
     private final UserRepository userRepository;
 
+    public static List<String> getSessionsUserIds(ConcurrentWebSocketSessionDecorator[] sessions) {
+        List<String> userIds = new ArrayList<>();
+        for (ConcurrentWebSocketSessionDecorator s : sessions) {
+            String userId = getSessionUserId(s);
+            if (!userId.isEmpty()) {
+                userIds.add(userId);
+            }
+        }
+        return userIds;
+    }
+
+    private static String getSessionUserId(ConcurrentWebSocketSessionDecorator session) {
+        String userId = "";
+        loop:
+        for (Map.Entry<String, ConcurrentWebSocketSessionDecorator[]> entry
+            : WebSocketUserPositionHandler.sessions.entrySet()) {
+            for (ConcurrentWebSocketSessionDecorator sessionDecorator : entry.getValue()) {
+
+                if (sessionDecorator.getId().equals(session.getId())) {
+                    System.out.println("Find user !");
+                    userId = entry.getKey();
+                    break loop;
+                }
+
+            }
+        }
+        return userId;
+    }
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         sessions = super.afterConnectionEstablished(session, sessions);
@@ -153,7 +182,7 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
                 trackedSessions
             );
         } else {
-            ConcurrentWebSocketSessionDecorator[] trackingSessions = new ConcurrentWebSocketSessionDecorator[]{
+            ConcurrentWebSocketSessionDecorator[] trackingSessions = new ConcurrentWebSocketSessionDecorator[] {
                 trackingSession
             };
             WebSocketUserPositionHandler.sessionsTracked.put(broadcastSession, trackingSessions);
@@ -215,35 +244,6 @@ public class WebSocketUserPositionHandler extends CytomineWebSocketHandler {
 
     private void sendPosition(WebSocketSession session, TextMessage position) {
         super.sendWebSocketMessage(session, position);
-    }
-
-    public static List<String> getSessionsUserIds(ConcurrentWebSocketSessionDecorator[] sessions) {
-        List<String> userIds = new ArrayList<>();
-        for (ConcurrentWebSocketSessionDecorator s : sessions) {
-            String userId = getSessionUserId(s);
-            if (!userId.isEmpty()) {
-                userIds.add(userId);
-            }
-        }
-        return userIds;
-    }
-
-    private static String getSessionUserId(ConcurrentWebSocketSessionDecorator session) {
-        String userId = "";
-        loop:
-        for (Map.Entry<String, ConcurrentWebSocketSessionDecorator[]> entry
-            : WebSocketUserPositionHandler.sessions.entrySet()) {
-            for (ConcurrentWebSocketSessionDecorator sessionDecorator : entry.getValue()) {
-
-                if (sessionDecorator.getId().equals(session.getId())) {
-                    System.out.println("Find user !");
-                    userId = entry.getKey();
-                    break loop;
-                }
-
-            }
-        }
-        return userId;
     }
 
     private void removeSessionFromTrackerSessions(WebSocketSession session) {

@@ -4,19 +4,18 @@ import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.Set;
 
-import org.cytomine.repository.persistence.ProjectListAvailableFilters;
-import org.cytomine.repository.persistence.ProjectListRow;
-import org.cytomine.repository.persistence.entity.ProjectEntity;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import org.cytomine.common.mapper.BaseMapper;
 import org.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import org.cytomine.common.repository.model.list.filtered.ProjectListAvailableFiltersPayload;
 import org.cytomine.common.repository.model.project.payload.CreateProject;
+import org.cytomine.repository.persistence.ProjectListAvailableFilters;
+import org.cytomine.repository.persistence.ProjectListRow;
+import org.cytomine.repository.persistence.entity.ProjectEntity;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface ProjectMapper {

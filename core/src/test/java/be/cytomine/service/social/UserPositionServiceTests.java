@@ -140,7 +140,7 @@ public class UserPositionServiceTests {
 
         lastUserPosition
             = userPositionService.lastPositionByUser(
-                sliceInstance.getImage(), sliceInstance, anotherUser.getId(), false);
+            sliceInstance.getImage(), sliceInstance, anotherUser.getId(), false);
         assertThat(lastUserPosition).isPresent();
         assertThat(lastUserPosition.get().getUser()).isEqualTo(anotherUser.getId());
         assertThat(lastUserPosition.get().getSlice()).isEqualTo(sliceInstance.getId());

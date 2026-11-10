@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import org.cytomine.common.resourceserver.model.permissionconfig.CytominePermissionConfig;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 
 @ConfigurationProperties(prefix = "cytomine.permissions")

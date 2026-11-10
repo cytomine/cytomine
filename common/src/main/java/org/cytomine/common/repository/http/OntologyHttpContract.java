@@ -3,6 +3,11 @@ package org.cytomine.common.repository.http;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import org.cytomine.common.repository.model.ontology.payload.OntologyLight;
+import org.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,12 +18,6 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
-
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
-import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
-import org.cytomine.common.repository.model.ontology.payload.OntologyLight;
-import org.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 
 @HttpExchange(OntologyHttpContract.ROOT_PATH)
 public interface OntologyHttpContract {

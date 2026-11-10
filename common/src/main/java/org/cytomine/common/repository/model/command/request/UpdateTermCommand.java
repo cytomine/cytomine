@@ -18,7 +18,7 @@ public record UpdateTermCommand(TermCommandPayload before,
     @Override
     public String getActionMessage() {
         return format("Term %s (%s => %s),color (%s => %s) updated in ontology %s", before.id(), before.name(),
-                after.name(), before.color(), after.color(), after.ontology());
+            after.name(), before.color(), after.color(), after.ontology());
     }
 
     @Override

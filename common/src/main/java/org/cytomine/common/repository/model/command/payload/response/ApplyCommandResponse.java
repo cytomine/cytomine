@@ -2,7 +2,6 @@ package org.cytomine.common.repository.model.command.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import org.cytomine.common.repository.model.HasLocaleDateTimeCUD;
 import org.cytomine.common.repository.model.HasLongId;
 import org.cytomine.common.repository.model.command.DataType;

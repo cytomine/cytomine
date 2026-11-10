@@ -27,6 +27,21 @@ public class SecUserSecRole extends CytomineDomain implements Serializable {
     @JoinColumn(name = "sec_role_id", nullable = false)
     private SecRole secRole;
 
+    /**
+     * Define fields available for JSON response
+     *
+     * @param domain Domain source for json value
+     * @return Map with fields (keys) and their values
+     */
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        SecUserSecRole secSecUserSecRole = (SecUserSecRole) domain;
+        returnArray.put("user", secSecUserSecRole.getUserId());
+        returnArray.put("role", secSecUserSecRole.getSecRoleId());
+        returnArray.put("authority", secSecUserSecRole.getSecRoleAuthority());
+        return returnArray;
+    }
+
     Long getUserId() {
         return (secUser != null ? secUser.getId() : null);
     }
@@ -47,22 +62,6 @@ public class SecUserSecRole extends CytomineDomain implements Serializable {
         secSecUserSecRole.created = json.getJSONAttrDate("created");
         secSecUserSecRole.updated = json.getJSONAttrDate("updated");
         return secSecUserSecRole;
-    }
-
-    /**
-     * Define fields available for JSON response
-     *
-     * @param domain Domain source for json value
-     *
-     * @return Map with fields (keys) and their values
-     */
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        SecUserSecRole secSecUserSecRole = (SecUserSecRole) domain;
-        returnArray.put("user", secSecUserSecRole.getUserId());
-        returnArray.put("role", secSecUserSecRole.getSecRoleId());
-        returnArray.put("authority", secSecUserSecRole.getSecRoleAuthority());
-        return returnArray;
     }
 
     @Override

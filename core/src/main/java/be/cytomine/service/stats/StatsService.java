@@ -24,13 +24,6 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import org.cytomine.common.repository.http.StatsHttpContract;
 import org.cytomine.common.repository.http.TermRelationHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
@@ -38,6 +31,13 @@ import org.cytomine.common.repository.model.command.payload.response.UserRespons
 import org.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
 import org.cytomine.common.repository.model.stat.payload.StatTerm;
 import org.cytomine.common.repository.model.stat.payload.StatUserTerm;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.social.AnnotationAction;
@@ -252,7 +252,7 @@ public class StatsService {
 
         Set<Long> nonLeafTermIds = leafsOnly ? termRelationHttpContract.findAllByOntologyId(
             project.getOntology()
-            .getId()
+                .getId()
         ).stream().map(TermRelationResponse::term1Id).collect(toSet()) : Set.of();
 
         return statsHttpContract.findTermsByProject(project.getId(), start, end, Pageable.unpaged())

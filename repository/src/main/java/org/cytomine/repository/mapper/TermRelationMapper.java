@@ -3,14 +3,13 @@ package org.cytomine.repository.mapper;
 import java.sql.Timestamp;
 
 import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import org.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 import org.cytomine.repository.persistence.entity.TermRelationEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import org.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
-import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
-import org.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
 
 @Mapper(componentModel = "spring", uses = BaseMapper.class)
 public interface TermRelationMapper {

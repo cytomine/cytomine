@@ -1,7 +1,6 @@
 package be.cytomine.security.current;
 
 import lombok.Data;
-
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 
 @Data

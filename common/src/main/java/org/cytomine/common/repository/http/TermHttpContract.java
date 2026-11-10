@@ -4,6 +4,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import jakarta.validation.Valid;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.term.payload.CreateTerm;
+import org.cytomine.common.repository.model.term.payload.UpdateTerm;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,11 +18,6 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
-
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.TermResponse;
-import org.cytomine.common.repository.model.term.payload.CreateTerm;
-import org.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 @HttpExchange(TermHttpContract.ROOT_PATH)
 public interface TermHttpContract {

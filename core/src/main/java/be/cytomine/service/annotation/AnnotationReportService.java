@@ -5,9 +5,9 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.http.TermHttpContract;
 import org.springframework.stereotype.Service;
 
-import org.cytomine.common.repository.http.TermHttpContract;
 import be.cytomine.domain.project.Project;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.AnnotationListingBuilder;

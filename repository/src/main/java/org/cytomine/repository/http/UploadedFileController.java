@@ -5,6 +5,11 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.UploadedFileHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
+import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
+import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import org.cytomine.repository.mapper.UploadedFileMapper;
 import org.cytomine.repository.persistence.UploadedFileRepository;
 import org.cytomine.repository.service.ACLService;
@@ -15,14 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.cytomine.common.repository.http.UploadedFileHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
-import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
-import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
-
-import static org.cytomine.common.repository.http.UploadedFileHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
+import static org.cytomine.common.repository.http.UploadedFileHttpContract.ROOT_PATH;
 
 @RestController
 @RequestMapping(ROOT_PATH)

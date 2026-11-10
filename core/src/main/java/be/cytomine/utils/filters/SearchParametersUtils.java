@@ -14,20 +14,17 @@ import be.cytomine.utils.RequestParams;
 
 public class SearchParametersUtils {
 
+    private static final String paramRegex = ".+\\[.+\\]";
     private static String SEARCH_PARAM_EQUALS = "equals";
-    private static String SEARCH_PARAM_LIKE = "like";
-    private static String SEARCH_PARAM_ILIKE = "ilike";
-    private static String SEARCH_PARAM_IN = "in";
-
     static List<String> equalsOperators = List.of(SEARCH_PARAM_EQUALS);
+    private static String SEARCH_PARAM_LIKE = "like";
     static List<String> likeOperators = List.of(SEARCH_PARAM_LIKE);
-    static List<String> ilikeOperators = List.of(SEARCH_PARAM_ILIKE);
     static List<String> equalsAndLikeOperators = List.of(SEARCH_PARAM_EQUALS, SEARCH_PARAM_LIKE);
+    private static String SEARCH_PARAM_ILIKE = "ilike";
+    static List<String> ilikeOperators = List.of(SEARCH_PARAM_ILIKE);
     static List<String> equalsAndIlikeOperators = List.of(SEARCH_PARAM_EQUALS, SEARCH_PARAM_ILIKE);
     static List<String> likeAndIlikeOperators = List.of(SEARCH_PARAM_LIKE, SEARCH_PARAM_ILIKE);
-
-    private static final String paramRegex = ".+\\[.+\\]";
-
+    private static String SEARCH_PARAM_IN = "in";
 
     public static List<SearchParameterEntry> getSearchParameters(RequestParams requestParams) {
         List<SearchParameterEntry> searchParameterEntries = new ArrayList<>();

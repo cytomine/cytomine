@@ -29,20 +29,21 @@ import static org.springframework.http.HttpMethod.POST;
 @Setter
 public class PreparedRequest {
 
+    private static final List<String> CORS_HEADERS = List.of(
+        "access-control-allow-origin",
+        "access-control-allow-methods",
+        "access-control-allow-headers",
+        "access-control-allow-credentials",
+        "access-control-expose-headers",
+        "access-control-max-age"
+    );
     private String scheme;
-
     private String host;
-
     private int port;
-
     private String path;
-
     private LinkedHashMap<String, Object> queryParameters;
-
     private HttpHeaders headers;
-
     private HttpMethod method;
-
     private Object body;
 
     public PreparedRequest() {
@@ -68,7 +69,6 @@ public class PreparedRequest {
     public void addQueryParameter(String key, Object value) {
         this.queryParameters.put(key, value);
     }
-
 
     public void addPathFragment(String fragment) {
         addPathFragment(fragment, false);
@@ -125,15 +125,6 @@ public class PreparedRequest {
         }
         throw new NotImplementedException("toObject is not implemented for method: " + method);
     }
-
-    private static final List<String> CORS_HEADERS = List.of(
-        "access-control-allow-origin",
-        "access-control-allow-methods",
-        "access-control-allow-headers",
-        "access-control-allow-credentials",
-        "access-control-expose-headers",
-        "access-control-max-age"
-    );
 
     private <T> ResponseEntity<T> stripCorsHeaders(ResponseEntity<T> response) {
         HttpHeaders newHeaders = new HttpHeaders();

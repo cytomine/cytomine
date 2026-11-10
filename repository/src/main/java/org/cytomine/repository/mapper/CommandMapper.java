@@ -5,12 +5,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
+import org.cytomine.common.repository.model.command.request.CommandV2Request;
 import org.cytomine.repository.persistence.entity.CommandV2Entity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import org.cytomine.common.repository.model.command.payload.response.CommandV2Response;
-import org.cytomine.common.repository.model.command.request.CommandV2Request;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface CommandMapper {

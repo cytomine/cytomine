@@ -8,6 +8,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import lombok.Getter;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.Role;
+import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.user.payload.CreateUser;
+import org.cytomine.common.repository.model.user.payload.UpdateUser;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.mapper.UserRoleMapper;
@@ -22,14 +29,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
-
-import org.cytomine.common.PostGisTestConfiguration;
-import org.cytomine.common.repository.http.UserHttpContract;
-import org.cytomine.common.repository.model.Role;
-import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.UserResponse;
-import org.cytomine.common.repository.model.user.payload.CreateUser;
-import org.cytomine.common.repository.model.user.payload.UpdateUser;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

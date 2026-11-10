@@ -5,6 +5,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import jakarta.validation.Valid;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import org.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
+import org.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,11 +17,6 @@ import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
-
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
-import org.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
-import org.cytomine.common.repository.model.termrelation.payload.UpdateTermRelation;
 
 @HttpExchange(TermRelationHttpContract.ROOT_PATH)
 public interface TermRelationHttpContract {

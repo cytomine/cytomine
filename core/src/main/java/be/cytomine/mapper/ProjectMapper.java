@@ -4,14 +4,14 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import org.cytomine.common.mapper.BaseMapper;
-import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import be.cytomine.domain.ontology.Ontology;
 import be.cytomine.domain.project.EditingMode;
 import be.cytomine.domain.project.Project;
@@ -41,7 +41,7 @@ public interface ProjectMapper {
     default void toLegacyProject(ProjectResponse projectResponse, @MappingTarget Project project) {
         project.setMode(projectResponse.isReadOnly() ? EditingMode.READ_ONLY
             : projectResponse.isRestricted() ? EditingMode.RESTRICTED
-            : EditingMode.CLASSIC);
+                : EditingMode.CLASSIC);
         projectResponse.ontology().ifPresent(ontologyId -> {
             Ontology ontology = new Ontology();
             ontology.setId(ontologyId);

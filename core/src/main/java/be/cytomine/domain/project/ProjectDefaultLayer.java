@@ -19,27 +19,15 @@ import be.cytomine.utils.JsonObject;
 @Setter
 public class ProjectDefaultLayer extends CytomineDomain {
 
+    boolean hideByDefault;
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
-
-    boolean hideByDefault;
-
-
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        ProjectDefaultLayer projectDefaultLayer = this;
-        projectDefaultLayer.setId(json.getJSONAttrLong("id", null));
-        projectDefaultLayer.setProject((Project) json.getJSONAttrDomain(entityManager, "project", new Project(), true));
-        projectDefaultLayer.setUser((User) json.getJSONAttrDomain(entityManager, "user", new User(), true));
-        projectDefaultLayer.setHideByDefault(json.getJSONAttrBoolean("hideByDefault", false));
-        return projectDefaultLayer;
-    }
 
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
@@ -48,6 +36,15 @@ public class ProjectDefaultLayer extends CytomineDomain {
         returnArray.put("user", projectDefaultLayer.getUser().getId());
         returnArray.put("hideByDefault", projectDefaultLayer.isHideByDefault());
         return returnArray;
+    }
+
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        ProjectDefaultLayer projectDefaultLayer = this;
+        projectDefaultLayer.setId(json.getJSONAttrLong("id", null));
+        projectDefaultLayer.setProject((Project) json.getJSONAttrDomain(entityManager, "project", new Project(), true));
+        projectDefaultLayer.setUser((User) json.getJSONAttrDomain(entityManager, "user", new User(), true));
+        projectDefaultLayer.setHideByDefault(json.getJSONAttrBoolean("hideByDefault", false));
+        return projectDefaultLayer;
     }
 
     @Override

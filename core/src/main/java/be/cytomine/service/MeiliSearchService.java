@@ -27,13 +27,13 @@ import com.meilisearch.sdk.model.TaskInfo;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.http.StorageHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import org.cytomine.common.repository.http.StorageHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchFacetsResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchImageResponse;
 import be.cytomine.dto.meilisearch.SearchWindow;
@@ -55,13 +55,11 @@ public class MeiliSearchService {
         "image.storage_id",
         "image.projects"
     };
-
-    @Value("${meilisearch.index_id}")
-    private String indexId;
-
     private final Client meiliSearchClient;
     private final ObjectMapper objectMapper;
     private final StorageHttpContract storageHttpContract;
+    @Value("${meilisearch.index_id}")
+    private String indexId;
 
     @PostConstruct
     public void createIndexIfNotExists() {
@@ -254,7 +252,7 @@ public class MeiliSearchService {
                 .filter(f -> f != null && !f.trim().isEmpty())
                 .collect(Collectors.joining(" AND "));
             if (!meiliFilter.isEmpty()) {
-                searchRequest.setFilter(new String[]{meiliFilter});
+                searchRequest.setFilter(new String[] {meiliFilter});
             }
         }
 
@@ -342,7 +340,7 @@ public class MeiliSearchService {
     private List<Map<String, Object>> searchFullDocuments(Index index, String filter) throws MeilisearchException {
         List<Map<String, Object>> documents = new ArrayList<>();
         SearchRequest searchRequest = new SearchRequest("")
-            .setFilter(new String[]{filter})
+            .setFilter(new String[] {filter})
             .setAttributesToRetrieve(ALL_ATTRIBUTES);
         int page = 1;
         SearchResultPaginated result;

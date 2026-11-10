@@ -30,11 +30,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 public class AppEngineServiceTests {
 
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private AppEngineService appEngineService;
-
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
-
     @Value("${application.appEngine.apiBasePath}")
     private String apiBasePath;
 

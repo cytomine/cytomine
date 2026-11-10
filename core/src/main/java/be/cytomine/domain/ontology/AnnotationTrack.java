@@ -40,11 +40,22 @@ public class AnnotationTrack extends CytomineDomain implements Serializable {
     @JoinColumn(name = "slice_id", nullable = false)
     private SliceInstance slice;
 
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        AnnotationTrack annotationTrack = (AnnotationTrack) domain;
+        returnArray.put("annotationIdent", annotationTrack.getAnnotationIdent());
+        returnArray.put("annotationClassName", annotationTrack.getAnnotationClassName());
+
+        returnArray.put("track", (annotationTrack.getTrack() != null ? annotationTrack.getTrack().getId() : null));
+        returnArray.put("slice", (annotationTrack.getSlice() != null ? annotationTrack.getSlice().getId() : null));
+
+        return returnArray;
+    }
+
     public void setAnnotation(AnnotationDomain annotation) {
         annotationClassName = annotation.getClass().getName();
         annotationIdent = annotation.getId();
     }
-
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         AnnotationTrack annotationTrack = this;
@@ -70,18 +81,6 @@ public class AnnotationTrack extends CytomineDomain implements Serializable {
         annotationTrack.track = (Track) json.getJSONAttrDomain(entityManager, "track", new Track(), false);
 
         return annotationTrack;
-    }
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        AnnotationTrack annotationTrack = (AnnotationTrack) domain;
-        returnArray.put("annotationIdent", annotationTrack.getAnnotationIdent());
-        returnArray.put("annotationClassName", annotationTrack.getAnnotationClassName());
-
-        returnArray.put("track", (annotationTrack.getTrack() != null ? annotationTrack.getTrack().getId() : null));
-        returnArray.put("slice", (annotationTrack.getSlice() != null ? annotationTrack.getSlice().getId() : null));
-
-        return returnArray;
     }
 
     @Override

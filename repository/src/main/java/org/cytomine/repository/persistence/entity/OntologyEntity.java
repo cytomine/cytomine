@@ -13,9 +13,8 @@ import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLRestriction;
-
 import org.cytomine.common.repository.model.HasTimestampCUD;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity(name = "ontology")
 @Data

@@ -28,6 +28,8 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -45,8 +47,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import org.cytomine.common.PostGisTestConfiguration;
-import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
@@ -97,7 +97,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ImageInstanceResourceTests {
 
     private static final String KEY_ID = "some random string";
-
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
+    private static final WireMockServer jwkMockServer = new WireMockServer(8888);
     private static RSAKey rsaKey;
     @Autowired
     UserRepository userRepository;
@@ -107,12 +108,6 @@ public class ImageInstanceResourceTests {
     private MockMvc restImageInstanceControllerMockMvc;
     @Autowired
     private ApplicationProperties applicationProperties;
-
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
-
-    private static final WireMockServer jwkMockServer = new WireMockServer(8888);
-
-
     @Autowired
     private UrlApi urlApi;
 

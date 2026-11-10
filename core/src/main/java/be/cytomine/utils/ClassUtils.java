@@ -8,7 +8,6 @@ public class ClassUtils {
      * Get the class name of an object without package name
      *
      * @param o Object
-     *
      * @return Class name (without package) of o
      */
     public static String getClassName(Object o) {

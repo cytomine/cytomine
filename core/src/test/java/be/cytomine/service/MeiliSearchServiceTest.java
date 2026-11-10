@@ -17,6 +17,8 @@ import com.meilisearch.sdk.model.Results;
 import com.meilisearch.sdk.model.SearchResult;
 import com.meilisearch.sdk.model.SearchResultPaginated;
 import com.meilisearch.sdk.model.TaskInfo;
+import org.cytomine.common.repository.http.StorageHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,8 +30,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import org.cytomine.common.repository.http.StorageHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.dto.meilisearch.SearchWindow;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -87,12 +87,12 @@ public class MeiliSearchServiceTest {
         verify(meiliSearchClient).waitForTask(anyInt());
         verify(created).updateFilterableAttributesSettings(argThat(attrs -> attrs.length == 3
             && Arrays.asList(attrs).containsAll(List.of(
-                "image.abstract_image_id", "image.storage_id", "image.projects"))));
+            "image.abstract_image_id", "image.storage_id", "image.projects"))));
     }
 
     @Test
     public void createIndexIfNotExistsShouldNotCreateIndexWhenAlreadyPresent() {
-        Index existing = mockConfiguredFilterableIndex(new String[]{
+        Index existing = mockConfiguredFilterableIndex(new String[] {
             "image.abstract_image_id", "image.storage_id", "image.projects"});
         when(existing.getUid()).thenReturn(INDEX_ID);
         mockExistingIndexes(existing);
@@ -105,7 +105,7 @@ public class MeiliSearchServiceTest {
 
     @Test
     public void createIndexIfNotExistsShouldMergeExistingFilterableAttributes() {
-        Index existing = mockConfiguredFilterableIndex(new String[]{
+        Index existing = mockConfiguredFilterableIndex(new String[] {
             "image.abstract_image_id", "image.storage_id"});
         mockUpdateFilterableAttributes(existing);
         when(existing.getUid()).thenReturn(INDEX_ID);
@@ -115,7 +115,7 @@ public class MeiliSearchServiceTest {
 
         verify(existing).updateFilterableAttributesSettings(argThat(attrs -> attrs.length == 3
             && Arrays.asList(attrs).containsAll(List.of(
-                "image.abstract_image_id", "image.storage_id", "image.projects"))));
+            "image.abstract_image_id", "image.storage_id", "image.projects"))));
     }
 
     @Test
@@ -334,7 +334,7 @@ public class MeiliSearchServiceTest {
         Index index = mock(Index.class);
         when(index.getUid()).thenReturn(INDEX_ID);
         mockExistingIndexes(index);
-        when(index.getFilterableAttributesSettings()).thenReturn(new String[]{"image.storage_id"});
+        when(index.getFilterableAttributesSettings()).thenReturn(new String[] {"image.storage_id"});
         SearchResult result = mock(SearchResult.class);
         when(result.getFacetDistribution()).thenReturn(Map.of());
         when(index.search(any(SearchRequest.class))).thenReturn(result);
@@ -350,7 +350,7 @@ public class MeiliSearchServiceTest {
         Index index = mock(Index.class);
         when(index.getUid()).thenReturn(INDEX_ID);
         mockExistingIndexes(index);
-        when(index.getFilterableAttributesSettings()).thenReturn(new String[]{"image.projects"});
+        when(index.getFilterableAttributesSettings()).thenReturn(new String[] {"image.projects"});
         SearchResult result = mock(SearchResult.class);
         when(result.getFacetDistribution()).thenReturn(Map.of());
         when(index.search(any(SearchRequest.class))).thenReturn(result);

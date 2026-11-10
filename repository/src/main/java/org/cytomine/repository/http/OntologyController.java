@@ -4,6 +4,12 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import org.cytomine.common.repository.model.ontology.payload.OntologyLight;
+import org.cytomine.common.repository.model.ontology.payload.UpdateOntology;
 import org.cytomine.repository.mapper.OntologyMapper;
 import org.cytomine.repository.persistence.OntologyRepository;
 import org.cytomine.repository.persistence.UserRepository;
@@ -15,15 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.cytomine.common.repository.http.OntologyHttpContract;
-import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
-import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
-import org.cytomine.common.repository.model.ontology.payload.OntologyLight;
-import org.cytomine.common.repository.model.ontology.payload.UpdateOntology;
-
-import static org.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
 import static java.time.temporal.ChronoUnit.MICROS;
+import static org.cytomine.common.repository.http.OntologyHttpContract.ROOT_PATH;
 
 @RequiredArgsConstructor
 @RestController

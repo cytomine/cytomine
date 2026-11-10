@@ -3,7 +3,6 @@ package org.cytomine.common.repository.model.command.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import org.cytomine.common.repository.model.HasAclId;
 import org.cytomine.common.repository.model.HasLongId;
 import org.cytomine.common.repository.model.command.CommandType;

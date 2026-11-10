@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-import be.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.PostGisTestConfiguration;
 import org.cytomine.common.repository.http.CommandHttpContract;
 import org.cytomine.common.repository.http.OntologyHttpContract;
 import org.cytomine.common.repository.model.command.CommandType;

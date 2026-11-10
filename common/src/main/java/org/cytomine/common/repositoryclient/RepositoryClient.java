@@ -4,21 +4,7 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.support.RestClientAdapter;
-import org.springframework.web.service.invoker.HttpServiceProxyFactory;
-
-import org.cytomine.common.security.IncomingAuthorizationContext;
+import org.cytomine.common.config.security.CytomineAuthenticationSupport;
 import org.cytomine.common.repository.http.CommandHttpContract;
 import org.cytomine.common.repository.http.HealthService;
 import org.cytomine.common.repository.http.OntologyHttpContract;
@@ -35,7 +21,20 @@ import org.cytomine.common.repository.http.UploadedFileHttpContract;
 import org.cytomine.common.repository.http.UserHttpContract;
 import org.cytomine.common.repository.http.UserRoleHttpContract;
 import org.cytomine.common.repository.utils.SpringPage;
-import org.cytomine.common.resourceserver.model.CytomineAuthenticationSupport;
+import org.cytomine.common.security.IncomingAuthorizationContext;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 
 @Configuration

@@ -21,7 +21,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
-import be.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.PostGisTestConfiguration;
 import org.cytomine.common.mapper.BaseMapper;
 import org.cytomine.common.repository.http.OntologyHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;

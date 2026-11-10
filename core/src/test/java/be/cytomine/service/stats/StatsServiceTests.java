@@ -24,7 +24,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.PostGisTestConfiguration;
 import org.cytomine.common.repository.http.StatsHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;

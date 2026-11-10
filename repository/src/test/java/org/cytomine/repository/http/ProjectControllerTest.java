@@ -15,7 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
-import be.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.PostGisTestConfiguration;
 import org.cytomine.common.repository.http.ProjectHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import org.cytomine.common.repository.model.project.payload.CreateProject;

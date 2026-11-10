@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.config.security.CytomineAuthenticationSupport;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
@@ -24,7 +25,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import org.cytomine.common.resourceserver.model.CytomineAuthenticationSupport;
 import org.cytomine.common.repository.http.StorageHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.domain.security.User;

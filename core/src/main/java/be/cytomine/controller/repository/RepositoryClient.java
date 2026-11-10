@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.cytomine.common.config.security.CytomineAuthenticationSupport;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +21,6 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import org.cytomine.common.security.IncomingAuthorizationContext;
 import org.cytomine.common.repositoryclient.PageableHttpServiceArgumentResolver;
-import org.cytomine.common.resourceserver.model.CytomineAuthenticationSupport;
 import org.cytomine.common.repository.http.CommandHttpContract;
 import org.cytomine.common.repository.http.HealthService;
 import org.cytomine.common.repository.http.OntologyHttpContract;

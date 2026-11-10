@@ -20,7 +20,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import be.cytomine.common.mapper.BaseMapperImpl;
+import org.cytomine.common.mapper.BaseMapperImpl;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.CropOffset;

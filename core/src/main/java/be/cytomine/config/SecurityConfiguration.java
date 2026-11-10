@@ -3,6 +3,8 @@ package be.cytomine.config;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.cytomine.common.config.security.JwtAuthConverter;
+import org.cytomine.common.config.security.TokenFromParameterFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,8 +19,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import be.cytomine.common.config.security.JwtAuthConverter;
-import be.cytomine.common.config.security.TokenFromParameterFilter;
 import be.cytomine.config.security.ApiKeyFilter;
 import be.cytomine.config.security.IncomingAuthorizationFilter;
 import be.cytomine.mapper.UserMapper;

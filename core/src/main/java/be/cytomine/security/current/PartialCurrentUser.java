@@ -5,8 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import lombok.Data;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.security.User;
 
 @Data

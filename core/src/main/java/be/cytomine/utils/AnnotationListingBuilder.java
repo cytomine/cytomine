@@ -10,14 +10,14 @@ import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
+import org.cytomine.common.repository.http.TermHttpContract;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.utils.ParserUtils;
 import org.locationtech.jts.io.ParseException;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.utils.ParserUtils;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.exceptions.WrongArgumentException;

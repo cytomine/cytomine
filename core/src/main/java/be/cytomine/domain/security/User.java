@@ -23,8 +23,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.cytomine.common.repository.utils.Language;
 
-import be.cytomine.common.repository.utils.Language;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;

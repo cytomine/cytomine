@@ -9,6 +9,12 @@ import java.util.UUID;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.http.UserRoleHttpContract;
+import org.cytomine.common.repository.model.Role;
+import org.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
+import org.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
+import org.cytomine.common.repository.model.userrole.payload.role.payload.UpdateUserRole;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.persistence.RoleRepository;
@@ -22,13 +28,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
-
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.UserRoleHttpContract;
-import be.cytomine.common.repository.model.Role;
-import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
-import be.cytomine.common.repository.model.userrole.payload.role.payload.CreateUserRole;
-import be.cytomine.common.repository.model.userrole.payload.role.payload.UpdateUserRole;
 
 import static java.lang.String.format;
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;

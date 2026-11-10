@@ -8,14 +8,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class KeycloakClient {
 
-    private static final String REALM = "cytomine";
-    private static final String CLIENT_ID = "admin-cli";
     @Value("${keycloak-client.url}")
     String url;
+
     @Value("${cytomine.admin.username}")
     String adminUsername;
+
     @Value("${cytomine.admin.password}")
     String adminPassword;
+
+    private static final String REALM = "cytomine";
+    private static final String CLIENT_ID = "admin-cli";
 
     public void deleteUser(String username) {
         try (Keycloak keycloak = Keycloak.getInstance(url, REALM, adminUsername, adminPassword, CLIENT_ID)) {

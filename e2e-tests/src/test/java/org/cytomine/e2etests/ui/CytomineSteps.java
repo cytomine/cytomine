@@ -247,7 +247,7 @@ public class CytomineSteps {
         String icon = descending
             ? "//span[contains(@class,'icon') and contains(@class,'is-desc')]"
             : "//span[contains(@class,'icon') and not(contains(@class,'is-desc'))"
-                + " and not(contains(@class,'is-invisible'))]";
+              + " and not(contains(@class,'is-invisible'))]";
         webDriverUtils.byIsDisplayed(wait, By.xpath(header + "[contains(@class,'is-current-sort')]" + icon));
 
         webDriverUtils.waitUntilByEmpty(wait, By.cssSelector(".uploaded-files-list .message.is-danger"));
@@ -715,7 +715,7 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(
             wait,
             "//div[contains(@class, 'modal')]//footer//button[contains(@class, 'is-danger') "
-                + "and contains(text(), 'Delete')]"
+            + "and contains(text(), 'Delete')]"
         );
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully deleted')]"));
         wait.until(ExpectedConditions.invisibilityOfElementLocated(
@@ -776,7 +776,7 @@ public class CytomineSteps {
         String icon = descending
             ? "//span[contains(@class,'icon') and contains(@class,'is-desc')]"
             : "//span[contains(@class,'icon') and not(contains(@class,'is-desc'))"
-                + " and not(contains(@class,'is-invisible'))]";
+              + " and not(contains(@class,'is-invisible'))]";
         webDriverUtils.byIsDisplayed(wait, By.xpath(header + "[contains(@class,'is-current-sort')]" + icon));
 
         verifyTagsRelativeOrder(wait, expectedBefore, expectedAfter);

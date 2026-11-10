@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.resourceserver.config.CytominePermissions;
+import org.cytomine.resourceserver.config.PermissionsConfigService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,7 @@ import be.cytomine.common.resourceserver.model.permission.CytominePermission;
 public class AuthorizationService implements PermissionsHttpContract {
 
     private final CytominePermissions cytominePermissions;
+    private final PermissionsConfigService permissionsConfigService;
 
     public AuthorizationResponse authorize(@RequestBody AuthorizationRequest authorizationRequest) {
         Set<String> roles =
@@ -36,13 +38,14 @@ public class AuthorizationService implements PermissionsHttpContract {
             roles.stream().flatMap(r -> cytominePermissions.roles().entrySet().stream()
                     .filter(entry -> entry.getKey().toUpperCase().equals(r)))
                 .flatMap(e -> e.getValue().stream())
+                .map(permissionsConfigService::map)
                 .collect(
                     Collectors.toSet());
 
         return new AuthorizationResponse(
             authorizationRequest.permissionsRequested().stream()
                 .filter(p -> permissions.contains(p.permission()))
-                .map(r -> new CytomineGrantedPermission(r))
+                .map(CytomineGrantedPermission::new)
                 .collect(Collectors.toSet()),
             authorizationRequest.permissionsRequested().stream()
                 .filter(p -> !permissions.contains(p.permission()))

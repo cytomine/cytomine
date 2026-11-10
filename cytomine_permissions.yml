@@ -8,6 +8,7 @@ cytomine:
       admin:
         - can_see_all_projects
         - can_create_project
+        - project_owner_can_add_members
       guest:
         - can_see_all_projects
 

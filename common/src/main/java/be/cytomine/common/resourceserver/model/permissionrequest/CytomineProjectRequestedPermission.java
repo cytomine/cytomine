@@ -1,8 +1,13 @@
 package be.cytomine.common.resourceserver.model.permissionrequest;
 
 import be.cytomine.common.resourceserver.model.permission.CytomineProjectPermission;
-import be.cytomine.common.resourceserver.model.target.ProjectTargetResource;
+import be.cytomine.common.resourceserver.model.permission.PermissionType;
 
-public record CytomineProjectRequestedPermission(CytomineProjectPermission permission, ProjectTargetResource target)
+public record CytomineProjectRequestedPermission(CytomineProjectPermission permission, long id)
     implements CytomineRequestedPermission {
+
+    @Override
+    public PermissionType permissionType() {
+        return PermissionType.PROJECT;
+    }
 }

@@ -6,13 +6,13 @@ import java.util.Set;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import be.cytomine.common.resourceserver.model.permission.CytominePermission;
+import be.cytomine.common.resourceserver.model.permissionconfig.CytominePermissionConfig;
 
 
 @ConfigurationProperties(prefix = "cytomine.permissions")
 public record CytominePermissions(
-    Map<String, Set<CytominePermission>> roles,
-    Map<String, Set<CytominePermission>> projectRoles
+    Map<String, Set<CytominePermissionConfig>> roles,
+    Map<String, Set<CytominePermissionConfig>> projectRoles
 
 ) {
     public CytominePermissions {

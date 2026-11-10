@@ -2,5 +2,5 @@ package be.cytomine.common.resourceserver.model;
 
 import be.cytomine.common.resourceserver.model.permissionrequest.CytomineRequestedPermission;
 
-public record CytomineDeniedPermission(CytomineRequestedPermission permission, String reason) {
+public record CytomineDeniedPermission(CytomineRequestedPermission requestedPermission, String reason) {
 }

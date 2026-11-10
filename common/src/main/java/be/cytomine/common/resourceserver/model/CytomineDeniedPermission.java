@@ -1,6 +1,6 @@
 package be.cytomine.common.resourceserver.model;
 
-import be.cytomine.common.resourceserver.model.target.TargetResource;
+import be.cytomine.common.resourceserver.model.permissionrequest.CytomineRequestedPermission;
 
-public record CytomineDeniedPermission(CytominePermission permission, TargetResource targetResource) {
+public record CytomineDeniedPermission(CytomineRequestedPermission permission, String reason) {
 }

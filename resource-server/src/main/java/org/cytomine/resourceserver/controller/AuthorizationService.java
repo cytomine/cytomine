@@ -15,7 +15,8 @@ import be.cytomine.common.resourceserver.model.AuthorizationRequest;
 import be.cytomine.common.resourceserver.model.AuthorizationResponse;
 import be.cytomine.common.resourceserver.model.CytomineDeniedPermission;
 import be.cytomine.common.resourceserver.model.CytomineGrantedPermission;
-import be.cytomine.common.resourceserver.model.CytominePermission;
+import be.cytomine.common.resourceserver.model.permission.CytominePermission;
+
 
 @RequiredArgsConstructor
 @RestController(PermissionsHttpContract.ROOT_PATH)
@@ -41,11 +42,11 @@ public class AuthorizationService implements PermissionsHttpContract {
         return new AuthorizationResponse(
             authorizationRequest.permissionsRequested().stream()
                 .filter(p -> permissions.contains(p.permission()))
-                .map(r -> new CytomineGrantedPermission(r.permission(), r.targetResource()))
+                .map(r -> new CytomineGrantedPermission(r))
                 .collect(Collectors.toSet()),
             authorizationRequest.permissionsRequested().stream()
                 .filter(p -> !permissions.contains(p.permission()))
-                .map(r -> new CytomineDeniedPermission(r.permission(), r.targetResource()))
+                .map(r -> new CytomineDeniedPermission(r, "Permission missing."))
                 .collect(Collectors.toSet()));
     }
 }

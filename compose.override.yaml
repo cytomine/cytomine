@@ -38,8 +38,8 @@ services:
       context: ./
       dockerfile: ./repository/Dockerfile
 
-  resource-server:
-    image: cytomine/resource-server:latest
+  authorization-api:
+    image: cytomine/authorization-api:latest
     build:
       context: ./
-      dockerfile: ./resource-server/Dockerfile
+      dockerfile: ./authorization-api/Dockerfile

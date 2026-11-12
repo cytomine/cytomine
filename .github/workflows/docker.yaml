@@ -48,9 +48,9 @@ jobs:
             context: .
             dockerfile_location: repository
             target: production
-          - name: resource-server
+          - name: authorization-api
             context: .
-            dockerfile_location: resource-server
+            dockerfile_location: authorization-api
             target: production
           - name: app-engine-tasks-runner
             context: .

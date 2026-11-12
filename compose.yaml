@@ -145,7 +145,7 @@ services:
       - iam-db
     ports:
       - 8100:8100
-    command: ["start-dev", "--http-port=8100"]
+    command: [ "start-dev", "--http-port=8100" ]
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
       KC_DB_PASSWORD: password
@@ -325,8 +325,8 @@ services:
       host_network:
         ipv4_address: 172.16.238.18
 
-  resource-server:
-    image: cytomine/resource-server:latest
+  authorization-api:
+    image: cytomine/authorization-api:latest
     restart: unless-stopped
     depends_on:
       - iam
@@ -391,19 +391,19 @@ services:
         ipv4_address: 172.16.238.15
 
 volumes:
-  k3s-server: {}
-  k3s-agent: {}
-  mongo-data: {}
-  postgis-data: {}
-  registry-data: {}
-  redis-data: {}
-  iam-db-data: {}
-  app-engine-db-data: {}
-  app-engine-data: {}
-  app-engine-shared-inputs: {}
-  app-engine-shared-datasets: {}
-  cbir-data: {}
-  meilisearch-data: {}
+  k3s-server: { }
+  k3s-agent: { }
+  mongo-data: { }
+  postgis-data: { }
+  registry-data: { }
+  redis-data: { }
+  iam-db-data: { }
+  app-engine-db-data: { }
+  app-engine-data: { }
+  app-engine-shared-inputs: { }
+  app-engine-shared-datasets: { }
+  cbir-data: { }
+  meilisearch-data: { }
 
 networks:
   host_network:

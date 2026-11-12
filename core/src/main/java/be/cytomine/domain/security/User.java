@@ -48,45 +48,7 @@ public class User extends CytomineDomain {
     @NotBlank
     @Column(nullable = false)
     protected String name;
-    /**
-     * Deprecated attributes. Kept here for migration
-     **/
-    @Deprecated
-    protected String firstname;
-    @Deprecated
-    protected String lastname;
-    @Deprecated
-    protected String email;
-    @Deprecated
-    @Enumerated(EnumType.STRING)
-    protected Language language;
-    @Deprecated
-    protected Boolean isDeveloper = false;
-    @Deprecated
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
-    protected User creator;
-    @Deprecated
-    protected String password;
-    @Deprecated
-    protected Boolean enabled = true;
-    @Deprecated
-    protected Boolean accountExpired = false;
-    @Deprecated
-    protected Boolean accountLocked = false;
-    @Deprecated
-    protected Boolean passwordExpired = false;
-    @Deprecated
-    protected String origin;
-    /**
-     * Deprecated API keys. Will be removed in a future release
-     **/
-    @Deprecated
-    protected String publicKey;
-    @Deprecated
-    protected String privateKey;
-    @Column(name = "deleted")
-    protected Date deleted;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
         name = "sec_user_sec_role",
@@ -95,23 +57,55 @@ public class User extends CytomineDomain {
     )
     private Set<SecRole> roles = new HashSet<>();
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        User user = (User) domain;
+    /** Deprecated attributes. Kept here for migration **/
+    @Deprecated
+    protected String firstname;
 
-        JsonObject json = new JsonObject();
-        json.put("id", user.getId());
-        json.put("username", user.getUsername());
-        json.put("name", user.getName());
-        json.put("email", user.getEmail());
-        json.put("fullName", user.getFullName());
-        json.put("firstname", user.getFirstname());
-        json.put("lastname", user.getLastname());
-        json.put("language", Objects.nonNull(user.language) ? user.language.toString() : "EN");
-        json.put("isDeveloper", user.isDeveloper);
-        json.put("created", user.getCreated());
-        json.put("updated", user.getUpdated());
-        return json;
-    }
+    @Deprecated
+    protected String lastname;
+
+    @Deprecated
+    protected String email;
+
+    @Deprecated
+    @Enumerated(EnumType.STRING)
+    protected Language language;
+
+    @Deprecated
+    protected Boolean isDeveloper = false;
+
+    @Deprecated
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = true)
+    protected User creator;
+
+    @Deprecated
+    protected String password;
+
+    @Deprecated
+    protected Boolean enabled = true;
+
+    @Deprecated
+    protected Boolean accountExpired = false;
+
+    @Deprecated
+    protected Boolean accountLocked = false;
+
+    @Deprecated
+    protected Boolean passwordExpired = false;
+
+    @Deprecated
+    protected String origin;
+
+    /** Deprecated API keys. Will be removed in a future release **/
+    @Deprecated
+    protected String publicKey;
+
+    @Deprecated
+    protected String privateKey;
+
+    @Column(name = "deleted")
+    protected Date deleted;
 
     @Deprecated
     public void generateKeys() {
@@ -156,6 +150,24 @@ public class User extends CytomineDomain {
         user.setIsDeveloper(json.getJSONAttrBoolean("isDeveloper", false));
         user.reference = json.getJSONAttrStr("reference");
         return user;
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        User user = (User) domain;
+
+        JsonObject json = new JsonObject();
+        json.put("id", user.getId());
+        json.put("username", user.getUsername());
+        json.put("name", user.getName());
+        json.put("email", user.getEmail());
+        json.put("fullName", user.getFullName());
+        json.put("firstname", user.getFirstname());
+        json.put("lastname", user.getLastname());
+        json.put("language", Objects.nonNull(user.language) ? user.language.toString() : "EN");
+        json.put("isDeveloper", user.isDeveloper);
+        json.put("created", user.getCreated());
+        json.put("updated", user.getUpdated());
+        return json;
     }
 
     @Override

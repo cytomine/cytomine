@@ -53,11 +53,39 @@ import be.cytomine.utils.StringUtils;
 public class ImageServerService {
     // Internal communication to image server must use this base path as a convention.
     public static final String IMS_API_BASE_PATH = "/ims";
+
+    public enum DownloadType {
+        IMAGE("image"),
+        FILE("file");
+
+        final String pathSegment;
+
+        DownloadType(String pathSegment) {
+            this.pathSegment = pathSegment;
+        }
+    }
+
     private final SliceCoordinatesService sliceCoordinatesService;
+
     private final SimplifyGeometryService simplifyGeometryService;
+
     private final RestTemplate restTemplate;
+
     @Value("${application.pimsURL}")
     private String pimsURL;
+
+    public String internalImageServerURL() {
+        return this.pimsURL + IMS_API_BASE_PATH;
+    }
+
+    public StorageStats storageSpace() throws IOException {
+        PreparedRequest request = new PreparedRequest();
+        request.setMethod(HttpMethod.GET);
+        request.setUrl(this.internalImageServerURL());
+        request.addPathFragment("storage/size.json");
+
+        return JsonObject.toObject(request.toObject(String.class), StorageStats.class);
+    }
 
     private static String retrieveCropFormat(CropParameter cropParameter) {
         String format;
@@ -114,59 +142,6 @@ public class ImageServerService {
         return (!accepted.contains(format)) ? accepted.get(0) : format;
     }
 
-    private static Map<String, Object> renameChannelHistogramKeys(Map<String, Object> hist) {
-        Object channel = hist.get("concreteChannel");
-        Object apparentChannel = hist.get("channel");
-        hist.put("channel", channel);
-        hist.put("apparentChannel", apparentChannel);
-        hist.remove("concreteChannel");
-        return hist;
-    }
-
-    private static String retrieveWindowFormat(WindowParameter params) {
-        String format;
-        if (checkType(params).equals("alphamask")) {
-            format = checkFormat(params.getFormat(), List.of("png", "webp"));
-        } else {
-            format = checkFormat(params.getFormat(), List.of("png", "jpg", "webp"));
-        }
-        return format;
-    }
-
-    private static String formatToMediaType(String format) {
-        return formatToMediaType(format, MediaType.IMAGE_JPEG_VALUE);
-    }
-
-    private static String formatToMediaType(String format, String defaultMediaType) {
-        return switch (format) {
-            case "json" -> MediaType.APPLICATION_JSON_VALUE;
-            case "png" -> MediaType.IMAGE_PNG_VALUE;
-            case "webp" -> "image/webp";
-            case "jpg" -> MediaType.IMAGE_JPEG_VALUE;
-            default -> defaultMediaType;
-        };
-    }
-
-    private static String invertColormap(String colormap) {
-        if (colormap.charAt(0) == '!') {
-            return colormap.substring(1);
-        }
-        return '!' + colormap;
-    }
-
-    public String internalImageServerURL() {
-        return this.pimsURL + IMS_API_BASE_PATH;
-    }
-
-    public StorageStats storageSpace() throws IOException {
-        PreparedRequest request = new PreparedRequest();
-        request.setMethod(HttpMethod.GET);
-        request.setUrl(this.internalImageServerURL());
-        request.addPathFragment("storage/size.json");
-
-        return JsonObject.toObject(request.toObject(String.class), StorageStats.class);
-    }
-
     public Map<String, Object> properties(AbstractImage image) throws IOException {
         PreparedRequest request = new PreparedRequest();
         request.setMethod(HttpMethod.GET);
@@ -176,6 +151,15 @@ public class ImageServerService {
         request.addPathFragment("info");
 
         return JsonObject.toMap(request.toObject(String.class));
+    }
+
+    private static Map<String, Object> renameChannelHistogramKeys(Map<String, Object> hist) {
+        Object channel = hist.get("concreteChannel");
+        Object apparentChannel = hist.get("channel");
+        hist.put("channel", channel);
+        hist.put("apparentChannel", apparentChannel);
+        hist.remove("concreteChannel");
+        return hist;
     }
 
     public List<Map<String, Object>> rawProperties(ImageInstance image) {
@@ -596,6 +580,30 @@ public class ImageServerService {
         return request.toResponseEntity(proxy, byte[].class);
     }
 
+    private static String retrieveWindowFormat(WindowParameter params) {
+        String format;
+        if (checkType(params).equals("alphamask")) {
+            format = checkFormat(params.getFormat(), List.of("png", "webp"));
+        } else {
+            format = checkFormat(params.getFormat(), List.of("png", "jpg", "webp"));
+        }
+        return format;
+    }
+
+    private static String formatToMediaType(String format) {
+        return formatToMediaType(format, MediaType.IMAGE_JPEG_VALUE);
+    }
+
+    private static String formatToMediaType(String format, String defaultMediaType) {
+        return switch (format) {
+            case "json" -> MediaType.APPLICATION_JSON_VALUE;
+            case "png" -> MediaType.IMAGE_PNG_VALUE;
+            case "webp" -> "image/webp";
+            case "jpg" -> MediaType.IMAGE_JPEG_VALUE;
+            default -> defaultMediaType;
+        };
+    }
+
     public ResponseEntity<byte[]> crop(
         AnnotationDomain annotation, CropParameter params,
         String etag, ProxyExchange<byte[]> proxy
@@ -851,14 +859,10 @@ public class ImageServerService {
         return request.toResponseEntity(proxy, byte[].class);
     }
 
-    public enum DownloadType {
-        IMAGE("image"),
-        FILE("file");
-
-        final String pathSegment;
-
-        DownloadType(String pathSegment) {
-            this.pathSegment = pathSegment;
+    private static String invertColormap(String colormap) {
+        if (colormap.charAt(0) == '!') {
+            return colormap.substring(1);
         }
+        return '!' + colormap;
     }
 }

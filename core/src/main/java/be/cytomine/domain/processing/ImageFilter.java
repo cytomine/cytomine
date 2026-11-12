@@ -17,23 +17,15 @@ import be.cytomine.utils.JsonObject;
 @Setter
 public class ImageFilter extends CytomineDomain {
 
-    @NotBlank
-    String method;
-    Boolean available = true;
     @NotNull
     @NotBlank
     @Column(nullable = false, unique = true)
     private String name;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        ImageFilter processingServer = (ImageFilter) domain;
-        returnArray.put("name", processingServer.getName());
-        returnArray.put("method", processingServer.getMethod());
-        returnArray.put("available", processingServer.getAvailable());
-        returnArray.put("baseUrl", processingServer.getBaseUrl());
-        return returnArray;
-    }
+    @NotBlank
+    String method;
+
+    Boolean available = true;
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         ImageFilter processingServer = (ImageFilter) this;
@@ -45,6 +37,17 @@ public class ImageFilter extends CytomineDomain {
         processingServer.updated = json.getJSONAttrDate("updated");
         return processingServer;
     }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        ImageFilter processingServer = (ImageFilter) domain;
+        returnArray.put("name", processingServer.getName());
+        returnArray.put("method", processingServer.getMethod());
+        returnArray.put("available", processingServer.getAvailable());
+        returnArray.put("baseUrl", processingServer.getBaseUrl());
+        return returnArray;
+    }
+
 
     public String getBaseUrl() {
         return "/filters/" + method + "&url="; // For backwards compatibility

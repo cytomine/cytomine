@@ -90,7 +90,7 @@ paths:
         - Image | Abstract image
       summary: Add a new abstract image
       description: Add a new abstract image in the storage. See IMS to upload an image.
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -543,7 +543,7 @@ paths:
       description:
         Add a new abstract slice. See 'upload file service' to upload a
         slice.
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -799,7 +799,7 @@ paths:
         - Annotation
       summary: Add an annotation
       description: Create a user annotation
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           description: annotation domain
@@ -1837,7 +1837,7 @@ paths:
       tags:
         - Annotation | Associated track
       description: Associate a track to an annotation
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -2179,7 +2179,7 @@ paths:
       description:
         Add a new companion file. See 'upload file service' to upload a
         slice.
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -2765,7 +2765,7 @@ paths:
       tags:
         - Image | Image instance
       description: Add an image to a project
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -3610,7 +3610,7 @@ paths:
       tags:
         - Ontology
       description: Add an ontology
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -3906,7 +3906,7 @@ paths:
       tags:
         - Project
       description: Add a new project
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -5570,7 +5570,7 @@ paths:
         - Ontology | Relation term
       summary: Add a relation between two terms
       description: Add a relation between two terms. If not set, relation is PARENT
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -6380,7 +6380,7 @@ paths:
       tags:
         - Storage
       description: Add a new storage
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -6510,7 +6510,7 @@ paths:
       tags:
         - Metadata | Tag
       description: Add a new tag
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -6679,7 +6679,7 @@ paths:
       tags:
         - Ontology | Term
       description: Add a new term
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -6802,7 +6802,7 @@ paths:
       tags:
         - Track
       description: Add a track in an image
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -6954,7 +6954,7 @@ paths:
       description:
         Add a new uploaded file. This DOES NOT upload the file, just create
         the domain.
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -7226,7 +7226,7 @@ paths:
       tags:
         - user
       description: Add a user, by default the sec role 'user' is set
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:
@@ -7283,7 +7283,7 @@ paths:
       tags:
         - user
       description: Get current user info
-      parameters: [ ]
+      parameters: []
       responses:
         "200":
           content:

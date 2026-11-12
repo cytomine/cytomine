@@ -34,15 +34,6 @@ public class Configuration extends CytomineDomain {
     @Enumerated(EnumType.STRING)
     private ConfigurationReadingRole readingRole;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        Configuration configuration = (Configuration) domain;
-        returnArray.put("key", configuration.getKey());
-        returnArray.put("value", configuration.getValue());
-        returnArray.put("readingRole", configuration.getReadingRole().name());
-        return returnArray;
-    }
-
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         Configuration configuration = (Configuration) this;
         configuration.id = json.getJSONAttrLong("id", null);
@@ -52,6 +43,15 @@ public class Configuration extends CytomineDomain {
         configuration.created = json.getJSONAttrDate("created");
         configuration.updated = json.getJSONAttrDate("updated");
         return configuration;
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        Configuration configuration = (Configuration) domain;
+        returnArray.put("key", configuration.getKey());
+        returnArray.put("value", configuration.getValue());
+        returnArray.put("readingRole", configuration.getReadingRole().name());
+        return returnArray;
     }
 
     @Override

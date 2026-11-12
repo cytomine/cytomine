@@ -19,24 +19,18 @@ import be.cytomine.utils.JsonObject;
 @Setter
 public class ProjectDefaultLayer extends CytomineDomain {
 
-    boolean hideByDefault;
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        ProjectDefaultLayer projectDefaultLayer = (ProjectDefaultLayer) domain;
-        returnArray.put("project", projectDefaultLayer.getProject().getId());
-        returnArray.put("user", projectDefaultLayer.getUser().getId());
-        returnArray.put("hideByDefault", projectDefaultLayer.isHideByDefault());
-        return returnArray;
-    }
+    boolean hideByDefault;
+
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         ProjectDefaultLayer projectDefaultLayer = this;
@@ -45,6 +39,15 @@ public class ProjectDefaultLayer extends CytomineDomain {
         projectDefaultLayer.setUser((User) json.getJSONAttrDomain(entityManager, "user", new User(), true));
         projectDefaultLayer.setHideByDefault(json.getJSONAttrBoolean("hideByDefault", false));
         return projectDefaultLayer;
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        ProjectDefaultLayer projectDefaultLayer = (ProjectDefaultLayer) domain;
+        returnArray.put("project", projectDefaultLayer.getProject().getId());
+        returnArray.put("user", projectDefaultLayer.getUser().getId());
+        returnArray.put("hideByDefault", projectDefaultLayer.isHideByDefault());
+        return returnArray;
     }
 
     @Override

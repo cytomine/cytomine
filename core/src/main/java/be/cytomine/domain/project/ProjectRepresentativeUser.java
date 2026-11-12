@@ -29,13 +29,6 @@ public class ProjectRepresentativeUser extends CytomineDomain {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        ProjectRepresentativeUser projectRepresentativeUser = (ProjectRepresentativeUser) domain;
-        returnArray.put("project", projectRepresentativeUser.getProject().getId());
-        returnArray.put("user", projectRepresentativeUser.getUserId());
-        return returnArray;
-    }
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         ProjectRepresentativeUser projectRepresentativeUser = (ProjectRepresentativeUser) this;
@@ -48,6 +41,14 @@ public class ProjectRepresentativeUser extends CytomineDomain {
         ));
         projectRepresentativeUser.setUserId(json.getJSONAttrDomain(entityManager, "user", new User(), true).getId());
         return projectRepresentativeUser;
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        ProjectRepresentativeUser projectRepresentativeUser = (ProjectRepresentativeUser) domain;
+        returnArray.put("project", projectRepresentativeUser.getProject().getId());
+        returnArray.put("user", projectRepresentativeUser.getUserId());
+        return returnArray;
     }
 
     @Override

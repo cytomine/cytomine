@@ -54,6 +54,7 @@ public class GenericAnnotationService {
      * @param idImage  Annotation image
      * @param layers   Annotation Users
      * @param table    Table that store annotation (user, reviewed)
+     *
      * @return List of annotation id from idImage and idUser that touch location
      */
     public List<AnnotationDomain> findAnnotationThatTouch(
@@ -129,6 +130,7 @@ public class GenericAnnotationService {
      *
      * @param ids     List of reviewed annotation id
      * @param termsId Term that must have all reviewed annotation (
+     *
      * @return Reviewed Annotation list
      */
     public List<ReviewedAnnotation> findReviewedAnnotationWithTerm(List<Long> ids, List<Long> termsId) {
@@ -156,6 +158,7 @@ public class GenericAnnotationService {
      *
      * @param ids     List of user annotation id
      * @param termsId Term that must have all user annotation (
+     *
      * @return user Annotation list
      */
     public List<UserAnnotation> findUserAnnotationWithTerm(List<Long> ids, List<Long> termsId) {

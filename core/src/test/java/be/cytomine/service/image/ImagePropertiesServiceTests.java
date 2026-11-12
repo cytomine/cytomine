@@ -36,11 +36,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Transactional
 public class ImagePropertiesServiceTests {
 
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
     ImagePropertiesService imagePropertiesService;
+
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     @Test
     void extractPopulatedPropertiesToAbstractImage() throws IOException, IllegalAccessException {

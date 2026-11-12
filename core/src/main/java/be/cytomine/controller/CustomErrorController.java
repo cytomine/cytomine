@@ -11,6 +11,31 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class CustomErrorController implements ErrorController {
 
+    @Value("${application.serverURL}")
+    String serverURL;
+
+    @RequestMapping("/error")
+    @ResponseBody
+    String error(HttpServletRequest request, HttpServletResponse response) {
+
+
+        int statusCode = response.getStatus();
+
+        String subject = switch (statusCode) {
+            case 401 -> "Authorization required";
+            case 404 -> "Resource not found";
+            default -> "Internal Error";
+        };
+
+        String message = switch (statusCode) {
+            case 401 -> "This page is not publicly available. To access it, please login first or use a valid token.";
+            case 404 -> "The page does not exists.";
+            default -> "";
+        };
+        return TEMPLATE.formatted(statusCode, CSS, statusCode, subject, message, serverURL);
+    }
+
+
     private static final String CSS = """
         h1{
         font-size:80px;
@@ -39,6 +64,7 @@ public class CustomErrorController implements ErrorController {
         color: #1e3148;
         }                
         """;
+
     private static final String TEMPLATE = """
         <html>
         <head>
@@ -58,27 +84,4 @@ public class CustomErrorController implements ErrorController {
         </body>
         </html>      
         """;
-    @Value("${application.serverURL}")
-    String serverURL;
-
-    @RequestMapping("/error")
-    @ResponseBody
-    String error(HttpServletRequest request, HttpServletResponse response) {
-
-
-        int statusCode = response.getStatus();
-
-        String subject = switch (statusCode) {
-            case 401 -> "Authorization required";
-            case 404 -> "Resource not found";
-            default -> "Internal Error";
-        };
-
-        String message = switch (statusCode) {
-            case 401 -> "This page is not publicly available. To access it, please login first or use a valid token.";
-            case 404 -> "The page does not exists.";
-            default -> "";
-        };
-        return TEMPLATE.formatted(statusCode, CSS, statusCode, subject, message, serverURL);
-    }
 }

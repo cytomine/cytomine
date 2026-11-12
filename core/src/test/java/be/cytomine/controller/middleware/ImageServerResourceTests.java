@@ -35,9 +35,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({MongoTestConfiguration.class, PostGisTestConfiguration.class, WiremockRepository.class})
 public class ImageServerResourceTests {
 
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private MockMvc restImageserverControllerMockMvc;
+
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     @Test
     @Transactional

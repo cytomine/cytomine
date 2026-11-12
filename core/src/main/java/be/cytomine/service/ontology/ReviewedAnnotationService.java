@@ -177,6 +177,7 @@ public class ReviewedAnnotationService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param jsonObject New domain data
+     *
      * @return Response structure (created domain data,..)
      */
     @Override
@@ -216,6 +217,7 @@ public class ReviewedAnnotationService extends ModelService {
      *
      * @param domain      Domain to update
      * @param jsonNewData New domain datas
+     *
      * @return Response structure (new domain data, old domain data..)
      */
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
@@ -234,6 +236,7 @@ public class ReviewedAnnotationService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
+     *
      * @return Response structure (code, old domain,..)
      */
     @Override
@@ -308,6 +311,7 @@ public class ReviewedAnnotationService extends ModelService {
      * Review annotation with the specified terms
      *
      * @param annotation Annotation to review
+     *
      * @return The reviewed annotation
      */
     private ReviewedAnnotation createReviewAnnotation(AnnotationDomain annotation) {
@@ -491,6 +495,7 @@ public class ReviewedAnnotationService extends ModelService {
      * @param coveringAnnotations List of reviewed annotations id that are covering by newLocation geometry
      * @param newLocation         A geometry (wkt format)
      * @param remove              Flag that tell to extend or substract part of geometry from  coveringAnnotations list
+     *
      * @return The first annotation data
      */
     // TODO: could be generic (same logic as for user annotation)

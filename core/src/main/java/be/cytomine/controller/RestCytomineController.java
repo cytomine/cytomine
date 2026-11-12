@@ -378,6 +378,7 @@ public abstract class RestCytomineController {
      *
      * @param service Service for this domain
      * @param json    JSON data
+     *
      * @return response
      */
     public ResponseEntity<String> add(ModelService service, JsonInput json, Task task) {
@@ -412,6 +413,7 @@ public abstract class RestCytomineController {
      *
      * @param service Service for this domain
      * @param json    JSON data
+     *
      * @return response
      */
     public ResponseEntity<String> update(ModelService service, JsonObject json, Task task) {
@@ -430,6 +432,7 @@ public abstract class RestCytomineController {
      *
      * @param service Service for this domain
      * @param json    JSON data
+     *
      * @return response
      */
     public ResponseEntity<String> delete(ModelService service, JsonObject json, Task task) {

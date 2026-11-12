@@ -37,18 +37,6 @@ public class AnnotationLink extends CytomineDomain {
     @JoinColumn(name = "image_id", nullable = false)
     ImageInstance image;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        AnnotationLink annotationLink = (AnnotationLink) domain;
-
-        returnArray.put("annotationClassName", annotationLink.getAnnotationClassName());
-        returnArray.put("annotationIdent", annotationLink.getAnnotationIdent());
-        returnArray.put("group", annotationLink.getGroup().getId());
-        returnArray.put("image", annotationLink.getImage().getId());
-
-        return returnArray;
-    }
-
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         AnnotationLink annotationLink = this;
 
@@ -72,6 +60,18 @@ public class AnnotationLink extends CytomineDomain {
         );
 
         return annotationLink;
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        AnnotationLink annotationLink = (AnnotationLink) domain;
+
+        returnArray.put("annotationClassName", annotationLink.getAnnotationClassName());
+        returnArray.put("annotationIdent", annotationLink.getAnnotationIdent());
+        returnArray.put("group", annotationLink.getGroup().getId());
+        returnArray.put("image", annotationLink.getImage().getId());
+
+        return returnArray;
     }
 
     @Override

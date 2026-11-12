@@ -112,10 +112,11 @@ public class ProjectServiceTests {
     UserMapper userMapper;
     @Autowired
     ProjectRepresentativeUserService projectRepresentativeUserService;
-    @MockitoBean
-    MeiliSearchService meiliSearchService;
     @Autowired
     private UrlApi urlApi;
+
+    @MockitoBean
+    MeiliSearchService meiliSearchService;
 
     private static void setupStub() {
         /* Simulate call to PIMS */

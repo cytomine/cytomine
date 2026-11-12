@@ -55,11 +55,13 @@ public class MeiliSearchService {
         "image.storage_id",
         "image.projects"
     };
+
+    @Value("${meilisearch.index_id}")
+    private String indexId;
+
     private final Client meiliSearchClient;
     private final ObjectMapper objectMapper;
     private final StorageHttpContract storageHttpContract;
-    @Value("${meilisearch.index_id}")
-    private String indexId;
 
     @PostConstruct
     public void createIndexIfNotExists() {
@@ -252,7 +254,7 @@ public class MeiliSearchService {
                 .filter(f -> f != null && !f.trim().isEmpty())
                 .collect(Collectors.joining(" AND "));
             if (!meiliFilter.isEmpty()) {
-                searchRequest.setFilter(new String[] {meiliFilter});
+                searchRequest.setFilter(new String[]{meiliFilter});
             }
         }
 
@@ -340,7 +342,7 @@ public class MeiliSearchService {
     private List<Map<String, Object>> searchFullDocuments(Index index, String filter) throws MeilisearchException {
         List<Map<String, Object>> documents = new ArrayList<>();
         SearchRequest searchRequest = new SearchRequest("")
-            .setFilter(new String[] {filter})
+            .setFilter(new String[]{filter})
             .setAttributesToRetrieve(ALL_ATTRIBUTES);
         int page = 1;
         SearchResultPaginated result;

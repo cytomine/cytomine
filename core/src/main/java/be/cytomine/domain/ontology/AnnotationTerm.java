@@ -38,18 +38,6 @@ public class AnnotationTerm extends CytomineDomain implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        AnnotationTerm annotationTerm = (AnnotationTerm) domain;
-        returnArray.put(
-            "userannotation",
-            (annotationTerm.getUserAnnotation() != null ? annotationTerm.getUserAnnotation().getId() : null)
-        );
-        returnArray.put("term", (annotationTerm.getTerm() != null ? annotationTerm.getTerm().getId() : null));
-        returnArray.put("user", (annotationTerm.getUser() != null ? annotationTerm.getUser().getId() : null));
-        return returnArray;
-    }
-
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         AnnotationTerm relationTerm = this;
         relationTerm.id = json.getJSONAttrLong("id", null);
@@ -76,6 +64,18 @@ public class AnnotationTerm extends CytomineDomain implements Serializable {
 
     public Long userDomainCreator() {
         return user.getId();
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        AnnotationTerm annotationTerm = (AnnotationTerm) domain;
+        returnArray.put(
+            "userannotation",
+            (annotationTerm.getUserAnnotation() != null ? annotationTerm.getUserAnnotation().getId() : null)
+        );
+        returnArray.put("term", (annotationTerm.getTerm() != null ? annotationTerm.getTerm().getId() : null));
+        returnArray.put("user", (annotationTerm.getUser() != null ? annotationTerm.getUser().getId() : null));
+        return returnArray;
     }
 
     @Override

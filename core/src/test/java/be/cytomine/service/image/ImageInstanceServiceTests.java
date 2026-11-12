@@ -90,7 +90,6 @@ import static org.mockito.Mockito.when;
 @MockedUser
 public class ImageInstanceServiceTests {
 
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     ImageInstanceService imageInstanceService;
     @Autowired
@@ -107,14 +106,16 @@ public class ImageInstanceServiceTests {
     PersistentUserPositionRepository persistentUserPositionRepository;
     @Autowired
     ImageConsultationService imageConsultationService;
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     CurrentUserService currentUserService;
     @Autowired
     PersistentImageConsultationRepository persistentImageConsultationRepository;
-    @MockitoBean
-    MeiliSearchService meiliSearchService;
     @Autowired
     private UrlApi urlApi;
+
+    @MockitoBean
+    MeiliSearchService meiliSearchService;
 
     private static void setupStub() {
         /* Simulate call to CBIR */

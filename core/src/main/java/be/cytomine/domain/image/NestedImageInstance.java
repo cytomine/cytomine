@@ -31,15 +31,6 @@ public class NestedImageInstance extends ImageInstance {
     @NotNull
     private Integer y;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
-        JsonObject returnArray = ImageInstance.getDataFromDomain(domain, urlApi);
-        NestedImageInstance nestedImageInstance = (NestedImageInstance) domain;
-        returnArray.put("parent", nestedImageInstance.getParentId());
-        returnArray.put("x", nestedImageInstance.getX());
-        returnArray.put("y", nestedImageInstance.getY());
-        return returnArray;
-    }
-
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         NestedImageInstance nestedImageInstance = (NestedImageInstance) super.buildDomainFromJson(
             this,
@@ -55,6 +46,15 @@ public class NestedImageInstance extends ImageInstance {
         nestedImageInstance.x = json.getJSONAttrInteger("x", 0);
         nestedImageInstance.y = json.getJSONAttrInteger("y", 0);
         return nestedImageInstance;
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
+        JsonObject returnArray = ImageInstance.getDataFromDomain(domain, urlApi);
+        NestedImageInstance nestedImageInstance = (NestedImageInstance) domain;
+        returnArray.put("parent", nestedImageInstance.getParentId());
+        returnArray.put("x", nestedImageInstance.getX());
+        returnArray.put("y", nestedImageInstance.getY());
+        return returnArray;
     }
 
     public Long getParentId() {

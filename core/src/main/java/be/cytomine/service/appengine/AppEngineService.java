@@ -28,15 +28,17 @@ import be.cytomine.exceptions.AppEngineException;
 @RequiredArgsConstructor
 public class AppEngineService {
 
-    private final RestTemplate restTemplate;
     @Value("${application.appEngine.apiUrl}")
     private String apiUrl;
+
     @Value("${application.appEngine.apiBasePath}")
     private String apiBasePath;
 
     private String buildFullUrl(String uri) {
         return apiUrl + apiBasePath + uri;
     }
+
+    private final RestTemplate restTemplate;
 
     public String get(String uri) {
         return restTemplate.exchange(buildFullUrl(uri), HttpMethod.GET, null, String.class).getBody();

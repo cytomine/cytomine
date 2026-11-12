@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.config.security.JwtAuthConverter;
 import org.cytomine.common.config.security.TokenFromParameterFilter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;

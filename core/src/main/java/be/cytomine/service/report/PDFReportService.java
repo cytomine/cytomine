@@ -85,7 +85,8 @@ public class PDFReportService {
     /**
      * Write a PDF from given data array (all types allowed)
      *
-     * @param dataArray data to write on PDF
+     * @param dataArray     data to write on PDF
+     *
      * @return PDF in a byte array encoded in base 64
      */
     public byte[] writePDF(

@@ -41,7 +41,7 @@ public interface ProjectMapper {
     default void toLegacyProject(ProjectResponse projectResponse, @MappingTarget Project project) {
         project.setMode(projectResponse.isReadOnly() ? EditingMode.READ_ONLY
             : projectResponse.isRestricted() ? EditingMode.RESTRICTED
-                : EditingMode.CLASSIC);
+            : EditingMode.CLASSIC);
         projectResponse.ontology().ifPresent(ontologyId -> {
             Ontology ontology = new Ontology();
             ontology.setId(ontologyId);

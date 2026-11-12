@@ -31,16 +31,6 @@ public class Property extends CytomineDomain {
     @NotNull
     private Long domainIdent;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        Property property = (Property) domain;
-        returnArray.put("domainIdent", property.getDomainIdent());
-        returnArray.put("domainClassName", property.getDomainClassName());
-        returnArray.put("key", property.getKey());
-        returnArray.put("value", property.getValue());
-        return returnArray;
-    }
-
     /**
      * Set annotation (storing class + id) With groovy, you can do: this.annotation = ...
      *
@@ -66,6 +56,16 @@ public class Property extends CytomineDomain {
         property.created = json.getJSONAttrDate("created");
         property.updated = json.getJSONAttrDate("updated");
         return property;
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        Property property = (Property) domain;
+        returnArray.put("domainIdent", property.getDomainIdent());
+        returnArray.put("domainClassName", property.getDomainClassName());
+        returnArray.put("key", property.getKey());
+        returnArray.put("value", property.getValue());
+        return returnArray;
     }
 
     @Override

@@ -252,7 +252,7 @@ public class StatsService {
 
         Set<Long> nonLeafTermIds = leafsOnly ? termRelationHttpContract.findAllByOntologyId(
             project.getOntology()
-                .getId()
+            .getId()
         ).stream().map(TermRelationResponse::term1Id).collect(toSet()) : Set.of();
 
         return statsHttpContract.findTermsByProject(project.getId(), start, end, Pageable.unpaged())

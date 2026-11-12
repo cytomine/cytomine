@@ -30,6 +30,16 @@ public class AttachedFile extends CytomineDomain {
 
     private String key;
 
+    /**
+     * Set annotation (storing class + id) With groovy, you can do: this.annotation = ...
+     *
+     * @param domain to add
+     */
+    public void setDomain(CytomineDomain domain) {
+        domainClassName = domain.getClass().getName();
+        domainIdent = domain.getId();
+    }
+
     public static JsonObject getDataFromDomain(CytomineDomain domain) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         AttachedFile property = (AttachedFile) domain;
@@ -39,16 +49,6 @@ public class AttachedFile extends CytomineDomain {
         returnArray.put("filename", property.getFilename());
         returnArray.put("key", property.getKey());
         return returnArray;
-    }
-
-    /**
-     * Set annotation (storing class + id) With groovy, you can do: this.annotation = ...
-     *
-     * @param domain to add
-     */
-    public void setDomain(CytomineDomain domain) {
-        domainClassName = domain.getClass().getName();
-        domainIdent = domain.getId();
     }
 
     @Override

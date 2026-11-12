@@ -25,13 +25,22 @@ import be.cytomine.service.ontology.AnnotationIndexService;
 @AllArgsConstructor
 public class KmeansGeometryService {
 
+    private final AnnotationIndexService annotationIndexService;
+
+    private final EntityManager entityManager;
+
+    private final SliceInstanceRepository sliceInstanceRepository;
+
     public static final int FULL = 3;
     public static final int KMEANSFULL = 2;
+
     public static final int ANNOTATIONSIZE1 = 0;
     public static final int ANNOTATIONSIZE2 = 100;
     public static final int ANNOTATIONSIZE3 = 2000;
     public static final int ANNOTATIONSIZE4 = 10000;
     public static final int ANNOTATIONSIZE5 = 100000;
+
+
     public static final Map<Integer, Map<Integer, Integer>> rules =
         Map.of(
             100,
@@ -101,9 +110,7 @@ public class KmeansGeometryService {
             )
 
         );
-    private final AnnotationIndexService annotationIndexService;
-    private final EntityManager entityManager;
-    private final SliceInstanceRepository sliceInstanceRepository;
+
 
     public List<Kmeans> doKeamsFullRequest(String request) {
         String requestKmeans = "SELECT kmeans, count(*), st_astext(ST_ConvexHull(ST_Collect(location))) \n"

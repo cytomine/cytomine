@@ -38,11 +38,11 @@ public class RedoStackItem extends CytomineDomain {
         this.transaction = firstUndoStack.getTransaction();
     }
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         throw new RuntimeException("Not supported");
     }
 
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
         throw new RuntimeException("Not supported");
     }
 

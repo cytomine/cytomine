@@ -64,6 +64,10 @@ public class CommandHistory extends CytomineDomain {
         this.setMessage(redoStackItem.getCommand().getActionMessage());
     }
 
+    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
+        throw new RuntimeException("Not supported");
+    }
+
     public static JsonObject getDataFromDomain(CytomineDomain domain, UrlApi urlApi) {
         JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
         CommandHistory commandHistory = (CommandHistory) domain;
@@ -73,10 +77,6 @@ public class CommandHistory extends CytomineDomain {
         returnArray.put("prefixAction", commandHistory.prefixAction);
         returnArray.put("user", commandHistory.getUserId());
         return returnArray;
-    }
-
-    public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
-        throw new RuntimeException("Not supported");
     }
 
     @Override

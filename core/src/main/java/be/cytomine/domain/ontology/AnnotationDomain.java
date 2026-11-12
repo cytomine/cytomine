@@ -70,87 +70,6 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
 
     long countComments = 0L;
 
-    public static Optional<AnnotationDomain> findAnnotationDomain(EntityManager entityManager, Long id) {
-        return Optional.ofNullable(getAnnotationDomain(entityManager, id, ""));
-    }
-
-    public static AnnotationDomain getAnnotationDomain(EntityManager entityManager, Long id) {
-        return getAnnotationDomain(entityManager, id, "");
-    }
-
-    /**
-     * Get user/reviewed annotation with id Check the correct type and return it
-     *
-     * @param id Annotation id
-     * @return Annotation
-     */
-    public static AnnotationDomain getAnnotationDomain(EntityManager entityManager, Long id, String className) {
-        // TODO: move in AnnotationDomainRepo
-        Class domain = null;
-        if (className != null) {
-            switch (className) {
-                case "be.cytomine.domain.ontology.UserAnnotation":
-                    domain = UserAnnotation.class;
-                    break;
-                case "be.cytomine.domain.ontology.ReviewedAnnotation":
-                    domain = ReviewedAnnotation.class;
-                    break;
-                case "be.cytomine.domain.processing.RoiAnnotation":
-                    throw new CytomineMethodNotYetImplementedException("migration");
-                default:
-                    break;
-            }
-        }
-
-        AnnotationDomain annotation;
-        if (domain != null) {
-            annotation = (AnnotationDomain) entityManager.find(domain, id);
-        } else {
-            annotation = entityManager.find(UserAnnotation.class, id);
-            if (annotation == null) {
-                annotation = entityManager.find(ReviewedAnnotation.class, id);
-            }
-        }
-
-        if (annotation != null) {
-            return annotation;
-        } else {
-            throw new ObjectNotFoundException("Annotation " + id + " not found");
-        }
-    }
-
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        AnnotationDomain annotationDomain = (AnnotationDomain) domain;
-        returnArray.put(
-            "slice",
-            Optional.ofNullable(annotationDomain.getSlice()).map(CytomineDomain::getId).orElse(null)
-        );
-        returnArray.put(
-            "image",
-            Optional.ofNullable(annotationDomain.getImage()).map(CytomineDomain::getId).orElse(null)
-        );
-        returnArray.put(
-            "project",
-            Optional.ofNullable(annotationDomain.getProject()).map(CytomineDomain::getId).orElse(null)
-        );
-        returnArray.put("user", annotationDomain.getUserId());
-
-        returnArray.put("location", annotationDomain.location.toString()); //TODO: to text?
-        returnArray.put("geometryCompression", annotationDomain.geometryCompression);
-        returnArray.put("centroid", annotationDomain.getCentroid());
-
-        returnArray.put("area", annotationDomain.getArea());
-        returnArray.put("areaUnit", annotationDomain.retrieveAreaUnit());
-        returnArray.put("perimeter", annotationDomain.getPerimeter());
-        returnArray.put("perimeterUnit", annotationDomain.retrievePerimeterUnit());
-
-        returnArray.put("term", annotationDomain.termsId());
-        returnArray.put("nbComments", annotationDomain.countComments);
-
-        return returnArray;
-    }
-
     public void beforeCreate() {
         if (project == null) {
             project = image.getProject();
@@ -199,6 +118,7 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
      */
     public abstract List<Term> termsForReview();
 
+
     public String getFilename() {
         return Optional.ofNullable(this.image)
             .map(ImageInstance::getBaseImage)
@@ -238,6 +158,89 @@ public abstract class AnnotationDomain extends CytomineDomain implements Seriali
         return new Point(centroid.getX(), centroid.getY());
     }
 
+
+    public static Optional<AnnotationDomain> findAnnotationDomain(EntityManager entityManager, Long id) {
+        return Optional.ofNullable(getAnnotationDomain(entityManager, id, ""));
+    }
+
+    public static AnnotationDomain getAnnotationDomain(EntityManager entityManager, Long id) {
+        return getAnnotationDomain(entityManager, id, "");
+    }
+
+    /**
+     * Get user/reviewed annotation with id Check the correct type and return it
+     *
+     * @param id Annotation id
+     *
+     * @return Annotation
+     */
+    public static AnnotationDomain getAnnotationDomain(EntityManager entityManager, Long id, String className) {
+        // TODO: move in AnnotationDomainRepo
+        Class domain = null;
+        if (className != null) {
+            switch (className) {
+                case "be.cytomine.domain.ontology.UserAnnotation":
+                    domain = UserAnnotation.class;
+                    break;
+                case "be.cytomine.domain.ontology.ReviewedAnnotation":
+                    domain = ReviewedAnnotation.class;
+                    break;
+                case "be.cytomine.domain.processing.RoiAnnotation":
+                    throw new CytomineMethodNotYetImplementedException("migration");
+                default:
+                    break;
+            }
+        }
+
+        AnnotationDomain annotation;
+        if (domain != null) {
+            annotation = (AnnotationDomain) entityManager.find(domain, id);
+        } else {
+            annotation = entityManager.find(UserAnnotation.class, id);
+            if (annotation == null) {
+                annotation = entityManager.find(ReviewedAnnotation.class, id);
+            }
+        }
+
+        if (annotation != null) {
+            return annotation;
+        } else {
+            throw new ObjectNotFoundException("Annotation " + id + " not found");
+        }
+    }
+
     public abstract Long getUserId();
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        AnnotationDomain annotationDomain = (AnnotationDomain) domain;
+        returnArray.put(
+            "slice",
+            Optional.ofNullable(annotationDomain.getSlice()).map(CytomineDomain::getId).orElse(null)
+        );
+        returnArray.put(
+            "image",
+            Optional.ofNullable(annotationDomain.getImage()).map(CytomineDomain::getId).orElse(null)
+        );
+        returnArray.put(
+            "project",
+            Optional.ofNullable(annotationDomain.getProject()).map(CytomineDomain::getId).orElse(null)
+        );
+        returnArray.put("user", annotationDomain.getUserId());
+
+        returnArray.put("location", annotationDomain.location.toString()); //TODO: to text?
+        returnArray.put("geometryCompression", annotationDomain.geometryCompression);
+        returnArray.put("centroid", annotationDomain.getCentroid());
+
+        returnArray.put("area", annotationDomain.getArea());
+        returnArray.put("areaUnit", annotationDomain.retrieveAreaUnit());
+        returnArray.put("perimeter", annotationDomain.getPerimeter());
+        returnArray.put("perimeterUnit", annotationDomain.retrievePerimeterUnit());
+
+        returnArray.put("term", annotationDomain.termsId());
+        returnArray.put("nbComments", annotationDomain.countComments);
+
+        return returnArray;
+    }
 
 }

@@ -117,7 +117,7 @@ public class RestAbstractSliceController extends RestCytomineController {
     @GetMapping("/abstractslice/{id}/user.json")
     public UserResponse showUploaderOfImage(@PathVariable Long id) {
         log.debug("REST request to show image uploader");
-        return abstractSliceService.findImageUploaded(id).orElseThrow(() -> new ObjectNotFoundException("User not "
+        return  abstractSliceService.findImageUploaded(id).orElseThrow(() -> new ObjectNotFoundException("User not "
             + "found"));
 
     }

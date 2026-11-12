@@ -96,6 +96,7 @@ public class TaskService {
      * Close task and put progress to 100
      *
      * @param task Task to close
+     *
      * @return Closed task
      */
     public Task finishTask(Task task) {

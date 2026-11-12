@@ -141,18 +141,6 @@ public class AnnotationDomainResourceTests {
         }
     }
 
-    private static Map<String, byte[]> unzip(byte[] bundle) throws IOException {
-        Map<String, byte[]> entries = new LinkedHashMap<>();
-        try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(bundle))) {
-            ZipEntry entry;
-            while ((entry = zip.getNextEntry()) != null) {
-                entries.put(entry.getName(), zip.readAllBytes());
-                zip.closeEntry();
-            }
-        }
-        return entries;
-    }
-
     void createAnnotationSet() throws ParseException {
         project = builder.givenAProject();
         image = builder.givenAnImageInstance(project);
@@ -1068,6 +1056,18 @@ public class AnnotationDomainResourceTests {
             .map(feature -> ((Map<String, Object>) feature.get("properties")).get("path_class_name"))
             .toList();
         org.assertj.core.api.Assertions.assertThat(pathClassNames).contains(term.getName());
+    }
+
+    private static Map<String, byte[]> unzip(byte[] bundle) throws IOException {
+        Map<String, byte[]> entries = new LinkedHashMap<>();
+        try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(bundle))) {
+            ZipEntry entry;
+            while ((entry = zip.getNextEntry()) != null) {
+                entries.put(entry.getName(), zip.readAllBytes());
+                zip.closeEntry();
+            }
+        }
+        return entries;
     }
 
     @Test

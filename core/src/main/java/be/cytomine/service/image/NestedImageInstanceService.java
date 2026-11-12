@@ -74,6 +74,7 @@ public class NestedImageInstanceService extends ModelService {
      * Add the new domain with JSON data
      *
      * @param json New domain data
+     *
      * @return Response structure (created domain data,..)
      */
     public CommandResponse add(JsonObject json) {
@@ -91,6 +92,7 @@ public class NestedImageInstanceService extends ModelService {
      *
      * @param domain      Domain to update
      * @param jsonNewData New domain datas
+     *
      * @return Response structure (new domain data, old domain data..)
      */
     @Override
@@ -111,6 +113,7 @@ public class NestedImageInstanceService extends ModelService {
      * @param transaction  Transaction link with this command
      * @param task         Task for this command
      * @param printMessage Flag if client will print or not confirm message
+     *
      * @return Response structure (code, old domain,..)
      */
     @Override

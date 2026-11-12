@@ -78,67 +78,6 @@ public class AnnotationBundleService {
 
     private final ObjectMapper objectMapper;
 
-    private static String imageAlias(AnnotationResult annotation) {
-        Object filename = annotation.get("instanceFilename");
-        if (filename == null || filename.toString().isBlank()) {
-            filename = annotation.get("originalFilename");
-        }
-        if (filename != null && !filename.toString().isBlank()) {
-            return filename.toString();
-        }
-        return alias("IMAGE");
-    }
-
-    private static String alias(String prefix) {
-        StringBuilder builder = new StringBuilder(prefix).append('_');
-        for (int i = 0; i < ALIAS_LENGTH; i++) {
-            builder.append(ALIAS_CHARS.charAt(ThreadLocalRandom.current().nextInt(ALIAS_CHARS.length())));
-        }
-        return builder.toString();
-    }
-
-    private static String sanitize(String name, String fallback) {
-        String sanitized = name == null ? "" : name.trim().toLowerCase().replaceAll("[^a-z0-9]+", "_");
-        sanitized = sanitized.replaceAll("^_+|_+$", "");
-        return sanitized.isEmpty() ? fallback : sanitized;
-    }
-
-    private static Long asLong(Object value) {
-        if (value instanceof Number number) {
-            return number.longValue();
-        }
-        if (value instanceof String string && !string.isBlank()) {
-            try {
-                return Long.parseLong(string.trim());
-            } catch (NumberFormatException ignored) {
-                return null;
-            }
-        }
-        return null;
-    }
-
-    private static LocalDateTime toLocalDateTime(Object epochMillis) {
-        Long millis = asLong(epochMillis);
-        if (millis == null) {
-            return LocalDateTime.now();
-        }
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault());
-    }
-
-    private static String sha256(byte[] content) {
-        try {
-            byte[] digest = MessageDigest.getInstance("SHA-256").digest(content);
-            StringBuilder hex = new StringBuilder(digest.length * 2);
-            for (byte b : digest) {
-                hex.append(Character.forDigit((b >> 4) & 0xF, 16));
-                hex.append(Character.forDigit(b & 0xF, 16));
-            }
-            return hex.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 algorithm not available", e);
-        }
-    }
-
     public byte[] buildBundle(Project project) {
         Long projectId = project.getId();
 
@@ -524,6 +463,67 @@ public class AnnotationBundleService {
             throw new UncheckedIOException(e);
         }
         return buffer.toByteArray();
+    }
+
+    private static String imageAlias(AnnotationResult annotation) {
+        Object filename = annotation.get("instanceFilename");
+        if (filename == null || filename.toString().isBlank()) {
+            filename = annotation.get("originalFilename");
+        }
+        if (filename != null && !filename.toString().isBlank()) {
+            return filename.toString();
+        }
+        return alias("IMAGE");
+    }
+
+    private static String alias(String prefix) {
+        StringBuilder builder = new StringBuilder(prefix).append('_');
+        for (int i = 0; i < ALIAS_LENGTH; i++) {
+            builder.append(ALIAS_CHARS.charAt(ThreadLocalRandom.current().nextInt(ALIAS_CHARS.length())));
+        }
+        return builder.toString();
+    }
+
+    private static String sanitize(String name, String fallback) {
+        String sanitized = name == null ? "" : name.trim().toLowerCase().replaceAll("[^a-z0-9]+", "_");
+        sanitized = sanitized.replaceAll("^_+|_+$", "");
+        return sanitized.isEmpty() ? fallback : sanitized;
+    }
+
+    private static Long asLong(Object value) {
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+        if (value instanceof String string && !string.isBlank()) {
+            try {
+                return Long.parseLong(string.trim());
+            } catch (NumberFormatException ignored) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private static LocalDateTime toLocalDateTime(Object epochMillis) {
+        Long millis = asLong(epochMillis);
+        if (millis == null) {
+            return LocalDateTime.now();
+        }
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault());
+    }
+
+    private static String sha256(byte[] content) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(content);
+            StringBuilder hex = new StringBuilder(digest.length * 2);
+            for (byte b : digest) {
+                hex.append(Character.forDigit((b >> 4) & 0xF, 16));
+                hex.append(Character.forDigit(b & 0xF, 16));
+            }
+            return hex.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 algorithm not available", e);
+        }
     }
 
     @FunctionalInterface

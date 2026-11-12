@@ -31,52 +31,6 @@ public abstract class AnnotationListing {
      * default property group to show
      */
     public static final List<String> availableColumnsDefault = List.of("basic", "meta", "term");
-    protected EntityManager entityManager;
-    List<String> columnsToPrint;
-    Long project = null;
-    Long image = null;
-    List<Long> images = null;
-    Long slice = null;
-    List<Long> slices = null;
-    Long track = null;
-    List<Long> tracks = null;
-    Long beforeSlice = null;
-    Long afterSlice = null;
-    Long sliceDimension = null;
-    Long annotationGroup = null;
-    List<Long> annotationGroups = null;
-    Long user = null;
-    Long term = null;
-    List<Long> terms = null;
-    List<Long> users = null; //for user that draw annotation
-    List<Long> usersForTerm = null; //for user that add a term to annotation
-    List<Long> reviewUsers;
-    Long tag = null;
-    List<Long> tags = null;
-    Date afterThan = null;
-    Date beforeThan = null;
-    Boolean notReviewedOnly = false;
-    Boolean noTerm = false;
-    Boolean noTag = false;
-    Boolean multipleTerm = false;
-    Boolean noTrack = false;
-    Boolean multipleTrack = false;
-    String bbox = null;
-    String bboxAnnotation = null;
-    Object baseAnnotation = null;
-    Long maxDistanceBaseAnnotation = null;
-    List<Long> parents;
-    //not used for search critera (just for specific request
-    Boolean avoidEmptyCentroid = false;
-    Long excludedAnnotation = null;
-    Boolean kmeans = false;
-    Integer kmeansValue = 3;
-    LinkedHashMap<String, String> extraColmun = new LinkedHashMap<>();
-    LinkedHashMap<String, String> orderBy = new LinkedHashMap<>();
-
-    public AnnotationListing(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     /**
      * all properties group available, each value is a list of assoc [propertyName, SQL columnName/methodName) If value
@@ -84,11 +38,78 @@ public abstract class AnnotationListing {
      */
     abstract LinkedHashMap<String, AvailableColumns> getAvailableColumn();
 
+    protected EntityManager entityManager;
+
+    List<String> columnsToPrint;
+
+    Long project = null;
+    Long image = null;
+    List<Long> images = null;
+
+    Long slice = null;
+    List<Long> slices = null;
+
+    Long track = null;
+    List<Long> tracks = null;
+    Long beforeSlice = null;
+    Long afterSlice = null;
+    Long sliceDimension = null;
+
+    Long annotationGroup = null;
+    List<Long> annotationGroups = null;
+
+    Long user = null;
+
+    Long term = null;
+    List<Long> terms = null;
+
+    List<Long> users = null; //for user that draw annotation
+    List<Long> usersForTerm = null; //for user that add a term to annotation
+
+    List<Long> reviewUsers;
+
+    Long tag = null;
+    List<Long> tags = null;
+
+    Date afterThan = null;
+    Date beforeThan = null;
+
+    Boolean notReviewedOnly = false;
+    Boolean noTerm = false;
+    Boolean noTag = false;
+    Boolean multipleTerm = false;
+    Boolean noTrack = false;
+    Boolean multipleTrack = false;
+
+    String bbox = null;
+    String bboxAnnotation = null;
+
+    Object baseAnnotation = null;
+    Long maxDistanceBaseAnnotation = null;
+
+
+    List<Long> parents;
+
+    //not used for search critera (just for specific request
+    Boolean avoidEmptyCentroid = false;
+    Long excludedAnnotation = null;
+
+    Boolean kmeans = false;
+    Integer kmeansValue = 3;
+
     abstract String getFrom();
 
     public abstract String getDomainClass();
 
     abstract String buildExtraRequest();
+
+    LinkedHashMap<String, String> extraColmun = new LinkedHashMap<>();
+
+    LinkedHashMap<String, String> orderBy = new LinkedHashMap<>();
+
+    public AnnotationListing(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     public void addExtraColumn(String propName, String column) {
         extraColmun.put(propName, column);

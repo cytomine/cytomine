@@ -34,7 +34,6 @@ import static be.cytomine.service.search.RetrievalService.CBIR_API_BASE_PATH;
 @Transactional
 public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
 
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     private UrlApi urlApi;
     @Autowired
@@ -42,6 +41,8 @@ public class UserAnnotationAuthorizationTest extends CRUDAuthorizationTest {
     @Autowired
     private UserAnnotationService userAnnotationService;
     private UserAnnotation userAnnotation = null;
+
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     private static void setupStub() {
         /* Simulate call to PIMS */

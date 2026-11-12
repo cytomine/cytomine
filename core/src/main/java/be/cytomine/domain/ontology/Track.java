@@ -37,15 +37,6 @@ public class Track extends CytomineDomain {
     @JoinColumn(name = "project_id", nullable = true)
     private Project project;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        Track track = (Track) domain;
-        returnArray.put("name", track.getName());
-        returnArray.put("color", track.getColor());
-        returnArray.put("image", track.getImage() != null ? track.getImage().getId() : null);
-        returnArray.put("project", track.getProject() != null ? track.getProject().getId() : null);
-        return returnArray;
-    }
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         Track track = this;
@@ -59,6 +50,16 @@ public class Track extends CytomineDomain {
         track.created = json.getJSONAttrDate("created");
         track.updated = json.getJSONAttrDate("updated");
         return track;
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        Track track = (Track) domain;
+        returnArray.put("name", track.getName());
+        returnArray.put("color", track.getColor());
+        returnArray.put("image", track.getImage() != null ? track.getImage().getId() : null);
+        returnArray.put("project", track.getProject() != null ? track.getProject().getId() : null);
+        return returnArray;
     }
 
     @Override

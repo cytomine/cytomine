@@ -54,7 +54,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class AbstractSliceResourceTests {
 
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     UrlApi urlApi;
     @Autowired
@@ -63,6 +62,8 @@ public class AbstractSliceResourceTests {
     private MockMvc restAbstractSliceControllerMockMvc;
     @Autowired
     private WiremockRepository wiremockRepository;
+
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     @Test
     @Transactional

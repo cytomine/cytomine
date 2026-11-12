@@ -53,11 +53,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 public class ImageServerServiceTests {
 
-    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
     @Autowired
     BasicInstanceBuilder builder;
     @Autowired
     ImageServerService imageServerService;
+
+    private static final WireMockServer wireMockServer = WiremockRepository.SERVER;
 
     @Test
     void retrieveStorageSpaces() throws IOException {

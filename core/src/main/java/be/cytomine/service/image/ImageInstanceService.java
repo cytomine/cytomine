@@ -104,33 +104,63 @@ import static org.springframework.security.acls.domain.BasePermission.READ;
 public class ImageInstanceService extends ModelService {
 
     private static final List<String> ABSTRACT_IMAGE_COLUMNS_FOR_SEARCH = List.of("width", "height");
-    private static final ThreadLocal<TagMode> tagMode = ThreadLocal.withInitial(() -> TagMode.NORMAL);
+
     private final EntityManager entityManager;
+
     private final CurrentUserService currentUserService;
+
     private final CurrentRoleService currentRoleService;
+
     private final SecurityACLService securityACLService;
+
     private final ImageInstanceRepository imageInstanceRepository;
+
     private final AbstractSliceRepository abstractSliceRepository;
+
     private final SliceInstanceService sliceInstanceService;
+
     private final NestedImageInstanceRepository nestedImageInstanceRepository;
+
     private final SliceInstanceRepository sliceInstanceRepository;
+
     private final SliceCoordinatesService sliceCoordinatesService;
+
     private final UserAnnotationRepository userAnnotationRepository;
+
     private final ReviewedAnnotationRepository reviewedAnnotationRepository;
+
     private final UserAnnotationService userAnnotationService;
+
     private final ReviewedAnnotationService reviewedAnnotationService;
+
     private final AnnotationActionRepository annotationActionRepository;
+
     private final PersistentUserPositionRepository persistentUserPositionRepository;
+
     private final LastUserPositionRepository lastUserPositionRepository;
+
     private final PersistentImageConsultationRepository persistentImageConsultationRepository;
+
     private final PropertyService propertyService;
+
     private final PropertyRepository propertyRepository;
+
     private final TrackService trackService;
+
     private final MongoClient mongoClient;
+
     private final UrlApi urlApi;
-    private final MeiliSearchService meiliSearchService;
     @Value("${spring.data.mongodb.database}")
     private String mongoDatabaseName;
+
+    private final MeiliSearchService meiliSearchService;
+
+    public enum TagMode {
+        NORMAL,
+        DEFER
+    }
+
+    private static final ThreadLocal<TagMode> tagMode = ThreadLocal.withInitial(() -> TagMode.NORMAL);
 
     public void setTagMode(TagMode mode) {
         tagMode.set(mode);
@@ -1256,10 +1286,5 @@ public class ImageInstanceService extends ModelService {
             imageInstance.setReviewStop(new Date());
         }
         saveDomain(imageInstance);
-    }
-
-    public enum TagMode {
-        NORMAL,
-        DEFER
     }
 }

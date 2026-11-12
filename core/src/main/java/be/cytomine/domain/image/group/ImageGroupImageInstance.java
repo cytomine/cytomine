@@ -23,17 +23,6 @@ public class ImageGroupImageInstance extends CytomineDomain {
     @ManyToOne(fetch = FetchType.LAZY)
     private ImageInstance image;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        ImageGroupImageInstance igii = (ImageGroupImageInstance) domain;
-
-        returnArray.put("image", igii.getImage().getId());
-        returnArray.put("group", igii.getGroup().getId());
-        returnArray.put("groupName", igii.getGroup().getName());
-
-        return returnArray;
-    }
-
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         ImageGroupImageInstance igii = this;
 
@@ -45,6 +34,17 @@ public class ImageGroupImageInstance extends CytomineDomain {
         igii.image = (ImageInstance) json.getJSONAttrDomain(entityManager, "image", new ImageInstance(), true);
 
         return igii;
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        ImageGroupImageInstance igii = (ImageGroupImageInstance) domain;
+
+        returnArray.put("image", igii.getImage().getId());
+        returnArray.put("group", igii.getGroup().getId());
+        returnArray.put("groupName", igii.getGroup().getName());
+
+        return returnArray;
     }
 
     @Override

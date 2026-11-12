@@ -55,9 +55,9 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/project/{project}/stats/term.json")
     public ResponseEntity<String> statTerm(@PathVariable("project") Long projectId,
-        @RequestParam(value = "startDate", required = false) Long startDateLong,
-        @RequestParam(value = "endDate", required = false) Long endDateLong,
-        @RequestParam(required = false, defaultValue = "true") Boolean leafOnly) {
+                                           @RequestParam(value = "startDate", required = false) Long startDateLong,
+                                           @RequestParam(value = "endDate", required = false) Long endDateLong,
+                                           @RequestParam(required = false, defaultValue = "true") Boolean leafOnly) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
@@ -67,8 +67,8 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/project/{project}/stats/user.json")
     public ResponseEntity<String> statUser(@PathVariable("project") Long projectId,
-        @RequestParam(value = "startDate", required = false) Long startDateLong,
-        @RequestParam(value = "endDate", required = false) Long endDateLong) {
+                                           @RequestParam(value = "startDate", required = false) Long startDateLong,
+                                           @RequestParam(value = "endDate", required = false) Long endDateLong) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
@@ -95,10 +95,10 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/project/{project}/stats/termimage.json")
     public ResponseEntity<String> statPerTermAndImage(@PathVariable("project") Long projectId,
-        @RequestParam(value = "startDate", required = false)
-        Long startDateLong,
-        @RequestParam(value = "endDate", required = false)
-        Long endDateLong) {
+                                                      @RequestParam(value = "startDate", required = false)
+                                                      Long startDateLong,
+                                                      @RequestParam(value = "endDate", required = false)
+                                                      Long endDateLong) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;
@@ -108,8 +108,8 @@ public class RestStatsController extends RestCytomineController {
 
     @GetMapping("/project/{project}/stats/userslide.json")
     public ResponseEntity<String> statUserSlide(@PathVariable("project") Long projectId,
-        @RequestParam(value = "startDate", required = false) Long startDateLong,
-        @RequestParam(value = "endDate", required = false) Long endDateLong) {
+                                                @RequestParam(value = "startDate", required = false) Long startDateLong,
+                                                @RequestParam(value = "endDate", required = false) Long endDateLong) {
         Project project =
             projectService.find(projectId).orElseThrow(() -> new ObjectNotFoundException("Project", projectId));
         Date startDate = startDateLong != null ? new Date(startDateLong) : null;

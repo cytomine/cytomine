@@ -26,11 +26,11 @@ public class MeiliSearchController {
 
     @GetMapping("/search")
     public ResponseEntity<List<MeiliSearchImageResponse>> search(
-        @RequestParam(required = false) String query,
-        @RequestParam(name = "filters", required = false) List<String> filters,
-        @RequestParam(name = "filter", required = false) List<String> filter,
-        @RequestParam(required = false, defaultValue = "20") int limit,
-        @RequestParam(required = false, defaultValue = "0") int offset) {
+            @RequestParam(required = false) String query,
+            @RequestParam(name = "filters", required = false) List<String> filters,
+            @RequestParam(name = "filter", required = false) List<String> filter,
+            @RequestParam(required = false, defaultValue = "20") int limit,
+            @RequestParam(required = false, defaultValue = "0") int offset) {
 
         List<String> allFilters = Stream.of(filters, filter)
             .filter(list -> list != null && !list.isEmpty())
@@ -45,7 +45,7 @@ public class MeiliSearchController {
 
     @GetMapping("/image/{imageid}")
     public ResponseEntity<MeiliSearchImageResponse> getDocument(
-        @PathVariable String imageid) {
+            @PathVariable String imageid) {
 
         MeiliSearchImageResponse document = meiliSearchService.getImage(imageid);
         if (document != null) {

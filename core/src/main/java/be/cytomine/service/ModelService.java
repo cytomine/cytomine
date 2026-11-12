@@ -215,6 +215,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      * Create domain from JSON object
      *
      * @param json JSON with new domain info
+     *
      * @return new domain
      */
     public abstract CytomineDomain createFromJSON(JsonObject json);
@@ -225,6 +226,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      * @param json         JSON data for the new domain
      * @param printMessage Flag to specify if confirmation message must be show in client Usefull when we create a lot
      *                     of data, just print the root command message
+     *
      * @return Response structure (status, object data,...)
      */
     CommandResponse create(JsonObject json, boolean printMessage) {
@@ -236,6 +238,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param domain       Domain to store
      * @param printMessage Flag to specify if confirmation message must be show in client
+     *
      * @return Response structure (status, object data,...)
      */
     public CommandResponse create(CytomineDomain domain, boolean printMessage) {
@@ -260,6 +263,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param json         domain data in json
      * @param printMessage Flag to specify if confirmation message must be show in client
+     *
      * @return Response structure (status, object data,...)
      */
     public CommandResponse edit(JsonObject json, boolean printMessage) {
@@ -283,6 +287,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param domain       Domain to update
      * @param printMessage Flag to specify if confirmation message must be show in client
+     *
      * @return Response structure (status, object data,...)
      */
     public CommandResponse edit(CytomineDomain domain, boolean printMessage) {
@@ -305,6 +310,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param json         JSON with domain data (to retrieve it)
      * @param printMessage Flag to specify if confirmation message must be show in client
+     *
      * @return Response structure (status, object data,...)
      */
     public CommandResponse destroy(JsonObject json, boolean printMessage) {
@@ -320,6 +326,7 @@ public abstract class ModelService<T extends CytomineDomain> {
      *
      * @param domain       Domain to remove
      * @param printMessage Flag to specify if confirmation message must be show in client
+     *
      * @return Response structure (status, object data,...)
      */
     public CommandResponse destroy(CytomineDomain domain, boolean printMessage) {

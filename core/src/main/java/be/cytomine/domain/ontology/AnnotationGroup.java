@@ -26,17 +26,6 @@ public class AnnotationGroup extends CytomineDomain {
 
     String type;
 
-    public static JsonObject getDataFromDomain(CytomineDomain domain) {
-        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
-        AnnotationGroup annotationGroup = (AnnotationGroup) domain;
-
-        returnArray.put("project", annotationGroup.getProject().getId());
-        returnArray.put("imageGroup", annotationGroup.getImageGroup().getId());
-        returnArray.put("type", annotationGroup.getType());
-
-        return returnArray;
-    }
-
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {
         AnnotationGroup annotationGroup = this;
 
@@ -54,6 +43,17 @@ public class AnnotationGroup extends CytomineDomain {
         annotationGroup.type = json.getJSONAttrStr("type", "SAME_OBJECT");
 
         return annotationGroup;
+    }
+
+    public static JsonObject getDataFromDomain(CytomineDomain domain) {
+        JsonObject returnArray = CytomineDomain.getDataFromDomain(domain);
+        AnnotationGroup annotationGroup = (AnnotationGroup) domain;
+
+        returnArray.put("project", annotationGroup.getProject().getId());
+        returnArray.put("imageGroup", annotationGroup.getImageGroup().getId());
+        returnArray.put("type", annotationGroup.getType());
+
+        return returnArray;
     }
 
     @Override

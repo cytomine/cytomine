@@ -10,25 +10,6 @@ class BigPictureXmlWriter {
         sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
     }
 
-    private static String escape(String value) {
-        if (value == null || value.isEmpty()) {
-            return "";
-        }
-        StringBuilder out = new StringBuilder(value.length());
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            switch (c) {
-                case '&' -> out.append("&amp;");
-                case '<' -> out.append("&lt;");
-                case '>' -> out.append("&gt;");
-                case '"' -> out.append("&quot;");
-                case '\'' -> out.append("&apos;");
-                default -> out.append(c);
-            }
-        }
-        return out.toString();
-    }
-
     private void indent() {
         sb.append("\t".repeat(depth));
     }
@@ -76,6 +57,25 @@ class BigPictureXmlWriter {
         leaf("TAG", tag);
         empty("VALUE", "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance", "xsi:nil", "true");
         close("STRING_ATTRIBUTE");
+    }
+
+    private static String escape(String value) {
+        if (value == null || value.isEmpty()) {
+            return "";
+        }
+        StringBuilder out = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '&' -> out.append("&amp;");
+                case '<' -> out.append("&lt;");
+                case '>' -> out.append("&gt;");
+                case '"' -> out.append("&quot;");
+                case '\'' -> out.append("&apos;");
+                default -> out.append(c);
+            }
+        }
+        return out.toString();
     }
 
     String build() {

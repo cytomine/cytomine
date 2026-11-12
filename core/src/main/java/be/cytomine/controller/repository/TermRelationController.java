@@ -33,6 +33,8 @@ public class TermRelationController {
     public static final String UNABLE_TO_FIND_TERM_RELATION = "Unable to find term relation with id: %s";
     private final TermRelationHttpContract termRelationHttpContract;
 
+    private record CreateTermRelationRequest(long term1, long term2) {}
+
     @PostMapping({"relation/term.json", "relation/parent/term.json"})
     public Optional<HttpCommandResponse> create(@RequestBody CreateTermRelationRequest request) {
         return termRelationHttpContract.create(
@@ -43,20 +45,20 @@ public class TermRelationController {
     public TermRelationResponse termRelation(@PathVariable long id) {
         log.debug("REST request to get term relation {}", id);
         return termRelationHttpContract.findTermRelationByID(id)
-            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
+                   .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
     }
 
     @PutMapping("relation/term/{id}.json")
     public HttpCommandResponse update(@PathVariable long id, @RequestBody UpdateTermRelation updateTermRelation) {
         return termRelationHttpContract.update(id, updateTermRelation)
-            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
+                   .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
     }
 
     @DeleteMapping("relation/term/{id}.json")
     public HttpCommandResponse delete(@PathVariable long id) {
         log.debug("REST request to delete term relation {}", id);
         return termRelationHttpContract.delete(id)
-            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
+                   .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, format(UNABLE_TO_FIND_TERM_RELATION, id)));
     }
 
     @DeleteMapping("relation/parent/term1/{idTerm1}/term2/{idTerm2}.json")
@@ -65,6 +67,4 @@ public class TermRelationController {
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND,
                 format("Unable to find term relation for term1=%s term2=%s", idTerm1, idTerm2)));
     }
-
-    private record CreateTermRelationRequest(long term1, long term2) {}
 }

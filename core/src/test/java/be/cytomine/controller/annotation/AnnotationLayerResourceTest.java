@@ -2,6 +2,7 @@ package be.cytomine.controller.annotation;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.cytomine.common.PostGisTestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,7 +12,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import be.cytomine.BasicInstanceBuilder;
-import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.annotation.Annotation;
@@ -50,6 +50,48 @@ public class AnnotationLayerResourceTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1))
             .andExpect(jsonPath("$[0].id").value(taskRunLayer.getAnnotationLayer().getId()));
+    }
+
+    @Test
+    public void getAnnotationLayersByImageShouldReturnAllLayersOfTaskRunWithSeveralOutputs() throws Exception {
+        // An app with several geometry outputs creates one annotation layer per output for a single task run.
+        // https://github.com/cytomine/cytomine/issues/1341: the repository must not assume a single layer per run.
+        var project = builder.givenAProject();
+        var image = builder.givenAnImageInstance(project);
+        var taskRun = builder.givenANotPersistedTaskRun(project, java.util.UUID.randomUUID(), image);
+        manager.persist(taskRun);
+        AnnotationLayer firstLayer = builder.givenAPersistedAnnotationLayer();
+        AnnotationLayer secondLayer = builder.givenAPersistedAnnotationLayer();
+        manager.persist(builder.givenANotPersistedTaskRunLayer(firstLayer, taskRun, image));
+        manager.persist(builder.givenANotPersistedTaskRunLayer(secondLayer, taskRun, image));
+        manager.flush();
+
+        mockMvc.perform(get("/api/image-instances/{id}/annotation-layers", image.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[*].id", containsInAnyOrder(
+                firstLayer.getId().intValue(),
+                secondLayer.getId().intValue()
+            )));
+    }
+
+    @Test
+    public void getAnnotationLayersByImageShouldNotReturnLayerOfLastTaskRunOnAnotherImage() throws Exception {
+        // The last task run of the project ran on another image: its layer must not leak to this image.
+        var project = builder.givenAProject();
+        var imageOnOtherImage = builder.givenAnImageInstance(project);
+        var queriedImage = builder.givenAnImageInstance(project);
+
+        var taskRun = builder.givenANotPersistedTaskRun(
+            project, java.util.UUID.randomUUID(), imageOnOtherImage);
+        manager.persist(taskRun);
+        manager.persist(builder.givenANotPersistedTaskRunLayer(
+            builder.givenAPersistedAnnotationLayer(), taskRun, imageOnOtherImage));
+        manager.flush();
+
+        mockMvc.perform(get("/api/image-instances/{id}/annotation-layers", queriedImage.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test

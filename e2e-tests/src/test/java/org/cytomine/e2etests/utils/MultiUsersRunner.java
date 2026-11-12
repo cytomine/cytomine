@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.model.Role;
 import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.openqa.selenium.WebDriver;
@@ -16,11 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.Role;
-
-import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
-import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
-import static be.cytomine.common.repository.model.Role.ROLE_USER;
+import static org.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static org.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static org.cytomine.common.repository.model.Role.ROLE_USER;
 
 @Slf4j
 @Component

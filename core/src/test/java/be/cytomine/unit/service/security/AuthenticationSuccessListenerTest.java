@@ -5,6 +5,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.user.payload.CreateUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,9 +18,6 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.domain.security.User;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.service.CurrentRoleService;

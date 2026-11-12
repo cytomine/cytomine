@@ -20,6 +20,12 @@ import jakarta.persistence.TupleElement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.http.UserRoleHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.ontology.payload.OntologyLight;
+import org.cytomine.common.repository.utils.SpringPageCrawler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -27,12 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
-import be.cytomine.common.repository.http.OntologyHttpContract;
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.http.UserRoleHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.ontology.payload.OntologyLight;
-import be.cytomine.common.repository.utils.SpringPageCrawler;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;
@@ -105,9 +105,9 @@ import be.cytomine.utils.SQLUtils;
 import be.cytomine.utils.Task;
 import be.cytomine.utils.filters.SearchParameterEntry;
 
-import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
-import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
-import static be.cytomine.common.repository.model.Role.ROLE_USER;
+import static org.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static org.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static org.cytomine.common.repository.model.Role.ROLE_USER;
 import static org.springframework.security.acls.domain.BasePermission.ADMINISTRATION;
 import static org.springframework.security.acls.domain.BasePermission.READ;
 

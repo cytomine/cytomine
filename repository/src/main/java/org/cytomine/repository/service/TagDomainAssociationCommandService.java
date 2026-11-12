@@ -10,6 +10,17 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cytomine.common.repository.model.command.payload.request.TagDomainAssociationCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
+import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
+import org.cytomine.common.repository.model.command.request.CreateTagDomainAssociationCommand;
+import org.cytomine.common.repository.model.command.request.DeleteCommandRequest;
+import org.cytomine.common.repository.model.command.request.DeleteTagDomainAssociationCommand;
+import org.cytomine.common.repository.model.command.request.UpdateCommandRequest;
+import org.cytomine.common.repository.model.command.request.UpdateTagDomainAssociationCommand;
+import org.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
+import org.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTagDomainAssociation;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.TagDomainAssociationMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -18,18 +29,6 @@ import org.cytomine.repository.persistence.TagRepository;
 import org.cytomine.repository.persistence.entity.TagDomainAssociationEntity;
 import org.cytomine.repository.persistence.entity.TagEntity;
 import org.springframework.stereotype.Component;
-
-import be.cytomine.common.repository.model.command.payload.request.TagDomainAssociationCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
-import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
-import be.cytomine.common.repository.model.command.request.CreateTagDomainAssociationCommand;
-import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
-import be.cytomine.common.repository.model.command.request.DeleteTagDomainAssociationCommand;
-import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
-import be.cytomine.common.repository.model.command.request.UpdateTagDomainAssociationCommand;
-import be.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
-import be.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTagDomainAssociation;
 
 @Component
 @RequiredArgsConstructor

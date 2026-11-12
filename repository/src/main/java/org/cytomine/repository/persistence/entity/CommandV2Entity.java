@@ -9,11 +9,10 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.cytomine.common.repository.model.command.request.CommandV2Request;
 import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-
-import be.cytomine.common.repository.model.command.request.CommandV2Request;
 
 @Data
 @AllArgsConstructor

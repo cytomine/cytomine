@@ -9,23 +9,23 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.user.payload.CreateUser;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.user.payload.CreateUser;
 import be.cytomine.domain.security.User;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.security.UserService;
 
-import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
-import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
-import static be.cytomine.common.repository.model.Role.ROLE_USER;
+import static org.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static org.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static org.cytomine.common.repository.model.Role.ROLE_USER;
 
 /**
  * Synchronizes the Cytomine user record with the JWT identity on every authentication success. All

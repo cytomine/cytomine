@@ -9,8 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
-
-import be.cytomine.common.repository.model.HasTimestampCUD;
+import org.cytomine.common.repository.model.HasTimestampCUD;
 
 @Entity(name = "relation")
 @Getter

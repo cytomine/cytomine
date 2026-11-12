@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.time.DateUtils;
 import org.assertj.core.api.Assertions;
+import org.cytomine.common.PostGisTestConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorato
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;

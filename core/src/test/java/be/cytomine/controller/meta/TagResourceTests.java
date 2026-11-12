@@ -7,6 +7,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.http.TagHttpContract;
+import org.cytomine.common.repository.model.command.Commands;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TagResponse;
+import org.cytomine.common.repository.model.tag.payload.CreateTag;
+import org.cytomine.common.repository.model.tag.payload.UpdateTag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,13 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.TagHttpContract;
-import be.cytomine.common.repository.model.command.Commands;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TagResponse;
-import be.cytomine.common.repository.model.tag.payload.CreateTag;
-import be.cytomine.common.repository.model.tag.payload.UpdateTag;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.meta.Tag;

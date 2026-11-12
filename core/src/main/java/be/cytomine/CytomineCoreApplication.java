@@ -13,7 +13,9 @@ import be.cytomine.config.properties.ApplicationProperties;
 @EnableJpaRepositories("be.cytomine.repository")
 @EntityScan("be.cytomine.domain")
 @EnableConfigurationProperties(ApplicationProperties.class)
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"be.cytomine", "org.cytomine.common.mapper",
+    "org.cytomine.common.serializer", "org.cytomine.common.security", "org.cytomine.common.config.security",
+    "org.cytomine.common.keycloak", "org.cytomine.common.repository.utils", "org.cytomine.common.utils"})
 public class CytomineCoreApplication {
     public static void main(String[] args) {
         SpringApplication.run(CytomineCoreApplication.class, args);

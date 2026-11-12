@@ -10,6 +10,17 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
+import org.cytomine.common.repository.model.command.request.CreateTermCommand;
+import org.cytomine.common.repository.model.command.request.DeleteCommandRequest;
+import org.cytomine.common.repository.model.command.request.DeleteTermCommand;
+import org.cytomine.common.repository.model.command.request.UpdateCommandRequest;
+import org.cytomine.common.repository.model.command.request.UpdateTermCommand;
+import org.cytomine.common.repository.model.term.payload.CreateTerm;
+import org.cytomine.common.repository.model.term.payload.UpdateTerm;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -17,18 +28,6 @@ import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.springframework.stereotype.Component;
-
-import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
-import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
-import be.cytomine.common.repository.model.command.request.CreateTermCommand;
-import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
-import be.cytomine.common.repository.model.command.request.DeleteTermCommand;
-import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
-import be.cytomine.common.repository.model.command.request.UpdateTermCommand;
-import be.cytomine.common.repository.model.term.payload.CreateTerm;
-import be.cytomine.common.repository.model.term.payload.UpdateTerm;
 
 @Component
 @RequiredArgsConstructor

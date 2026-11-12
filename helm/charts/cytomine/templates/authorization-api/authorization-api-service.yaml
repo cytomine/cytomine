@@ -7,5 +7,5 @@ spec:
     app: authorization-api
   ports:
     - name: http
-      port: {{ .Values.authorizationApi.port }}
+      port: {{ .Values.authorization_api.port }}
       protocol: TCP

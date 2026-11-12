@@ -24,8 +24,6 @@ COPY ./registry-client/build.gradle /app/registry-client/build.gradle
 COPY ./registry-client/src /app/registry-client/src
 COPY ./repository/build.gradle /app/repository/build.gradle
 COPY ./repository/src /app/repository/src
-COPY ./resource-server/build.gradle /app/resource-server/build.gradle
-COPY ./resource-server/src /app/resource-server/src
 COPY ./settings.gradle /app/settings.gradle
 
 ARG CORE_VERSION

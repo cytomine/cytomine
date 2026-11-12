@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Import;
 
-@SpringBootApplication(scanBasePackages = {"org.cytomine.authorizationapi", "be.cytomine.common.mapper",
-    "be.cytomine.common.config.security", "be.cytomine.common.serialization"})
+@SpringBootApplication(scanBasePackages = {"org.cytomine.authorizationapi", "org.cytomine.common.mapper",
+    "org.cytomine.common.config.security", "org.cytomine.common.security", "org.cytomine.common.serialization"})
 @Import({ObjectMapperFactory.class})
 @ConfigurationPropertiesScan
 public class AuthorizationApiApp {

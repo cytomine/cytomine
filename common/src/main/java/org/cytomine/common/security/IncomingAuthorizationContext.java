@@ -1,4 +1,4 @@
-package be.cytomine.config.security;
+package org.cytomine.common.security;
 
 import java.util.Optional;
 
@@ -14,19 +14,16 @@ import java.util.Optional;
  */
 public final class IncomingAuthorizationContext {
 
-    public record Headers(String authorization, String date, String contentMd5, String contentType) {
-    }
-
     private static final ThreadLocal<Headers> HEADERS = new ThreadLocal<>();
 
     private IncomingAuthorizationContext() {
     }
 
-    static void set(Headers headers) {
+    public static void set(Headers headers) {
         HEADERS.set(headers);
     }
 
-    static void clear() {
+    public static void clear() {
         HEADERS.remove();
     }
 
@@ -50,5 +47,8 @@ public final class IncomingAuthorizationContext {
         } finally {
             HEADERS.remove();
         }
+    }
+
+    public record Headers(String authorization, String date, String contentMd5, String contentType) {
     }
 }

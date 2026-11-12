@@ -9,11 +9,10 @@ import java.util.stream.IntStream;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.security.IncomingAuthorizationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.config.security.IncomingAuthorizationContext;
-import be.cytomine.config.security.IncomingAuthorizationContext.Headers;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.repository.image.ImageInstanceRepository;
@@ -44,7 +43,8 @@ public class ProjectFromSearchAsyncService {
     private final ImageInstanceService imageInstanceService;
 
     @Async
-    public void run(Long taskId, Long projectId, String query, List<String> filters, Headers headers) {
+    public void run(Long taskId, Long projectId, String query, List<String> filters,
+        IncomingAuthorizationContext.Headers headers) {
         Task task = taskService.get(taskId);
         Project project = task != null && projectId != null
             ? projectRepository.findById(projectId).orElse(null)

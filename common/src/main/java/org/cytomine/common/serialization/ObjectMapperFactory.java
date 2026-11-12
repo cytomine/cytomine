@@ -1,4 +1,4 @@
-package org.cytomine.repository.http.serialization;
+package org.cytomine.common.serialization;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;

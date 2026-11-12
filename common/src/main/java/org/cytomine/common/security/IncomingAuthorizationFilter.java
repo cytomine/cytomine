@@ -1,4 +1,4 @@
-package be.cytomine.config.security;
+package org.cytomine.common.security;
 
 import java.io.IOException;
 

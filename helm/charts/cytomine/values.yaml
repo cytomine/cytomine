@@ -177,7 +177,7 @@ core:
   # Comma-separated suffixes identifying external (LS-AAI) users whose project
   # memberships are provisioned from IAM, e.g. "@lifescience-ri.eu".
   # Empty by default: no user is considered external unless a deployment sets it.
-  external_username_suffixes: ""
+  external_username_suffixes: ''
   resources:
     requests:
       memory: 2Gi
@@ -322,6 +322,7 @@ authorization_api:
       memory: 1Gi
       cpu: 1000m
       ephemeral-storage: 512Mi
+  cytomine_permissions.yaml:
 
 #
 # Kubernetes things

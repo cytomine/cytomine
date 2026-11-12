@@ -48,7 +48,7 @@ spec:
             - name: temp
               mountPath: /fix
           resources:
-            {{- toYaml .Values.authorization-api.resources | nindent 12 }}
+            {{- toYaml .Values.authorization_api.resources | nindent 12 }}
       containers:
         - name: authorization-api
           image: "{{ .Values.images.authorization_api }}"

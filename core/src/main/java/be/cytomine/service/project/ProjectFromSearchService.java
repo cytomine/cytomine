@@ -8,10 +8,9 @@ import org.cytomine.common.repository.http.OntologyHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.ontology.payload.CreateOntology;
+import org.cytomine.common.security.IncomingAuthorizationContext;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.config.security.IncomingAuthorizationContext;
-import be.cytomine.config.security.IncomingAuthorizationContext.Headers;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.project.ProjectFromSearchRequest;
 import be.cytomine.dto.project.ProjectFromSearchResponse;
@@ -61,7 +60,7 @@ public class ProjectFromSearchService {
         Task task = taskService.createNewTask(project, userId, false);
 
         List<String> filters = request.filters() != null ? request.filters() : List.of();
-        Headers headers = IncomingAuthorizationContext.get().orElse(null);
+        IncomingAuthorizationContext.Headers headers = IncomingAuthorizationContext.get().orElse(null);
         projectFromSearchAsyncService.run(task.getId(), project.getId(), request.query(), filters, headers);
 
         return new ProjectFromSearchResponse(

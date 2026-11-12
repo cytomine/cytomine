@@ -78,14 +78,14 @@ class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRol
         String username = getUsername(userId);
         String stringResultGuest = mockMvc.perform(
                 put(getApiURL() + format("/define/%s/role/%s", targetUserId, Role.ROLE_GUEST)).with(
-                    authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
+                        authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
         Set<UserRoleResponse> resultGuest = getObjectMapper().readValue(stringResultGuest, new TypeReference<>() {
         });
         assertEquals(4, resultGuest.size());
         String stringResultAdmin = mockMvc.perform(
                 put(getApiURL() + format("/define/%s/role/%s", targetUserId, Role.ROLE_SUPER_ADMIN)).with(
-                    authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
+                        authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
         Set<UserRoleResponse> resultAdmin = getObjectMapper().readValue(stringResultAdmin, new TypeReference<>() {
         });

@@ -1,6 +1,5 @@
 package org.cytomine.common.config.security;
 
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;

@@ -3,7 +3,6 @@ export default {
   DIGITAL_ZOOM_INCREMENT: 4,
   CORE_URL: null,
   IAM_URL: null,
-  CORE_CLIENT_NAME: null,
   PIMS_URL: null,
   APPENGINE_URL: null,
   CBIR_URL: null,

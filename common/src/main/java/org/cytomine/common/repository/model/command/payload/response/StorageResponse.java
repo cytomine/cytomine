@@ -13,8 +13,7 @@ public record StorageResponse(
     Optional<LocalDateTime> updated,
     Optional<LocalDateTime> deleted
 ) implements ApplyCommandResponse {
-    @Override
-    public DataType getDataType() {
+    @Override public DataType getDataType() {
         return DataType.STORAGE;
     }
 }

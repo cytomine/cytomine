@@ -36,6 +36,8 @@ import org.springframework.stereotype.Component;
 @Getter
 public class TagCommandService
     implements CRUDCommandService<CreateTag, UpdateTag, TagCommandPayload, TagEntity, TagResponse> {
+    @Setter
+    private ApplyCommandService applyCommandService;
     private final ACLService aclService;
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
@@ -44,8 +46,6 @@ public class TagCommandService
     private final TagDomainAssociationCommandService tagDomainAssociationCommandService;
     private final TagDomainAssociationRepository tagDomainAssociationRepository;
     private final UserRepository userRepository;
-    @Setter
-    private ApplyCommandService applyCommandService;
 
     @Override
     public TagEntity updateEntityWithEntity(TagEntity entity, UpdateTag payload, Timestamp now) {

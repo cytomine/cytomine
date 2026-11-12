@@ -16,7 +16,7 @@ export function getKeycloak() {
     const initOptions = {
       url: url,
       realm: 'cytomine',
-        clientId: constants.CORE_CLIENT_NAME,
+      clientId: 'core',
       enableLogging: true
     };
     _keycloak = new Keycloak(initOptions);

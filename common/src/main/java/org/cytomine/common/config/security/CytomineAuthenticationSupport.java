@@ -16,6 +16,9 @@ public final class CytomineAuthenticationSupport {
     private CytomineAuthenticationSupport() {
     }
 
+    public record Credentials(String accessKey, String signature) {
+    }
+
     public static Optional<Credentials> parse(String authorization) {
         if (authorization == null
             || !authorization.startsWith(SCHEME)
@@ -57,8 +60,5 @@ public final class CytomineAuthenticationSupport {
         // In order to match the client signature, we generate it with an empty value.
         // => it would be better to improve the java client to set a valid content type.
         return providedSignature.equals(generateSignature(method, contentMd5, "", date, privateKey));
-    }
-
-    public record Credentials(String accessKey, String signature) {
     }
 }

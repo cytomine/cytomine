@@ -10,6 +10,12 @@ public enum Language {
     DUTCH("NL"),
     SPANISH("ES");
 
+    private final String code;
+
+    Language(String code) {
+        this.code = code;
+    }
+
     private static final Map<String, Language> map;
 
     static {
@@ -17,12 +23,6 @@ public enum Language {
         for (Language l : Language.values()) {
             map.put(l.code, l);
         }
-    }
-
-    private final String code;
-
-    Language(String code) {
-        this.code = code;
     }
 
     public static Language findByCode(String c) {

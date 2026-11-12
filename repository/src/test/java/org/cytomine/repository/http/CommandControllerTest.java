@@ -35,13 +35,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import({PostGisTestConfiguration.class, SecurityMockMvcTestConfiguration.class})
 public class CommandControllerTest {
-    private final String apiUrl = CommandHttpContract.ROOT_PATH;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper objectMapper;
+
+    private final String apiUrl = CommandHttpContract.ROOT_PATH;
 
     private long createUser() {
         String username = UUID.randomUUID().toString();

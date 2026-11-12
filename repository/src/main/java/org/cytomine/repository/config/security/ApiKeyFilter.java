@@ -20,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
 public class ApiKeyFilter extends OncePerRequestFilter {
 
     private final Logger log = LoggerFactory.getLogger(ApiKeyFilter.class);

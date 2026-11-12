@@ -24,7 +24,7 @@ COPY ./settings.gradle /app/settings.gradle
 RUN --mount=type=cache,target=/opt/gradle/.gradle,id=gradle-cache,sharing=locked \
     gradle :authorization-api:bootJar --no-daemon --build-cache --console=verbose
 
-COPY ./cytomine_permissions.yaml /app/cytomine_permissions.yaml
+COPY ./cytomine_permissions.yml /app/cytomine_permissions.yml
 
 FROM ${PROXY_CACHE}/eclipse-temurin:${JAVA_VERSION} AS production
 WORKDIR /app

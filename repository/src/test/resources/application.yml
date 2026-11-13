@@ -34,6 +34,7 @@ application:
   adminEmail: ${ADMIN_EMAIL:dev@cytomine.com}
   imageServerPublicKey: ${IMAGE_SERVER_PUBLIC_KEY:imageServerPublicKey}
   imageServerPrivateKey: ${IMAGE_SERVER_PRIVATE_KEY:imageServerPrivateKey}
+  authorizationApiURL: ${AUTHORIZATION_API_URL:http://127.0.0.1:8083}
 
 jwt:
   auth:

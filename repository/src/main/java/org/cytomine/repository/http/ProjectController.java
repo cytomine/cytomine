@@ -25,6 +25,7 @@ import org.cytomine.repository.service.ProjectCommandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,6 +50,7 @@ public class ProjectController implements ProjectHttpContract {
         return bounds.flatMap(OptionallyBoundedFilter::max).orElse(null);
     }
 
+    @PreAuthorize("@authorizationVerifier.hasInstancePermission('CAN_CREATE_PROJECT')")
     @Override
     public Optional<HttpCommandResponse> create(@RequestBody CreateProject payload) {
         return service.create(currentUserService.getCurrentUserId(), payload, LocalDateTime.now().truncatedTo(MICROS));

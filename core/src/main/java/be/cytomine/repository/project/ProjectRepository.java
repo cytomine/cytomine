@@ -94,4 +94,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     List<Project> findByNameIn(List<String> names);
 
+    List<Project> findByJoinTokenIn(List<String> joinTokens);
+
+    Optional<Project> findByJoinToken(String joinToken);
+
 }

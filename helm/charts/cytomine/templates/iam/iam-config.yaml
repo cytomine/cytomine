@@ -12,8 +12,6 @@ data:
   KC_HTTP_ENABLED: "true"
   KC_HTTP_PORT: "{{ .Values.iam.port }}"
   KC_HOSTNAME_STRICT: "false"
-  KC_HOSTNAME_STRICT_HTTPS: "false"
-  KC_HOSTNAME_STRICT_BACKCHANNEL: "true"
   KC_FEATURES: token-exchange
   KC_DB: postgres
   KC_DB_USERNAME: iam

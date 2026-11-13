@@ -2,63 +2,48 @@ package be.cytomine.unit.service.security;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.user.payload.CreateUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
 import be.cytomine.mapper.UserMapper;
-import be.cytomine.repository.project.ProjectRepository;
-import be.cytomine.repository.security.SecRoleRepository;
-import be.cytomine.repository.security.SecUserSecRoleRepository;
-import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.project.ProjectMemberService;
-import be.cytomine.service.security.IamProjectMembershipService;
+import be.cytomine.service.security.UserService;
 import be.cytomine.utils.AuthenticationSuccessListener;
 
-import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationSuccessListenerTest {
 
-    private static final String INTERNAL_USERNAME = "flora";
-
-    private static final String EXTERNAL_USERNAME = "flora@lifescience-ri.eu";
+    private static final String USERNAME = "flora";
 
     private final UUID userReference = UUID.randomUUID();
-
-    @Mock
-    private ApplicationContext applicationContext;
 
     @Mock
     private CurrentRoleService currentRoleService;
 
     @Mock
-    private SecUserSecRoleRepository secSecUserSecRoleRepository;
+    private UserService userService;
 
     @Mock
-    private SecRoleRepository secRoleRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private ProjectRepository projectRepository;
+    private UserHttpContract userHttpContract;
 
     @Mock
     private ProjectMemberService projectMemberService;
@@ -66,113 +51,83 @@ public class AuthenticationSuccessListenerTest {
     @Mock
     private UserMapper userMapper;
 
-    @Mock
-    private IamProjectMembershipService iamProjectMembershipService;
-
     private AuthenticationSuccessListener listener;
 
     @BeforeEach
     public void setUp() {
-        listener = new AuthenticationSuccessListener(applicationContext, currentRoleService,
-            secSecUserSecRoleRepository, secRoleRepository, null, userRepository, projectRepository,
-            projectMemberService, userMapper, iamProjectMembershipService);
-        org.mockito.Mockito.doReturn(listener)
-            .when(applicationContext).getBean(AuthenticationSuccessListener.class);
+        listener = new AuthenticationSuccessListener(currentRoleService, userService, userHttpContract,
+            projectMemberService, userMapper);
     }
 
-    @DisplayName("The project membership of a local user is not synchronized with IAM")
+    @DisplayName("A user already linked to its token subject is synchronized with its claims")
     @Test
-    public void localUserMembershipIsNotSynchronizedWithIam() {
-        User user = internalUser();
-        when(userRepository.findByReference(userReference.toString())).thenReturn(Optional.of(user));
+    public void linkedUserIsSynchronizedWithTokenClaims() {
+        User user = user();
+        when(userService.findUserByReference(userReference.toString())).thenReturn(Optional.of(user));
 
-        listener.onApplicationEvent(authenticationEventOf(INTERNAL_USERNAME));
+        listener.onApplicationEvent(
+            authenticationEventOf(USERNAME, List.of("alpha"), List.of("join-token-1")));
 
-        verify(iamProjectMembershipService, never()).findProjects(INTERNAL_USERNAME);
-        verifyNoInteractions(projectMemberService);
+        verify(userService).syncCumulativeRole(user, Set.of());
+        verify(projectMemberService).syncProjectMembership(user, List.of("alpha"));
+        verify(projectMemberService).syncJoinTokenMembership(user, List.of("join-token-1"));
     }
 
-    @DisplayName("The membership of an external user matching IAM provisioning is left untouched")
+    @DisplayName("A user known only by its token subject name is linked and synchronized")
     @Test
-    public void externalUserMembershipMatchingIamIsLeftUntouched() {
-        Project project = project("alpha", 1L);
-        User user = externalUser();
-        when(userRepository.findByReference(userReference.toString())).thenReturn(Optional.of(user));
-        when(iamProjectMembershipService.isExternal(EXTERNAL_USERNAME)).thenReturn(true);
-        when(iamProjectMembershipService.findProjects(EXTERNAL_USERNAME)).thenReturn(List.of("alpha"));
-        when(projectRepository.findByNameIn(List.of("alpha"))).thenReturn(List.of(project));
-        when(projectRepository.findAllProjectForUser(EXTERNAL_USERNAME)).thenReturn(List.of(project));
+    public void unlinkedUserIsLinkedToItsTokenSubject() {
+        User user = user();
+        when(userService.findUserByUsername(userReference.toString())).thenReturn(Optional.of(user));
+        when(userService.findUserByReference(userReference.toString())).thenReturn(Optional.empty());
 
-        listener.onApplicationEvent(authenticationEventOf(EXTERNAL_USERNAME));
+        listener.onApplicationEvent(authenticationEventOf(USERNAME, List.of(), List.of()));
 
-        verifyNoInteractions(projectMemberService);
+        verify(userService).save(user);
+        verify(userService).syncCumulativeRole(user, Set.of());
+        verify(projectMemberService).syncProjectMembership(user, List.of());
+        verify(projectMemberService).syncJoinTokenMembership(user, List.of());
     }
 
-    @DisplayName("The membership of an external user not present in IAM provisioning is removed")
+    @DisplayName("An unknown user is self-registered then synchronized")
     @Test
-    public void membershipOfExternalUserAbsentFromIamIsRemoved() {
-        Project alphaProject = project("alpha", 1L);
-        Project betaProject = project("beta", 2L);
-        User user = externalUser();
-        when(userRepository.findByReference(userReference.toString())).thenReturn(Optional.of(user));
-        when(iamProjectMembershipService.isExternal(EXTERNAL_USERNAME)).thenReturn(true);
-        when(iamProjectMembershipService.findProjects(EXTERNAL_USERNAME)).thenReturn(List.of("alpha"));
-        when(projectRepository.findByNameIn(List.of("alpha"))).thenReturn(List.of(alphaProject));
-        when(projectRepository.findAllProjectForUser(EXTERNAL_USERNAME)).thenReturn(
-            List.of(alphaProject, betaProject));
+    public void unknownUserIsSelfRegisteredAndSynchronized() {
+        User savedUser = user();
+        savedUser.setReference(userReference.toString());
+        when(userService.findUserByUsername(userReference.toString())).thenReturn(Optional.empty());
+        when(userService.findUserByReference(userReference.toString()))
+            .thenReturn(Optional.empty())
+            .thenReturn(Optional.of(savedUser));
+        when(userMapper.map(savedUser)).thenReturn(userResponse());
 
-        listener.onApplicationEvent(authenticationEventOf(EXTERNAL_USERNAME));
+        listener.onApplicationEvent(authenticationEventOf(USERNAME, List.of("alpha"), List.of()));
 
-        verify(projectMemberService).deleteUserFromProjectWithAdmin(user, betaProject, false);
-        verifyNoMoreInteractions(projectMemberService);
+        verify(userHttpContract).selfRegister(any(CreateUser.class));
+        verify(projectMemberService).syncProjectMembership(savedUser, List.of("alpha"));
+        verify(projectMemberService).syncJoinTokenMembership(savedUser, List.of());
+        verify(currentRoleService).hasCurrentUserAdminRole(any(UserResponse.class));
     }
 
-    @DisplayName("The IAM provisioning of an external user without membership in core is granted")
-    @Test
-    public void iamProvisioningAbsentFromCoreMembershipIsGranted() {
-        Project alphaProject = project("alpha", 1L);
-        Project betaProject = project("beta", 2L);
-        User user = externalUser();
-        when(userRepository.findByReference(userReference.toString())).thenReturn(Optional.of(user));
-        when(iamProjectMembershipService.isExternal(EXTERNAL_USERNAME)).thenReturn(true);
-        when(iamProjectMembershipService.findProjects(EXTERNAL_USERNAME)).thenReturn(List.of("alpha", "beta"));
-        when(projectRepository.findByNameIn(List.of("alpha", "beta"))).thenReturn(
-            List.of(alphaProject, betaProject));
-        when(projectRepository.findAllProjectForUser(EXTERNAL_USERNAME)).thenReturn(List.of(alphaProject));
-
-        listener.onApplicationEvent(authenticationEventOf(EXTERNAL_USERNAME));
-
-        verify(projectMemberService).addUserToProjectWithAdmin(EXTERNAL_USERNAME, betaProject, false);
-        verifyNoMoreInteractions(projectMemberService);
-    }
-
-    private User internalUser() {
+    private User user() {
         User user = new User();
-        user.setUsername(INTERNAL_USERNAME);
-        user.setReference(userReference.toString());
+        user.setUsername(USERNAME);
         return user;
     }
 
-    private User externalUser() {
-        User user = new User();
-        user.setUsername(EXTERNAL_USERNAME);
-        user.setReference(userReference.toString());
-        return user;
+    private UserResponse userResponse() {
+        return new UserResponse(1L, USERNAME, null, Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), false, Optional.empty(), Optional.empty(), Optional.empty(), null,
+            Optional.empty(), Optional.empty(), Set.of());
     }
 
-    private Project project(String name, long id) {
-        Project project = new Project();
-        project.setName(name);
-        project.setId(id);
-        return project;
-    }
-
-    private AuthenticationSuccessEvent authenticationEventOf(String username) {
+    private AuthenticationSuccessEvent authenticationEventOf(String username, List<String> projects,
+        List<String> joinTokens) {
         Jwt jwt = Jwt.withTokenValue("token")
             .header("alg", "none")
             .header("typ", "JWT")
             .subject(userReference.toString())
             .claim("preferred_username", username)
+            .claim("projects", projects)
+            .claim("lti_join_tokens", joinTokens)
             .build();
         return new AuthenticationSuccessEvent(new JwtAuthenticationToken(jwt));
     }

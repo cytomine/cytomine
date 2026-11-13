@@ -19,6 +19,7 @@ import ListImageGroups from '@/components/image-group/ListImageGroups.vue';
 import ListImages from '@/components/image/ListImages.vue';
 import ListOntologies from '@/components/ontology/ListOntologies.vue';
 import ListProjects from '@/components/project/ListProjects.vue';
+import LtiContentSelection from '@/components/lti/LtiContentSelection.vue';
 import MemberActivityDetails from '@/components/project/activity/MemberActivityDetails.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 import ProjectActivity from '@/components/project/ProjectActivity.vue';
@@ -153,6 +154,10 @@ const routes = [
   {
     path: '/history',
     component: UserHistoryPage,
+  },
+  {
+    path: '/lti/content-selection',
+    component: LtiContentSelection,
   },
   {
     path: '*',

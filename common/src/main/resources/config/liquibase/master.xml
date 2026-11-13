@@ -148,4 +148,7 @@
 
     <include file="/config/liquibase/changelog/2026-10-01-project-id-sequence.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-10-13-project-join-token.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

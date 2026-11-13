@@ -52,6 +52,23 @@ import App from './App.vue';
 
 Vue.config.productionTip = false;
 
+// When Keycloak ends a flow it did not start from this page (e.g. an LTI launch brokered through
+// /lti/login-init), it redirects here with OIDC response parameters in the query string
+// (?session_state=...&iss=...&code=...). keycloak-js uses the fragment response mode and ignores them,
+// so they would end up in the redirect_uri of its own login request, which Keycloak 26 rejects
+// ("Redirect URI rejected: contains forbidden OIDC parameter 'code' in query"). Remove them before
+// initializing Keycloak, but keep other parameters (e.g. the deep-linking picker's ctx).
+function stripOidcCallbackParams() {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has('code')) {
+    return;
+  }
+  ['code', 'state', 'session_state', 'iss'].forEach(param => url.searchParams.delete(param));
+  window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
+}
+
+stripOidcCallbackParams();
+
 // Load configuration before initializing Keycloak
 axios.get('/configuration.json').then(response => {
   const settings = response.data;

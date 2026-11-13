@@ -75,6 +75,7 @@ services:
       - core
       - iam
       - pims
+      - repository
     volumes:
       - /etc/localtime:/etc/localtime
     environment:
@@ -144,7 +145,7 @@ services:
       - iam-db
     ports:
       - 8100:8100
-    command: ["start-dev", "--http-port=8100"]
+    command: [ "start-dev", "--http-port=8100" ]
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
       KC_DB_PASSWORD: password
@@ -240,6 +241,7 @@ services:
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
       IAM_URL: http://iam:8100
       IAM_EXTERNAL_URL: http://127.0.0.1:8100
+      CYTOMINE_IAM_EXTERNALUSERNAME_SUFFIXES: ${CYTOMINE_IAM_EXTERNALUSERNAME_SUFFIXES:-}
       SERVER_URL: http://127.0.0.1:8080
       PIMS_URL: http://pims:5000
       CBIR_URL: http://cbir:6000
@@ -309,6 +311,8 @@ services:
       - iam
     ports:
       - 8081:8081
+    volumes:
+      - /etc/localtime:/etc/localtime
     environment:
       IMAGE_SERVER_PRIVATE_KEY: d70607f5-c478-403c-be11-3dbc1716d1cf
       IMAGE_SERVER_PUBLIC_KEY: 9a8b8369-2446-44cb-b0af-604a74e1dcdb
@@ -320,6 +324,24 @@ services:
     networks:
       host_network:
         ipv4_address: 172.16.238.18
+
+  authorization-api:
+    image: cytomine/authorization-api:latest
+    restart: unless-stopped
+    depends_on:
+      - iam
+    ports:
+      - 8083:8083
+    volumes:
+      - ${PWD}/cytomine_permissions.yml:/app/cytomine_permissions.yml:ro
+      - /etc/localtime:/etc/localtime
+    environment:
+      POSTGIS_HOST: postgis
+      IAM_URL: http://iam:8100
+      IAM_EXTERNAL_URL: http://127.0.0.1:8100
+    networks:
+      host_network:
+        ipv4_address: 172.16.238.20
 
   meilisearch:
     image: getmeili/meilisearch:v1.43.0
@@ -369,19 +391,19 @@ services:
         ipv4_address: 172.16.238.15
 
 volumes:
-  k3s-server: {}
-  k3s-agent: {}
-  mongo-data: {}
-  postgis-data: {}
-  registry-data: {}
-  redis-data: {}
-  iam-db-data: {}
-  app-engine-db-data: {}
-  app-engine-data: {}
-  app-engine-shared-inputs: {}
-  app-engine-shared-datasets: {}
-  cbir-data: {}
-  meilisearch-data: {}
+  k3s-server: { }
+  k3s-agent: { }
+  mongo-data: { }
+  postgis-data: { }
+  registry-data: { }
+  redis-data: { }
+  iam-db-data: { }
+  app-engine-db-data: { }
+  app-engine-data: { }
+  app-engine-shared-inputs: { }
+  app-engine-shared-datasets: { }
+  cbir-data: { }
+  meilisearch-data: { }
 
 networks:
   host_network:

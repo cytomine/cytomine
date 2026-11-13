@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,8 +29,6 @@ import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorato
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.image.ImageInstance;

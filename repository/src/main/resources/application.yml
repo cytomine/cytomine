@@ -26,9 +26,9 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${IAM_EXTERNAL_URL:http://127.0.0.1:8070}/iam/realms/cytomine
+          issuer-uri: ${IAM_EXTERNAL_URL:http://127.0.0.1:8100}/iam/realms/cytomine
           jws-algorithms: RS256
-          jwk-set-uri: ${IAM_URL:http://127.0.0.1:8070}/iam/realms/cytomine/protocol/openid-connect/certs
+          jwk-set-uri: ${IAM_URL:http://127.0.0.1:8100}/iam/realms/cytomine/protocol/openid-connect/certs
 
 application:
   adminEmail: ${ADMIN_EMAIL:dev@cytomine.com}

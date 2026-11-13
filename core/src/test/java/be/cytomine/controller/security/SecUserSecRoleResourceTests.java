@@ -6,6 +6,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.http.UserRoleHttpContract;
+import org.cytomine.common.repository.model.command.Commands;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,11 +24,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.UserRoleHttpContract;
-import be.cytomine.common.repository.model.command.Commands;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 

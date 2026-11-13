@@ -57,7 +57,7 @@ public class ProjectController implements ProjectHttpContract {
     @Override
     public Optional<ProjectResponse> read(@PathVariable long id) {
         long userId = currentUserService.getCurrentUserId();
-        return repository.findByIdAndDeletedNull(id)
+        return service.get(id)
             .filter(project -> aclService.canReadProject(userId, project.getId())).map(service::mapToResponse);
     }
 

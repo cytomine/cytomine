@@ -1,4 +1,4 @@
-package be.cytomine.controller.repository;
+package org.cytomine.common.security;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Pageable;

@@ -584,6 +584,22 @@ class Cytomine:
 
         return collection
 
+    def post_search_collection(
+        self,
+        collection: "Collection",
+        uri: str,
+        append_mode: bool = False,
+    ) -> "bool | Collection":
+        response = self._post(uri, data=collection.to_search_body())
+        if response.status_code == requests.codes.ok:
+            collection = collection.populate(response.json(), append_mode)
+
+        self._log_response(response, collection)
+        if not response.status_code == requests.codes.ok:
+            return False
+
+        return collection
+
     def _put(
         self,
         uri: str,

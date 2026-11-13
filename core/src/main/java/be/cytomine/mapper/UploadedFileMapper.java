@@ -2,11 +2,10 @@ package be.cytomine.mapper;
 
 import java.util.Optional;
 
+import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 
 @Mapper(componentModel = "spring")
 public interface UploadedFileMapper {

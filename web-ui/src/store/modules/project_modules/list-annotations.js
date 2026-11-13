@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 export default {
   namespaced: true,
 
@@ -23,7 +21,6 @@ export default {
       },
       fromDate: null,
       toDate: null,
-
 
       currentPages: {} // mapping of type {idProp: currentPage}
     };
@@ -77,7 +74,7 @@ export default {
     },
 
     setCurrentPage(state, { prop, page }) {
-      Vue.set(state.currentPages, prop, page);
+      state.currentPages[prop] = page;
     }
   }
 };

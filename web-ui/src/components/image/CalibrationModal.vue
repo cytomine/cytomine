@@ -5,44 +5,50 @@
       {{ $t('warning-change-applies-in-project-only') }}
     </b-message>
 
-    <b-field :label="$t('resolution')" :type="{'is-danger': this.errors.has('resolution')}" :message="errors.first('resolution')">
-      <b-field :type="{'is-danger': this.errors.has('resolution')}">
-        <b-input v-model="calibrationFieldX" name="resolution" v-validate="'required|decimal|positive'" expanded />
-        <b-select v-model="calibrationFactorX">
-          <option :value="0.001"> {{ $t('nm-per-pixel') }}</option>
-          <option :value="1">{{ $t('um-per-pixel') }}</option>
-          <option :value="1000">{{ $t('mm-per-pixel') }}</option>
-        </b-select>
+    <field :form="form" name="resolution" :validators="resolutionRules" v-slot="{field, state}">
+      <b-field :label="$t('resolution')" :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+        <b-field :type="{'is-danger': !!state.meta.errors.length}">
+          <b-input :model-value="state.value" @update:model-value="field.handleChange" expanded />
+          <b-select v-model="calibrationFactorX">
+            <option :value="0.001"> {{ $t('nm-per-pixel') }}</option>
+            <option :value="1">{{ $t('um-per-pixel') }}</option>
+            <option :value="1000">{{ $t('mm-per-pixel') }}</option>
+          </b-select>
+        </b-field>
       </b-field>
-    </b-field>
+    </field>
 
-    <b-field v-if="this.image.depth > 1" :label="$t('z-resolution')"
-             :type="{'is-danger': this.errors.has('resolution-z')}" :message="errors.first('resolution-z')">
-      <b-field :type="{'is-danger': this.errors.has('resolution-z')}">
-        <b-input v-model="calibrationFieldZ" name="resolution-z" v-validate="'required|decimal|positive'" expanded />
-        <b-select v-model="calibrationFactorZ">
-          <option :value="0.001"> {{ $t('nm-per-slice') }}</option>
-          <option :value="1">{{ $t('um-per-slice') }}</option>
-          <option :value="1000">{{ $t('mm-per-slice') }}</option>
-        </b-select>
+    <field v-if="image.depth > 1" :form="form" name="resolution-z" :validators="resolutionRules" v-slot="{field, state}">
+      <b-field :label="$t('z-resolution')"
+               :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+        <b-field :type="{'is-danger': !!state.meta.errors.length}">
+          <b-input :model-value="state.value" @update:model-value="field.handleChange" expanded />
+          <b-select v-model="calibrationFactorZ">
+            <option :value="0.001"> {{ $t('nm-per-slice') }}</option>
+            <option :value="1">{{ $t('um-per-slice') }}</option>
+            <option :value="1000">{{ $t('mm-per-slice') }}</option>
+          </b-select>
+        </b-field>
       </b-field>
-    </b-field>
+    </field>
 
-    <b-field v-if="this.image.duration > 1" :label="$t('frame-rate')"
-             :type="{'is-danger': this.errors.has('resolution-t')}" :message="errors.first('resolution-t')">
-      <b-field :type="{'is-danger': this.errors.has('resolution-t')}">
-        <b-input v-model="calibrationFieldT" name="resolution-t" v-validate="'required|decimal|positive'" expanded />
-        <p class="control">
-          <span class="button is-static">{{$t('frame-per-second')}}</span>
-        </p>
+    <field v-if="image.duration > 1" :form="form" name="resolution-t" :validators="resolutionRules" v-slot="{field, state}">
+      <b-field :label="$t('frame-rate')"
+               :type="{'is-danger': !!state.meta.errors.length}" :message="state.meta.errors[0]">
+        <b-field :type="{'is-danger': !!state.meta.errors.length}">
+          <b-input :model-value="state.value" @update:model-value="field.handleChange" expanded />
+          <p class="control">
+            <span class="button is-static">{{$t('frame-per-second')}}</span>
+          </p>
+        </b-field>
       </b-field>
-    </b-field>
+    </field>
 
     <template #footer>
       <button class="button" type="button" @click="$emit('update:active', false)">
         {{$t('button-cancel')}}
       </button>
-      <button class="button is-link" :disabled="errors.any()">
+      <button class="button is-link" :disabled="!isValid">
         {{$t('button-save')}}
       </button>
     </template>
@@ -51,6 +57,9 @@
 </template>
 
 <script>
+import { Field, useForm } from '@tanstack/vue-form';
+
+import { decimal, positive, required, rules, validateForm } from '@/utils/form.js';
 import CytomineModal from '@/components/utils/CytomineModal.vue';
 
 export default {
@@ -59,15 +68,24 @@ export default {
     active: { type: Boolean },
     image: { type: Object }
   },
-  components: { CytomineModal },
-  $_veeValidate: { validator: 'new' },
+  components: { CytomineModal, Field },
+  setup() {
+    const form = useForm({
+      defaultValues: { 'resolution': '', 'resolution-z': '', 'resolution-t': '' }
+    });
+    return {
+      form,
+      isValid: form.useStore(state => state.isValid),
+      // The z and t fields only exist for images that have those dimensions.
+      // Unmounting a `Field` deregisters it, so the rules below apply to
+      // whichever of the three are on screen, exactly as vee-validate did.
+      resolutionRules: { onChange: rules(required, decimal, positive) }
+    };
+  },
   data() {
     return {
-      calibrationFieldX: '',
       calibrationFactorX: 1,
-      calibrationFieldZ: '',
-      calibrationFactorZ: 1,
-      calibrationFieldT: ''
+      calibrationFactorZ: 1
     };
   },
   computed: {
@@ -78,29 +96,31 @@ export default {
   watch: {
     active(val) {
       if (val) {
-        this.calibrationFieldX = this.image.physicalSizeX;
-        this.calibrationFieldZ = this.image.physicalSizeZ;
-        this.calibrationFieldT = this.image.fps;
+        this.form.reset({
+          'resolution': this.image.physicalSizeX,
+          'resolution-z': this.image.physicalSizeZ,
+          'resolution-t': this.image.fps
+        });
       }
     }
   },
   methods: {
     async setResolution() {
-      let result = await this.$validator.validateAll();
-      if (!result) {
+      if (!await validateForm(this.form)) {
         return;
       }
 
+      let values = this.form.state.values;
       let imageName = this.blindMode ? this.image.blindedName : this.image.instanceFilename;
       try {
         let updateImage = this.image.clone();
-        updateImage.physicalSizeX = Number(this.calibrationFieldX) * this.calibrationFactorX;
-        updateImage.physicalSizeY = Number(this.calibrationFieldX) * this.calibrationFactorX;
+        updateImage.physicalSizeX = Number(values['resolution']) * this.calibrationFactorX;
+        updateImage.physicalSizeY = Number(values['resolution']) * this.calibrationFactorX;
         if (this.image.depth > 1) {
-          updateImage.physicalSizeZ = Number(this.calibrationFieldZ) * this.calibrationFactorZ;
+          updateImage.physicalSizeZ = Number(values['resolution-z']) * this.calibrationFactorZ;
         }
         if (this.image.duration > 1) {
-          updateImage.fps = Number(this.calibrationFieldT);
+          updateImage.fps = Number(values['resolution-t']);
         }
         await updateImage.save();
 

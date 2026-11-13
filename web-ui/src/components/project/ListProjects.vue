@@ -1,6 +1,6 @@
 <template>
 <div class="list-projects-wrapper content-wrapper">
-  <b-loading :is-full-page="false" :active="loading" />
+  <b-loading :is-full-page="false" :model-value="loading" />
   <div class="box error" v-if="error">
     <h2> {{ $t('error') }} </h2>
     <p>{{ $t('unexpected-error-info-message') }}</p>
@@ -33,7 +33,7 @@
         </button>
       </div>
 
-      <b-collapse :open="filtersOpened">
+      <b-collapse :model-value="filtersOpened">
         <div class="filters">
           <div class="columns">
             <div class="column filter">
@@ -115,59 +115,57 @@
       <cytomine-table
         :collection="projectCollection"
         class="table-projects"
-        :currentPage.sync="currentPage"
-        :perPage.sync="perPage"
-        :openedDetailed.sync="openedDetails"
-        :sort.sync="sortField"
-        :order.sync="sortOrder"
+        v-model:currentPage="currentPage"
+        v-model:perPage="perPage"
+        v-model:openedDetailed="openedDetails"
+        v-model:sort="sortField"
+        v-model:order="sortOrder"
         :revision="revision"
       >
-        <template #default="{row: project}">
-          <b-table-column field="currentUserRole" label="" centered width="1">
-            <icon-project-member-role
-              :is-manager="project.currentUserRoles?.includes('admin')"
-              :is-representative="project.currentUserRoles?.includes('representative')"
-            />
-          </b-table-column>
+        <b-table-column v-slot="{row: project}" field="currentUserRole" label="" centered width="1">
+          <icon-project-member-role
+            :is-manager="project.currentUserRoles?.includes('admin')"
+            :is-representative="project.currentUserRoles?.includes('representative')"
+          />
+        </b-table-column>
 
-          <b-table-column field="name" :label="$t('name')" sortable width="250">
-            <router-link :to="`/project/${project.id}`">
-              {{ project.name }}
-            </router-link>
-          </b-table-column>
+        <b-table-column v-slot="{row: project}" field="name" :label="$t('name')" sortable width="250">
+          <router-link :to="`/project/${project.id}`">
+            {{ project.name }}
+          </router-link>
+        </b-table-column>
 
-          <b-table-column field="members_count" :label="$t('members')" centered sortable width="150">
-            {{ project.membersCount }}
-          </b-table-column>
+        <b-table-column v-slot="{row: project}" field="members_count" :label="$t('members')" centered sortable width="150">
+          {{ project.membersCount }}
+        </b-table-column>
 
-          <b-table-column field="count_images" :label="$t('images')" centered sortable width="150">
-            <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
-          </b-table-column>
+        <b-table-column v-slot="{row: project}" field="count_images" :label="$t('images')" centered sortable width="150">
+          <router-link :to="`/project/${project.id}/images`">{{ project.numberOfImages }}</router-link>
+        </b-table-column>
 
-          <b-table-column field="count_annotations" :label="$t('user-annotations')" centered sortable width="150">
-            <router-link :to="`/project/${project.id}/annotations?type=user`">
-              {{ project.numberOfAnnotations }}
-            </router-link>
-          </b-table-column>
+        <b-table-column v-slot="{row: project}" field="count_annotations" :label="$t('user-annotations')" centered sortable width="150">
+          <router-link :to="`/project/${project.id}/annotations?type=user`">
+            {{ project.numberOfAnnotations }}
+          </router-link>
+        </b-table-column>
 
-          <b-table-column field="count_reviewed_annotations" :label="$t('reviewed-annotations')" centered sortable width="150">
-            <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
-              {{ project.numberOfReviewedAnnotations }}
-            </router-link>
-          </b-table-column>
+        <b-table-column v-slot="{row: project}" field="count_reviewed_annotations" :label="$t('reviewed-annotations')" centered sortable width="150">
+          <router-link :to="`/project/${project.id}/annotations?type=reviewed`">
+            {{ project.numberOfReviewedAnnotations }}
+          </router-link>
+        </b-table-column>
 
-          <b-table-column field="last_activity" :label="$t('last-activity')" centered sortable width="180">
-            <template v-if="project.lastActivity">
-              {{ formatMomentDate(Number(project.lastActivity), 'll') }}
-            </template>
-          </b-table-column>
+        <b-table-column v-slot="{row: project}" field="last_activity" :label="$t('last-activity')" centered sortable width="180">
+          <template v-if="project.lastActivity">
+            {{ formatMomentDate(Number(project.lastActivity), 'll') }}
+          </template>
+        </b-table-column>
 
-          <b-table-column label=" " centered width="150">
-            <router-link :to="`/project/${project.id}`" class="button is-small is-link">
-              {{$t('button-open')}}
-            </router-link>
-          </b-table-column>
-        </template>
+        <b-table-column v-slot="{row: project}" label=" " centered width="150">
+          <router-link :to="`/project/${project.id}`" class="button is-small is-link">
+            {{$t('button-open')}}
+          </router-link>
+        </b-table-column>
 
         <template #detail="{row: project}">
           <project-details
@@ -195,7 +193,7 @@
     </div>
   </div>
 
-  <add-project-modal :active.sync="creationModal" :ontologies="ontologies" />
+  <add-project-modal v-model:active="creationModal" :ontologies="ontologies" />
 </div>
 </template>
 

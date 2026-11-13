@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Buefy from 'buefy';
 import Vuex from 'vuex';
 
@@ -13,9 +13,6 @@ vi.mock('@/api', () => ({
 }));
 
 describe('SimilarAnnotation.vue', () => {
-  const localVue = createLocalVue();
-  localVue.use(Buefy);
-  localVue.use(Vuex);
 
   const mockTerms = [
     { id: 1, name: 'term1' },
@@ -75,9 +72,11 @@ describe('SimilarAnnotation.vue', () => {
           },
         },
       }),
-      'currentProject/imageModule': () => state.currentProject.imageModule,
-      'currentProject/terms': () => state.currentProject.terms,
-      'currentProject/currentViewer': () => state.currentProject.currentViewer,
+      // Vuex 4 wraps the state object in a new reactive proxy instead of making
+      // it reactive in place, so getters have to read the state they are given.
+      'currentProject/imageModule': storeState => storeState.currentProject.imageModule,
+      'currentProject/terms': storeState => storeState.currentProject.terms,
+      'currentProject/currentViewer': storeState => storeState.currentProject.currentViewer,
     };
 
     mutations = {
@@ -94,16 +93,17 @@ describe('SimilarAnnotation.vue', () => {
     });
 
     wrapper = shallowMount(SimilarAnnotation, {
-      localVue,
-      store,
-      propsData: {
+      props: {
         index: testIndex,
       },
-      mocks: {
-        $t: (msg) => msg,
-        $store: store,
-        $notify: vi.fn(),
-      },
+      global: {
+        plugins: [Buefy, store],
+        mocks: {
+          $t: (msg) => msg,
+          $store: store,
+          $notify: vi.fn(),
+        }
+      }
     });
   });
 
@@ -148,7 +148,8 @@ describe('SimilarAnnotation.vue', () => {
   });
 
   it('should close the window when close button is clicked', async () => {
-    const closeButton = wrapper.find('.button.is-small.close');
+    // The 'back to query annotation' button shares these classes and comes first.
+    const closeButton = wrapper.findAll('.button.is-small.close').at(-1);
     await closeButton.trigger('click');
 
     expect(wrapper.vm.showSimilarAnnotations).toBe(false);

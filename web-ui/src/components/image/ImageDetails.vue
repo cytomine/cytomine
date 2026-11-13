@@ -5,7 +5,7 @@
     <p> {{ $t('unexpected-error-info-message') }} </p>
   </b-message>
   <table v-else class="table">
-    <b-loading :is-full-page="false" :active="loading" class="small" />
+    <b-loading :is-full-page="false" :model-value="loading" class="small" />
     <tbody v-if="!loading">
       <tr v-if="isPropDisplayed('overview')">
         <td class="prop-label">{{$t('overview')}}</td>
@@ -133,7 +133,7 @@
         <template v-if="isPropDisplayed('depth')">
           <td class="prop-label">{{$t("image-depth")}}</td>
           <td class="prop-content-half" :colspan="isPropDisplayed('physicalSizeZ') ? 1 : 3">
-            {{$tc("count-slices", image.depth, {count: image.depth})}}
+            {{$t("count-slices", image.depth, {count: image.depth})}}
             <template v-if="image.physicalSizeZ">({{(image.depth * image.physicalSizeZ).toFixed(3)}} {{$t("um")}})</template>
           </td>
         </template>
@@ -150,7 +150,7 @@
         <template v-if="isPropDisplayed('time')">
           <td class="prop-label">{{$t("image-time")}}</td>
           <td class="prop-content-half" :colspan="isPropDisplayed('fps') ? 1 : 3">
-            {{$tc("count-frames", image.duration, {count: image.duration})}}
+            {{$t("count-frames", image.duration, {count: image.duration})}}
             <template v-if="image.fps && image.duration > 0">
               ({{formatMinutesSeconds(image.duration / image.fps)}})
             </template>
@@ -168,7 +168,7 @@
       <tr v-if="isPropDisplayed('channels')">
         <td class="prop-label">{{$t("image-channels")}}</td>
         <td class="prop-content" colspan="3">
-          {{$tc("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
+          {{$t("count-bands", image.apparentChannels, {count: image.apparentChannels})}}
           ({{image.channels}} x {{image.samplePerPixel}})
         </td>
       </tr>
@@ -252,29 +252,29 @@
   <rename-modal
     :title="$t('rename-image')"
     :currentName="image.instanceFilename"
-    :active.sync="isRenameModalActive"
+    v-model:active="isRenameModalActive"
     @rename="rename"
   />
 
   <magnification-modal
     :image="image"
-    :active.sync="isMagnificationModalActive"
+    v-model:active="isMagnificationModalActive"
     @setMagnification="(event) => $emit('setMagnification', event)"
   />
 
   <calibration-modal
     :image="image"
-    :active.sync="isCalibrationModalActive"
+    v-model:active="isCalibrationModalActive"
     @setResolution="(event) => $emit('setResolution', event)"
   />
 
   <image-metadata-modal
-    :active.sync="isMetadataModalActive"
+    v-model:active="isMetadataModalActive"
     :image="image"
   />
 
   <simple-add-to-image-group-modal
-    :active.sync="isAddToImageGroupModalActive"
+    v-model:active="isAddToImageGroupModalActive"
     :image="image"
     @addToImageGroup="(event) => imageGroupLinks.push(event)"
   />

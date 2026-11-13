@@ -41,7 +41,7 @@
       </template>
     </template>
 
-    <cytomine-task v-else :task.sync="task" />
+    <cytomine-task v-else v-model:task="task" />
 
     <template #footer>
       <button class="button" type="button" @click="$emit('update:active', false)">

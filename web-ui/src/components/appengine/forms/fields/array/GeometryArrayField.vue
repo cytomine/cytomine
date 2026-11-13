@@ -10,9 +10,13 @@ export default {
   components: {
     AnnotationMultiSelect,
   },
+  props: {
+    modelValue: {},
+  },
+  emits: ['update:modelValue'],
   methods: {
     onSelect(ids) {
-      this.$emit('input', { ids, type: 'annotation' });
+      this.$emit('update:modelValue', { ids, type: 'annotation' });
     }
   },
 };

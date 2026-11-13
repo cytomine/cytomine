@@ -1,7 +1,7 @@
 <template>
 <b-taginput
-  :value="value"
-  @input="$emit('input', $event)"
+  :model-value="value"
+  @update:model-value="$emit('input', $event)"
   :data="filteredUsers"
   autocomplete
   :open-on-focus="true"

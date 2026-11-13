@@ -6,6 +6,9 @@ import java.util.Set;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.authorizationapi.model.permission.CytomineInstancePermission;
+import org.cytomine.common.authorizationapi.model.permission.CytominePermission;
+import org.cytomine.common.authorizationapi.model.permission.CytomineProjectPermission;
 import org.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
@@ -44,6 +47,11 @@ public class ProjectCommandService
     private final OntologyRepository ontologyRepository;
     private final ProjectMapper projectMapper;
     private final ProjectRepository projectRepository;
+
+    public Set<CytominePermission> createPermissions = Set.of(CytomineInstancePermission.CAN_CREATE_PROJECT);
+    public Set<CytominePermission> editPermissions = Set.of(CytomineProjectPermission.PROJECT_OWNER_CAN_ADD_MEMBERS);
+    public Set<CytominePermission> deletePermissions = Set.of();
+    public Set<CytominePermission> readPermissions = Set.of();
 
     @Override
     public ProjectEntity updateEntityWithEntity(ProjectEntity entity, UpdateProject payload, Timestamp now) {

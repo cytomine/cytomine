@@ -20,7 +20,6 @@ public class ServerController extends RestCytomineController {
 
     @GetMapping("/server/ping")
     public Map<String, Object> ping() {
-        log.debug("GET /server/ping");
         return Map.of(
             "alive", true,
             "version", applicationProperties.getVersion(),

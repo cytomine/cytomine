@@ -1,4 +1,4 @@
-package org.cytomine.common.http;
+package org.cytomine.common.beans.restclientfactory;
 
 import java.io.IOException;
 

@@ -15,7 +15,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.util.StringUtils;
 
 @SpringBootApplication(scanBasePackages = {"org.cytomine.repository", "org.cytomine.common.mapper",
-    "org.cytomine.common.config.security", "org.cytomine.common.keycloak", "org.cytomine.common.serialization"})
+    "org.cytomine.common.config.security", "org.cytomine.common.keycloak", "org.cytomine.common.serialization",
+    "org.cytomine.common.beans.authorizationclient", "org.cytomine.common.beans.restclientfactory"})
 @Import({ObjectMapperFactory.class})
 @ConfigurationPropertiesScan
 @Slf4j

@@ -105,9 +105,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
     }
 
     default Optional<HttpCommandResponse> create(long userId, C createPayload, LocalDateTime now) {
-        if (!getAuthorizationVerifier().authorize(new AuthorizationRequest(getCreatePermissions(userId)))) {
-            return Optional.empty();
-        }
+        getAuthorizationVerifier().authorize(new AuthorizationRequest(getCreatePermissions(userId)));
         E entity = mapCreateToEntity(createPayload, userId, Timestamp.valueOf(now));
         E savedEntity = save(entity);
         P commandPayload = map(savedEntity);

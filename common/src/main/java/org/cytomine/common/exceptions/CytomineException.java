@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
  * User: lrollus Date: 17/11/11 This exception is the top exception for all cytomine exception It store a message and a
  * code, corresponding to an HTTP code
  */
+@EqualsAndHashCode(callSuper = false)
 public abstract class CytomineException extends RuntimeException {
 
 

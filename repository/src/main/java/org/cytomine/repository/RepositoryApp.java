@@ -18,7 +18,8 @@ import org.springframework.util.StringUtils;
 
 @SpringBootApplication(scanBasePackages = {"org.cytomine.repository", "org.cytomine.common.mapper",
     "org.cytomine.common.config.security", "org.cytomine.common.keycloak", "org.cytomine.common.serialization",
-    "org.cytomine.common.beans.authorization.internal", "org.cytomine.common.beans.authorization.verifier"})
+    "org.cytomine.common.beans.authorization.internal", "org.cytomine.common.beans.authorization.verifier",
+    "org.cytomine.common.beans.exception.http"})
 @Import({ObjectMapperFactory.class, CytominePermissions.class})
 @ConfigurationPropertiesScan
 @EnableMethodSecurity

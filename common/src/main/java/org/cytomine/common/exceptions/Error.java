@@ -1,8 +1,6 @@
-package be.cytomine.controller.error;
+package org.cytomine.common.exceptions;
 
 import java.util.Map;
-
-import org.cytomine.common.exceptions.ErrorCode;
 
 public record Error(
     String message,

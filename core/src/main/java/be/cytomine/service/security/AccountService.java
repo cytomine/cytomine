@@ -14,6 +14,7 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.Error;
 import org.cytomine.common.exceptions.ErrorCode;
 import org.cytomine.common.exceptions.UserManagementException;
 import org.keycloak.admin.client.CreatedResponseUtil;
@@ -30,7 +31,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import be.cytomine.controller.error.Error;
 import be.cytomine.dto.Account;
 import be.cytomine.service.utils.Validation;
 import be.cytomine.service.utils.ValidationFor;

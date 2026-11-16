@@ -127,8 +127,9 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 
-        HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
-        throw new Exception();
+        Optional<HttpCommandResponse> result = getObjectMapper().readValue(response,
+            new TypeReference<Optional<HttpCommandResponse>>() {});
+        assertEquals(Optional.empty(), result);
     }
 
     @Test

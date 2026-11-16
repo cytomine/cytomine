@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.mapper.BaseMapper;
 import org.cytomine.common.repository.http.OntologyHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
@@ -22,6 +23,7 @@ import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.cytomine.repository.service.OntologyCommandService;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -58,7 +60,8 @@ public class OntologyControllerTest implements CRUDCommandTests<CreateOntology, 
 
     @Autowired
     OntologyCommandService cRUDCommandService;
-
+    @Mock
+    private AuthorizationVerifier authorizationVerifier;
     String apiURL = OntologyHttpContract.ROOT_PATH;
     CreateOntology createPayload = new CreateOntology(UUID.randomUUID().toString());
     UpdateOntology updatePayload = new UpdateOntology(Optional.of(UUID.randomUUID().toString()));

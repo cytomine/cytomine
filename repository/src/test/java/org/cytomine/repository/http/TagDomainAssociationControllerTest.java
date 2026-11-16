@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.TagDomainAssociationHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
 import org.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
@@ -13,6 +14,7 @@ import org.cytomine.common.repository.model.tagdomainassociation.payload.UpdateT
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.service.TagDomainAssociationCommandService;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -45,7 +47,8 @@ class TagDomainAssociationControllerTest
     private ObjectMapper objectMapper;
     @Autowired
     private TagDomainAssociationCommandService cRUDCommandService;
-
+    @Mock
+    private AuthorizationVerifier authorizationVerifier;
     @Override
     public void beforeCreate(long userId) {
         Long tagId = jdbcTemplate.queryForObject(

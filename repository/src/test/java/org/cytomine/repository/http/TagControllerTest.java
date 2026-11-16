@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.TagHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.TagResponse;
@@ -20,6 +21,7 @@ import org.cytomine.repository.mapper.TagDomainAssociationMapper;
 import org.cytomine.repository.persistence.TagDomainAssociationRepository;
 import org.cytomine.repository.persistence.entity.TagDomainAssociationEntity;
 import org.cytomine.repository.service.TagCommandService;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -51,6 +53,9 @@ class TagControllerTest implements CRUDCommandTests<CreateTag, TagResponse, Upda
     private ObjectMapper objectMapper;
     @Autowired
     private TagCommandService cRUDCommandService;
+    @Mock
+    private AuthorizationVerifier authorizationVerifier;
+
     @Override
     public Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
         TagDomainAssociationEntity subEntity = new TagDomainAssociationEntity();

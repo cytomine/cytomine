@@ -10,6 +10,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.cytomine.common.config.security.CytomineAuthenticationSupport;
+import org.cytomine.common.exceptions.AuthenticationException;
+import org.cytomine.common.exceptions.ForbiddenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,8 +21,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.AuthenticationException;
-import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.UserRepository;
 

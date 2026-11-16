@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.TermHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.TermResponse;
 import org.cytomine.common.repository.model.term.payload.CreateTerm;
@@ -18,6 +19,7 @@ import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.persistence.OntologyRepository;
 import org.cytomine.repository.persistence.entity.OntologyEntity;
 import org.cytomine.repository.service.TermCommandService;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -53,6 +55,9 @@ class TermControllerTest implements CRUDCommandTests<CreateTerm, TermResponse, U
     private OntologyRepository ontologyRepository;
     @Autowired
     private TermCommandService cRUDCommandService;
+    @Mock
+    private AuthorizationVerifier authorizationVerifier;
+
     private long ontologyId;
 
     @Override

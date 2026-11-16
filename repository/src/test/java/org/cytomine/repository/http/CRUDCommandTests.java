@@ -9,6 +9,7 @@ import lombok.SneakyThrows;
 import org.cytomine.common.PostGisTestConfiguration;
 import org.cytomine.common.authorizationapi.model.AuthorizationRequest;
 import org.cytomine.common.authorizationapi.model.permissionrequest.CytomineRequestedPermission;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -56,6 +58,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
     ApplyCommandResponseMapper getApplyCommandResponseMapper();
 
     CRUDCommandService<C, U, ?, ?, R> getCRUDCommandService();
+
+    AuthorizationVerifier getAuthorizationVerifier();
 
     default Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
         return Set.of();
@@ -104,7 +108,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         if (permissions.isEmpty()) {
             return;
         }
-        when(getCRUDCommandService().getAuthorizationVerifier()
+        when(getAuthorizationVerifier()
             .authorize(eq(new AuthorizationRequest(permissions)))).thenReturn(true);
     }
 
@@ -117,7 +121,6 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             return;
         }
         String username = getUsername(userId);
-        mockPermissions(getCRUDCommandService().getCreatePermissions(userId));
 
         String response = getMockMvc().perform(
                 post(getApiURL()).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
@@ -125,11 +128,12 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             .andReturn().getResponse().getContentAsString();
 
         HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
-
+        throw new Exception();
     }
 
     @Test
     @SneakyThrows
+    @WithMockUser
     default void baseTest() {
         // Create Entity
         long userId = createUser();

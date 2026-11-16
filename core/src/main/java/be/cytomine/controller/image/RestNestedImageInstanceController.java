@@ -2,6 +2,7 @@ package be.cytomine.controller.image;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.NestedImageInstanceService;
 import be.cytomine.utils.JsonObject;

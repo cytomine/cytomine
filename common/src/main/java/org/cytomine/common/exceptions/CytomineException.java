@@ -1,8 +1,10 @@
-package be.cytomine.exceptions;
+package org.cytomine.common.exceptions;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import lombok.Getter;
 
 /**
  * User: lrollus Date: 17/11/11 This exception is the top exception for all cytomine exception It store a message and a
@@ -24,6 +26,7 @@ public abstract class CytomineException extends RuntimeException {
     /**
      * Values of the exception
      */
+    @Getter
     public Map<Object, Object> values;
 
 
@@ -31,6 +34,7 @@ public abstract class CytomineException extends RuntimeException {
      * Headers to be sent in the response (can contain information on the exception or how the client has to treat the
      * exception).
      */
+    @Getter
     public Map<String, String> headers;
 
     /**
@@ -70,11 +74,4 @@ public abstract class CytomineException extends RuntimeException {
         return this.msg;
     }
 
-    public Map<Object, Object> getValues() {
-        return values;
-    }
-
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
 }

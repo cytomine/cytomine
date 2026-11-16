@@ -8,9 +8,9 @@ import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ServerException;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.utils.ReportFormatService;
 import be.cytomine.utils.DateUtils;
 import be.cytomine.utils.JsonObject;

@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
 import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 

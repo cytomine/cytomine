@@ -1,4 +1,4 @@
-package be.cytomine.controller.error;
+package org.cytomine.common.exceptions;
 
 import lombok.Getter;
 

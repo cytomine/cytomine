@@ -18,9 +18,8 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.cytomine.common.exceptions.ServerException;
 import org.springframework.stereotype.Service;
-
-import be.cytomine.exceptions.ServerException;
 
 @Service
 @Slf4j

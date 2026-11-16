@@ -10,6 +10,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.UploadedFileHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
@@ -19,6 +20,7 @@ import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.service.UploadedFileCommandService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -52,10 +54,7 @@ public class UploadedFileControllerTest
     JdbcTemplate jdbcTemplate;
     @Autowired
     ApplyCommandResponseMapper applyCommandResponseMapper;
-    @Autowired
-    private UploadedFileCommandService cRUDCommandService;
     String apiURL = UploadedFileHttpContract.ROOT_PATH;
-
     UpdateUploadedFile updatePayload = new UpdateUploadedFile(
         Optional.of(UUID.randomUUID() + ".tif"),
         Optional.empty(),
@@ -65,8 +64,11 @@ public class UploadedFileControllerTest
         Optional.empty(),
         Optional.empty()
     );
-
     CreateUploadedFile createPayload;
+    @Autowired
+    private UploadedFileCommandService cRUDCommandService;
+    @Mock
+    private AuthorizationVerifier authorizationVerifier;
 
     @Override
     public void beforeCreate(long userId) {

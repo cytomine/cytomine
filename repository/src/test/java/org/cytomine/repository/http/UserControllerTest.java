@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.UserHttpContract;
 import org.cytomine.common.repository.model.Role;
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
@@ -28,6 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
@@ -49,7 +51,8 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
     JdbcTemplate jdbcTemplate;
     @Autowired
     private UserCommandService cRUDCommandService;
-
+    @MockitoBean
+    private AuthorizationVerifier authorizationVerifier;
     String apiURL = UserHttpContract.ROOT_PATH;
 
     CreateUser createPayload =

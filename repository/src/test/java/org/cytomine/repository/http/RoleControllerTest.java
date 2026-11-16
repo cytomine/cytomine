@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.RoleHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import org.cytomine.common.repository.model.role.payload.CreateRole;
@@ -13,6 +14,7 @@ import org.cytomine.common.repository.model.role.payload.UpdateRole;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.service.RoleCommandService;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -42,6 +44,8 @@ class RoleControllerTest implements CRUDCommandTests<CreateRole, RoleResponse, U
 
     @Autowired
     private RoleCommandService cRUDCommandService;
+    @Mock
+    private AuthorizationVerifier authorizationVerifier;
 
     @Override
     public RoleResponse expectedUpdatedResponse(RoleResponse response, UpdateRole updatePayload,

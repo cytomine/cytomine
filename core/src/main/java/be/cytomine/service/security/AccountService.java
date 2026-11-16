@@ -14,6 +14,8 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ErrorCode;
+import org.cytomine.common.exceptions.UserManagementException;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -29,16 +31,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.controller.error.Error;
-import be.cytomine.controller.error.ErrorCode;
 import be.cytomine.dto.Account;
-import be.cytomine.exceptions.UserManagementException;
 import be.cytomine.service.utils.Validation;
 import be.cytomine.service.utils.ValidationFor;
 
 import static be.cytomine.service.utils.IamRepresentationUtil.getAccountRepresentation;
 import static be.cytomine.service.utils.IamRepresentationUtil.setCustomAttributes;
 import static be.cytomine.service.utils.IamRepresentationUtil.setPermanentPassword;
-
 
 @Slf4j
 @Service

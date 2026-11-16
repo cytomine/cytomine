@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.AlreadyExistException;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +20,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.processing.ImageFilter;
 import be.cytomine.domain.processing.ImageFilterProject;
 import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.AlreadyExistException;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.processing.ImageFilterProjectRepository;
 import be.cytomine.repository.processing.ImageFilterRepository;
 import be.cytomine.repository.project.ProjectRepository;

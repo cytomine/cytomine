@@ -1,9 +1,10 @@
 package be.cytomine.controller.repository;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import lombok.RequiredArgsConstructor;
-import org.cytomine.common.beans.restclientfactory.RestClientFactory;
+import org.cytomine.common.config.security.CytomineAuthenticationSupport;
 import org.cytomine.common.http.HealthService;
 import org.cytomine.common.repository.http.CommandHttpContract;
 import org.cytomine.common.repository.http.OntologyHttpContract;
@@ -20,22 +21,27 @@ import org.cytomine.common.repository.http.UploadedFileHttpContract;
 import org.cytomine.common.repository.http.UserHttpContract;
 import org.cytomine.common.repository.http.UserRoleHttpContract;
 import org.cytomine.common.repository.utils.SpringPage;
+import org.cytomine.common.security.IncomingAuthorizationContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
-@RequiredArgsConstructor
+
 @Configuration
 public class RepositoryClient {
 
     @Value("${application.repositoryURL}")
     private String repositoryURL;
-
-    private final RestClientFactory restClientFactory;
 
     // Not sure if it should or not be shared between each client instance.
     @Bean
@@ -50,84 +56,122 @@ public class RepositoryClient {
         return RestClient.builder()
             .baseUrl(repositoryURL)
             .messageConverters(converters -> converters.addFirst(new MappingJackson2HttpMessageConverter(objectMapper)))
-            .requestInterceptor(restClientFactory::forwardAuthorizationHeader)
+            .requestInterceptor(this::forwardAuthorizationHeader)
             .build();
     }
 
+    private ClientHttpResponse forwardAuthorizationHeader(
+        HttpRequest request,
+        byte[] body,
+        ClientHttpRequestExecution execution
+    ) throws IOException {
+        IncomingAuthorizationContext.get().ifPresent(incoming -> {
+            HttpHeaders headers = request.getHeaders();
+            if (incoming.authorization() != null) {
+                headers.set(HttpHeaders.AUTHORIZATION, normalizeAuthorization(incoming.authorization()));
+            }
+            // A CYTOMINE-scheme signature is an HMAC over method + contentMd5 + contentType + date,
+            // so repository needs the exact values the caller signed to recompute a matching signature.
+            if (incoming.date() != null) {
+                headers.set("date", incoming.date());
+            }
+            if (incoming.contentMd5() != null) {
+                headers.set("content-MD5", incoming.contentMd5());
+            }
+            if (incoming.contentType() != null) {
+                headers.set(HttpHeaders.CONTENT_TYPE, incoming.contentType());
+            }
+        });
+        return execution.execute(request, body);
+    }
+
+    private String normalizeAuthorization(String authorization) {
+        if (authorization.startsWith("Bearer ") || authorization.startsWith(CytomineAuthenticationSupport.SCHEME)) {
+            return authorization;
+        }
+        return "Bearer " + authorization;
+    }
 
     @Bean
     CommandHttpContract commandHttpContract(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, CommandHttpContract.class);
+        return createClient(repositoryRestClient, CommandHttpContract.class);
     }
 
     @Bean
     HealthService healthServiceClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, HealthService.class);
+        return createClient(repositoryRestClient, HealthService.class);
     }
 
     @Bean
     OntologyHttpContract ontologyServiceClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, OntologyHttpContract.class);
+        return createClient(repositoryRestClient, OntologyHttpContract.class);
     }
 
     @Bean
     TermHttpContract termServiceClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, TermHttpContract.class);
+        return createClient(repositoryRestClient, TermHttpContract.class);
     }
 
     @Bean
     TermRelationHttpContract termRelationServiceClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, TermRelationHttpContract.class);
+        return createClient(repositoryRestClient, TermRelationHttpContract.class);
     }
 
     @Bean
     StatsHttpContract statsServiceClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, StatsHttpContract.class);
+        return createClient(repositoryRestClient, StatsHttpContract.class);
     }
 
     @Bean
     StorageHttpContract storageServiceClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, StorageHttpContract.class);
+        return createClient(repositoryRestClient, StorageHttpContract.class);
     }
 
     @Bean
     RoleHttpContract roleServiceClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, RoleHttpContract.class);
+        return createClient(repositoryRestClient, RoleHttpContract.class);
     }
 
     @Bean
     ReviewedAnnotationHttpContract reviewedAnnotationClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, ReviewedAnnotationHttpContract.class);
+        return createClient(repositoryRestClient, ReviewedAnnotationHttpContract.class);
     }
 
     @Bean
     ProjectHttpContract projectHttpContract(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, ProjectHttpContract.class);
+        return createClient(repositoryRestClient, ProjectHttpContract.class);
     }
 
     @Bean
     TagHttpContract tagHttpContract(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, TagHttpContract.class);
+        return createClient(repositoryRestClient, TagHttpContract.class);
     }
 
     @Bean
     TagDomainAssociationHttpContract tagDomainAssociationClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, TagDomainAssociationHttpContract.class);
+        return createClient(repositoryRestClient, TagDomainAssociationHttpContract.class);
     }
 
     @Bean
     UploadedFileHttpContract uploadedFileServiceClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, UploadedFileHttpContract.class);
+        return createClient(repositoryRestClient, UploadedFileHttpContract.class);
     }
 
     @Bean
     UserRoleHttpContract userRoleServiceClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, UserRoleHttpContract.class);
+        return createClient(repositoryRestClient, UserRoleHttpContract.class);
     }
 
     @Bean
     UserHttpContract userServiceClient(RestClient repositoryRestClient) {
-        return restClientFactory.createClient(repositoryRestClient, UserHttpContract.class);
+        return createClient(repositoryRestClient, UserHttpContract.class);
     }
 
+    private <T> T createClient(RestClient repositoryRestClient, Class<T> repoType) {
+        RestClientAdapter adapter = RestClientAdapter.create(repositoryRestClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter)
+            .customArgumentResolver(new PageableHttpServiceArgumentResolver())
+            .build();
+        return factory.createClient(repoType);
+    }
 }

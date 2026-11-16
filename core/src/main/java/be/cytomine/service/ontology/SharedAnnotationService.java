@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,6 @@ import be.cytomine.domain.command.DeleteCommand;
 import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.SharedAnnotation;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.ontology.SharedAnnotationRepository;
 import be.cytomine.service.CurrentRoleService;

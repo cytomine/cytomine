@@ -14,13 +14,13 @@ import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.ontology.ReviewedAnnotationRepository;
 import be.cytomine.repository.ontology.UserAnnotationRepository;

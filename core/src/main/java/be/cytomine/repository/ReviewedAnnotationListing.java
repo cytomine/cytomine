@@ -5,12 +5,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
 import be.cytomine.domain.image.ImageInstance;
-import be.cytomine.exceptions.WrongArgumentException;
 
 public class ReviewedAnnotationListing extends AnnotationListing {
 

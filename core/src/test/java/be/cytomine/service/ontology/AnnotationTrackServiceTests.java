@@ -2,6 +2,7 @@ package be.cytomine.service.ontology;
 
 import jakarta.transaction.Transactional;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.exceptions.AlreadyExistException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.AnnotationTrack;
 import be.cytomine.domain.ontology.UserAnnotation;
-import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.ontology.AnnotationTrackRepository;
 import be.cytomine.service.CommandService;
 import be.cytomine.service.UrlApi;

@@ -1,4 +1,4 @@
-package be.cytomine.exceptions;
+package org.cytomine.common.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
 

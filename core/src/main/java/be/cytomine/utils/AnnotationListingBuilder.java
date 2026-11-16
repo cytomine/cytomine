@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.cytomine.common.repository.http.TermHttpContract;
 import org.cytomine.common.repository.http.UserHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.TermResponse;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Component;
 
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.dto.annotation.AnnotationResult;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.ReviewedAnnotationListing;
 import be.cytomine.repository.UserAnnotationListing;

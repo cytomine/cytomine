@@ -1,7 +1,8 @@
-package org.cytomine.common.beans.authorizationclient;
+package org.cytomine.common.beans.authorization.httpclient;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.common.authorizationapi.http.PermissionsHttpContract;
+import org.cytomine.common.authorizationapi.service.PermissionsServiceV2;
 import org.cytomine.common.beans.restclientfactory.RestClientFactory;
 import org.cytomine.common.repository.utils.SpringPage;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +42,7 @@ public class AuthorizationRestClientConfig {
     }
 
     @Bean
-    PermissionsHttpContract permissionsHttpContract(RestClient restClient) {
+    PermissionsServiceV2 permissionsHttpContract(RestClient restClient) {
         return restClientFactory.createClient(restClient, PermissionsHttpContract.class);
     }
 }

@@ -1,4 +1,4 @@
-package org.cytomine.authorizationapi.config;
+package org.cytomine.common.beans.authorization.internal;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.common.authorizationapi.model.permission.CytomineInstancePermission;

@@ -1,30 +1,28 @@
-package org.cytomine.authorizationapi.controller;
+package org.cytomine.common.beans.authorization.internal;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-import org.cytomine.authorizationapi.config.CytominePermissions;
-import org.cytomine.authorizationapi.config.PermissionsConfigService;
-import org.cytomine.common.authorizationapi.http.PermissionsHttpContract;
 import org.cytomine.common.authorizationapi.model.AuthorizationRequest;
 import org.cytomine.common.authorizationapi.model.AuthorizationResponse;
 import org.cytomine.common.authorizationapi.model.CytomineDeniedPermission;
 import org.cytomine.common.authorizationapi.model.CytomineGrantedPermission;
 import org.cytomine.common.authorizationapi.model.permission.CytominePermission;
+import org.cytomine.common.authorizationapi.service.PermissionsServiceV2;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 
 @RequiredArgsConstructor
-@RestController(PermissionsHttpContract.ROOT_PATH)
-public class AuthorizationService implements PermissionsHttpContract {
+@Component
+public class AuthorizationInternalResolver implements PermissionsServiceV2 {
 
     private final CytominePermissions cytominePermissions;
     private final PermissionsConfigService permissionsConfigService;
 
+    @Override
     public AuthorizationResponse authorize(@RequestBody AuthorizationRequest authorizationRequest) {
         Set<String> roles =
             SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()

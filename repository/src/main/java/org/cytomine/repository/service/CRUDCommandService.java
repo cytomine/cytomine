@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.cytomine.common.authorizationapi.model.permissionrequest.CytomineRequestedPermission;
 import org.cytomine.common.repository.model.HasAclId;
 import org.cytomine.common.repository.model.HasLongId;
 import org.cytomine.common.repository.model.HasTimestampCUD;
@@ -47,6 +48,10 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
     DeleteCommandRequest<P> mapDeleteCommand(long userId, P before);
 
     Optional<E> get(long id);
+
+    default Set<CytomineRequestedPermission> getCreatePermissions(long userId, long id) {
+        return Set.of();
+    }
 
     default Set<HttpCommandResponse> deleteSubEntities(long userId, long id, LocalDateTime now, UUID parentCommandId) {
         return Set.of();
@@ -98,6 +103,7 @@ public interface CRUDCommandService<C, U, P extends HasLongId & HasAclId, E exte
     }
 
     default Optional<HttpCommandResponse> create(long userId, C createPayload, LocalDateTime now) {
+
         E entity = mapCreateToEntity(createPayload, userId, Timestamp.valueOf(now));
         E savedEntity = save(entity);
         P commandPayload = map(savedEntity);

@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.command.payload.request.UploadedFileCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
 import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
@@ -42,6 +43,7 @@ public class UploadedFileCommandService
     private final CommandV2Repository commandV2Repository;
     private final UploadedFileMapper uploadedFileMapper;
     private final UploadedFileRepository uploadedFileRepository;
+    private final AuthorizationVerifier authorizationVerifier;
     @Setter
     private ApplyCommandService applyCommandService;
 

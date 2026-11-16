@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.Role;
 import org.cytomine.common.repository.model.command.payload.request.UserRoleCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
@@ -47,6 +48,7 @@ public class UserRoleCommandService implements
     private final RoleRepository roleRepository;
     private final UserRoleMapper mapper;
     private final RoleHierarchy roleHierarchy;
+    private final AuthorizationVerifier authorizationVerifier;
 
     @Setter
     private ApplyCommandService applyCommandService;

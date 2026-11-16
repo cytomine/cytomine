@@ -2,6 +2,7 @@ package org.cytomine.repository;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.beans.authorization.internal.CytominePermissions;
 import org.cytomine.common.serialization.ObjectMapperFactory;
 import org.cytomine.repository.persistence.ConfigurationRepository;
 import org.cytomine.repository.persistence.UserRepository;
@@ -17,8 +18,8 @@ import org.springframework.util.StringUtils;
 
 @SpringBootApplication(scanBasePackages = {"org.cytomine.repository", "org.cytomine.common.mapper",
     "org.cytomine.common.config.security", "org.cytomine.common.keycloak", "org.cytomine.common.serialization",
-    "org.cytomine.common.beans.authorizationclient", "org.cytomine.common.beans.restclientfactory"})
-@Import({ObjectMapperFactory.class})
+    "org.cytomine.common.beans.authorization.internal", "org.cytomine.common.beans.authorization.verifier"})
+@Import({ObjectMapperFactory.class, CytominePermissions.class})
 @ConfigurationPropertiesScan
 @EnableMethodSecurity
 @Slf4j

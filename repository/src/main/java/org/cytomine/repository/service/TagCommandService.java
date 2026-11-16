@@ -10,6 +10,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.command.payload.request.TagCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.TagResponse;
@@ -46,6 +47,7 @@ public class TagCommandService
     private final TagDomainAssociationCommandService tagDomainAssociationCommandService;
     private final TagDomainAssociationRepository tagDomainAssociationRepository;
     private final UserRepository userRepository;
+    private final AuthorizationVerifier authorizationVerifier;
 
     @Override
     public TagEntity updateEntityWithEntity(TagEntity entity, UpdateTag payload, Timestamp now) {

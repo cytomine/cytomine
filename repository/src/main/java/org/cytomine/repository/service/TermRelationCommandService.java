@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.command.payload.request.TermRelationCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
@@ -39,6 +40,7 @@ public class TermRelationCommandService implements
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
+    private final AuthorizationVerifier authorizationVerifier;
     @Setter
     private ApplyCommandService applyCommandService;
 

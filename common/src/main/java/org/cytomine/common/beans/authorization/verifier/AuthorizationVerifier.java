@@ -17,7 +17,11 @@ public class AuthorizationVerifier {
 
     private final PermissionsServiceV2 permissionsServiceV2;
 
-    public boolean verifyGranted(AuthorizationRequest authorizationRequest,
+    public boolean authorize(AuthorizationRequest authorizationRequest) {
+        return verifyGranted(authorizationRequest, permissionsServiceV2.authorize(authorizationRequest));
+    }
+
+    boolean verifyGranted(AuthorizationRequest authorizationRequest,
         AuthorizationResponse authorizationResponse) {
         return authorizationRequest.permissionsRequested()
             .equals(authorizationResponse.grantedPermissions().stream().map(CytomineGrantedPermission::permission));

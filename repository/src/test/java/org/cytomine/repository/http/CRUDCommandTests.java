@@ -110,6 +110,26 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
     @Test
     @SneakyThrows
+    default void noCreatePermissionTest() {
+
+        long userId = createUser();
+        if (getCRUDCommandService().getCreatePermissions(userId).isEmpty()) {
+            return;
+        }
+        String username = getUsername(userId);
+        mockPermissions(getCRUDCommandService().getCreatePermissions(userId));
+
+        String response = getMockMvc().perform(
+                post(getApiURL()).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
+                    .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+
+        HttpCommandResponse result = getObjectMapper().readValue(response, HttpCommandResponse.class);
+
+    }
+
+    @Test
+    @SneakyThrows
     default void baseTest() {
         // Create Entity
         long userId = createUser();

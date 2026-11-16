@@ -7,11 +7,14 @@ import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.authorizationapi.model.AuthorizationRequest;
+import org.cytomine.common.authorizationapi.model.permissionrequest.CytomineRequestedPermission;
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.service.CRUDCommandService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -23,6 +26,8 @@ import tools.jackson.databind.ObjectMapper;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -49,6 +54,8 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
     JdbcTemplate getJdbcTemplate();
 
     ApplyCommandResponseMapper getApplyCommandResponseMapper();
+
+    CRUDCommandService<C, U, ?, ?, R> getCRUDCommandService();
 
     default Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
         return Set.of();
@@ -93,12 +100,22 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         return getJdbcTemplate().queryForObject("SELECT username FROM sec_user WHERE id = ?", String.class, userId);
     }
 
+    default void mockPermissions(Set<CytomineRequestedPermission> permissions) {
+        if (permissions.isEmpty()) {
+            return;
+        }
+        when(getCRUDCommandService().getAuthorizationVerifier()
+            .authorize(eq(new AuthorizationRequest(permissions)))).thenReturn(true);
+    }
+
     @Test
     @SneakyThrows
     default void baseTest() {
         // Create Entity
         long userId = createUser();
         String username = getUsername(userId);
+        mockPermissions(getCRUDCommandService().getCreatePermissions(userId));
+
         String response = getMockMvc().perform(
                 post(getApiURL()).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
@@ -149,6 +166,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         // Create Entity
         long userId = createUser();
         String username = getUsername(userId);
+        mockPermissions(getCRUDCommandService().getCreatePermissions(userId));
 
         Optional<HttpCommandResponse> maybeFirstCreate = getObjectMapper().readValue(getMockMvc().perform(
                 post(getApiURL()).with(authenticatedAs(username)).contentType(APPLICATION_JSON)

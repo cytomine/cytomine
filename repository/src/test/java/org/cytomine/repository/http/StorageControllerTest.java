@@ -12,6 +12,7 @@ import org.cytomine.common.repository.model.storage.payload.CreateStorage;
 import org.cytomine.common.repository.model.storage.payload.UpdateStorage;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.service.StorageCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -36,7 +37,8 @@ public class StorageControllerTest implements CRUDCommandTests<CreateStorage, St
     UpdateStorage updatePayload = new UpdateStorage(Optional.of(UUID.randomUUID().toString()));
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;
-
+    @Autowired
+    private StorageCommandService cRUDCommandService;
     @Override
     public StorageResponse expectedUpdatedResponse(
         StorageResponse response,

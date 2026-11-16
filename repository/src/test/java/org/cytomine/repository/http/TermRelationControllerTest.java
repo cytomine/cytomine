@@ -15,6 +15,7 @@ import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.TermRepository;
+import org.cytomine.repository.service.TermRelationCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -51,7 +52,8 @@ class TermRelationControllerTest
 
     @Autowired
     private ObjectMapper objectMapper;
-
+    @Autowired
+    private TermRelationCommandService cRUDCommandService;
     private CreateTermRelation createPayload;
     private UpdateTermRelation updatePayload;
 

@@ -17,6 +17,7 @@ import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedF
 import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.service.UploadedFileCommandService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,6 +52,8 @@ public class UploadedFileControllerTest
     JdbcTemplate jdbcTemplate;
     @Autowired
     ApplyCommandResponseMapper applyCommandResponseMapper;
+    @Autowired
+    private UploadedFileCommandService cRUDCommandService;
     String apiURL = UploadedFileHttpContract.ROOT_PATH;
 
     UpdateUploadedFile updatePayload = new UpdateUploadedFile(

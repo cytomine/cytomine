@@ -1,6 +1,7 @@
 package org.cytomine.common.beans.authorization.verifier;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.cytomine.common.authorizationapi.model.AuthorizationRequest;
@@ -24,7 +25,8 @@ public class AuthorizationVerifier {
     boolean verifyGranted(AuthorizationRequest authorizationRequest,
         AuthorizationResponse authorizationResponse) {
         return authorizationRequest.permissionsRequested()
-            .equals(authorizationResponse.grantedPermissions().stream().map(CytomineGrantedPermission::permission));
+            .equals(authorizationResponse.grantedPermissions().stream().map(CytomineGrantedPermission::permission)
+                .collect(Collectors.toSet()));
     }
 
     public boolean hasInstancePermission(String cytomineInstancePermission) {

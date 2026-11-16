@@ -19,6 +19,7 @@ import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.mapper.TagDomainAssociationMapper;
 import org.cytomine.repository.persistence.TagDomainAssociationRepository;
 import org.cytomine.repository.persistence.entity.TagDomainAssociationEntity;
+import org.cytomine.repository.service.TagCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -48,7 +49,8 @@ class TagControllerTest implements CRUDCommandTests<CreateTag, TagResponse, Upda
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ObjectMapper objectMapper;
-
+    @Autowired
+    private TagCommandService cRUDCommandService;
     @Override
     public Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
         TagDomainAssociationEntity subEntity = new TagDomainAssociationEntity();

@@ -21,6 +21,7 @@ import org.cytomine.repository.mapper.UserRoleMapper;
 import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.persistence.UserRoleRepository;
 import org.cytomine.repository.persistence.entity.UserRoleEntity;
+import org.cytomine.repository.service.UserCommandService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +47,9 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
     ObjectMapper objectMapper;
     @Autowired
     JdbcTemplate jdbcTemplate;
+    @Autowired
+    private UserCommandService cRUDCommandService;
+
     String apiURL = UserHttpContract.ROOT_PATH;
 
     CreateUser createPayload =

@@ -19,6 +19,7 @@ import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.persistence.entity.RoleEntity;
+import org.cytomine.repository.service.UserRoleCommandService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,7 +56,8 @@ class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRol
     JdbcTemplate jdbcTemplate;
     @Autowired
     ApplyCommandResponseMapper applyCommandResponseMapper;
-
+    @Autowired
+    private UserRoleCommandService cRUDCommandService;
     @Override
     public void beforeCreate(long userId) {
         RoleEntity roleGuest = roleRepository.save(

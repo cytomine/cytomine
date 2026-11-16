@@ -12,6 +12,7 @@ import org.cytomine.common.repository.model.project.payload.CreateProject;
 import org.cytomine.common.repository.model.project.payload.UpdateProject;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.service.ProjectCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -41,6 +42,8 @@ class ProjectControllerTest implements CRUDCommandTests<CreateProject, ProjectRe
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ProjectCommandService cRUDCommandService;
 
     @Override
     public ProjectResponse expectedUpdatedResponse(ProjectResponse response, UpdateProject updatePayload,

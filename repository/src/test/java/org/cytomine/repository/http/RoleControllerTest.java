@@ -12,6 +12,7 @@ import org.cytomine.common.repository.model.role.payload.CreateRole;
 import org.cytomine.common.repository.model.role.payload.UpdateRole;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.service.RoleCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -38,6 +39,9 @@ class RoleControllerTest implements CRUDCommandTests<CreateRole, RoleResponse, U
     JdbcTemplate jdbcTemplate;
     @Autowired
     ApplyCommandResponseMapper applyCommandResponseMapper;
+
+    @Autowired
+    private RoleCommandService cRUDCommandService;
 
     @Override
     public RoleResponse expectedUpdatedResponse(RoleResponse response, UpdateRole updatePayload,

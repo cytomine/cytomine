@@ -12,6 +12,7 @@ import org.cytomine.common.repository.model.tagdomainassociation.payload.CreateT
 import org.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTagDomainAssociation;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.service.TagDomainAssociationCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -42,6 +43,8 @@ class TagDomainAssociationControllerTest
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private TagDomainAssociationCommandService cRUDCommandService;
 
     @Override
     public void beforeCreate(long userId) {

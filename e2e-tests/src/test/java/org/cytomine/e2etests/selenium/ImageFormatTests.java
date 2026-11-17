@@ -67,16 +67,16 @@ public class ImageFormatTests {
         }
     }
 
-    private void uploadImageAndCheckFormat(String resourcePath, String format) {
+    private void uploadImageAndCheckFormat(TestImage image) {
         multiUsers.runAsAdmin(
             wait, driver, admin -> {
-                String imageName = "selenium-" + randomUUID() + "." + format;
+                String imageName = "selenium-" + randomUUID() + "." + image.getExtension();
 
                 cytomineSteps.addImageFromResource(
                     wait,
                     driver,
                     cytomineUrl,
-                    resourcePath,
+                    image.getResourcePath(),
                     imageName,
                     Optional.of(admin.projectName())
                 );
@@ -93,6 +93,6 @@ public class ImageFormatTests {
 
     @Test
     void uploadImageAndCheckFormatSVS() {
-        uploadImageAndCheckFormat(TestImage.SVS.getResourcePath(), TestImage.SVS.getExtension());
+        uploadImageAndCheckFormat(TestImage.SVS);
     }
 }

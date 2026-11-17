@@ -2,6 +2,7 @@ package be.cytomine.controller.ontology;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.SliceInstance;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.image.SliceInstanceService;
 import be.cytomine.service.ontology.AnnotationIndexService;
 

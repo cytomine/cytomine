@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.http.UserHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,6 @@ import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.social.LastUserPosition;
 import be.cytomine.dto.image.AreaDTO;
 import be.cytomine.dto.image.Point;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.ImageInstanceService;
 import be.cytomine.service.image.SliceInstanceService;

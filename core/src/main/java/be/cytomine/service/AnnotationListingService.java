@@ -13,11 +13,11 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TupleElement;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.dto.annotation.AnnotationResult;
 import be.cytomine.dto.image.Point;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.AnnotationListing;
 import be.cytomine.repository.UserAnnotationListing;
 import be.cytomine.service.security.SecurityACLService;

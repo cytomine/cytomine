@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ServerException;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import be.cytomine.exceptions.ServerException;
 import be.cytomine.utils.Lock;
 
 @Slf4j

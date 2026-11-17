@@ -2,6 +2,7 @@ package be.cytomine.controller.ontology;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.image.group.ImageGroupService;
 import be.cytomine.service.ontology.AnnotationGroupService;

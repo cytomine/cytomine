@@ -4,6 +4,7 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.cytomine.common.repository.http.OntologyHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
@@ -16,7 +17,6 @@ import be.cytomine.dto.project.ProjectFromSearchRequest;
 import be.cytomine.dto.project.ProjectFromSearchResponse;
 import be.cytomine.dto.project.ProjectFromSearchResponse.ProjectReference;
 import be.cytomine.dto.project.ProjectFromSearchResponse.TaskReference;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.CommandResponse;

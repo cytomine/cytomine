@@ -3,6 +3,7 @@ package be.cytomine.authorization.image;
 import java.util.Date;
 import java.util.Optional;
 
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,6 @@ import be.cytomine.CytomineCoreApplication;
 import be.cytomine.authorization.CRUDAuthorizationTest;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.EditingMode;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;

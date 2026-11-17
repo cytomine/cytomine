@@ -125,7 +125,8 @@ export default {
     shortTermToken: get('currentUser/shortTermToken'),
     uploadedFileCollection() {
       return new UploadedFileCollection({
-        originalFilename: { ilike: encodeURIComponent(this.searchString) },
+        // axios encodes the value; encoding it here would double-encode special characters
+        originalFilename: { ilike: this.searchString },
         metadataSearch: this.metadataSearch || null,
         metadataFilter: this.metadataFilters.length ? this.metadataFilters.join(' AND ') : null,
       });

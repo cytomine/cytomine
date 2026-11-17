@@ -71,10 +71,11 @@ public class UploadedFileController {
     public CollectionResponse<UploadedFileResponse> getAll(
         @RequestParam(defaultValue = "") String metadataSearch,
         @RequestParam(defaultValue = "") String metadataFilter,
+        @RequestParam(value = "originalFilename[ilike]", required = false) String originalFilename,
         @SortDefault(sort = "created", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         log.debug("GET /uploadedfile.json");
-        Page<UploadedFileResponse> page = getPage(metadataSearch, metadataFilter, pageable);
+        Page<UploadedFileResponse> page = getPage(metadataSearch, metadataFilter, originalFilename, pageable);
         Set<Long> ids = page.getContent().stream().map(UploadedFileResponse::id).collect(Collectors.toSet());
         Map<Long, Long> abstractImageIdByUploadedFileId = abstractImageRepository
             .findIdsByUploadedFileIds(ids)
@@ -144,12 +145,13 @@ public class UploadedFileController {
     private Page<UploadedFileResponse> getPage(
         String metadataSearch,
         String metadataFilter,
+        String originalFilename,
         Pageable pageable
     ) {
         boolean hasSearch = !metadataSearch.isBlank();
         boolean hasFilter = !metadataFilter.isBlank();
         if (!hasSearch && !hasFilter) {
-            return uploadedFileHttpContract.getAll(null, pageable);
+            return uploadedFileHttpContract.getAll(null, originalFilename, pageable);
         }
 
         List<String> filters = hasFilter ? List.of(metadataFilter) : List.of();
@@ -177,8 +179,12 @@ public class UploadedFileController {
             return new PageImpl<>(List.of(), pageable, window.totalHits());
         }
 
+        // The Meili window only filters on metadata; the filename clause narrows it further in the repository
+        // query. window.totalHits() stays the pagination total, so counts are approximate when both filters are
+        // combined and the filename removes hits from the window.
         Page<UploadedFileResponse> repoPage = uploadedFileHttpContract.getAll(
             orderedUploadedFileIds,
+            originalFilename,
             PageRequest.of(0, orderedUploadedFileIds.size(), Sort.by("id").ascending())
         );
         return new PageImpl<>(repoPage.getContent(), pageable, window.totalHits());

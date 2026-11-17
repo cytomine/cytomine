@@ -2,7 +2,6 @@ package org.cytomine.repository.config;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.cytomine.common.config.security.JwtAuthConverter;
-import org.cytomine.common.config.security.TokenFromParameterFilter;
 import org.cytomine.repository.config.security.ApiKeyFilter;
 import org.cytomine.repository.persistence.UserRepository;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +10,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -28,7 +26,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .addFilterBefore(new ApiKeyFilter(userRepository), BasicAuthenticationFilter.class)
@@ -45,7 +43,6 @@ public class SecurityConfiguration {
                     .anyRequest().authenticated()
             );
         http
-            .addFilterBefore(new TokenFromParameterFilter(), BearerTokenAuthenticationFilter.class)
             .oauth2ResourceServer((oauth2) -> oauth2
                 .jwt(jwtAuthConverter -> jwtAuthConverter.jwtAuthenticationConverter(customJwtAuthConverter)));
         return http.build();

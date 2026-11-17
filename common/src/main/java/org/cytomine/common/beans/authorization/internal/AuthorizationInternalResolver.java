@@ -3,7 +3,9 @@ package org.cytomine.common.beans.authorization.internal;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.cytomine.common.authorizationapi.model.AuthorizationRequest;
 import org.cytomine.common.authorizationapi.model.AuthorizationResponse;
 import org.cytomine.common.authorizationapi.model.CytomineDeniedPermission;
@@ -15,12 +17,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class AuthorizationInternalResolver implements PermissionsServiceV2 {
 
     private final CytominePermissions cytominePermissions;
     private final PermissionsConfigService permissionsConfigService;
+
+    @PostConstruct
+    public void printPermissions() {
+        log.info("{}", cytominePermissions);
+    }
 
     @Override
     public AuthorizationResponse authorize(@RequestBody AuthorizationRequest authorizationRequest) {
@@ -31,6 +39,7 @@ public class AuthorizationInternalResolver implements PermissionsServiceV2 {
                 .map(r -> r.substring(5))
                 .map(String::toUpperCase)
                 .collect(Collectors.toSet());
+        log.info("Roles for user {}", roles);
         Set<CytominePermission> permissions =
             roles.stream().flatMap(r -> cytominePermissions.roles().entrySet().stream()
                     .filter(entry -> entry.getKey().toUpperCase().equals(r)))
@@ -38,7 +47,7 @@ public class AuthorizationInternalResolver implements PermissionsServiceV2 {
                 .map(permissionsConfigService::map)
                 .collect(
                     Collectors.toSet());
-
+        log.info("Computed permissions for user: {}", permissions);
         return new AuthorizationResponse(
             authorizationRequest.permissionsRequested().stream()
                 .filter(p -> permissions.contains(p.permission()))

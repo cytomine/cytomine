@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import org.cytomine.common.repository.http.TermHttpContract;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;

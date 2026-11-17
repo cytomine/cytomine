@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +26,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;

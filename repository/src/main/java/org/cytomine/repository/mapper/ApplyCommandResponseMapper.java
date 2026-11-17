@@ -5,23 +5,22 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
+import org.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
+import org.cytomine.common.repository.model.command.payload.response.TagResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import be.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
-import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
-import be.cytomine.common.repository.model.command.payload.response.RoleResponse;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
-import be.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
-import be.cytomine.common.repository.model.command.payload.response.TagResponse;
-import be.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
-import be.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
 
 @Mapper(componentModel = "spring")
 public interface ApplyCommandResponseMapper {

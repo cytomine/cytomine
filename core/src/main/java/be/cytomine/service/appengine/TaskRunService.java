@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.springframework.core.io.ByteArrayResource;
@@ -44,7 +45,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.domain.appengine.CropOffset;
 import be.cytomine.domain.appengine.TaskRun;

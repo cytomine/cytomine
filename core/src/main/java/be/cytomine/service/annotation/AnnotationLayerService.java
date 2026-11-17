@@ -2,17 +2,15 @@ package be.cytomine.service.annotation;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.annotation.AnnotationLayer;
-import be.cytomine.domain.appengine.TaskRun;
 import be.cytomine.domain.appengine.TaskRunLayer;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.dto.annotation.AnnotationLayerResponse;
@@ -52,28 +50,18 @@ public class AnnotationLayerService {
     }
 
     public Set<AnnotationLayerResponse> findByTaskRunLayer(Long imageId) {
-        List<TaskRunLayer> taskRunLayers = taskRunLayerRepository.findAllByImageId(imageId);
-
-        Set<AnnotationLayerResponse> annotationLayerSet = taskRunLayers
-            .stream()
-            .map(TaskRunLayer::getAnnotationLayer)
-            .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
-            .collect(Collectors.toCollection(LinkedHashSet::new));
+        Stream<AnnotationLayer> taskRunLayers =
+            taskRunLayerRepository.findAllByImageId(imageId).stream().map(TaskRunLayer::getAnnotationLayer);
 
         ImageInstance imageInstance = imageInstanceService.get(imageId);
+        Stream<AnnotationLayer> lastTaskRunLayers =
+            taskRunRepository.findFirstByProjectIdOrderByCreatedDesc(imageInstance.getProject().getId()).stream()
+                .flatMap(
+                    existingTaskRun -> taskRunLayerRepository.findAllByTaskRunAndImage(existingTaskRun, imageInstance)
+                        .stream()).map(TaskRunLayer::getAnnotationLayer);
 
-        Optional<TaskRun> lastTaskRun = taskRunRepository
-            .findFirstByProjectIdOrderByCreatedDesc(imageInstance.getProject().getId());
-
-        if (lastTaskRun.isPresent()) {
-            Optional<TaskRunLayer> lastExecutedRunLayer = taskRunLayerRepository.findByTaskRun(lastTaskRun.get());
-
-            lastExecutedRunLayer
-                .map(TaskRunLayer::getAnnotationLayer)
-                .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
-                .ifPresent(annotationLayerSet::add);
-        }
-
-        return annotationLayerSet;
+        return Stream.concat(taskRunLayers, lastTaskRunLayers)
+            .map(layer -> new AnnotationLayerResponse(layer.getId(), layer.getName()))
+            .collect(Collectors.toSet());
     }
 }

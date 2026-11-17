@@ -13,13 +13,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.common.repository.http.ReviewedAnnotationHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;

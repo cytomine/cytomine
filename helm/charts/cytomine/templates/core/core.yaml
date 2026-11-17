@@ -68,6 +68,10 @@ spec:
                 secretKeyRef:
                   name: meilisearch-secret
                   key: masterKey
+            {{- if .Values.core.external_username_suffixes }}
+            - name: CYTOMINE_IAM_EXTERNALUSERNAME_SUFFIXES
+              value: "{{ .Values.core.external_username_suffixes }}"
+            {{- end }}
           envFrom:
             - configMapRef:
                 name: core-env

@@ -16,6 +16,14 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.config.security.CytomineAuthenticationSupport;
+import org.cytomine.common.repository.http.OntologyHttpContract;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.KeysResponse;
+import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.utils.SpringPageCrawler;
+import org.cytomine.common.utils.ParserUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,14 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.config.security.CytomineAuthenticationSupport;
-import be.cytomine.common.repository.http.OntologyHttpContract;
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.KeysResponse;
-import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.utils.SpringPageCrawler;
-import be.cytomine.common.utils.ParserUtils;
 import be.cytomine.controller.JsonResponseEntity;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.ImageInstance;
@@ -312,7 +312,7 @@ public class RestUserController extends RestCytomineController {
             }
         }
         if (!errors.isEmpty()) {
-            errorMessage += "Cannot add theses users to the project ${project.id} : " + errors + ". ";
+            errorMessage += "Cannot add these users to the project " + project.getId() + " : " + errors + ". ";
         }
         if (!wrongIds.isEmpty()) {
             errorMessage += String.join(",", wrongIds) + " are not well formatted ids";
@@ -324,6 +324,7 @@ public class RestUserController extends RestCytomineController {
 
         if (!errors.isEmpty() || !wrongIds.isEmpty()) {
             response.put("data", JsonObject.of("message", errorMessage));
+            response.put("status", 206);
             return JsonResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response.toJsonString());
         } else {
             response.put("data", JsonObject.of("message", "OK"));
@@ -385,7 +386,7 @@ public class RestUserController extends RestCytomineController {
             }
         }
         if (!errors.isEmpty()) {
-            errorMessage += "Cannot add theses users to the project ${project.id} : " + errors + ". ";
+            errorMessage += "Cannot remove these users from the project " + project.getId() + " : " + errors + ". ";
         }
         if (!wrongIds.isEmpty()) {
             errorMessage += String.join(",", wrongIds) + " are not well formatted ids";
@@ -397,6 +398,7 @@ public class RestUserController extends RestCytomineController {
 
         if (!errors.isEmpty() || !wrongIds.isEmpty()) {
             response.put("data", JsonObject.of("message", errorMessage));
+            response.put("status", 206);
             return JsonResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response.toJsonString());
         } else {
             response.put("data", JsonObject.of("message", "OK"));

@@ -7,6 +7,16 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cytomine.common.repository.model.command.payload.request.UploadedFileCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
+import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
+import org.cytomine.common.repository.model.command.request.CreateUploadedFileCommand;
+import org.cytomine.common.repository.model.command.request.DeleteCommandRequest;
+import org.cytomine.common.repository.model.command.request.DeleteUploadedFileCommand;
+import org.cytomine.common.repository.model.command.request.UpdateCommandRequest;
+import org.cytomine.common.repository.model.command.request.UpdateUploadedFileCommand;
+import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
+import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import org.cytomine.repository.mapper.CommandMapper;
 import org.cytomine.repository.mapper.UploadedFileMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
@@ -15,17 +25,6 @@ import org.cytomine.repository.persistence.entity.UploadedFileEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-
-import be.cytomine.common.repository.model.command.payload.request.UploadedFileCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
-import be.cytomine.common.repository.model.command.request.CreateCommandRequest;
-import be.cytomine.common.repository.model.command.request.CreateUploadedFileCommand;
-import be.cytomine.common.repository.model.command.request.DeleteCommandRequest;
-import be.cytomine.common.repository.model.command.request.DeleteUploadedFileCommand;
-import be.cytomine.common.repository.model.command.request.UpdateCommandRequest;
-import be.cytomine.common.repository.model.command.request.UpdateUploadedFileCommand;
-import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
-import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 
 @Component
 @RequiredArgsConstructor

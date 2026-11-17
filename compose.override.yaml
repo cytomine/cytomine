@@ -37,3 +37,9 @@ services:
     build:
       context: ./
       dockerfile: ./repository/Dockerfile
+
+  authorization-api:
+    image: cytomine/authorization-api:latest
+    build:
+      context: ./
+      dockerfile: ./authorization-api/Dockerfile

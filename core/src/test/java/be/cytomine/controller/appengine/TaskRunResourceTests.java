@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.transaction.Transactional;
+import org.cytomine.common.PostGisTestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.appengine.TaskRun;

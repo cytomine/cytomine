@@ -11,6 +11,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import jakarta.transaction.Transactional;
 import org.bson.Document;
+import org.cytomine.common.PostGisTestConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.social.LastConnection;

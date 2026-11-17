@@ -4,14 +4,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.cytomine.common.repository.model.list.filtered.BoundedFilter;
 import org.cytomine.repository.persistence.entity.ProjectEntity;
 import org.cytomine.repository.persistence.projection.ProjectRoleProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import be.cytomine.common.repository.model.list.filtered.BoundedFilter;
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     String PROJECT_CLASS = "'be.cytomine.domain.project.Project'";

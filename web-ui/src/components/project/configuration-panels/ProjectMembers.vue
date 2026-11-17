@@ -213,7 +213,8 @@ export default {
         this.$notify({ type: 'success', text: this.$t('notif-success-remove-project-members') });
       } catch (error) {
         console.log(error);
-        this.$notify({ type: 'error', text: this.$t('notif-error-remove-project-members') });
+        await this.refreshMembers();
+        this.$notify({ type: 'error', text: error?.response?.data?.errors?.message || error.message || this.$t('notif-error-remove-project-members') });
       }
     },
 

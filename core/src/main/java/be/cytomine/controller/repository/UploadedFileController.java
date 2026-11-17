@@ -11,6 +11,11 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.http.UploadedFileHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
+import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
+import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,11 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import be.cytomine.common.repository.http.UploadedFileHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
-import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
-import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import be.cytomine.controller.utils.CollectionResponse;
 import be.cytomine.controller.utils.PageMapper;
 import be.cytomine.dto.meilisearch.SearchWindow;

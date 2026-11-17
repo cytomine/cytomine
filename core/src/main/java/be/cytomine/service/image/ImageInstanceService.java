@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +31,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.command.AddCommand;
 import be.cytomine.domain.command.Command;

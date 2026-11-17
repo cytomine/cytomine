@@ -13,9 +13,9 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.test.web.servlet.MvcResult;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.Term;

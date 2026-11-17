@@ -1,5 +1,6 @@
 package be.cytomine.controller;
 
+import org.cytomine.common.PostGisTestConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;

@@ -179,9 +179,6 @@ public class UploadedFileController {
             return new PageImpl<>(List.of(), pageable, window.totalHits());
         }
 
-        // The Meili window only filters on metadata; the filename clause narrows it further in the repository
-        // query. window.totalHits() stays the pagination total, so counts are approximate when both filters are
-        // combined and the filename removes hits from the window.
         Page<UploadedFileResponse> repoPage = uploadedFileHttpContract.getAll(
             orderedUploadedFileIds,
             originalFilename,

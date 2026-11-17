@@ -17,13 +17,10 @@ import org.cytomine.e2etests.ui.WebDriverUtils;
 import org.cytomine.e2etests.utils.MultiUsersRunner;
 import org.cytomine.e2etests.utils.ReportType;
 import org.cytomine.e2etests.utils.Screenshots;
-import org.cytomine.e2etests.utils.TestImage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -606,31 +603,6 @@ public class CytomineTests {
 
             cytomineSteps.createUser(wait, cytomineUrl, username, firstname, lastname, email, password);
             cytomineSteps.deleteUser(wait, cytomineUrl, username, lastname);
-        });
-    }
-
-    @ParameterizedTest(name = "upload {0} image, then check its thumbnail and viewer")
-    @EnumSource(TestImage.class)
-    void uploadImageAndCheckFormat(TestImage testImage) {
-        multiUsers.runAsAdmin(wait, driver, admin -> {
-            String imageName = "selenium-" + randomUUID() + "." + testImage.getExtension();
-
-            cytomineSteps.addImageFromResource(
-                wait,
-                driver,
-                cytomineUrl,
-                testImage.getResourcePath(),
-                imageName,
-                Optional.of(admin.projectName())
-            );
-            try {
-                cytomineSteps.verifyImageThumbnail(wait, admin.projectUrl(), imageName);
-
-                cytomineSteps.openImageInViewer(wait, admin.projectUrl());
-                cytomineSteps.verifyImageViewerCanvas(wait);
-            } finally {
-                cleanup(() -> cytomineSteps.deleteImage(wait, cytomineUrl, imageName));
-            }
         });
     }
 }

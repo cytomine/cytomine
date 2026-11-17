@@ -4,12 +4,12 @@ import java.util.Date;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import be.cytomine.domain.CytomineSocialDomain;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.utils.JsonObject;
 
 @Getter

@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import lombok.AllArgsConstructor;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
@@ -17,7 +18,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.Kmeans;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.SliceInstanceRepository;
 import be.cytomine.service.ontology.AnnotationIndexService;
 

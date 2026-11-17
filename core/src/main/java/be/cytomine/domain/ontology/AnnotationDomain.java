@@ -17,6 +17,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.CytomineMethodNotYetImplementedException;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.locationtech.jts.geom.Geometry;
 
 import be.cytomine.domain.CytomineDomain;
@@ -25,8 +27,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.image.Point;
-import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.utils.GisUtils;
 import be.cytomine.utils.JsonObject;
 

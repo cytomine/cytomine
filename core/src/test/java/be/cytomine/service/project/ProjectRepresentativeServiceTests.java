@@ -2,6 +2,9 @@ package be.cytomine.service.project;
 
 import jakarta.transaction.Transactional;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.exceptions.AlreadyExistException;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,9 +20,6 @@ import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
-import be.cytomine.exceptions.AlreadyExistException;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.CommandResponse;
 

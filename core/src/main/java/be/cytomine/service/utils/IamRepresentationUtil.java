@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ErrorCode;
+import org.cytomine.common.exceptions.UserManagementException;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
-import be.cytomine.controller.error.ErrorCode;
 import be.cytomine.dto.Account;
-import be.cytomine.exceptions.UserManagementException;
 
 @Slf4j
 public class IamRepresentationUtil {

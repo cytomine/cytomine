@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
+import org.cytomine.common.exceptions.ServerException;
 import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.config.properties.ApplicationProperties;
 import be.cytomine.domain.meta.Property;
 import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.UrlApi;

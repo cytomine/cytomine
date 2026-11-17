@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.http.TermHttpContract;
 import org.locationtech.jts.io.ParseException;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
@@ -28,7 +29,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.image.CropParameter;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.image.ImageInstanceService;

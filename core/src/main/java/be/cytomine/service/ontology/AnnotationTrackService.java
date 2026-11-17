@@ -8,6 +8,8 @@ import java.util.Optional;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.AlreadyExistException;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +21,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.ontology.AnnotationDomain;
 import be.cytomine.domain.ontology.AnnotationTrack;
 import be.cytomine.domain.ontology.Track;
-import be.cytomine.exceptions.AlreadyExistException;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.repository.ontology.AnnotationTrackRepository;
 import be.cytomine.repository.ontology.TrackRepository;

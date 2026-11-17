@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.cytomine.common.exceptions.ForbiddenException;
 import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.utils.WeakConcurrentHashMap;
 
 // TODO IAM - ADMIN SESSION ADAPT IF NEEDED

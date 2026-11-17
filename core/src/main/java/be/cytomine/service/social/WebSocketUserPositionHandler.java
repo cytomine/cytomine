@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.cytomine.common.exceptions.ServerException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -21,7 +22,6 @@ import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorato
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastUserPosition;
-import be.cytomine.exceptions.ServerException;
 import be.cytomine.repository.image.ImageInstanceRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CytomineWebSocketHandler;

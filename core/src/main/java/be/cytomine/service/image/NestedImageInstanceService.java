@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.AlreadyExistException;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.NestedImageInstance;
 import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.image.NestedImageInstanceRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;

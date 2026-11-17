@@ -2,6 +2,7 @@ package be.cytomine.service.utils;
 
 import java.util.Optional;
 
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,8 +10,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
-
-import be.cytomine.exceptions.WrongArgumentException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

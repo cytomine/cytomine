@@ -5,7 +5,9 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Optional;
 
+import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
+import org.cytomine.e2etests.ui.AnnotationTools;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.cytomine.e2etests.ui.WebDriverUtils;
 import org.cytomine.e2etests.utils.MultiUsersRunner;
@@ -25,7 +27,8 @@ import org.springframework.context.annotation.Import;
 
 import static java.util.UUID.randomUUID;
 
-@Import({CytomineSteps.class, MultiUsersRunner.class, SeleniumDriver.class, WebDriverUtils.class})
+@Import({AnnotationTools.class, CytomineSteps.class, KeycloakClient.class, MultiUsersRunner.class, SeleniumDriver.class,
+    WebDriverUtils.class})
 @SpringBootTest
 public class ImageFormatTests {
     @Autowired

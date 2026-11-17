@@ -3,6 +3,7 @@ package be.cytomine.service.utils;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -12,8 +13,6 @@ import org.locationtech.jts.io.WKTWriter;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
 import org.locationtech.jts.io.geojson.GeoJsonWriter;
 import org.springframework.stereotype.Service;
-
-import be.cytomine.exceptions.WrongArgumentException;
 
 @RequiredArgsConstructor
 @Service

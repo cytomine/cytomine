@@ -7,6 +7,7 @@ import java.util.Optional;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.AlreadyExistException;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.CompanionFile;
 import be.cytomine.domain.image.UploadedFile;
-import be.cytomine.exceptions.AlreadyExistException;
 import be.cytomine.repository.image.CompanionFileRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;

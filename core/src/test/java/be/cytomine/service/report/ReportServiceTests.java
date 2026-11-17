@@ -9,6 +9,7 @@ import java.util.Set;
 
 import jakarta.transaction.Transactional;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.exceptions.ServerException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,7 +21,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import be.cytomine.CytomineCoreApplication;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
-import be.cytomine.exceptions.ServerException;
 import be.cytomine.service.utils.ReportFormatService;
 import be.cytomine.utils.JsonObject;
 

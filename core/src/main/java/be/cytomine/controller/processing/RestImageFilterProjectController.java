@@ -3,6 +3,7 @@ package be.cytomine.controller.processing;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import be.cytomine.controller.RestCytomineController;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.processing.ImageFilterProjectService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.utils.JsonObject;

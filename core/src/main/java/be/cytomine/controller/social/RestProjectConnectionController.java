@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.CytomineMethodNotYetImplementedException;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.http.UserHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.data.domain.Page;
@@ -24,8 +26,6 @@ import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.social.PersistentImageConsultation;
 import be.cytomine.domain.social.PersistentProjectConnection;
-import be.cytomine.exceptions.CytomineMethodNotYetImplementedException;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.report.ReportService;

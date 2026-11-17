@@ -27,6 +27,7 @@ import com.meilisearch.sdk.model.TaskInfo;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.SearchException;
 import org.cytomine.common.repository.http.StorageHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +38,6 @@ import org.springframework.stereotype.Service;
 import be.cytomine.dto.meilisearch.MeiliSearchFacetsResponse;
 import be.cytomine.dto.meilisearch.MeiliSearchImageResponse;
 import be.cytomine.dto.meilisearch.SearchWindow;
-import be.cytomine.exceptions.SearchException;
 
 @Slf4j
 @Service

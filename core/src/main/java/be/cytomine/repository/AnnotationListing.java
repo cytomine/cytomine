@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import jakarta.persistence.EntityManager;
 import lombok.Getter;
 import lombok.Setter;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
+import org.cytomine.common.exceptions.WrongArgumentException;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.image.ImageInstance;
@@ -20,8 +22,6 @@ import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.Track;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.exceptions.WrongArgumentException;
 
 @Getter
 @Setter

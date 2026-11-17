@@ -9,6 +9,7 @@ import java.util.Optional;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.group.ImageGroup;
 import be.cytomine.domain.image.group.ImageGroupImageInstance;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.group.ImageGroupImageInstanceRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.ModelService;

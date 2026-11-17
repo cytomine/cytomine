@@ -151,14 +151,16 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         // Get the Entity with Sub Entities
         String get = getMockMvc().perform(
-                get(getApiURL() + "/" + result.data().id()).with(authenticatedAs(username)).contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + result.data().id()).with(authenticatedAs(username))
+                    .contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         ApplyCommandResponse getResponse = getObjectMapper().readValue(get, ApplyCommandResponse.class);
         R getResponseData = (R) getResponse;
 
         // Update Entity
         String update = getMockMvc().perform(
-                put(getApiURL() + "/" + result.data().id()).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
+                put(getApiURL() + "/" + result.data().id()).with(authenticatedAs(username))
+                    .contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getUpdatePayload()))).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
 

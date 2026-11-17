@@ -79,22 +79,7 @@ jobs:
 
       - name: Count e2e tests in selenium folder
         run: |
-          SELENIUM_DIR=e2e-tests/src/test/java/org/cytomine/e2etests/selenium
-          TEST_DIR=e2e-tests/src/test/java
-
-          TEST_COUNT=$(grep -rhE "@Test\b" "$SELENIUM_DIR" --include="*.java" | wc -l)
-
-          PARAM_COUNT=0
-          while read -r ENUM; do
-            [ -z "$ENUM" ] && continue
-            ENUM_FILE=$(grep -rl "enum $ENUM" "$TEST_DIR" --include="*.java" | head -n1)
-            CONSTANTS=$(grep -cE "^[[:space:]]*[A-Z][A-Z0-9_]*[[:space:]]*\(" "$ENUM_FILE")
-            PARAM_COUNT=$((PARAM_COUNT + CONSTANTS))
-          done < <(grep -rhoE "@EnumSource\([^)]*[A-Za-z0-9_]+\.class" "$SELENIUM_DIR" --include="*.java" \
-            | grep -oE "[A-Za-z0-9_]+\.class" | sed "s/\.class//")
-
-          E2E_TEST_COUNT=$((TEST_COUNT + PARAM_COUNT))
-          echo "E2E_TEST_COUNT=$E2E_TEST_COUNT (tests=$TEST_COUNT, parameterized sessions=$PARAM_COUNT)"
+          E2E_TEST_COUNT=$(grep -r "@Test" e2e-tests/src/test/java/org/cytomine/e2etests/selenium/ --include="*.java" | wc -l)
           echo "E2E_TEST_COUNT=$E2E_TEST_COUNT" >> $GITHUB_ENV
 
       - name: Lint charts

@@ -6,6 +6,7 @@ import java.util.Optional;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,6 @@ import be.cytomine.domain.command.Transaction;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.ontology.AnnotationDomain;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.meta.AttachedFileRepository;
 import be.cytomine.repository.ontology.AnnotationDomainRepository;
 import be.cytomine.service.CurrentUserService;

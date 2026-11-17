@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ForbiddenException;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.http.UserHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.locationtech.jts.io.ParseException;
@@ -43,8 +45,6 @@ import be.cytomine.dto.image.ImageParameter;
 import be.cytomine.dto.image.LabelParameter;
 import be.cytomine.dto.image.WindowParameter;
 import be.cytomine.dto.meilisearch.SearchWindow;
-import be.cytomine.exceptions.ForbiddenException;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.image.ImageInstanceService;

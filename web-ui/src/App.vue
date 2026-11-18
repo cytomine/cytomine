@@ -132,9 +132,11 @@ export default {
     Object.freeze(constants);
 
     const authorizationHeaderInterceptor = async config => {
-      const token = await updateToken();
-
       config.headers = config.headers || {};
+
+      const token = this.$store.getters['currentUser/isActing']
+        ? await this.$store.dispatch('currentUser/ensureActingToken')
+        : await updateToken();
 
       if (token !== null) {
         this.$store.commit('currentUser/setShortTermToken', token);
@@ -168,6 +170,8 @@ html, body {
   padding: 0;
   overflow: hidden;
 }
+
+/* acting-as banner styles live in CytomineNavbar.vue */
 
 body {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif, sans-serif;

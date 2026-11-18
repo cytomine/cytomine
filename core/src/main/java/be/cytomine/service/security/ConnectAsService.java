@@ -1,8 +1,6 @@
 package be.cytomine.service.security;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -25,11 +23,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
-import be.cytomine.domain.security.ConnectAsEvent;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.security.ConnectAsResponse;
 import be.cytomine.dto.security.TokenExchangeResponse;
-import be.cytomine.repository.security.ConnectAsEventRepository;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
@@ -45,7 +41,6 @@ public class ConnectAsService {
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String IMAGE_SERVER_USERNAME = "ImageServer1";
 
-    private final ConnectAsEventRepository connectAsEventRepository;
     private final CurrentUserService currentUserService;
     private final CurrentRoleService currentRoleService;
     private final UserRepository userRepository;
@@ -79,14 +74,6 @@ public class ConnectAsService {
         String subject = resolveIamSubject(target);
         TokenExchangeResponse exchange = exchange(subject, adminJwt);
 
-        closeOpenEventsForAdmin(admin.id());
-        ConnectAsEvent event = new ConnectAsEvent();
-        event.setActingAdminId(admin.id());
-        event.setTargetUserId(target.getId());
-        event.setTargetUsername(target.getUsername());
-        event.setStartedAt(new Date());
-        connectAsEventRepository.save(event);
-
         log.info(
             "Connect as: admin {} ({}) now acts as user {} ({})",
             admin.username(), admin.id(), target.getUsername(), target.getId()
@@ -107,23 +94,7 @@ public class ConnectAsService {
             throw new ForbiddenException("You don't have the right to perform this action! You must be admin!");
         }
 
-        Optional<ConnectAsEvent> event =
-            connectAsEventRepository.findFirstByActingAdminIdAndTargetUserIdAndEndedAtIsNullOrderByStartedAtDesc(
-                admin.id(), targetUserId
-            );
-        if (event.isEmpty()) {
-            event = connectAsEventRepository
-                .findFirstByTargetUserIdAndEndedAtIsNullOrderByStartedAtDesc(targetUserId);
-        }
-        if (event.isPresent()) {
-            ConnectAsEvent open = event.get();
-            open.setEndedAt(new Date());
-            connectAsEventRepository.save(open);
-            log.info(
-                "Connect as: admin {} ({}) stopped acting as user {} ({})",
-                admin.username(), admin.id(), open.getTargetUsername(), open.getTargetUserId()
-            );
-        }
+        log.info("Connect as: admin {} ({}) stopped acting as user {}", admin.username(), admin.id(), targetUserId);
     }
 
     private String resolveIamSubject(User target) {
@@ -200,9 +171,4 @@ public class ConnectAsService {
         return "HTTP " + e.getStatusCode().value();
     }
 
-    private void closeOpenEventsForAdmin(Long actingAdminId) {
-        List<ConnectAsEvent> open = connectAsEventRepository.findByActingAdminIdAndEndedAtIsNull(actingAdminId);
-        open.forEach(e -> e.setEndedAt(new Date()));
-        connectAsEventRepository.saveAll(open);
-    }
 }

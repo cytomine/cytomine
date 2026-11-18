@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.cytomine.common.security.CommonSecurityConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,6 +21,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) {
         return commonSecurityConfiguration.commonHttp(http).authorizeHttpRequests(
-            (authorizeHttpRequests) -> authorizeHttpRequests.requestMatchers("/authorize").authenticated()).build();
+            authorizeHttpRequests -> authorizeHttpRequests.requestMatchers("/ping").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().anyRequest().authenticated()).build();
     }
 }

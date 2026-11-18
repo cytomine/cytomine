@@ -34,17 +34,6 @@ import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentRoleService;
 import be.cytomine.service.CurrentUserService;
 
-/**
- * "Connect as" (issue #1322): lets an administrator act on behalf of another user by
- * exchanging the admin's IAM access token for a regular token of the target user
- * (RFC 8693 token exchange with {@code requested_subject}). The minted token carries an
- * {@code act} claim identifying the admin, is a plain Keycloak token (so core, repository
- * and all downstream services enforce the target user's ACLs), and every session is
- * persisted to {@code connect_as_event} for audit.
- *
- * <p>IAM side prerequisites (one-time realm configuration): admin accounts must hold the
- * realm-management {@code impersonation} role.
- */
 @Slf4j
 @Service
 @Transactional
@@ -123,7 +112,6 @@ public class ConnectAsService {
                 admin.id(), targetUserId
             );
         if (event.isEmpty()) {
-            // tolerate the target being the acting identity in the current request
             event = connectAsEventRepository
                 .findFirstByTargetUserIdAndEndedAtIsNullOrderByStartedAtDesc(targetUserId);
         }
@@ -138,11 +126,6 @@ public class ConnectAsService {
         }
     }
 
-    /**
-     * Keycloak UUID of the target user: its stored reference, or looked up by username in IAM
-     * (and backfilled, like the authentication listener does) when the user never logged in
-     * with an IAM account yet.
-     */
     private String resolveIamSubject(User target) {
         if (target.getReference() != null) {
             return target.getReference();
@@ -212,13 +195,11 @@ public class ConnectAsService {
                 return error.error() + description;
             }
         } catch (JsonProcessingException ignored) {
-            // fall through to the generic message
         }
         return "HTTP " + e.getStatusCode().value();
     }
 
     private void closeOpenEventsForAdmin(Long actingAdminId) {
-        // a new connect-as session by the same admin ends any previous one still marked open
         List<ConnectAsEvent> open = connectAsEventRepository.findByActingAdminIdAndEndedAtIsNull(actingAdminId);
         open.forEach(e -> e.setEndedAt(new Date()));
         connectAsEventRepository.saveAll(open);

@@ -160,7 +160,6 @@ export default {
         onConfirm: async () => {
           try {
             await this.$store.dispatch('currentUser/connectAs', user.id);
-            // full reload so every service is queried with the acting identity
             window.location.assign('/');
           } catch (error) {
             console.log(error);

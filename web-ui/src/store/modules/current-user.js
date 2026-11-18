@@ -34,17 +34,12 @@ function persistActing(actingAs) {
       window.sessionStorage.removeItem(ACTING_AS_STORAGE_KEY);
     }
   } catch (error) {
-    // storage unavailable (private mode, ...) : acting session will not survive a reload
+    void error;
   }
 }
 
-/**
- * Re-arm the admin session then exchange the admin token for a token of the target user.
- * Uses a raw axios instance on purpose: the app request interceptor would attach the
- * acting token, while this exchange must be authorized by the admin's own token.
- */
 async function exchangeForActingToken(commit, userId) {
-  await updateToken(-1); // force refresh of the admin token held by the keycloak instance
+  await updateToken(-1);
   const adminToken = await updateToken();
   const authorization = { Authorization: `Bearer ${adminToken}` };
 
@@ -141,18 +136,10 @@ export default {
       await dispatch('fetchUser');
     },
 
-    /**
-     * Exchange the admin token for a token of the target user and store it as the
-     * "acting as" identity used for all subsequent API calls.
-     */
     async connectAs({ commit }, userId) {
       return exchangeForActingToken(commit, userId);
     },
 
-    /**
-     * Return the acting token, minting a fresh one through the still-alive admin
-     * session when it is expired or about to expire.
-     */
     async ensureActingToken({ state, commit }) {
       if (!state.actingAs) {
         return null;
@@ -163,17 +150,12 @@ export default {
       try {
         return await exchangeForActingToken(commit, state.actingAs.userId);
       } catch (error) {
-        // cannot act anymore (admin session gone, ...) : fall back to the admin identity
         persistActing(null);
         commit('setActingAs', null);
         throw error;
       }
     },
 
-    /**
-     * Close the acting session: notify core for the audit trail, then drop the local
-     * acting identity. The local cleanup always runs, even if core is unreachable.
-     */
     async exitActingAs({ state, commit }) {
       try {
         await updateToken(-1);

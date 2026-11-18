@@ -171,8 +171,6 @@ html, body {
   overflow: hidden;
 }
 
-/* acting-as banner styles live in CytomineNavbar.vue */
-
 body {
   font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif, sans-serif;
   color: #333;

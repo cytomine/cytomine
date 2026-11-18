@@ -12,10 +12,6 @@ import be.cytomine.domain.CytomineDomain;
 import be.cytomine.service.UrlApi;
 import be.cytomine.utils.JsonObject;
 
-/**
- * Audit trail entry of a "connect as" (admin impersonation) session: one row per
- * impersonation, closed (ended_at set) when the admin exits or starts a new one.
- */
 @Getter
 @Setter
 @Entity

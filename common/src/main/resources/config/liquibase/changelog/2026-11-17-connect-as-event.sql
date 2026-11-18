@@ -1,7 +1,5 @@
 --liquibase formatted sql
 --changeset cytomine:2026-11-17-connect-as-event
--- Audit trail of "connect as" (admin impersonation) sessions. No FK on purpose:
--- rows must survive the deletion of the admin or the target user.
 CREATE TABLE connect_as_event (
     id              BIGINT PRIMARY KEY,
     acting_admin_id BIGINT       NOT NULL,

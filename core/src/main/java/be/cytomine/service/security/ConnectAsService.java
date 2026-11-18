@@ -51,13 +51,13 @@ public class ConnectAsService {
     private final UserRepository userRepository;
     private final Keycloak keycloak;
 
-    @Value("${spring.security.oauth2.client.provider.keycloak.token-uri}")
+    @Value("${spring.security.oauth2.client.provider.keycloak.token-uri:http://iam:8100/iam/realms/cytomine/protocol/openid-connect/token}")
     private String tokenUri;
 
-    @Value("${keycloak-client.target.realm}")
+    @Value("${keycloak-client.target.realm:cytomine}")
     private String targetRealm;
 
-    @Value("${keycloak-client.target.client-id}")
+    @Value("${keycloak-client.target.client-id:core}")
     private String targetClientId;
 
     private final RestClient restClient = RestClient.create();
@@ -195,6 +195,7 @@ public class ConnectAsService {
                 return error.error() + description;
             }
         } catch (JsonProcessingException ignored) {
+            log.debug("Could not parse token exchange error response", ignored);
         }
         return "HTTP " + e.getStatusCode().value();
     }

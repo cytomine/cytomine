@@ -68,6 +68,8 @@ spec:
                 secretKeyRef:
                   name: meilisearch-secret
                   key: masterKey
+            - name: AUTHORIZATION_API_URL
+              value: http://authorization_api.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authorization_api.port }}
             {{- if .Values.core.external_username_suffixes }}
             - name: CYTOMINE_IAM_EXTERNALUSERNAME_SUFFIXES
               value: "{{ .Values.core.external_username_suffixes }}"

@@ -1,4 +1,4 @@
-package be.cytomine.exceptions;
+package org.cytomine.common.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -7,16 +7,16 @@ import lombok.extern.slf4j.Slf4j;
  * a project with same name It correspond to the HTTP code 409 (Conflict)
  */
 @Slf4j
-public class AlreadyExistException extends CytomineException {
+public class ConstraintException extends CytomineException {
 
-    public static int CODE = 409;
+    public static int CODE = 400;
 
     /**
      * Message map with this exception
      *
      * @param message Message
      */
-    public AlreadyExistException(String message) {
+    public ConstraintException(String message) {
         super(message, CODE);
         log.info(message);
     }

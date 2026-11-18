@@ -3,6 +3,7 @@ package be.cytomine.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -12,7 +13,6 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
 import be.cytomine.dto.image.BoundariesCropParameter;
-import be.cytomine.exceptions.WrongArgumentException;
 
 public class GeometryUtils {
 

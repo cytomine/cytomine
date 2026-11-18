@@ -5,6 +5,8 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.CytomineException;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.http.OntologyHttpContract;
 import org.cytomine.common.repository.http.UserHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
@@ -26,8 +28,6 @@ import be.cytomine.domain.command.CommandHistory;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.project.ProjectFromSearchRequest;
 import be.cytomine.dto.project.ProjectFromSearchResponse;
-import be.cytomine.exceptions.CytomineException;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.project.ProjectRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.appengine.TaskRunService;

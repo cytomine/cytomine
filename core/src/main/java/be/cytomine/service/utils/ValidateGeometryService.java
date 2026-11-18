@@ -7,12 +7,11 @@ import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Service;
-
-import be.cytomine.exceptions.WrongArgumentException;
 
 @Slf4j
 @RequiredArgsConstructor

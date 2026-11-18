@@ -87,6 +87,7 @@ images:
   cbir: cytomine/cbir:latest
   pims_import: cytomine/python-client:latest
   repository: cytomine/repository:latest
+  authorization_api: cytomine/authorization-api:latest
   tasks_runner_image: cytomine/app-engine-tasks-runner:latest
 
   #
@@ -176,7 +177,7 @@ core:
   # Comma-separated suffixes identifying external (LS-AAI) users whose project
   # memberships are provisioned from IAM, e.g. "@lifescience-ri.eu".
   # Empty by default: no user is considered external unless a deployment sets it.
-  external_username_suffixes: ""
+  external_username_suffixes: ''
   resources:
     requests:
       memory: 2Gi
@@ -308,6 +309,20 @@ repository:
       memory: 1Gi
       cpu: 1000m
       ephemeral-storage: 512Mi
+
+# Authorization API - Permissions microservice
+authorization_api:
+  port: 8083
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 500m
+      ephemeral-storage: 256Mi
+    limits:
+      memory: 1Gi
+      cpu: 1000m
+      ephemeral-storage: 512Mi
+  cytomine_permissions.yaml:
 
 #
 # Kubernetes things

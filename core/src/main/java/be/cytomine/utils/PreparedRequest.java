@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.NotImplementedException;
+import org.cytomine.common.exceptions.ServerException;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,11 +20,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import be.cytomine.exceptions.ServerException;
-
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
-
 
 @Getter
 @Setter

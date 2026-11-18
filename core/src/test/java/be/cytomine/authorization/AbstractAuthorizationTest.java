@@ -2,6 +2,7 @@ package be.cytomine.authorization;
 
 import jakarta.persistence.EntityManager;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.exceptions.ForbiddenException;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.exceptions.ForbiddenException;
 import be.cytomine.repository.security.UserRepository;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.PermissionService;

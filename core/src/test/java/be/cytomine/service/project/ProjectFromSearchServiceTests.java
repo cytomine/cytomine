@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.cytomine.common.exceptions.AlreadyExistException;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.cytomine.common.repository.http.OntologyHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
@@ -21,8 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import be.cytomine.domain.project.Project;
 import be.cytomine.dto.project.ProjectFromSearchRequest;
 import be.cytomine.dto.project.ProjectFromSearchResponse;
-import be.cytomine.exceptions.AlreadyExistException;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.utils.TaskService;
 import be.cytomine.utils.CommandResponse;

@@ -67,5 +67,15 @@ class ProjectCollection(Collection):
         self._allowed_filters = [None, "user", "ontology"]
         self.set_parameters(parameters)
 
+    def _fetch(self, append_mode: bool = False) -> "bool | Collection":
+        if not self._filters:
+            return Cytomine.get_instance().post_search_collection(
+                self,
+                "projects/search",
+                append_mode,
+            )
+
+        return super()._fetch(append_mode)
+
     def save(self, *args: Any, **kwargs: Any) -> bool | Collection:
         raise NotImplementedError("Cannot save a project collection by client.")

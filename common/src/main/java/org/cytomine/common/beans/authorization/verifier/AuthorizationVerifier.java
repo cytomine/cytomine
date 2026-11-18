@@ -19,18 +19,19 @@ public class AuthorizationVerifier {
     private final PermissionsServiceV2 permissionsServiceV2;
 
     public void authorize(AuthorizationRequest authorizationRequest) {
+        if (authorizationRequest.permissionsRequested().isEmpty()) {
+            return;
+        }
         AuthorizationResponse authorize = permissionsServiceV2.authorize(authorizationRequest);
         if (!verifyGranted(authorizationRequest, authorize)) {
-            throw new ForbiddenException(format("Missing permissions: %s",
-                authorize.deniedPermissions()));
+            throw new ForbiddenException(format("Missing permissions: %s", authorize.deniedPermissions()));
         }
 
     }
 
-    boolean verifyGranted(AuthorizationRequest authorizationRequest,
-        AuthorizationResponse authorizationResponse) {
-        return authorizationRequest.permissionsRequested()
-            .equals(authorizationResponse.grantedPermissions().stream().map(CytomineGrantedPermission::permission)
+    boolean verifyGranted(AuthorizationRequest authorizationRequest, AuthorizationResponse authorizationResponse) {
+        return authorizationRequest.permissionsRequested().equals(
+            authorizationResponse.grantedPermissions().stream().map(CytomineGrantedPermission::permission)
                 .collect(Collectors.toSet()));
     }
 }

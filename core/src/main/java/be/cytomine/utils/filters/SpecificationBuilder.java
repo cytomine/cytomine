@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.springframework.data.jpa.domain.Specification;
 
 import be.cytomine.domain.CytomineDomain;
-import be.cytomine.exceptions.WrongArgumentException;
 
 @Slf4j
 public class SpecificationBuilder {

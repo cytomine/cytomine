@@ -2,6 +2,7 @@ package be.cytomine.controller.project;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.http.UserHttpContract;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.project.ProjectRepresentativeUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.utils.TaskService;

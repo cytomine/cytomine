@@ -2,6 +2,7 @@ package be.cytomine.service.meta;
 
 import jakarta.transaction.Transactional;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.meta.AttachedFile;
 import be.cytomine.domain.project.Project;
-import be.cytomine.exceptions.ObjectNotFoundException;
 
 import static be.cytomine.authorization.AbstractAuthorizationTest.SUPERADMIN;
 import static org.assertj.core.api.Assertions.assertThat;

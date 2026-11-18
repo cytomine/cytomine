@@ -3,6 +3,7 @@ package be.cytomine.authorization.ontology;
 import java.util.Date;
 import java.util.Optional;
 
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,6 @@ import be.cytomine.config.WiremockRepository;
 import be.cytomine.domain.ontology.ReviewedAnnotation;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.EditingMode;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.service.UrlApi;
 import be.cytomine.service.ontology.ReviewedAnnotationService;
 import be.cytomine.utils.JsonObject;

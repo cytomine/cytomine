@@ -14,11 +14,11 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
+import org.cytomine.common.exceptions.ServerException;
+import org.cytomine.common.exceptions.WrongArgumentException;
 
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.dto.json.JsonInput;
-import be.cytomine.exceptions.ServerException;
-import be.cytomine.exceptions.WrongArgumentException;
 
 import static be.cytomine.utils.DateUtils.MONGO_DB_FORMAT;
 

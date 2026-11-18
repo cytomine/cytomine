@@ -1,9 +1,6 @@
-package be.cytomine.exceptions;
+package org.cytomine.common.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
-
-import be.cytomine.controller.error.ErrorCode;
-
 
 @Slf4j
 public class UserManagementException extends CytomineException {

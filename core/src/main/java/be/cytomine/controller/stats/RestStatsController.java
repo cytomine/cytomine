@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.cytomine.common.repository.http.TermHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.TermResponse;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,6 @@ import be.cytomine.domain.ontology.Term;
 import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.CurrentUserService;
 import be.cytomine.service.project.ProjectService;
 import be.cytomine.service.security.SecurityACLService;

@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
     "org.cytomine.common.config.security",
     "org.cytomine.common.keycloak",
     "org.cytomine.common.mapper",
+    "org.cytomine.common.security",
     "org.cytomine.common.serialization",
     "org.cytomine.repository",
 })

@@ -148,4 +148,7 @@
 
     <include file="/config/liquibase/changelog/2026-10-01-project-id-sequence.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="/config/liquibase/changelog/2026-11-17-connect-as-event.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -45,9 +45,6 @@ spec:
                 sleep 5
               done
               echo "IAM is ready"
-          volumeMounts:
-            - name: kc-auth
-              mountPath: "/opt/keycloak-auth"
           env:
             - name: KEYCLOAK_ADMIN_PASSWORD
               valueFrom:

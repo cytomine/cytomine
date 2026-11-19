@@ -81,6 +81,7 @@ spec:
         image: {{ .Values.images.iam }}
         ports:
         - containerPort: {{ .Values.iam.port }}
+        - containerPort: 9000
         command:
         - "/opt/keycloak/bin/kc.sh"
         - "start"
@@ -107,7 +108,7 @@ spec:
               key: password
         startupProbe:
           httpGet:
-            path: /iam/health/live
+            path: /health/live
             scheme: HTTPS
             port: 9000
           initialDelaySeconds: 30
@@ -125,7 +126,7 @@ spec:
           timeoutSeconds: 10
         livenessProbe:
           httpGet:
-            path: /iam/health/live
+            path: /health/live
             scheme: HTTPS
             port: 9000
           periodSeconds: 10

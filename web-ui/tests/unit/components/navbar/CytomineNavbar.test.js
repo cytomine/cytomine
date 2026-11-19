@@ -31,13 +31,19 @@ describe('CytomineNavbar.vue', () => {
     logout: vi.fn()
   };
 
-  const createWrapper = ({ user = {}, projects = {} } = {}) => {
+  const createWrapper = ({ user = {}, projects = {}, isEffectiveAdmin = false, isActing = false } = {}) => {
     const store = new Vuex.Store({
       modules: {
         currentUser: {
           namespaced: true,
           state: {
             user: { fullName: 'John Doe', guestByNow: false, ...user }
+          },
+          getters: {
+            isEffectiveAdmin: () => isEffectiveAdmin,
+            isActing: () => isActing,
+            actingUsername: () => null,
+            actingActorUsername: () => null
           }
         },
         projects: {
@@ -82,8 +88,7 @@ describe('CytomineNavbar.vue', () => {
     let wrapper = createWrapper();
     expect(wrapper.find('[to="/admin"]').exists()).toBe(false);
 
-    keycloak.hasResourceRole.mockImplementationOnce((role) => role === 'ADMIN');
-    wrapper = createWrapper();
+    wrapper = createWrapper({ isEffectiveAdmin: true });
     expect(wrapper.find('[to="/admin"]').exists()).toBe(true);
   });
 

@@ -155,7 +155,7 @@ export default {
       }
       if (this.searchString) {
         collection['fullName'] = {
-          ilike: encodeURIComponent(this.searchString)
+          ilike: this.searchString
         };
       }
 

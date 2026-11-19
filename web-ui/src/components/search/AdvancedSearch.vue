@@ -339,7 +339,7 @@ export default {
 
       if (this.searchString) {
         collection['name'] = {
-          ilike: encodeURIComponent(this.searchString)
+          ilike: this.searchString
         };
       }
       if (this.selectedTags.length > 0 && this.selectedTags.length < this.availableTags.length) {

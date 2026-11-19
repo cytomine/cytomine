@@ -43,6 +43,7 @@ public interface UploadedFileHttpContract {
     @GetExchange("/all")
     Page<UploadedFileResponse> getAll(
         @RequestParam(required = false) List<Long> uploadedFileIds,
+        @RequestParam(required = false) String originalFilename,
         Pageable pageable
     );
 }

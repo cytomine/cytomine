@@ -155,6 +155,7 @@ import { MyAccount, User } from '@/api';
 import { rolesMapping } from '@/utils/role-utils';
 import { getKeycloak } from '@/keycloak.js';
 import { KeycloakRole, UserRole } from '@/constants/UserRole.js';
+import { tokenHasResourceRole } from '@/utils/token-utils';
 import { useClipboard } from '@vueuse/core';
 import { formatMomentDate } from '@/utils/date';
 
@@ -187,7 +188,12 @@ export default {
     currentUser: get('currentUser/user'),
     currentAccount: get('currentUser/account'),
     role() {
-      // Guest > User > Admin
+      if (this.$store.getters['currentUser/isActing']) {
+        const token = this.$store.state.currentUser.actingAs && this.$store.state.currentUser.actingAs.token;
+        let key = tokenHasResourceRole(token, KeycloakRole.ADMIN) ? UserRole.ADMIN
+          : tokenHasResourceRole(token, KeycloakRole.USER) ? UserRole.USER : UserRole.GUEST;
+        return rolesMapping[key];
+      }
       let key = getKeycloak().hasResourceRole(KeycloakRole.ADMIN) ? UserRole.ADMIN
         : getKeycloak().hasResourceRole(KeycloakRole.USER) ? UserRole.USER : UserRole.GUEST;
       return rolesMapping[key];

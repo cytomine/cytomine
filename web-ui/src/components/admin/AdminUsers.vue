@@ -61,10 +61,13 @@
             <template v-else>-</template>
           </b-table-column>
 
-          <b-table-column label="" width="100">
+          <b-table-column label="" width="180">
             <div class="buttons">
               <button class="button is-link is-small" @click="startUserEdition(user)">
                 {{$t('button-edit')}}
+              </button>
+              <button class="button is-link is-small" @click="connectAs(user)" v-if="canConnectAs(user)">
+                {{$t('button-connect-as')}}
               </button>
               <button class="button is-link is-danger is-small" @click="deleteUser(user)" v-if="canDelete(user)">
                 {{$t('button-delete')}}
@@ -143,6 +146,27 @@ export default {
     canDelete(user) {
       const protectedUsers = ['admin', 'ImageServer1'];
       return !protectedUsers.includes(user.username);
+    },
+    canConnectAs(user) {
+      return user.username !== 'ImageServer1';
+    },
+    connectAs(user) {
+      this.$buefy.dialog.confirm({
+        title: this.$t('button-connect-as'),
+        message: this.$t('connect-as-confirmation', { username: user.username }),
+        confirmText: this.$t('button-connect-as'),
+        type: 'is-warning',
+        hasIcon: true,
+        onConfirm: async () => {
+          try {
+            await this.$store.dispatch('currentUser/connectAs', user.id);
+            window.location.assign('/');
+          } catch (error) {
+            console.log(error);
+            this.$notify({ type: 'error', text: this.$t('notif-error-connect-as') });
+          }
+        }
+      });
     },
     displayMemberOrigin(member) {
       let key;

@@ -35,22 +35,17 @@ spec:
       - name: temp
         emptyDir: {}
       initContainers:
-        - name: wait-for-iam-login
-          image: "{{ .Values.images.iam }}"
-          command: ["/bin/sh", "-c"]
-          args:
+        - name: wait-for-keycloak
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
             - |
-              until /opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm master --user admin --password $KEYCLOAK_ADMIN_PASSWORD --config /opt/keycloak-auth/kcadm.config; do
-                echo "Waiting for IAM to be ready..."
+              until curl --connect-timeout 5 -kfsS https://iam.{{ .Release.Namespace }}.svc.cluster.local:9000/health/started; do
+                echo "Waiting for Keycloak..."
                 sleep 5
               done
-              echo "IAM is ready"
-          env:
-            - name: KEYCLOAK_ADMIN_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: admin-iam-secret
-                  key: password
+              echo "Keycloak is ready"
           securityContext:
           {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
 

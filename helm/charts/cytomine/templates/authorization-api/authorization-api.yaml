@@ -33,6 +33,16 @@ spec:
         - name: temp
           emptyDir: { }
       initContainers:
+        - name: authorization-api-image-warm-up
+          image: "{{ .Values.images.authorization_api }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - exit
+            - "0"
         - name: wait-for-postgis
           image: "{{ .Values.images.postgis }}"
           securityContext:

@@ -26,6 +26,16 @@ spec:
         - name: temp
           emptyDir: {}
       initContainers:
+        - name: app-engine-image-warm-up
+          image: "{{ .Values.images.app_engine }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - exit
+            - "0"
         - name: wait-for-postgres
           image: "{{ .Values.images.postgresql }}"
           securityContext:

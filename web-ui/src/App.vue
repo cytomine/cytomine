@@ -132,9 +132,11 @@ export default {
     Object.freeze(constants);
 
     const authorizationHeaderInterceptor = async config => {
-      const token = await updateToken();
-
       config.headers = config.headers || {};
+
+      const token = this.$store.getters['currentUser/isActing']
+        ? await this.$store.dispatch('currentUser/ensureActingToken')
+        : await updateToken();
 
       if (token !== null) {
         this.$store.commit('currentUser/setShortTermToken', token);

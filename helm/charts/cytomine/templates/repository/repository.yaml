@@ -35,6 +35,28 @@ spec:
       - name: temp
         emptyDir: {}
       initContainers:
+        - name: wait-for-iam-login
+          image: "{{ .Values.images.iam }}"
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              until /opt/keycloak/bin/kcadm.sh config credentials --server {{ include "cytomine.iamInternalUrl" . }} --realm master --user admin --password $KEYCLOAK_ADMIN_PASSWORD --config /opt/keycloak-auth/kcadm.config; do
+                echo "Waiting for IAM to be ready..."
+                sleep 5
+              done
+              echo "IAM is ready"
+          volumeMounts:
+            - name: kc-auth
+              mountPath: "/opt/keycloak-auth"
+          env:
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-iam-secret
+                  key: password
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+
         - name: wait-for-postgis
           image: "{{ .Values.images.postgis }}"
           securityContext:

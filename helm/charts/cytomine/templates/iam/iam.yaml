@@ -28,6 +28,22 @@ spec:
       - name: tmp-keycloak
         emptyDir: {}
       initContainers:
+      - name: iam-init
+        image: {{ .Values.images.iam }}
+        imagePullPolicy: {{ .Values.images.pullPolicy }}
+        securityContext:
+        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
+        volumeMounts:
+          - name: opt-keycloak
+            mountPath: "/tmp"
+        command:
+          - /bin/sh
+          - -c
+          - >
+            set -x;
+            cp -r /opt/keycloak/* /tmp/;
+        resources:
+          {{- toYaml .Values.postgresql.resources | nindent 12 }}
       - name: wait-for-postgres
         image: "{{ .Values.images.postgresql }}"
         securityContext:
@@ -47,24 +63,6 @@ spec:
               echo "postgres-iam not ready, retrying in 2s..."
               sleep 2
             done
-
-      - name: iam-init
-        image: {{ .Values.images.iam }}
-        imagePullPolicy: {{ .Values.images.pullPolicy }}
-        securityContext:
-        {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
-        volumeMounts:
-          - name: opt-keycloak
-            mountPath: "/tmp"
-        command:
-          - /bin/sh
-          - -c
-          - >
-            set -x;
-            cp -r /opt/keycloak/* /tmp/;
-        resources:
-          {{- toYaml .Values.postgresql.resources | nindent 12 }}
-
       - name: certificates-provider
         securityContext:
         {{- include "cytomine.containerSecurityContext" . | nindent 10 }}
@@ -73,7 +71,6 @@ spec:
         volumeMounts:
         - name: keystore
           mountPath: "/keystore"
-
       containers:
       - name: iam
         securityContext:

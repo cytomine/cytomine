@@ -118,7 +118,7 @@ spec:
                   name: cytomine-admin-iam-secret
                   key: password
             - name: AUTHORIZATION_API_URL
-              value: http://authorization_api.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authorization_api.port }}
+              value: http://authorization-api.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authorization_api.port }}
           volumeMounts:
             - name: temp
               mountPath: /tmp

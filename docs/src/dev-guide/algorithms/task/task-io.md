@@ -171,7 +171,7 @@ The coordinate system used to encode positions is a simple 2D cartesian coordina
 
 <!-- TODO: add a note about the precision of the coordinates: support floating point but no guarantee to conserve all decimal places when there are a lot of them -->
 
-When the geometry is derived from an image parameter (see [`outputs.{PARAM}.dependencies.derived_from`](/dev-guide/algorithms/task/descriptor-reference##outputs-param-dependencies-derived-from)), the origin of the cartesian coordinate system must be located at the top left corner of the image.
+When the geometry is derived from an image parameter (see [`outputs.{PARAM}.dependencies.derived_from`](/dev-guide/algorithms/task/descriptor-reference##outputs-param-dependencies-derived-from)), the origin of the cartesian coordinate system must be located at the bottom-left corner of the image.
 
 Examples:
 

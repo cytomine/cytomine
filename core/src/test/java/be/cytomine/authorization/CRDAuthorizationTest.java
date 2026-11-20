@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.model.Permission;
@@ -107,13 +106,11 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     public void adminAddDomain() {
         expectOK(this::whenIAddDomain);
     }
 
     @Test
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     @WithMockUser(username = USER_ACL_ADMIN)
     public void userWithAdminPermissionAddDomain() {
         if (isPermissionForbidden(minimalPermissionForCreate(), BasePermission.ADMINISTRATION)) {
@@ -125,7 +122,6 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_DELETE)
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     public void userWithDeletePermissionAddDomain() {
         if (isPermissionForbidden(minimalPermissionForCreate(), BasePermission.DELETE)) {
             expectForbidden(this::whenIAddDomain);
@@ -136,7 +132,6 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_WRITE)
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     public void userWithWritePermissionAddDomain() {
         if (isPermissionForbidden(minimalPermissionForCreate(), BasePermission.WRITE)) {
             expectForbidden(this::whenIAddDomain);
@@ -147,7 +142,6 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_CREATE)
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     public void userWithCreatePermissionAddDomain() {
         if (isPermissionForbidden(minimalPermissionForCreate(), BasePermission.CREATE)) {
             expectForbidden(this::whenIAddDomain);
@@ -158,7 +152,6 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = USER_ACL_READ)
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     public void userWithReadPermissionAddDomain() {
         if (isPermissionForbidden(minimalPermissionForCreate(), BasePermission.READ)) {
             expectForbidden(this::whenIAddDomain);
@@ -189,7 +182,6 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
 
     @Test
     @WithMockUser(username = SUPERADMIN)
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     public void adminDeleteDomain() {
         if (minimalRoleForDelete().isPresent() && minimalRoleForDelete().get().equals("CREATOR")) {
             expectOK(this::whenIDeleteDomain);
@@ -201,7 +193,6 @@ public abstract class CRDAuthorizationTest extends AbstractAuthorizationTest {
     }
 
     @Test
-    @Disabled("This test does not work, the returned entity is a 500, but expectOK() ignores that")
     @WithMockUser(username = USER_ACL_ADMIN)
     public void userWithAdminPermissionDeleteDomain() {
         if (minimalRoleForDelete().isPresent() && minimalRoleForDelete().get().equals("CREATOR")) {

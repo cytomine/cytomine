@@ -100,7 +100,7 @@ export default {
       });
       if (this.searchString) {
         collection['instanceFilename'] = {
-          ilike: encodeURIComponent(this.searchString)
+          ilike: this.searchString
         };
       }
       return collection;

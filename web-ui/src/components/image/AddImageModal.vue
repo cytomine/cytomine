@@ -88,7 +88,7 @@ export default {
       });
       if (this.searchString) {
         collection['originalFilename'] = {
-          ilike: encodeURIComponent(this.searchString)
+          ilike: this.searchString
         };
       }
 

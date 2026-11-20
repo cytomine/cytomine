@@ -143,9 +143,10 @@ public class UploadedFileCommandService
         return aclService.canDeleteStorage(userId, aclId);
     }
 
-    public Page<UploadedFileResponse> getAll(long userId, List<Long> uploadedFileIds, Pageable pageable) {
+    public Page<UploadedFileResponse> getAll(long userId, List<Long> uploadedFileIds, String originalFilename,
+        Pageable pageable) {
         List<Long> storageIds = aclService.getAccessibleStorageIds(userId);
-        return uploadedFileRepository.search(storageIds, uploadedFileIds, pageable)
+        return uploadedFileRepository.search(storageIds, uploadedFileIds, originalFilename, pageable)
             .map(uploadedFileMapper::mapToUploadedFileResponse);
     }
 }

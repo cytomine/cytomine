@@ -125,7 +125,7 @@ export default {
     shortTermToken: get('currentUser/shortTermToken'),
     uploadedFileCollection() {
       return new UploadedFileCollection({
-        originalFilename: { ilike: encodeURIComponent(this.searchString) },
+        originalFilename: { ilike: this.searchString },
         metadataSearch: this.metadataSearch || null,
         metadataFilter: this.metadataFilters.length ? this.metadataFilters.join(' AND ') : null,
       });

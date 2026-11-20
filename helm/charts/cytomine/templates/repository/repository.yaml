@@ -35,6 +35,30 @@ spec:
       - name: temp
         emptyDir: {}
       initContainers:
+        - name: repository-image-warm-up
+          image: "{{ .Values.images.repository }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - exit
+            - "0"
+        - name: wait-for-keycloak
+          image: {{ .Values.images.curl }}
+          command:
+            - sh
+            - -c
+            - |
+              until curl --connect-timeout 5 -kfsS https://iam.{{ .Release.Namespace }}.svc.cluster.local:9000/health/started; do
+                echo "Waiting for Keycloak..."
+                sleep 5
+              done
+              echo "Keycloak is ready"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+
         - name: wait-for-postgis
           image: "{{ .Values.images.postgis }}"
           securityContext:

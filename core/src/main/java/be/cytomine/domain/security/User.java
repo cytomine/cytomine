@@ -130,7 +130,7 @@ public class User extends CytomineDomain {
     }
 
     public String getReference() {
-        return reference.toString();
+        return reference;
     }
 
     public CytomineDomain buildDomainFromJson(JsonObject json, EntityManager entityManager) {

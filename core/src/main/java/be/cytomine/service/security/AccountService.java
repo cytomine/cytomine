@@ -62,7 +62,7 @@ public class AccountService {
         usersResource.delete(badAccount.getId());
     }
 
-    public void createAccount(Account account) throws UserManagementException {
+    public String createAccount(Account account) throws UserManagementException {
 
         log.info("Creating account for user {}", account.username());
         // validate account
@@ -102,6 +102,8 @@ public class AccountService {
             );
             throw new UserManagementException(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR.toString(), 500);
         }
+        String createdId = CreatedResponseUtil.getCreatedId(response);
+
         // Get client
         ClientRepresentation client = getClientRepresentation(realmResource, usersResource, user);
 
@@ -110,12 +112,11 @@ public class AccountService {
 
         // Assign client level roles to user
         try {
-            UserResource userResource =
-                usersResource.get(CreatedResponseUtil.getCreatedId(response));
+            UserResource userResource = usersResource.get(createdId);
             userResource.roles().clientLevel(client.getId()).add(listOfRoles);
             log.info("assigned roles for user {}", account.username());
         } catch (WebApplicationException e) {
-            usersResource.delete(user.getId());
+            usersResource.delete(createdId);
             throw new UserManagementException(
                 ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT.toString(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value()
@@ -123,6 +124,7 @@ public class AccountService {
 
         }
         log.info("Created account for user {} successfully", account.username());
+        return createdId;
     }
 
     private List<RoleRepresentation> getRoleRepresentations(

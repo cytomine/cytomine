@@ -163,7 +163,6 @@ export default {
 
       let labelTranslation = this.editionMode ? 'update' : 'creation';
       this.internalUser.name = `${this.internalUser.firstname} ${this.internalUser.lastname}`;
-      this.internalUser.reference = crypto.randomUUID();
       this.internalUser.role = this.selectedRole;
       try {
         await this.internalUser.save();

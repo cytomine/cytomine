@@ -1,6 +1,8 @@
 	# Local registry address (must match k3s/registries.yaml)
 LOCAL_REGISTRY := 172.16.238.4:5000
 
+GATEWAY_IP ?= 172.16.238.100
+
 # Services to build (from compose.override.yaml)
 SERVICES := web-ui pims app-engine core cbir sam repository e2e-tests authorization-api
 
@@ -40,7 +42,7 @@ push-local:
 
 # Deploy helm cytomine to k3s
 helm-install:
-	helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install
+	helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install --set test.ingressIP=$(GATEWAY_IP)
 
 doctor:
 	@echo "Checking required tools..."
@@ -70,7 +72,7 @@ start-k3s-cluster:
 	docker compose $(FILES) up
 
 deploy-helm:
-	@helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install
+	@helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install --set test.ingressIP=$(GATEWAY_IP)
 
 run-e2e:
 	sudo mkdir -p ./data/dataset/aa-test-project/test-project/IMAGES

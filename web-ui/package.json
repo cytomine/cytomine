@@ -20,7 +20,7 @@
     "@vueuse/core": "^11.3.0",
     "axios": "^1.20.0",
     "buefy": "^0.8.20",
-    "bulma": "^0.7.5",
+    "bulma": "^1.0.4",
     "bulma-slider": "^2.0.0",
     "chart.js": "^4.5.1",
     "chartjs-plugin-datalabels": "^2.2.0",

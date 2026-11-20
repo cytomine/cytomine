@@ -15,8 +15,8 @@
 
 global:
   domainName:
-  affinity: { }
-  tolerations: { }
+  affinity: {}
+  tolerations: {}
 readOnceStorageClass: ''
 readManyStorageClass:
 # Resource settings
@@ -43,9 +43,9 @@ gateway:
   #     - name: my-gateway
   #       namespace: gateway-namespace
   #       sectionName: https
-  parentRefs: [ ]
+  parentRefs: []
   # Annotations for the Gateway resource
-  annotations: { }
+  annotations: {}
   # Timeout settings for HTTPRoute
   timeouts:
     # Request timeout (e.g., "3600s" for 1 hour)
@@ -332,7 +332,7 @@ serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations: { }
+  annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname
   # template

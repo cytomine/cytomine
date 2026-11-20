@@ -137,6 +137,67 @@ public class UploadedFileControllerTest
         assertFalse(getAllIds(username, String.valueOf(uploadedFileId + 1_000_000)).contains(uploadedFileId));
     }
 
+    private long createUploadedFileWithNames(String username, String filename, String originalFilename)
+        throws Exception {
+        long userId = jdbcTemplate.queryForObject("SELECT id FROM sec_user WHERE username = ?", Long.class, username);
+        long storageId = jdbcTemplate.queryForObject(
+            "INSERT INTO storage (version, name, user_id, created) VALUES (0, ?, ?, NOW()) RETURNING id",
+            Long.class, "test-storage-filename", userId
+        );
+        CreateUploadedFile payload = new CreateUploadedFile(userId, storageId, Optional.empty(),
+            filename, originalFilename, "tif", "image/tiff", 1024L, 0, Set.of());
+        String response = mockMvc.perform(post(apiURL).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload))).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+        return objectMapper.readValue(response, HttpCommandResponse.class).data().id();
+    }
+
+    private List<Long> getAllIdsByOriginalFilename(String username, String originalFilename) throws Exception {
+        var request = get(apiURL + "/all").with(authenticatedAs(username));
+        if (originalFilename != null) {
+            request = request.param("originalFilename", originalFilename);
+        }
+        String response = mockMvc.perform(request).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+
+        List<Long> ids = new ArrayList<>();
+        for (JsonNode node : objectMapper.readTree(response).get("content")) {
+            ids.add(node.get("id").asLong());
+        }
+        return ids;
+    }
+
+    @Test
+    @SneakyThrows
+    void getAllShouldReturnOnlyUploadedFilesMatchingOriginalFilename() {
+        String username = getUsername(createUser());
+        long boneId = createUploadedFileWithNames(username, UUID.randomUUID() + ".tif", "BONE slide A.tif");
+        createUploadedFileWithNames(username, UUID.randomUUID() + ".tif", "brain slide B.tif");
+
+        List<Long> ids = getAllIdsByOriginalFilename(username, "bone");
+
+        assertTrue(ids.contains(boneId));
+        assertEquals(1, ids.size());
+    }
+
+    @Test
+    @SneakyThrows
+    void getAllShouldReturnNoUploadedFileWhenOriginalFilenameMatchesNothing() {
+        String username = getUsername(createUser());
+        createUploadedFileWithNames(username, UUID.randomUUID() + ".tif", "BONE slide A.tif");
+
+        assertTrue(getAllIdsByOriginalFilename(username, "kidney").isEmpty());
+    }
+
+    @Test
+    @SneakyThrows
+    void getAllShouldReturnUploadedFilesWhenOriginalFilenameIsAbsent() {
+        String username = getUsername(createUser());
+        long boneId = createUploadedFileWithNames(username, UUID.randomUUID() + ".tif", "BONE slide A.tif");
+
+        assertTrue(getAllIdsByOriginalFilename(username, null).contains(boneId));
+    }
+
     @Override
     public UploadedFileResponse expectedUpdatedResponse(
         UploadedFileResponse response,

@@ -116,7 +116,7 @@ export default {
   },
   methods: {
     async fetchImages() {
-      this.images = await ImageInstanceCollection.fetchAllLight();
+      this.images = await ImageInstanceCollection.fetchAllLight({ userId: this.currentUser.id });
     },
     async fetchProjects() {
       this.projects = (await new ProjectCollection({

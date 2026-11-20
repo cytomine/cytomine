@@ -1171,3 +1171,9 @@ you-are-reviewing-image-since,You are reviewing this image since {date},Cette im
 you-have-validated-image-on,You have validated this image on {date},Vous avez validé cette image le {date},Usted ha validado esta imagen el {date},U hebt deze afbeelding gevalideerd op {date}
 z-resolution,Z resolution,Résolution Z,,Z-resolutie
 zip-upload-info,A ZIP file containing multiple image is allowed (except for VMS and MRXS),Il est possible d'uploader un ZIP contenant plusieurs images (à l'exception des images VMS et MRXS).,Se permite que un archivo ZIP contanga múltiples imágenes (excepto para VMS y MRXS),Het is mogelijk om een ??ZIP met meerdere afbeeldingen te uploaden (met uitzondering van VMS- en MRXS-afbeeldingen).
+acting-as-admin-label,admin: {username},admin : {username},admin: {username},admin: {username}
+acting-as-banner,Connecting as {username},Connecté en tant que {username},Conectado como {username},Verbonden als {username}
+acting-as-exit,Return to {username},Retour à {username},Volver a {username},Terug naar {username}
+button-connect-as,Connect as,Se connecter en tant que,Conectarse como,Verbinden als
+connect-as-confirmation,You are about to connect as {username}. All actions will be performed on their behalf until you exit. Continue?,Vous êtes sur le point de vous connecter en tant que {username}. Toutes les actions seront effectuées en son nom jusqu'à ce que vous quittiez. Continuer ?,Está a punto de conectarse como {username}. Todas las acciones se realizarán en su nombre hasta que salga. ¿Continuar?,U staat op het punt verbinding te maken als {username}. Alle acties worden namens deze gebruiker uitgevoerd totdat u afsluit. Doorgaan?
+notif-error-connect-as,Failed to connect as this user,Échec de la connexion en tant que cet utilisateur,Error al conectarse como este usuario,Verbinden als deze gebruiker mislukt

@@ -41,16 +41,17 @@ export default class ImageInstanceCollection extends Collection {
   }
 
   /**
-   * @static Fetch all image instances available to current user
+   * @static Fetch all image instances available to the given user
    *
-   * @param {number} [max=0]    The maximum number of items to retrieve
-   * @param {number} [offset=0] The offset
+   * @param {number} userId      Identifier of the user owning the images
+   * @param {number} [max=0]     The maximum number of items to retrieve
+   * @param {number} [offset=0]  The offset
    *
    * @returns {Array<{id: Number, filename: String, originalFilename: String, projectName: String, project: Number}>}
    *          The list of images (light format)
    */
-  static async fetchAllLight({ max = 0, offset = 0 } = {}) {
-    let { data } = await Cytomine.instance.api.get(`user/0/imageinstance/light.json?max=${max}&offset=${offset}`); // {user} value ignored in backend => set to 0
+  static async fetchAllLight({ userId, max = 0, offset = 0 } = {}) {
+    let { data } = await Cytomine.instance.api.get(`user/${userId}/imageinstance/light.json?max=${max}&offset=${offset}`);
     return data.collection;
   }
 

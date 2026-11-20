@@ -58,7 +58,7 @@ public class UploadedFileController implements UploadedFileHttpContract {
     }
 
     @Override
-    public Page<UploadedFileResponse> getAll(List<Long> uploadedFileIds, Pageable pageable) {
-        return service.getAll(currentUserService.getCurrentUserId(), uploadedFileIds, pageable);
+    public Page<UploadedFileResponse> getAll(List<Long> uploadedFileIds, String originalFilename, Pageable pageable) {
+        return service.getAll(currentUserService.getCurrentUserId(), uploadedFileIds, originalFilename, pageable);
     }
 }

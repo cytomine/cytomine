@@ -144,8 +144,7 @@ export default class Collection {
         } else if (typeof value === 'object') {
           for (let subkey in value) {
             if (value[subkey] !== null) {
-              let subkeyEncoded = encodeURI(`[${subkey}]`); // [ and ] are unsafe char in URL
-              params[`${key}` + subkeyEncoded] = value[subkey];
+              params[`${key}[${subkey}]`] = value[subkey];
             }
           }
         } else {

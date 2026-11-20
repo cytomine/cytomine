@@ -6,12 +6,13 @@ import java.util.UUID;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.domain.CytomineDomain;
 import be.cytomine.domain.annotation.Annotation;
 import be.cytomine.domain.annotation.AnnotationLayer;
@@ -54,7 +55,6 @@ import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
 import be.cytomine.domain.security.User;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.security.SecRoleRepository;
 import be.cytomine.repository.security.UserRepository;

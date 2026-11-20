@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import copy
+import json
 from collections.abc import Callable, Iterable, MutableSequence
 from typing import Any, TypeVar
 
@@ -162,6 +163,9 @@ class Collection(MutableSequence):
 
     def to_json(self, **dump_parameters: dict[str, Any]) -> str:
         return f"[{','.join([d.to_json(**dump_parameters) for d in self._data])}]"
+
+    def to_search_body(self) -> str:
+        return json.dumps(self._filters)
 
     def populate(
         self,

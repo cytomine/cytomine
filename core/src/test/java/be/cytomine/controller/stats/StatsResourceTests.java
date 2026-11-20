@@ -5,6 +5,13 @@ import java.util.List;
 
 import jakarta.persistence.EntityManager;
 import org.apache.commons.lang3.time.DateUtils;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.http.StatsHttpContract;
+import org.cytomine.common.repository.http.TermRelationHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
+import org.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
+import org.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
+import org.cytomine.common.repository.model.stat.payload.StatTerm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import be.cytomine.BasicInstanceBuilder;
 import be.cytomine.CytomineCoreApplication;
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.StatsHttpContract;
-import be.cytomine.common.repository.http.TermRelationHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
-import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
-import be.cytomine.common.repository.model.stat.payload.StatPerTermAndImage;
-import be.cytomine.common.repository.model.stat.payload.StatTerm;
 import be.cytomine.config.MockedUser;
 import be.cytomine.config.MongoTestConfiguration;
 import be.cytomine.config.WiremockRepository;

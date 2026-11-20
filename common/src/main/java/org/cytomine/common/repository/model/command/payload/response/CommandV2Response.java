@@ -1,0 +1,14 @@
+package org.cytomine.common.repository.model.command.payload.response;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.cytomine.common.repository.model.HasAclId;
+import org.cytomine.common.repository.model.HasLongId;
+import org.cytomine.common.repository.model.command.request.CommandV2Request;
+
+public record CommandV2Response<T extends HasLongId & HasAclId>(
+    UUID id,
+    CommandV2Request<T> commandRequest,
+    LocalDateTime created
+) {}

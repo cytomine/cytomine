@@ -13,6 +13,10 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.config.security.CytomineAuthenticationSupport;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
+import org.cytomine.common.repository.http.StorageHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
@@ -24,12 +28,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import be.cytomine.common.config.security.CytomineAuthenticationSupport;
-import be.cytomine.common.repository.http.StorageHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import be.cytomine.domain.security.User;
 import be.cytomine.dto.appengine.task.TaskRunValue;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.middleware.ImageServerService;
 

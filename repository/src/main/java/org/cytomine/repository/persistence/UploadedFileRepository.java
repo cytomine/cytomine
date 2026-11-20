@@ -19,6 +19,8 @@ public interface UploadedFileRepository extends JpaRepository<UploadedFileEntity
             WHERE uf.deleted IS NULL
             AND (:ignoreStorageFilter = TRUE OR uf.storageId IN (:storageIds))
             AND (:ignoreIdFilter = TRUE OR uf.id IN (:ids))
+            AND (:ignoreFilenameFilter = TRUE OR LOWER(COALESCE(uf.originalFilename, '')) LIKE
+                LOWER(CONCAT('%', :originalFilename, '%')))
             """
     )
     Page<UploadedFileEntity> search(
@@ -26,15 +28,25 @@ public interface UploadedFileRepository extends JpaRepository<UploadedFileEntity
         List<Long> storageIds,
         boolean ignoreIdFilter,
         List<Long> ids,
+        boolean ignoreFilenameFilter,
+        String originalFilename,
         Pageable pageable
     );
 
     default Page<UploadedFileEntity> search(List<Long> storageIds, List<Long> ids, Pageable pageable) {
+        return search(storageIds, ids, null, pageable);
+    }
+
+    default Page<UploadedFileEntity> search(List<Long> storageIds, List<Long> ids, String originalFilename,
+        Pageable pageable) {
+        boolean hasFilename = originalFilename != null && !originalFilename.isBlank();
         return search(
             storageIds == null,
             storageIds != null ? storageIds : List.of(-1L),
             ids == null || ids.isEmpty(),
             ids != null && !ids.isEmpty() ? ids : List.of(-1L),
+            !hasFilename,
+            hasFilename ? originalFilename : "",
             pageable
         );
     }

@@ -1,0 +1,28 @@
+package org.cytomine.common.repository.model.command.request;
+
+import org.cytomine.common.repository.model.command.CommandType;
+import org.cytomine.common.repository.model.command.Commands;
+import org.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+
+import static java.lang.String.format;
+
+public record UpdateTermCommand(TermCommandPayload before,
+                                TermCommandPayload after,
+                                long userId) implements UpdateCommandRequest<TermCommandPayload> {
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.UPDATE_TERM_COMMAND;
+    }
+
+    @Override
+    public String getActionMessage() {
+        return format("Term %s (%s => %s),color (%s => %s) updated in ontology %s", before.id(), before.name(),
+                after.name(), before.color(), after.color(), after.ontology());
+    }
+
+    @Override
+    public String getCommand() {
+        return Commands.UPDATE_TERM;
+    }
+}

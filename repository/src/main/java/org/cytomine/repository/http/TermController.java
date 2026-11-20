@@ -8,6 +8,11 @@ import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.TermHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.term.payload.CreateTerm;
+import org.cytomine.common.repository.model.term.payload.UpdateTerm;
 import org.cytomine.repository.mapper.TermMapper;
 import org.cytomine.repository.persistence.TermRepository;
 import org.cytomine.repository.service.ACLService;
@@ -20,13 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.http.TermHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
-import be.cytomine.common.repository.model.term.payload.CreateTerm;
-import be.cytomine.common.repository.model.term.payload.UpdateTerm;
-
-import static be.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
+import static org.cytomine.common.repository.http.TermHttpContract.ROOT_PATH;
 
 @RequiredArgsConstructor
 @RestController

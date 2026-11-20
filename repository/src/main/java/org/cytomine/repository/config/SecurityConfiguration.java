@@ -1,6 +1,8 @@
 package org.cytomine.repository.config;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.cytomine.common.config.security.JwtAuthConverter;
+import org.cytomine.common.config.security.TokenFromParameterFilter;
 import org.cytomine.repository.config.security.ApiKeyFilter;
 import org.cytomine.repository.persistence.UserRepository;
 import org.springframework.context.annotation.Bean;
@@ -12,9 +14,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
-import be.cytomine.common.config.security.JwtAuthConverter;
-import be.cytomine.common.config.security.TokenFromParameterFilter;
 
 @Configuration
 @EnableWebSecurity

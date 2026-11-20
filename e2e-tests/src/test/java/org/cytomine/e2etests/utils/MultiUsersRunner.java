@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.model.Role;
 import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.ui.CytomineSteps;
 import org.openqa.selenium.WebDriver;
@@ -15,12 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import be.cytomine.common.repository.model.Role;
+import static org.cytomine.common.repository.model.Role.ROLE_ADMIN;
+import static org.cytomine.common.repository.model.Role.ROLE_GUEST;
+import static org.cytomine.common.repository.model.Role.ROLE_USER;
 
-import static be.cytomine.common.repository.model.Role.ROLE_ADMIN;
-import static be.cytomine.common.repository.model.Role.ROLE_GUEST;
-import static be.cytomine.common.repository.model.Role.ROLE_USER;
-
+@Slf4j
 @Component
 public class MultiUsersRunner {
 
@@ -70,12 +71,22 @@ public class MultiUsersRunner {
                         projectUrl, projectName, ontologyUrl
                     ));
                 } finally {
-                    cytomineSteps.deleteProject(wait, projectUrl);
-                    cytomineSteps.deleteOntology(wait, ontologyUrl);
-                    cytomineSteps.logout(wait, cytomineUrl);
+                    cleanup(() -> cytomineSteps.deleteProject(wait, projectUrl),
+                        () -> cytomineSteps.deleteOntology(wait, ontologyUrl),
+                        () -> cytomineSteps.logout(wait, cytomineUrl));
                 }
             } finally {
                 keycloakClient.deleteUser(user.username());
+            }
+        }
+    }
+
+    private void cleanup(Runnable... actions) {
+        for (Runnable action : actions) {
+            try {
+                action.run();
+            } catch (Exception e) {
+                log.warn("Cleanup step failed: {}", e.getMessage(), e);
             }
         }
     }

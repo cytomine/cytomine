@@ -41,6 +41,13 @@
     </div>
 
     <div class="navbar-end">
+      <div class="navbar-item has-text-danger acting-as-label" v-if="isActing">
+        {{$t('acting-as-banner', { username: actingUsername })}}
+      </div>
+      <a class="navbar-item has-text-link acting-as-return" v-if="isActing" @click="exitActingAs">
+        <i class="fas fa-sign-out-alt"></i>
+        {{$t('acting-as-exit', { username: actingActorUsername })}}
+      </a>
       <cytomine-searcher />
       <!-- TODO IAM -->
       <navbar-dropdown
@@ -89,7 +96,6 @@ import shortcuts from '@/utils/shortcuts.js';
 import { useShortkeys } from '@/utils/use-shortkeys.js';
 import { getCurrentInstance } from 'vue';
 import { getKeycloak } from '@/keycloak.js';
-import { KeycloakRole } from '@/constants/UserRole.js';
 
 export default {
   name: 'cytomine-navbar',
@@ -115,8 +121,17 @@ export default {
   },
   computed: {
     currentUser: get('currentUser/user'),
+    isActing() {
+      return this.$store.getters['currentUser/isActing'];
+    },
+    actingUsername() {
+      return this.$store.getters['currentUser/actingUsername'];
+    },
+    actingActorUsername() {
+      return this.$store.getters['currentUser/actingActorUsername'];
+    },
     isAdmin() {
-      return getKeycloak().hasResourceRole(KeycloakRole.ADMIN);
+      return this.$store.getters['currentUser/isEffectiveAdmin'];
     },
     nbActiveProjects() {
       return Object.keys(this.$store.state.projects).length;
@@ -155,6 +170,10 @@ export default {
         console.log(error);
         this.$notify({ type: 'error', text: this.$t('notif-error-logout') });
       }
+    },
+    async exitActingAs() {
+      await this.$store.dispatch('currentUser/exitActingAs');
+      window.location.assign('/');
     }
   }
 };
@@ -184,5 +203,9 @@ export default {
   .fas, .far {
     padding-right: 0.5rem;
   }
+}
+
+.acting-as-label {
+  font-weight: 600;
 }
 </style>

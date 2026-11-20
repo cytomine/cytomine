@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.locationtech.jts.io.ParseException;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.project.Project;
@@ -26,7 +27,6 @@ import be.cytomine.dto.image.CropParameter;
 import be.cytomine.dto.image.ImageParameter;
 import be.cytomine.dto.image.LabelParameter;
 import be.cytomine.dto.image.WindowParameter;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.image.ImagePropertiesService;
 import be.cytomine.service.image.SliceCoordinatesService;

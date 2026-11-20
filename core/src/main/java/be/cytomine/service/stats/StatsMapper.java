@@ -7,10 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
+import org.cytomine.common.repository.model.stat.payload.StatUserTerm;
 import org.mapstruct.Mapper;
-
-import be.cytomine.common.repository.model.stat.payload.FlatStatUserTerm;
-import be.cytomine.common.repository.model.stat.payload.StatUserTerm;
 
 @Mapper(componentModel = "spring")
 public interface StatsMapper {

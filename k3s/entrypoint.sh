@@ -4,25 +4,11 @@
 # Make all mounts shared recursively to support Cilium's eBPF requirements
 mount --make-rshared /
 
-# Part one: forward requests to docker DNS
-# https://github.com/corneliusludmann/k3s-docker-compose-dns/blob/master/entrypoint.sh
-# Add IP tables rules to access Docker's internal DNS 127.0.0.11 from outside
-# based on https://serverfault.com/a/826424
-
-TCP_DNS_ADDR=$(iptables-save | grep DOCKER_OUTPUT | grep tcp | grep -o '127\.0\.0\.11:.*$')
-UDP_DNS_ADDR=$(iptables-save | grep DOCKER_OUTPUT | grep udp | grep -o '127\.0\.0\.11:.*$')
-
-iptables -t nat -A PREROUTING -p tcp --dport 53 -j DNAT --to "$TCP_DNS_ADDR"
-iptables -t nat -A PREROUTING -p udp --dport 53 -j DNAT --to "$UDP_DNS_ADDR"
-
-
-# Add this IP to resolv.conf since CoreDNS of k3s uses this file
-
-TMP_FILE=$(mktemp)
-sed "/nameserver.*/ a nameserver $(hostname -i | cut -f1 -d' ')" /etc/resolv.conf > "$TMP_FILE"
-cp "$TMP_FILE" /etc/resolv.conf
-rm "$TMP_FILE"
-
+# Do not DNAT DNS traffic to Docker's embedded resolver (127.0.0.11).
+# That resolver is loopback-only and its replies do not survive Cilium's
+# eBPF datapath, which breaks external DNS resolution from pods.
+# Kubelet already replaces Docker's loopback resolver with a public resolver
+# when generating /etc/resolv.conf for CoreDNS.
 
 # Part two: fix cgroups problems
 # https://github.com/k3s-io/k3s/issues/5123#issuecomment-1039674532

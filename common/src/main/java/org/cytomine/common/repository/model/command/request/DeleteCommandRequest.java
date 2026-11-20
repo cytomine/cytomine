@@ -1,0 +1,35 @@
+package org.cytomine.common.repository.model.command.request;
+
+import java.util.Optional;
+
+import org.cytomine.common.repository.model.HasAclId;
+import org.cytomine.common.repository.model.HasLongId;
+import org.cytomine.common.repository.model.command.payload.request.UpdateCommandPayload;
+
+public sealed interface DeleteCommandRequest<T extends HasLongId & HasAclId> extends CommandV2Request<T>
+    permits DeleteOntologyCommand,
+    DeleteProjectCommand,
+    DeleteRoleCommand,
+    DeleteStorageCommand,
+    DeleteTagCommand,
+    DeleteTagDomainAssociationCommand,
+    DeleteTermCommand,
+    DeleteTermRelationCommand,
+    DeleteUploadedFileCommand,
+    DeleteUserCommand,
+    DeleteUserRoleCommand {
+
+    T before();
+
+    default UpdateCommandPayload<T> data() {
+        return new UpdateCommandPayload<>(Optional.of(before()), Optional.empty());
+    }
+
+    default long id() {
+        return before().id();
+    }
+
+    default long aclId() {
+        return before().aclId();
+    }
+}

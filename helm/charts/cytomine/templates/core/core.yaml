@@ -68,6 +68,10 @@ spec:
                 secretKeyRef:
                   name: meilisearch-secret
                   key: masterKey
+            {{- if .Values.core.external_username_suffixes }}
+            - name: CYTOMINE_IAM_EXTERNALUSERNAME_SUFFIXES
+              value: "{{ .Values.core.external_username_suffixes }}"
+            {{- end }}
           envFrom:
             - configMapRef:
                 name: core-env
@@ -117,6 +121,16 @@ spec:
             failureThreshold: 40
             timeoutSeconds: 5
       initContainers:
+        - name: core-image-warm-up
+          image: "{{ .Values.images.core }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - exit
+            - "0"
         - name: wait-for-postgis
           image: "{{ .Values.images.postgis }}"
           securityContext:

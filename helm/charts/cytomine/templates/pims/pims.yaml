@@ -51,6 +51,16 @@ spec:
           name: images-temp
         {{ end }}
       initContainers:
+        - name: pims-image-warm-up
+          image: "{{ .Values.images.pims }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - /bin/sh
+            - -c
+            - exit
+            - "0"
         - name: wait-for-cache
           image: "{{ .Values.images.pims_cache }}"
           securityContext:

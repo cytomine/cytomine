@@ -1,9 +1,9 @@
 package be.cytomine;
 
+import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.repository.model.command.payload.response.OntologyResponse;
 import be.cytomine.domain.ontology.Ontology;
 
 @Mapper(componentModel = "spring", uses = {TermMapper.class})

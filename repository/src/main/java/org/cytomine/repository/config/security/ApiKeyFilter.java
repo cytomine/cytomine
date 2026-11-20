@@ -9,6 +9,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.cytomine.common.config.security.CytomineAuthenticationSupport;
 import org.cytomine.repository.persistence.UserRepository;
 import org.cytomine.repository.persistence.entity.UserEntity;
 import org.slf4j.Logger;
@@ -18,8 +19,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import be.cytomine.common.config.security.CytomineAuthenticationSupport;
 
 public class ApiKeyFilter extends OncePerRequestFilter {
 

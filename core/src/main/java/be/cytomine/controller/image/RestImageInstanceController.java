@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ForbiddenException;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
+import org.cytomine.common.repository.http.UserHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.locationtech.jts.io.ParseException;
 import org.springframework.cloud.gateway.mvc.ProxyExchange;
 import org.springframework.data.domain.Page;
@@ -29,8 +33,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import be.cytomine.common.repository.http.UserHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.UserResponse;
 import be.cytomine.controller.RestCytomineController;
 import be.cytomine.domain.image.AbstractImage;
 import be.cytomine.domain.image.ImageInstance;
@@ -43,8 +45,6 @@ import be.cytomine.dto.image.ImageParameter;
 import be.cytomine.dto.image.LabelParameter;
 import be.cytomine.dto.image.WindowParameter;
 import be.cytomine.dto.meilisearch.SearchWindow;
-import be.cytomine.exceptions.ForbiddenException;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.service.MeiliSearchService;
 import be.cytomine.service.image.AbstractImageService;
 import be.cytomine.service.image.ImageInstanceService;

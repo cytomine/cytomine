@@ -9,3 +9,6 @@ spec:
     - name: http
       port: {{ .Values.iam.port }}
       protocol: TCP
+    - name: http2
+      port: 9000
+      protocol: TCP

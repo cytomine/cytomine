@@ -4,16 +4,16 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.cytomine.common.mapper.BaseMapper;
+import org.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.term.payload.CreateTerm;
 import org.cytomine.repository.persistence.entity.TermEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import be.cytomine.common.repository.model.command.payload.request.TermCommandPayload;
-import be.cytomine.common.repository.model.command.payload.response.TermResponse;
-import be.cytomine.common.repository.model.term.payload.CreateTerm;
-
-@Mapper(componentModel = "spring", uses = {be.cytomine.common.mapper.BaseMapper.class})
+@Mapper(componentModel = "spring", uses = {BaseMapper.class})
 public interface TermMapper {
 
     @Mapping(target = "name", source = "replace.name")

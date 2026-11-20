@@ -183,8 +183,11 @@ export default class Project extends Model {
     if (this.isNew()) {
       throw new Error('Cannot add a user to a project with no ID.');
     }
-    let { data } = await Cytomine.instance.api.post(`${this.callbackIdentifier}/${this.id}/user.json?users=${idUsers.join(',')}`);
-    Cytomine.instance.lastCommand = data.command;
+    let response = await Cytomine.instance.api.post(`${this.callbackIdentifier}/${this.id}/user.json?users=${idUsers.join(',')}`);
+    if (response.status !== 200) {
+      throw new Error(response.data?.data?.message || 'Cannot add users to the project.');
+    }
+    Cytomine.instance.lastCommand = response.data.command;
   }
 
   /**
@@ -209,8 +212,11 @@ export default class Project extends Model {
     if (this.isNew()) {
       throw new Error('Cannot delete a user from a project with no ID.');
     }
-    let { data } = await Cytomine.instance.api.delete(`${this.callbackIdentifier}/${this.id}/user.json?users=${idUsers.join(',')}`);
-    Cytomine.instance.lastCommand = data.command;
+    let response = await Cytomine.instance.api.delete(`${this.callbackIdentifier}/${this.id}/user.json?users=${idUsers.join(',')}`);
+    if (response.status !== 200) {
+      throw new Error(response.data?.data?.message || 'Cannot remove users from the project.');
+    }
+    Cytomine.instance.lastCommand = response.data.command;
   }
 
   /**

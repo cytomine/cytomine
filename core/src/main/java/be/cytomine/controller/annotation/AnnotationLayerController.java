@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +15,6 @@ import be.cytomine.domain.annotation.AnnotationLayer;
 import be.cytomine.dto.annotation.AnnotationLayerResponse;
 import be.cytomine.dto.annotation.AnnotationResponse;
 import be.cytomine.dto.appengine.task.TaskRunLayerValue;
-import be.cytomine.exceptions.ObjectNotFoundException;
 import be.cytomine.repository.annotation.AnnotationRepository;
 import be.cytomine.repository.appengine.TaskRunLayerRepository;
 import be.cytomine.service.annotation.AnnotationLayerService;

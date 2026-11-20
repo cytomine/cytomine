@@ -14,7 +14,9 @@ import java.util.UUID;
 import lombok.SneakyThrows;
 import org.cytomine.e2etests.utils.ReportType;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -149,12 +151,41 @@ public class CytomineSteps {
 
     @SneakyThrows
     public void addImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName, Optional<String> maybeProjectName) {
+        uploadImageToStorage(wait, cytomineUrl, "cat.png", imageName, maybeProjectName);
+        waitForUploadSuccess(wait, imageName);
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'Hide successful uploads')]"));
+        webDriverUtils.clickButtonByText(wait, "Hide successful uploads");
+    }
+
+    @SneakyThrows
+    public void addImageFromResource(
+        Wait<WebDriver> wait,
+        WebDriver driver,
+        URL cytomineUrl,
+        String resourcePath,
+        String imageName,
+        Optional<String> maybeProjectName
+    ) {
+        uploadImageToStorage(wait, cytomineUrl, resourcePath, imageName, maybeProjectName);
+        // Some image formats need more time to be converted by PIMS
+        Wait<WebDriver> conversionWait = new WebDriverWait(driver, Duration.ofSeconds(300));
+        waitForUploadSuccess(conversionWait, imageName);
+    }
+
+    @SneakyThrows
+    private void uploadImageToStorage(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String resourcePath,
+        String imageName,
+        Optional<String> maybeProjectName
+    ) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/storage");
         webDriverUtils.byIsDisplayed(wait, By.xpath("//a[contains(., 'Add files')]"));
 
         Path tempDir = Files.createTempDirectory("selenium-upload");
         Path copiedFile = tempDir.resolve(imageName);
-        try (var in = getClass().getClassLoader().getResourceAsStream("cat.png")) {
+        try (var in = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
             Files.copy(in, copiedFile);
         }
         maybeProjectName.ifPresent(projectName -> selectProject(wait, projectName));
@@ -166,6 +197,9 @@ public class CytomineSteps {
             wait,
             By.xpath("//div[contains(@class,'uploaded-files-list')]//*[contains(text(),'" + imageName + "')]")
         );
+    }
+
+    private void waitForUploadSuccess(Wait<WebDriver> wait, String imageName) {
         webDriverUtils.byIsDisplayed(
             wait,
             By.xpath(
@@ -173,8 +207,28 @@ public class CytomineSteps {
                     + "//td[@data-label='Status']//span[@data-status='success']"
             )
         );
-        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'Hide successful uploads')]"));
-        webDriverUtils.clickButtonByText(wait, "Hide successful uploads");
+    }
+
+    public void verifyImageThumbnail(Wait<WebDriver> wait, String projectUrl, String imageName) {
+        webDriverUtils.goTo(wait, projectUrl.replace("configuration", "images"));
+        By thumbnail = By.xpath(
+            "//tr[.//span[contains(text(), '" + imageName + "')]]//img[contains(@class, 'image-thumbnail')]"
+        );
+        webDriverUtils.byIsDisplayed(wait, thumbnail);
+        wait.until(d -> {
+            try {
+                WebElement image = d.findElement(thumbnail);
+                Object loaded = ((JavascriptExecutor) d).executeScript(
+                    "return arguments[0].complete && arguments[0].naturalWidth > 0;", image);
+                return Boolean.TRUE.equals(loaded);
+            } catch (Exception e) {
+                return false;
+            }
+        });
+    }
+
+    public void verifyImageViewerCanvas(Wait<WebDriver> wait) {
+        webDriverUtils.waitForCanvasReady(wait, By.cssSelector(".ol-viewport canvas"));
     }
 
     private void selectProject(Wait<WebDriver> wait, String projectName) {

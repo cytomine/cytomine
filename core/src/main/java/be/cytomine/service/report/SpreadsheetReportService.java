@@ -10,9 +10,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.cytomine.common.exceptions.ServerException;
 import org.springframework.stereotype.Service;
-
-import be.cytomine.exceptions.ServerException;
 
 @Service
 @Slf4j
@@ -90,4 +89,3 @@ public class SpreadsheetReportService {
     }
 
 }
-

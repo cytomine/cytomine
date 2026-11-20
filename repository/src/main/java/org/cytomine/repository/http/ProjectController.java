@@ -7,6 +7,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.repository.http.ProjectHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
+import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
+import org.cytomine.common.repository.model.list.filtered.OptionallyBoundedFilter;
+import org.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
+import org.cytomine.common.repository.model.list.filtered.ProjectListFiltersPayload;
+import org.cytomine.common.repository.model.project.payload.CreateProject;
+import org.cytomine.common.repository.model.project.payload.UpdateProject;
 import org.cytomine.repository.persistence.ProjectListRow;
 import org.cytomine.repository.persistence.ProjectRepository;
 import org.cytomine.repository.persistence.projection.ProjectRoleProjection;
@@ -20,16 +29,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import be.cytomine.common.repository.http.ProjectHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
-import be.cytomine.common.repository.model.command.payload.response.ProjectResponse;
-import be.cytomine.common.repository.model.list.filtered.OptionallyBoundedFilter;
-import be.cytomine.common.repository.model.list.filtered.ProjectListFilteredResponse;
-import be.cytomine.common.repository.model.list.filtered.ProjectListFiltersPayload;
-import be.cytomine.common.repository.model.project.payload.CreateProject;
-import be.cytomine.common.repository.model.project.payload.UpdateProject;
 
 import static java.time.temporal.ChronoUnit.MICROS;
 

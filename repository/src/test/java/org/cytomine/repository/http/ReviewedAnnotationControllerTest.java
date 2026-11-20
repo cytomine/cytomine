@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import lombok.SneakyThrows;
+import org.cytomine.common.PostGisTestConfiguration;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.persistence.ReviewedAnnotationLinkRepository;
 import org.cytomine.repository.persistence.entity.ReviewedAnnotationLinkEntity;
@@ -19,8 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
-
-import be.cytomine.common.PostGisTestConfiguration;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.exceptions.ObjectNotFoundException;
+import org.cytomine.common.exceptions.WrongArgumentException;
 import org.springframework.stereotype.Service;
 
 import be.cytomine.domain.image.AbstractImage;
@@ -12,8 +14,6 @@ import be.cytomine.domain.image.ImageInstance;
 import be.cytomine.domain.image.SliceInstance;
 import be.cytomine.dto.image.SliceCoordinate;
 import be.cytomine.dto.image.SliceCoordinates;
-import be.cytomine.exceptions.ObjectNotFoundException;
-import be.cytomine.exceptions.WrongArgumentException;
 import be.cytomine.repository.image.AbstractSliceRepository;
 import be.cytomine.repository.image.SliceInstanceRepository;
 

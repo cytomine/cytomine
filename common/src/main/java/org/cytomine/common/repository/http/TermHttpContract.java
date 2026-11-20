@@ -1,0 +1,53 @@
+package org.cytomine.common.repository.http;
+
+import java.util.Optional;
+import java.util.Set;
+
+import jakarta.validation.Valid;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.TermResponse;
+import org.cytomine.common.repository.model.term.payload.CreateTerm;
+import org.cytomine.common.repository.model.term.payload.UpdateTerm;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.service.annotation.DeleteExchange;
+import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.annotation.HttpExchange;
+import org.springframework.web.service.annotation.PostExchange;
+import org.springframework.web.service.annotation.PutExchange;
+
+@HttpExchange(TermHttpContract.ROOT_PATH)
+public interface TermHttpContract {
+    String ROOT_PATH = "/terms";
+
+    @GetExchange("/{id}")
+    Optional<TermResponse> findTermByID(@PathVariable long id);
+
+    @PostExchange
+    Optional<HttpCommandResponse> create(@Valid @RequestBody CreateTerm createTerm);
+
+    @PutExchange("/{id}")
+    Optional<HttpCommandResponse> update(@PathVariable long id,
+        @RequestBody UpdateTerm updateTerm);
+
+    @DeleteExchange("/{id}")
+    Optional<HttpCommandResponse> delete(@PathVariable long id);
+
+    @DeleteExchange("/all")
+    Set<HttpCommandResponse> deleteAll(@RequestParam Set<Long> ids);
+
+    @GetExchange("/project/{id}")
+    Page<TermResponse> findTermsByProject(@PathVariable long id, Pageable pageable);
+
+    @GetExchange("/ontology/{id}")
+    Page<TermResponse> findTermsByOntology(@PathVariable long id, Pageable pageable);
+
+    @GetExchange("/ontology/{id}/all-terms")
+    Set<Long> findAllTermIdsByOntology(@PathVariable long id);
+
+    @GetExchange("/project/{id}/all-terms")
+    Set<Long> findAllTermIdsByProject(@PathVariable long id);
+}

@@ -1,0 +1,37 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:postgresql://${POSTGIS_HOST:localhost}:${POSTGIS_PORT:5432}/${POSTGIS_DB_NAME:docker}
+    username: ${POSTGIS_USER:docker}
+    password: ${POSTGIS_PASS:password}
+    hikari:
+      poolName: Hikari
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          batch_size: 50
+
+  liquibase:
+    enabled: true
+    change-log: classpath:config/liquibase/master.xml
+    contexts: prod
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${IAM_EXTERNAL_URL:http://127.0.0.1:8070}/iam/realms/cytomine
+          jws-algorithms: RS256
+          jwk-set-uri: ${IAM_URL:http://127.0.0.1:8070}/iam/realms/cytomine/protocol/openid-connect/certs
+
+jwt:
+  auth:
+    converter:
+      resource-id: core
+      principle-attribute: preferred_username

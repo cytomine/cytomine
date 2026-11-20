@@ -9,6 +9,12 @@ import java.util.UUID;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.repository.http.UploadedFileHttpContract;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
+import org.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
+import org.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.junit.jupiter.api.Test;
@@ -20,13 +26,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-
-import be.cytomine.common.PostGisTestConfiguration;
-import be.cytomine.common.repository.http.UploadedFileHttpContract;
-import be.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
-import be.cytomine.common.repository.model.command.payload.response.UploadedFileResponse;
-import be.cytomine.common.repository.model.uploadedfile.payload.CreateUploadedFile;
-import be.cytomine.common.repository.model.uploadedfile.payload.UpdateUploadedFile;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -136,6 +135,67 @@ public class UploadedFileControllerTest
         long uploadedFileId = createUploadedFile(username);
 
         assertFalse(getAllIds(username, String.valueOf(uploadedFileId + 1_000_000)).contains(uploadedFileId));
+    }
+
+    private long createUploadedFileWithNames(String username, String filename, String originalFilename)
+        throws Exception {
+        long userId = jdbcTemplate.queryForObject("SELECT id FROM sec_user WHERE username = ?", Long.class, username);
+        long storageId = jdbcTemplate.queryForObject(
+            "INSERT INTO storage (version, name, user_id, created) VALUES (0, ?, ?, NOW()) RETURNING id",
+            Long.class, "test-storage-filename", userId
+        );
+        CreateUploadedFile payload = new CreateUploadedFile(userId, storageId, Optional.empty(),
+            filename, originalFilename, "tif", "image/tiff", 1024L, 0, Set.of());
+        String response = mockMvc.perform(post(apiURL).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload))).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+        return objectMapper.readValue(response, HttpCommandResponse.class).data().id();
+    }
+
+    private List<Long> getAllIdsByOriginalFilename(String username, String originalFilename) throws Exception {
+        var request = get(apiURL + "/all").with(authenticatedAs(username));
+        if (originalFilename != null) {
+            request = request.param("originalFilename", originalFilename);
+        }
+        String response = mockMvc.perform(request).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+
+        List<Long> ids = new ArrayList<>();
+        for (JsonNode node : objectMapper.readTree(response).get("content")) {
+            ids.add(node.get("id").asLong());
+        }
+        return ids;
+    }
+
+    @Test
+    @SneakyThrows
+    void getAllShouldReturnOnlyUploadedFilesMatchingOriginalFilename() {
+        String username = getUsername(createUser());
+        long boneId = createUploadedFileWithNames(username, UUID.randomUUID() + ".tif", "BONE slide A.tif");
+        createUploadedFileWithNames(username, UUID.randomUUID() + ".tif", "brain slide B.tif");
+
+        List<Long> ids = getAllIdsByOriginalFilename(username, "bone");
+
+        assertTrue(ids.contains(boneId));
+        assertEquals(1, ids.size());
+    }
+
+    @Test
+    @SneakyThrows
+    void getAllShouldReturnNoUploadedFileWhenOriginalFilenameMatchesNothing() {
+        String username = getUsername(createUser());
+        createUploadedFileWithNames(username, UUID.randomUUID() + ".tif", "BONE slide A.tif");
+
+        assertTrue(getAllIdsByOriginalFilename(username, "kidney").isEmpty());
+    }
+
+    @Test
+    @SneakyThrows
+    void getAllShouldReturnUploadedFilesWhenOriginalFilenameIsAbsent() {
+        String username = getUsername(createUser());
+        long boneId = createUploadedFileWithNames(username, UUID.randomUUID() + ".tif", "BONE slide A.tif");
+
+        assertTrue(getAllIdsByOriginalFilename(username, null).contains(boneId));
     }
 
     @Override

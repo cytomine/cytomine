@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -117,7 +118,8 @@ public class AnnotationLayerServiceTest {
         List<TaskRunLayer> mockTaskRunLayers = List.of(mockTaskRunLayer, mockTaskRunLayer);
         when(taskRunLayerRepository.findAllByImageId(mockImage.getId())).thenReturn(mockTaskRunLayers);
         when(imageInstanceService.get(mockImage.getId())).thenReturn(mockImage);
-        when(taskRunLayerRepository.findByTaskRun(mockTaskRun)).thenReturn(Optional.of(mockTaskRunLayer));
+        when(taskRunLayerRepository.findAllByTaskRunAndImage(mockTaskRun, mockImage))
+            .thenReturn(Set.of(mockTaskRunLayer));
         when(taskRunRepository.findFirstByProjectIdOrderByCreatedDesc(mockProject.getId())).thenReturn(Optional.of(
             mockTaskRun));
 
@@ -126,5 +128,67 @@ public class AnnotationLayerServiceTest {
         assertFalse(results.isEmpty());
         assertEquals(mockTaskRunLayers.size(), results.size() + 1);
         verify(taskRunLayerRepository, times(1)).findAllByImageId(mockImage.getId());
+        verify(taskRunLayerRepository, times(1)).findAllByTaskRunAndImage(mockTaskRun, mockImage);
+    }
+
+    @Test
+    public void findByTaskRunLayerShouldReturnAllLayersOfLastTaskRun() {
+        // an app with several geometry outputs creates one annotation layer per output for a single task run
+        AnnotationLayer secondAnnotationLayer = new AnnotationLayer();
+        secondAnnotationLayer.setId(2L);
+        secondAnnotationLayer.setName(name + "-second");
+
+        TaskRunLayer secondLayer = new TaskRunLayer();
+        secondLayer.setId(101L);
+        secondLayer.setAnnotationLayer(secondAnnotationLayer);
+        secondLayer.setTaskRun(mockTaskRun);
+        secondLayer.setImage(mockImage);
+
+        when(taskRunLayerRepository.findAllByImageId(mockImage.getId())).thenReturn(List.of());
+        when(imageInstanceService.get(mockImage.getId())).thenReturn(mockImage);
+        when(taskRunRepository.findFirstByProjectIdOrderByCreatedDesc(mockProject.getId())).thenReturn(Optional.of(
+            mockTaskRun));
+        when(taskRunLayerRepository.findAllByTaskRunAndImage(mockTaskRun, mockImage))
+            .thenReturn(Set.of(mockTaskRunLayer, secondLayer));
+
+        Set<AnnotationLayerResponse> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
+
+        assertEquals(2, results.size());
+        assertTrue(results.contains(new AnnotationLayerResponse(mockAnnotationLayer.getId(), name)));
+        assertTrue(results.contains(new AnnotationLayerResponse(2L, name + "-second")));
+    }
+
+    @Test
+    public void findByTaskRunLayerShouldNotAddLayersFromAnotherImage() {
+        ImageInstance otherImage = new ImageInstance();
+        otherImage.setId(2L);
+        otherImage.setProject(mockProject);
+
+        TaskRun taskRunOnOtherImage = new TaskRun();
+        taskRunOnOtherImage.setImage(otherImage);
+
+        AnnotationLayer otherImageLayer = new AnnotationLayer();
+        otherImageLayer.setId(3L);
+        otherImageLayer.setName(name + "-other-image");
+
+        TaskRunLayer layerOnOtherImage = new TaskRunLayer();
+        layerOnOtherImage.setAnnotationLayer(otherImageLayer);
+        layerOnOtherImage.setTaskRun(taskRunOnOtherImage);
+        layerOnOtherImage.setImage(otherImage);
+
+        when(taskRunLayerRepository.findAllByImageId(mockImage.getId())).thenReturn(List.of(mockTaskRunLayer));
+        when(imageInstanceService.get(mockImage.getId())).thenReturn(mockImage);
+        when(taskRunRepository.findFirstByProjectIdOrderByCreatedDesc(mockProject.getId()))
+            .thenReturn(Optional.of(taskRunOnOtherImage));
+        when(taskRunLayerRepository.findAllByTaskRunAndImage(taskRunOnOtherImage, mockImage)).thenReturn(Set.of());
+
+        Set<AnnotationLayerResponse> results = annotationLayerService.findByTaskRunLayer(mockImage.getId());
+
+        assertEquals(1, results.size());
+        assertTrue(results.contains(new AnnotationLayerResponse(mockAnnotationLayer.getId(), name)));
+        assertFalse(results.contains(new AnnotationLayerResponse(3L, name + "-other-image")));
+
+        verify(taskRunLayerRepository, times(1)).findAllByTaskRunAndImage(taskRunOnOtherImage, mockImage);
+        verify(taskRunLayerRepository, never()).findAllByTaskRunAndImage(taskRunOnOtherImage, otherImage);
     }
 }

@@ -10,6 +10,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.UserRoleHttpContract;
 import org.cytomine.common.repository.model.Role;
 import org.cytomine.common.repository.model.command.payload.response.UserRoleResponse;
@@ -19,7 +20,9 @@ import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.persistence.RoleRepository;
 import org.cytomine.repository.persistence.entity.RoleEntity;
+import org.cytomine.repository.service.UserRoleCommandService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -55,6 +58,10 @@ class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRol
     JdbcTemplate jdbcTemplate;
     @Autowired
     ApplyCommandResponseMapper applyCommandResponseMapper;
+    @Autowired
+    private UserRoleCommandService cRUDCommandService;
+    @Mock
+    private AuthorizationVerifier authorizationVerifier;
 
     @Override
     public void beforeCreate(long userId) {
@@ -78,14 +85,14 @@ class UserRoleControllerTest implements CRUDCommandTests<CreateUserRole, UserRol
         String username = getUsername(userId);
         String stringResultGuest = mockMvc.perform(
                 put(getApiURL() + format("/define/%s/role/%s", targetUserId, Role.ROLE_GUEST)).with(
-                        authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
+                    authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
         Set<UserRoleResponse> resultGuest = getObjectMapper().readValue(stringResultGuest, new TypeReference<>() {
         });
         assertEquals(4, resultGuest.size());
         String stringResultAdmin = mockMvc.perform(
                 put(getApiURL() + format("/define/%s/role/%s", targetUserId, Role.ROLE_SUPER_ADMIN)).with(
-                        authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
+                    authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
             .andReturn().getResponse().getContentAsString();
         Set<UserRoleResponse> resultAdmin = getObjectMapper().readValue(stringResultAdmin, new TypeReference<>() {
         });

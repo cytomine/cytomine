@@ -5,8 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.cytomine.common.authorizationapi.model.permission.CytominePermission;
 import org.cytomine.common.authorizationapi.model.permission.PermissionType;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "permissionType",
-    visible = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "permissionType")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = CytomineInstanceRequestedPermission.class, name = "INSTANCE"),
     @JsonSubTypes.Type(value = CytomineProjectRequestedPermission.class, name = "PROJECT"),

@@ -72,7 +72,7 @@ start-k3s-cluster:
 	docker compose $(FILES) up
 
 deploy-helm:
-	@helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install --set test.ingressIP=$(GATEWAY_IP)
+	@helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install --dependency-update --set test.ingressIP=$(GATEWAY_IP)
 
 run-e2e:
 	sudo mkdir -p ./data/dataset/aa-test-project/test-project/IMAGES

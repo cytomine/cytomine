@@ -123,11 +123,11 @@ postgresql:
   resources:
     requests:
       memory: 512Mi
-      cpu: 50m
+      cpu: 100m
       ephemeral-storage: 1Gi
     limits:
-      memory: 512Mi
-      cpu: 200m
+      memory: 1024Mi
+      cpu: 400m
       ephemeral-storage: 1Gi
   storageClassName:
 
@@ -140,12 +140,12 @@ mongodb:
   database: cytomine
   resources:
     requests:
-      memory: 256Mi
-      cpu: 50m
+      memory: 512Mi
+      cpu: 100m
       ephemeral-storage: 1Gi
     limits:
-      memory: 1Gi
-      cpu: 200m
+      memory: 1024Mi
+      cpu: 400m
       ephemeral-storage: 1Gi
   storageClassName:
 

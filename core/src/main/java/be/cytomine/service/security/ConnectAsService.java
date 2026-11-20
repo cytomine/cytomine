@@ -5,6 +5,8 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.cytomine.common.exceptions.ForbiddenException;
@@ -98,9 +100,10 @@ public class ConnectAsService {
     }
 
     private String resolveIamSubject(User target) {
-        if (target.getReference() != null) {
+        if (iamUserMatches(target)) {
             return target.getReference();
         }
+
         List<UserRepresentation> found = keycloak.realm(targetRealm).users()
             .searchByUsername(target.getUsername(), true);
         if (found.isEmpty()) {
@@ -109,10 +112,27 @@ public class ConnectAsService {
             );
         }
         String iamId = found.get(0).getId();
-        log.info("Connect as: backfilling IAM reference of user {} to {}", target.getUsername(), iamId);
-        target.setReference(iamId);
-        userRepository.saveAndFlush(target);
+        if (!iamId.equals(target.getReference())) {
+            log.info("Connect as: backfilling IAM reference of user {} to {}", target.getUsername(), iamId);
+            target.setReference(iamId);
+            userRepository.saveAndFlush(target);
+        }
         return iamId;
+    }
+
+    private boolean iamUserMatches(User target) {
+        String reference = target.getReference();
+        if (reference == null) {
+            return false;
+        }
+        try {
+            UserRepresentation iamUser = keycloak.realm(targetRealm).users()
+                .get(reference)
+                .toRepresentation();
+            return iamUser != null && target.getUsername().equalsIgnoreCase(iamUser.getUsername());
+        } catch (NotFoundException | BadRequestException e) {
+            return false;
+        }
     }
 
     private String currentAdminJwt() {

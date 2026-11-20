@@ -148,6 +148,9 @@ services:
     command: [ "start-dev", "--http-port=8100" ]
     environment:
       KC_ADMIN_EMAIL: mail@mail.com
+      # Without KC_DB, Keycloak silently uses its embedded dev-file H2 database and ignores
+      # KC_DB_URL_*; the realm and users are then lost whenever the container is recreated.
+      KC_DB: postgres
       KC_DB_PASSWORD: password
       KC_DB_URL_DATABASE: iam
       KC_DB_URL_HOST: iam-db

@@ -780,7 +780,8 @@ public class UserService extends ModelService {
                 json.getJSONAttrBoolean("isDeveloper", false), json.getJSONAttrStr("language").toLowerCase(),
                 List.of(json.getJSONAttrStr("role").substring(5)));
 
-            accountService.createAccount(account);
+            String iamId = accountService.createAccount(account);
+            json.put("reference", iamId);
             CommandResponse response = executeCommand(new AddCommand(currentUser.id()), null, json);
 
             return response;

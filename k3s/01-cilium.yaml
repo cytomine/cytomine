@@ -9,7 +9,6 @@ metadata:
   name: cilium
   namespace: kube-system
 spec:
-  bootstrap: true
   repo: https://helm.cilium.io/
   chart: cilium
   targetNamespace: kube-system

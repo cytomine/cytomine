@@ -148,7 +148,9 @@ export default {
       return !protectedUsers.includes(user.username);
     },
     canConnectAs(user) {
-      return user.username !== 'ImageServer1';
+      const currentUser = this.$store.state.currentUser.user;
+      return user.username !== 'ImageServer1'
+        && (!currentUser || String(user.id) !== String(currentUser.id));
     },
     connectAs(user) {
       this.$buefy.dialog.confirm({

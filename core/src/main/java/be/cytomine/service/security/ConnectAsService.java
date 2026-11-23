@@ -68,6 +68,10 @@ public class ConnectAsService {
         User target = userRepository.findById(targetUserId)
             .orElseThrow(() -> new ObjectNotFoundException("User", targetUserId));
 
+        if (target.getId() != null && target.getId() == admin.id()) {
+            throw new ForbiddenException("You cannot connect as yourself");
+        }
+
         if (IMAGE_SERVER_USERNAME.equals(target.getUsername())) {
             throw new ForbiddenException("Connect as " + IMAGE_SERVER_USERNAME + " is not allowed");
         }

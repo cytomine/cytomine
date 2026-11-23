@@ -20,6 +20,7 @@ import org.cytomine.common.exceptions.UserManagementException;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -44,6 +45,10 @@ import static be.cytomine.service.utils.IamRepresentationUtil.setPermanentPasswo
 @Transactional
 @RequiredArgsConstructor
 public class AccountService {
+
+    private static final String ADMIN_ROLE = "ADMIN";
+    private static final String REALM_MANAGEMENT_CLIENT_ID = "realm-management";
+    private static final String IMPERSONATION_ROLE = "impersonation";
 
     private final Keycloak keycloak;
 
@@ -115,6 +120,12 @@ public class AccountService {
             UserResource userResource = usersResource.get(createdId);
             userResource.roles().clientLevel(client.getId()).add(listOfRoles);
             log.info("assigned roles for user {}", account.username());
+            syncRealmManagementImpersonationRole(
+                realmResource,
+                userResource,
+                account.username(),
+                account.roles().contains(ADMIN_ROLE)
+            );
         } catch (WebApplicationException e) {
             usersResource.delete(createdId);
             throw new UserManagementException(
@@ -255,7 +266,12 @@ public class AccountService {
             } else {
                 userResource.roles().clientLevel(client.getId()).add(listOfRoles);
             }
-
+            syncRealmManagementImpersonationRole(
+                keycloak.realm(realm),
+                userResource,
+                account.username(),
+                account.roles().contains(ADMIN_ROLE)
+            );
 
         } catch (WebApplicationException e) {
             log.error("failed to assign roles to account {}", account.username(), e);
@@ -287,6 +303,46 @@ public class AccountService {
         }
         log.info("account roles retrieved successfully");
         return listOfRoles;
+    }
+
+    /**
+     * Keep the Keycloak {@code realm-management:impersonation} role in sync with the Cytomine ADMIN role.
+     * This role is required for token exchange ("connect as") and must not be assigned manually.
+     */
+    private void syncRealmManagementImpersonationRole(
+        RealmResource realmResource,
+        UserResource userResource,
+        String username,
+        boolean shouldHaveImpersonation
+    ) {
+        List<ClientRepresentation> realmManagementClients =
+            realmResource.clients().findByClientId(REALM_MANAGEMENT_CLIENT_ID);
+        if (realmManagementClients.isEmpty()) {
+            log.error(
+                "realm-management client not found; cannot synchronize impersonation role for user {}",
+                username
+            );
+            return;
+        }
+
+        String realmManagementId = realmManagementClients.get(0).getId();
+        RoleScopeResource roleMapping = userResource.roles().clientLevel(realmManagementId);
+        boolean hasImpersonation = roleMapping.listAll().stream()
+            .anyMatch(role -> IMPERSONATION_ROLE.equals(role.getName()));
+
+        if (shouldHaveImpersonation == hasImpersonation) {
+            return;
+        }
+
+        RoleRepresentation impersonation = realmResource.clients().get(realmManagementId)
+            .roles().get(IMPERSONATION_ROLE).toRepresentation();
+        if (shouldHaveImpersonation) {
+            roleMapping.add(List.of(impersonation));
+            log.info("Assigned realm-management '{}' role to user {}", IMPERSONATION_ROLE, username);
+        } else {
+            roleMapping.remove(List.of(impersonation));
+            log.info("Removed realm-management '{}' role from user {}", IMPERSONATION_ROLE, username);
+        }
     }
 
     private Validation validateAccount(Account account, ValidationFor source) {

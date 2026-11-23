@@ -50,7 +50,7 @@ public class PermissionsService {
     private static final List<String> WEB_ORIGINS = List.of("*");
     private static final String REALM_MANAGEMENT_CLIENT = "realm-management";
     private static final List<String> REALM_MANAGEMENT_ROLES =
-        List.of("view-users", "manage-users", "query-users");
+        List.of("view-users", "manage-users", "query-users", "impersonation");
     private static final List<String> SUPPORTED_LOCALES = List.of("en", "fr", "es", "nl");
     private static final String DEFAULT_LOCALE = "en";
     private static final String PROFILE_CLIENT_SCOPE = "profile";
@@ -96,6 +96,7 @@ public class PermissionsService {
             ensureAdminUserIsSet(realmResource, coreClient);
             ensureRealmIsInternationalized(realmResource);
             ensureAdminHasRealmManagementRoles(realmResource);
+            ensureAllAdminUsersHaveRealmManagementRoles(realmResource, coreClient);
             applyUserProfileSchema(realmResource);
             ensureProjectsMapperIsSet(realmResource);
         }
@@ -254,6 +255,18 @@ public class PermissionsService {
         if (user == null) {
             throw new IllegalStateException("Missing Keycloak admin user " + adminUsername);
         }
+        ensureRealmManagementRoles(realmResource, user);
+    }
+
+    private void ensureAllAdminUsersHaveRealmManagementRoles(
+        RealmResource realmResource,
+        ClientResource coreClient
+    ) {
+        coreClient.roles().get(ADMIN_ROLE).getUserMembers(0, 1000)
+            .forEach(user -> ensureRealmManagementRoles(realmResource, user));
+    }
+
+    private void ensureRealmManagementRoles(RealmResource realmResource, UserRepresentation user) {
         ClientRepresentation realmManagement = realmResource.clients().findByClientId(REALM_MANAGEMENT_CLIENT).stream()
             .findFirst().orElse(null);
         if (realmManagement == null) {
@@ -272,7 +285,7 @@ public class PermissionsService {
         }
         userResource.roles().clientLevel(realmManagement.getId()).add(missing);
         log.info("Assigned realm-management roles {} to user '{}'",
-            missing.stream().map(RoleRepresentation::getName).toList(), adminUsername);
+            missing.stream().map(RoleRepresentation::getName).toList(), user.getUsername());
     }
 
     private void applyUserProfileSchema(RealmResource realmResource) {

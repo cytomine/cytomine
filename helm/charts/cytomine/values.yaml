@@ -123,15 +123,23 @@ postgresql:
   resources:
     requests:
       memory: 512Mi
-      cpu: 50m
+      cpu: 100m
       ephemeral-storage: 1Gi
     limits:
-      memory: 512Mi
-      cpu: 200m
+      memory: 1024Mi
+      cpu: 400m
       ephemeral-storage: 1Gi
   storageClassName:
 
 # MongoDB - Secondary database.Stores activity data
+# To upgrade mongoDB:
+# Upgrade the helm multiple times, start from 5.0 probably, and go up, one by one, to the desired state.
+# mongo:5.0-focal
+# mongo:6.0-focal
+# mongo:7
+# mongo:8
+# mongo:9 -> current max version.
+
 mongodb:
   deploy: true
   port: 27017
@@ -140,12 +148,12 @@ mongodb:
   database: cytomine
   resources:
     requests:
-      memory: 256Mi
-      cpu: 50m
+      memory: 512Mi
+      cpu: 100m
       ephemeral-storage: 1Gi
     limits:
-      memory: 1Gi
-      cpu: 200m
+      memory: 1024Mi
+      cpu: 400m
       ephemeral-storage: 1Gi
   storageClassName:
 

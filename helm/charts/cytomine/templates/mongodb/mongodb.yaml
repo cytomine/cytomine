@@ -37,8 +37,6 @@ spec:
         {{ if not .Values.mongodb.storageClassName -}}
         - name: mongodb-storage
           emptyDir: { }
-        - name: mongodb-storage-backups
-          emptyDir: { }
         {{ end }}
       containers:
         - name: mongodb
@@ -95,39 +93,6 @@ spec:
             timeoutSeconds: 10
           resources:
             {{- toYaml .Values.mongodb.resources | nindent 12 }}
-      initContainers:
-      {{ if .Values.mongodb.upgradeFrom }}
-        - name: export-mongodb
-          image: "{{ .Values.mongodb.upgradeFrom }}"
-          imagePullPolicy: {{ .Values.images.pullPolicy }}
-          securityContext:
-            {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
-          volumeMounts:
-            - name: mongodb-storage
-              mountPath: "/data/db"
-            - name: mongodb-storage-backups
-              mountPath: "/data/db-backups"
-            - name: temp
-              mountPath: "/tmp"
-          command:
-            - mongodump
-            - "-out=/data/db-backups/backup-{{ .Values.mongodb.upgradeFrom }}"
-        - name: import-mongodb
-          image: "{{ .Values.images.mongodb }}"
-          imagePullPolicy: {{ .Values.images.pullPolicy }}
-          securityContext:
-            {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
-          volumeMounts:
-            - name: mongodb-storage
-              mountPath: "/data/db"
-            - name: mongodb-storage-backups
-              mountPath: "/data/db-backups"
-            - name: temp
-              mountPath: "/tmp"
-          command:
-            - mongorestore
-            - "/data/db-backups/backup-{{ .Values.mongodb.upgradeFrom }}"
-      {{ end }}
       {{- with .Values.global.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
@@ -136,15 +101,6 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: mongodb-storage
-      spec:
-        storageClassName: {{ .Values.mongodb.storageClassName }}
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: {{ .Values.mongodbStorage }}
-    - metadata:
-        name: mongodb-storage-backups
       spec:
         storageClassName: {{ .Values.mongodb.storageClassName }}
         accessModes:

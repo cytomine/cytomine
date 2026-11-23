@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongo-upgrade-job
+  labels:
+    app: mongo-upgrade-job
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+spec:
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
+      initContainers: # initContainers run in sequence, not containers
+        - name: wait-for-mongo
+          image: "{{ .Values.images.mongodb }}"
+          command:
+            - mongod --version
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+
+      containers:
+        - name: check-job-done
+          image: "{{ .Values.images.mongodb }}"
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          command:
+            - mongod --version
+          env:
+          volumeMounts:
+
+      volumes:
+      restartPolicy: Never

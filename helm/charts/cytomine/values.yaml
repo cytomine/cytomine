@@ -100,7 +100,7 @@ images:
   eclipse_temurin: eclipse-temurin:8u462-b08-jdk-ubi9-minimal
   postgis: postgis/postgis:15-3.5
   postgresql: postgres:15
-  mongodb: mongo:5.0-focal
+  mongodb: mongo:6.0-focal
   pims_cache: redis:7
   redis: redis:7
   meilisearch: getmeili/meilisearch:v1.43.0
@@ -132,6 +132,8 @@ postgresql:
   storageClassName:
 
 # MongoDB - Secondary database.Stores activity data
+# To upgrade mongoDB:
+# Upgrade the helm multiple times, start from 5.0 probably, and go up to the desired state.
 mongodb:
   deploy: true
   port: 27017
@@ -148,11 +150,6 @@ mongodb:
       cpu: 200m
       ephemeral-storage: 1Gi
   storageClassName:
-  # upgrade mongoDB. If the image here is different from .images.mongodb then it is ignored.
-  # the goal is to have a clear backup/import way of upgrading.
-  upgradeFrom: mongo:5.0-focal
-  upgradeFromVersion: 5
-  upgradeToVersion: 9
 
 
 # Redis - Cache for fast image extractor

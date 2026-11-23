@@ -29,6 +29,7 @@ COPY ./cytomine_permissions.yml /app/cytomine_permissions.yml
 FROM ${PROXY_CACHE}/eclipse-temurin:${JAVA_VERSION} AS production
 WORKDIR /app
 COPY --from=jar-builder /app/authorization-api/build/libs/authorization-api.jar /app/authorization-api.jar
+COPY --from=jar-builder /app/cytomine_permissions.yml /app/cytomine_permissions.yml
 
 EXPOSE 8082
 CMD ["java", "-jar", "/app/authorization-api.jar"]

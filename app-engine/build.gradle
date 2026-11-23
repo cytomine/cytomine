@@ -102,7 +102,7 @@ dependencies {
 
     // Cucumber dependencies
     implementation group: 'io.cucumber', name: 'cucumber-spring', version: '8.0.4'
-    testImplementation 'io.cucumber:cucumber-java:8.0.4'
+    testImplementation 'io.cucumber:cucumber-java:8.1.0'
     testImplementation 'io.cucumber:cucumber-junit:8.0.4'
     testImplementation 'org.assertj:assertj-core:3.27.7'
     testImplementation 'org.junit.vintage:junit-vintage-engine'

@@ -1,0 +1,63 @@
+{{ if and .Values.mongodb.deploy (contains "mongo:6" .Values.images.mongodb) }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongodb-set-feature-compatibility-version
+  labels:
+    role: mongodb
+    app: {{ include "cytomine.name" . }}
+    component: {{ .Release.Name }}-mongodb
+    release: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+spec:
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        role: mongodb
+        app: mongodb
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ include "cytomine.serviceAccountName" . }}
+      securityContext:
+      {{- include "cytomine.podSecurityContext" . | nindent 8 }}
+      restartPolicy: Never
+      volumes:
+        - name: temp
+          emptyDir: { }
+      containers:
+        - name: set-feature-compatibility-version
+          image: "{{ .Values.images.mongodb }}"
+          imagePullPolicy: {{ .Values.images.pullPolicy }}
+          securityContext:
+          {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+          volumeMounts:
+            - name: temp
+              mountPath: "/tmp"
+          env:
+            - name: HOME
+              value: /tmp
+            - name: MONGO_USERNAME
+              value: {{ .Values.mongodb.username }}
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: password
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until mongosh \
+                --host mongodb.{{ .Release.Namespace }}.svc.cluster.local \
+                --port {{ .Values.mongodb.port }} \
+                --username "$MONGO_USERNAME" \
+                --password "$MONGO_PASSWORD" \
+                --authenticationDatabase admin \
+                --quiet \
+                --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "6.0" }).ok || quit(1)'; do
+                echo "Waiting for MongoDB 6 to accept the feature compatibility version..."
+                sleep 5
+              done
+{{ end }}

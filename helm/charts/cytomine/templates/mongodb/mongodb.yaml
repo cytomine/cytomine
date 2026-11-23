@@ -33,10 +33,10 @@ spec:
       {{- end }}
       volumes:
         - name: temp
-          emptyDir: {}
+          emptyDir: { }
         {{ if not .Values.mongodb.storageClassName -}}
         - name: mongodb-storage
-          emptyDir: {}
+          emptyDir: { }
         {{ end }}
       containers:
         - name: mongodb
@@ -93,6 +93,24 @@ spec:
             timeoutSeconds: 10
           resources:
             {{- toYaml .Values.mongodb.resources | nindent 12 }}
+        initContainers:
+        {{ if .Values.mongodb.upgradeFrom }}
+          - name: export-mongodb
+            image: "{{ .Values.mongodb.upgradeFrom }}"
+            imagePullPolicy: {{ .Values.images.pullPolicy }}
+            securityContext:
+              {{- include "cytomine.containerSecurityContext" . | nindent 12 }}
+            volumeMounts:
+              - name: mongodb-storage
+                mountPath: "/data/db"
+              - name: temp
+                mountPath: "/tmp"
+            command:
+              - /bin/sh
+              - -c
+              - exit
+              - "0"
+        {{ end }}
       {{- with .Values.global.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

@@ -15,8 +15,8 @@
 
 global:
   domainName:
-  affinity: {}
-  tolerations: {}
+  affinity: { }
+  tolerations: { }
 readOnceStorageClass: ''
 readManyStorageClass:
 # Resource settings
@@ -43,9 +43,9 @@ gateway:
   #     - name: my-gateway
   #       namespace: gateway-namespace
   #       sectionName: https
-  parentRefs: []
+  parentRefs: [ ]
   # Annotations for the Gateway resource
-  annotations: {}
+  annotations: { }
   # Timeout settings for HTTPRoute
   timeouts:
     # Request timeout (e.g., "3600s" for 1 hour)
@@ -123,11 +123,11 @@ postgresql:
   resources:
     requests:
       memory: 512Mi
-      cpu: 100m
+      cpu: 50m
       ephemeral-storage: 1Gi
     limits:
-      memory: 1024Mi
-      cpu: 400m
+      memory: 512Mi
+      cpu: 200m
       ephemeral-storage: 1Gi
   storageClassName:
 
@@ -140,14 +140,20 @@ mongodb:
   database: cytomine
   resources:
     requests:
-      memory: 512Mi
-      cpu: 100m
+      memory: 256Mi
+      cpu: 50m
       ephemeral-storage: 1Gi
     limits:
-      memory: 1024Mi
-      cpu: 400m
+      memory: 1Gi
+      cpu: 200m
       ephemeral-storage: 1Gi
   storageClassName:
+  # upgrade mongoDB. If the image here is different from .images.mongodb then it is ignored.
+  # the goal is to have a clear backup/import way of upgrading.
+  upgradeFrom: mongo:5.0-focal
+  upgradeFromVersion: 5
+  upgradeToVersion: 9
+
 
 # Redis - Cache for fast image extractor
 pims_cache:
@@ -332,7 +338,7 @@ serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations: {}
+  annotations: { }
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname
   # template

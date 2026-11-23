@@ -33,10 +33,10 @@ spec:
       {{- end }}
       volumes:
         - name: temp
-          emptyDir: { }
+          emptyDir: {}
         {{ if not .Values.mongodb.storageClassName -}}
         - name: mongodb-storage
-          emptyDir: { }
+          emptyDir: {}
         {{ end }}
       containers:
         - name: mongodb

@@ -15,8 +15,8 @@
 
 global:
   domainName:
-  affinity: { }
-  tolerations: { }
+  affinity: {}
+  tolerations: {}
 readOnceStorageClass: ''
 readManyStorageClass:
 # Resource settings
@@ -43,9 +43,9 @@ gateway:
   #     - name: my-gateway
   #       namespace: gateway-namespace
   #       sectionName: https
-  parentRefs: [ ]
+  parentRefs: []
   # Annotations for the Gateway resource
-  annotations: { }
+  annotations: {}
   # Timeout settings for HTTPRoute
   timeouts:
     # Request timeout (e.g., "3600s" for 1 hour)

@@ -305,10 +305,6 @@ public class AccountService {
         return listOfRoles;
     }
 
-    /**
-     * Keep the Keycloak {@code realm-management:impersonation} role in sync with the Cytomine ADMIN role.
-     * This role is required for token exchange ("connect as") and must not be assigned manually.
-     */
     private void syncRealmManagementImpersonationRole(
         RealmResource realmResource,
         UserResource userResource,

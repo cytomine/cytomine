@@ -120,7 +120,6 @@ public class CoreApiClient {
                 "Unable to update user " + username + ": HTTP " + response.statusCode() + " " + response.body()
             );
         }
-        // The admin panel updates the IAM role through the user update and the repository role separately.
         defineUserRole(adminToken, userId, role);
     }
 

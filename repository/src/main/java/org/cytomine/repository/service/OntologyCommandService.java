@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.command.payload.request.OntologyCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.OntologyResponse;
@@ -39,6 +40,7 @@ public class OntologyCommandService implements
     private final UserRepository userRepository;
     private final CommandMapper commandMapper;
     private final TermCommandService termCommandService;
+    private final AuthorizationVerifier authorizationVerifier;
 
     @Override
     public OntologyEntity save(OntologyEntity entity) {

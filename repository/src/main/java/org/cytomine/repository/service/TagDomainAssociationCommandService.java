@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.command.payload.request.TagDomainAssociationCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
@@ -43,6 +44,7 @@ public class TagDomainAssociationCommandService implements
     private final CommandV2Repository commandV2Repository;
     private final CommandMapper commandMapper;
     private final ACLService aclService;
+    private final AuthorizationVerifier authorizationVerifier;
     @Setter
     private ApplyCommandService applyCommandService;
 

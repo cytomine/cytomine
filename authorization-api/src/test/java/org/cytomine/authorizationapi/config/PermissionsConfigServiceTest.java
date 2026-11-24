@@ -6,6 +6,7 @@ import org.cytomine.common.authorizationapi.model.permission.CytomineInstancePer
 import org.cytomine.common.authorizationapi.model.permission.CytominePermission;
 import org.cytomine.common.authorizationapi.model.permission.CytomineProjectPermission;
 import org.cytomine.common.authorizationapi.model.permissionconfig.CytominePermissionConfig;
+import org.cytomine.common.beans.authorization.internal.PermissionsConfigService;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

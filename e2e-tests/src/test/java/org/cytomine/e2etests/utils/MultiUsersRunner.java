@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import static org.cytomine.common.repository.model.Role.ROLE_ADMIN;
-import static org.cytomine.common.repository.model.Role.ROLE_GUEST;
 import static org.cytomine.common.repository.model.Role.ROLE_USER;
 
 @Slf4j
@@ -45,7 +44,10 @@ public class MultiUsersRunner {
     }
 
     public void runAllRoles(Wait<WebDriver> wait, WebDriver driver, Consumer<TestData> test) {
-        run(wait, driver, List.of(ROLE_GUEST, ROLE_ADMIN, ROLE_USER), test);
+        run(wait, driver, List.of(
+            // ROLE_GUEST,
+            // ROLE_GUEST is disabled for now because the default role does not provide create_project permission.
+            ROLE_ADMIN, ROLE_USER), test);
     }
 
     public void run(Wait<WebDriver> wait, WebDriver driver, List<Role> roles, Consumer<TestData> test) {

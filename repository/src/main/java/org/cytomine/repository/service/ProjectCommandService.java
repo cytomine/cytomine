@@ -6,6 +6,9 @@ import java.util.Set;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.authorizationapi.model.permissionrequest.CytomineInstanceRequestedPermission;
+import org.cytomine.common.authorizationapi.model.permissionrequest.CytomineRequestedPermission;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.command.payload.request.ProjectCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.ProjectListRowResponse;
 import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
@@ -29,6 +32,8 @@ import org.cytomine.repository.persistence.entity.OntologyEntity;
 import org.cytomine.repository.persistence.entity.ProjectEntity;
 import org.springframework.stereotype.Component;
 
+import static org.cytomine.common.authorizationapi.model.permission.CytomineInstancePermission.CAN_CREATE_PROJECT;
+
 @Component
 @RequiredArgsConstructor
 @Getter
@@ -44,6 +49,11 @@ public class ProjectCommandService
     private final OntologyRepository ontologyRepository;
     private final ProjectMapper projectMapper;
     private final ProjectRepository projectRepository;
+    private final AuthorizationVerifier authorizationVerifier;
+
+    public Set<CytomineRequestedPermission> getCreatePermissions(long userId) {
+        return Set.of(new CytomineInstanceRequestedPermission(CAN_CREATE_PROJECT));
+    }
 
     @Override
     public ProjectEntity updateEntityWithEntity(ProjectEntity entity, UpdateProject payload, Timestamp now) {

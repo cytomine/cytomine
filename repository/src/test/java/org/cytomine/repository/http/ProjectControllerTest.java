@@ -6,17 +6,20 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.ProjectHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.ProjectResponse;
 import org.cytomine.common.repository.model.project.payload.CreateProject;
 import org.cytomine.common.repository.model.project.payload.UpdateProject;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.service.ProjectCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
@@ -41,6 +44,11 @@ class ProjectControllerTest implements CRUDCommandTests<CreateProject, ProjectRe
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private ProjectCommandService cRUDCommandService;
+
+    @MockitoBean
+    private AuthorizationVerifier authorizationVerifier;
 
     @Override
     public ProjectResponse expectedUpdatedResponse(ProjectResponse response, UpdateProject updatePayload,

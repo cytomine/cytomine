@@ -7,22 +7,30 @@ import java.util.UUID;
 
 import lombok.SneakyThrows;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.authorizationapi.model.AuthorizationRequest;
+import org.cytomine.common.authorizationapi.model.permissionrequest.CytomineRequestedPermission;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
+import org.cytomine.common.exceptions.ForbiddenException;
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.UndoCommandResponse;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.service.CRUDCommandService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -50,6 +58,10 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
     ApplyCommandResponseMapper getApplyCommandResponseMapper();
 
+    CRUDCommandService<C, U, ?, ?, R> getCRUDCommandService();
+
+    AuthorizationVerifier getAuthorizationVerifier();
+
     default Set<? extends ApplyCommandResponse> createSubEntities(long userId, long currentId) {
         return Set.of();
     }
@@ -59,9 +71,9 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
     default long createUser() {
         String username = UUID.randomUUID().toString();
-        long userId = getJdbcTemplate().queryForObject(
-            "INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING ID", Long.class,
-            username);
+        long userId =
+            getJdbcTemplate().queryForObject("INSERT INTO sec_user (version, username) VALUES (0, ?) RETURNING ID",
+                Long.class, username);
 
         getJdbcTemplate().update("INSERT INTO sec_role (version, authority, created) SELECT 0, 'ROLE_ADMIN', NOW() "
             + "WHERE NOT EXISTS (SELECT 1 FROM sec_role WHERE authority = 'ROLE_ADMIN')");
@@ -93,12 +105,40 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         return getJdbcTemplate().queryForObject("SELECT username FROM sec_user WHERE id = ?", String.class, userId);
     }
 
+    default void mockDeniedPermissions(Set<CytomineRequestedPermission> permissions) {
+        if (permissions.isEmpty()) {
+            return;
+        }
+        doThrow(new ForbiddenException("forbidden")).when(getAuthorizationVerifier())
+            .authorize(eq(new AuthorizationRequest(permissions)));
+    }
+
     @Test
     @SneakyThrows
+    default void noCreatePermissionTest() {
+
+        long userId = createUser();
+        if (getCRUDCommandService().getCreatePermissions(userId).isEmpty()) {
+            return;
+        }
+        String username = getUsername(userId);
+        mockDeniedPermissions(getCRUDCommandService().getCreatePermissions(userId));
+        Exception resolvedException = getMockMvc().perform(
+                post(getApiURL()).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
+                    .content(getObjectMapper().writeValueAsString(getCreatePayload())))
+            .andExpect(status().isForbidden())
+            .andReturn().getResolvedException();
+        assertEquals(new ForbiddenException("forbidden"), resolvedException);
+    }
+
+    @Test
+    @SneakyThrows
+    @WithMockUser
     default void baseTest() {
         // Create Entity
         long userId = createUser();
         String username = getUsername(userId);
+
         String response = getMockMvc().perform(
                 post(getApiURL()).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
@@ -133,9 +173,9 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         // Delete Entity
         String delete = getMockMvc().perform(
-                delete(getApiURL() + "/" + result.data().id())
-                    .with(authenticatedAs(username)).contentType(APPLICATION_JSON))
-            .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+                delete(getApiURL() + "/" + result.data().id()).with(authenticatedAs(username))
+                    .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
+            .getContentAsString();
         HttpCommandResponse deleteResult = getObjectMapper().readValue(delete, HttpCommandResponse.class);
         assertEquals(getApplyCommandResponseMapper().setDeleteTime(updateDataResult, Optional.of(
                 deleteResult.data().deleted()
@@ -153,8 +193,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Optional<HttpCommandResponse> maybeFirstCreate = getObjectMapper().readValue(getMockMvc().perform(
                 post(getApiURL()).with(authenticatedAs(username)).contentType(APPLICATION_JSON)
                     .content(getObjectMapper().writeValueAsString(getCreatePayload()))).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {}
-        );
+            .andReturn().getResponse().getContentAsString(), new TypeReference<>() {});
 
         HttpCommandResponse firstCreate =
             maybeFirstCreate.orElseThrow(() -> new IllegalStateException("First creation should not be empty."));
@@ -163,9 +202,10 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
         Set<? extends ApplyCommandResponse> ignored = createSubEntities(userId, firstCreate.data().id());
 
         // Get the Entity with Sub Entities
-        String get = getMockMvc().perform(get(getApiURL() + "/" + firstCreate.data().id())
-                .with(authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsString();
+        String get = getMockMvc().perform(
+                get(getApiURL() + "/" + firstCreate.data().id()).with(authenticatedAs(username))
+                    .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn().getResponse()
+            .getContentAsString();
 
         ApplyCommandResponse getResponse = getObjectMapper().readValue(get, ApplyCommandResponse.class);
         R getResponseData = (R) getResponse;
@@ -187,8 +227,7 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             undoCommandResponse.map(HttpCommandResponse::data));
 
         String emptyResponseString = getMockMvc().perform(
-                get(getApiURL() + "/" + entityID).with(authenticatedAs(username))
-                    .contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + entityID).with(authenticatedAs(username)).contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         Optional<R> emptyResponse = getObjectMapper().readValue(emptyResponseString,
             getObjectMapper().constructType(Optional.of(firstCreate.data()).getClass()));
@@ -197,10 +236,9 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
 
         // Undo (Undo (Entity Creation)) -> Recreate Entity
         Optional<HttpCommandResponse> redoCommandResponse = getObjectMapper().readValue(getMockMvc().perform(
-                post(CommandController.ROOT_PATH + "/undo/" + undoCommandResponse.get().commandId())
-                    .with(authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk())
-            .andReturn().getResponse()
-            .getContentAsString(), new TypeReference<>() {});
+                post(CommandController.ROOT_PATH + "/undo/" + undoCommandResponse.get().commandId()).with(
+                    authenticatedAs(username)).contentType(APPLICATION_JSON)).andExpect(status().isOk()).andReturn()
+            .getResponse().getContentAsString(), new TypeReference<>() {});
         LocalDateTime updateTime = redoCommandResponse.stream().findFirst()
             .orElseThrow(() -> new IllegalStateException("Response should not be empty.")).data().updated()
             .orElseThrow(() -> new IllegalStateException("Updated should not be empty."));
@@ -211,15 +249,14 @@ public interface CRUDCommandTests<C, R extends ApplyCommandResponse, U> {
             redoCommandResponse.map(HttpCommandResponse::data));
 
         String redoGetResponseString = getMockMvc().perform(
-                get(getApiURL() + "/" + entityID).with(authenticatedAs(username))
-                    .contentType(APPLICATION_JSON))
+                get(getApiURL() + "/" + entityID).with(authenticatedAs(username)).contentType(APPLICATION_JSON))
             .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         R redoGetResponse = (R) getObjectMapper().readValue(redoGetResponseString, (firstCreateData).getClass());
 
         assertEquals(getApplyCommandResponseMapper().setUpdateTime(getResponse, Optional.of(redoGetResponse.updated()
                 .orElseThrow(
-                    () -> new IllegalStateException("Newly re-created entity should not have `updated` empty.")))),
+                    () -> new IllegalStateException("Newly re-created entity should not have `updated` empty" + ".")))),
             getObjectMapper().readValue(redoGetResponseString, firstCreate.data().getClass()));
     }
 }

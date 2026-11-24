@@ -6,12 +6,15 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.TagDomainAssociationHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.TagDomainAssociationResponse;
 import org.cytomine.common.repository.model.tagdomainassociation.payload.CreateTagDomainAssociation;
 import org.cytomine.common.repository.model.tagdomainassociation.payload.UpdateTagDomainAssociation;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.service.TagDomainAssociationCommandService;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -29,11 +32,9 @@ class TagDomainAssociationControllerTest
 
     String apiURL = TagDomainAssociationHttpContract.ROOT_PATH;
     CreateTagDomainAssociation createPayload;
-    UpdateTagDomainAssociation updatePayload = new UpdateTagDomainAssociation(
-        Optional.empty(),
-        Optional.of("be.cytomine.domain.project.Project"),
-        Optional.empty()
-    );
+    UpdateTagDomainAssociation updatePayload =
+        new UpdateTagDomainAssociation(Optional.empty(), Optional.of("be.cytomine.domain.project.Project"),
+            Optional.empty());
     @Autowired
     ApplyCommandResponseMapper applyCommandResponseMapper;
     @Autowired
@@ -42,31 +43,25 @@ class TagDomainAssociationControllerTest
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private TagDomainAssociationCommandService cRUDCommandService;
+    @Mock
+    private AuthorizationVerifier authorizationVerifier;
 
     @Override
     public void beforeCreate(long userId) {
-        Long tagId = jdbcTemplate.queryForObject(
-            "INSERT INTO tag (version, name, user_id) VALUES (0, ?, ?) RETURNING id",
-            Long.class, UUID.randomUUID().toString(), userId
-        );
+        Long tagId =
+            jdbcTemplate.queryForObject("INSERT INTO tag (version, name, user_id) VALUES (0, ?, ?) RETURNING id",
+                Long.class, UUID.randomUUID().toString(), userId);
         createPayload = new CreateTagDomainAssociation(tagId, "be.cytomine.domain.ontology.Ontology", userId);
     }
 
     @Override
-    public TagDomainAssociationResponse expectedUpdatedResponse(
-        TagDomainAssociationResponse response,
-        UpdateTagDomainAssociation updatePayload,
-        LocalDateTime updatedTime
-    ) {
-        return new TagDomainAssociationResponse(
-            response.id(),
-            updatePayload.tagId().orElse(response.tagId()),
+    public TagDomainAssociationResponse expectedUpdatedResponse(TagDomainAssociationResponse response,
+        UpdateTagDomainAssociation updatePayload, LocalDateTime updatedTime) {
+        return new TagDomainAssociationResponse(response.id(), updatePayload.tagId().orElse(response.tagId()),
             updatePayload.domainClassName().orElse(response.domainClassName()),
-            updatePayload.domainId().orElse(response.domainId()),
-            response.tagName(),
-            response.created(),
-            Optional.of(updatedTime),
-            response.deleted()
-        );
+            updatePayload.domainId().orElse(response.domainId()), response.tagName(), response.created(),
+            Optional.of(updatedTime), response.deleted());
     }
 }

@@ -27,6 +27,8 @@ public class TokenFromParameterFilter extends OncePerRequestFilter {
         Optional<String> authToken =
             Optional.ofNullable(request.getParameter("auth"))
                 .filter(not(String::isBlank))
+                .or(() -> Optional.ofNullable(request.getParameter("authorization"))
+                    .filter(not(String::isBlank)))
                 .or(() -> Optional.ofNullable(request.getParameter("Authorization"))
                     .filter(not(String::isBlank)))
                 .map(token -> token.startsWith("Bearer") ? token : "Bearer " + token);

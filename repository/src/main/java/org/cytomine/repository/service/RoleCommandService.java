@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.command.payload.request.RoleCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.RoleResponse;
 import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
@@ -34,6 +35,7 @@ public class RoleCommandService
     private final CommandV2Repository commandV2Repository;
     private final RoleMapper roleMapper;
     private final RoleRepository roleRepository;
+    private final AuthorizationVerifier authorizationVerifier;
     @Setter
     private ApplyCommandService applyCommandService;
 

@@ -40,10 +40,6 @@ push-local:
 	@echo "Deleting all pods to pick up new images..."
 	@kubectl --kubeconfig=./.kube/shared/config delete pods --all -n cytomine-local
 
-# Deploy helm cytomine to k3s
-helm-install:
-	helm upgrade --kubeconfig=./.kube/shared/config -f ./helm/charts/cytomine/example/values.yaml cytomine-platform ./helm/charts/cytomine/ -n cytomine-local --install --set test.ingressIP=$(GATEWAY_IP)
-
 doctor:
 	@echo "Checking required tools..."
 	@command -v docker >/dev/null 2>&1 || { echo "docker: NOT FOUND"; exit 1; } && echo "docker: OK"

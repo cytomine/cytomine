@@ -36,29 +36,6 @@ public class KeycloakClient {
         }
     }
 
-    public boolean hasClientRole(String username, String clientId, String roleName) {
-        try (Keycloak keycloak = keycloak()) {
-            String userId = findUser(keycloak, username)
-                .map(UserRepresentation::getId)
-                .orElseThrow(() -> new IllegalStateException("IAM user not found: " + username));
-            String internalClientId = keycloak.realm(REALM)
-                .clients()
-                .findByClientId(clientId)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("IAM client not found: " + clientId))
-                .getId();
-            return keycloak.realm(REALM)
-                .users()
-                .get(userId)
-                .roles()
-                .clientLevel(internalClientId)
-                .listAll()
-                .stream()
-                .anyMatch(role -> roleName.equals(role.getName()));
-        }
-    }
-
     private Optional<UserRepresentation> findUser(Keycloak keycloak, String username) {
         return keycloak.realm(REALM)
             .users()

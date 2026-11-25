@@ -66,6 +66,22 @@ public class CoreApiClient {
         return token;
     }
 
+    public boolean hasClientRole(String username, String password, String clientId, String roleName) {
+        JsonNode roles = decodeJwt(passwordToken(username, password))
+            .path("resource_access")
+            .path(clientId)
+            .path("roles");
+        if (!roles.isArray()) {
+            return false;
+        }
+        for (JsonNode role : roles) {
+            if (roleName.equals(role.asText())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public long createUser(String adminToken, String username, String password, String role) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("username", username);

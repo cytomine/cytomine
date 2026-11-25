@@ -55,7 +55,7 @@ public class ConnectAsApiTests {
 
             assertTrue(
                 waitFor(
-                    () -> keycloakClient.hasClientRole(newAdminName, REALM_MANAGEMENT, IMPERSONATION),
+                    () -> hasImpersonation(newAdminName),
                     Duration.ofSeconds(10)
                 ),
                 "New ADMIN should receive realm-management:impersonation"
@@ -103,7 +103,7 @@ public class ConnectAsApiTests {
             targetUserId = api.createUser(adminToken, targetName, PASSWORD, ROLE_USER);
             assertTrue(
                 waitFor(
-                    () -> keycloakClient.hasClientRole(newAdminName, REALM_MANAGEMENT, IMPERSONATION),
+                    () -> hasImpersonation(newAdminName),
                     Duration.ofSeconds(10)
                 ),
                 "New ADMIN should receive realm-management:impersonation"
@@ -113,7 +113,7 @@ public class ConnectAsApiTests {
 
             assertTrue(
                 waitFor(
-                    () -> !keycloakClient.hasClientRole(newAdminName, REALM_MANAGEMENT, IMPERSONATION),
+                    () -> !hasImpersonation(newAdminName),
                     Duration.ofSeconds(10)
                 ),
                 "Demoted ADMIN should lose realm-management:impersonation"
@@ -131,6 +131,14 @@ public class ConnectAsApiTests {
             deleteQuietly(adminToken, newAdminId);
             deleteIamUserQuietly(targetName);
             deleteIamUserQuietly(newAdminName);
+        }
+    }
+
+    private boolean hasImpersonation(String username) {
+        try {
+            return api.hasClientRole(username, PASSWORD, REALM_MANAGEMENT, IMPERSONATION);
+        } catch (Exception e) {
+            return false;
         }
     }
 

@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.function.BooleanSupplier;
 
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.e2etests.api.CoreApiClient;
 import org.cytomine.e2etests.api.KeycloakClient;
 import org.cytomine.e2etests.configuration.SeleniumDriver;
 import org.cytomine.e2etests.ui.AnnotationTools;
@@ -29,7 +30,14 @@ import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
-@Import({AnnotationTools.class, CytomineSteps.class, KeycloakClient.class, SeleniumDriver.class, WebDriverUtils.class})
+@Import({
+    AnnotationTools.class,
+    CoreApiClient.class,
+    CytomineSteps.class,
+    KeycloakClient.class,
+    SeleniumDriver.class,
+    WebDriverUtils.class
+})
 @SpringBootTest
 public class ConnectAsUiTests {
 
@@ -42,6 +50,9 @@ public class ConnectAsUiTests {
 
     @Autowired
     CytomineSteps cytomineSteps;
+
+    @Autowired
+    CoreApiClient api;
 
     @Autowired
     KeycloakClient keycloakClient;
@@ -104,7 +115,7 @@ public class ConnectAsUiTests {
 
             assertTrue(
                 waitFor(
-                    () -> keycloakClient.hasClientRole(newAdminName, REALM_MANAGEMENT, IMPERSONATION),
+                    () -> hasImpersonation(newAdminName),
                     Duration.ofSeconds(10)
                 ),
                 "New ADMIN created from the admin panel should receive realm-management:impersonation"
@@ -130,6 +141,14 @@ public class ConnectAsUiTests {
             cleanup(() -> cytomineSteps.deleteUser(wait, cytomineUrl, newAdminName, newAdminLastname));
             cleanup(() -> keycloakClient.deleteUser(targetName));
             cleanup(() -> keycloakClient.deleteUser(newAdminName));
+        }
+    }
+
+    private boolean hasImpersonation(String username) {
+        try {
+            return api.hasClientRole(username, PASSWORD, REALM_MANAGEMENT, IMPERSONATION);
+        } catch (Exception e) {
+            return false;
         }
     }
 

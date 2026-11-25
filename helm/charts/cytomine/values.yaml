@@ -134,10 +134,13 @@ postgresql:
 # MongoDB - Secondary database.Stores activity data
 # To upgrade mongoDB:
 # Upgrade the helm multiple times, start from 5.0 probably, and go up, one by one, to the desired state.
+# You need to run all of them.
 # mongo:5.0-focal
 # mongo:6.0-focal
 # mongo:7
-# mongo:8
+# mongo:8.0
+# mongo:8.2
+# mongo:8.3
 # mongo:9 -> current max version.
 
 mongodb:

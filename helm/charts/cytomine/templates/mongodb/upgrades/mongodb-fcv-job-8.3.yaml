@@ -1,4 +1,4 @@
-{{ if and .Values.mongodb.deploy (contains "mongo:8" .Values.images.mongodb) }}
+{{ if and .Values.mongodb.deploy (contains "mongo:8.3" .Values.images.mongodb) }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -25,7 +25,7 @@ spec:
       restartPolicy: Never
       volumes:
         - name: temp
-          emptyDir: {}
+          emptyDir: { }
       containers:
         - name: set-feature-compatibility-version
           image: "{{ .Values.images.mongodb }}"
@@ -56,7 +56,8 @@ spec:
                 --password "$MONGO_PASSWORD" \
                 --authenticationDatabase admin \
                 --quiet \
-                --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "8.0", confirm: true }).ok || quit(1)'; do
+                --eval 'db.adminCommand({ setFeatureCompatibilityVersion: "8.3", confirm: true })
+              .ok || quit(1)'; do
                 echo "Waiting for Mongo to accept the feature compatibility version..."
                 sleep 5
               done

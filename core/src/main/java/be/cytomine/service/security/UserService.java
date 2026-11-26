@@ -52,6 +52,7 @@ import be.cytomine.domain.ontology.UserAnnotation;
 import be.cytomine.domain.project.Project;
 import be.cytomine.domain.project.ProjectDefaultLayer;
 import be.cytomine.domain.project.ProjectRepresentativeUser;
+import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.domain.social.LastConnection;
@@ -868,13 +869,9 @@ public class UserService extends ModelService {
             user.generateKeys();
             userRepository.save(user);
         }
-        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
-        secSecUserSecRole.setSecUser(user);
-        secSecUserSecRole.setSecRole(secRoleRepository.getUser());
-
-        if (secSecUserSecRoleRepository.findBySecUserAndSecRole(secSecUserSecRole.getSecUser(),
-            secSecUserSecRole.getSecRole()).isEmpty()) {
-            secSecUserSecRoleRepository.save(secSecUserSecRole);
+        SecRole userRole = secRoleRepository.getUser();
+        if (secSecUserSecRoleRepository.findBySecUserAndSecRole(user, userRole).isEmpty()) {
+            secSecUserSecRoleRepository.insertUserRole(user.getId(), userRole.getId());
         }
 
         storageService.initUserStorage(domain.getId());

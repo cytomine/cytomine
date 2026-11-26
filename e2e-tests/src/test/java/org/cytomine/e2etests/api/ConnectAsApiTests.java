@@ -6,6 +6,7 @@ import java.util.function.BooleanSupplier;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
+import org.cytomine.common.repository.model.Role;
 import org.cytomine.e2etests.api.CoreApiClient.ApiResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ConnectAsApiTests {
 
     private static final String PASSWORD = "Selenium1!";
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
-    private static final String ROLE_USER = "ROLE_USER";
     private static final String REALM_MANAGEMENT = "realm-management";
     private static final String IMPERSONATION = "impersonation";
 
@@ -50,8 +49,8 @@ public class ConnectAsApiTests {
         long targetUserId = 0;
 
         try {
-            newAdminId = api.createUser(adminToken, newAdminName, PASSWORD, ROLE_ADMIN);
-            targetUserId = api.createUser(adminToken, targetName, PASSWORD, ROLE_USER);
+            newAdminId = api.createUser(adminToken, newAdminName, PASSWORD, Role.ROLE_ADMIN);
+            targetUserId = api.createUser(adminToken, targetName, PASSWORD, Role.ROLE_USER);
 
             assertTrue(
                 waitFor(
@@ -99,8 +98,8 @@ public class ConnectAsApiTests {
         long targetUserId = 0;
 
         try {
-            newAdminId = api.createUser(adminToken, newAdminName, PASSWORD, ROLE_ADMIN);
-            targetUserId = api.createUser(adminToken, targetName, PASSWORD, ROLE_USER);
+            newAdminId = api.createUser(adminToken, newAdminName, PASSWORD, Role.ROLE_ADMIN);
+            targetUserId = api.createUser(adminToken, targetName, PASSWORD, Role.ROLE_USER);
             assertTrue(
                 waitFor(
                     () -> hasImpersonation(newAdminName),
@@ -109,7 +108,7 @@ public class ConnectAsApiTests {
                 "New ADMIN should receive realm-management:impersonation"
             );
 
-            api.updateUserRole(adminToken, newAdminId, newAdminName, ROLE_USER);
+            api.updateUserRole(adminToken, newAdminId, newAdminName, Role.ROLE_USER);
 
             assertTrue(
                 waitFor(

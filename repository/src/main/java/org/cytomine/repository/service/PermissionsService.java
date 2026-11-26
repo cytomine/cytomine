@@ -15,6 +15,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -49,6 +50,7 @@ public class PermissionsService {
         List.of("address", "phone", "offline_access", "microprofile-jwt");
     private static final List<String> WEB_ORIGINS = List.of("*");
     private static final String REALM_MANAGEMENT_CLIENT = "realm-management";
+    private static final int ADMIN_MEMBERS_PAGE_SIZE = 100;
     private static final List<String> REALM_MANAGEMENT_ROLES =
         List.of("view-users", "manage-users", "query-users", "impersonation");
     private static final List<String> SUPPORTED_LOCALES = List.of("en", "fr", "es", "nl");
@@ -262,8 +264,14 @@ public class PermissionsService {
         RealmResource realmResource,
         ClientResource coreClient
     ) {
-        coreClient.roles().get(ADMIN_ROLE).getUserMembers(0, 1000)
-            .forEach(user -> ensureRealmManagementRoles(realmResource, user));
+        RoleResource adminRole = coreClient.roles().get(ADMIN_ROLE);
+        int first = 0;
+        List<UserRepresentation> page;
+        do {
+            page = adminRole.getUserMembers(first, ADMIN_MEMBERS_PAGE_SIZE);
+            page.forEach(user -> ensureRealmManagementRoles(realmResource, user));
+            first += page.size();
+        } while (page.size() == ADMIN_MEMBERS_PAGE_SIZE);
     }
 
     private void ensureRealmManagementRoles(RealmResource realmResource, UserRepresentation user) {

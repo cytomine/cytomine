@@ -126,7 +126,8 @@ public class AccountService {
                 account.username(),
                 account.roles().contains(ADMIN_ROLE)
             );
-        } catch (WebApplicationException e) {
+        } catch (WebApplicationException | UserManagementException e) {
+            log.error("failed to assign roles to account {}, rolling back IAM account", account.username(), e);
             usersResource.delete(createdId);
             throw new UserManagementException(
                 ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT.toString(),
@@ -318,7 +319,10 @@ public class AccountService {
                 "realm-management client not found; cannot synchronize impersonation role for user {}",
                 username
             );
-            return;
+            throw new UserManagementException(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT
+            );
         }
 
         String realmManagementId = realmManagementClients.get(0).getId();

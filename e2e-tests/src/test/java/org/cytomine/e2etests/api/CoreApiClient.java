@@ -15,7 +15,10 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.cytomine.common.repository.model.Role;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,9 +28,6 @@ public class CoreApiClient {
     private static final String CLIENT_ID = "core";
     private static final String AUTHORIZATION = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final String CONTENT_TYPE = "Content-Type";
-    private static final String JSON = "application/json";
-    private static final String FORM = "application/x-www-form-urlencoded";
 
     private final HttpClient httpClient = HttpClient.newBuilder()
         .connectTimeout(Duration.ofSeconds(30))
@@ -49,7 +49,7 @@ public class CoreApiClient {
         );
         HttpRequest request = HttpRequest.newBuilder(tokenUri())
             .timeout(Duration.ofSeconds(60))
-            .header(CONTENT_TYPE, FORM)
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
             .POST(HttpRequest.BodyPublishers.ofString(form))
             .build();
         HttpResponse<String> response = send(request);
@@ -82,14 +82,14 @@ public class CoreApiClient {
         return false;
     }
 
-    public long createUser(String adminToken, String username, String password, String role) {
+    public long createUser(String adminToken, String username, String password, Role role) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("username", username);
         payload.put("name", "Selenium " + username);
         payload.put("firstname", "Selenium");
         payload.put("lastname", username);
         payload.put("email", username + "@selenium.test");
-        payload.put("role", role);
+        payload.put("role", role.name());
         payload.put("language", "EN");
         payload.put("isDeveloper", false);
         payload.put("password", password);
@@ -114,7 +114,7 @@ public class CoreApiClient {
         return userId;
     }
 
-    public void updateUserRole(String adminToken, long userId, String username, String role) {
+    public void updateUserRole(String adminToken, long userId, String username, Role role) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("username", username);
         payload.put("name", "Selenium " + username);
@@ -123,7 +123,7 @@ public class CoreApiClient {
         payload.put("email", username + "@selenium.test");
         payload.put("language", "EN");
         payload.put("isDeveloper", false);
-        payload.put("role", role);
+        payload.put("role", role.name());
 
         HttpResponse<String> response = sendJson(
             "PUT",
@@ -139,9 +139,9 @@ public class CoreApiClient {
         defineUserRole(adminToken, userId, role);
     }
 
-    public void defineUserRole(String adminToken, long userId, String role) {
+    public void defineUserRole(String adminToken, long userId, Role role) {
         HttpRequest request = authorized(
-            HttpRequest.newBuilder(coreUri("/api/user/" + userId + "/role/" + role + "/define.json")),
+            HttpRequest.newBuilder(coreUri("/api/user/" + userId + "/role/" + role.name() + "/define.json")),
             adminToken
         ).PUT(HttpRequest.BodyPublishers.noBody()).timeout(Duration.ofSeconds(60)).build();
         HttpResponse<String> response = send(request);
@@ -201,8 +201,8 @@ public class CoreApiClient {
             throw new IllegalArgumentException("Unable to serialize request", e);
         }
         HttpRequest.Builder builder = authorized(HttpRequest.newBuilder(uri), token)
-            .header(CONTENT_TYPE, JSON)
-            .header("Accept", JSON)
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .method(method, body)
             .timeout(Duration.ofSeconds(60));
         return send(builder.build());

@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 
 import be.cytomine.domain.project.Project;
+import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.SecUserSecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.mapper.UserMapper;
@@ -191,16 +192,15 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     @Transactional
     protected void setCumulativeRole(Set<String> rolesFromAuthentication, User user) {
 
-        SecUserSecRole secSecUserSecRole = new SecUserSecRole();
+        SecRole role;
         if (rolesFromAuthentication.contains(ROLE_ADMIN.toString())) {
-            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_ADMIN.toString()));
+            role = secRoleRepository.getByAuthority(ROLE_ADMIN.toString());
         } else if (rolesFromAuthentication.contains(ROLE_USER.toString())) {
-            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_USER.toString()));
+            role = secRoleRepository.getByAuthority(ROLE_USER.toString());
         } else {
-            secSecUserSecRole.setSecRole(secRoleRepository.getByAuthority(ROLE_GUEST.toString()));
+            role = secRoleRepository.getByAuthority(ROLE_GUEST.toString());
         }
-        secSecUserSecRole.setSecUser(user);
-        secSecUserSecRoleRepository.save(secSecUserSecRole);
+        secSecUserSecRoleRepository.insertUserRole(user.getId(), role.getId());
     }
 
     @Override

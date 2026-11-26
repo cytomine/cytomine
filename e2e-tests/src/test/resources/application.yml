@@ -1,5 +1,6 @@
 cytomine:
   url: ${CYTOMINE_URL}
+  api-url: ${CYTOMINE_API_URL:${cytomine.url}}
   admin:
     username: ${CYTOMINE_ADMIN_USERNAME}
     password: ${CYTOMINE_ADMIN_PASSWORD}

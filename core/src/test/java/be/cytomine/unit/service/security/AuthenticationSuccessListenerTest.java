@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import be.cytomine.domain.project.Project;
+import be.cytomine.domain.security.SecRole;
 import be.cytomine.domain.security.User;
 import be.cytomine.mapper.UserMapper;
 import be.cytomine.repository.project.ProjectRepository;
@@ -27,6 +28,8 @@ import be.cytomine.service.project.ProjectMemberService;
 import be.cytomine.service.security.IamProjectMembershipService;
 import be.cytomine.utils.AuthenticationSuccessListener;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -78,6 +81,9 @@ public class AuthenticationSuccessListenerTest {
             projectMemberService, userMapper, iamProjectMembershipService);
         org.mockito.Mockito.doReturn(listener)
             .when(applicationContext).getBean(AuthenticationSuccessListener.class);
+        SecRole role = new SecRole();
+        role.setId(1L);
+        lenient().when(secRoleRepository.getByAuthority(anyString())).thenReturn(role);
     }
 
     @DisplayName("The project membership of a local user is not synchronized with IAM")

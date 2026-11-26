@@ -1,5 +1,6 @@
 cytomine:
   url: http://cytomine.local
+  api-url: http://cytomine.local
   admin:
     username: admin
     password:

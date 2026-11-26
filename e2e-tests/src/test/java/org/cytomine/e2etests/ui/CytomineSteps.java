@@ -91,19 +91,6 @@ public class CytomineSteps {
         );
     }
 
-    public String createOntology(Wait<WebDriver> wait, WebDriver driver, URL cytomineUrl, String ontologyName) {
-        webDriverUtils.goTo(wait, cytomineUrl.toString());
-        webDriverUtils.xpathClick(wait, "//a[@href='/ontology']");
-        webDriverUtils.clickButtonByText(wait, "New ontology");
-        webDriverUtils.bySendKeys(wait, By.name("name"), ontologyName);
-        webDriverUtils.clickButtonByText(wait, "Save");
-        webDriverUtils.byIsDisplayed(
-            wait,
-            By.xpath("//p[contains(@class, 'panel-heading') and contains(text(), '" + ontologyName + "')]")
-        );
-        return driver.getCurrentUrl();
-    }
-
     public void deleteOntology(Wait<WebDriver> wait, String ontologyURL) {
         webDriverUtils.goTo(wait, ontologyURL);
         webDriverUtils.clickButtonByText(wait, "Delete");
@@ -193,6 +180,11 @@ public class CytomineSteps {
         webDriverUtils.bySendKeysWait(wait, By.cssSelector("input[type='file']"), copiedFile.toString(), false);
         webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'Start upload') and not(@disabled)]"));
         webDriverUtils.clickButtonByText(wait, "Start upload");
+        webDriverUtils.bySendKeys(
+            wait,
+            By.cssSelector("div.search-uploaded-file input[placeholder='Search']"),
+            imageName
+        );
         webDriverUtils.byIsDisplayed(
             wait,
             By.xpath("//div[contains(@class,'uploaded-files-list')]//*[contains(text(),'" + imageName + "')]")
@@ -262,6 +254,11 @@ public class CytomineSteps {
     public void deleteImage(Wait<WebDriver> wait, URL cytomineUrl, String imageName) {
         webDriverUtils.goTo(wait, cytomineUrl.toString() + "/storage");
         webDriverUtils.waitLoading(wait);
+        webDriverUtils.bySendKeys(
+            wait,
+            By.cssSelector("div.search-uploaded-file input[placeholder='Search']"),
+            imageName
+        );
         webDriverUtils.byIsDisplayed(
             wait,
             By.xpath("//div[contains(@class,'uploaded-files-list')]//span[@data-filename='" + imageName + "']")
@@ -301,7 +298,7 @@ public class CytomineSteps {
         String icon = descending
             ? "//span[contains(@class,'icon') and contains(@class,'is-desc')]"
             : "//span[contains(@class,'icon') and not(contains(@class,'is-desc'))"
-              + " and not(contains(@class,'is-invisible'))]";
+                + " and not(contains(@class,'is-invisible'))]";
         webDriverUtils.byIsDisplayed(wait, By.xpath(header + "[contains(@class,'is-current-sort')]" + icon));
 
         webDriverUtils.waitUntilByEmpty(wait, By.cssSelector(".uploaded-files-list .message.is-danger"));
@@ -830,7 +827,7 @@ public class CytomineSteps {
         webDriverUtils.xpathClick(
             wait,
             "//div[contains(@class, 'modal')]//footer//button[contains(@class, 'is-danger') "
-            + "and contains(text(), 'Delete')]"
+                + "and contains(text(), 'Delete')]"
         );
         webDriverUtils.byIsDisplayed(wait, By.xpath("//div[contains(text(), 'User successfully deleted')]"));
         wait.until(ExpectedConditions.invisibilityOfElementLocated(
@@ -891,7 +888,7 @@ public class CytomineSteps {
         String icon = descending
             ? "//span[contains(@class,'icon') and contains(@class,'is-desc')]"
             : "//span[contains(@class,'icon') and not(contains(@class,'is-desc'))"
-              + " and not(contains(@class,'is-invisible'))]";
+                + " and not(contains(@class,'is-invisible'))]";
         webDriverUtils.byIsDisplayed(wait, By.xpath(header + "[contains(@class,'is-current-sort')]" + icon));
 
         verifyTagsRelativeOrder(wait, expectedBefore, expectedAfter);
@@ -1131,7 +1128,7 @@ public class CytomineSteps {
             wait,
             "//footer[contains(@class, 'modal-card-foot')]//button[normalize-space()='Add']"
         );
-        webDriverUtils.waitUntilByEmpty(
+        webDriverUtils.byIsDisplayed(
             wait,
             By.xpath("//div[contains(., 'The selected tags were correctly associated')]")
         );

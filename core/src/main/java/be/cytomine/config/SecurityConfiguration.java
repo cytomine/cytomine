@@ -30,7 +30,7 @@ public class SecurityConfiguration {
         return commonSecurityConfiguration.commonHttp(http)
             // Deprecated. Kept as transitional in 2024.2
             .addFilterBefore(new ApiKeyFilter(userRepository, userMapper), BasicAuthenticationFilter.class)
-            .authorizeHttpRequests((authorizeHttpRequests) ->
+            .authorizeHttpRequests(authorizeHttpRequests ->
                 authorizeHttpRequests
                     .requestMatchers("/api/abstractimage/**").permitAll()
                     .requestMatchers("/api/meilisearch/**").permitAll()

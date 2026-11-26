@@ -6,12 +6,15 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.StorageHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import org.cytomine.common.repository.model.storage.payload.CreateStorage;
 import org.cytomine.common.repository.model.storage.payload.UpdateStorage;
 import org.cytomine.repository.RepositoryApp;
 import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
+import org.cytomine.repository.service.StorageCommandService;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -36,6 +39,10 @@ public class StorageControllerTest implements CRUDCommandTests<CreateStorage, St
     UpdateStorage updatePayload = new UpdateStorage(Optional.of(UUID.randomUUID().toString()));
     @Autowired
     private ApplyCommandResponseMapper applyCommandResponseMapper;
+    @Autowired
+    private StorageCommandService cRUDCommandService;
+    @Mock
+    private AuthorizationVerifier authorizationVerifier;
 
     @Override
     public StorageResponse expectedUpdatedResponse(

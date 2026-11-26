@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.command.payload.request.UserCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
@@ -45,6 +46,7 @@ public class UserCommandService
     private final RoleRepository roleRepository;
     private final UserRoleCommandService userRoleCommandService;
     private final StorageCommandService storageCommandService;
+    private final AuthorizationVerifier authorizationVerifier;
 
     @Override
     public UserEntity updateEntityWithEntity(UserEntity entity, UpdateUser payload, Timestamp now) {

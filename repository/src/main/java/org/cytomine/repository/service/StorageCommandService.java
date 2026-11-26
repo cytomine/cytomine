@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.model.command.payload.request.StorageCommandPayload;
 import org.cytomine.common.repository.model.command.payload.response.StorageResponse;
 import org.cytomine.common.repository.model.command.request.CreateCommandRequest;
@@ -34,6 +35,8 @@ public class StorageCommandService
     private final CommandV2Repository commandV2Repository;
     private final StorageMapper storageMapper;
     private final StorageRepository storageRepository;
+    private final AuthorizationVerifier authorizationVerifier;
+
     @Setter
     private ApplyCommandService applyCommandService;
 

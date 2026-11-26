@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import org.cytomine.common.PostGisTestConfiguration;
+import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.TermRelationHttpContract;
 import org.cytomine.common.repository.model.command.payload.response.TermRelationResponse;
 import org.cytomine.common.repository.model.termrelation.payload.CreateTermRelation;
@@ -15,6 +16,8 @@ import org.cytomine.repository.mapper.ApplyCommandResponseMapper;
 import org.cytomine.repository.persistence.CommandV2Repository;
 import org.cytomine.repository.persistence.TermRelationRepository;
 import org.cytomine.repository.persistence.TermRepository;
+import org.cytomine.repository.service.TermRelationCommandService;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -51,6 +54,10 @@ class TermRelationControllerTest
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private TermRelationCommandService cRUDCommandService;
+    @Mock
+    private AuthorizationVerifier authorizationVerifier;
 
     private CreateTermRelation createPayload;
     private UpdateTermRelation updatePayload;

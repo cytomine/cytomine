@@ -12,12 +12,24 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.util.StringUtils;
 
-@SpringBootApplication(scanBasePackages = {"org.cytomine.repository", "org.cytomine.common.mapper",
-    "org.cytomine.common.config.security", "org.cytomine.common.keycloak", "org.cytomine.common.serialization"})
+@SpringBootApplication(scanBasePackages = {
+    "org.cytomine.common.beans.authorization.httpclient",
+    "org.cytomine.common.beans.restclientfactory",
+    "org.cytomine.common.beans.authorization.verifier",
+    "org.cytomine.common.beans.exception.http",
+    "org.cytomine.common.config.security",
+    "org.cytomine.common.keycloak",
+    "org.cytomine.common.mapper",
+    "org.cytomine.common.security",
+    "org.cytomine.common.serialization",
+    "org.cytomine.repository",
+})
 @Import({ObjectMapperFactory.class})
 @ConfigurationPropertiesScan
+@EnableMethodSecurity
 @Slf4j
 public class RepositoryApp {
 

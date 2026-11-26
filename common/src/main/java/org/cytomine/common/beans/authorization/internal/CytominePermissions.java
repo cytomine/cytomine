@@ -1,4 +1,4 @@
-package org.cytomine.authorizationapi.config;
+package org.cytomine.common.beans.authorization.internal;
 
 import java.util.HashMap;
 import java.util.Map;

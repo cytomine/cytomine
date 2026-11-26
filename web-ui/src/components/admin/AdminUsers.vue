@@ -66,7 +66,11 @@
               <button class="button is-link is-small" @click="startUserEdition(user)">
                 {{$t('button-edit')}}
               </button>
-              <button class="button is-link is-small" @click="connectAs(user)" v-if="canConnectAs(user)">
+              <button
+                class="button is-link is-small"
+                :data-testid="'connect-as-' + user.username"
+                @click="connectAs(user)"
+                v-if="canConnectAs(user)">
                 {{$t('button-connect-as')}}
               </button>
               <button class="button is-link is-danger is-small" @click="deleteUser(user)" v-if="canDelete(user)">
@@ -148,7 +152,9 @@ export default {
       return !protectedUsers.includes(user.username);
     },
     canConnectAs(user) {
-      return user.username !== 'ImageServer1';
+      const currentUser = this.$store.state.currentUser.user;
+      return user.username !== 'ImageServer1'
+        && (!currentUser || String(user.id) !== String(currentUser.id));
     },
     connectAs(user) {
       this.$buefy.dialog.confirm({

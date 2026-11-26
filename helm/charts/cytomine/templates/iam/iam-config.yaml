@@ -22,4 +22,4 @@ data:
   KC_DB_URL_DATABASE: iam
   KC_DB_URL_HOST: postgres-iam.{{ .Release.Namespace }}.svc.cluster.local
   KC_DB_URL_PORT: "5432"
-  KC_HOSTNAME: "{{ .Values.global.domainName }}"
+  KC_HOSTNAME: "https://{{ .Values.global.domainName }}/iam"

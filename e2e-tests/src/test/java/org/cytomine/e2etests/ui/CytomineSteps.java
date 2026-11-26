@@ -750,6 +750,67 @@ public class CytomineSteps {
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.name("firstname")));
     }
 
+    public void verifyConnectAsVisible(
+        Wait<WebDriver> wait,
+        URL cytomineUrl,
+        String username,
+        String lastname,
+        boolean expected
+    ) {
+        goToAdminUsers(wait, cytomineUrl, lastname);
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//td[normalize-space(text())='" + username + "']"));
+        By connectAs = By.cssSelector("button[data-testid='connect-as-" + username + "']");
+        if (expected) {
+            webDriverUtils.byIsDisplayed(wait, connectAs);
+        } else {
+            webDriverUtils.waitUntilByEmpty(wait, connectAs);
+        }
+    }
+
+    public void connectAs(Wait<WebDriver> wait, URL cytomineUrl, String username, String lastname) {
+        goToAdminUsers(wait, cytomineUrl, lastname);
+        webDriverUtils.byClick(wait, By.cssSelector("button[data-testid='connect-as-" + username + "']"));
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector(".modal-card-foot button.is-warning"));
+        webDriverUtils.byClick(wait, By.cssSelector(".modal-card-foot button.is-warning"));
+        verifyActingAs(wait, username);
+    }
+
+    public void verifyActingAs(Wait<WebDriver> wait, String username) {
+        By banner = By.cssSelector("[data-testid='acting-as-banner']");
+        webDriverUtils.byIsDisplayed(wait, banner);
+        wait.until(d -> d.findElement(banner).getText().contains(username));
+        webDriverUtils.byIsDisplayed(wait, By.cssSelector("[data-testid='acting-as-exit']"));
+    }
+
+    public void verifyAdminMenuVisible(Wait<WebDriver> wait, boolean expected) {
+        By adminMenu = By.cssSelector("[data-testid='admin-menu']");
+        if (expected) {
+            webDriverUtils.byIsDisplayed(wait, adminMenu);
+        } else {
+            webDriverUtils.waitUntilByEmpty(wait, adminMenu);
+        }
+    }
+
+    public void exitActingAs(Wait<WebDriver> wait) {
+        webDriverUtils.byClick(wait, By.cssSelector("[data-testid='acting-as-exit']"));
+        webDriverUtils.waitUntilByEmpty(wait, By.cssSelector("[data-testid='acting-as-banner']"));
+    }
+
+    public void exitActingAsIfNeeded(Wait<WebDriver> wait) {
+        if (!wait.until(d -> d.findElements(By.cssSelector("[data-testid='acting-as-exit']"))).isEmpty()) {
+            exitActingAs(wait);
+        }
+    }
+
+    private void goToAdminUsers(Wait<WebDriver> wait, URL cytomineUrl, String search) {
+        webDriverUtils.goTo(wait, cytomineUrl.toString() + "/admin?tab=users");
+        By searchInput = By.cssSelector(".content-wrapper input[type='search']");
+        webDriverUtils.byIsDisplayed(wait, searchInput);
+        webDriverUtils.byClear(wait, searchInput);
+        webDriverUtils.bySendKeys(wait, searchInput, search);
+        webDriverUtils.byIsDisplayed(wait, By.xpath("//button[contains(text(), 'New user')]"));
+    }
+
     public void deleteUser(
         Wait<WebDriver> wait,
         URL cytomineUrl,

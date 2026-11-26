@@ -3,7 +3,11 @@
     <template v-if="facets.length">
       <h1>Metadata filters</h1>
 
-      <b-field label="Search from metadata">
+      <b-field>
+        <template #label>
+          Search from metadata
+          <span class="metadata-search-hint">{{ $t('search-exact-match-hint') }}</span>
+        </template>
         <b-input
           :value="searchString"
           @input="debounceSearchString"
@@ -160,6 +164,13 @@ export default {
 
 .metadata-filter h1 {
   margin-bottom: 1rem;
+}
+
+.metadata-search-hint {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: normal;
+  color: #7a7a7a;
 }
 
 .metadata-search-actions {

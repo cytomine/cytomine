@@ -1,6 +1,7 @@
 package org.cytomine.repository.mapper;
 
 import java.sql.Timestamp;
+import java.util.Locale;
 import java.util.Set;
 
 import org.cytomine.common.mapper.BaseMapper;
@@ -13,12 +14,18 @@ import org.cytomine.repository.persistence.entity.UserEntity;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring", uses = {BaseMapper.class, RoleMapper.class})
 public interface UserMapper {
 
     default Language mapToLanguage(String language) {
         return Language.resolve(language);
+    }
+
+    @Named("lowercaseUsername")
+    default String lowercaseUsername(String username) {
+        return username == null ? null : username.toLowerCase(Locale.ROOT);
     }
 
     @Mapping(target = "id", ignore = true)
@@ -28,6 +35,7 @@ public interface UserMapper {
     @Mapping(target = "enabled", ignore = true)
     @Mapping(target = "created", source = "now")
     @Mapping(target = "developer", source = "entity.developer")
+    @Mapping(target = "username", source = "entity.username", qualifiedByName = "lowercaseUsername")
     @BeanMapping(ignoreUnmappedSourceProperties = {"role", "password"})
     UserEntity mapToUserEntity(CreateUser entity, long userId, Timestamp now, Set<RoleEntity> roles);
 
@@ -53,7 +61,7 @@ public interface UserMapper {
     UserEntity update(UserEntity entity, String newEmail, String newName, String newFirstname, String newLastname,
         String newLanguage, String publicKey, String privateKey, String origin, boolean newDeveloper, Timestamp now);
 
-    @Mapping(target = "username", source = "replace.username")
+    @Mapping(target = "username", source = "replace.username", qualifiedByName = "lowercaseUsername")
     @Mapping(target = "name", source = "replace.name")
     @Mapping(target = "email", source = "replace.email")
     @Mapping(target = "firstname", source = "replace.firstname")

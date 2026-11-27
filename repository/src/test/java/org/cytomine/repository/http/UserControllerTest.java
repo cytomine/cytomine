@@ -3,6 +3,9 @@ package org.cytomine.repository.http;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -13,6 +16,7 @@ import org.cytomine.common.beans.authorization.verifier.AuthorizationVerifier;
 import org.cytomine.common.repository.http.UserHttpContract;
 import org.cytomine.common.repository.model.Role;
 import org.cytomine.common.repository.model.command.payload.response.ApplyCommandResponse;
+import org.cytomine.common.repository.model.command.payload.response.HttpCommandResponse;
 import org.cytomine.common.repository.model.command.payload.response.UserResponse;
 import org.cytomine.common.repository.model.user.payload.CreateUser;
 import org.cytomine.common.repository.model.user.payload.UpdateUser;
@@ -34,7 +38,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.cytomine.repository.http.SecurityMockMvcTestConfiguration.authenticatedAs;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -85,6 +92,37 @@ public class UserControllerTest implements CRUDCommandTests<CreateUser, UserResp
         var userRoleEntity = userRoleRepository.save(
             new UserRoleEntity(null, 0, role.getId(), currentId, Timestamp.from(Instant.now()), null, null));
         return Set.of(userRoleMapper.mapToUserRoleResponse(userRoleEntity));
+    }
+
+    @Test
+    public void createUserWithUppercaseUsernameStoresLowercaseUsername() throws Exception {
+        long adminId = createUser();
+        String adminUsername = getUsername(adminId);
+        String uppercaseUsername = UUID.randomUUID().toString().toUpperCase(Locale.ROOT);
+        String lowercaseUsername = uppercaseUsername.toLowerCase(Locale.ROOT);
+
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("username", uppercaseUsername);
+        payload.put("name", "Mixed Case");
+        payload.put("firstname", "Mixed");
+        payload.put("lastname", "Case");
+        payload.put("email", lowercaseUsername + "@example.test");
+        payload.put("role", Role.ROLE_USER.toString());
+        payload.put("language", "EN");
+        payload.put("isDeveloper", false);
+        payload.put("password", UUID.randomUUID().toString());
+
+        String response = mockMvc.perform(post(apiURL).with(authenticatedAs(adminUsername))
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.username").value(lowercaseUsername))
+            .andReturn().getResponse().getContentAsString();
+
+        HttpCommandResponse result = objectMapper.readValue(response, HttpCommandResponse.class);
+        assertEquals(lowercaseUsername,
+            jdbcTemplate.queryForObject("SELECT username FROM sec_user WHERE id = ?", String.class,
+                result.data().id()));
     }
 
     @Test

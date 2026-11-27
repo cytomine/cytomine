@@ -1,5 +1,6 @@
 package be.cytomine.unit.utils;
 
+import java.net.URI;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -40,8 +41,8 @@ public class PreparedRequestUtilsTests {
         pr.addPathFragment("/d");
         assertThat(pr.getPath()).isEqualTo("/a/b/c/d");
 
-        pr.addPathFragment("/dir/path,&2%3.jpg", true);
-        assertThat(pr.getPath()).isEqualTo("/a/b/c/d/dir/path%2C%262%253.jpg");
+        pr.addPathFragment("/dir/path,&2%3.jpg");
+        assertThat(pr.getPath()).isEqualTo("/a/b/c/d/dir/path,&2%3.jpg");
     }
 
     @Test
@@ -66,5 +67,25 @@ public class PreparedRequestUtilsTests {
         pr.addQueryParameter("d", null);
         pr.addQueryParameter("e", 3);
         assertThat(pr.getURI().toString()).isEqualTo("https://domain.com:10900/basepath/b/c?e=3");
+    }
+
+    @Test
+    public void pathFragmentIsEncodedOnce() {
+        PreparedRequest pr = new PreparedRequest();
+        pr.setUrl("http://pims:5000");
+        pr.addPathFragment("image");
+        pr.addPathFragment("upload-1/two words [1] café?.ndpi");
+        pr.addPathFragment("info");
+
+        URI uri = pr.getURI();
+
+        // getRawPath() is the path as it goes on the wire; getPath() is the same path decoded
+        assertThat(uri.getRawPath())
+            .isEqualTo("/image/upload-1/two%20words%20%5B1%5D%20caf%C3%A9%3F.ndpi/info");
+        assertThat(uri.getPath())
+            .isEqualTo("/image/upload-1/two words [1] café?.ndpi/info");
+
+        // nothing non-ASCII is left anywhere in the URI, query included
+        assertThat(uri.toString()).isEqualTo(uri.toASCIIString());
     }
 }

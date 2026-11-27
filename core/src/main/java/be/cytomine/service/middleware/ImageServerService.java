@@ -147,7 +147,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(image.getPath(), true);
+        request.addPathFragment(image.getPath());
         request.addPathFragment("info");
 
         return JsonObject.toMap(request.toObject(String.class));
@@ -171,7 +171,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(image.getPath(), true);
+        request.addPathFragment(image.getPath());
         request.addPathFragment("metadata");
 
         return JsonObject.toJsonObject(request.toObject(String.class))
@@ -186,7 +186,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(image.getPath(), true);
+        request.addPathFragment(image.getPath());
         request.addPathFragment("histogram");
         request.addPathFragment("per-image");
         request.addQueryParameter("n_bins", nBins);
@@ -204,7 +204,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(image.getPath(), true);
+        request.addPathFragment(image.getPath());
         request.addPathFragment("histogram");
         request.addPathFragment("per-image");
         request.addPathFragment("bounds");
@@ -264,7 +264,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("file");
-        request.addPathFragment(uploadedFile.getPath(), true);
+        request.addPathFragment(uploadedFile.getPath());
         request.addPathFragment("export");
         request.addQueryParameter("filename", uploadedFile.getOriginalFilename());
         request.getHeaders()
@@ -282,7 +282,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(abstractImage.getPath(), true);
+        request.addPathFragment(abstractImage.getPath());
         request.addPathFragment("export");
         request.addQueryParameter("filename", abstractImage.getOriginalFilename());
         request.getHeaders()
@@ -308,7 +308,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(image.getPath(), true);
+        request.addPathFragment(image.getPath());
         request.addPathFragment("info");
         request.addPathFragment("associated");
 
@@ -324,7 +324,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(image.getPath(), true);
+        request.addPathFragment(image.getPath());
         request.addPathFragment("histogram");
         request.addPathFragment("per-channels");
         request.addQueryParameter("n_bins", nBins);
@@ -341,7 +341,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(image.getPath(), true);
+        request.addPathFragment(image.getPath());
         request.addPathFragment("histogram");
         request.addPathFragment("per-channels");
         request.addPathFragment("bounds");
@@ -361,7 +361,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(slice.getPath(), true);
+        request.addPathFragment(slice.getPath());
         request.addPathFragment("histogram");
         request.addPathFragment("per-plane");
         request.addPathFragment("z");
@@ -388,7 +388,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(slice.getPath(), true);
+        request.addPathFragment(slice.getPath());
         request.addPathFragment("histogram");
         request.addPathFragment("per-plane");
         request.addPathFragment("z");
@@ -422,7 +422,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(image.getPath(), true);
+        request.addPathFragment(image.getPath());
         request.addPathFragment("associated");
         request.addPathFragment(params.getLabel().toLowerCase());
         request.addQueryParameter("length", params.getMaxSize());
@@ -466,7 +466,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.GET);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(slice.getPath(), true);
+        request.addPathFragment(slice.getPath());
         request.addPathFragment((params.getBits() != null) ? "resized" : "thumb");
 
         if (slice.getImage().getChannels() != null && slice.getImage().getChannels() > 1) {
@@ -532,7 +532,7 @@ public class ImageServerService {
         request.setUrl(this.internalImageServerURL());
 
         request.addPathFragment("image");
-        request.addPathFragment(slice.getPath(), true);
+        request.addPathFragment(slice.getPath());
         request.addPathFragment("normalized-tile");
         request.addPathFragment("zoom");
         request.addPathFragment(params.getZoom().toString());
@@ -628,7 +628,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.POST);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(slice.getPath(), true);
+        request.addPathFragment(slice.getPath());
         request.addPathFragment(getCropUri(params));
 
         JsonObject body = new JsonObject();
@@ -741,7 +741,7 @@ public class ImageServerService {
         request.setMethod(HttpMethod.POST);
         request.setUrl(this.internalImageServerURL());
         request.addPathFragment("image");
-        request.addPathFragment(slice.getPath(), true);
+        request.addPathFragment(slice.getPath());
         request.addPathFragment("window");
 
         JsonObject body = new JsonObject();

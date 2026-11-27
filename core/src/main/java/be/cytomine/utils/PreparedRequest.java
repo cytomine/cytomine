@@ -2,8 +2,6 @@ package be.cytomine.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,19 +67,8 @@ public class PreparedRequest {
 
 
     public void addPathFragment(String fragment) {
-        addPathFragment(fragment, false);
-    }
-
-    public void addPathFragment(String fragment, boolean encode) {
         if (fragment == null || fragment.isEmpty()) {
             return;
-        }
-        if (encode) {
-            // Apache reverse proxy does not support '%2F' encoding inside a path
-            // whereas pims supports both '/' and '%2F'. Therefore, we revert the
-            // encoding of the `/` to support routing through an Apache proxy.
-            // see issue cm/rnd/cytomine/core/core-ce#84
-            fragment = URLEncoder.encode(fragment, StandardCharsets.UTF_8).replace("%2F", "/");
         }
         fragment = org.apache.commons.lang3.StringUtils.strip(fragment, "/");
         this.path += "/" + fragment;
@@ -97,10 +84,14 @@ public class PreparedRequest {
 
     public URI getURI() {
         try {
-            return new URI(
+            URI uri = new URI(
                 this.scheme, null, this.host, this.port, this.path, this.getQuery(),
                 null
             );
+            // The multi-argument constructor quotes '%' and illegal ASCII characters, but
+            // leaves non-ASCII characters as they are, and RestTemplate sends toString().
+            // toASCIIString() encodes them as UTF-8 percent escapes; re-parse that.
+            return new URI(uri.toASCIIString());
         } catch (URISyntaxException e) {
             throw new ServerException(e.getMessage(), e.getCause());
         }

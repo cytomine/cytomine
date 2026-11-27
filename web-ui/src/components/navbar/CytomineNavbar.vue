@@ -34,17 +34,21 @@
         <i class="fas fa-code"></i>
         {{ $t('app-engine.applications') }}
       </router-link>
-      <router-link v-if="isAdmin" to="/admin" class="navbar-item">
+      <router-link v-if="isAdmin" to="/admin" class="navbar-item" data-testid="admin-menu">
         <i class="fas fa-wrench"></i>
         {{ $t('admin-menu') }}
       </router-link>
     </div>
 
     <div class="navbar-end">
-      <div class="navbar-item has-text-danger acting-as-label" v-if="isActing">
+      <div class="navbar-item has-text-danger acting-as-label" data-testid="acting-as-banner" v-if="isActing">
         {{$t('acting-as-banner', { username: actingUsername })}}
       </div>
-      <a class="navbar-item has-text-link acting-as-return" v-if="isActing" @click="exitActingAs">
+      <a
+        class="navbar-item has-text-link acting-as-return"
+        data-testid="acting-as-exit"
+        v-if="isActing"
+        @click="exitActingAs">
         <i class="fas fa-sign-out-alt"></i>
         {{$t('acting-as-exit', { username: actingActorUsername })}}
       </a>

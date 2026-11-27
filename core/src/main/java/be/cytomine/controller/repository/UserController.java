@@ -50,8 +50,23 @@ public class UserController {
     @PostMapping("/user.json")
     public Optional<HttpCommandResponse> create(@RequestBody CreateUser createUser) {
         log.debug("REST request to save User");
-        accountService.createAccount(toAccount(createUser));
-        return userHttpContract.create(createUser);
+        String iamId = accountService.createAccount(toAccount(createUser));
+        CreateUser userWithIamReference = new CreateUser(
+            createUser.username(),
+            createUser.name(),
+            createUser.firstname(),
+            createUser.lastname(),
+            createUser.email(),
+            createUser.origin(),
+            createUser.developer(),
+            createUser.role(),
+            createUser.language(),
+            createUser.privateKey(),
+            createUser.publicKey(),
+            createUser.password(),
+            Optional.ofNullable(iamId)
+        );
+        return userHttpContract.create(userWithIamReference);
     }
 
     private Account toAccount(CreateUser createUser) {

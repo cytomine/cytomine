@@ -20,6 +20,7 @@ import org.cytomine.common.exceptions.UserManagementException;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -45,6 +46,10 @@ import static be.cytomine.service.utils.IamRepresentationUtil.setPermanentPasswo
 @RequiredArgsConstructor
 public class AccountService {
 
+    private static final String ADMIN_ROLE = "ADMIN";
+    private static final String REALM_MANAGEMENT_CLIENT_ID = "realm-management";
+    private static final String IMPERSONATION_ROLE = "impersonation";
+
     private final Keycloak keycloak;
 
     @Value("${keycloak-client.target.client-id}")
@@ -62,7 +67,7 @@ public class AccountService {
         usersResource.delete(badAccount.getId());
     }
 
-    public void createAccount(Account account) throws UserManagementException {
+    public String createAccount(Account account) throws UserManagementException {
 
         log.info("Creating account for user {}", account.username());
         // validate account
@@ -102,6 +107,8 @@ public class AccountService {
             );
             throw new UserManagementException(ErrorCode.CORE_IAM_UNKNOWN_CREATE_ERROR.toString(), 500);
         }
+        String createdId = CreatedResponseUtil.getCreatedId(response);
+
         // Get client
         ClientRepresentation client = getClientRepresentation(realmResource, usersResource, user);
 
@@ -110,12 +117,18 @@ public class AccountService {
 
         // Assign client level roles to user
         try {
-            UserResource userResource =
-                usersResource.get(CreatedResponseUtil.getCreatedId(response));
+            UserResource userResource = usersResource.get(createdId);
             userResource.roles().clientLevel(client.getId()).add(listOfRoles);
             log.info("assigned roles for user {}", account.username());
-        } catch (WebApplicationException e) {
-            usersResource.delete(user.getId());
+            syncRealmManagementImpersonationRole(
+                realmResource,
+                userResource,
+                account.username(),
+                account.roles().contains(ADMIN_ROLE)
+            );
+        } catch (WebApplicationException | UserManagementException e) {
+            log.error("failed to assign roles to account {}, rolling back IAM account", account.username(), e);
+            usersResource.delete(createdId);
             throw new UserManagementException(
                 ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT.toString(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value()
@@ -123,6 +136,7 @@ public class AccountService {
 
         }
         log.info("Created account for user {} successfully", account.username());
+        return createdId;
     }
 
     private List<RoleRepresentation> getRoleRepresentations(
@@ -253,7 +267,12 @@ public class AccountService {
             } else {
                 userResource.roles().clientLevel(client.getId()).add(listOfRoles);
             }
-
+            syncRealmManagementImpersonationRole(
+                keycloak.realm(realm),
+                userResource,
+                account.username(),
+                account.roles().contains(ADMIN_ROLE)
+            );
 
         } catch (WebApplicationException e) {
             log.error("failed to assign roles to account {}", account.username(), e);
@@ -285,6 +304,45 @@ public class AccountService {
         }
         log.info("account roles retrieved successfully");
         return listOfRoles;
+    }
+
+    private void syncRealmManagementImpersonationRole(
+        RealmResource realmResource,
+        UserResource userResource,
+        String username,
+        boolean shouldHaveImpersonation
+    ) {
+        List<ClientRepresentation> realmManagementClients =
+            realmResource.clients().findByClientId(REALM_MANAGEMENT_CLIENT_ID);
+        if (realmManagementClients.isEmpty()) {
+            log.error(
+                "realm-management client not found; cannot synchronize impersonation role for user {}",
+                username
+            );
+            throw new UserManagementException(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ErrorCode.CORE_ROLES_NOT_ASSIGNED_TO_ACCOUNT
+            );
+        }
+
+        String realmManagementId = realmManagementClients.get(0).getId();
+        RoleScopeResource roleMapping = userResource.roles().clientLevel(realmManagementId);
+        boolean hasImpersonation = roleMapping.listAll().stream()
+            .anyMatch(role -> IMPERSONATION_ROLE.equals(role.getName()));
+
+        if (shouldHaveImpersonation == hasImpersonation) {
+            return;
+        }
+
+        RoleRepresentation impersonation = realmResource.clients().get(realmManagementId)
+            .roles().get(IMPERSONATION_ROLE).toRepresentation();
+        if (shouldHaveImpersonation) {
+            roleMapping.add(List.of(impersonation));
+            log.info("Assigned realm-management '{}' role to user {}", IMPERSONATION_ROLE, username);
+        } else {
+            roleMapping.remove(List.of(impersonation));
+            log.info("Removed realm-management '{}' role from user {}", IMPERSONATION_ROLE, username);
+        }
     }
 
     private Validation validateAccount(Account account, ValidationFor source) {

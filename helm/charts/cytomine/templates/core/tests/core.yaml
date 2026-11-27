@@ -131,6 +131,8 @@ spec:
           value: admin
         - name: CYTOMINE_URL
           value: https://{{ .Values.global.domainName }}
+        - name: CYTOMINE_API_URL
+          value: http://core.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.core.port }}
         - name: SELENIUM_URL
           value: http://localhost:4444
         - name: E2E_PARALLEL

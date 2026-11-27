@@ -15,6 +15,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.ClientsResource;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -49,8 +50,9 @@ public class PermissionsService {
         List.of("address", "phone", "offline_access", "microprofile-jwt");
     private static final List<String> WEB_ORIGINS = List.of("*");
     private static final String REALM_MANAGEMENT_CLIENT = "realm-management";
+    private static final int ADMIN_MEMBERS_PAGE_SIZE = 100;
     private static final List<String> REALM_MANAGEMENT_ROLES =
-        List.of("view-users", "manage-users", "query-users");
+        List.of("view-users", "manage-users", "query-users", "impersonation");
     private static final List<String> SUPPORTED_LOCALES = List.of("en", "fr", "es", "nl");
     private static final String DEFAULT_LOCALE = "en";
     private static final String PROFILE_CLIENT_SCOPE = "profile";
@@ -96,6 +98,7 @@ public class PermissionsService {
             ensureAdminUserIsSet(realmResource, coreClient);
             ensureRealmIsInternationalized(realmResource);
             ensureAdminHasRealmManagementRoles(realmResource);
+            ensureAllAdminUsersHaveRealmManagementRoles(realmResource, coreClient);
             applyUserProfileSchema(realmResource);
             ensureProjectsMapperIsSet(realmResource);
         }
@@ -254,6 +257,24 @@ public class PermissionsService {
         if (user == null) {
             throw new IllegalStateException("Missing Keycloak admin user " + adminUsername);
         }
+        ensureRealmManagementRoles(realmResource, user);
+    }
+
+    private void ensureAllAdminUsersHaveRealmManagementRoles(
+        RealmResource realmResource,
+        ClientResource coreClient
+    ) {
+        RoleResource adminRole = coreClient.roles().get(ADMIN_ROLE);
+        int first = 0;
+        List<UserRepresentation> page;
+        do {
+            page = adminRole.getUserMembers(first, ADMIN_MEMBERS_PAGE_SIZE);
+            page.forEach(user -> ensureRealmManagementRoles(realmResource, user));
+            first += page.size();
+        } while (page.size() == ADMIN_MEMBERS_PAGE_SIZE);
+    }
+
+    private void ensureRealmManagementRoles(RealmResource realmResource, UserRepresentation user) {
         ClientRepresentation realmManagement = realmResource.clients().findByClientId(REALM_MANAGEMENT_CLIENT).stream()
             .findFirst().orElse(null);
         if (realmManagement == null) {
@@ -272,7 +293,7 @@ public class PermissionsService {
         }
         userResource.roles().clientLevel(realmManagement.getId()).add(missing);
         log.info("Assigned realm-management roles {} to user '{}'",
-            missing.stream().map(RoleRepresentation::getName).toList(), adminUsername);
+            missing.stream().map(RoleRepresentation::getName).toList(), user.getUsername());
     }
 
     private void applyUserProfileSchema(RealmResource realmResource) {

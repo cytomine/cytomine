@@ -218,6 +218,17 @@ jobs:
         run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
           -c selenium
 
+      - name: Logs platform services
+        if: failure()
+        run: |
+          mkdir -p ./test-results/service-logs
+          for app in core iam repository web-ui; do
+            echo "::group::$app logs"
+            kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs deployment/$app --all-containers --timestamps \
+              | tee ./test-results/service-logs/$app.log || true
+            echo "::endgroup::"
+          done
+
       - name: Export test results
         if: always()
         run: |

@@ -1,7 +1,7 @@
 <template>
   <div class="metadata-filter">
     <template v-if="facets.length">
-      <h1>Metadata filters</h1>
+      <h1>{{ $t('metadata-filters') }}</h1>
 
       <b-field>
         <template #label>

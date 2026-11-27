@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -776,6 +777,7 @@ public class UserService extends ModelService {
                 json.put("user", currentUser.id());
                 json.put("origin", "ADMINISTRATOR");
             }
+            normalizeUsername(json);
             Account account = new Account(json.getJSONAttrStr("username"), json.getJSONAttrStr("lastname"),
                 json.getJSONAttrStr("firstname"), json.getJSONAttrStr("password"), json.getJSONAttrStr("email"), true,
                 json.getJSONAttrBoolean("isDeveloper", false), json.getJSONAttrStr("language").toLowerCase(),
@@ -799,6 +801,7 @@ public class UserService extends ModelService {
     public CommandResponse update(CytomineDomain domain, JsonObject jsonNewData, Transaction transaction) {
         UserResponse currentUser = currentUserService.getCurrentUser();
         securityACLService.checkIsCreator((User) domain, currentUser);
+        normalizeUsername(jsonNewData);
         Account account = new Account(jsonNewData.getJSONAttrStr("username"), jsonNewData.getJSONAttrStr("lastname"),
             jsonNewData.getJSONAttrStr("firstname"), jsonNewData.getJSONAttrStr("password"),
             jsonNewData.getJSONAttrStr("email"), true, jsonNewData.getJSONAttrBoolean("isDeveloper", false),
@@ -806,6 +809,13 @@ public class UserService extends ModelService {
             List.of(jsonNewData.getJSONAttrStr("role").substring(5)));
         accountService.update(account);
         return executeCommand(new EditCommand(currentUser.id(), null), domain, jsonNewData);
+    }
+
+    private static void normalizeUsername(JsonObject json) {
+        String username = json.getJSONAttrStr("username");
+        if (username != null) {
+            json.put("username", username.toLowerCase(Locale.ROOT));
+        }
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.cytomine.common.repository.model.user.payload;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
@@ -7,4 +8,9 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 public record CreateUser(String username, Optional<String> name, Optional<String> firstname, Optional<String> lastname,
                          String email, Optional<String> origin, @JsonAlias("isDeveloper") boolean developer,
                          String role, String language, Optional<String> privateKey, Optional<String> publicKey,
-                         String password, Optional<String> reference) {}
+                         String password, Optional<String> reference) {
+
+    public CreateUser {
+        username = username == null ? null : username.toLowerCase(Locale.ROOT);
+    }
+}

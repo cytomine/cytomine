@@ -169,6 +169,15 @@ public class CoreApiClient {
         }
     }
 
+    public ApiResponse currentUser(String token) {
+        HttpRequest request = authorized(
+            HttpRequest.newBuilder(coreUri("/api/user/current.json")),
+            token
+        ).GET().timeout(Duration.ofSeconds(60)).build();
+        HttpResponse<String> response = send(request);
+        return new ApiResponse(response.statusCode(), jsonOrEmpty(response.body()), response.body());
+    }
+
     public ApiResponse connectAs(String adminToken, long targetUserId) {
         HttpRequest request = authorized(
             HttpRequest.newBuilder(coreUri("/api/user/" + targetUserId + "/connect-as.json")),

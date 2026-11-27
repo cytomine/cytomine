@@ -1,6 +1,7 @@
 package org.cytomine.e2etests.api;
 
 import java.time.Duration;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
 
@@ -38,6 +39,33 @@ public class ConnectAsApiTests {
 
     @Value("${cytomine.admin.password}")
     String adminPassword;
+
+    @Test
+    void userCreatedWithUppercaseUsernameCanLogIn() {
+        String suffix = UUID.randomUUID().toString().substring(0, 8);
+        String username = "Selenium-Upper-" + suffix;
+        String adminToken = api.passwordToken(adminUsername, adminPassword);
+        long userId = 0;
+
+        try {
+            userId = api.createUser(adminToken, username, PASSWORD, Role.ROLE_USER);
+
+            String token = api.passwordToken(username, PASSWORD);
+            ApiResponse currentUser = api.currentUser(token);
+            assertEquals(
+                200,
+                currentUser.status(),
+                () -> "Unable to get current user after login: " + currentUser.rawBody()
+            );
+            assertEquals(
+                username.toLowerCase(Locale.ROOT),
+                currentUser.body().path("username").asText()
+            );
+        } finally {
+            deleteQuietly(adminToken, userId);
+            deleteIamUserQuietly(username.toLowerCase(Locale.ROOT));
+        }
+    }
 
     @Test
     void newAdminGetsImpersonationAndCanConnectAsAnotherUser() {

@@ -20,6 +20,7 @@ import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.Index;
 import com.meilisearch.sdk.SearchRequest;
 import com.meilisearch.sdk.exceptions.MeilisearchException;
+import com.meilisearch.sdk.model.MatchingStrategy;
 import com.meilisearch.sdk.model.SearchResult;
 import com.meilisearch.sdk.model.SearchResultPaginated;
 import com.meilisearch.sdk.model.Searchable;
@@ -238,7 +239,8 @@ public class MeiliSearchService {
         String projectName,
         List<Long> storageIds
     ) {
-        SearchRequest searchRequest = new SearchRequest(query != null ? query : "");
+        SearchRequest searchRequest = new SearchRequest(query != null ? query : "")
+            .setMatchingStrategy(MatchingStrategy.ALL);
 
         List<String> allFilters = new ArrayList<>(filters);
         if (projectName != null && !projectName.isBlank()) {

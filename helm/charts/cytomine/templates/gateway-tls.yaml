@@ -3,7 +3,8 @@
 {{- $secretData := (get $secretObj "data") | default dict }}
 {{- $existingCrt := get $secretData "tls.crt" }}
 {{- $existingKey := get $secretData "tls.key" }}
-{{- $cert := genSelfSignedCert .Values.global.domainName nil (list .Values.global.domainName) 3650 }}
+{{- $domainName := required "global.domainName is required" .Values.global.domainName }}
+{{- $cert := genSelfSignedCert $domainName nil (list $domainName) 3650 }}
 apiVersion: v1
 kind: Secret
 metadata:

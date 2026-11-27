@@ -209,12 +209,12 @@ jobs:
         run: kubectl get events --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} --sort-by='.lastTimestamp'
 
       - name: Logs e2e tests results - e2e-tests pod
-        if: always()
+        if: failure()
         run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
           -c e2e-tests
 
       - name: Logs e2e tests results - selenium pod
-        if: always()
+        if: failure()
         run: kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} logs e2e-tests
           -c selenium
 
@@ -230,7 +230,7 @@ jobs:
           done
 
       - name: Export test results
-        if: always()
+        if: failure()
         run: |
           kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} delete pod e2e-tests --wait=true --timeout=60s
           kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} apply -f .github/workflows/tests/export-pod.yaml
@@ -239,7 +239,7 @@ jobs:
           kubectl --namespace=cytomine-${{ env.DEPLOYMENT_NAME }} cp export-test-results:/reports/e2e-tests/build/reports ./test-results/build/ -c exporter
 
       - name: Upload helm test results
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: helm-test-results

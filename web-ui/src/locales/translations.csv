@@ -535,6 +535,7 @@ medium,Medium,Moyen,Mediana,Medium
 members,Members,Membres,Miembros,Leden
 members-activity,Members activity,Activité des membres,Actividad de miembros,Leden activiteit
 merged-channels,Merged channels,Canaux fusionnés,,Samengevoegde kanalen
+metadata-filters,Metadata filters,Filtres de métadonnées,Filtros de metadatos,Metadatafilters
 min-max,Min/Max,Min/Max,,Min/Max
 minimum,Minimum,Minimum,Mínimo,Minimum
 mm,mm,mm,mm,mm
@@ -940,6 +941,8 @@ sample-preview,Sample preview,Aperçu de l'image,Vista previa de muestra,Afbeeld
 sample-preview-of,Sample preview of {filename},Aperçu de l'image {filename},Vista previa de muestra de {filename},Afbeeldingsvoorbeeld {filename}
 saturation,Saturation,Saturation,Saturación,Verzadiging
 screenshot,Screenshot current image view,Capture d'écran de l'image actuelle,,Screenshot van de huidige afbeelding
+search-exact-match-hint,"Tip: wrap your search in double quotes for an exact match, e.g. ""IMAGE_123"".","Astuce : placez votre recherche entre guillemets doubles pour une correspondance exacte, par ex. ""IMAGE_123"".","Consejo: escriba su búsqueda entre comillas dobles para una coincidencia exacta, p. ej. ""IMAGE_123"".","Tip: zet uw zoekopdracht tussen dubbele aanhalingstekens voor een exacte overeenkomst, bijv. ""IMAGE_123""."
+search-from-metadata,Search from metadata,Rechercher dans les métadonnées,Buscar en los metadatos,Zoeken in metadata
 search-or-create-tag,Search tag (or create a new one by typing its name and pressing Enter)...,Rechercher un tag (ou créer un nouveau en entrant son nom suivi de la touche Enter)...,Busque la etiqueta (o cree una nueva escribiendo su nombre y presionando Enter) ...,Zoek naar een tag (of maak een nieuwe aan door de naam in te voeren gevolgd door de Enter-toets)...
 search-placeholder,Search,Recherche,Buscar,Zoeken
 search-similar-annotation,Search for similar annotations,Recherche d'annotations similaires,Buscar anotaciones similares,Zoeken naar soortgelijke annotaties

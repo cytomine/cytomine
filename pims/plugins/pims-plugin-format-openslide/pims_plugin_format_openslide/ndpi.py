@@ -1,4 +1,3 @@
-
 from pyvips import Image as VipsImage
 from tifffile import astype
 
@@ -35,7 +34,7 @@ class NDPIParser(TifffileParser):
             # Comments tag (65449): ASCII key=value pairs (not always present)
             lines = comments.split('\n')
             for line in lines:
-                key, sep, value = line.partition("=")   # was: key, value = line.split("=")
+                key, sep, value = line.partition("=")
                 if not sep:
                     continue
                 tags[key.strip()] = astype(value.strip())

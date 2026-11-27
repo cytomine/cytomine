@@ -5,7 +5,7 @@
 
       <b-field>
         <template #label>
-          Search from metadata
+          {{ $t('search-from-metadata') }}
           <span class="metadata-search-hint">{{ $t('search-exact-match-hint') }}</span>
         </template>
         <b-input

@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: e2e-tests-reports-reader
+  labels:
+spec:
+  volumes:
+    - name: workspace
+      persistentVolumeClaim:
+        claimName: e2e-test-reports
+  containers:
+    - name: e2e-tests-reports-reader
+      image: ubuntu
+      command:
+        - sleep
+        - '604800'
+      volumeMounts:
+        - name: workspace
+          mountPath: /workspace
+  restartPolicy: Never

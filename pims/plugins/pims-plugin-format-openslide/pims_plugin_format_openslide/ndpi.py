@@ -1,4 +1,3 @@
-from posixpath import sep
 
 from pyvips import Image as VipsImage
 from tifffile import astype
